@@ -314,6 +314,8 @@ public:
 
     void ensureRaisedConeItem(QnResourceWidget *widget);
 
+    QRectF raisedGeometry(QnResourceWidget *widget) const;
+
     QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
 
 public slots:

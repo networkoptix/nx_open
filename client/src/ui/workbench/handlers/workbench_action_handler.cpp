@@ -1147,7 +1147,9 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QUrl url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
-    QDesktopServices::openUrl(url);
+    url.setScheme(lit("http"));
+    url.setPath(lit("/static/index.html"));
+    QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1514,8 +1516,9 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
     QUrl url = server->getApiUrl();
     url.setScheme(lit("http"));
-    url.setPath(lit("/api/showLog"));
+    url.setPath(lit("/static/index.html"));
     url.setQuery(lit("lines=1000"));
+    url.setFragment(lit("/log")); // add hashtag postfix. It's required for our web page java script
     
     //setting credentials for access to resource
     url.setUserName(QnAppServerConnectionFactory::url().userName());
@@ -1722,9 +1725,8 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         }
         if (modified.isEmpty())
             return; // very strange outcome - at least camera should be in the list
-        const QList<QnUuid>& idList = idListFromResList(modified);
-        connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idList),
+        
+        connection2()->getCameraManager()->save(modified,
             this, 
             [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
                 at_resources_saved( reqID, errorCode, modified );
@@ -1732,7 +1734,6 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
                     foreach (const QnVirtualCameraResourcePtr &camera, modified)
                         camera->setGroupName(oldName);
             } );
-        propertyDictionary->saveParamsAsync(idList);
     } else {
         if (!validateResourceName(resource, name))
             return;

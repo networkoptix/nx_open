@@ -4,6 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <signal.h>
+#ifdef __linux__
+#include <signal.h>
+#endif
 
 #include <qtsinglecoreapplication.h>
 #include "qtservice.h"
@@ -172,6 +175,7 @@
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
+#include "network/universal_request_processor.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -185,6 +189,8 @@ static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
 static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 static const QByteArray AUTH_KEY("authKey");
+static const QByteArray APPSERVER_PASSWORD("appserverPassword");
+static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -235,8 +241,7 @@ public:
 #else
             lit("INFO")
 #endif
-        ),
-        msgLogLevel( lit("none") )
+        )
     {
     }
 };
@@ -684,6 +689,11 @@ int serverMain(int argc, char *argv[])
 
     initLog(cmdLineArguments.logLevel);
 
+    if( cmdLineArguments.msgLogLevel.isEmpty() )
+        cmdLineArguments.msgLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::HTTP_MSG_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL ).toString();
+
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
             dataLocation + QLatin1String("/log/http_log"),
@@ -788,7 +798,7 @@ void initAppServerConnection(QSettings &settings)
 
     // TODO: Actually appserverPassword is always empty. Remove?
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
-    QString password = settings.value("appserverPassword", QLatin1String("")).toString();
+    QString password = settings.value(APPSERVER_PASSWORD, QLatin1String("")).toString();
     QByteArray authKey = settings.value(AUTH_KEY).toByteArray();
     QString appserverHostString = settings.value("appserverHost").toString();
     if (!authKey.isEmpty() && !isLocalAppServer(appserverHostString))
@@ -1316,6 +1326,7 @@ bool QnMain::initTcpListener()
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
+    QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"));
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
@@ -1467,7 +1478,8 @@ void QnMain::run()
 
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
-    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("")).toString());
+    qnCommon->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
+    qnCommon->setUseLowPriorityAdminPasswordHach(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
 
     qnCommon->setAdminPasswordData(settings->value(ADMIN_PSWD_HASH).toByteArray(), settings->value(ADMIN_PSWD_DIGEST).toByteArray());
 
@@ -1533,7 +1545,7 @@ void QnMain::run()
         MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
-        MSSettings::roSettings()->setValue("appserverPassword", "");
+        MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
         MSSettings::roSettings()->sync();
 
@@ -1545,6 +1557,7 @@ void QnMain::run()
     }
     settings->remove(ADMIN_PSWD_HASH);
     settings->remove(ADMIN_PSWD_DIGEST);
+    settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
@@ -1725,12 +1738,11 @@ void QnMain::run()
     }
 
     /* This key means that password should be forcibly changed in the database. */
-    const QString passwordChangeKey = "appserverPassword";
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->setValue(passwordChangeKey, "");
+    MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
 #ifdef _DEBUG
     MSSettings::roSettings()->sync();
-    Q_ASSERT_X(MSSettings::roSettings()->value(passwordChangeKey).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
+    Q_ASSERT_X(MSSettings::roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
     if (needToStop()) {
@@ -2284,6 +2296,12 @@ void changePort(quint16 port)
 
 static void printVersion();
 
+#ifdef __linux__
+void SIGUSR1_handler(int)
+{
+    //doing nothing. Need this signal only to interrupt some blocking calls
+}
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -2302,6 +2320,10 @@ int main(int argc, char* argv[])
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
     _tzset();
+#endif
+
+#ifdef __linux__
+    signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
     //parsing command-line arguments

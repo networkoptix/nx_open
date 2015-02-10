@@ -81,6 +81,16 @@ QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
     return QnUuid();
 }
 
+QnRoutePoint QnRouter::enforcedConnection() const {
+    QMutexLocker lk(&m_mutex);
+    return m_routeBuilder->enforcedConnection();
+}
+
+void QnRouter::setEnforcedConnection(const QnRoutePoint &enforcedConnection) {
+    QMutexLocker lk(&m_mutex);
+    m_routeBuilder->setEnforcedConnection(enforcedConnection);
+}
+
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
     Endpoint endpoint(moduleInformation.id, url.host(), url.port());
 

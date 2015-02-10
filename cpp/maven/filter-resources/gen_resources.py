@@ -35,7 +35,13 @@ def execute(command):
     else:
         raise Exception(command, exitCode, output)
 
-def genqrc(qrcname, qrcprefix, pathes, extensions, exclusion, additions=''):
+def fileIsAllowed(file, exclusions):
+    for exclusion in exclusions:
+        if file.endswith(exclusion):
+            return False
+    return True
+        
+def genqrc(qrcname, qrcprefix, pathes, exclusions, additions=''):
     os.path = posixpath
 
     qrcfile = open(qrcname, 'w')
@@ -49,9 +55,8 @@ def genqrc(qrcname, qrcprefix, pathes, extensions, exclusion, additions=''):
             parent = root[len(path) + 1:]
         
             for f in files:
-                for extension in extensions:
-                    if f.endswith(extension) and not f.endswith(exclusion):
-                        print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
+                if fileIsAllowed(f, exclusions):
+                    print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
   
     print >> qrcfile, additions
     print >> qrcfile, '</qresource>'
@@ -127,7 +132,8 @@ if __name__ == '__main__':
                     else:
 	                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
-    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], [''],'vmsclient.png')  
+    exceptions = ['vmsclient.png', '.ai', '.svg', '.profile']
+    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], exceptions)  
     
     if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
         f = open(output_pro_file, "w")

@@ -329,6 +329,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 				delete dataProvider;
 			} else
 			{
+                reader->setOwner(this);
 				if ( role ==  Qn::CR_LiveVideo )
 					connect(reader->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
 					
@@ -341,6 +342,16 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 			}			
 		}
     }
+}
+
+QnLiveStreamProviderPtr QnVideoCamera::getPrimaryReader()
+{
+    return getLiveReader(QnServer::HiQualityCatalog);
+}
+
+QnLiveStreamProviderPtr QnVideoCamera::getSecondaryReader()
+{
+    return getLiveReader(QnServer::LowQualityCatalog);
 }
 
 QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog catalog)

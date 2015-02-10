@@ -564,13 +564,13 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const 
     return text;
 }
 
-void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
+void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
 {
     if (catalog) {
-        cameras << catalog->getTimePeriods(startTime, endTime, detailLevel);
-        if (!cameras.last().isEmpty())
+        periods << catalog->getTimePeriods(startTime, endTime, detailLevel);
+        if (!periods.last().isEmpty())
         {
-            QnTimePeriod& lastPeriod = cameras.last().last();
+            QnTimePeriod& lastPeriod = periods.last().last();
             bool isActive = !camera->hasFlags(Qn::foreigner) && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
             if (lastPeriod.durationMs == -1 && !isActive)
             {
@@ -1278,17 +1278,17 @@ void QnStorageManager::backupFolderRecursive(const QString& srcDir, const QStrin
     }
 }
 
-void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalog)
+void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType)
 {
     QString base = closeDirPath(getDataDirectory());
     QString separator = getPathSeparator(base);
     backupFolderRecursive(base + lit("record_catalog"), base + lit("record_catalog_backup"));
-    QDir dir(base + QString("record_catalog") + separator + QString("media") + separator + DeviceFileCatalog::prefixByCatalog(catalog));
+    QDir dir(base + QString("record_catalog") + separator + QString("media") + separator + DeviceFileCatalog::prefixByCatalog(catalogType));
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     for(QFileInfo fi: list)
     {
         QByteArray mac = fi.fileName().toUtf8();
-        DeviceFileCatalogPtr catalogFile = getFileCatalogInternal(mac, catalog);
+        DeviceFileCatalogPtr catalogFile(new DeviceFileCatalog(mac, catalogType));
         QString catalogName = closeDirPath(fi.absoluteFilePath()) + lit("title.csv");
         QVector<DeviceFileCatalog::Chunk> notMigratedChunks;
         if (catalogFile->fromCSVFile(catalogName)) 
@@ -1298,7 +1298,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalog)
                 QnStorageResourcePtr storage = findStorageByOldIndex(chunk.storageIndex);
                 QnStorageDbPtr sdb = storage ? getSDB(storage) : QnStorageDbPtr();
                 if (sdb)
-                    sdb->addRecord(mac, catalog, chunk);
+                    sdb->addRecord(mac, catalogType, chunk);
                 else
                     notMigratedChunks << chunk;
             }

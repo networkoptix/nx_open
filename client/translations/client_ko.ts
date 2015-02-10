@@ -21,7 +21,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="94"/>
         <source>GPU Information</source>
-        <translation>GUP 정보</translation>
+        <translation>GPU 정보</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="125"/>
@@ -31,7 +31,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="156"/>
         <source>Support</source>
-        <translation type="unfinished"></translation>
+        <translation>지원</translation>
     </message>
 </context>
 <context>
@@ -192,27 +192,27 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="143"/>
         <source>S&amp;tart IP:</source>
-        <translation>시&amp;작 IP:</translation>
+        <translation>시작 IP(&amp;T):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="160"/>
         <source>&amp;End IP:</source>
-        <translation>&amp;끝 IP:</translation>
+        <translation>종료 IP(&amp;E):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="183"/>
         <source>S&amp;ubnet scan</source>
-        <translation>서&amp;브넷 검색</translation>
+        <translation>서브넷 검색 (&amp;u)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="209"/>
         <source>&amp;Login:</source>
-        <translation>&amp;로그인:</translation>
+        <translation>로그인(&amp;L):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="244"/>
         <source>&amp;Password:</source>
-        <translation>&amp;비밀번호:</translation>
+        <translation>비밀번호(&amp;P):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="320"/>
@@ -227,7 +227,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="343"/>
         <source>&amp;Discovery Port:</source>
-        <translation>&amp;검색 포트:</translation>
+        <translation>검색 포트(&amp;D):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="495"/>
@@ -237,7 +237,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="524"/>
         <source>&amp;Scan</source>
-        <translation>&amp;찾기</translation>
+        <translation>찾기(&amp;S)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="488"/>
@@ -287,7 +287,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="557"/>
         <source>&amp;Add selected</source>
-        <translation>&amp;추가 선택</translation>
+        <translation>추가 선택(&amp;A)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="564"/>
@@ -300,27 +300,27 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="27"/>
         <source>Advanced settings for this camera cannot be loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>이 카메라의 고급 설정을 사용할 수 없습니다</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="41"/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>이 카메라는 고급 설정을 지원하지 않습니다</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="116"/>
         <source>Warning: all changes are applied instantly</source>
-        <translation type="unfinished"></translation>
+        <translation>주의:모든 변경 내용은 바로 적용됩니다 </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="131"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>카테고리</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="172"/>
         <source>about:blank</source>
-        <translation type="unfinished"></translation>
+        <translation>상세 </translation>
     </message>
 </context>
 <context>
@@ -328,7 +328,7 @@
     <message>
         <location filename="../src/camera/camera_diagnose_tool.cpp" line="160"/>
         <source>No connection to Server %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 서버를 접속할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -357,112 +357,112 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="17"/>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished">설명서를 읽고 리스크를 이해</translation>
+        <translation>설명서를 읽고 리스크의 이해 필요</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="30"/>
         <source>Camera Settings Control</source>
-        <translation type="unfinished">카메라 설정 조정</translation>
+        <translation>카메라 설정 조정</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="36"/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished">카메라 스트림과 프로파일 설정 유지</translation>
+        <translation>카메라 스트림과 프로파일 설정 유지</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="49"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
+        <translation>주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="69"/>
         <source>Secondary Stream Control</source>
-        <translation type="unfinished">보조 스트림 제어</translation>
+        <translation>보조 스트림 제어</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="75"/>
         <source>Override secondary stream quality</source>
-        <translation type="unfinished"></translation>
+        <translation>보조 스트림의 화질 조정</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="107"/>
         <source>Don&apos;t use</source>
-        <translation type="unfinished">사용안함</translation>
+        <translation>사용안함</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="127"/>
         <source>Low quality</source>
-        <translation type="unfinished">저화질</translation>
+        <translation>저화질</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="150"/>
         <source>Medium quality</source>
-        <translation type="unfinished">일반화질</translation>
+        <translation>일반화질</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="173"/>
         <source>High quality</source>
-        <translation type="unfinished">고화질</translation>
+        <translation>고화질</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="192"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;주의! 저화질은 낮은 해상도의 이미지가 될 수 있습니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;주의! 저 화질 설정은 낮은 해상도 이미지의 원인이 될 수 있습니다. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message utf8="true">
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="199"/>
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>주의! 고 화질 설정은 서버의 CPU 과부하, 네트워크 연결 오류 및 기타 문제의 원인이 될 수 있습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="219"/>
         <source>Archive control</source>
-        <translation type="unfinished"></translation>
+        <translation>저장 제어</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="225"/>
         <source>Do not archive primary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>주 스트림을 저장하지 않음</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="232"/>
         <source>Do not archive secondary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>보조 스트림을 저장하지 않음</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="242"/>
         <source>Media streaming control</source>
-        <translation type="unfinished"></translation>
+        <translation>미디어 스트리밍 제어</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="248"/>
         <source>RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>RTP 전송:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="256"/>
         <source>Auto</source>
-        <translation type="unfinished">자동</translation>
+        <translation>자동</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="261"/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="266"/>
         <source>UDP</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="327"/>
         <source>Warning! Please read documentation before changing these settings!</source>
-        <translation type="unfinished">주의! 이 설정을 사용하기 전 사용설명서를 반드시 참고하시기 바랍니다.!</translation>
+        <translation>주의! 이 설정을 사용하기 전 사용설명서를 반드시 참고하시기 바랍니다.!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="347"/>
         <source>Restore Defaults</source>
-        <translation type="unfinished">초기화 복구</translation>
+        <translation>초기값 복구</translation>
     </message>
 </context>
 <context>
@@ -496,12 +496,12 @@
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="30"/>
         <source>Allow system to optimize camera settings (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 자동 설정 허용(권장)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="43"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
+        <translation>주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
     </message>
 </context>
 <context>
@@ -509,12 +509,12 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui" line="32"/>
         <source>&amp;Output ID:</source>
-        <translation>&amp;출력 ID:</translation>
+        <translation>출력 ID(&amp;O):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui" line="45"/>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation>&amp;자동-리셋 시간:</translation>
+        <translation>자동-리셋 시간 (&amp;A):</translation>
     </message>
 </context>
 <context>
@@ -597,28 +597,28 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="429"/>
         <source>Fixed Archive Length</source>
-        <translation type="unfinished"></translation>
+        <translation>녹화 범위 설정</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="447"/>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="491"/>
         <source>Auto</source>
-        <translation type="unfinished">자동</translation>
+        <translation>자동</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="467"/>
         <source>Warning! High value may prevent other cameras from recording!</source>
-        <translation type="unfinished"></translation>
+        <translation>주의! 높은 값은 다른카메라의 저장에 영향을 줄 수 있습니다!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="513"/>
         <source>Min days:</source>
-        <translation type="unfinished"></translation>
+        <translation>최소 저장일:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="520"/>
         <source>Max days:</source>
-        <translation type="unfinished"></translation>
+        <translation>최대 저장일:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="534"/>
@@ -670,7 +670,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="250"/>
         <source>Could not cancel installation</source>
-        <translation>설치를 취소할 수 없습니다.</translation>
+        <translation>설치를 취소할 수 없습니다</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="259"/>
@@ -680,7 +680,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="277"/>
         <source>Installation has been cancelled</source>
-        <translation>설치가 취소되었습니다.</translation>
+        <translation>설치가 취소되었습니다</translation>
     </message>
 </context>
 <context>
@@ -688,17 +688,17 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="14"/>
         <source>Save connection as...</source>
-        <translation type="unfinished">연결 저장...</translation>
+        <translation>연결 저장...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="26"/>
         <source>Enter name:</source>
-        <translation type="unfinished">이름 입력:</translation>
+        <translation>이름 입력:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="36"/>
         <source>Save password</source>
-        <translation type="unfinished"></translation>
+        <translation>비밀번호 저장</translation>
     </message>
 </context>
 <context>
@@ -762,7 +762,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui" line="268"/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 서버가 오프라인 상태입니다. 로그를 사용할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -803,7 +803,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="45"/>
         <source>&amp;Browse...</source>
-        <translation>&amp;찾기...</translation>
+        <translation>찾기(&amp;B)...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="55"/>
@@ -813,17 +813,17 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="81"/>
         <source>&amp;Add...</source>
-        <translation>&amp;추가...</translation>
+        <translation>추가(&amp;A)...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="91"/>
         <source>&amp;Remove</source>
-        <translation>&amp;삭제</translation>
+        <translation>삭제(&amp;R)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="149"/>
         <source>Auto pause video:</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 정지 설정:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="140"/>
@@ -854,12 +854,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="239"/>
         <source>Double buffering:</source>
-        <translation type="unfinished"></translation>
+        <translation>추가 버퍼링:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="277"/>
         <source>Disable only if the client takes too much CPU.</source>
-        <translation type="unfinished"></translation>
+        <translation>클라이언트가 너무 많은 CPU를 사용하는 경우 사용하지 않음.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="302"/>
@@ -882,72 +882,72 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="17"/>
         <source>Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>관리</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="29"/>
         <source>&amp;Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>알람/이벤트 정책(&amp;A)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="32"/>
         <source>Ctrl+E</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+E</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="45"/>
         <source>&amp;Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>이벤트 로그(&amp;E)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="48"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="55"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;알람/이벤트 정책 관리 열기 (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="62"/>
         <source>&amp;Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 목록(&amp;C)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="65"/>
         <source>Ctrl+M</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+M</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="72"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;이벤트 로그 열기 (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="79"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;카메라 목록 열기 (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="86"/>
         <source>&amp;Health Monitoring</source>
-        <translation type="unfinished"></translation>
+        <translation>상태 보기(&amp;H)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="93"/>
         <source>Open all servers statistics on one layout</source>
-        <translation type="unfinished"></translation>
+        <translation>하나의 레이아웃에 모든 서버의 통계 열기</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="103"/>
         <source>Camera Management</source>
-        <translation type="unfinished">카메라 조정</translation>
+        <translation>카메라 조정</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="115"/>
         <source>System Configuration Backup and Restore</source>
-        <translation type="unfinished">시스템 구성 백업 및 복원</translation>
+        <translation>시스템 설정 백업 및 복원</translation>
     </message>
 </context>
 <context>
@@ -1036,7 +1036,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="14"/>
         <source>Layout Settings</source>
-        <translation type="unfinished">레이아웃 설정</translation>
+        <translation>레이아웃 설정</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="20"/>
@@ -1076,12 +1076,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="163"/>
         <source>&amp;Crop to monitor aspect ratio</source>
-        <translation>&amp;모니터에 맞춰 비율 조정</translation>
+        <translation>모니터에 맞춰 비율 조정(&amp;C)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="175"/>
         <source>&amp;Width:</source>
-        <translation>&amp;너비:</translation>
+        <translation>너비(&amp;W):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="188"/>
@@ -1092,12 +1092,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="204"/>
         <source>&amp;Height:</source>
-        <translation>&amp;높이:</translation>
+        <translation>높이(&amp;H):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="233"/>
         <source>&amp;Opacity:</source>
-        <translation>&amp;투명도:</translation>
+        <translation>투명도(&amp;H):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="246"/>
@@ -1115,32 +1115,32 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="23"/>
         <source>License Details</source>
-        <translation type="unfinished">인증키 정보</translation>
+        <translation>인증키 정보</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="35"/>
         <source>Generic</source>
-        <translation type="unfinished"></translation>
+        <translation>일반</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="43"/>
         <source>License Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>인증키 방식:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="57"/>
         <source>License Key:</source>
-        <translation type="unfinished">인증키:</translation>
+        <translation>인증키:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="71"/>
         <source>Locked to Hardware ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>하드웨어 ID 잠금:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="86"/>
         <source>Features</source>
-        <translation type="unfinished"></translation>
+        <translation>기능</translation>
     </message>
 </context>
 <context>
@@ -1153,7 +1153,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="44"/>
         <source>Remove</source>
-        <translation type="unfinished">제거</translation>
+        <translation>제거</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="51"/>
@@ -1209,28 +1209,28 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="78"/>
         <source>Paste from Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>클립보드 붙여넣기</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="87"/>
         <source>License key is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>인증키 오류</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="156"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>클립보드 복사</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="174"/>
         <source>Select license file...</source>
-        <translation type="unfinished"></translation>
+        <translation>인증 파일 선택...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="220"/>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="233"/>
         <source>License will be bound to the current server</source>
-        <translation type="unfinished"></translation>
+        <translation>인증키는 현재 서버에 사용됩니다</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="223"/>
@@ -1249,7 +1249,7 @@ Short for &quot;seconds&quot;</extracomment>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="68"/>
         <source>Connect to Server</source>
         <comment>Groupbox Title</comment>
-        <translation type="unfinished"></translation>
+        <translation>서버 연결</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="92"/>
@@ -1264,37 +1264,37 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="108"/>
         <source>&amp;Connection options:</source>
-        <translation>&amp;접속 옵션:</translation>
+        <translation>접속 옵션(&amp;C):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="120"/>
         <source>&amp;Host:</source>
-        <translation>&amp;호스트:</translation>
+        <translation>호스트(&amp;H):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="240"/>
         <source>P&amp;ort:</source>
-        <translation>포&amp;트:</translation>
+        <translation>포트(&amp;o):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="130"/>
         <source>&amp;Login:</source>
-        <translation>&amp;로그인:</translation>
+        <translation>로그인(&amp;L):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="159"/>
         <source>&amp;Password:</source>
-        <translation>&amp;비밀번호:</translation>
+        <translation>비밀번호(&amp;P):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="212"/>
         <source>&amp;Test</source>
-        <translation>&amp;테스트</translation>
+        <translation>테스트(&amp;T)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="267"/>
         <source>&amp;Auto-Login</source>
-        <translation>&amp;자동-로그인</translation>
+        <translation>자동-로그인(&amp;A)</translation>
     </message>
 </context>
 <context>
@@ -1302,111 +1302,112 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="20"/>
         <source>Look and Feel</source>
-        <translation type="unfinished">화면 설정</translation>
+        <translation>화면 설정</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="46"/>
         <source>Timeline mode:</source>
-        <translation type="unfinished">시간 기준:</translation>
+        <translation>시간 표기 기준:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="53"/>
         <source>Language:</source>
-        <translation type="unfinished">언어:</translation>
+        <translation>언어:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="63"/>
         <source>Show IP in tree:</source>
-        <translation type="unfinished">목록에서 IP 표기:</translation>
+        <translation>목록에서 IP 표기:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="73"/>
         <source>Skin:</source>
-        <translation type="unfinished">배경:</translation>
+        <translation>스킨:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="80"/>
         <source>Tour sequence cycle time:</source>
-        <translation type="unfinished">투어 전환 간격 시간:</translation>
+        <translation>투어 전환 간격 시간:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="108"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="153"/>
         <source>Restart required.</source>
-        <translation type="unfinished">재 시작 요청.</translation>
+        <translation>재 시작 요청.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="126"/>
         <source> seconds</source>
-        <translation type="unfinished">초</translation>
+        <translation>초</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="169"/>
         <source>This option will not affect Recording Schedule.
 Recording Schedule is always based on Server Time.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 설정은 녹화 설정에는 영향을 미치지 않습니다.
+녹화 일정은 항시 서버 시간을 기준으로 합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="180"/>
         <source>Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>배경 효과</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="186"/>
         <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>배경 효과 사용</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="211"/>
         <source>Color:</source>
-        <translation type="unfinished"></translation>
+        <translation>색상:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="223"/>
         <source>Select color...</source>
-        <translation type="unfinished"></translation>
+        <translation>색상 선택...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="245"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="377"/>
         <source>Intensity:</source>
-        <translation type="unfinished"></translation>
+        <translation>강도:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="254"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="386"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="291"/>
         <source>Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>배경 이미지</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="297"/>
         <source>Enable Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>배경 이미지 사용</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="322"/>
         <source>Image:</source>
-        <translation type="unfinished"></translation>
+        <translation>이미지:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="334"/>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished">&lt;이미지 없음&gt;</translation>
+        <translation>&lt;이미지 없음&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="341"/>
         <source>Browse...</source>
-        <translation type="unfinished">찾기...</translation>
+        <translation>찾기...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="370"/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>모드:</translation>
     </message>
 </context>
 <context>
@@ -1419,7 +1420,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="60"/>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>이미지 제어</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="134"/>
@@ -1449,12 +1450,12 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="117"/>
         <source>Force aspect ratio to:</source>
-        <translation>물리적 영상비:</translation>
+        <translation>영상 비율:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="124"/>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>기본 순환:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="142"/>
@@ -1469,7 +1470,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="190"/>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished">어안 렌즈 커메라 사용</translation>
+        <translation>어안 렌즈 커메라 사용</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="214"/>
@@ -1536,7 +1537,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="14"/>
         <source>Local Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>내부 설정</translation>
     </message>
 </context>
 <context>
@@ -1597,32 +1598,32 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="210"/>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>줌 인</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="214"/>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>줌 아웃</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="218"/>
         <source>Focus Far</source>
-        <translation type="unfinished"></translation>
+        <translation>원거리 초첨</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="224"/>
         <source>Focus Near</source>
-        <translation type="unfinished"></translation>
+        <translation>근거리 초점</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="230"/>
         <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 초점</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="234"/>
         <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>디와핑 모드 변경</translation>
     </message>
 </context>
 <context>
@@ -1688,7 +1689,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/customization/customizer.cpp" line="215"/>
         <source>Parameter 1 is null.</source>
-        <translation type="unfinished"></translation>
+        <translation>변수 1은 null입니다.</translation>
     </message>
 </context>
 <context>
@@ -1696,57 +1697,57 @@ Recording Schedule is always based on Server Time.</source>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="281"/>
         <source>%n millisecond(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 밀리초</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="283"/>
         <source>%n second(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 초</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="285"/>
         <source>%n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 분</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="287"/>
         <source>%n hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 시간</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="289"/>
         <source>%n day(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 일</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="291"/>
         <source>%n week(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 주</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="293"/>
         <source>%n month(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 달</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="295"/>
         <source>%n year(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 년</numerusform>
         </translation>
     </message>
 </context>
@@ -1755,7 +1756,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="122"/>
         <source>Copy to Clipboard</source>
-        <translation>상세보기</translation>
+        <translation>상세보기 복사</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="125"/>
@@ -1767,12 +1768,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="102"/>
         <source>Server at %2: v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>%2 서버: v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="139"/>
         <source>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;서버&lt;/b&gt;에 &lt;b&gt;접속&lt;/b&gt;할 수 없습니다.&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="142"/>
@@ -1785,7 +1786,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
 &lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
 &lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="162"/>
@@ -1804,7 +1805,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="191"/>
         <source>&lt;b&gt;Support&lt;/b&gt;: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;지원&lt;/b&gt;: %1</translation>
     </message>
 </context>
 <context>
@@ -1946,12 +1947,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="497"/>
         <source>Control Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 조정</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="503"/>
         <source>Push my screen</source>
-        <translation type="unfinished"></translation>
+        <translation>화면 적용</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="508"/>
@@ -1961,7 +1962,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="512"/>
         <source>Select time server</source>
-        <translation type="unfinished"></translation>
+        <translation>시간 서버 선택</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="535"/>
@@ -1981,12 +1982,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="550"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished">서버 연결...</translation>
+        <translation>서버 연결...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="551"/>
         <source>Ctrl+Shift+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="557"/>
@@ -2066,12 +2067,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="618"/>
         <source>Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="619"/>
         <source>New Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>새로운 비디오 월...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="626"/>
@@ -2129,7 +2130,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/actions/action_manager.cpp" line="678"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="961"/>
         <source>Save Video Wall View</source>
-        <translation type="unfinished"></translation>
+        <translation>비디어 월 화면 저장</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="694"/>
@@ -2285,63 +2286,63 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="393"/>
         <source>Show Debug</source>
-        <translation type="unfinished"></translation>
+        <translation>디버그 보기</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="394"/>
         <source>Hide Debug</source>
-        <translation type="unfinished"></translation>
+        <translation>디버그 숨기기</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="395"/>
         <source>Ctrl+Alt+D</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="408"/>
         <source>Delayed Open Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>출력 중인 비디어 월 열기</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="458"/>
         <source>Filter...</source>
-        <translation type="unfinished">필터...</translation>
+        <translation>필터...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="487"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="800"/>
         <source>Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>이벤트 로그...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="761"/>
         <source>System Administration...</source>
-        <translation type="unfinished"></translation>
+        <translation>관리자...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="762"/>
         <source>Ctrl+Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="775"/>
         <source>System Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 업데이트...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="780"/>
         <source>Local Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>내부 설정...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="814"/>
         <source>Merge Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 조정...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="857"/>
         <source>Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>서버...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="874"/>
@@ -2401,7 +2402,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="927"/>
         <source>Open Video Wall(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 열기</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="932"/>
@@ -2421,42 +2422,42 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="941"/>
         <source>Identify</source>
-        <translation type="unfinished"></translation>
+        <translation>확인</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="948"/>
         <source>Attach to Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월에 배속...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="955"/>
         <source>Switch to Video Wall mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 모드 전환...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
         <source>Save Current Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 매트릭스 저장</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="977"/>
         <source>Load Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>매트릭스 읽어오기</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="988"/>
         <source>Update Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>레이아웃 업데이트</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="999"/>
         <source>Stop Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 정지</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1006"/>
         <source>Detach Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>레이아웃 분리하기</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1013"/>
@@ -2557,7 +2558,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="528"/>
         <source>Activate PTZ object</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ 대상 활성화</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="753"/>
@@ -2692,7 +2693,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="982"/>
@@ -2752,7 +2753,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1317"/>
         <source>Video Wall Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 설정...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
@@ -2792,7 +2793,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
         <source>Connect to the Current System...</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 시스템 연결...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1387"/>
@@ -2812,12 +2813,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>
         <source>3:4</source>
-        <translation type="unfinished">3:4</translation>
+        <translation>3:4</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1420"/>
         <source>9:16</source>
-        <translation type="unfinished">9:16</translation>
+        <translation>9:16</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1429"/>
@@ -2892,17 +2893,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1531"/>
         <source>Bookmark Selection...</source>
-        <translation type="unfinished"></translation>
+        <translation>북마크 선택...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1536"/>
         <source>Edit Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>북마크 조정...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1541"/>
         <source>Remove Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>북마크 삭제...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1550"/>
@@ -3172,27 +3173,27 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1713"/>
         <source>Ctrl+Alt+T</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1714"/>
         <source>Disable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>배경 효과 사용안함</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1715"/>
         <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>배경 효과 사용</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1722"/>
         <source>Show Search Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>검색 판넬 보기</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1723"/>
         <source>Hide Search Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>검색 판넬 숨기기</translation>
     </message>
 </context>
 <context>
@@ -3236,12 +3237,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="14"/>
         <source>Attach to Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 첨부...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="20"/>
         <source>Preview</source>
-        <translation type="unfinished">미리보기</translation>
+        <translation>미리보기</translation>
     </message>
 </context>
 <context>
@@ -3294,32 +3295,32 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="14"/>
         <source>Install specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>특정 빌드 설치</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="22"/>
         <source>Build number:</source>
-        <translation type="unfinished"></translation>
+        <translation>빌드 버젼:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="29"/>
         <source>99990</source>
-        <translation type="unfinished">99990</translation>
+        <translation>99990</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="39"/>
         <source>Password:</source>
-        <translation type="unfinished">비밀번호:</translation>
+        <translation>비밀번호:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.cpp" line="47"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.cpp" line="47"/>
         <source>The password you have entered is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>입력하신 비밀번호가 유효하지 않습니다</translation>
     </message>
 </context>
 <context>
@@ -3550,7 +3551,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="229"/>
         <source>Error while receiving rules.</source>
-        <translation>규칙을 받는 동안 오류 발생</translation>
+        <translation>규칙을 받는 동안 오류 발생.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="232"/>
@@ -3575,17 +3576,17 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="290"/>
         <source>&amp;New...</source>
-        <translation>&amp;신규...</translation>
+        <translation>신규(&amp;N)...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="293"/>
         <source>&amp;Delete</source>
-        <translation>&amp;삭제</translation>
+        <translation>삭제(&amp;D)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="300"/>
         <source>&amp;Schedule...</source>
-        <translation>&amp;일정...</translation>
+        <translation>일정(&amp;S)...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="317"/>
@@ -3692,7 +3693,7 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="550"/>
         <source>First address in range is greater than the last one.</source>
-        <translation>범위내의 첫번째 주소가 이전보다 큼</translation>
+        <translation>범위내의 첫번째 주소가 이전보다 큽니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="556"/>
@@ -3737,7 +3738,7 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="643"/>
         <source>Error while adding camera(s).</source>
         <translation>
-            <numerusform>%n 카메라를 추가하는 동안 오류가 발생함</numerusform>
+            <numerusform>%n 카메라를 추가하는 동안 오류가 발생함.</numerusform>
         </translation>
     </message>
     <message>
@@ -3753,7 +3754,7 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="715"/>
         <source>Server was removed, search aborted.</source>
-        <translation>서버가 삭제되어, 검색이 중단됨</translation>
+        <translation>서버가 삭제되어, 검색이 중단됨.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="719"/>
@@ -3787,7 +3788,7 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="810"/>
         <source>Select target server...</source>
-        <translation type="unfinished"></translation>
+        <translation>대상 서버 선택...</translation>
     </message>
 </context>
 <context>
@@ -3796,34 +3797,34 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="51"/>
         <source>Please wait while settings are being loaded.
 This can take a lot of time.</source>
-        <translation type="unfinished"></translation>
+        <translation>설정을 읽는 동안 잠시 기다려주십시오.
+시간이 많이 소요될 수 있습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="259"/>
         <source>Applying settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>설정 적용 중...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="341"/>
         <source>Possibly, appropriate camera&apos;s service is unavailable now</source>
-        <translation type="unfinished"></translation>
+        <translation>이 카메라의 서비르를 현재 사용할 수 없을 수 있습니다</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="342"/>
         <source>Server returned the following error code : </source>
-        <translation type="unfinished"></translation>
+        <translation>서버로부터 오류 코드 반송:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="357"/>
         <source>Could not save parameters</source>
-        <translation type="unfinished">해당 변수를 저장할 수 없습니다</translation>
+        <translation>해당 변수를 저장할 수 없습니다</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="358"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
-        <translation type="unfinished">현재의 변수의 적용에 실패하였습니다 (%1):
-%2</translation>
+        <translation>현재의 변수의 적용에 실패하였습니다 (%1): %2</translation>
     </message>
 </context>
 <context>
@@ -3831,57 +3832,57 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="14"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>북마크</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="25"/>
         <source>&amp;Name</source>
-        <translation type="unfinished"></translation>
+        <translation>이름(&amp;N)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="38"/>
         <source>&amp;Description</source>
-        <translation type="unfinished"></translation>
+        <translation>설명(&amp;D)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="51"/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>시간제한(&amp;T)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="64"/>
         <source>T&amp;ags</source>
-        <translation type="unfinished"></translation>
+        <translation>태그(&amp;A)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="89"/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>쉼표나 태그로 태그의 목록 구분</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="70"/>
         <source>Do not lock archive</source>
-        <translation type="unfinished"></translation>
+        <translation>저장일수 제한하지 않음</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="71"/>
         <source>1 month</source>
-        <translation type="unfinished"></translation>
+        <translation>1달</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="72"/>
         <source>3 month</source>
-        <translation type="unfinished"></translation>
+        <translation>3달</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="73"/>
         <source>6 month</source>
-        <translation type="unfinished"></translation>
+        <translation>6달</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="74"/>
         <source>year</source>
-        <translation type="unfinished"></translation>
+        <translation>년</translation>
     </message>
 </context>
 <context>
@@ -3889,7 +3890,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="30"/>
         <source>Copy to Clipboard</source>
-        <translation>상세 정보</translation>
+        <translation>상세 정보 복사</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="99"/>
@@ -3899,7 +3900,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="114"/>
         <source>Checking Server availability</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 가용성 확인</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="116"/>
@@ -4022,7 +4023,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="130"/>
         <source>MAC address</source>
-        <translation type="unfinished"></translation>
+        <translation>MAC 정보</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="131"/>
@@ -4175,51 +4176,51 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="160"/>
         <source>Camera(s) not Saved</source>
-        <translation type="unfinished">저장되지 않는 카메라</translation>
+        <translation>카메라 저장되지 않음</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="161"/>
         <source>Save changes to the following %n camera(s)?</source>
-        <translation type="unfinished">
-            <numerusform>%n 카메라들의 변경내용을 저장하시겠습니까?</numerusform>
+        <translation>
+            <numerusform>%n 카메라의 변경내용을 저장하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="175"/>
         <source>Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation>변경 사항이 저장되지 않았습니다. 원하는 유형의 녹화, FPS, 품질을 선택하신 후 일정표에 변경사항을 표시하여 주십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="176"/>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="185"/>
         <source>Changes are not applied</source>
-        <translation type="unfinished">변경 내용이 적용되지 않음</translation>
+        <translation>변경 사항이 적용되지 않음</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="184"/>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
-        <translation type="unfinished">실제 모션 감도 변경이 되지 않았습니다. 모션 변경 감도 이미지에 사각형을 그려주십시오.</translation>
+        <translation>실제 모션 감도 변경이 되지 않았습니다. 모션 변경 감도 이미지에 사각형을 그려주십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="220"/>
         <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
-        <translation type="unfinished">인증키 제한을 넘었습니다. 설정값은 저장하지만, 효과는 영향을 받지 않습니다.</translation>
+        <translation>인증키 제한을 넘었습니다. 설정값은 저장하지만, 설정의 영향을 받지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="221"/>
         <source>Could not apply changes</source>
-        <translation type="unfinished">변경 사항을 적용할 수 없음</translation>
+        <translation>변경 사항을 적용할 수 없음</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="236"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="237"/>
         <source>Could not save the following %n cameras to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 카메라는 서버에 저장할 수 없습니다.</numerusform>
         </translation>
     </message>
 </context>
@@ -4257,12 +4258,12 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/graphics/items/controls/clock_label.cpp" line="92"/>
         <source>Server time</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 시간</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/clock_label.cpp" line="94"/>
         <source>Local system time</source>
-        <translation type="unfinished"></translation>
+        <translation>로컬 타임</translation>
     </message>
 </context>
 <context>
@@ -4270,12 +4271,12 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/update/connect_to_current_system_tool.cpp" line="61"/>
         <source>Configuring server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>구성 서버</translation>
     </message>
     <message>
         <location filename="../src/update/connect_to_current_system_tool.cpp" line="115"/>
         <source>Updating server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 서버</translation>
     </message>
 </context>
 <context>
@@ -4283,7 +4284,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="68"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished">입력된 로그인 또는 비밀번호가 맞지 않습니다, 다시 시도해 주세요.</translation>
+        <translation>입력된 로그인 또는 비밀번호가 맞지 않습니다, 다시 시도해 주세요.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="70"/>
@@ -4291,12 +4292,15 @@ This can take a lot of time.</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 연결이 되지 않습니다.
+입력 정보가 올바르지 않으니, 다시 시도하여 주십시오.
+
+만약 오류가 지속될 경우, 관리자에게 문의하여 주십시오.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="74"/>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>호환되지 않는 서버입니다.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="81"/>
@@ -4308,17 +4312,17 @@ If this error persists, please contact your VMS administrator.</source>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="210"/>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="235"/>
         <source>Could not connect to Server</source>
-        <translation type="unfinished"></translation>
+        <translation>서버에 연결할 수 없습니다</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="101"/>
         <source>Server</source>
-        <translation type="unfinished">서버</translation>
+        <translation>서버</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="102"/>
         <source>Client</source>
-        <translation type="unfinished"></translation>
+        <translation>클라이언트</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="103"/>
@@ -4326,7 +4330,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - Server version: %2.
 These versions are not compatible. Please update your %3</source>
-        <translation type="unfinished"></translation>
+        <translation>연결하려는 서버의 버젼이 맞지 않습니다:
+ - Client version: %1.
+ - Server version: %2.
+이 버젼과는 호환되지 않습니다. %3로 업데이트 바랍니다</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="129"/>
@@ -4334,7 +4341,10 @@ These versions are not compatible. Please update your %3</source>
  - Client version: %1.
  - Server version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>연결하려는 서버의 버젼이 맞지 않습니다:
+ - Client version: %1.
+ - Server version: %2.
+%3 보다 낮은 버젼에 대한 호환성 모드는 지원하지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="165"/>
@@ -4342,7 +4352,10 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - Server version: %2.
 An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택된 서버의 버젼이 다릅니다:
+ - Client version: %1.
+ - Server version: %2.
+다시 시작하는 동안 호환성 모드에서 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="145"/>
@@ -4351,12 +4364,15 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - Server version: %2.
 The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택된 서버의 버젼이 다릅니다:
+ - Client version: %1.
+ - Server version: %2.
+서버에 연결하기 위해 클라이언트의 다른 버젼이 필요합니다.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="196"/>
         <source>Could not connect to Enterprise Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>제어 서버에 연결할 수 없습니다</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="197"/>
@@ -4364,7 +4380,10 @@ The other version of the Client is needed in order to establish the connection t
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>선택된 제어 서버의 버젼이 다릅니다:
+ - Client version: %1.
+ - EC version: %2.
+연결을 위해 %3 버젼의 클라이언트를 다운 받으십시오</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="211"/>
@@ -4373,7 +4392,11 @@ You need to download client %3 to connect</source>
  - Server version: %2.
 Client version %3 is required to connect to this Server.
 Download version %3?</source>
-        <translation type="unfinished"></translation>
+        <translation>연결하려는 서버의 버젼이 맞지 않습니다:
+ - Client version: %1.
+ - Server version: %2.
+서버를 연결하기 위해 %3 버젼의 클라이언트가 필요합니다.
+%3 버젼을 다운받으시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="236"/>
@@ -4381,29 +4404,34 @@ Download version %3?</source>
  - Client version: %1.
  - Server version: %2.
 Would you like to restart the Client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation>연결하려는 서버의 버젼이 맞지 않습니다:
+ - Client version: %1.
+ - Server version: %2.
+호환성 모드로 재 시작 하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="255"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished">시작프로세서를 찾을 수 없음</translation>
+        <translation>시작 프로세서를 찾을 수 없음</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="256"/>
         <source>Cannot restart the Client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>호환성 모드로 재시작 할 수 없습니다.
+프로그램을 닫으신 후에 시작 메뉴의 바로가기를 사용하여 다시 시작하십시오.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="267"/>
         <source>Failure</source>
-        <translation type="unfinished">실패</translation>
+        <translation>실패</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="268"/>
         <source>Failed to launch compatibility version %1
 Try to restore version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>호환성 버젼 %1을 시작하는데 실패하였습니다
+%1 버젼으로 복원하시겠습니까?</translation>
     </message>
 </context>
 <context>
@@ -4424,12 +4452,15 @@ Try to restore version %1?</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 연결이 되지 않습니다.
+입력 정보가 올바르지 않으니, 다시 시도하여 주십시오.
+
+만약 오류가 지속될 경우, 관리자에게 문의하여 주십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="117"/>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>호환되지 않는 서버입니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="123"/>
@@ -4437,7 +4468,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - Server version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 버젼이 맞지 않습니다.
+ - Client version: %1.
+ - Server version: %2.
+%3 보다 낮은 버젼에 대한 호환성 모드는 지원하지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="133"/>
@@ -4445,17 +4479,20 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - Server version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버의 버젼이 맞지 않습니다:
+ - Client version: %1.
+ - Server version: %2.
+호환성 모드에서 다시 시작하라는 메시지가 표시 됩니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="144"/>
         <source>Server</source>
-        <translation type="unfinished">서버</translation>
+        <translation>서버</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="145"/>
         <source>Client</source>
-        <translation type="unfinished"></translation>
+        <translation>클라이언트</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="146"/>
@@ -4463,7 +4500,11 @@ You will be asked to restart the client in compatibility mode.</source>
  - Client version: %1.
  - Server version: %2.
 These versions are not compatible. Please update your %3</source>
-        <translation type="unfinished"></translation>
+        <translation>서버의 버젼이 맞지 않습니다 :
+ - Client version: %1.
+ - Server version: %2.
+
+이 버젼은 호환되지 않습니다. %3 버젼으로 업데이트 하세요</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="158"/>
@@ -4481,17 +4522,17 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="14"/>
         <source>Enter user name and password...</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 이름과 비밀번호를 입력하세요...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="20"/>
         <source>User:</source>
-        <translation type="unfinished">사용자:</translation>
+        <translation>사용자:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="30"/>
         <source>Password:</source>
-        <translation type="unfinished">비밀번호:</translation>
+        <translation>비밀번호:</translation>
     </message>
 </context>
 <context>
@@ -4499,7 +4540,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="34"/>
         <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation type="unfinished">오류가 발생했을 경우 복원할 수 있는 설정값을 백업받을 수 있습니다.</translation>
+        <translation>시스템 복원을 실패할 경우 시스템 구성에 대한 백업 파일을 만들 수 있습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="50"/>
@@ -4546,7 +4587,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="98"/>
         <source>Failed to dump Server database to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>%1로의 서버 데이터 베이스 덤프 실패</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="105"/>
@@ -4586,17 +4627,17 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="153"/>
         <source>You need to connect to a server before doing backup</source>
-        <translation type="unfinished"></translation>
+        <translation>백업을 실행 하기 전 먼저 서버를 연결 하십시오</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="165"/>
         <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 파일로 부터 데이터 베이스의 복원이 완료 되었습니다. 저장서버를 다시 시작하여 주십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="169"/>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 파일로 부터 데이터 베이스를 복원하는 동안 오류가 발생하였습니다.</translation>
     </message>
 </context>
 <context>
@@ -4769,18 +4810,18 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="410"/>
         <source>Motion video</source>
-        <translation type="unfinished"></translation>
+        <translation>움직임 영상</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="413"/>
         <source>
 </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="419"/>
         <source> (%1 times)</source>
-        <translation type="unfinished"></translation>
+        <translation>(%1 번)</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="481"/>
@@ -4828,7 +4869,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="64"/>
         <source>Copy archive length settings</source>
-        <translation type="unfinished"></translation>
+        <translation>저장 범위 설정 복사</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="71"/>
@@ -4851,7 +4892,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="30"/>
         <source>Loading preview, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>미리보기를 불러오고 있습니다, 잠시만 기다려 주세요...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="152"/>
@@ -4862,12 +4903,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="152"/>
         <source>Auto calibration failed. Image is not round.</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 교정에 실패하였습니다. 이미지를 구성할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="155"/>
         <source>Auto calibration failed. The image might be too dim.</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 교정에 실패하였습니다. 이미지가 너무 어두울 수 있습니다.</translation>
     </message>
 </context>
 <context>
@@ -4904,18 +4945,18 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="155"/>
         <source>* %1</source>
-        <translation type="unfinished"></translation>
+        <translation>* %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="158"/>
         <source>Confirm exit</source>
-        <translation type="unfinished">종료 확인</translation>
+        <translation>종료 및 확인</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="159"/>
         <source>Unsaved changes will be lost. Save the following pages?
 </source>
-        <translation type="unfinished"></translation>
+        <translation>저장되지 않은 변경 사항이 손실되었습니다. 이 페이지를 저장하시겠습니까?</translation>
     </message>
 </context>
 <context>
@@ -4995,17 +5036,17 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="93"/>
         <source>Could not create output file %1</source>
-        <translation type="unfinished">%1의 내보낼 파일을 만들 수 없음</translation>
+        <translation>%1의 내보내기 파일을 만들 수 없습니다</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="329"/>
         <source>Exporting to &quot;%2&quot;...</source>
-        <translation type="unfinished">&quot;%1&quot;로 내보내기... {2&quot;?}</translation>
+        <translation>&quot;%2&quot;로 내보내기...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="382"/>
         <source>Could not export camera %1</source>
-        <translation>%1 카메라를 내보낼 수 없습니다.</translation>
+        <translation>%1 카메라를 내보낼 수 없습니다</translation>
     </message>
 </context>
 <context>
@@ -5029,7 +5070,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="506"/>
         <source>Select file...</source>
-        <translation type="unfinished">파일선택...</translation>
+        <translation>파일선택...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="508"/>
@@ -5043,49 +5084,49 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="26"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="60"/>
         <source>Screens Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>화면 허용:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="27"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="61"/>
         <source>Control Sessions Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>제어 세션 허용:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="29"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="63"/>
         <source>Archive Streams Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>저장 스트림 허용:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="35"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>상세보기 복사</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="53"/>
         <source>Generic:</source>
-        <translation type="unfinished"></translation>
+        <translation>일반:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="54"/>
         <source>License Type</source>
-        <translation type="unfinished"></translation>
+        <translation>인증키 방식</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="55"/>
         <source>License Key</source>
-        <translation type="unfinished">인증키</translation>
+        <translation>인증키</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="56"/>
         <source>Locked to Hardware ID</source>
-        <translation type="unfinished"></translation>
+        <translation>하드웨어 ID 잠금</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="58"/>
         <source>Features:</source>
-        <translation type="unfinished"></translation>
+        <translation>기능:</translation>
     </message>
 </context>
 <context>
@@ -5108,17 +5149,17 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="68"/>
         <source>Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>합계</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="71"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>상태</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="72"/>
         <source>Server</source>
-        <translation type="unfinished">서버</translation>
+        <translation>서버</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="97"/>
@@ -5150,12 +5191,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="127"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="142"/>
         <source>&lt;Server not found&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;서버를 찾을 수 없음&gt;</translation>
     </message>
 </context>
 <context>
@@ -5163,51 +5204,53 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="114"/>
         <source>The software is licensed to: </source>
-        <translation type="unfinished"></translation>
+        <translation>해당 프로그램의 인증키 :</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
         <source>
 %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="135"/>
         <source>
 At least %n %2 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>최소 %2 또는 %n이 필요함</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="141"/>
         <source>
 %n %2 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 현재 사용 중입니다</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="148"/>
         <source>Obtaining licenses from Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>서버로부터 인증키를 얻어오는 중...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="152"/>
         <source>You do not have a valid license installed.
 Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>유효하지 않은 인증키 입니다.
+구매하신 또는 평가판 인증키를 등록하십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="153"/>
         <source>You do not have a valid license installed.
 Please activate your commercial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>유효하지 않은 인증키입니다.
+구매하신 인증키를 등록하십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="172"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>상세보기 복사</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="188"/>
@@ -5223,52 +5266,52 @@ Please activate your commercial license.</source>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="285"/>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="477"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>호환되지 않는 인증키를 사용하셨습니다. 관리자를 통해 유효한 인증키를 받으십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="328"/>
         <source>There was a problem activating your license key. Network error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>네트워크 오류로 인해 인증키를 등록하는 과정에 문제가 발생하였습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="351"/>
         <source>License Activation </source>
-        <translation type="unfinished"></translation>
+        <translation>인증키 활성화</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="352"/>
         <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>네트워크 오류로 인해 인증키를 자동 등록하는 과정에 문제가 발생하였습니다. 관리자를 통해 수동 등록을 통해 인증 받으세요.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="393"/>
         <source>License activation</source>
-        <translation type="unfinished"></translation>
+        <translation>인증키 활성화</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="393"/>
         <source>Can&apos;t activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>라이센스를 인증 받을 수 없음:  %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="446"/>
         <source>Remove license</source>
-        <translation type="unfinished"></translation>
+        <translation>인증키 삭제</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="446"/>
         <source>Can&apos;t remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>서버로부터 인증키를 지울 수 없음:  %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="468"/>
         <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
-        <translation type="unfinished"></translation>
+        <translation>유효하지 않은 인증 파일입니다. 올바른 인증 파일을 선택하여 주십시오.만약 문제가 지속 될 경우, 관리자에게 문의하십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="472"/>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택하신 인증 키는 %1 시스템에 이미 사용하였습니다. 관리자를 통해 유효한 인증키를 받으십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="290"/>
@@ -5293,7 +5336,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="41"/>
         <source>Some of your licenses are unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>일부 인증키는 사용할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="43"/>
@@ -5316,17 +5359,17 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="42"/>
         <source>Please send email with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Then we&apos;ll send you an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>시리얼 키와 하드웨어 ID를 &lt;a href=&quot;메일:%1&quot;&gt;%1&lt;/a&gt;로 이메일을 통해 보내주십시오.그럼 유효한 인증키를 보내드릴 것입니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="65"/>
         <source>Success</source>
-        <translation type="unfinished">성공</translation>
+        <translation>성공</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="65"/>
         <source>Hardware ID copied to clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation>클립보드에 하드웨어 ID 복사.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="136"/>
@@ -5351,12 +5394,12 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="178"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="178"/>
         <source>Could not open the file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 파일을 열수 없습니다</translation>
     </message>
 </context>
 <context>
@@ -5394,17 +5437,17 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="82"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished">서버 연결...</translation>
+        <translation>서버 연결...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="89"/>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>버전 %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="123"/>
         <source>Auto-Discovered Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 자동 검색</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="400"/>
@@ -5456,72 +5499,72 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="180"/>
         <source>Select file...</source>
-        <translation type="unfinished">파일선택...</translation>
+        <translation>파일선택...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="182"/>
         <source>Pictures %1</source>
-        <translation type="unfinished">사진 %1</translation>
+        <translation>사진 %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="201"/>
         <source>Preparing Image...</source>
-        <translation type="unfinished"></translation>
+        <translation>이미지 준비 중...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="202"/>
         <source>Please wait while image is being prepared...</source>
-        <translation type="unfinished"></translation>
+        <translation>이미지를 준비하는 동안 잠시 기다려 주세요...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="238"/>
         <source>Dark</source>
-        <translation type="unfinished">어두움</translation>
+        <translation>어두움</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="239"/>
         <source>Light</source>
-        <translation type="unfinished">밝음</translation>
+        <translation>밝음</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="249"/>
         <source>Server Time</source>
-        <translation type="unfinished">서버시간</translation>
+        <translation>서버시간</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="250"/>
         <source>Client Time</source>
-        <translation type="unfinished"></translation>
+        <translation>클라이언트 시간</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="260"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>기본</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="261"/>
         <source>Rainbow</source>
-        <translation type="unfinished"></translation>
+        <translation>무지개색</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="262"/>
         <source>Custom...</source>
-        <translation type="unfinished">사용자...</translation>
+        <translation>사용자...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="264"/>
         <source>Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>펼처보기</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="265"/>
         <source>Fit</source>
-        <translation type="unfinished"></translation>
+        <translation>맞추기</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="266"/>
         <source>Crop</source>
-        <translation type="unfinished"></translation>
+        <translation>잘라내기</translation>
     </message>
 </context>
 <context>
@@ -5564,17 +5607,17 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="902"/>
         <source>Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>저-해상도</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="902"/>
         <source>Hi-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>고-해상도</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="925"/>
         <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5 %6	%7 {1x?} {2 %3f?} {4M?}</translation>
+        <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="919"/>
@@ -5592,27 +5635,27 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="14"/>
         <source>Merge Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 조정...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="55"/>
         <source>Server URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 URL:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="85"/>
         <source>Password:</source>
-        <translation type="unfinished">비밀번호:</translation>
+        <translation>비밀번호:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="94"/>
         <source>Find System</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 찾기</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="142"/>
         <source>The new system will have password and name from the system:</source>
-        <translation type="unfinished"></translation>
+        <translation>새 시스템은 시스템에서 암호와 이름을 갖게 됨:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="193"/>
@@ -5620,94 +5663,97 @@ Try to activate your license manually.</source>
 
 The system was configured successfully.
 The servers from the remote system should appear in your system soon.</source>
-        <translation type="unfinished"></translation>
+        <translation>성공!
+
+시스템의 설정이 완료되었습니다.
+원격 시스템에서 서버는 곧 시스템에 표시됩니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="23"/>
         <source>http(s)://host:port</source>
-        <translation type="unfinished"></translation>
+        <translation>http(s)://host:port</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="82"/>
         <source>You are about to merge the current system %1 with the system</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 %1 시스템과 이 시스템의 병합을 시행함</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="83"/>
         <source>%1 (current)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (현재)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="123"/>
         <source>The URL is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>유효하지 않은 URL.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="129"/>
         <source>The password cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>비밀번호를 입력하십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="138"/>
         <source>testing...</source>
-        <translation type="unfinished"></translation>
+        <translation>시험...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="151"/>
         <source>merging systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 병합 중...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="162"/>
         <source>Use a specific hostname or IP address rather than %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 보다는 별도 호스트 네임 또는 아이피 주소를 사용하세요.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="164"/>
         <source>This is the current system URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 시스템의 URL입니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="169"/>
         <source>Merge with %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1로 병합</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="176"/>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="204"/>
         <source>The password is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>비밀번호가 유효하지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="179"/>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="207"/>
         <source>The found system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 시스템에서 호환되지 않는 %2 버젼이 발견되었습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="182"/>
         <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템을 찾을 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="210"/>
         <source>Could not create a backup of the server database.</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 데이터 베이스에 백업을 만들 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="213"/>
         <source>System was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템을 찾을 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="222"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="222"/>
         <source>Cannot merge systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 조정을 할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -5730,32 +5776,32 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="102"/>
         <source>0 degrees</source>
-        <translation type="unfinished">0도</translation>
+        <translation>0도</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="103"/>
         <source>90 degrees</source>
-        <translation type="unfinished">90도</translation>
+        <translation>90도</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="104"/>
         <source>180 degrees</source>
-        <translation type="unfinished">180도</translation>
+        <translation>180도</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="105"/>
         <source>270 degrees</source>
-        <translation type="unfinished">270도</translation>
+        <translation>270도</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="284"/>
         <source>Invalid schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>유효하지 않은 스케줄</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="285"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라의 보조 스트림을 사용할 수 없습니다. Motion + LQ 옵션이 동작하지 않습니다. 보조 스트림을 활성화 하신 후에 녹화 설정을 &quot;항상&quot; 또는 &quot;아니오&quot;로 변경하려면 &quot;예&quot;를 누르세요.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="460"/>
@@ -5833,22 +5879,22 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="43"/>
         <source>&amp;Play</source>
-        <translation>&amp;재생</translation>
+        <translation>재생(&amp;P)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="57"/>
         <source>&amp;Add...</source>
-        <translation>&amp;추가...</translation>
+        <translation>추가(&amp;A)...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="68"/>
         <source>&amp;Rename...</source>
-        <translation>&amp;이름 변경...</translation>
+        <translation>이름 변경(&amp;R)...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="75"/>
         <source>&amp;Delete...</source>
-        <translation>&amp;삭제...</translation>
+        <translation>삭제(&amp;D)...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="64"/>
@@ -5868,7 +5914,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="71"/>
         <source>Custom Title:</source>
-        <translation>사용자 타이틀</translation>
+        <translation>사용자 타이틀:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="85"/>
@@ -5894,7 +5940,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="111"/>
         <source>New title could not be set.</source>
-        <translation>새로운 타이틀을 설정할 수 없습니다</translation>
+        <translation>새로운 타이틀을 설정할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="128"/>
@@ -5991,7 +6037,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="439"/>
         <source>SMTP Settin gs</source>
-        <translation type="unfinished"></translation>
+        <translation>SMTP 설정</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="475"/>
@@ -6050,7 +6096,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="30"/>
         <source>Look and Feel</source>
-        <translation type="unfinished">화면 설정</translation>
+        <translation>화면 설정</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="33"/>
@@ -6060,7 +6106,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="75"/>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
-        <translation type="unfinished">응용 프로그램을 다시 시작한 후에 변경 내용이 적용 됩니다.프로그램을 다시 시작하시겠습니까?</translation>
+        <translation>응용 프로그램을 다시 시작한 후에 변경 내용이 적용 됩니다.프로그램을 다시 시작하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="43"/>
@@ -6079,7 +6125,7 @@ All changes will be lost after program exit.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="74"/>
         <source>Information</source>
-        <translation type="unfinished">정보</translation>
+        <translation>정보</translation>
     </message>
 </context>
 <context>
@@ -6212,13 +6258,13 @@ These tours will become invalid if you remove it.</source>
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="554"/>
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation>
-            <numerusform>프리셋은 비활성화된 %n분 후에 활성화 됩니다.</numerusform>
+            <numerusform>프리셋은 비활성화된 %n분 후에 활성화 됩니다</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="651"/>
         <source>Tour should contain at least 2 positions</source>
-        <translation>투어는 2개 이상의 위치를 포함합니다.</translation>
+        <translation>투어는 2개 이상의 위치를 포함합니다</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="671"/>
@@ -6273,22 +6319,22 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="102"/>
         <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation type="unfinished">이 단축키는 &quot;%1&quot; 프리셋에서 사용합니다.</translation>
+        <translation>이 단축키는 &quot;%1&quot; 프리셋에서 사용합니다</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="103"/>
         <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation type="unfinished">이 단축키는 &quot;%1&quot; 투어에서 사용합니다.</translation>
+        <translation>이 단축키는 &quot;%1&quot; 투어에서 사용합니다</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="105"/>
         <source>Change hotkey</source>
-        <translation type="unfinished">단축키 변경</translation>
+        <translation>단축키 변경</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="106"/>
         <source>Reassign</source>
-        <translation type="unfinished">재할당</translation>
+        <translation>재할당</translation>
     </message>
 </context>
 <context>
@@ -6371,7 +6417,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.cpp" line="33"/>
         <source>Canceling...</source>
-        <translation type="unfinished"></translation>
+        <translation>취소 중...</translation>
     </message>
 </context>
 <context>
@@ -6459,33 +6505,33 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="46"/>
         <source>Root</source>
-        <translation type="unfinished">루트</translation>
+        <translation>루트</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="49"/>
         <source>Local</source>
-        <translation type="unfinished">기본</translation>
+        <translation>내부</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="53"/>
         <source>System</source>
-        <translation type="unfinished">시스템</translation>
+        <translation>시스템</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="57"/>
         <source>Other Systems</source>
-        <translation type="unfinished"></translation>
+        <translation>다른 시스템</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="62"/>
         <source>Users</source>
-        <translation type="unfinished">사용자</translation>
+        <translation>사용자</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="217"/>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1의 화면</translation>
     </message>
 </context>
 <context>
@@ -6548,52 +6594,52 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="17"/>
         <source>Available Server Addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>사용 가능한 서버 주소</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="40"/>
         <source>Add URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL 추가</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="57"/>
         <source>Remove</source>
-        <translation type="unfinished">제거</translation>
+        <translation>제거</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="91"/>
         <source>Removing this connection option could lead to system malfunction.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 연결 옵션을 삭제할 경우 시스템의 오류가 발생 할 수 있습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="313"/>
         <source>Enter URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL 입력</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="313"/>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="395"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="395"/>
         <source>You have entered an invalid URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>입력한 URL이 유효하지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
         <source>Warning</source>
-        <translation type="unfinished">주의</translation>
+        <translation>주의</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
         <source>This URL is already in the address list.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 URL은 목록에 이미 존재합니다.</translation>
     </message>
 </context>
 <context>
@@ -6609,17 +6655,17 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/search_line_edit.cpp" line="135"/>
         <source>Search</source>
-        <translation type="unfinished">검색</translation>
+        <translation>검색</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/search_line_edit.cpp" line="139"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>이전</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/search_line_edit.cpp" line="143"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>다음</translation>
     </message>
 </context>
 <context>
@@ -6627,12 +6673,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/server_addresses_model.cpp" line="213"/>
         <source>Address</source>
-        <translation type="unfinished">주소</translation>
+        <translation>주소</translation>
     </message>
     <message>
         <location filename="../src/ui/models/server_addresses_model.cpp" line="215"/>
         <source>In Use</source>
-        <translation type="unfinished">사용자</translation>
+        <translation>사용자</translation>
     </message>
 </context>
 <context>
@@ -6650,14 +6696,14 @@ These tours will become invalid if you remove it.</source>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="754"/>
         <source>%1 (up %n days, %2)</source>
-        <translation type="unfinished">
-            <numerusform>%1 %2(%n일 이상, %3) {1 ?} {2)?}</numerusform>
+        <translation>
+            <numerusform>%1 (%n일 이상, %2)</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="758"/>
         <source>%1</source>
-        <translation type="unfinished">%1% {1?}</translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -6670,7 +6716,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="169"/>
         <source>Open Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>웹페이지 열기...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="223"/>
@@ -6697,12 +6743,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="530"/>
         <source>Rebuild archive index</source>
-        <translation type="unfinished">인덱스 보관소 재정비</translation>
+        <translation>인덱스 보관소 재정비</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="532"/>
         <source>Fast initial scan in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>진행의 빠른 초기 검색</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="541"/>
@@ -6712,22 +6758,22 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="542"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation>인덱스 보관소 재정리 완료</translation>
+        <translation>인덱스 보관소 재정리 완료.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="554"/>
         <source>At least two servers are required for this feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 기능은 두개 이상의 서버가 요구 됩니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="557"/>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>이 서버는 이미 최대 카메라를 넘김</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="560"/>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>고장을 피하기 위해 최대 카메라 량을 조절해야 함</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="605"/>
@@ -6745,12 +6791,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/server_updates_model.cpp" line="122"/>
         <source>Server</source>
-        <translation type="unfinished">서버</translation>
+        <translation>서버</translation>
     </message>
     <message>
         <location filename="../src/ui/models/server_updates_model.cpp" line="124"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>상태</translation>
     </message>
 </context>
 <context>
@@ -6758,202 +6804,203 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="60"/>
         <source>Cannot check updates via the internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>인터넷을 통해 업데이트를 확인할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="209"/>
         <source>Available version:</source>
-        <translation type="unfinished"></translation>
+        <translation>사용 가능 버젼:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="222"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>알려지지 않음</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="229"/>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="397"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="236"/>
         <source>&lt;a href=&apos;notes&apos;&gt;release notes&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;notes&apos;&gt;업데이트 목록&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="282"/>
         <source>Update from file:</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 파일:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="303"/>
         <source>Archive url:</source>
-        <translation type="unfinished"></translation>
+        <translation>저장기 URL:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="310"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>상세보기 복사</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="320"/>
         <source>To update manually, download an archive with the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation>수동 업데이트를 할 경우, 아래 링크를 통해 다운로드 받기:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="354"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="444"/>
         <source>&lt;a href=&apos;spec&apos;&gt;I want specific build&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;spec&apos;&gt;특정 빌드&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="451"/>
         <source>&lt;a href=&apos;latest&apos;&gt;I want latest version&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;latest&apos;&gt;최종 버전&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="477"/>
         <source>Cancel</source>
-        <translation type="unfinished">취소</translation>
+        <translation>취소</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="501"/>
         <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 진행에 다소 시간이 소요될 수 있습니다. 잠시만 기다려 주세요.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="90"/>
         <source>Select Update File...</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 파일 선택...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="91"/>
         <source>Update Files (*.zip)</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 파일 (*.zip)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="109"/>
         <source>As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.</source>
-        <translation type="unfinished"></translation>
+        <translation>보다 나은 기술 지원을 위해, 주말의 업데이트는 권장하지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="156"/>
         <source>Update from Internet...</source>
-        <translation type="unfinished"></translation>
+        <translation>인터넷을 통한 업데이트...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="157"/>
         <source>Update from local source...</source>
-        <translation type="unfinished"></translation>
+        <translation>내부 파일을 통한 업데이트...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="166"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="185"/>
         <source>Update from Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>인터넷을 통한 업데이트</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="194"/>
         <source>Update from local source</source>
-        <translation type="unfinished"></translation>
+        <translation>내부 파일을 통한 업데이트</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="202"/>
         <source>Success</source>
-        <translation type="unfinished">성공</translation>
+        <translation>성공</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="202"/>
         <source>URL copied to clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation>클립보드에 URL 복사.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="226"/>
         <source>Latest version:</source>
-        <translation type="unfinished"></translation>
+        <translation>최종 버전:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="244"/>
         <source>Target version:</source>
-        <translation type="unfinished"></translation>
+        <translation>대상 버전:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
         <source>Information</source>
-        <translation type="unfinished">정보</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
         <source>Update is in process now.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 진행 중.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
         <source>Cannot cancel update at this state.
 Please wait until update is finished</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 취소할 수 없는 상태입니다.
+업데이트가 완료 될 때까지 잠시 기다려 주세요</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="291"/>
         <source>Update finished... 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 완료... 100%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="297"/>
         <source>Update has been successfully finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트가 성공적으로 완료 되었습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="305"/>
         <source>Now you have to update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>클라리언트의 수정 업데이트를 해야 합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="307"/>
         <source>Now you have to update the client manually using an installer.</source>
-        <translation type="unfinished"></translation>
+        <translation>설치 파일을 사용하여 클라이언트의 수동 업데이트를 해야 합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="310"/>
         <source>The client will be restarted to the updated version.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 된 버전의 클라이언트로 다시 시작됩니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="314"/>
         <source>Update is successful</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 완료</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="321"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished">시작프로세서를 찾을 수 없음</translation>
+        <translation>시작 프로세서를 찾을 수 없음</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="322"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished">클라이언트를 다시 시작할 수 없습니다.
+        <translation>클라이언트를 다시 시작할 수 없습니다.
 응용 프로그램을 종료 하고 시작 메뉴에 바로가기를 사용하여 다시 시작 하십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="335"/>
         <source>Update cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 취소</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="335"/>
         <source>Update has been cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트가 취소 되었습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
@@ -6966,24 +7013,24 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="382"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="386"/>
         <source>Update failed</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 실패</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
         <source>Someone has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트가 이미 시작되었습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="341"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="344"/>
         <source>Could not download updates.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트를 다운 받을 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="344"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
         <source>No free space left on the disk.</source>
-        <translation type="unfinished"></translation>
+        <translation>여유 공간이 디스크에 남아있지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="347"/>
@@ -6991,134 +7038,134 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="367"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="375"/>
         <source>Could not push updates to servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버에 업데이트를 할 수 없습니다.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="350"/>
         <source>The problem is caused by %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 서버에 문제 발생:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="361"/>
         <source>No free space left on %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 서버에 여유 공간이 없음:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="369"/>
         <source>%n servers are not responding:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 서버가 응답이 없음:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="377"/>
         <source>%n servers have gone offline:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 서버가 오프라인 상태:</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="382"/>
         <source>Could not install an update to the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>클라이언트에 업데이트를 설치 할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="386"/>
         <source>Could not install updates on one or more servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>하나 이상의 서버에 업데이트를 설치 할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="416"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="502"/>
         <source>Checking for updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 확인 중...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="443"/>
         <source>Internet connection problem</source>
-        <translation type="unfinished"></translation>
+        <translation>인터넷 연결 오류</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="448"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="526"/>
         <source>There is no such build on the update server</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 서버에 해당 빌드가 없음</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="454"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="530"/>
         <source>Cannot start update. An update for one or more servers was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트를 시작 할 수 없습니다. 하나 이상의 서버에 대한 업데이트를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="459"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="534"/>
         <source>Cannot start update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트를 시작할 수 없습니다. 클라이언트에 대한 업데이트를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="513"/>
         <source>Newer version found.</source>
-        <translation type="unfinished"></translation>
+        <translation>새 버전이 있습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="516"/>
         <source>You will have to update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>클라이언트의 수동 업데이트가 필요합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="518"/>
         <source>You will have to update the client manually using an installer.</source>
-        <translation type="unfinished"></translation>
+        <translation>설치 파일을 사용하여 클라이언트의 수동 업데이트가 필요합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="523"/>
         <source>All components in your system are up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템의 모든 구성 요소는 최신 버전입니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="538"/>
         <source>Cannot update from this file.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 할 수 없는 파일입니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
         <source>Cannot extract the update file.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 파일을 추출할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="622"/>
         <source>Checking for updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 확인 중... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="625"/>
         <source>Downloading updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 다운로드 중... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="628"/>
         <source>Installing client update... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>클라이언트 설치 중... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="631"/>
         <source>Installing updates to incompatible servers... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>호환되지 않는 서버에 업데이트 버전 설치 중... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="634"/>
         <source>Pushing updates to servers... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>서버에 업데이트 전송 중... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="637"/>
         <source>Installing updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 설치 중... %1%</translation>
     </message>
 </context>
 <context>
@@ -7164,22 +7211,22 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="148"/>
         <source>0 degrees</source>
-        <translation type="unfinished">0도</translation>
+        <translation>0도</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="149"/>
         <source>90 degrees</source>
-        <translation type="unfinished">90도</translation>
+        <translation>90도</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="150"/>
         <source>180 degrees</source>
-        <translation type="unfinished">180도</translation>
+        <translation>180도</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="151"/>
         <source>270 degrees</source>
-        <translation type="unfinished">270도</translation>
+        <translation>270도</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="420"/>
@@ -7194,23 +7241,24 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="636"/>
         <source>Invalid schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>유효하지 않은 스케줄</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="637"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라의 보조 스트림을 사용할 수 없습니다. Motion + LQ 옵션이 동작하지 않습니다. 보조 스트림을 활성화 하신 후에 녹화 설정을 &quot;항상&quot; 또는 &quot;아니오&quot;로 변경하려면 &quot;예&quot;를 누르세요.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="775"/>
         <source>Confirm motion regions reset</source>
-        <translation type="unfinished"></translation>
+        <translation>모션 영역 초기화 확인</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="776"/>
         <source>Are you sure you want to reset motion regions to the defaults?
 This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>모션영역을 재 설정 하시겠습니까?
+이 작업을 취소할 수 없습니다.!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="759"/>
@@ -7245,17 +7293,17 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="320"/>
         <source>Network Error</source>
-        <translation type="unfinished"></translation>
+        <translation>네트워크 오류</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="320"/>
         <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>테스트를 수행할 수 없습니다. 서버가 인터넷에 연결되어있지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="357"/>
         <source>Failed</source>
-        <translation type="unfinished">실패</translation>
+        <translation>실패</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="362"/>
@@ -7270,13 +7318,13 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="387"/>
         <source>No preset found. Use &apos;Advanced&apos; option</source>
-        <translation type="unfinished"></translation>
+        <translation>프리셋을 찾을 수 없습니다. &apos;고급&apos;설정을 사용하세요</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="393"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="414"/>
         <source>Support email is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation>이메일 정보가 유효하지 않습니다</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="332"/>
@@ -7347,7 +7395,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/graphics/items/overlays/resource_status_overlay_widget.cpp" line="64"/>
         <source>Activate Video Wall license to remove this message</source>
-        <translation type="unfinished"></translation>
+        <translation>이 메세지를 지우시려면 비디오 월 인증 키를 활성화 하십시오</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/overlays/resource_status_overlay_widget.cpp" line="65"/>
@@ -7357,7 +7405,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/graphics/items/overlays/resource_status_overlay_widget.cpp" line="63"/>
         <source>Activate analog license to remove this message</source>
-        <translation>이 메세지를 제거 하려면 아날로그 인증 키를 활성화 하십시오</translation>
+        <translation>이 메세지를 지우시려면 아날로그 인증 키를 활성화 하십시오</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/overlays/resource_status_overlay_widget.cpp" line="76"/>
@@ -7391,57 +7439,57 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.ui" line="14"/>
         <source>System Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>관리자</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="29"/>
         <source>General</source>
-        <translation type="unfinished">일반</translation>
+        <translation>일반</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="30"/>
         <source>Licenses</source>
-        <translation type="unfinished">인증키</translation>
+        <translation>인증키</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="31"/>
         <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation>이메일</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="32"/>
         <source>Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="33"/>
         <source>Routing Management</source>
-        <translation type="unfinished"></translation>
+        <translation>라우팅 관리</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="34"/>
         <source>Time Synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation>시간 동기화</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="43"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="43"/>
         <source>Cannot cancel update at this state.</source>
-        <translation type="unfinished"></translation>
+        <translation>현 상태에서는 업데이트를 취소할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="51"/>
         <source>Information</source>
-        <translation type="unfinished">정보</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="51"/>
         <source>Update is in process now.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 진행 중입니다.</translation>
     </message>
 </context>
 <context>
@@ -7451,22 +7499,22 @@ This action CANNOT be undone!</source>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="208"/>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="312"/>
         <source>Server</source>
-        <translation type="unfinished">서버</translation>
+        <translation>서버</translation>
     </message>
     <message>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="185"/>
         <source>Server Time</source>
-        <translation type="unfinished">서버시간</translation>
+        <translation>서버시간</translation>
     </message>
     <message>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="187"/>
         <source>Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>오프셋</translation>
     </message>
     <message>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="221"/>
         <source>Synchronizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>동기화 중...</translation>
     </message>
 </context>
 <context>
@@ -7474,12 +7522,12 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.cpp" line="49"/>
         <source>Time is taken from the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>인터넷을 통한 시간 업데이트.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.cpp" line="51"/>
         <source>Time is taken from %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 로 부터 시간 업데이트.</translation>
     </message>
 </context>
 <context>
@@ -7649,7 +7697,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/update_dialog.ui" line="14"/>
         <source>Update Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 서버</translation>
     </message>
 </context>
 <context>
@@ -7657,7 +7705,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/delegates/update_status_item_delegate.cpp" line="45"/>
         <source>%1%</source>
-        <translation type="unfinished">%1%</translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -7675,26 +7723,26 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="117"/>
         <source>%n of %1 users have invalid email address</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 사용자의 %n 는 유효하지 않은 이메일 주소를 가지고 있습니다</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="131"/>
         <source>Invalid email address %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 유효하지 않은 이메일 주소</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="132"/>
         <source>%n of %1 additional email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1의 %n 는 유효하지 않은 이메일 주소가 추가됨</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="135"/>
         <source>Send email to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 로 이메일 보내기</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="137"/>
@@ -7736,7 +7784,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="333"/>
         <source>To change your password, please enter your current password.</source>
-        <translation type="unfinished"></translation>
+        <translation>비밀번호를 변경하시려면, 현재 비밀번호를 입력하여 주세요.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="336"/>
@@ -7746,7 +7794,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="347"/>
         <source>User was renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 이름이 재 설정 되었습니다. 비밀번호를 반드시 업데이트 하셔야 합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="354"/>
@@ -7823,7 +7871,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="504"/>
         <source>Can edit Video Walls</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 조정</translation>
     </message>
 </context>
 <context>
@@ -7831,7 +7879,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/graphics/items/resource/videowall_item_widget.cpp" line="121"/>
         <source>Information</source>
-        <translation type="unfinished">정보</translation>
+        <translation>정보</translation>
     </message>
 </context>
 <context>
@@ -7839,32 +7887,32 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="342"/>
         <source>Desktop %1</source>
-        <translation type="unfinished"></translation>
+        <translation>바탕화면 %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="574"/>
         <source>Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>화면</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="574"/>
         <source>Screen %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 화면</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="717"/>
         <source>New Item</source>
-        <translation type="unfinished"></translation>
+        <translation>신규 항목</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="736"/>
         <source>Delete Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>화면 삭제</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="737"/>
         <source>Are you sure you want to delete %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>삭제 하시겠습니까 &apos;%1&apos;?</translation>
     </message>
 </context>
 <context>
@@ -7872,13 +7920,13 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/graphics/items/resource/videowall_screen_widget.cpp" line="94"/>
         <source>Pc %1</source>
-        <translation type="unfinished"></translation>
+        <translation>PC %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/videowall_screen_widget.cpp" line="104"/>
         <source>Pc %1 - Screens %2</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nPc %1 - Screens %2</numerusform>
         </translation>
     </message>
 </context>
@@ -7887,17 +7935,17 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="14"/>
         <source>Video Wall Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 설정</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="20"/>
         <source>Start Video Wall when the Windows starts</source>
-        <translation type="unfinished"></translation>
+        <translation>윈도우 시작 시 비디오 월 실행</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="27"/>
         <source>Shortcut on the desktop</source>
-        <translation type="unfinished"></translation>
+        <translation>바탕화면으로 바로가기</translation>
     </message>
 </context>
 <context>
@@ -7958,12 +8006,12 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="855"/>
         <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라를 다른 서버로 이동할 수 없습니다. %1 서버의 응답이 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="878"/>
         <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 서버은 지금까지 이 카메라를 찾지 못하였습니다. 그들을 이동 하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1032"/>
@@ -8048,22 +8096,22 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1654"/>
         <source>User already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 사용자는 이미 존재합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1655"/>
         <source>Video Wall already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월이 이미 존재합니다</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1658"/>
         <source>User with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>같은 이름의 사용자가 존재합니다</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1659"/>
         <source>Video Wall with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>같은 이름의 비디오 월이 존재합니다</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1708"/>
@@ -8080,8 +8128,10 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>These %n cameras are auto-discovered.
 They may be auto-discovered again after removing.
 Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 카메라가 자동으로 찾아졌습니다.
+이 카메라들은 삭제 후에도 다시 자동으로 찾아집니다.
+삭제하시겠습니까?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -8089,8 +8139,10 @@ Are you sure you want to delete them?</source>
         <source>%n of these %1 cameras are auto-discovered.
 They may be auto-discovered again after removing.
 Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 카메라 중 %n 이 자동으로 찾아졌습니다.
+이 카메라들은 삭제 후에도 다시 자동으로 찾아집니다.
+삭제하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
@@ -8101,8 +8153,8 @@ Are you sure you want to delete them?</source>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2228"/>
         <source>Could not save the following %n items.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 아이템들을 저장 할 수 없습니다.</numerusform>
         </translation>
     </message>
     <message>
@@ -8110,32 +8162,34 @@ Are you sure you want to delete them?</source>
         <source>An error has occurred while trying to delete a resource from Server. 
 
 Error description: &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>서버의 리소스 삭제를 시도하는 동안 오류가 발생했습니다.
+
+오류 내용: &apos;%2&apos;</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2397"/>
         <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 서버: v%2&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2399"/>
         <source>Server v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2425"/>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템의 일부 구성 요소가 업데이트 되지 않음: &lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;최근 버젼의 구성요소들로 업데이트 하십시오 %2.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2441"/>
         <source>Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2451"/>
         <source>Beta version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>베타 버젼 %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1878"/>
@@ -8147,7 +8201,7 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2452"/>
         <source>You are running beta version of %1.</source>
-        <translation>%1 시험 버젼이 동작 중</translation>
+        <translation>%1의 시험 버젼이 동작 중.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2477"/>
@@ -8216,37 +8270,37 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="136"/>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="163"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="104"/>
         <source>Bookmark can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>북마크는 활성화된 서버에만 추가 됩니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="110"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>북마크</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="137"/>
         <source>Bookmark can only be edited on an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>북마크는 활성화된 서버에만 변경 됩니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="164"/>
         <source>Bookmark can only be deleted from an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>북마크는 활성화된 서버에서만 삭제됩니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="169"/>
         <source>Confirm delete</source>
-        <translation type="unfinished"></translation>
+        <translation>삭제 확인</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="170"/>
         <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 북마크를 삭제 하시겠습니까?</translation>
     </message>
 </context>
 <context>
@@ -8254,22 +8308,22 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="128"/>
         <source>Connect to Another Server...</source>
-        <translation type="unfinished">다른 서버 연결...</translation>
+        <translation>다른 서버 연결...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="188"/>
         <source>Could not connect to server. Closing in %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>서버가 접속되지 않습니다. %1 닫는중...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="257"/>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>연결 중...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="358"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished">서버 연결...</translation>
+        <translation>서버 연결...</translation>
     </message>
 </context>
 <context>
@@ -8288,7 +8342,7 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="609"/>
         <source>Recording in...%1</source>
-        <translation type="unfinished"></translation>
+        <translation>저장 중...%1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="651"/>
@@ -8428,12 +8482,12 @@ Do you want to continue?</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="288"/>
         <source>Transcode video to guarantee WYSIWYG</source>
-        <translation type="unfinished"></translation>
+        <translation>WYSIWYG에서 비디오 변환을 보장함</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="488"/>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 레이아웃에는 내부 파일이 포함되어있습니다. 내부 파일은 다중 비디오 내보내기를 허용하지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="322"/>
@@ -8549,59 +8603,61 @@ Do you want to continue?</source>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="116"/>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="119"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="29"/>
         <source>Please, wait before the previously requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>기다려 주세요, 이전 요청을 서버에 저장 중에 있습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="54"/>
         <source>Enter Password...</source>
-        <translation type="unfinished"></translation>
+        <translation>비밀번호 입력...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="55"/>
         <source>Administrator Password</source>
-        <translation type="unfinished"></translation>
+        <translation>관리자 비밀번호</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="65"/>
         <source>Password cannot be empty!</source>
-        <translation type="unfinished"></translation>
+        <translation>암호는 빈칸을 허용하지 않음!</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="75"/>
         <source>Connecting to the current system...</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 서버에 접속 중...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="104"/>
         <source>Information</source>
-        <translation type="unfinished">정보</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="104"/>
         <source>The selected servers has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation>선택된 서버 시스템에 성공적으로 연결되었습니다!</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="107"/>
         <source>Authentification failed.
 Please, check the password you have entered.</source>
-        <translation type="unfinished"></translation>
+        <translation>인증 오류.
+입력하신 비밀번호를 확인하여 주십시오.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="116"/>
         <source>Could not configure the selected servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택된 서버의 설정을 할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="119"/>
         <source>Could not update the selected servers.
 You can try to update the servers again in the System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택된 서버에 업데이트가 되지 않습니다.
+관리자 권한으로 업데이트를 다시 시도하십시오.</translation>
     </message>
 </context>
 <context>
@@ -8695,8 +8751,8 @@ You can try to update the servers again in the System Administration.</source>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="630"/>
         <source>Could not save the following %n layout(s) to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>서버에 %n 레이아웃을 저장할 수 없습니다.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -8852,7 +8908,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="310"/>
         <source>Saving %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 저장 중</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="357"/>
@@ -8867,7 +8923,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="369"/>
         <source>Saving Screenshot...</source>
-        <translation type="unfinished"></translation>
+        <translation>스크린 샷 저장 중...</translation>
     </message>
 </context>
 <context>
@@ -8875,44 +8931,44 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="70"/>
         <source>Newer version is available</source>
-        <translation type="unfinished"></translation>
+        <translation>최신 버젼 사용 가능</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="71"/>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="76"/>
         <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
-        <translation type="unfinished"></translation>
+        <translation>새 버젼 &lt;b&gt;%1&lt;/b&gt; 사용 가능합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="73"/>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="82"/>
         <source>Would you like to update?</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="75"/>
         <source>Update is recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 권장</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="78"/>
         <source>Major issues have been fixed.</source>
-        <translation type="unfinished"></translation>
+        <translation>중요한 문제가 해결되었습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="80"/>
         <source>Update is strongly recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 하시는 것이 좋습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="89"/>
         <source>Don&apos;t notify again about this update.</source>
-        <translation type="unfinished">해당 업데이트에 대한 알람을 다시 열지 않음.</translation>
+        <translation>해당 업데이트에 대한 알람을 다시 열지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="94"/>
         <source>Release Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 내용</translation>
     </message>
 </context>
 <context>
@@ -8921,14 +8977,15 @@ Please wait for the camera to go online.</source>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="328"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="919"/>
         <source>Control session is already running</source>
-        <translation type="unfinished"></translation>
+        <translation>제어 세션이 이미 동작 중입니다</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="329"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="920"/>
         <source>Could not start control session.
 Another user is already controlling this screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>제어 세션이 시작 되지 않았습니다.
+다른 사용자가 이미 이 화면을 제어 중입니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="420"/>
@@ -8936,156 +8993,156 @@ Another user is already controlling this screen.</source>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="507"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1256"/>
         <source>Error</source>
-        <translation type="unfinished">오류</translation>
+        <translation>오류</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="420"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="460"/>
         <source>Unexpected error has occurred. Changes cannot be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>예상치 못한 오류가 발생하였습니다. 변경된 사항이 저장되지 않았습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="508"/>
         <source>There are no offline videowall items attached to this pc.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 PC에 연결된 비디오 월이 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="515"/>
         <source>Switch to Video Wall Mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 모드 전환...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="516"/>
         <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation>비디어 월이 시작됩니다. %1 클라이언트를 종료 하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="901"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1203"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="2559"/>
         <source>More licenses required</source>
-        <translation type="unfinished"></translation>
+        <translation>추가 인증키가 요청됨</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="902"/>
         <source>To enable the feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation>기능 사용을 위해 최소 하나의 비디오 월 인증키가 필요합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="907"/>
         <source>Could not start Video Wall control session.</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 제어 세션을 시작할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1165"/>
         <source>%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1170"/>
         <source>New layout</source>
-        <translation type="unfinished">새 레이아웃</translation>
+        <translation>새 레이아웃</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1170"/>
         <source>New layout %1</source>
-        <translation type="unfinished">%1 새 레이아웃</translation>
+        <translation>%1 새 레이아웃</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1204"/>
         <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation type="unfinished"></translation>
+        <translation>기능 사용을 위해 최소 하나의 비디오 월 인증키가 필요합니다</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
         <source>Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
         <source>Video Wall %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 비디오 월</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1216"/>
         <source>New Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>새 비디오 월...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1217"/>
         <source>Enter the name of the Video Wall to create:</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 이름 입력:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1232"/>
         <source>Video Wall already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월이 이미 존재합니다</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1233"/>
         <source>Video Wall with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>동일한 이름의 비디오 월이 존재합니다</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1257"/>
         <source>Could not save the following %n items to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>서버에 %n 아이뎀이 저장되지 않습니다.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1328"/>
         <source>Delete Items</source>
-        <translation type="unfinished"></translation>
+        <translation>항목 삭제</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1329"/>
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 항목을 영구 삭제 하시겠습니까?</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1351"/>
         <source>Could not start Video Wall.</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월을 시작할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1363"/>
         <source>Confirm Video Wall stop</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월 중지</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1364"/>
         <source>Are you sure you want to stop the Video Wall?
 You&apos;ll have to start it manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 월을 중지 하시겠습니까? 이 경우 수동 시작을 하셔야 합니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1631"/>
         <source>New Matrix %1</source>
-        <translation type="unfinished"></translation>
+        <translation>새 매트릭스 %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1642"/>
         <source>Invalid matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>유효하지 않은 매트릭스</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1643"/>
         <source>You have no layouts on the screens. Matrix cannot be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 화면에 레이아웃이 없습니다. 매트릭스를 저장할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1712"/>
         <source>Delete Matrices</source>
-        <translation type="unfinished"></translation>
+        <translation>매트릭스 삭제</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1713"/>
         <source>Are you sure you want to permanently delete these %n matrices?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 매트릭스를 영구 삭제 하시겠습니까?</numerusform>
         </translation>
     </message>
 </context>
@@ -9094,12 +9151,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.ui" line="17"/>
         <source>Reconnecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>재 접속 중...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.ui" line="26"/>
         <source>Please wait while connection is being restored...</source>
-        <translation type="unfinished"></translation>
+        <translation>연결을 복원하는 동안 잠시 기다려주세요...</translation>
     </message>
 </context>
 <context>
@@ -9152,7 +9209,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="45"/>
         <source>&amp;Browse...</source>
-        <translation>&amp;찾기...</translation>
+        <translation>찾기(&amp;B)...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="55"/>
@@ -9301,7 +9358,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/resource_list_dialog.ui" line="59"/>
         <source>Never suggest saving layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>레이아웃을 저장하시기 바랍니다</translation>
     </message>
 </context>
 <context>
@@ -9332,12 +9389,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui" line="32"/>
         <source>&amp;Additional Recipients:</source>
-        <translation>&amp;함께 받는사람:</translation>
+        <translation>함께 받는사람(&amp;A):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui" line="45"/>
         <source>&amp;Global Email Settings...</source>
-        <translation>&amp;이메일 설정...</translation>
+        <translation>이메일 설정(&amp;G)...</translation>
     </message>
 </context>
 <context>
@@ -9375,17 +9432,17 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="88"/>
         <source>Failover</source>
-        <translation type="unfinished"></translation>
+        <translation>장애 조치(이중화)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="97"/>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>장애조치 활성화 (오프라인 서버로 부터 자동으로 카메라 목록 가져옴)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="122"/>
         <source>Max. cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>서버의 최대 카메라 수:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="164"/>
@@ -9410,17 +9467,17 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="216"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>로그인</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="221"/>
         <source>Password</source>
-        <translation type="unfinished">비밀번호</translation>
+        <translation>비밀번호</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="226"/>
         <source>Space</source>
-        <translation type="unfinished">여유공간</translation>
+        <translation>여유공간</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="237"/>
@@ -9491,12 +9548,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="209"/>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>이미지 제어</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="246"/>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>기본 전환:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="280"/>
@@ -9516,7 +9573,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="422"/>
         <source>Software (Max FPS may be slightly decreased on Server)</source>
-        <translation type="unfinished"></translation>
+        <translation>소프트웨어 (최대 FPS가 감소 할 수 있음)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="73"/>
@@ -9669,24 +9726,24 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="20"/>
         <source>Outgoing Email Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>발송 이메일 설정</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="99"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished">&amp;이메일:</translation>
+        <translation>이메일(&amp;E):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="112"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="225"/>
         <source>&amp;Password:</source>
-        <translation>&amp;비밀번호:</translation>
+        <translation>비밀번호(&amp;P):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="129"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="331"/>
         <source>&amp;System Signature:</source>
-        <translation>&amp;시스템 서명:</translation>
+        <translation>시스템 서명(&amp;S):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="139"/>
@@ -9698,27 +9755,27 @@ You&apos;ll have to start it manually.</source>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="146"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="348"/>
         <source>Support Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>서명 지원: </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="199"/>
         <source>SMTP &amp;Server:</source>
-        <translation>SMTP &amp;서버:</translation>
+        <translation>SMTP 서버(&amp;S):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="212"/>
         <source>&amp;User:</source>
-        <translation>&amp;사용자:</translation>
+        <translation>사용자(&amp;U):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="242"/>
         <source>Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>이메일:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="256"/>
         <source>P&amp;ort:</source>
-        <translation>포&amp;트:</translation>
+        <translation>포트(&amp;o):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="280"/>
@@ -9815,12 +9872,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="59"/>
         <source>Login:</source>
-        <translation type="unfinished">로그인:</translation>
+        <translation>로그인:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="72"/>
         <source>Password:</source>
-        <translation type="unfinished">비밀번호:</translation>
+        <translation>비밀번호:</translation>
     </message>
 </context>
 <context>
@@ -9828,17 +9885,17 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="25"/>
         <source>Current system time:</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 시스템 시간:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="38"/>
         <source>Synchronizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>동기화 중...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="54"/>
         <source>Choose the server which is going to be used as a time server if the system has no internet access:</source>
-        <translation type="unfinished"></translation>
+        <translation>인터넷에 연결되지 않을 경우 선택된 서버에서 시간 동기화 시행:</translation>
     </message>
 </context>
 <context>

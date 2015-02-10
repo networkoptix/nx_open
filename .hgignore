@@ -34,6 +34,8 @@ donotrebuild
 Debug
 Release
 
+.directory
+
 x86
 x64
 arm-isd

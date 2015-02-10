@@ -20,9 +20,6 @@ CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     m_FrameCnt(0),
     m_cameraControlRequired(false)
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(dev.data());
-    if (camera) 
-        m_cameraAudioEnabled = camera->isAudioEnabled();
 }
 
 CameraDiagnostics::Result CLServerPushStreamReader::diagnoseMediaStreamConnection()
@@ -44,6 +41,17 @@ bool CLServerPushStreamReader::canChangeStatus() const
 {
     const QnLiveStreamProvider* liveProvider = dynamic_cast<const QnLiveStreamProvider*>(this);
     return liveProvider && liveProvider->canChangeStatus();
+}
+
+CameraDiagnostics::Result CLServerPushStreamReader::openStreamInternal()
+{
+    m_cameraControlRequired = QnLiveStreamProvider::isCameraControlRequired(); // cache value to prevent race condition if value will changed durinng stream opening
+    return openStream();
+}
+
+bool CLServerPushStreamReader::isCameraControlRequired() const
+{
+    return m_cameraControlRequired;
 }
 
 void CLServerPushStreamReader::run()
@@ -70,7 +78,7 @@ void CLServerPushStreamReader::run()
                     m_openStreamResult = openStreamResult;
             }
             else {
-                m_openStreamResult = openStreamResult = openStream();
+                m_openStreamResult = openStreamResult = openStreamInternal();
                 m_needControlTimer.restart();
             }
 
@@ -108,7 +116,7 @@ void CLServerPushStreamReader::run()
         else {
             if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME) 
             {
-                if (!m_cameraControlRequired && isCameraControlRequired())
+                if (!m_cameraControlRequired && QnLiveStreamProvider::isCameraControlRequired())
                     pleaseReOpen();
                 m_needControlTimer.restart();
             }
@@ -224,15 +232,26 @@ void CLServerPushStreamReader::beforeRun()
 {
     QnAbstractMediaStreamDataProvider::beforeRun();
     getResource()->init();
+
+    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(m_resource.data());
+    if (camera) {
+        m_cameraAudioEnabled = camera->isAudioEnabled();
+        connect(camera,  SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(at_resourceChanged(QnResourcePtr)), Qt::DirectConnection);
+    }
 }
 
+void CLServerPushStreamReader::afterRun()
+{
+    QnAbstractMediaStreamDataProvider::afterRun();
+    m_resource->disconnect(this, SLOT(at_resourceChanged(QnResourcePtr)));
+}
 
 void CLServerPushStreamReader::pleaseReOpen()
 {
     m_needReopen = true;
 }
 
-void CLServerPushStreamReader::afterUpdate() 
+void CLServerPushStreamReader::at_resourceChanged(const QnResourcePtr& res)
 {
     const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(getResource().data());
     if (camera) {

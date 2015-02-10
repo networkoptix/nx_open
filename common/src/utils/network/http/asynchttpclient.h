@@ -78,7 +78,7 @@ namespace nx_http
         virtual void terminate();
 
         State state() const;
-        //!Returns true, if \a AsyncHttpClient::state() == \a AsyncHttpClient::sFailed
+        //!Returns true if no response has been recevied due to transport error
         bool failed() const;
         //!Start GET request to \a url
         /*!
@@ -165,6 +165,7 @@ namespace nx_http
         State m_state;
         Request m_request;
         QSharedPointer<AbstractStreamSocket> m_socket;
+        bool m_connectionClosed;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
         QUrl m_url;
@@ -182,6 +183,7 @@ namespace nx_http
         unsigned int m_msgBodyReadTimeoutMs;
         AuthType m_authType;
         HttpHeaders m_additionalHeaders;
+        int m_awaitedMessageNumber;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );

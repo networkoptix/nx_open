@@ -422,7 +422,7 @@ namespace nx_http
             const Authorization& operator=( const Authorization& );
         };
 
-        //!Convient class for generating Authorization header with Basic authentication method
+        //!Convenient class for generating Authorization header with Basic authentication method
         class BasicAuthorization
         :
             public Authorization
@@ -453,40 +453,47 @@ namespace nx_http
             bool parse( const BufferType& str );
         };
 
+        //! identity
+        static const StringType IDENTITY_CODING( "identity" );
+        //! *
+        static const StringType ANY_CODING( "*" );
+
         //![rfc2616, 14.3]
         class AcceptEncodingHeader
         {
         public:
             AcceptEncodingHeader( const nx_http::StringType& strValue );
 
+            void parse( const nx_http::StringType& str );
             //!Returns \a true if \a encodingName is present in header and returns corresponding qvalue in \a *q (if not null)
-            bool encodingIsAllowed( const nx_http::StringType& encodingName, float* q = nullptr ) const;
+            bool encodingIsAllowed( const nx_http::StringType& encodingName, double* q = nullptr ) const;
 
         private:
-            nx_http::StringType m_strValue;
+            //!map<coding, qvalue>
+            std::map<nx_http::StringType, double> m_codings;
+            boost::optional<double> m_anyCodingQValue;
+        };
+
+        /*!
+            \note Boundaries are inclusive
+        */
+        class RangeSpec
+        {
+        public:
+            quint64 start;
+            boost::optional<quint64> end;
+
+            RangeSpec()
+            :
+                start( 0 )
+            {
+            }
         };
 
         //![rfc2616, 14.35]
         class Range
         {
         public:
-            /*!
-                \note Boundaries are inclusive
-            */
-            class RangeSpec
-            {
-            public:
-                quint64 start;
-                boost::optional<quint64> end;
-
-                RangeSpec()
-                :
-                    start( 0 )
-                {
-                }
-            };
-
-
             Range();
 
             /*!
@@ -504,6 +511,21 @@ namespace nx_http
             quint64 totalRangeLength( size_t contentSize ) const;
 
             std::vector<RangeSpec> rangeSpecList;
+        };
+
+        //![rfc2616, 14.16]
+        class ContentRange
+        {
+        public:
+            //!By default, bytes
+            StringType unitName;
+            boost::optional<quint64> instanceLength;
+            RangeSpec rangeSpec;
+
+            ContentRange();
+
+            quint64 rangeLength() const;
+            StringType toString() const;
         };
 
         //![rfc2616, 14.45]

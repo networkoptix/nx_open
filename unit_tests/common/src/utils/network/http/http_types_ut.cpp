@@ -32,11 +32,12 @@ namespace nx_http
     }
 }
 
+
 //////////////////////////////////////////////
 //   Range header tests
 //////////////////////////////////////////////
 
-TEST( HttpRangeHeaderTest, parse )
+TEST( HttpHeaderTest, RangeHeader_parse )
 {
     nx_http::header::Range range;
     range.parse( "650-" );
@@ -60,7 +61,7 @@ TEST( HttpRangeHeaderTest, parse )
     ASSERT_EQ( range.rangeSpecList[0].end.get(), 230 );
 }
 
-TEST( HttpRangeHeaderTest, validateByContentSize )
+TEST( HttpHeaderTest, RangeHeader_validateByContentSize )
 {
     nx_http::header::Range range;
     range.parse( "650-" );
@@ -90,7 +91,7 @@ TEST( HttpRangeHeaderTest, validateByContentSize )
     EXPECT_FALSE( range.validateByContentSize(0) );
 }
 
-TEST( HttpRangeHeaderTest, full )
+TEST( HttpHeaderTest, RangeHeader_full )
 {
     nx_http::header::Range range;
     range.parse( "650-" );
@@ -118,7 +119,7 @@ TEST( HttpRangeHeaderTest, full )
     EXPECT_FALSE( range.full(2) );
 }
 
-TEST( HttpRangeHeaderTest, totalRangeLength )
+TEST( HttpHeaderTest, RangeHeader_totalRangeLength )
 {
     nx_http::header::Range range;
     range.parse( "650-" );
@@ -150,11 +151,66 @@ TEST( HttpRangeHeaderTest, totalRangeLength )
 }
 
 
+
+//////////////////////////////////////////////
+//   Content-Range test
+//////////////////////////////////////////////
+TEST( HttpHeaderTest, ContentRange_toString )
+{
+    {
+        nx_http::header::ContentRange contentRange;
+        EXPECT_EQ( contentRange.toString(), "bytes 0-0/*" );
+        EXPECT_EQ( contentRange.rangeLength(), 1 );
+
+        contentRange.instanceLength = 240;
+        EXPECT_EQ( contentRange.toString(), "bytes 0-239/240" );
+        EXPECT_EQ( contentRange.rangeLength(), 240 );
+
+        contentRange.rangeSpec.start = 100;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-239/240" );
+        EXPECT_EQ( contentRange.rangeLength(), 140 );
+    }
+
+    {
+        nx_http::header::ContentRange contentRange;
+        contentRange.rangeSpec.start = 100;
+        contentRange.rangeSpec.end = 249;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-249/*" );
+        EXPECT_EQ( contentRange.rangeLength(), 150 );
+    }
+
+    {
+        nx_http::header::ContentRange contentRange;
+        contentRange.rangeSpec.start = 100;
+        contentRange.rangeSpec.end = 249;
+        contentRange.instanceLength = 500;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-249/500" );
+        EXPECT_EQ( contentRange.rangeLength(), 150 );
+    }
+
+    {
+        nx_http::header::ContentRange contentRange;
+        contentRange.rangeSpec.start = 100;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-100/*" );
+        EXPECT_EQ( contentRange.rangeLength(), 1 );
+    }
+
+    {
+        nx_http::header::ContentRange contentRange;
+        contentRange.rangeSpec.start = 100;
+        contentRange.rangeSpec.end = 100;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-100/*" );
+        EXPECT_EQ( contentRange.rangeLength(), 1 );
+    }
+}
+
+
+
 //////////////////////////////////////////////
 //   Via header tests
 //////////////////////////////////////////////
 
-TEST( HttpViaHeaderTest, parse )
+TEST( HttpHeaderTest, Via_parse )
 {
     nx_http::header::Via via;
     EXPECT_TRUE( via.parse("1.0 fred, 1.1 nowhere.com (Apache/1.1)") );
@@ -247,7 +303,7 @@ TEST( HttpViaHeaderTest, parse )
     EXPECT_EQ( via.entries[1].comment, QByteArray("(Apache/1.1) Commanch Whooyanch") );
 }
 
-TEST( HttpViaHeaderTest, toString )
+TEST( HttpHeaderTest, Via_toString )
 {
     nx_http::header::Via via;
     nx_http::header::Via::ProxyEntry entry;
@@ -271,4 +327,63 @@ TEST( HttpViaHeaderTest, toString )
     nx_http::header::Via via2;
     EXPECT_TRUE( via2.parse( via.toString() ) );
     EXPECT_EQ( via, via2 );
+}
+
+
+
+//////////////////////////////////////////////
+//   Via header tests
+//////////////////////////////////////////////
+
+TEST( HttpHeaderTest, AcceptEncoding_parse )
+{
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncoding( "gzip, deflate, sdch" );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("gzip") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("deflate") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("sdch") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("identity") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("qweasd123") );
+    }
+
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncoding( "gzip, deflate, sdch, identity;q=0" );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("gzip") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("deflate") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("sdch") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("identity") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("qweasd123") );
+    }
+
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncoding( "" );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("gzip") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("identity") );
+    }
+
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncoding( "gzip;q=0, deflate;q=0.5, sdch" );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("gzip") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("deflate") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("sdch") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("identity") );
+    }
+
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncoding( "gzip;q=0, deflate;q=0.5, sdch,*" );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("gzip") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("deflate") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("sdch") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("identity") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("qweasd123") );
+    }
+
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncoding( "gzip;q=0, deflate;q=0.5, sdch,*;q=0.0" );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("gzip") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("deflate") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("sdch") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("identity") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("qweasd123") );
+    }
 }

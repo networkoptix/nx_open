@@ -44,8 +44,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
     int port = QUrl(res->getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
     CLSimpleHTTPClient http (res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
 
-    m_cameraControlRequired = isCameraControlRequired();
-    if (m_cameraControlRequired)
+    if (isCameraControlRequired())
     {
         QByteArray request;
         QString result;

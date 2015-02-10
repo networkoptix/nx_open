@@ -22,7 +22,6 @@ QnResourceTreeItemDelegate::QnResourceTreeItemDelegate(QObject *parent):
     base_type(parent)
 {
     m_recordingIcon = qnSkin->icon("tree/recording.png");
-    m_raisedIcon = qnSkin->icon("tree/raised.png");
     m_scheduledIcon = qnSkin->icon("tree/scheduled.png");
     m_buggyIcon = qnSkin->icon("tree/buggy.png");
 }

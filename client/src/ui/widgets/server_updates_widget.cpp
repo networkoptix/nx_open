@@ -116,6 +116,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->connectionProblemLabel->setVisible(false);
     ui->longUpdateWarning->setVisible(false);
 
+    ui->releaseNotesLabel->setText(lit("<a href='notes'>%1</a>").arg(tr("Release notes")));
+    ui->specificBuildLabel->setText(lit("<a href='spec'>%1</a>").arg(tr("Get a specific build")));
+    ui->latestBuildLabel->setText(lit("<a href='latest'>%1</a>").arg(tr("Get the latest version")));
+
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
     updateTimer->setInterval(autoCheckIntervalMs);

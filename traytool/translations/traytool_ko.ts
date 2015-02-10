@@ -35,7 +35,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="157"/>
         <source>Access denied.</source>
-        <translation>요청된 접근이 거부됨</translation>
+        <translation>접근이 거부됨.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="160"/>
@@ -50,7 +50,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="167"/>
         <source>Could not access installed services</source>
-        <translation>설치된 서비스에 접근할 수 없습니다.</translation>
+        <translation>설치된 서비스에 접근할 수 없음</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="167"/>
@@ -117,7 +117,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="483"/>
         <source>Media Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>저장 서버 웹페이지</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="386"/>

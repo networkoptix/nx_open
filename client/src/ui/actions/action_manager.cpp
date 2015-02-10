@@ -543,7 +543,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space"), QnActionBuilder::Mac, true).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/main_menu.png"));
+        icon(qnSkin->icon("main_menu/main_menu.png"));
 
     factory(Qn::OpenLoginDialogAction).
         flags(Qn::Main | Qn::GlobalHotkey).
@@ -1234,7 +1234,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::RenameResourceAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
         requiredPermissions(Qn::WritePermission | Qn::WriteNamePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).

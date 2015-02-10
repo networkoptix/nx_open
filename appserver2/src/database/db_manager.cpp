@@ -291,9 +291,6 @@ bool removeFile(const QString& fileName)
 bool QnDbManager::migrateServerGUID(const QString& table, const QString& field)
 {
     QSqlQuery updateGuidQuery( m_sdb );
-    QString ggg = lit("UPDATE %1 SET %2=? WHERE %2=?").arg(table).arg(field);
-    QByteArray oldG = qnCommon->moduleGUID().toByteArray();
-    QByteArray newG = qnCommon->obsoleteServerGuid().toByteArray();
     updateGuidQuery.prepare(lit("UPDATE %1 SET %2=? WHERE %2=?").arg(table).arg(field) );
     updateGuidQuery.addBindValue( qnCommon->moduleGUID().toRfc4122() );
     updateGuidQuery.addBindValue( qnCommon->obsoleteServerGuid().toRfc4122() );
@@ -565,6 +562,8 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         // admin user resource has been updated
         QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
         transactionLog->fillPersistentInfo(userTransaction);
+        if (qnCommon->useLowPriorityAdminPasswordHach())
+            userTransaction.persistentInfo.timestamp = 1; // use hack to declare this change with low proprity in case if admin has been changed in other system (keep other admin user fields unchanged)
         fromResourceToApi( userResource, userTransaction.params );
         executeTransactionNoLock( userTransaction, QnUbjson::serialized( userTransaction ) );
     }
@@ -1254,6 +1253,7 @@ ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
 ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiResourceParamWithRefDataList& params )
 {
     const QnUuid resID = filter.fields.value( RES_ID_FIELD ).value<QnUuid>();
+    const QnUuid resParentID = resID.isNull() ? filter.fields.value( RES_PARENT_ID_FIELD ).value<QnUuid>() : QnUuid();
     const QByteArray resType = filter.fields.value( RES_TYPE_FIELD ).toByteArray();
 
     QSqlQuery query(m_sdb);
@@ -1261,7 +1261,7 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
     QString queryStr = "\
             SELECT kv.resource_guid as resourceId, kv.value, kv.name \
             FROM vms_kvpair kv ";
-    if( !resType.isEmpty() )
+    if( !resType.isEmpty() || !resParentID.isNull())
     {
         queryStr += 
            "JOIN vms_resource r on r.guid = kv.resource_guid ";
@@ -1275,6 +1275,9 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
     if( !resID.isNull() )
         queryStr += "\
             WHERE kv.resource_guid = :guid ";
+    if( !resParentID.isNull() )
+        queryStr += "\
+                    WHERE r.parent_guid = :parentGuid ";
     queryStr += 
            "ORDER BY kv.resource_guid ";
 
@@ -1286,6 +1289,8 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
 
     if( !resID.isNull() )
         query.bindValue(QLatin1String(":guid"), resID.toRfc4122());
+    if( !resParentID.isNull() )
+        query.bindValue(QLatin1String(":parentGuid"), resParentID.toRfc4122());
     if (!query.exec())
     {
         NX_LOG( lit("DB error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
@@ -2051,7 +2056,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
 ErrorCode QnDbManager::addCameraHistory(const ApiCameraServerItemData& params)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverGuid, :timestamp, :cameraUniqueId)");
+    query.prepare("INSERT OR REPLACE INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverGuid, :timestamp, :cameraUniqueId)");
     QnSql::bind(params, &query);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -2700,12 +2705,12 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList)
+ErrorCode QnDbManager::getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList)
 {
     QString filterStr;
-    if( !cameraId.isNull() )
-        filterStr = QString("WHERE camera_guid = %1").arg(guidToSqlString(cameraId));
-
+    if( !serverId.isNull() )
+        filterStr = QString("WHERE r2.parent_guid = %1").arg(guidToSqlString(serverId));
+    
     //fetching recording schedule
     QSqlQuery queryScheduleTask(m_sdb);
     queryScheduleTask.setForwardOnly(true);
@@ -2723,6 +2728,7 @@ ErrorCode QnDbManager::getScheduleTasks(const QnUuid& cameraId, std::vector<ApiS
             st.fps                                 \
         FROM vms_scheduletask st \
         JOIN vms_camera_user_attributes r on r.id = st.camera_attrs_id \
+        LEFT JOIN vms_resource r2 on r2.guid = r.camera_guid \
         %1\
         ORDER BY r.camera_guid\
     ").arg(filterStr));
@@ -2736,13 +2742,13 @@ ErrorCode QnDbManager::getScheduleTasks(const QnUuid& cameraId, std::vector<ApiS
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributesDataList& cameraUserAttributesList)
 {
     //fetching camera user attributes
     QSqlQuery queryCameras(m_sdb);
     QString filterStr;
-    if( !cameraId.isNull() )
-        filterStr = QString("WHERE camera_guid = %1").arg(guidToSqlString(cameraId));
+    if( !serverId.isNull() )
+        filterStr = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(serverId));
     queryCameras.setForwardOnly(true);
 
     queryCameras.prepare(lit("\
@@ -2760,6 +2766,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributes
             max_archive_days as maxArchiveDays,          \
             prefered_server_id as preferedServerId       \
          FROM vms_camera_user_attributes                 \
+         LEFT JOIN vms_resource r on r.guid = camera_guid     \
          %1                                              \
          ORDER BY camera_guid                            \
         ").arg(filterStr) );
@@ -2772,7 +2779,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributes
     QnSql::fetch_many(queryCameras, &cameraUserAttributesList);
 
     std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
-    ErrorCode errCode = getScheduleTasks(cameraId, scheduleTaskList);
+    ErrorCode errCode = getScheduleTasks(serverId, scheduleTaskList);
     if (errCode != ErrorCode::ok)
         return errCode;
 
@@ -2787,14 +2794,14 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributes
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList& cameraExList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList& cameraExList)
 {
     QSqlQuery queryCameras( m_sdb );
     queryCameras.setForwardOnly(true);
 
     QString filterStr;
-    if (!cameraId.isNull()) {
-        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(cameraId));
+    if (!serverId.isNull()) {
+        filterStr = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(serverId));
     }
     
     queryCameras.prepare(QString("\
@@ -2830,8 +2837,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList
 
     //reading resource properties
     QnQueryFilter filter;
-    if( !cameraId.isNull() )
-        filter.fields.insert( RES_ID_FIELD, QVariant::fromValue(cameraId) );    //TODO #ak use QnSql::serialized_field
+    if( !serverId.isNull() )
+        filter.fields.insert( RES_PARENT_ID_FIELD, QVariant::fromValue(serverId) );    //TODO #ak use QnSql::serialized_field
     filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_CAMERA );
     ApiResourceParamWithRefDataList params;
     ErrorCode result = fetchResourceParams( filter, params );
@@ -2840,7 +2847,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList
     mergeObjectListData<ApiCameraDataEx>(cameraExList, params, &ApiCameraDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
 
     std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
-    ErrorCode errCode = getScheduleTasks(cameraId, scheduleTaskList);
+    ErrorCode errCode = getScheduleTasks(serverId, scheduleTaskList);
     if (errCode != ErrorCode::ok)
         return errCode;
 
@@ -2993,7 +3000,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServer
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("SELECT server_guid as serverGuid, timestamp, physical_id as cameraUniqueId FROM vms_cameraserveritem"));
+    query.prepare(QString("SELECT server_guid as serverGuid, timestamp, physical_id as cameraUniqueId FROM vms_cameraserveritem ORDER BY physical_id, timestamp"));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;

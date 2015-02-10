@@ -31,6 +31,8 @@ public:
         VideoWall,
         VideoWallItem,
         VideoWallMatrix,
+        OtherSystem,
+        OtherSystems,
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,

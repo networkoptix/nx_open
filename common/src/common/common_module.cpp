@@ -34,6 +34,7 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     m_runUuid = QnUuid::createUuid();
     m_transcodingDisabled = false;
     m_systemIdentityTime = 0;
+    m_lowPriorityAdminPassword = false;
 }
 
 QnCommonModule::~QnCommonModule() {
@@ -157,4 +158,14 @@ void QnCommonModule::adminPasswordData(QByteArray* hash, QByteArray* digest) con
 {
     *hash = m_adminPaswdHash;    
     *digest = m_adminPaswdDigest;
+}
+
+void QnCommonModule::setUseLowPriorityAdminPasswordHach(bool value)
+{
+    m_lowPriorityAdminPassword = value;
+}
+
+bool QnCommonModule::useLowPriorityAdminPasswordHach() const
+{
+    return m_lowPriorityAdminPassword;
 }

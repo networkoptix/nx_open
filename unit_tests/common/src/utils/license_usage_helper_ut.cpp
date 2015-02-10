@@ -270,9 +270,44 @@ TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCamerasOverflow )
     licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
 
     helper.propose(cameras, true);
-    ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1 + overflow);
+    /* We should see a message like: 2 licenses are used; 1 more license is required */
+    ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 2);    
     ASSERT_EQ(helper.requiredLicenses(Qn::LC_AnalogEncoder), 1);
     ASSERT_FALSE( helper.isValid() );   
+}
+
+/** Basic test for single license type requirement. */
+TEST( QnCamLicenseUsageHelperTest, checkRequiredLicenses )
+{
+    QnResourcePoolScaffold resPoolScaffold;
+    auto cameras = resPoolScaffold.addCameras(Qn::LC_Professional, 2, false);
+
+    QnCamLicenseUsageHelper helper;
+    QnLicensePoolScaffold licPoolScaffold;
+
+    ASSERT_TRUE( helper.isValid() );   
+    helper.propose(cameras, true);
+    ASSERT_FALSE( helper.isValid() );   
+
+    ASSERT_EQ(helper.usedLicenses(Qn::LC_Professional), 2);
+    ASSERT_EQ(helper.requiredLicenses(Qn::LC_Professional), 2);
+}
+
+/** Basic test for analog licenses requirement. */
+TEST( QnCamLicenseUsageHelperTest, checkRequiredAnalogLicenses )
+{
+    QnResourcePoolScaffold resPoolScaffold;
+    auto cameras = resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder, false);
+
+    QnCamLicenseUsageHelper helper;
+    QnLicensePoolScaffold licPoolScaffold;
+
+    ASSERT_TRUE( helper.isValid() );   
+    helper.propose(cameras, true);
+    ASSERT_FALSE( helper.isValid() );   
+
+    ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1);
+    ASSERT_EQ(helper.requiredLicenses(Qn::LC_AnalogEncoder), 1);
 }
 
 /** 
@@ -308,3 +343,4 @@ TEST( QnCamLicenseUsageHelperTest, profileCalculateSpeed )
     licPoolScaffold.addLicenses(Qn::LC_Trial, borrowedCount * Qn::LC_Count);
     ASSERT_TRUE(helper.isValid());
 }
+

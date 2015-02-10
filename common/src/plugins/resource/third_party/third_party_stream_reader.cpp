@@ -136,7 +136,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
 
     m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
 
-    if( !isCameraControlDisabled() )
+    if( isCameraControlRequired() )
     {
         if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
         {
