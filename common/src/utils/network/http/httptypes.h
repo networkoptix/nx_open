@@ -453,17 +453,25 @@ namespace nx_http
             bool parse( const BufferType& str );
         };
 
+        //! identity
+        static const StringType IDENTITY_CODING( "identity" );
+        //! *
+        static const StringType ANY_CODING( "*" );
+
         //![rfc2616, 14.3]
         class AcceptEncodingHeader
         {
         public:
             AcceptEncodingHeader( const nx_http::StringType& strValue );
 
+            void parse( const nx_http::StringType& str );
             //!Returns \a true if \a encodingName is present in header and returns corresponding qvalue in \a *q (if not null)
-            bool encodingIsAllowed( const nx_http::StringType& encodingName, float* q = nullptr ) const;
+            bool encodingIsAllowed( const nx_http::StringType& encodingName, double* q = nullptr ) const;
 
         private:
-            nx_http::StringType m_strValue;
+            //!map<coding, qvalue>
+            std::map<nx_http::StringType, double> m_codings;
+            boost::optional<double> m_anyCodingQValue;
         };
 
         /*!

@@ -22,5 +22,11 @@
         <resource name = "AXISQ7224" public = "AXIS_ENCODER"/>
         <resource name = "AXISQ7424" public = "AXIS_ENCODER"/>
         <resource name = "AXISQ7414" public = "AXIS_ENCODER"/>
+        <resource name = "AXISQ1755" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="25"/>
+            </params>
+        </resource>        
     </oem>
 </resources>
