@@ -133,8 +133,17 @@ public:
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
+    //!Returns user-defined group name (if not empty) or server-defined group name
     virtual QString getGroupName() const;
+    //!Returns server-defined group name
+    QString getDefaultGroupName() const;
     virtual void setGroupName(const QString& value);
+    //!Set group name (the one is show to the user in client)
+    /*!
+        This name is set by user.
+        \a setGroupName name is generally set automatically (e.g., by server)
+    */
+    void setUserDefinedGroupName( const QString& value );
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
 
