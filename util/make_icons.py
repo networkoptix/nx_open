@@ -53,7 +53,7 @@ def getCustomizations():
 
 def getColors(customization):
     colors = None
-    colorsFile = os.path.join('customization', customization, 'client', 'resources', '.colors')
+    colorsFile = os.path.join('customization', customization, '.colors')
     if os.path.isfile(colorsFile):
         with open(colorsFile) as file:
             colors = json.load(file)
