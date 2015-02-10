@@ -17,7 +17,7 @@ baseCustomizations = ['default', 'digitalwatchdog', 'vista']
 
 def convert(sourceFile, exportFile, profile):
     with open(os.devnull, 'w') as devnull:
-        subprocess.call(['inkscape', sourceFile, '-e', exportFile] + profile.split(), stdout = devnull)
+        subprocess.call(['inkscape', sourceFile, '-e', exportFile] + profile.split(), stdout = devnull, stderr = devnull)
 
 def convertIcon(srcFile, dstFile, colors):
     tmpFile = None
