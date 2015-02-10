@@ -215,6 +215,9 @@ namespace ec2
         void beginTran();
         void commit();
         void rollback();
+
+        qint64 getTransactionLogTime() const;
+        void setTransactionLogTime(qint64 value);
     private:
         friend class QnDbManager;
 

@@ -16,6 +16,8 @@ static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
 static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;
 
+static const QLatin1String anyResolution( "*" );
+
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0)
 {}
@@ -149,23 +151,25 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
     CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>( mediaStreamsStr.toLatin1() );
 
     //checking if stream info has been changed
-    bool needSaveMediaStreamInfo = true;
     for( auto it = supportedMediaStreams.streams.begin();
         it != supportedMediaStreams.streams.end();
         ++it )
     {
         if( it->encoderIndex == mediaStreamInfo.encoderIndex )
         {
-            if( *it == mediaStreamInfo )
-                needSaveMediaStreamInfo = false;
-            else
-                supportedMediaStreams.streams.erase( it );
+            if( *it == mediaStreamInfo ||
+                //if new media stream info does not contain resolution, preferring existing one
+                (mediaStreamInfo.codec == it->codec &&
+                 mediaStreamInfo.resolution != it->resolution &&
+                 mediaStreamInfo.resolution == anyResolution) )
+            {
+                return false;   //stream info has not been changed
+            }
+            supportedMediaStreams.streams.erase( it );
             break;
         }
     }
 
-    if( !needSaveMediaStreamInfo )
-        return false; //stream info has not been changed
 
     //removing non-native streams (they will be re-generated)
     supportedMediaStreams.streams.erase(
@@ -363,7 +367,7 @@ CameraMediaStreamInfo::CameraMediaStreamInfo(
     CodecID _codec )
 :
     encoderIndex( _encoderIndex ),
-    resolution( _resolution.isValid() ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height()) : lit("*") ),
+    resolution( _resolution.isValid() ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height()) : anyResolution ),
     transcodingRequired( false ),
     codec( _codec )
 {

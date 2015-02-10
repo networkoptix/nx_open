@@ -882,27 +882,60 @@ namespace nx_http
         //   Accept-Encoding
         //////////////////////////////////////////////
 
+        //const nx_http::StringType IDENTITY_CODING( "identity" );
+        //const nx_http::StringType ANY_CODING( "*" );
+
         AcceptEncodingHeader::AcceptEncodingHeader( const nx_http::StringType& strValue )
-        :
-            m_strValue( strValue )
         {
+            parse( strValue );
         }
 
-        bool AcceptEncodingHeader::encodingIsAllowed( const nx_http::StringType& encodingName, float* q ) const
+        void AcceptEncodingHeader::parse( const nx_http::StringType& str )
         {
-            //TODO #ak using very simplified (and incorrect) implementation because it is currently use only by hls and this implementation is enough for hls client
-            if( m_strValue.isEmpty() ||                         //empty Accept-Encoding means any encoding will do
-                m_strValue.indexOf(encodingName) >= 0 || 
-                m_strValue.indexOf('*') >= 0 )
+            m_anyCodingQValue.reset();
+
+            //TODO #ak this function is very slow. Introduce some parsing without allocations and copyings..
+            auto codingsStr = str.split( ',' );
+            for( const nx_http::StringType& contentCodingStr: codingsStr )
             {
-                if( q )
-                    *q = 0.5;
-                return true;
+                auto tokens = contentCodingStr.split( ';' );
+                if( tokens.isEmpty() )
+                    continue;
+                double qValue = 1.0;
+                if( tokens.size() > 1 )
+                {
+                    const nx_http::StringType& qValueStr = tokens[1].trimmed();
+                    if( !qValueStr.startsWith("q=") )
+                        continue;   //bad token, ignoring...
+                    qValue = qValueStr.mid(2).toDouble();
+                }
+                const nx_http::StringType& contentCoding = tokens.front().trimmed();
+                if( contentCoding == ANY_CODING )
+                    m_anyCodingQValue = qValue;
+                else
+                    m_codings[contentCoding] = qValue;
             }
-            else
+        }
+
+        bool AcceptEncodingHeader::encodingIsAllowed( const nx_http::StringType& encodingName, double* q ) const
+        {
+            auto codingIter = m_codings.find( encodingName );
+            if( codingIter == m_codings.end() )
             {
-                return false;
+                //encoding is not explicitly specified
+                if( m_anyCodingQValue )
+                {
+                    if( q )
+                        *q = m_anyCodingQValue.get();
+                    return m_anyCodingQValue.get() > 0.0;
+                }
+
+                return encodingName == IDENTITY_CODING;
             }
+
+            if( q )
+                *q = codingIter->second;
+            return codingIter->second > 0.0;
         }
 
 
