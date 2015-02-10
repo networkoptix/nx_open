@@ -272,6 +272,7 @@ QnDbManager::QnDbManager()
     m_needResyncLog(false),
     m_needResyncLicenses(false),
     m_needResyncFiles(false),
+    m_needResyncCameraUserAttributes(false),
     m_dbJustCreated(false),
     m_isBackupRestore(false)
 {
@@ -516,6 +517,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         }
         if (m_needResyncFiles) {
             if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+                return false;
+        }
+        if (m_needResyncCameraUserAttributes) {
+            if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
                 return false;
         }
     }
@@ -1140,6 +1145,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/27_remove_server_status.sql")) {
         return removeServerStatusFromTransactionLog();
+    }
+    else if (updateName == lit(":/updates/31_move_group_name_to_user_attrs.sql")) {
+        m_needResyncCameraUserAttributes = true;
     }
 
     return true;
