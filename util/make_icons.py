@@ -23,8 +23,8 @@ def convertIcon(srcFile, dstFile, colors):
     tmpFile = None
     
     if not colors is None:
-        path, ext = os.path.splitext(srcFile)
-        tmpFile = path + '__' + ext
+        path, _ = os.path.splitext(dstFile)
+        tmpFile = path + '__.svg'
         colorizer.colorize(srcFile, tmpFile, colors)
         srcFile = tmpFile
         
