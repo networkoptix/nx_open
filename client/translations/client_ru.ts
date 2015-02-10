@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru" sourcelanguage="en">
+<TS version="2.0" language="ru" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -3059,7 +3059,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1375"/>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>Присоединить сервер к текущей системе</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1517"/>
@@ -4418,7 +4418,10 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбран сервер другой версии:
+ - Версия клиента: %1.
+ - Версия сервера: %2.
+Для подключения к серверу нужен клиент версии %3.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="152"/>
@@ -5016,12 +5019,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="38"/>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>К сожалению, ваш видеоадаптер не поддерживается. Вы можете продолжить работу, но корректная работоспособность не будет гарантирована.</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="39"/>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Установка или обновление драйверов видеоадаптера может помочь в решении проблемы.</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="40"/>
@@ -5031,12 +5034,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="43"/>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Драйвера видеоадаптера не установлены, либо устарели.</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="44"/>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Установка или обновление драйверов видеоадаптера может помочь ускорить быстродействие при работе с видео.</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="45"/>
@@ -5433,7 +5436,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="45"/>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Для получения лицензионного ключа необходимо отослать сообщение, содержащее серийный номер и Hardware ID, %1.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="66"/>
@@ -6865,7 +6868,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="633"/>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить внешнее хранилище...</translation>
     </message>
 </context>
 <context>
@@ -6957,17 +6960,17 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="119"/>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Что нового</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="120"/>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить другую сборку</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="121"/>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить последнюю версию</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="160"/>
