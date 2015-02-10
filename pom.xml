@@ -328,6 +328,8 @@
             <modules>                       
                 <module>applauncher</module> 
                 <module>client</module>     
+                <module>axhdwitness</module>     
+                <module>clientexe</module>     
             </modules>  
         </profile>         
         <profile>
@@ -342,6 +344,8 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->                   
                 <module>client</module>                     
+                <module>axhdwitness</module>     
+                <module>clientexe</module>                     
                 <module>wixsetup</module>
             </modules>
             <properties>
