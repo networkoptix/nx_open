@@ -18,7 +18,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_softMotionRole(Qn::CR_Default),
     m_softMotionLastChannel(0),
     m_secondaryQuality(Qn::SSQualityNotDefined),
-    m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1)
+    m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
+    m_owner(0)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_motionMaskBinData[i] = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
@@ -37,6 +38,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_layout = m_cameraRes->getVideoLayout();
     m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
     m_resolutionCheckTimer.invalidate();
+}
+
+void QnLiveStreamProvider::setOwner(QnAbstractVideoCamera* owner)
+{
+    m_owner = owner;
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -107,17 +113,14 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        m_cameraRes->lockConsumers();
-        for(QnResourceConsumer* consumer: m_cameraRes->getAllConsumers())
-        {
-            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-            if (lp && lp->getRole() == Qn::CR_SecondaryLiveVideo) {
+        if (m_owner) {
+            QnLiveStreamProviderPtr lp = m_owner->getSecondaryReader();
+            if (lp)
+            {
                 lp->setQuality(m_cameraRes->getSecondaryStreamQuality());
                 lp->onPrimaryFpsUpdated(m_fps);
             }
         }
-        m_cameraRes->unlockConsumers();
-
         updateStreamParamsBasedOnFps();
     }
 }
@@ -208,14 +211,11 @@ void QnLiveStreamProvider::setFps(float f)
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        m_cameraRes->lockConsumers();
-        for(QnResourceConsumer* consumer: m_cameraRes->getAllConsumers())
-        {
-            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-            if (lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
+        if (m_owner) {
+            QnLiveStreamProviderPtr lp = m_owner->getSecondaryReader();
+            if (lp)
                 lp->onPrimaryFpsUpdated(f);
         }
-        m_cameraRes->unlockConsumers();
     }
 
 

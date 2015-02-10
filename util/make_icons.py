@@ -17,14 +17,14 @@ baseCustomizations = ['default', 'digitalwatchdog', 'vista']
 
 def convert(sourceFile, exportFile, profile):
     with open(os.devnull, 'w') as devnull:
-        subprocess.call(['inkscape', sourceFile, '-e', exportFile] + profile.split(), stdout = devnull)
+        subprocess.call(['inkscape', sourceFile, '-e', exportFile] + profile.split(), stdout = devnull, stderr = devnull)
 
 def convertIcon(srcFile, dstFile, colors):
     tmpFile = None
     
     if not colors is None:
-        path, ext = os.path.splitext(srcFile)
-        tmpFile = path + '__' + ext
+        path, _ = os.path.splitext(dstFile)
+        tmpFile = path + '__.svg'
         colorizer.colorize(srcFile, tmpFile, colors)
         srcFile = tmpFile
         
@@ -53,7 +53,7 @@ def getCustomizations():
 
 def getColors(customization):
     colors = None
-    colorsFile = os.path.join('customization', customization, 'client', 'resources', '.colors')
+    colorsFile = os.path.join('customization', customization, '.colors')
     if os.path.isfile(colorsFile):
         with open(colorsFile) as file:
             colors = json.load(file)
