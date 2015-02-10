@@ -1725,7 +1725,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         }
         if (modified.isEmpty())
             return; // very strange outcome - at least camera should be in the list
-        
+        //todo: #akolesnikov groupName should be moved from camera settings to camera user attributies
         connection2()->getCameraManager()->save(modified,
             this, 
             [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
