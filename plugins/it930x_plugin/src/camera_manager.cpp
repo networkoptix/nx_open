@@ -853,6 +853,8 @@ namespace ite
 
                 if (encoderNumber)
                     packet->setLowQualityFlag();
+                if (pkt->flags() & ContentPacket::F_StreamReset)
+                    packet->setStreamReset();
 
                 return packet;
             }

@@ -1,6 +1,6 @@
 #include "it930x.h"
 #include "rc_command.h"
-//#include "timer.h"
+#include "timer.h"
 
 #include "dev_reader.h"
 #include "dev_read_thread.h"
@@ -283,6 +283,7 @@ namespace ite
             if (q->size() >= MAX_QUEUE_SIZE)
             {
                 q->pop_front();
+                q->front()->flags() |= ContentPacket::F_StreamReset;
 #if 0
                 if (pid == Pacidal::PID_VIDEO_SD)
                     printf("lost packet\n");
@@ -314,12 +315,14 @@ namespace ite
 
     bool DevReader::readRetChanCmd(RCCommand& cmd)
     {
+        static const unsigned WAIT_TIME_MS = 1000;
+
         sync();
 
+        Timer t(true);
         TsBuffer ts(m_poolTs);
 
-        static const unsigned MAX_READS = 1000;
-        for (unsigned i=0; i < MAX_READS; ++i)
+        while (t.elapsed() < WAIT_TIME_MS)
         {
             if (m_buf.readTSPacket(ts))
             {

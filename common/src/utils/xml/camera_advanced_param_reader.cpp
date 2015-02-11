@@ -111,6 +111,7 @@ void QnCachingCameraAdvancedParamsReader::setParams(const QnResourcePtr &resourc
 }
 
 bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {
+#if 0 // need only Q_ASSERT in DEBUG
     QnIODeviceRAAI guard(xmlSource);
     if (!guard.isValid())
         return false;
@@ -123,6 +124,9 @@ bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {
     QnXMLValidationMessageHandler msgHandler;
     validator.setMessageHandler(&msgHandler);
     return validator.validate(xmlSource);
+#else
+    return true;
+#endif
 }
 
 namespace QnXmlTag {

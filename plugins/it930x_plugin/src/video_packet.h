@@ -39,6 +39,7 @@ namespace ite
         void setTime(uint64_t ts) { m_time = ts; }
         void setKeyFlag() { m_flags |= MediaDataPacket::fKeyPacket; }
         void setLowQualityFlag() { m_flags |= MediaDataPacket::fLowQuality; }
+        void setStreamReset() { m_flags |= MediaDataPacket::fStreamReset; }
 
         bool isKey() const { return m_flags & MediaDataPacket::fKeyPacket; }
 

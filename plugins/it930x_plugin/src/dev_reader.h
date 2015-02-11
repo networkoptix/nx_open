@@ -100,12 +100,19 @@ namespace ite
     class ContentPacket
     {
     public:
+        enum Flags
+        {
+            F_IsKey         = 0x1,
+            F_StreamReset   = 0x2
+        };
+
         ContentPacket()
         :   m_gotPES(0),
             m_pesPTS(0),
             m_pesDTS(0),
             m_adaptPCR(0),
-            m_adaptOPCR(0)
+            m_adaptOPCR(0),
+            m_flags(0)
         {
             static const unsigned SIZE_RESERVE = 16 * 1024;
 
@@ -156,6 +163,8 @@ namespace ite
 
         int64_t pts() const { return m_pesPTS; }
 
+        unsigned& flags() { return m_flags; }
+
     private:
         std::vector<uint8_t> m_data;
         unsigned m_gotPES;
@@ -163,6 +172,7 @@ namespace ite
         int64_t m_pesDTS;
         uint64_t m_adaptPCR;
         uint64_t m_adaptOPCR;
+        unsigned m_flags;
 
         void append(const uint8_t * apData, uint8_t dataSize)
         {
