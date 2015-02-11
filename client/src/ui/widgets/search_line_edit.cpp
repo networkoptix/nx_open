@@ -15,6 +15,7 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOptionFrameV2>
 
+#include <ui/style/skin.h>
 #include <ui/common/palette.h>
 
 namespace {
@@ -58,62 +59,35 @@ namespace {
         QMap<int, QPainterPath> m_pathCacheBySize;
     };
 
-    /**
-    Clear button on the right hand side of the search widget.
-    */
-    class QnArrowButton : public QAbstractButton {
-    public:
-        QnArrowButton(bool left, QWidget *parent = 0):
-            QAbstractButton(parent),
-            m_left(left)
-        {
-            setCursor(Qt::ArrowCursor);
-        }
+    QToolButton *createCloseButton(QnSearchLineEdit *parent)
+    {
+        QToolButton *result = new QToolButton(parent);
+        const QIcon icon = qnSkin->icon(lit("titlebar/close_tab.png"));
+        result->setIcon(icon);
 
-        void paintEvent(QPaintEvent *event) {
-            Q_UNUSED(event);
-            QPainter painter(this);
-            int size = height(); //assuming height and width are equal
+        result->setToolTip(QObject::tr("Close"));
+        QObject::connect(result, &QAbstractButton::clicked, parent, &QnSearchLineEdit::escKeyPressed);
 
-            painter.setRenderHint(QPainter::Antialiasing, true);
-            painter.setBrush(isDown()
-                ? palette().color(QPalette::Dark)
-                : palette().color(QPalette::Mid));
-            //TODO: #GDM #Bookmarks should we customize this?
-            //TODO: #GDM #Bookmarks should we cache pixmap?
+        return result;
+    }
 
-            painter.setPen(painter.brush().color());
-
-            int offset = size / 5;
-            int center = size / 2;
-            int radius = size - offset * 2;
-            painter.drawEllipse(offset, offset, radius, radius);
-
-            painter.setPen(Qt::white);
-            int border = offset * 2;
-            int dx = size / 10;
-
-            if (m_left) {
-                painter.drawLine(center + dx, border, center - dx, center);
-                painter.drawLine(center + dx, size - border, center - dx, center);
-            } else {
-                painter.drawLine(center - dx, border, center + dx, center);
-                painter.drawLine(center - dx, size - border, center + dx, center);
-            }
-        }
-    private:
-        bool m_left;
-    };
-
+    QString getBookmarksCountText(int found
+        , int overall)
+    {
+        return QString(lit("%1/%2")).arg(QString::number(found), QString::number(overall));
+    }
 }
 
-QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
-    QWidget(parent),
-    m_lineEdit(new QLineEdit(this)),
-    m_occurencesLabel(new QLabel(this)),
-    m_prevButton(new QnArrowButton(true, this)),
-    m_nextButton(new QnArrowButton(false, this)),
-    m_searchButton(new QnSearchButton(this))
+QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
+    : QWidget(parent)
+    , m_lineEdit(new QLineEdit(this))
+    , m_closeButton(createCloseButton(this))
+    , m_occurencesLabel(new QLabel(this))
+    , m_searchButton(new QnSearchButton(this))
+
+    , m_foundBookmarks(0)
+    , m_overallBookmarks(0)
+
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -134,19 +108,11 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
     m_lineEdit->setPalette(clearPalette);
     m_lineEdit->setPlaceholderText(tr("Search"));
     connect(m_lineEdit, &QLineEdit::textChanged, this, &QnSearchLineEdit::textChanged);
+    connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
 
-    // prevButton
-    m_prevButton->setToolTip(tr("Previous"));
-    connect(m_prevButton, &QAbstractButton::clicked, this, &QnSearchLineEdit::prevButtonClicked);
-
-    // nextButton
-    m_nextButton->setToolTip(tr("Next"));
-    connect(m_nextButton, &QAbstractButton::clicked, this, &QnSearchLineEdit::nextButtonClicked);
-
-    m_occurencesLabel->setText(lit("25/1920"));
+    m_occurencesLabel->setText(getBookmarksCountText(m_foundBookmarks, m_overallBookmarks));
     m_occurencesLabel->setAutoFillBackground(true);
     setPaletteColor(m_occurencesLabel, QPalette::Base, QColor(50, 127, 50));
-
 
     QSizePolicy policy = sizePolicy();
     setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
@@ -164,23 +130,17 @@ void QnSearchLineEdit::updateGeometries() {
     QRect rect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
 
     int height = rect.height();
-    int width = rect.width();
-
     int buttonSize = height;
     
     // left edge
     m_searchButton->setGeometry(rect.x(), rect.y(), buttonSize, buttonSize);
 
-    // rightmost
-    m_nextButton->setGeometry(width - buttonSize, 0, buttonSize, buttonSize);
-    
-    // to the left from "Next"
-    m_prevButton->setGeometry(m_nextButton->x() - buttonSize, 0, buttonSize, buttonSize);
-
+    // right edge
+    m_closeButton->setGeometry(rect.width() - buttonSize, rect.y() + 1, buttonSize, buttonSize);
     int labelWidth = m_occurencesLabel->sizeHint().width();
     int labelOffset = 2;
 
-    m_occurencesLabel->setGeometry(m_prevButton->x() - labelWidth, labelOffset, labelWidth, height - labelOffset*2);
+    m_occurencesLabel->setGeometry(m_closeButton->x() - labelWidth, labelOffset, labelWidth, height - labelOffset*2);
 
     m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, m_occurencesLabel->x() - buttonSize, height);
     
@@ -209,8 +169,22 @@ QSize QnSearchLineEdit::sizeHint() const {
     return size;
 }
 
-void QnSearchLineEdit::focusInEvent(QFocusEvent *event) {
+void QnSearchLineEdit::updateFoundBookmarksCount(int count)
+{
+    m_foundBookmarks = count;
+    m_occurencesLabel->setText(getBookmarksCountText(m_foundBookmarks, m_overallBookmarks));
+}
+
+void QnSearchLineEdit::updateOverallBookmarksCount(int count)
+{
+    m_overallBookmarks = count;
+    m_occurencesLabel->setText(getBookmarksCountText(m_foundBookmarks, m_overallBookmarks));
+}
+
+void QnSearchLineEdit::focusInEvent(QFocusEvent *event) 
+{
     m_lineEdit->event(event);
+    m_lineEdit->selectAll();
     QWidget::focusInEvent(event);
 }
 
@@ -226,13 +200,33 @@ void QnSearchLineEdit::focusOutEvent(QFocusEvent *event) {
     QWidget::focusOutEvent(event);
 }
 
-void QnSearchLineEdit::keyPressEvent(QKeyEvent *event) {
+void QnSearchLineEdit::keyPressEvent(QKeyEvent *event)
+{
     m_lineEdit->event(event);
+    if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return))
+    {
+        event->accept();
+    }
 }
 
-bool QnSearchLineEdit::event(QEvent *event) {
+bool QnSearchLineEdit::event(QEvent *event)
+{
     if (event->type() == QEvent::ShortcutOverride)
-        return m_lineEdit->event(event);
+    {
+        QKeyEvent * const keyEvent = static_cast<QKeyEvent *>(event);
+        const bool result = m_lineEdit->event(event);
+        if (keyEvent->key() == Qt::Key_Escape)
+        {
+            escKeyPressed();
+            keyEvent->accept();
+        }
+        return result;
+    }
+    else if (event->type() == QEvent::EnabledChange)
+    {
+        m_closeButton->setVisible(isEnabled()); /// To update close button state when hiding/showing
+    }
+
     return QWidget::event(event);
 }
 

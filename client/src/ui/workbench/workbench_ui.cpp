@@ -2425,6 +2425,7 @@ void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
 
     m_inFreespace = false;
 
+    const bool wasOpened = m_searchOpened;
     m_searchOpened = opened;
 
     QSizeF newSize = opened ? QSizeF(250, 21) : QSizeF(250, 0);
@@ -2434,7 +2435,14 @@ void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
         m_searchSizeAnimator->stop();
         m_searchWidget->setPaintSize(newSize);
     }
-
+    
+    QnSearchLineEdit *searchWidget = navigator()->bookmarksSearchWidget();
+    if (opened && !wasOpened)
+    {
+        searchWidget->enterKeyPressed();
+    }
+    
+    searchWidget->setEnabled(opened);
     action(Qn::ToggleBookmarksSearchAction)->setChecked(opened);
 }
 
@@ -2487,6 +2495,7 @@ void QnWorkbenchUi::createSearchWidget() {
     QnSearchLineEdit *searchLine = new QnSearchLineEdit();
     searchLine->setAttribute(Qt::WA_TranslucentBackground);
     searchLine->resize(250, 21);
+    connect(searchLine, &QnSearchLineEdit::escKeyPressed, this, [this]() { setSearchOpened(false, true); } );
 
     navigator()->setBookmarksSearchWidget(searchLine);
 
@@ -2498,12 +2507,6 @@ void QnWorkbenchUi::createSearchWidget() {
 
     // slider should be highlighted when search widget is hovered
     m_sliderOpacityProcessor->addTargetItem(m_searchWidget);
-
-    HoverFocusProcessor* searchHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    searchHidingProcessor->addTargetItem(m_searchWidget);
-    searchHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
-    searchHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
-    connect(searchHidingProcessor,  &HoverFocusProcessor::hoverFocusLeft, this, [this](){ setSearchOpened(false);});
 
     m_searchOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_searchOpacityProcessor->addTargetItem(m_searchWidget);

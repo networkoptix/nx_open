@@ -43,6 +43,7 @@ extern "C"
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/search_line_edit.h>
+#include <ui/common/search_query_strategy.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
@@ -254,11 +255,22 @@ void QnWorkbenchNavigator::initialize() {
 
     connect(m_dayTimeWidget,                    SIGNAL(timeClicked(const QTime &)),                 this,   SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
 
-    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::textChanged, this, [this](const QString &text) {
-        if (!m_currentMediaWidget)
-            return;
-        //TODO: #GDM #Bookmarks do not search till the full tag or at least 3 letters will be entered, search once in 2-3 seconds
-        loader(m_currentMediaWidget)->setBookmarksTextFilter(text); //TODO: #GDM #Bookmarks synced widgets? clear previous?
+    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::textChanged
+        , m_searchQueryStrategy, &QnSearchQueryStrategy::queryChanged);
+    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::enterKeyPressed, this, [this]() 
+    { 
+        const QString query = m_bookmarksSearchWidget->lineEdit()->text();
+        m_searchQueryStrategy->forciblyQueryChanged(query);
+    });
+    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::escKeyPressed, this, [this] 
+    {
+        m_searchQueryStrategy->forciblyQueryChanged(lit("")); 
+    });
+
+    connect(m_searchQueryStrategy, &QnSearchQueryStrategy::updateQuery, this, [this](const QString &text)
+    {
+        if (m_currentMediaWidget)
+            loader(m_currentMediaWidget)->setBookmarksTextFilter(text);
     });
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
@@ -989,9 +1001,9 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
             switch (dataType) {
             case Qn::RecordedTimePeriod:
             case Qn::MotionTimePeriod:
+            case Qn::BookmarkTimePeriod:
                 loader->setTargetPeriod(calendarPeriod, dataType);
                 break;
-            case Qn::BookmarkTimePeriod:
             case Qn::BookmarkData:
                 loader->setTargetPeriod(timeSliderPeriod, dataType);
                 break;
@@ -1613,18 +1625,23 @@ QnSearchLineEdit * QnWorkbenchNavigator::bookmarksSearchWidget() const {
     return m_bookmarksSearchWidget;
 }
 
-void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget) {
+void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget)
+{
     if(m_bookmarksSearchWidget == bookmarksSearchWidget)
         return;
 
     if(m_bookmarksSearchWidget) {
         disconnect(m_bookmarksSearchWidget, NULL, this, NULL);
+        disconnect(m_searchQueryStrategy, nullptr, this, nullptr);
 
         if(isValid())
             deinitialize();
     }
 
     m_bookmarksSearchWidget = bookmarksSearchWidget;
+
+    enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
+    m_searchQueryStrategy = new QnSearchQueryStrategy(m_bookmarksSearchWidget, kMinimalSymbolsCount, kDelayMs);
 
     if(m_bookmarksSearchWidget) {
         connect(m_bookmarksSearchWidget, &QObject::destroyed, this, [this](){setBookmarksSearchWidget(NULL);});

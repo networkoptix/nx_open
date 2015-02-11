@@ -9,6 +9,7 @@
 
 #include <client/client_globals.h>
 
+#include <ui/common/fwd.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -208,6 +209,7 @@ private:
     QnCalendarWidget *m_calendar;
     QnDayTimeWidget *m_dayTimeWidget;
     QnSearchLineEdit *m_bookmarksSearchWidget;
+    QnSearchQueryStrategy *m_searchQueryStrategy;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
