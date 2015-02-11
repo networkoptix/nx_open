@@ -1,8 +1,88 @@
+#include <ctime>
 #include <memory>
+#include <utility>
 
 #include "discovery_manager.h"
 #include "stream_reader.h"
 #include "video_packet.h"
+
+#if 1
+#include "../../../common/src/utils/media/nalUnits.h"
+#include "../../../common/src/utils/media/bitStream.h"
+#endif
+
+
+namespace
+{
+    ///
+    class FrameTypeExtractor
+    {
+    public:
+        static constexpr bool dataWithNalPrefixes() { return true; }
+
+        enum FrameType
+        {
+            UnknownFrameType,
+            I_Frame,
+            P_Frame,
+            B_Frame
+        };
+
+        static FrameTypeExtractor::FrameType getH264FrameType(const quint8 * data, int size)
+        {
+            if (size < 4)
+                return UnknownFrameType;
+
+            const quint8* end = data + size;
+            while (data < end)
+            {
+                if (dataWithNalPrefixes())
+                {
+                    data = NALUnit::findNextNAL(data, end);
+                    if (data >= end)
+                        break;
+                }
+                else {
+                    data += 4;
+                }
+
+                quint8 nalType = *data & 0x1f;
+                if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR)
+                {
+                    if (nalType == nuSliceIDR)
+                        return I_Frame;
+                    quint8 nal_ref_idc = (*data >> 5) & 3;
+                    if (nal_ref_idc)
+                        return P_Frame;
+
+                    BitStreamReader bitReader;
+                    bitReader.setBuffer(data+1, end);
+                    try {
+                        /*int first_mb_in_slice =*/ NALUnit::extractUEGolombCode(bitReader);
+
+                        int slice_type = NALUnit::extractUEGolombCode(bitReader);
+                        if (slice_type >= 5)
+                            slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
+
+                        if (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE)
+                            return P_Frame; // fake. It is i-frame, but not IDR, so we can't seek to this time and e.t.c.  // I_Frame;
+                        else if (slice_type == SliceUnit::P_TYPE || slice_type == SliceUnit::SP_TYPE)
+                            return P_Frame;
+                        else if (slice_type == SliceUnit::B_TYPE)
+                            return B_Frame;
+                        else
+                            return UnknownFrameType;
+                    } catch(...) {
+                        return UnknownFrameType;
+                    }
+                }
+                if (! dataWithNalPrefixes())
+                    break;
+            }
+            return UnknownFrameType;
+        }
+    };
+}
 
 namespace ite
 {
@@ -60,6 +140,31 @@ namespace ite
             return nxcip::NX_TRY_AGAIN;
         }
 
+        auto type = FrameTypeExtractor::getH264FrameType((const uint8_t *)packet->data(), packet->dataSize());
+        if (type == FrameTypeExtractor::I_Frame)
+            packet->setKeyFlag();
+#if 0
+        const char * strFrameType = "Unknown";
+        switch(type)
+        {
+            case FrameTypeExtractor::I_Frame:
+                strFrameType = "I-frame";
+                break;
+
+            case FrameTypeExtractor::P_Frame:
+                strFrameType = "P-frame";
+                break;
+
+            case FrameTypeExtractor::B_Frame:
+                strFrameType = "B-frame";
+                break;
+
+            default:
+                break;
+        }
+
+        printf("%s cam: %d enc: %d (size %d; pts %ld; time %ld)\n", strFrameType, m_cameraManager->txID(), m_encoderNumber, packet->dataSize(), packet->pts(), time(NULL));
+#endif
         packet->setTime( usecTime(packet->pts()) );
         *lpPacket = packet;
         return nxcip::NX_NO_ERROR;

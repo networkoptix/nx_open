@@ -1,5 +1,6 @@
-#include <ctime>
 #include <chrono>
+#include <thread>
+#include <atomic>
 
 #if 0
 #include <ratio>
@@ -26,39 +27,79 @@ namespace
 
 namespace ite
 {
-    //!
+    ///
     class Timer
     {
     public:
-        typedef std::chrono::steady_clock Clock;
         //typedef ClockRDTSC Clock;
+        //typedef std::chrono::steady_clock Clock;
+        typedef std::chrono::high_resolution_clock Clock;
 
-        Timer()
-        :   m_finished(false)
+        Timer(bool start = false)
+        :   m_started(false)
         {
+            if (start)
+                restart();
         }
 
-        void reset(const std::chrono::milliseconds& duration)
+        void restart()
         {
-            m_stopAt = Clock::now() + duration;
-            m_finished = false;
+            m_start = Clock::now();
+            m_started = true;
         }
 
-        bool timeIsUp()
-        {
-            if (m_finished)
-                return true;
+        void stop() { m_started = false; }
+        bool isStarted() const { return m_started; }
 
-            if (Clock::now() > m_stopAt)
-            {
-                m_finished = true;
-                return true;
-            }
-            return false;
+        int64_t elapsed() const
+        {
+            return std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - m_start).count();
+        }
+
+        static void sleep(unsigned msec)
+        {
+            std::chrono::milliseconds duration(msec);
+            std::this_thread::sleep_for(duration);
         }
 
     private:
-        std::chrono::time_point<Clock> m_stopAt;
-        bool m_finished;
+        std::chrono::time_point<Clock> m_start;
+        std::atomic_bool m_started;
+
+        Timer(const Timer&);
+        const Timer& operator = (const Timer&);
+    };
+
+    ///
+    class ContextTimer
+    {
+    public:
+        ContextTimer(const char * msg = "", bool start = true)
+        :   m_timer(start),
+            m_msg(msg)
+        {
+        }
+
+        ~ContextTimer()
+        {
+            if (isStarted())
+                print();
+        }
+
+        void restart()
+        {
+            m_timer.restart();
+        }
+
+        bool isStarted() const { return m_timer.isStarted(); }
+
+        void print()
+        {
+            printf("%s. Context timer %ld\n", m_msg, m_timer.elapsed());
+        }
+
+    private:
+        Timer m_timer;
+        const char * m_msg;
     };
 }

@@ -11,6 +11,7 @@
 
 #include "ref_counter.h"
 #include "rx_device.h"
+#include "timer.h"
 
 namespace ite
 {
@@ -68,6 +69,8 @@ namespace ite
 
         const char * url() const { return m_info.url; }
 
+        unsigned short txID() const { return m_txID; }
+
     private:
         mutable std::mutex m_mutex;
 
@@ -76,8 +79,9 @@ namespace ite
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
 
         std::set<unsigned> m_openedStreams;
-        std::atomic_bool m_waitStop;
-        time_t m_stopTime;
+        //std::atomic_bool m_waitStop;
+        //time_t m_stopTime;
+        Timer m_stopTimer;
 
         RxDevicePtr m_rxDevice;
         bool m_loading;
@@ -96,11 +100,6 @@ namespace ite
         void tryLoad();
 
         bool stopStreams(bool force = false);
-        void stopTimer()
-        {
-            m_waitStop = false;
-            m_stopTime = 0;
-        }
 
         std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum);
 

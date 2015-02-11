@@ -189,8 +189,7 @@ namespace ite
             if (m_devReader)
                 m_devReader->setThreadObj(this);
 
-            if (! m_devReader->synced())
-                m_devReader->sync();
+            m_devReader->sync();
 
             while (!m_stopMe)
             {

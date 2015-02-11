@@ -163,8 +163,6 @@ namespace ite
     CameraManager::CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper)
     :   m_refManager( DiscoveryManager::refManager() ),
         m_devMapper(devMapper),
-        m_waitStop(false),
-        m_stopTime(0),
         m_loading(false),
         m_errorStr( nullptr )
     {
@@ -707,17 +705,10 @@ namespace ite
 
     bool CameraManager::stopIfNeedIt()
     {
-        // TODO: class timer
-        static const unsigned WAIT_TO_STOP_S = 30;
+        static const unsigned WAIT_TO_STOP_MS = 30000; // 30 sec
 
-        if (m_waitStop)
-        {
-            if (! m_stopTime)
-                m_stopTime = time(NULL);
-
-            if ((time(NULL) - m_stopTime) > WAIT_TO_STOP_S)
-                return stopStreams();
-        }
+        if (m_stopTimer.isStarted() && m_stopTimer.elapsed() > WAIT_TO_STOP_MS)
+            return stopStreams();
 
         return false;
     }
@@ -734,7 +725,7 @@ namespace ite
         {
             if (m_rxDevice->isLocked() && m_rxDevice->txID() == m_txID)
             {
-                stopTimer();
+                m_stopTimer.stop();
                 return true;
             }
             //else
@@ -793,7 +784,7 @@ namespace ite
             m_rxDevice->unlockF();
             m_rxDevice.reset();
         }
-        stopTimer();
+        m_stopTimer.stop();
     }
 
     void CameraManager::initEncoders()
@@ -831,10 +822,8 @@ namespace ite
 
     VideoPacket * CameraManager::nextPacket(unsigned encoderNumber)
     {
-        static const unsigned MAX_READ_ATTEMPTS = 50;
+        static const unsigned MAX_READ_ATTEMPTS = 500;
         static const unsigned SLEEP_DURATION_MS = 20;
-
-        static std::chrono::milliseconds dura( SLEEP_DURATION_MS );
 
         for (unsigned i = 0; i < MAX_READ_ATTEMPTS; ++i)
         {
@@ -852,21 +841,23 @@ namespace ite
 
             ContentPacketPtr pkt = devReader->getPacket( RxDevice::stream2pid(encoderNumber) );
 
-            if (pkt && pkt->size())
+            if (pkt)
             {
-                // TODO: better ContentPacket -> VideoPacket
-                std::unique_ptr<VideoPacket> packet( new VideoPacket(pkt->data(), pkt->size()) );
+                if (!pkt->size())
+                    printf("%s empty packet", __FUNCTION__);
 
-                // TODO: AV_PKT_FLAG_KEY - FrameTypeExtractor
+                // TODO: better ContentPacket -> VideoPacket
+                VideoPacket * packet = new VideoPacket(pkt->data(), pkt->size());
 
                 packet->setPTS(pkt->pts());
 
                 if (encoderNumber)
                     packet->setLowQualityFlag();
-                return packet.release();
+
+                return packet;
             }
 
-            std::this_thread::sleep_for(dura);
+            Timer::sleep(SLEEP_DURATION_MS);
         }
 
         return nullptr;
@@ -874,12 +865,11 @@ namespace ite
 
     void CameraManager::openStream(unsigned encNo)
     {
-        m_waitStop = false;
+        m_stopTimer.stop();
 
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         m_openedStreams.insert(encNo);
-        m_stopTime = 0;
     }
 
     void CameraManager::closeStream(unsigned encNo)
@@ -888,7 +878,7 @@ namespace ite
 
         m_openedStreams.erase(encNo);
         if (m_openedStreams.empty())
-            m_waitStop = true;
+            m_stopTimer.restart();
     }
 
     // from another thread

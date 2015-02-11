@@ -1,28 +1,132 @@
 #include "it930x.h"
 #include "rc_command.h"
+//#include "timer.h"
 
 #include "dev_reader.h"
 #include "dev_read_thread.h"
 
 namespace ite
 {
-    DevReader::DevReader(It930x * dev, size_t size)
-    :   m_device(dev),
-        m_size(size),
-        m_pos(0),
+    // DeviceBuffer
+
+    bool DeviceBuffer::sync()
+    {
+        static const unsigned SYNC_COUNT = 2;
+
+        for (unsigned i = 0; i < SYNC_COUNT * MpegTsPacket::PACKET_SIZE(); ++i)
+        {
+            if (synced())
+                return true;
+            uint8_t val;
+            read(&val, 1);
+        }
+        return false;
+    }
+
+    int DeviceBuffer::read(uint8_t * buf, int bufSize)
+    {
+        if (bufSize <= size())
+        {
+            memcpy(buf, data(), bufSize);
+            m_pos += bufSize;
+            return bufSize;
+        }
+
+        int hasRead = size();
+        memcpy(buf, data(), size());
+        buf += hasRead;
+        bufSize -= hasRead;
+
+        int ret = readDevice();
+        if (ret < 0)
+            return ret;
+        if (ret == 0)
+            return hasRead;
+
+        return hasRead + read(buf, bufSize);
+    }
+
+    int DeviceBuffer::readDevice()
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        if (! m_device || ! m_device->hasStream())
+        {
+            clear();
+            return -1;
+        }
+
+        m_buf.resize(m_size);
+        int ret = m_device->read( &(*m_buf.begin()), m_buf.size() );
+        if (ret < 0) {
+            m_buf.clear();
+            m_pos = 0;
+            return ret;
+        }
+
+        if (size_t(ret) != m_size)
+            m_buf.resize(ret);
+        m_pos = 0;
+        return ret;
+    }
+
+    void DeviceBuffer::setDevice(It930x * dev)
+    {
+        {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            m_device = dev;
+        }
+
+        if (dev)
+            readDevice();
+    }
+
+    // Demux
+
+    ContentPacketPtr Demux::dumpPacket(uint16_t pid)
+    {
+        TsQueue * q = queue(pid);
+        if (!q)
+            return 0;
+
+        ContentPacketPtr pkt = std::make_shared<ContentPacket>();
+
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        bool gotPES = false;
+        while (q->size())
+        {
+            TsBuffer ts = q->front();
+
+            if (q->front().packet().isPES())
+            {
+                if (gotPES)
+                    break;
+                gotPES = true;
+            }
+
+            pkt->append(q->front());
+            q->pop_front();
+        }
+
+        return pkt;
+    }
+
+    // DevReader
+
+    DevReader::DevReader(It930x * dev)
+    :   m_buf(dev),
         m_threadObject(nullptr),
         m_hasThread(false)
     {
-        if (m_size < MIN_PACKETS_COUNT() * MpegTsPacket::PACKET_SIZE())
-            m_size = MIN_PACKETS_COUNT() * MpegTsPacket::PACKET_SIZE();
-
         //m_demux.addPid(MpegTsPacket::PID_PAT);
         //m_demux.addPid(MpegTsPacket::PID_CAT);
         m_demux.addPid(It930x::PID_RETURN_CHANNEL);
         m_demux.addPid(Pacidal::PID_VIDEO_FHD);
-        //m_demux.addPid(Pacidal::PID_VIDEO_HD);
+        m_demux.addPid(Pacidal::PID_VIDEO_HD);
         m_demux.addPid(Pacidal::PID_VIDEO_SD);
-        //m_demux.addPid(Pacidal::PID_VIDEO_CIF);
+        m_demux.addPid(Pacidal::PID_VIDEO_CIF);
     }
 
     bool DevReader::subscribe(uint16_t pid)
@@ -39,23 +143,9 @@ namespace ite
         return false;
     }
 
-    void DevReader::setDevice(It930x * dev)
-    {
-        {
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            if (m_device != dev)
-                m_device = dev;
-        }
-
-        clear();
-        if (dev)
-            readDevice();
-    }
-
     void DevReader::start(It930x * dev)
     {
-        setDevice(dev);
+        m_buf.setDevice(dev);
 
         try
         {
@@ -91,13 +181,13 @@ namespace ite
             std::string s = e.what();
         }
 
-        setDevice(nullptr);
+        m_buf.setDevice(nullptr);
     }
 
     bool DevReader::readStep()
     {
         TsBuffer ts;
-        if (! readTSPacket(ts))
+        if (! m_buf.readTSPacket(ts))
             return false;
 
         MpegTsPacket pkt = ts.packet();
@@ -115,36 +205,65 @@ namespace ite
 
     void DevReader::dumpPacket(uint16_t pid)
     {
-        static const unsigned MAX_QUEUE_SIZE = 64;
+        static const unsigned MAX_QUEUE_SIZE = 128;
 
         ContentPacketPtr pkt = m_demux.dumpPacket(pid);
+
         if (pkt && pkt->size())
         {
-            //std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-            m_packetQueues[pid].push_back(pkt); // creates queue if not exists
-        }
+            PacketsQueue * q = nullptr;
+            auto it = m_packetQueues.find(pid);
+            if (it != m_packetQueues.end())
+                q = &it->second;
+            else
+                q = &m_packetQueues[pid];
 
-        if (m_packetQueues[pid].size() > MAX_QUEUE_SIZE)
-        {
-            m_packetQueues[pid].pop_front();
-#if 1
-            printf("lost packet\n");
+            // TODO: could unlock DevReader, lock just one queue here
+
+            if (q->size() >= MAX_QUEUE_SIZE)
+            {
+                q->pop_front();
+#if 0
+                if (pid == Pacidal::PID_VIDEO_SD)
+                    printf("lost packet\n");
 #endif
+            }
+
+            q->push_back(pkt);
         }
+    }
+
+    ContentPacketPtr DevReader::getPacket(uint16_t pid)
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        ContentPacketPtr pkt;
+        auto it = m_packetQueues.find(pid);
+        if (it != m_packetQueues.end())
+        {
+            PacketsQueue& q = it->second;
+            if (q.size())
+            {
+                pkt = q.front();
+                q.pop_front();
+            }
+        }
+
+        return pkt;
     }
 
     bool DevReader::readRetChanCmd(RCCommand& cmd)
     {
-        if (! synced())
-            sync();
+        sync();
 
         TsBuffer ts;
 
         static const unsigned MAX_READS = 1000;
         for (unsigned i=0; i < MAX_READS; ++i)
         {
-            if (readTSPacket(ts))
+            if (m_buf.readTSPacket(ts))
             {
                 MpegTsPacket pkt = ts.packet();
                 if (pkt.syncOK())
@@ -179,49 +298,5 @@ namespace ite
         }
 
         return false;
-    }
-
-    int DevReader::read(uint8_t * buf, int bufSize)
-    {
-        if (bufSize <= size())
-        {
-            memcpy(buf, data(), bufSize);
-            m_pos += bufSize;
-            return bufSize;
-        }
-
-        int hasRead = size();
-        memcpy(buf, data(), size());
-        buf += hasRead;
-        bufSize -= hasRead;
-
-        int ret = readDevice();
-        if (ret < 0)
-            return ret;
-        if (ret == 0)
-            return hasRead;
-
-        return hasRead + read(buf, bufSize);
-    }
-
-    int DevReader::readDevice()
-    {
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        if (! m_device || ! m_device->hasStream())
-            return -1;
-
-        m_buf.resize(m_size);
-        int ret = m_device->read( &(*m_buf.begin()), m_buf.size() );
-        if (ret < 0) {
-            m_buf.clear();
-            m_pos = 0;
-            return ret;
-        }
-
-        if (size_t(ret) != m_size)
-            m_buf.resize(ret);
-        m_pos = 0;
-        return ret;
     }
 }

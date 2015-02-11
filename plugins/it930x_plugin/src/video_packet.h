@@ -16,13 +16,6 @@ namespace ite
         DEF_REF_COUNTER
 
     public:
-        VideoPacket()
-        :   m_refManager(this),
-            m_data(nullptr),
-            m_size(0),
-            m_pts(0)
-        {}
-
         VideoPacket(const uint8_t* data, unsigned size);
         virtual ~VideoPacket();
 

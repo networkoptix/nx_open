@@ -8,9 +8,9 @@
 
 namespace
 {
-    static void freeAlignedX( void* ptr)
+    static void freeAlignedX(void * ptr)
     {
-        nxpt::freeAligned( ptr );
+        nxpt::freeAligned(ptr);
     }
 }
 
@@ -18,11 +18,12 @@ namespace ite
 {
     DEFAULT_REF_COUNTER(VideoPacket)
 
-    VideoPacket::VideoPacket( const uint8_t* data, unsigned size )
+    VideoPacket::VideoPacket(const uint8_t* data, unsigned size)
     :   m_refManager( this ),
-        m_size( 0 ),
-        m_time( 0 ),
-        m_flags( 0 )
+        m_size(0),
+        m_pts(0),
+        m_time(0),
+        m_flags(0)
     {
         if (data)
         {

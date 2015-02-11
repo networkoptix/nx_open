@@ -59,7 +59,10 @@ namespace ite
         {
             MpegTsPacket pkt = buf.packet();
             if (!m_gotPES && !pkt.isPES())
+            {
+                //printf("TS lost: waiting for PES\n");
                 return;
+            }
 
             if (pkt.isPES())
             {
@@ -68,7 +71,7 @@ namespace ite
                 if (pkt.isPES())
                     pkt.print();
 #endif
-#if 1
+#if 0
                 if (m_gotPES > 1)
                     printf("PES already have one!\n");
 #endif
@@ -145,11 +148,22 @@ namespace ite
             if (q->size() >= MAX_TS_QUEUE_SIZE())
             {
                 q->pop_front(); // TODO: save TsBuffer for future use
-#if 1
+#if 0
                 printf("lost TS\n");
 #endif
             }
 
+#if 0
+            if (ts.packet().checkbit())
+                printf("TS error bit\n");
+#endif
+#if 1
+            if (q->size())
+            {
+                if ((q->back().packet().counter() + 1) % 16 != ts.packet().counter())
+                    printf("TS wrong count: %d -> %d\n", q->back().packet().counter(), ts.packet().counter());
+            }
+#endif
             q->push_back(ts);
         }
 
@@ -194,38 +208,11 @@ namespace ite
             return q->size();
         }
 
-        ContentPacketPtr dumpPacket(uint16_t pid)
-        {
-            TsQueue * q = queue(pid);
-            if (!q)
-                return 0;
-
-            ContentPacketPtr pkt = std::make_shared<ContentPacket>();
-
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            bool gotPES = false;
-            while (q->size())
-            {
-                TsBuffer ts = q->front();
-
-                if (q->front().packet().isPES())
-                {
-                    if (gotPES)
-                        break;
-                    gotPES = true;
-                }
-
-                pkt->append(q->front());
-                q->pop_front();
-            }
-
-            return pkt;
-        }
+        ContentPacketPtr dumpPacket(uint16_t pid);
 
     private:
         mutable std::mutex m_mutex;
-        std::map<uint16_t, TsQueue> m_queues;       // {PID, TS queue}
+        std::map<uint16_t, TsQueue> m_queues;   // {PID, TS queue}
 
         TsQueue * queue(uint16_t pid)
         {
@@ -244,29 +231,25 @@ namespace ite
         }
     };
 
-
-    class DevReadThread;
     class It930x;
-    class RCCommand;
 
     ///
-    class DevReader
+    class DeviceBuffer
     {
     public:
         static constexpr unsigned MIN_PACKETS_COUNT() { return 5; }
         static constexpr unsigned DEFAULT_PACKETS_NUM() { return 816; }
 
-        DevReader(It930x * dev = nullptr, size_t size = DEFAULT_PACKETS_NUM() * MpegTsPacket::PACKET_SIZE());
-
-        bool subscribe(uint16_t pid);
-        void unsubscribe(uint16_t /*pid*/) {}
+        DeviceBuffer(It930x * dev = nullptr, size_t size = DEFAULT_PACKETS_NUM() * MpegTsPacket::PACKET_SIZE())
+        :   m_device(dev),
+            m_size(size),
+            m_pos(0)
+        {
+            if (m_size < MIN_PACKETS_COUNT() * MpegTsPacket::PACKET_SIZE())
+                m_size = MIN_PACKETS_COUNT() * MpegTsPacket::PACKET_SIZE();
+        }
 
         void setDevice(It930x * dev);
-        void start(It930x * dev);
-        void stop();
-
-        void setThreadObj(DevReadThread * ptr) { m_threadObject = ptr; }
-        bool hasThread() const { return m_threadObject; }
 
         bool synced() const
         {
@@ -283,60 +266,23 @@ namespace ite
             return false;
         }
 
-        bool sync()
+        /// @note sync() and read() are not thread safe. m_pos changes are not under mutex.
+        /// Do not want to lock every read(). Call sync() and read() in the same thread!
+
+        bool sync();
+
+        bool readTSPacket(TsBuffer& buf)
         {
-            static const unsigned SYNC_COUNT = 2;
-
-            for (unsigned i = 0; i < SYNC_COUNT * MpegTsPacket::PACKET_SIZE(); ++i)
-            {
-                if (synced())
-                    return true;
-                uint8_t val;
-                read(&val, 1);
-            }
-            return false;
-        }
-
-        bool readStep();
-        bool readRetChanCmd(RCCommand& cmd);
-        bool getRetChanCmd(RCCommand& cmd);
-
-        ContentPacketPtr getPacket(uint16_t pid)
-        {
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            // FIXME
-            auto it = m_packetQueues.find(pid);
-            if (it != m_packetQueues.end())
-            {
-                if (it->second.size())
-                {
-                    PacketsQueue& q = it->second;
-                    ContentPacketPtr pkt = q.front();
-                    it->second.pop_front();
-                    return pkt;
-                }
-            }
-
-            return ContentPacketPtr();
+            return read(buf.data(), buf.size()) == (int)buf.size();
         }
 
     private:
-        typedef std::deque<ContentPacketPtr> PacketsQueue;
-
         mutable std::mutex m_mutex;
 
         It930x * m_device;
         std::vector<uint8_t> m_buf;
         size_t m_size;
         size_t m_pos;
-
-        Demux m_demux;
-        std::map<uint16_t, PacketsQueue> m_packetQueues;
-
-        DevReadThread * m_threadObject;
-        std::thread m_readThread;
-        bool m_hasThread;
 
         const uint8_t * data() const { return &m_buf[m_pos]; }
         int size() const { return m_buf.size() - m_pos; }
@@ -349,11 +295,52 @@ namespace ite
 
         int read(uint8_t * buf, int bufSize);
         int readDevice();
+    };
 
-        bool readTSPacket(TsBuffer& buf)
+    class DevReadThread;
+    class RCCommand;
+
+    ///
+    class DevReader
+    {
+    public:
+        DevReader(It930x * dev = nullptr);
+
+        bool subscribe(uint16_t pid);
+        void unsubscribe(uint16_t /*pid*/) {}
+
+        void setDevice(It930x * dev) { m_buf.setDevice(dev); }
+        void start(It930x * dev);
+        void stop();
+
+        void setThreadObj(DevReadThread * ptr) { m_threadObject = ptr; }
+        bool hasThread() const { return m_threadObject; }
+
+        bool sync()
         {
-            return read(buf.data(), buf.size()) == (int)buf.size();
+            if (! m_buf.synced())
+                return m_buf.sync();
+            return true;
         }
+
+        bool readStep();
+        bool readRetChanCmd(RCCommand& cmd);
+        bool getRetChanCmd(RCCommand& cmd);
+
+        ContentPacketPtr getPacket(uint16_t pid);
+
+    private:
+        typedef std::deque<ContentPacketPtr> PacketsQueue;
+
+        mutable std::mutex m_mutex;
+
+        DeviceBuffer m_buf;
+        Demux m_demux;
+        std::map<uint16_t, PacketsQueue> m_packetQueues;
+
+        DevReadThread * m_threadObject;
+        std::thread m_readThread;
+        bool m_hasThread;
 
         void dumpPacket(uint16_t pid);
     };
