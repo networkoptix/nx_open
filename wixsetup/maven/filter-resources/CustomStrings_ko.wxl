@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-US" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+
+    <!-- Standard Strings (Common Buttons, Labels etc) -->
+    <String Id="StdString_Ok"                                       Overridable="yes">예</String>
+    <String Id="StdString_Warning"                                  Overridable="yes">주의</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 설정</String>
+
+    <!-- AllFieldsAreMandatoryDlg -->
+    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">모든 필드는 필수 항목입니다.</String>
+
+    <!-- AppServerDlg -->
+    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">제어 서버 설정</String>
+    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">제어 서버의 세부 항목을 지정하십시오.</String>
+    <String Id="AppServerDlg_Port"                                  Overridable="yes">포트</String>
+    <String Id="AppServerDlg_Login"                                 Overridable="yes">로그인</String>
+    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">비밀번호 생성</String>
+    <String Id="AppServerDlg_Network"                               Overridable="yes">네트워크</String>    
+    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">프록시 포트</String>
+    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">비밀번호 확인</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">세부항목 추가</String>   
+    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">카메라 최적화 설정 허용 (권장)</String>   
+
+    <!-- Associations -->
+    <String Id="Associations_PlayWith"                              Overridable="yes">Play with ${product.name}</String>
+
+    <!-- ClientDlg -->
+    <String Id="ClientDlg_Shortcut"                                 Overridable="yes">바로가기</String>
+    <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">바탕화면에 바로가기 생성</String>
+    
+    <!-- DowngradeWarningDlg -->
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">최종 버젼의 [ProductName] 이 이미 설치 되어있습니다.</String> 
+
+    <!-- EmptyPasswordDlg -->
+    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">잘못된 비밀번호</String>
+    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">비밀번호를 입력 하십시오</String>     
+    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">주의</String>     
+
+    <!-- InstallTypeDlg -->
+    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">모든 설치 (모든 서버 설치)</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">클라이언트만 설치 (별도 서버가 존재 하는 경우)</String>
+    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">상세</String>
+    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">설치 방식을 선택 하십시오.</String>
+    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">설치 방식</String>       
+
+    <!-- InvalidPasswordDlg -->
+    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">비밀번호는 같거나 비어있지 않아야 합니다.</String>    
+
+    <!-- MediaDirDlg -->
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">기본 폴더를 사용하려면 다음 버튼을, 변경라시려면 변경 버튼을 선택하세요.</String>
+    <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">저장 기본 폴더</String>
+    <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">기본 저장 폴더 선택:</String>
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">로그인</String>    
+
+    <!-- MediaServerDlg -->
+    <String Id="MediaServerDlg_Host"                                Overridable="yes">주소</String>
+    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">포트</String>
+    <String Id="MediaServerDlg_Login"                               Overridable="yes">로그인</String>
+    <String Id="MediaServerDlg_Password"                            Overridable="yes">비밀번호</String>  
+    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">저장서버 포트</String>
+    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">제어 서버</String>
+    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">저장 서버 설정</String>
+    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">저장 서버</String>  
+
+    <!-- MyExitDialog -->
+
+    <!-- MyFeaturesDlg -->
+    <String Id="MyFeaturesDlg_Components"                           Overridable="yes">구성 요소</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (별도 서버가 존재 하는 경우)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (현재 PC를 사용하는 경우)</String>
+    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (데이터 베이스 관리입니다. 하나의 네트워에 한번 이상 설치 해서는 안됩니다.)</String>    
+
+    <!-- PasswordDlg -->
+    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">관리자 비밀번호를 입력하십시오.</String>
+    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">관리자 자격 확인</String>
+    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">관리자 자격 확인</String>
+    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">로그인</String>
+    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">비밀번호 생성</String>
+    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">비밀번호 확인</String>    
+
+    <!-- PasswordShouldMatchDlg -->
+    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">설정 오류</String>    
+    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">주의</String>    
+    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">비밀번호는 동일해야 합니다.</String>    
+
+    <!-- PortDuplicateDlg -->
+    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">잘못된 포트 지정</String>    
+    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">주의</String>    
+    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">같은 포트를 지정할 수 없습니다. 설정을 다시 확인하십시오.</String>    
+
+    <!-- PortIsBusyDlg -->
+    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">포트 [BUSYPORT] 는 사용 중입니다.</String>    
+    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">주의</String>    
+    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">지정한 포트는 이미 사용 중입니다. 인지 한 경우 다음 버튼을 선택하십시오.</String>    
+
+    <!-- Product -->
+    <String Id="Product_LaunchClient"                               Overridable="yes">설정을 종료하시면 ${product.name} 이 시작됩니다.</String>    
+    <String Id="Product_ArchMismatch"                               Overridable="yes">이 프로그램은 32비트 운영체재용입니다. 설치가 종료 됩니다.</String>
+
+    <!-- SelectionWarningDlg -->
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">하나 이상의 구성 요소를 선택하십시오.</String>    
+
+    <!-- UninstallOptionsDlg -->
+    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">삭제 옵션</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">데이터 베이스 ${product.name} 남기기</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">데이터 베이스 ${product.name} 삭제</String>
+    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">현재</String>  
+    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">버전 유지:</String>   
+    
+    <!-- UpgradeDlg -->
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">이전 버전 감지</String>    
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">설치 방식</String>    
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">업그레이드가 진행 됩니다.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">데이터 베이스가 손상되어 복구 할 수 없어 새 데이터 베이스가 설치 되었습니다. 연결하시려면 ID: admin / PW: admin을 사용하십시오. 첫 번째 로그인 시에 권한 정보를 변경하십시오.</String>    
+
+    <!-- WixSchedFirewallExceptions -->
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Window 방화벽에 연결할 수 없습니다.  ([2]   [3]   [4]   [5])</String>    
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Window 방화벽 구성</String>    
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Window 방화벽 구성</String>    
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Window 방화벽 구성 롤백</String>    
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Window 방화벽 구성 설치</String>    
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Window 방화벽 구성 롤백</String>    
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Window 방화벽 구성 삭제</String>    
+    
+</WixLocalization>

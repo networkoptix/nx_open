@@ -720,14 +720,14 @@
         },
         {
             "keys": [
-                "VIVOTEK|SD8363E", "VIVOTEK|SD8363E|SD8363-VVTK-0200f"
+                "VIVOTEK|SD8363E", "VIVOTEK|SD8363E|SD8363-VVTK-0200f", "SD8363|SD8363"
             ],
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
                         "extrapolationMode": "PeriodicExtrapolation",
                         "device":  [   -1,  1],
-                        "logical": [180, -180]
+                        "logical": [-180, 180]
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",

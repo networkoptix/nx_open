@@ -56,9 +56,9 @@ if p.returncode != 0 and p.returncode != 204:
 if os.path.exists(join(bin_source_dir, '${product.name} Launcher.exe')):
     os.unlink(join(bin_source_dir, '${product.name} Launcher.exe'))
 if os.path.exists(join(bin_source_dir, 'applauncher.exe')):
-    shutil.copy2(join(bin_source_dir, 'applauncher.exe'), join(bin_source_dir, '${product.name} Launcher.exe'))
+    shutil.copy2(join(bin_source_dir, 'applauncher.exe'), join(bin_source_dir, '${display.product.name} Launcher.exe'))
     
 if os.path.exists(join(bin_source_dir, '${product.name}.exe')):
     os.unlink(join(bin_source_dir, '${product.name}.exe'))          
 if os.path.exists(join(bin_source_dir, 'client.exe')):
-    shutil.copy2(join(bin_source_dir, 'client.exe'), join(bin_source_dir, '${product.name}.exe'))
+    shutil.copy2(join(bin_source_dir, 'client.exe'), join(bin_source_dir, '${display.product.name}.exe'))
