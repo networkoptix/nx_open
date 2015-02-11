@@ -347,23 +347,15 @@
             "target": "#FF9966",
             "error": "#CC0000"
         }    
+    },
+
+    "QnScheduleGridWidget": {
+        "colors": {
+            "normalLabel": "#000000",
+            "weekendLabel": "custom_red",
+            "selectedLabel": "custom_blue",
+            "disabledLabel": "dark_grey"
+        }
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

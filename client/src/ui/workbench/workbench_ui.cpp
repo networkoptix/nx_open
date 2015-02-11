@@ -1657,7 +1657,7 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged() {
     m_notificationsBackgroundItem->setGeometry(backgroundGeometry);
     m_notificationsShowButton->setPos(QPointF(
         qMin(m_controlsWidgetRect.right(), headerGeometry.left()),
-        (headerGeometry.top() + headerGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
+        (headerGeometry.top() + headerGeometry.bottom() - showHideButtonSize.height()) / 2
     ));
     m_notificationsPinButton->setPos(headerGeometry.topLeft() + QPointF(m_pinOffset, m_pinOffset));
     if (isNotificationsOpened())
