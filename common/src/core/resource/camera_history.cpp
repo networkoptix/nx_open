@@ -259,7 +259,7 @@ QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetwo
 QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnNetworkResourcePtr &camera, qint64 timestamp, bool allowOfflineServers) const
 {
     QnCameraHistoryPtr history = getCameraHistory(camera);
-    return history ? history->getMediaServerOnTime(timestamp, allowOfflineServers) : QnMediaServerResourcePtr();
+    return history ? history->getMediaServerOnTime(timestamp, allowOfflineServers) : camera->getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
 QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const
