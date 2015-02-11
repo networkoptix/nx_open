@@ -12,9 +12,9 @@
 #include <type_traits>
 #include <utility>
 
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 #include <QtCore/QThreadPool>
 #include <QtCore/QSharedPointer>
 
@@ -69,7 +69,7 @@ namespace QnConcurrent
             
             void waitForFinished()
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 while( (!m_isCancelled && (m_tasksCompleted < m_totalTasksToRun)) ||
                        (m_isCancelled && (m_startedTaskCount > 0)) )
                 {
@@ -79,49 +79,49 @@ namespace QnConcurrent
 
             void cancel()
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 m_isCancelled = true;
             }
 
             bool isCanceled() const
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 return m_isCancelled;
             }
 
             size_type progressValue() const
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 return m_tasksCompleted;
             }
 
             size_type progressMinimum() const
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 return 0;
             }
 
             size_type progressMaximum() const
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 return m_totalTasksToRun;
             }
 
             size_type resultCount() const
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 return m_tasksCompleted;
             }
 
             bool isResultReadyAt( size_type index ) const
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 return m_completionMarks[index];
             }
 
             bool incStartedTaskCountIfAllowed()
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 if( m_isCancelled )
                     return false;
                 ++m_startedTaskCount;
@@ -134,7 +134,7 @@ namespace QnConcurrent
             }
 
         protected:
-            mutable QMutex m_mutex;
+            mutable QnMutex m_mutex;
 
             void setCompletedAtNonSafe( size_type index )
             {
@@ -151,7 +151,7 @@ namespace QnConcurrent
             }
 
         private:
-            QWaitCondition m_cond;
+            QnWaitCondition m_cond;
             size_t m_totalTasksToRun;
             size_t m_tasksCompleted;
             std::vector<bool> m_completionMarks;
@@ -187,13 +187,13 @@ namespace QnConcurrent
 
             reference resultAt( size_type index )
             {
-                QMutexLocker lk( &this->m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &this->m_mutex );
                 return m_results[index];
             }
 
             const_reference resultAt( size_type index ) const
             {
-                QMutexLocker lk( &this->m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &this->m_mutex );
                 return m_results[index];
             }
 
@@ -212,7 +212,7 @@ namespace QnConcurrent
             template<class ResultType>
             void setResultAt( size_type index, ResultType&& result )
             {
-                QMutexLocker lk( &this->m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &this->m_mutex );
                 m_results[index] = std::forward<ResultType>(result);
                 this->setCompletedAtNonSafe( index );
             }
@@ -247,7 +247,7 @@ namespace QnConcurrent
 
             void setResultAt( size_type index )
             {
-                QMutexLocker lk( &this->m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &this->m_mutex );
                 this->setCompletedAtNonSafe( index );
             }
         };
@@ -268,7 +268,7 @@ namespace QnConcurrent
 
             std::pair<typename Container::iterator, int> fetchAndMoveToNextPos()
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
                 //TODO #ak is int appropriate here?
                 std::pair<typename Container::iterator, int> curVal( m_currentIter, (int)m_currentIndex );
@@ -282,13 +282,13 @@ namespace QnConcurrent
 
             void moveToEnd()
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 m_currentIter = m_container.end();
                 m_currentIndex = m_container.size();
             }
 
         private:
-            QMutex m_mutex;
+            QnMutex m_mutex;
             Container& m_container;
             typename Container::iterator m_currentIter;
             size_type m_currentIndex;

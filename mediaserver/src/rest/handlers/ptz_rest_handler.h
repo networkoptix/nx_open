@@ -2,7 +2,7 @@
 #define QN_PTZ_REST_HANDLER_H
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <core/ptz/ptz_fwd.h>
 
@@ -59,7 +59,7 @@ private:
     bool m_detectAvailableOnly;
     
     QMap<QString, SequenceInfo> m_sequencedRequests;
-    QMutex m_sequenceMutex;
+    QnMutex m_sequenceMutex;
 
     
     struct AsyncExecInfo 
@@ -70,7 +70,7 @@ private:
         AsyncFunc nextCommand;
     };
     static QMap<QString, AsyncExecInfo> m_workers;
-    static QMutex m_asyncExecMutex;
+    static QnMutex m_asyncExecMutex;
     
 };
 

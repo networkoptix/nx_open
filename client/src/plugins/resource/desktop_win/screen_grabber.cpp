@@ -9,7 +9,7 @@
 #include "utils/media/sse_helper.h"
 #include "utils/color_space/yuvconvert.h"
 
-QMutex QnScreenGrabber::m_guiWaitMutex;
+QnMutex QnScreenGrabber::m_guiWaitMutex;
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -42,7 +42,7 @@ static void toggleAero(bool enable)
 }
 
 
-QMutex QnScreenGrabber::m_instanceMutex;
+QnMutex QnScreenGrabber::m_instanceMutex;
 int QnScreenGrabber::m_aeroInstanceCounter;
 
 QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
@@ -70,7 +70,7 @@ QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMod
 
     if (m_mode == Qn::FullScreenNoAeroMode)
     {
-        QMutexLocker locker(&m_instanceMutex);
+        SCOPED_MUTEX_LOCK( locker, &m_instanceMutex);
         if (++m_aeroInstanceCounter == 1)
             toggleAero(false);
     }
@@ -111,7 +111,7 @@ QnScreenGrabber::~QnScreenGrabber()
     }
     if (m_mode == Qn::FullScreenNoAeroMode)
     {
-        QMutexLocker locker(&m_instanceMutex);
+        SCOPED_MUTEX_LOCK( locker, &m_instanceMutex);
         if (--m_aeroInstanceCounter == 0)
             toggleAero(true);
     }
@@ -250,7 +250,7 @@ void QnScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format
 
 void QnScreenGrabber::captureFrameOpenGL(CaptureInfoPtr data)
 {
-    QMutexLocker lock (&m_guiWaitMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_guiWaitMutex);
     if (data->terminated)
         return;
 
@@ -291,7 +291,7 @@ CaptureInfoPtr QnScreenGrabber::captureFrame()
         
         //QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::BlockingQueuedConnection, ret, Q_ARG(void*, &rez));
         {
-            QMutexLocker lock(&m_guiWaitMutex);
+            SCOPED_MUTEX_LOCK( lock, &m_guiWaitMutex);
             QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::QueuedConnection, ret, Q_ARG(CaptureInfoPtr, rez));
             m_waitCond.wait(&m_guiWaitMutex);
             if (m_needStop) {
@@ -692,7 +692,7 @@ int QnScreenGrabber::screenHeight() const
 
 void QnScreenGrabber::pleaseStop()
 {
-    QMutexLocker lock(&m_guiWaitMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_guiWaitMutex);
     m_needStop = true;
     m_waitCond.wakeAll();
 }

@@ -6,7 +6,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QProcess>
 #include <QtCore/QSet>
-#include <QtCore/QWaitCondition>
+#include <utils/common/wait_condition.h>
 
 #include "core/resource/resource_fwd.h"
 #include "core/datapacket/media_data_packet.h"
@@ -89,18 +89,18 @@ private:
     QnNetworkResource* m_res;
     typedef QMap<QnVmax480DataConsumer*, CLDataQueue*> ConsumersMap;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QProcess* m_vMaxProxy;
     QString m_tcpID;
 
-    QMutex m_connectMtx;
-    QWaitCondition m_vmaxConnectionCond;
+    QnMutex m_connectMtx;
+    QnWaitCondition m_vmaxConnectionCond;
     QnVMax480ConnectionProcessor* m_vmaxConnection;
     ConsumersMap m_dataConsumers;
     bool m_isLive;
     int m_usageCount;
 
-    static QMutex m_instMutex;
+    static QnMutex m_instMutex;
     static QMap<QByteArray, VMaxStreamFetcher*> m_instances;
     quint8 m_sequence;
     qint64 m_lastChannelTime[256];

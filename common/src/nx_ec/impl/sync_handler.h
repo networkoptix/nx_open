@@ -6,8 +6,8 @@
 #ifndef SYNC_HANDLER_H
 #define SYNC_HANDLER_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 
 #include "ec_api_impl.h"
 
@@ -27,8 +27,8 @@ namespace ec2
             void done( int reqID, ErrorCode errorCode );
 
         private:
-            QWaitCondition m_cond;
-            mutable QMutex m_mutex;
+            QnWaitCondition m_cond;
+            mutable QnMutex m_mutex;
             bool m_done;
             ErrorCode m_errorCode;
         };

@@ -78,7 +78,7 @@ public:
     QnDesktopResource* desktop;
     QnAbstractStreamDataProvider* dataProvider;
     QnAbstractDataConsumer* dataConsumer;
-    QMutex sendMutex;
+    QnMutex sendMutex;
 };
 
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, void* sslContext, QnDesktopResource* desktop):
@@ -124,7 +124,7 @@ void QnDesktopCameraConnectionProcessor::processRequest()
         // nothing to do. we restarting timer on any request
     }
     d->response.headers.insert(std::make_pair("cSeq", nx_http::getHeaderValue(d->request.headers, "cSeq")));
-    //QMutexLocker lock(&d->sendMutex);
+    //SCOPED_MUTEX_LOCK( lock, &d->sendMutex);
     //sendResponse("RTSP", CODE_OK, QByteArray(), QByteArray());
 }
 
@@ -209,7 +209,7 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
 void QnDesktopCameraConnection::pleaseStop()
 {
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         if (processor)
             processor->pleaseStop();
         if (connection)
@@ -224,7 +224,7 @@ void QnDesktopCameraConnection::run()
     while (!m_needStop)
     {
         {
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             delete processor;
             processor = 0;
             delete connection;
@@ -262,7 +262,7 @@ void QnDesktopCameraConnection::run()
         }
     }
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     delete processor;
     delete connection;

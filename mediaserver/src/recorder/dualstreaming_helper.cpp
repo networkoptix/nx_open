@@ -12,13 +12,13 @@ QnDualStreamingHelper::~QnDualStreamingHelper()
 
 qint64 QnDualStreamingHelper::getLastMotionTime()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_lastMotionTime;
 }
 
 void QnDualStreamingHelper::onMotion(const QnMetaDataV1* motion)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     //motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
     if(!motion->isEmpty())
         m_lastMotionTime = motion->timestamp;

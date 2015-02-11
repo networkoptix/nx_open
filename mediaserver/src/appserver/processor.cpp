@@ -90,7 +90,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
         return;
     }
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QString name;
     if (cameraResource->hasFlags(Qn::parent_change))
         name = ec2::QnMutexCameraDataHandler::CAM_UPD_PREFIX;
@@ -115,7 +115,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
 
 void QnAppserverResourceProcessor::at_mutexLocked()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     LockData data = m_lockInProgress.value(mutex->name());
     if (!data.mutex)
@@ -158,7 +158,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 
 void QnAppserverResourceProcessor::at_mutexTimeout()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     m_lockInProgress.remove(mutex->name());
     mutex->deleteLater();

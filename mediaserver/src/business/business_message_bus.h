@@ -1,7 +1,7 @@
 #ifndef __BUSINESS_MESSAGE_BUS_H_
 #define __BUSINESS_MESSAGE_BUS_H_
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
@@ -56,7 +56,7 @@ private:
     QNetworkAccessManager m_transport;
     typedef QMap<QNetworkReply*, QnAbstractBusinessActionPtr> ActionMap;
     ActionMap m_actionsInProgress;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QMap<int, QnAbstractBusinessActionPtr> m_sendingActions;
 };
 

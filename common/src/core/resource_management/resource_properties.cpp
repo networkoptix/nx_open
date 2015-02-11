@@ -6,7 +6,7 @@ void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 {
     ec2::ApiResourceParamWithRefDataList params;
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         auto itr = m_modifiedItems.find(resourceId);
         if (itr == m_modifiedItems.end())
             return;
@@ -47,7 +47,7 @@ int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDat
     if (data.empty())
         return -1; // nothing to save
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    QMutexLocker lock(&m_requestMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_requestMutex);
     //TODO #ak m_requestInProgress is redundant here, data can be saved to 
         //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone
     int requestId = conn->getResourceManager()->save(data, this, &QnResourcePropertyDictionary::onRequestDone);
@@ -59,7 +59,7 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QnUuid& resourceId)
 {
     ec2::ApiResourceParamWithRefDataList data;
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         //TODO #vasilenko is it correct to mark property as saved before it has been actually saved to ec?
         fromModifiedDataToSavedData(resourceId, data);
     }
@@ -70,7 +70,7 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QList<QnUuid>& idList)
 {
     ec2::ApiResourceParamWithRefDataList data;
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         //TODO #vasilenko is it correct to mark property as saved before it has been actually saved to ec?
         for(const QnUuid& resourceId: idList) 
             fromModifiedDataToSavedData(resourceId, data);
@@ -82,7 +82,7 @@ void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode erro
 {
     ec2::ApiResourceParamWithRefDataList unsavedData;
     {
-        QMutexLocker lock(&m_requestMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_requestMutex);
         auto itr = m_requestInProgress.find(reqID);
         if (itr == m_requestInProgress.end())
             return;
@@ -97,7 +97,7 @@ void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode erro
 
 void QnResourcePropertyDictionary::addToUnsavedParams(const ec2::ApiResourceParamWithRefDataList& params)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for(const ec2::ApiResourceParamWithRefData& param: params) 
     {
         auto itr = m_modifiedItems.find(param.resourceId);
@@ -112,14 +112,14 @@ void QnResourcePropertyDictionary::addToUnsavedParams(const ec2::ApiResourcePara
 
 QString QnResourcePropertyDictionary::value(const QnUuid& resourceId, const QString& key) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     auto itr = m_items.find(resourceId);
     return itr != m_items.end() ? itr.value().value(key) : QString();
 }
 
 void QnResourcePropertyDictionary::clear()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_items.clear();
     m_modifiedItems.clear();
     m_requestInProgress.clear();
@@ -127,7 +127,7 @@ void QnResourcePropertyDictionary::clear()
 
 void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for(const QnUuid& id: idList) {
         m_items.remove(id);
         m_modifiedItems.remove(id);
@@ -141,7 +141,7 @@ void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
 
 bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty, bool replaceIfExists)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     auto itr = m_items.find(resourceId);
     if (itr == m_items.end())
         itr = m_items.insert(resourceId, QnResourcePropertyList());
@@ -171,7 +171,7 @@ bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QStr
 
 bool QnResourcePropertyDictionary::hasProperty(const QnUuid& resourceId, const QString& key) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     auto itr = m_items.find(resourceId);
     return itr != m_items.end() && itr.value().contains(key);
 }
@@ -198,7 +198,7 @@ namespace
 
 bool QnResourcePropertyDictionary::removeProperty(const QnUuid& resourceId, const QString& key)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if( !removePropertyFromDictionary(&m_items, resourceId, key) &&
         !removePropertyFromDictionary(&m_modifiedItems, resourceId, key) )
@@ -218,7 +218,7 @@ ec2::ApiResourceParamDataList QnResourcePropertyDictionary::allProperties(const 
 {
     ec2::ApiResourceParamDataList result;
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     auto itr = m_items.find(resourceId);
     if (itr == m_items.end())
         return result;
@@ -232,7 +232,7 @@ ec2::ApiResourceParamDataList QnResourcePropertyDictionary::allProperties(const 
 QHash<QnUuid, QSet<QString> > QnResourcePropertyDictionary::allPropertyNamesByResource() const {
     QHash<QnUuid, QSet<QString> > result;
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for (auto iter = m_items.constBegin(); iter != m_items.constEnd(); ++iter) {
         QnUuid id = iter.key();
         result.insert(id, iter.value().keys().toSet());

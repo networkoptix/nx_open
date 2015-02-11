@@ -187,12 +187,12 @@ CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
 }
 
 QByteArray QnAxisPtzController::getCookie() const {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_cookie;
 }
 
 void QnAxisPtzController::setCookie(const QByteArray &cookie) {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     m_cookie = cookie;
 }
 

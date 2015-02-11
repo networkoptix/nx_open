@@ -299,7 +299,7 @@ public:
     unsigned short foreignPort;
     bool terminated;
     quint64 killTimerID;
-    QMutex mutex;
+    QnMutex mutex;
 
     QnProgressiveDownloadingConsumerPrivate()
     :
@@ -353,7 +353,7 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 
     quint64 killTimerID = 0;
     {
-        QMutexLocker lk( &d->mutex );
+        SCOPED_MUTEX_LOCK( lk,  &d->mutex );
         killTimerID = d->killTimerID;
         d->killTimerID = 0;
     }
@@ -690,7 +690,7 @@ void QnProgressiveDownloadingConsumer::onTimer( const quint64& /*timerID*/ )
 {
     Q_D(QnProgressiveDownloadingConsumer);
 
-    QMutexLocker lk( &d->mutex );
+    SCOPED_MUTEX_LOCK( lk,  &d->mutex );
     d->terminated = true;
     d->killTimerID = 0;
     pleaseStop();

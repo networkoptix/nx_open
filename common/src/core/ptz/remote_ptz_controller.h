@@ -66,7 +66,7 @@ private:
     QnUuid m_sequenceId;
     QAtomicInt m_sequenceNumber;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QHash<int, PtzCommandData> m_dataByHandle;
 };
 

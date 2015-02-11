@@ -3,8 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 #include <QtCore/QTimer>
 
 #include <QtNetwork/QNetworkCookie>
@@ -38,8 +38,8 @@ public:
 private:
     bool m_finished;
     QnHTTPRawResponse m_response;
-    QMutex m_mutex;
-    QWaitCondition m_condition;
+    QnMutex m_mutex;
+    QnWaitCondition m_condition;
 };
 
 
@@ -98,14 +98,14 @@ signals:
 
 private:
     QNetworkAccessManager *m_accessManager;
-    mutable QMutex m_accessManagerMutex;
+    mutable QnMutex m_accessManagerMutex;
     static QAtomicInt s_handle;
     
     QScopedPointer<QThread> m_thread;
     QHash<QNetworkReply*, AsyncRequestInfo> m_handleInProgress;
 
     QHash<int, QnSessionManagerSyncReply*>  m_syncReplyInProgress;
-    QMutex m_syncReplyMutex;
+    QnMutex m_syncReplyMutex;
 };
 
 #endif // __SESSION_MANAGER_H__

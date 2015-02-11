@@ -13,7 +13,7 @@ public:
     QMap<QnUuid, Qn::ResourceStatus> values() const;
 private:
     QMap<QnUuid, Qn::ResourceStatus> m_items;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 #define qnStatusDictionary QnResourceStatusDictionary::instance()

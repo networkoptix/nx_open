@@ -9,8 +9,8 @@
 #include <map>
 #include <set>
 
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -75,8 +75,8 @@ private slots:
     void asyncParamsSetComplete(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values);
 
 private:
-    QMutex m_mutex;
-    QWaitCondition m_cond;
+    QnMutex m_mutex;
+    QnWaitCondition m_cond;
     std::set<AwaitedParameters*> m_awaitedParamsSets;
     QScopedPointer<QnCachingCameraAdvancedParamsReader> m_paramsReader;
 };

@@ -4,7 +4,7 @@
 #ifdef ENABLE_ACTI
 
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -153,7 +153,7 @@ private:
     int m_rtspPort;
     bool m_hasAudio;
     QByteArray m_platform;
-    QMutex m_dioMutex;
+    QnMutex m_dioMutex;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     int m_outputCount;
     int m_inputCount;

@@ -4,7 +4,7 @@
 
 #include "ondemand_media_data_provider.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 
 static const size_t MAX_DATA_QUEUE_SIZE = 16;   //TODO: #ak is queue really needed here?
@@ -25,7 +25,7 @@ OnDemandMediaDataProvider::~OnDemandMediaDataProvider() throw()
 //!Implementation of AbstractOnDemandDataProvider::tryRead
 bool OnDemandMediaDataProvider::tryRead( QnAbstractDataPacketPtr* const data )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     if( m_dataQueue.empty() )
         return false;
@@ -38,7 +38,7 @@ bool OnDemandMediaDataProvider::tryRead( QnAbstractDataPacketPtr* const data )
 
 quint64 OnDemandMediaDataProvider::currentPos() const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     if( m_prevPacketTimestamp != -1 )
         return m_prevPacketTimestamp;
@@ -49,7 +49,7 @@ quint64 OnDemandMediaDataProvider::currentPos() const
 
 bool OnDemandMediaDataProvider::canAcceptData() const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     return m_dataQueue.size() < MAX_DATA_QUEUE_SIZE;
 }
 
@@ -57,7 +57,7 @@ void OnDemandMediaDataProvider::putData( const QnAbstractDataPacketPtr& data )
 {
     bool dataBecameAvailable = false;
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         dataBecameAvailable = m_dataQueue.empty();
         m_dataQueue.push( data );
     }

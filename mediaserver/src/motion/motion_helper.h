@@ -52,7 +52,7 @@ private:
     typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;
     typedef QMap<MotionArchiveKey, QnMotionArchive*> MotionWriters;
     MotionWriters m_writers;
-    QMutex m_mutex;
+    QnMutex m_mutex;
 };
 
 

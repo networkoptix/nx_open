@@ -2,7 +2,7 @@
 #define QN_GL_CONTEXT_DATA_H
 
 #include <QHash>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QSharedPointer>
 #include <QtOpenGL/QGLContext>
 
@@ -31,7 +31,7 @@ public:
     QnGlContextData(const Factory &factory = Factory()): m_factory(factory) {}
 
     QSharedPointer<T> get(const QGLContext *context) {
-        QMutexLocker locked(&m_mutex);
+        SCOPED_MUTEX_LOCK( locked, &m_mutex);
 
         typename map_type::iterator pos = m_map.find(context);
         if(pos == m_map.end())
@@ -41,7 +41,7 @@ public:
     }
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     Factory m_factory;
     map_type m_map;
 };

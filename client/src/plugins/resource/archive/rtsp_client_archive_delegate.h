@@ -78,7 +78,7 @@ private:
     void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     RTPSession m_rtspSession;
     RTPIODevice* m_rtpData;
     quint8* m_rtpDataBuffer;
@@ -120,7 +120,7 @@ private:
         QString password;
         QnUuid videowall;
     } m_auth;
-    mutable QMutex m_timeMutex;
+    mutable QnMutex m_timeMutex;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

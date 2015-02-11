@@ -59,7 +59,7 @@ void QnDistributedMutex::at_newPeerFound(ec2::ApiPeerAliveData data)
     if (data.peer.peerType != Qn::PT_Server)
         return;
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     Q_ASSERT(data.peer.id != qnCommon->moduleGUID());
     if (!m_selfLock.isEmpty())
         sendTransaction(m_selfLock, ApiCommand::lockRequest, data.peer.id);
@@ -70,7 +70,7 @@ void QnDistributedMutex::at_peerLost(ec2::ApiPeerAliveData data)
     if (data.peer.peerType != Qn::PT_Server)
         return;
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     m_proccesedPeers.remove(data.peer.id);
     for (LockedMap::iterator itr = m_peerLockInfo.begin(); itr != m_peerLockInfo.end();)
@@ -87,7 +87,7 @@ void QnDistributedMutex::at_timeout()
 {
     QSet<QnUuid> failedPeers;
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         if (m_locked)
             return;
         failedPeers = QSet<QnUuid>::fromList(qnTransactionBus->alivePeers().keys()) - m_proccesedPeers;
@@ -98,7 +98,7 @@ void QnDistributedMutex::at_timeout()
 
 void QnDistributedMutex::lockAsync(int timeoutMs)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_selfLock = LockRuntimeInfo(qnCommon->moduleGUID(), m_owner->newTimestamp(), m_name);
     if (m_owner->m_userDataHandler)
         m_selfLock.userData = m_owner->m_userDataHandler->getUserData(m_name);
@@ -111,7 +111,7 @@ void QnDistributedMutex::lockAsync(int timeoutMs)
 void QnDistributedMutex::unlock()
 {
     m_owner->releaseMutex(m_name);
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     unlockInternal();
 }
 
@@ -147,7 +147,7 @@ void QnDistributedMutex::unlockInternal()
 
 void QnDistributedMutex::at_gotLockResponse(ApiLockData lockData)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     if (lockData.timestamp != NO_MUTEX_LOCK)
         m_peerLockInfo.insert(lockData, 0);
     m_proccesedPeers << lockData.peer;
@@ -156,7 +156,7 @@ void QnDistributedMutex::at_gotLockResponse(ApiLockData lockData)
 
 void QnDistributedMutex::at_gotLockRequest(ApiLockData lockData)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if (!m_locked && LockRuntimeInfo(lockData) < m_selfLock)
     {
@@ -171,7 +171,7 @@ void QnDistributedMutex::at_gotLockRequest(ApiLockData lockData)
 /*
 void QnDistributedMutex::at_gotUnlockRequest(ApiLockData lockData)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     LockedMap::iterator itr = m_peerLockInfo.find(lockData);
     if (itr != m_peerLockInfo.end()) {
@@ -198,7 +198,7 @@ void QnDistributedMutex::checkForLocked()
 
 bool QnDistributedMutex::checkUserData() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     if (!m_owner->m_userDataHandler)
         return true;
 
@@ -212,13 +212,13 @@ bool QnDistributedMutex::checkUserData() const
 
 bool QnDistributedMutex::isLocking() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return !m_peerLockInfo.isEmpty();
 }
 
 bool QnDistributedMutex::isLocked() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_locked;
 }
 

@@ -79,7 +79,7 @@ QnRecordingManager::LockData::~LockData()
         mutex->deleteLater();
 }
 
-QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
+QnRecordingManager::QnRecordingManager(): m_mutex(QnMutex::Recursive)
 {
     m_tooManyRecordingCnt = 0;
     m_licenseMutex = 0;
@@ -156,7 +156,7 @@ void QnRecordingManager::stop()
     exit();
     wait(); // stop QT event loop
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     for(const Recorders& recorders: m_recordMap.values())
     {
@@ -178,7 +178,7 @@ void QnRecordingManager::stop()
 
 Recorders QnRecordingManager::findRecorders(const QnResourcePtr& res) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_recordMap.value(res);
 }
 
@@ -229,7 +229,7 @@ void QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 
 void QnRecordingManager::at_historyMutexTimeout()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     if (mutex)
         m_lockInProgress.erase(mutex->name());
@@ -237,7 +237,7 @@ void QnRecordingManager::at_historyMutexTimeout()
 
 void QnRecordingManager::at_historyMutexLocked()
 {
-	QMutexLocker lock(&m_mutex);
+	SCOPED_MUTEX_LOCK( lock, &m_mutex);
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     if (!mutex)
         return;
@@ -269,7 +269,7 @@ bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& ca
     if (!camera)
         return false;
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.find(camRes);
     if (itrRec == m_recordMap.constEnd())
@@ -296,7 +296,7 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
     if (!camera)
         return false;
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(camRes);
     if (itrRec == m_recordMap.end())
@@ -489,7 +489,7 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
     updateCamera(camera);
 
     // no need mutex here because of readOnly access from other threads and m_recordMap modified only from current thread
-    //QMutexLocker lock(&m_mutex);
+    //SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
     if (itr != m_recordMap.constEnd() && ownResource) 
@@ -531,7 +531,7 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 
     Recorders recorders;
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(resource);
         if (itr == m_recordMap.constEnd())
             return;
@@ -547,7 +547,7 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 
 bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(camera);
     if (itr == m_recordMap.end())
         return false;
@@ -560,7 +560,7 @@ void QnRecordingManager::onTimer()
     qint64 time = qnSyncTime->currentMSecsSinceEpoch();
 
     // Mutex is not required here because of m_recordMap used in readOnly mode here and m_recordMap modified from this thread only (from other private slot)
-    //QMutexLocker lock(&m_mutex);
+    //SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     bool someRecordingIsPresent = false;
     for (QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)

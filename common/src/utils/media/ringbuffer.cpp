@@ -3,7 +3,7 @@
 CLRingBuffer::CLRingBuffer( unsigned int capacity, QObject* parent)
     : QIODevice(parent),
       m_capacity(capacity),
-      m_mtx(QMutex::Recursive)
+      m_mtx(QnMutex::Recursive)
 {
 	m_buff = new char[m_capacity];
 	m_pw = m_buff;
@@ -25,21 +25,21 @@ void CLRingBuffer::clear()
 
 qint64 CLRingBuffer::bytesAvailable() const
 {
-	QMutexLocker mutex(&m_mtx);
+	SCOPED_MUTEX_LOCK( mutex, &m_mtx);
 
 	return (m_pr <= m_pw) ? m_pw - m_pr : m_capacity - (m_pr - m_pw);
 }
 
 qint64 CLRingBuffer::avalable_to_write() const
 {
-	QMutexLocker mutex(&m_mtx);
+	SCOPED_MUTEX_LOCK( mutex, &m_mtx);
 
 	return (m_pw >= m_pr) ? m_capacity - (m_pw - m_pr) : m_pr - m_pw;
 }
 
 qint64 CLRingBuffer::readData(char *data, qint64 maxlen)
 {
-	QMutexLocker mutex(&m_mtx);
+	SCOPED_MUTEX_LOCK( mutex, &m_mtx);
 
 	qint64 canRead = bytesAvailable();
 	qint64 toRead = qMin(canRead, maxlen);
@@ -64,7 +64,7 @@ qint64 CLRingBuffer::readData(char *data, qint64 maxlen)
 
 qint64 CLRingBuffer::writeData(const char *data, qint64 len)
 {
-	QMutexLocker mutex(&m_mtx);
+	SCOPED_MUTEX_LOCK( mutex, &m_mtx);
 
 	qint64 can_write = avalable_to_write();
 	qint64 to_write = qMin(len, can_write);
@@ -91,7 +91,7 @@ qint64 CLRingBuffer::readToIODevice(QIODevice* device, qint64 maxlen)
 {
     //maxlen = qMin(maxlen, divce->bytesToWrite());
 
-    QMutexLocker mutex(&m_mtx);
+    SCOPED_MUTEX_LOCK( mutex, &m_mtx);
 
     qint64 canRead = bytesAvailable();
     qint64 toRead = qMin(canRead, maxlen);

@@ -164,7 +164,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         result->opaque = 0;
         if (result->dataType == QnAbstractMediaData::AUDIO && result->context && result->context->ctx() && !m_audioLayout)
         {
-            QMutexLocker lock(&m_audioLayoutMutex);
+            SCOPED_MUTEX_LOCK( lock, &m_audioLayoutMutex);
             m_audioLayout.reset( new QnResourceCustomAudioLayout() );
             QnResourceAudioLayout::AudioTrack track(result->context, "");
             m_audioLayout->addAudioTrack(track);
@@ -184,7 +184,7 @@ void QnDesktopCameraStreamReader::updateStreamParamsBasedOnFps()
 
 QnConstResourceAudioLayoutPtr QnDesktopCameraStreamReader::getDPAudioLayout() const
 {
-    QMutexLocker lock(&m_audioLayoutMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_audioLayoutMutex);
     return m_audioLayout;
 }
 

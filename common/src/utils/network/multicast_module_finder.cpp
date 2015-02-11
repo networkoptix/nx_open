@@ -55,7 +55,7 @@ QnMulticastModuleFinder::~QnMulticastModuleFinder() {
 }
 
 bool QnMulticastModuleFinder::isValid() const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return !m_clientSockets.empty();
 }
 
@@ -68,7 +68,7 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
 }
 
 void QnMulticastModuleFinder::updateInterfaces() {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
 
     QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
@@ -107,17 +107,17 @@ void QnMulticastModuleFinder::updateInterfaces() {
 }
 
 QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QnUuid &moduleId) const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return m_foundModules[moduleId];
 }
 
 QList<QnModuleInformation> QnMulticastModuleFinder::foundModules() const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return m_foundModules.values();
 }
 
 void QnMulticastModuleFinder::addIgnoredModule(const QnNetworkAddress &address, const QnUuid &id) {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     if (m_ignoredModules.contains(address, id))
         return;
 
@@ -125,12 +125,12 @@ void QnMulticastModuleFinder::addIgnoredModule(const QnNetworkAddress &address, 
 }
 
 void QnMulticastModuleFinder::removeIgnoredModule(const QnNetworkAddress &address, const QnUuid &id) {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     m_ignoredModules.remove(address, id);
 }
 
 QMultiHash<QnNetworkAddress, QnUuid> QnMulticastModuleFinder::ignoredModules() const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return m_ignoredModules;
 }
 
@@ -218,7 +218,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     QnModuleInformation moduleInformation = response.toModuleInformation();
     QnNetworkAddress address(QHostAddress(remoteAddressStr), moduleInformation.port);
 
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
 
     if (m_ignoredModules.contains(address, moduleInformation.id))
         return false;
@@ -322,7 +322,7 @@ void QnMulticastModuleFinder::run() {
         currentClock = QDateTime::currentMSecsSinceEpoch();
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
-            QMutexLocker lk(&m_mutex);
+            SCOPED_MUTEX_LOCK( lk, &m_mutex);
 
             //sending request via each socket
             for (UDPSocket *socket: m_clientSockets) {
@@ -364,7 +364,7 @@ void QnMulticastModuleFinder::run() {
                 processDiscoveryResponse(udpSocket);
         }
 
-        QMutexLocker lk(&m_mutex);
+        SCOPED_MUTEX_LOCK( lk, &m_mutex);
         //checking for expired known hosts...
         for (auto it = m_foundAddresses.begin(); it != m_foundAddresses.end(); /* no inc */) {
             QnUuid id = it->moduleId;
@@ -416,7 +416,7 @@ void QnMulticastModuleFinder::run() {
         }
     }
 
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     for (UDPSocket *socket: m_clientSockets)
         m_pollSet.remove( socket->implementationDelegate(), aio::etRead );
     if (m_serverSocket)

@@ -78,7 +78,7 @@ public:
     QByteArray responseBody;
     QByteArray clientRequest;
     QByteArray receiveBuffer;
-    QMutex sockMutex;
+    QnMutex sockMutex;
     quint8* tcpReadBuffer;
     int socketTimeout;
     bool chunkedMode;

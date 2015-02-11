@@ -8,7 +8,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QTimer>
@@ -194,7 +194,7 @@ private:
     bool addLicenses_i(const QnLicenseList &licenses);
 private:
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QTimer m_timer;
 };
 

@@ -10,8 +10,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
+#include <utils/common/mutex.h>
 #include <QtCore/QPluginLoader>
 #include <QSharedPointer>
 #include <QtCore/QString>
@@ -51,7 +51,7 @@ public:
     //!Searches for plugins of type \a T among loaded plugins
     template<class T> QList<T*> findPlugins() const
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
         QList<T*> foundPlugins;
         for( QSharedPointer<QPluginLoader> plugin: m_qtPlugins )
@@ -97,7 +97,7 @@ private:
     const QString m_pluginDir;
     QList<QSharedPointer<QPluginLoader> > m_qtPlugins;
     QList<nxpl::PluginInterface*> m_nxPlugins;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     void loadPluginsFromDir( const QString& dirToSearchIn, PluginType pluginsToLoad );
     bool loadQtPlugin( const QString& fullFilePath );

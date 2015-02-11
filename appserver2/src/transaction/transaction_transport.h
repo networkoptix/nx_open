@@ -170,7 +170,7 @@ private:
     bool m_writeSync;
     bool m_syncDone;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QSharedPointer<AbstractStreamSocket> m_socket;
     nx_http::AsyncHttpClientPtr m_httpClient;
     State m_state;
@@ -190,7 +190,7 @@ private:
     static QSet<QnUuid> m_existConn;
     typedef QMap<QnUuid, QPair<bool, bool>> ConnectingInfoMap;
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
-    static QMutex m_staticMutex;
+    static QnMutex m_staticMutex;
 
     QByteArray m_extraData;
     bool m_authByKey;

@@ -395,7 +395,7 @@ namespace nx_hls
             m_switchToChunkedTransfer = false;
         }
 
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
         for( ;; )
         {
             //reading chunk data
@@ -963,7 +963,7 @@ namespace nx_hls
 
     void QnHttpLiveStreamingProcessor::chunkDataAvailable( StreamingChunkPtr /*chunk*/, quint64 /*newSizeBytes*/ )
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
         m_cond.wakeAll();
     }
 

@@ -2,7 +2,7 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <api/abstract_connection.h>
 #include <api/runtime_info_manager.h>
@@ -59,7 +59,7 @@ private:
     void updateRuntimeData(bool force = false);
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     std::weak_ptr<ec2::AbstractECConnection> m_connection;
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QnUuid, Endpoint> m_connections;

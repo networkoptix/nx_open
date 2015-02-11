@@ -54,7 +54,7 @@ public:
      */
     virtual void destroyAsync() 
     {
-        QMutexLocker lock(&m_usingMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_usingMutex);
         m_needStop = true;
         if (m_useCount == 0)
             emit canBeDestroyed();
@@ -97,12 +97,12 @@ public:
     virtual bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const = 0;
 
     void inUse() {
-        QMutexLocker lock(&m_usingMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_usingMutex);
         m_useCount++; 
     }
 
     void notInUse() { 
-        QMutexLocker lock(&m_usingMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_usingMutex);
         if (--m_useCount == 0 && m_needStop)
             emit canBeDestroyed();
     }
@@ -127,7 +127,7 @@ signals:
 private:
     int m_useCount;
     bool m_needStop;
-    QMutex m_usingMutex;
+    QnMutex m_usingMutex;
 };
 
 #endif // QN_ABSTRACT_RENDERER_H

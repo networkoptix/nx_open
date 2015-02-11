@@ -115,7 +115,7 @@ void QnOnvifStreamReader::setCameraControlDisabled(bool value)
 
 CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QString* const streamUrl )
 {
-    //QMutexLocker lock(m_onvifRes->getStreamConfMutex());
+    //SCOPED_MUTEX_LOCK( lock, m_onvifRes->getStreamConfMutex());
 
     int currentFps = getFps();
     Qn::StreamQuality currentQuality = getQuality();

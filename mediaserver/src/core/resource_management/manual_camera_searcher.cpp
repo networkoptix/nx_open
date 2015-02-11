@@ -145,7 +145,7 @@ QnManualCameraSearcher::~QnManualCameraSearcher() {
 
 bool QnManualCameraSearcher::run( QThreadPool* threadPool, const QString &startAddr, const QString &endAddr, const QAuthenticator &auth, int port ) {
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         if (m_state == QnManualCameraSearchStatus::Aborted)
             return false;
     }
@@ -164,7 +164,7 @@ bool QnManualCameraSearcher::run( QThreadPool* threadPool, const QString &startA
         QStringList onlineHosts;
         {
             {
-                QMutexLocker lock(&m_mutex);
+                SCOPED_MUTEX_LOCK( lock, &m_mutex);
                 m_hostRangeSize = endIPv4Addr - startIPv4Addr;
                 m_state = QnManualCameraSearchStatus::CheckingOnline;
             }
@@ -175,7 +175,7 @@ bool QnManualCameraSearcher::run( QThreadPool* threadPool, const QString &startA
                 port ? port : nx_http::DEFAULT_HTTP_PORT );
 
             {
-                QMutexLocker lock(&m_mutex);
+                SCOPED_MUTEX_LOCK( lock, &m_mutex);
                 if( m_cancelled )
                 {
                     m_state = QnManualCameraSearchStatus::Aborted;
@@ -193,7 +193,7 @@ bool QnManualCameraSearcher::run( QThreadPool* threadPool, const QString &startA
     {
         QnConcurrent::QnFuture<QnManualCameraSearchCameraList> results;
         {
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             if (m_state == QnManualCameraSearchStatus::Aborted)
                 return false;
             m_state = QnManualCameraSearchStatus::CheckingHost;
@@ -203,7 +203,7 @@ bool QnManualCameraSearcher::run( QThreadPool* threadPool, const QString &startA
         }
         results.waitForFinished();
         {
-             QMutexLocker lock(&m_mutex);
+             SCOPED_MUTEX_LOCK( lock, &m_mutex);
              for (size_t i = 0; i < results.resultCount(); ++i) {
                  if (!results.isResultReadyAt(i))
                      continue;
@@ -221,7 +221,7 @@ bool QnManualCameraSearcher::run( QThreadPool* threadPool, const QString &startA
 }
 
 void QnManualCameraSearcher::cancel() {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_cancelled = true;
     switch(m_state) {
     case QnManualCameraSearchStatus::Finished:
@@ -242,7 +242,7 @@ void QnManualCameraSearcher::cancel() {
 }
 
 QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QnManualCameraSearchProcessStatus result;
 

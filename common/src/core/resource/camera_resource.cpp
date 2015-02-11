@@ -66,7 +66,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSiz
 
 int QnPhysicalCameraResource::getChannel() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_channelNumber;
 }
 
@@ -74,7 +74,7 @@ void QnPhysicalCameraResource::setUrl(const QString &urlStr)
 {
     QnVirtualCameraResource::setUrl( urlStr ); /* This call emits, so we should not invoke it under lock. */
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QUrl url( urlStr );
     m_channelNumber = QUrlQuery( url.query() ).queryItemValue( QLatin1String( "channel" ) ).toInt();
     setHttpPort( url.port( httpPort() ) );
@@ -144,7 +144,7 @@ CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
 bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
 {
     //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
-    QMutexLocker lk( &m_mediaStreamsMutex );
+    SCOPED_MUTEX_LOCK( lk, &m_mediaStreamsMutex );
 
     //get saved stream info with index encoderIndex
     const QString& mediaStreamsStr = getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME );
@@ -315,7 +315,7 @@ QString QnVirtualCameraResource::toSearchString() const
 
 void QnVirtualCameraResource::issueOccured()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_issueTimes.push_back(getUsecTimer());
     if (m_issueTimes.size() >= MAX_ISSUE_CNT) {
         if (!hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
@@ -339,7 +339,7 @@ void QnVirtualCameraResource::at_saveAsyncFinished(int, ec2::ErrorCode, const Qn
 
 void QnVirtualCameraResource::noCameraIssues()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     qint64 threshold = getUsecTimer() - ISSUE_KEEP_TIMEOUT;
     while(!m_issueTimes.empty() && m_issueTimes.front() < threshold)
         m_issueTimes.pop_front();

@@ -62,7 +62,7 @@ namespace ec2
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             if (m_connections.isEmpty())
                 return;
             QnTransactionTransportHeader ttHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers);
@@ -223,7 +223,7 @@ namespace ec2
         QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
         ECConnectionNotificationManager* m_handler;
         QTimer* m_timer;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         QThread *m_thread;
         QnConnectionMap m_connections;
 

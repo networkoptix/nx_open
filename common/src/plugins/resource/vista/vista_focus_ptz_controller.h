@@ -40,7 +40,7 @@ private:
     QnPtzAuxilaryTraitList m_traits;
     bool m_isMotor;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QString m_lastHostAddress;
     QScopedPointer<CLSimpleHTTPClient> m_client;
 };

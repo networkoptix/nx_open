@@ -82,7 +82,7 @@ bool QnDlinkPtzController::continuousMove(const QVector3D &speed)
         rez = doQuery(request);
     
     if (rez) {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         m_lastRequest = request;
         if (!m_lastRequest.isEmpty())
             m_repeatCommand->start();
@@ -126,7 +126,7 @@ bool QnDlinkPtzController::doQuery(const QString &request, QByteArray* body) con
 
 QString QnDlinkPtzController::getLastCommand() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_lastRequest;
 }
 

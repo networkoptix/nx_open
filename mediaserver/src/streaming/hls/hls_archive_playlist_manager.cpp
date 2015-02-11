@@ -6,7 +6,7 @@
 
 #include <limits>
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 #include <core/resource/security_cam_resource.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>
@@ -82,7 +82,7 @@ namespace nx_hls
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached ) const
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
         const_cast<ArchivePlaylistManager*>(this)->generateChunksIfNeeded();
 

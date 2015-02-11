@@ -15,8 +15,8 @@ public:
     AbstractStreamServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
-    mutable QMutex portMutex;
-    QMutex connectionMtx;
+    mutable QnMutex portMutex;
+    QnMutex connectionMtx;
     int newPort;
     QHostAddress serverAddress;
     int localPort;
@@ -118,7 +118,7 @@ void QnTcpListener::removeDisconnectedConnections()
     QVector<QnLongRunnable*> toDeleteList;
 
     {
-        QMutexLocker lock(&d->connectionMtx);
+        SCOPED_MUTEX_LOCK( lock, &d->connectionMtx);
         for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
         {
             QnLongRunnable* processor = *itr;
@@ -138,7 +138,7 @@ void QnTcpListener::removeDisconnectedConnections()
 void QnTcpListener::removeOwnership(QnLongRunnable* processor)
 {
     Q_D(QnTcpListener);
-    QMutexLocker lock(&d->connectionMtx);
+    SCOPED_MUTEX_LOCK( lock, &d->connectionMtx);
     for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
         if (processor == *itr) {
@@ -152,7 +152,7 @@ void QnTcpListener::addOwnership(QnLongRunnable* processor)
 {
     Q_D(QnTcpListener);
 
-    QMutexLocker lock(&d->connectionMtx);
+    SCOPED_MUTEX_LOCK( lock, &d->connectionMtx);
     d->connections << processor;
 }
 
@@ -177,7 +177,7 @@ void QnTcpListener::removeAllConnections()
 
     QList<QnLongRunnable*> oldConnections = d->connections;
     {
-        QMutexLocker lock(&d->connectionMtx);
+        SCOPED_MUTEX_LOCK( lock, &d->connectionMtx);
 
         for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
         {
@@ -198,7 +198,7 @@ void QnTcpListener::removeAllConnections()
 void QnTcpListener::updatePort(int newPort)
 {
     Q_D(QnTcpListener);
-    QMutexLocker lock(&d->portMutex);
+    SCOPED_MUTEX_LOCK( lock, &d->portMutex);
     d->newPort = newPort;
 }
 
@@ -221,7 +221,7 @@ void QnTcpListener::run()
         {
             if (d->newPort)
             {
-                QMutexLocker lock(&d->portMutex);
+                SCOPED_MUTEX_LOCK( lock, &d->portMutex);
                 NX_LOG( lit("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
                 removeAllConnections();
                 delete d->serverSocket;
@@ -254,7 +254,7 @@ void QnTcpListener::run()
                 clientSocket->setRecvTimeout(processor->getSocketTimeout());
                 clientSocket->setSendTimeout(processor->getSocketTimeout());
                 
-                QMutexLocker lock(&d->connectionMtx);
+                SCOPED_MUTEX_LOCK( lock, &d->connectionMtx);
                 d->connections << processor;
                 processor->start();
             }
@@ -287,7 +287,7 @@ void QnTcpListener::run()
 int QnTcpListener::getPort() const
 {
     Q_D(const QnTcpListener);
-    QMutexLocker lock(&d->portMutex);
+    SCOPED_MUTEX_LOCK( lock, &d->portMutex);
     if (!d->serverSocket)
         return -1;
     return d->serverSocket->getLocalAddress().port;

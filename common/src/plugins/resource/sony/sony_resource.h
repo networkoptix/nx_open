@@ -6,7 +6,7 @@
 #include <map>
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -39,7 +39,7 @@ protected:
 
 private:
     nx_http::AsyncHttpClientPtr m_inputMonitorHttpClient;
-    mutable QMutex m_inputPortMutex;
+    mutable QnMutex m_inputPortMutex;
     nx_http::LineSplitter m_lineSplitter;
     std::map<int, bool> m_relayInputStates;
 

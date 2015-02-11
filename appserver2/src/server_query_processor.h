@@ -84,7 +84,7 @@ namespace ec2
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-            QMutexLocker lock(&m_updateDataMutex);
+            SCOPED_MUTEX_LOCK( lock, &m_updateDataMutex);
 
             //starting transaction
             std::unique_ptr<QnDbManager::QnDbTransactionLocker> dbTran;
@@ -386,7 +386,7 @@ namespace ec2
             } );
         }
         private:
-            static QMutex m_updateDataMutex;
+            static QnMutex m_updateDataMutex;
     };
 }
 

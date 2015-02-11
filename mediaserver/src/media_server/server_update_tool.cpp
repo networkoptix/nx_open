@@ -81,7 +81,7 @@ namespace {
 } // anonymous namespace
 
 QnServerUpdateTool::QnServerUpdateTool() :
-    m_mutex(QMutex::Recursive)
+    m_mutex(QnMutex::Recursive)
 {}
 
 QnServerUpdateTool::~QnServerUpdateTool() {}

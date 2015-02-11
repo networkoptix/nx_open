@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 #include <QtCore/QMultiMap>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtGui/QRegion>
 #include <QtGui/QPainterPath>
 
@@ -32,7 +32,7 @@ public:
     QVector<QRect> rects() const;
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 // TODO: #Elric rename header

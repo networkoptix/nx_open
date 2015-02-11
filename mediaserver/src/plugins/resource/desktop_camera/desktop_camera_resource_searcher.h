@@ -57,7 +57,7 @@ private:
     };
 
     QList<ClientConnectionInfo> m_connections;
-    QMutex m_mutex;
+    QnMutex m_mutex;
 private:
     void cleanupConnections();
 };

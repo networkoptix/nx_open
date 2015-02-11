@@ -151,7 +151,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         ? timePeriod.endTimeMs() * 1000ll
         : DATETIME_NOW;
 
-    QMutexLocker lock(&m_exportMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_exportMutex);
     if (m_exportRecorder == 0)
     {
         QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
@@ -224,7 +224,7 @@ void QnClientVideoCamera::stopExport() {
         connect(m_exportRecorder, SIGNAL(finished()), this, SIGNAL(exportStopped()));
         m_exportRecorder->pleaseStop();
     }
-    QMutexLocker lock(&m_exportMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_exportMutex);
     m_exportReader = 0;
     m_exportRecorder = 0;
 }
@@ -245,7 +245,7 @@ QSharedPointer<QBuffer> QnClientVideoCamera::motionIODevice(int channel) {
 
 QString QnClientVideoCamera::exportedFileName() const
 {
-    QMutexLocker lock(&m_exportMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_exportMutex);
     if (m_exportRecorder)
         return m_exportRecorder->fixedFileName();
     else

@@ -7,7 +7,7 @@
 #include <QtCore/QFileInfoList>
 #include <QHash>
 #include <QtCore/QTime>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QSharedPointer>
 
 
@@ -68,7 +68,7 @@ private:
 
     bool m_needsToBesaved;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 typedef QSharedPointer<QnColdStoreMetaData> QnColdStoreMetaDataPtr;
@@ -87,7 +87,7 @@ private:
 
     QHash<QString, QnColdStoreMetaDataPtr>  m_pool;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
 };
 
 class QnColdStoreConnection;

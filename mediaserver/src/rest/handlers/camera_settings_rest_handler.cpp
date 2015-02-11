@@ -117,7 +117,7 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
     processOperation(camera, operation, values);
 
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         std::set<AwaitedParameters*>::iterator awaitedParamsIter = m_awaitedParamsSets.insert( &awaitedParams ).first;
         QElapsedTimer asyncOpCompletionTimer;
         asyncOpCompletionTimer.start();
@@ -207,7 +207,7 @@ void QnCameraSettingsRestHandler::processOperation(const QnResourcePtr &resource
 }
 
 void QnCameraSettingsRestHandler::asyncParamGetComplete(const QnResourcePtr &resource, const QString &id, const QString &value, bool success) {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     NX_LOG( QString::fromLatin1("QnCameraSettingsHandler::asyncParamGetComplete. paramName %1, paramValue %2").arg(id).arg(value), cl_logDEBUG1 );
     for( std::set<AwaitedParameters*>::const_iterator
@@ -237,7 +237,7 @@ void QnCameraSettingsRestHandler::asyncParamSetComplete(const QnResourcePtr &res
 }
 
 void QnCameraSettingsRestHandler::asyncParamsGetComplete(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values) {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     for( std::set<AwaitedParameters*>::const_iterator
         it = m_awaitedParamsSets.begin();

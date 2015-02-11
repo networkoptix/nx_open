@@ -30,7 +30,7 @@ void QnServerConnector::at_moduleFinder_moduleUrlFound(const QnModuleInformation
     if (!moduleInformation.isCompatibleToCurrentSystem()) {
         bool used;
         {
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             used = m_usedUrls.contains(trimmed);
         }
         if (used) {
@@ -76,7 +76,7 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
     UrlInfo urlInfo;
 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
         if (m_usedUrls.contains(trimmed)) {
             NX_LOG(lit("QnServerConnector: Url %1 is already used.").arg(trimmed.toString()), cl_logINFO);
@@ -99,7 +99,7 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
 void QnServerConnector::removeConnection(const QnModuleInformation &moduleInformation, const QUrl &url) {
     QUrl trimmed = trimmedUrl(url);
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     UrlInfo urlInfo = m_usedUrls.take(trimmed);
     lock.unlock();
     if (urlInfo.peerId.isNull())
@@ -138,7 +138,7 @@ void QnServerConnector::stop() {
 
     QHash<QUrl, UrlInfo> usedUrls;
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         usedUrls = m_usedUrls;
     }
 
@@ -146,7 +146,7 @@ void QnServerConnector::stop() {
         removeConnection(m_moduleFinder->moduleInformation(it->peerId), it.key());
 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         m_usedUrls.clear();
     }
 }

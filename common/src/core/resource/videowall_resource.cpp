@@ -55,13 +55,13 @@ void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArra
 }
 
 bool QnVideoWallResource::isAutorun() const {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_autorun;
 }
 
 void QnVideoWallResource::setAutorun(bool value) {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if (m_autorun == value)
             return;
         m_autorun = value;

@@ -58,7 +58,7 @@ class OnvifResourceSearcherWsdd
 
     OnvifResourceInformationFetcher& m_onvifFetcher;
     //mutable QHash<QString, QUdpSocketPtr> m_recvSocketList;
-    //mutable QMutex m_mutex;
+    //mutable QnMutex m_mutex;
 
 public:
     OnvifResourceSearcherWsdd();

@@ -6,7 +6,7 @@
 #ifndef PTS_TO_CLOCK_MAPPER_H
 #define PTS_TO_CLOCK_MAPPER_H
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 
 /*!
@@ -38,7 +38,7 @@ public:
         size_t modificationSequence() const;
 
     private:
-        mutable QMutex m_timestampSynchronizationMutex;
+        mutable QnMutex m_timestampSynchronizationMutex;
         //!Difference (usec) between local time and source time
         int64_t m_localToSourceTimeShift;
         size_t m_modificationSequence;

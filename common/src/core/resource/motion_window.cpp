@@ -1,7 +1,7 @@
 
 #include "motion_window.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 #include "core/datapacket/media_data_packet.h"
 
@@ -61,7 +61,7 @@ QnRegion& QnRegion::operator=( const QnRegion& r )
 
 QVector<QRect> QnRegion::rects() const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     return QRegion::rects();
 }
 

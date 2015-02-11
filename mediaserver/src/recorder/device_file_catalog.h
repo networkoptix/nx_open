@@ -5,9 +5,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QFileInfo>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <deque>
 #include <QtCore/QFileInfo>
@@ -119,7 +119,7 @@ public:
     static bool needRebuildPause();
     static void rebuildPause(void*);
     static void rebuildResume(void*);
-    static QMutex m_rebuildMutex;
+    static QnMutex m_rebuildMutex;
     static QSet<void*> m_pauseList;
 
     bool doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period);
@@ -158,7 +158,7 @@ private:
 private:
     friend class QnStorageManager;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     //QFile m_file;
     std::deque<Chunk> m_chunks; 
     QString m_cameraUniqueId;
@@ -179,7 +179,7 @@ private:
     //QMap<int,QString> m_prevFileNames;
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
-    QMutex m_IOMutex;
+    QnMutex m_IOMutex;
     static RebuildMethod m_rebuildArchive;
 };
 

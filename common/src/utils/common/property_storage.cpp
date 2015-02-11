@@ -4,7 +4,7 @@
 
 #include <QtCore/QMetaType>
 #include <QtCore/QSettings>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtGui/QColor>
 
 #include <utils/serialization/json_functions.h>
@@ -196,7 +196,7 @@ void QnPropertyStorage::setThreadSafe(bool threadSafe) {
     m_threadSafe = threadSafe;
 
     if(m_threadSafe && !m_mutex)
-        m_mutex.reset(new QMutex(QMutex::Recursive));
+        m_mutex.reset(new QnMutex(QnMutex::Recursive));
 }
 
 void QnPropertyStorage::updateFromSettings(QSettings *settings) {

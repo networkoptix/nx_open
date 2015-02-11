@@ -15,7 +15,7 @@ QnBufferedFrameDisplayer::QnBufferedFrameDisplayer():
 
 void QnBufferedFrameDisplayer::setRenderList(QSet<QnAbstractRenderer*> renderList)
 {
-    QMutexLocker lock(&m_renderMtx);
+    SCOPED_MUTEX_LOCK( lock, &m_renderMtx);
     m_renderList = renderList;
 }
 
@@ -30,7 +30,7 @@ void QnBufferedFrameDisplayer::waitForFramesDisplayed()
 }
 
 qint64 QnBufferedFrameDisplayer::bufferedDuration() {
-    QMutexLocker lock(&m_sync);
+    SCOPED_MUTEX_LOCK( lock, &m_sync);
     if (m_queue.size() == 0)
         return 0;
     else
@@ -57,26 +57,26 @@ bool QnBufferedFrameDisplayer::addFrame(const QSharedPointer<CLVideoDecoderOutpu
 }
 
 void QnBufferedFrameDisplayer::setCurrentTime(qint64 time) {
-    QMutexLocker lock(&m_sync);
+    SCOPED_MUTEX_LOCK( lock, &m_sync);
     m_currentTime = time;
     m_timer.restart();
 }
 
 void QnBufferedFrameDisplayer::clear() {
-    QMutexLocker processFrameLock( &m_processFrameMutex );
+    SCOPED_MUTEX_LOCK( processFrameLock, &m_processFrameMutex );
     m_queue.clear();
     m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
 }
 
 qint64 QnBufferedFrameDisplayer::getTimestampOfNextFrameToRender() const 
 {
-    QMutexLocker lock(&m_sync);
+    SCOPED_MUTEX_LOCK( lock, &m_sync);
     return m_lastDisplayedTime;
 }
 
 void QnBufferedFrameDisplayer::overrideTimestampOfNextFrameToRender(qint64 value)
 {
-    QMutexLocker lock(&m_sync);
+    SCOPED_MUTEX_LOCK( lock, &m_sync);
     m_lastDisplayedTime = value;
 }
 
@@ -95,7 +95,7 @@ void QnBufferedFrameDisplayer::run()
                 m_expectedTime = frame->pkt_dts;
             }
 
-            QMutexLocker syncLock( &m_sync );
+            SCOPED_MUTEX_LOCK( syncLock, &m_sync );
             qint64 expectedTime = m_expectedTime  + m_alignedTimer.elapsed()*1000ll;
             qint64 currentTime = (quint64)m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
                 
@@ -145,7 +145,7 @@ void QnBufferedFrameDisplayer::run()
             syncLock.unlock();
 
             {
-                QMutexLocker lock(&m_renderMtx);
+                SCOPED_MUTEX_LOCK( lock, &m_renderMtx);
                 foreach(QnAbstractRenderer* render, m_renderList)
                     render->draw(frame);
             }
@@ -162,6 +162,6 @@ void QnBufferedFrameDisplayer::run()
         }
     }
 
-    QMutexLocker processFrameLock( &m_processFrameMutex );
+    SCOPED_MUTEX_LOCK( processFrameLock,  &m_processFrameMutex );
     m_queue.clear();
 }

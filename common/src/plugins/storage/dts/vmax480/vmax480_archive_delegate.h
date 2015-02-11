@@ -47,7 +47,7 @@ private:
     bool m_thumbnailsMode;
     qint64 m_lastSeekPos;
     bool m_isOpened;
-    mutable QMutex m_seekMtx;
+    mutable QnMutex m_seekMtx;
     QByteArray m_groupId;
     bool m_beforeSeek;
     bool m_ignoreNextSeek;

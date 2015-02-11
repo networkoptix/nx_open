@@ -6,7 +6,7 @@
 #include "coldstore_storage.h"
 
 QnColdStoreMetaData::QnColdStoreMetaData():
-m_mutex(QMutex::Recursive)
+m_mutex(QnMutex::Recursive)
 {
     m_needsToBesaved = false;
     m_lastUsageTime.restart();
@@ -19,7 +19,7 @@ QnColdStoreMetaData::~QnColdStoreMetaData()
 
 void QnColdStoreMetaData::put(const QString& fn, QnCSFileInfo info)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     m_lastUsageTime.restart();
     m_hash.insert(fn, info);
@@ -28,7 +28,7 @@ void QnColdStoreMetaData::put(const QString& fn, QnCSFileInfo info)
 
 QnCSFileInfo QnColdStoreMetaData::getFileinfo(const QString& fn) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     m_lastUsageTime.restart();
     QHash<QString, QnCSFileInfo>::const_iterator it = m_hash.find(fn);
@@ -41,7 +41,7 @@ QnCSFileInfo QnColdStoreMetaData::getFileinfo(const QString& fn) const
 
 QFileInfoList QnColdStoreMetaData::fileInfoList(const QString& subPath) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QFileInfoList result;
 
@@ -58,7 +58,7 @@ QFileInfoList QnColdStoreMetaData::fileInfoList(const QString& subPath) const
 
 QByteArray QnColdStoreMetaData::toByteArray() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QByteArray result;
     result.reserve(m_hash.size()*66 + 4); // to avoid memory reallocation
@@ -85,7 +85,7 @@ QByteArray QnColdStoreMetaData::toByteArray() const
 
 void QnColdStoreMetaData::fromByteArray(const QByteArray& ba)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     m_hash.clear();
 
@@ -125,14 +125,14 @@ int QnColdStoreMetaData::age() const
 
 QnColdStoreMetaDataPool::QnColdStoreMetaDataPool(QnPlColdStoreStorage *csStorage):
 m_csStorage(csStorage),
-m_mutex(QMutex::Recursive)
+m_mutex(QnMutex::Recursive)
 {
 
 }
 
 QnColdStoreMetaDataPool::~QnColdStoreMetaDataPool()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_pool.clear();
 }
 
@@ -165,7 +165,7 @@ QnColdStoreMetaDataPtr QnColdStoreMetaDataPool::getStoreMetaData(const QString& 
             connection.read(ba.data(), size);
             md->fromByteArray(ba);
 
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             m_pool.insert(csFn, md);
             return md;
         }
@@ -189,7 +189,7 @@ QnColdStoreMetaDataPtr QnColdStoreMetaDataPool::getStoreMetaData(const QString& 
 
 void QnColdStoreMetaDataPool::checkIfSomedataNeedstoberemoved()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if (m_pool.size() <= 20)
         return;

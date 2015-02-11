@@ -68,7 +68,7 @@ private:
 
     typedef bool (QnRedAssController::*SearchCondition)(QnCamDisplay*);
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     typedef QMap<QnCamDisplay*, RedAssInfo> ConsumersMap;
     ConsumersMap m_redAssInfo;
     QTimer m_timer;

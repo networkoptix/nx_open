@@ -7,9 +7,9 @@
 #define EC2_BASE_QUERY_HTTP_HANDLER_H
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 
 #include <rest/server/request_handler.h>
 #include <utils/common/concurrent.h>
@@ -88,7 +88,7 @@ namespace ec2
                 errorCode = _errorCode;
                 contentType = Qn::serializationFormatToHttpContentType(format);
 
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 finished = true;
                 m_cond.wakeAll();
             };
@@ -97,7 +97,7 @@ namespace ec2
                 inputData,
                 queryDoneHandler );
 
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
             while( !finished )
                 m_cond.wait( lk.mutex() );
 
@@ -123,8 +123,8 @@ namespace ec2
 
     private:
         ApiCommand::Value m_cmdCode;
-        QWaitCondition m_cond;
-        QMutex m_mutex;
+        QnWaitCondition m_cond;
+        QnMutex m_mutex;
     };
 
 

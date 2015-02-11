@@ -11,37 +11,37 @@ QnAsyncHttpClientReply::QnAsyncHttpClientReply(const nx_http::AsyncHttpClientPtr
 }
 
 nx_http::AsyncHttpClientPtr QnAsyncHttpClientReply::asyncHttpClient() const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_client;
 }
 
 bool QnAsyncHttpClientReply::isFailed() const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_failed;
 }
 
 QUrl QnAsyncHttpClientReply::url() const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_url;
 }
 
 QByteArray QnAsyncHttpClientReply::contentType() {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_contentType;
 }
 
 QByteArray QnAsyncHttpClientReply::data() {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_data;
 }
 
 nx_http::Response QnAsyncHttpClientReply::response() {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_response;
 }
 
 void QnAsyncHttpClientReply::at_client_done(const nx_http::AsyncHttpClientPtr &client) {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if (client != m_client)
         return;

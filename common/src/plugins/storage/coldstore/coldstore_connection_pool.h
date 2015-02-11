@@ -8,7 +8,7 @@
 #include <QHash>
 #include <QtCore/QIODevice>
 #include <QtCore/QTime>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 
 #define CS_ACTUAL_DATA_CHANNEL 0
@@ -64,7 +64,7 @@ private:
 
     bool m_opened;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
         
 };
 
@@ -87,7 +87,7 @@ private:
     
     QHash<QString, QnColdStoreConnection*>  m_pool;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
 };
 
 #endif // ENABLE_COLDSTORE

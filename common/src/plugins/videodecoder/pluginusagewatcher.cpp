@@ -5,7 +5,7 @@
 #include "pluginusagewatcher.h"
 
 #include <QtCore/QDateTime>
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 #include <utils/common/log.h>
 
@@ -72,13 +72,13 @@ PluginUsageWatcher::~PluginUsageWatcher()
 
 size_t PluginUsageWatcher::currentSessionCount() const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     return m_currentSessions.size();
 }
 
 stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     //reading usage from shared memory
     const quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
@@ -117,14 +117,14 @@ stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
 
 void PluginUsageWatcher::decoderCreated( stree::AbstractResourceReader* const decoder )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     m_currentSessions.insert( decoder );
 }
 
 void PluginUsageWatcher::decoderIsAboutToBeDestroyed( stree::AbstractResourceReader* const decoder )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     m_currentSessions.erase( decoder );
 

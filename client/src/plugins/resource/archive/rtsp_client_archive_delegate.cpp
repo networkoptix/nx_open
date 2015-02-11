@@ -142,7 +142,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     qint64 startTime = otherRtspSession.startTime();
     if ((quint64)startTime != AV_NOPTS_VALUE && startTime != DATETIME_NOW) 
     {
-        QMutexLocker lock(&m_timeMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
         if (startTime < *result || *result == AV_NOPTS_VALUE)
             *result = startTime;
     }
@@ -157,14 +157,14 @@ bool checkGlobalMinTime(const ArchiveTimeCheckInfo& checkInfo)
 void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera)
 {
     if (!camera) {
-        QMutexLocker lock(&m_timeMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
         m_globalMinArchiveTime = AV_NOPTS_VALUE;
         return;
     }
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
     if (!history) {
-        QMutexLocker lock(&m_timeMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
         m_globalMinArchiveTime = AV_NOPTS_VALUE;
         return;
     }
@@ -180,7 +180,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
             checkList << ArchiveTimeCheckInfo(camera, server, this, server == m_server ? &currentMinTime : &otherMinTime);
     }
     QtConcurrent::blockingFilter(checkList, checkGlobalMinTime);
-    QMutexLocker lock(&m_timeMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
     if ((otherMinTime != AV_NOPTS_VALUE) && (currentMinTime == AV_NOPTS_VALUE || otherMinTime < currentMinTime))
         m_globalMinArchiveTime = otherMinTime;
     else
@@ -307,7 +307,7 @@ void QnRtspClientArchiveDelegate::beforeClose()
 
 void QnRtspClientArchiveDelegate::close()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     //m_waitBOF = false;
     m_rtspSession.stop();
     m_rtpData = 0;
@@ -320,7 +320,7 @@ void QnRtspClientArchiveDelegate::close()
 
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
-    QMutexLocker lock(&m_timeMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
     qint64 result = m_globalMinArchiveTime != AV_NOPTS_VALUE ? m_globalMinArchiveTime : m_rtspSession.startTime();
 
     if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
@@ -653,7 +653,7 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
 
 QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QnAbstractMediaDataPtr result;
 

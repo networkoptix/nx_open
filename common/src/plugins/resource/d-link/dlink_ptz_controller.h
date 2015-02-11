@@ -27,7 +27,7 @@ private:
     QString getLastCommand() const;
 private:
     QSharedPointer<QnPlOnvifResource> m_resource;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QString m_lastRequest;
     QScopedPointer<QnDlinkPtzRepeatCommand> m_repeatCommand;
 };

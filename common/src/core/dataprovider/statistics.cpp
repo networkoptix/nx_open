@@ -9,7 +9,7 @@ QnStatistics::QnStatistics()
 
 void QnStatistics::resetStatistics()
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     m_startTime = QDateTime::currentDateTime();
     m_frames = 0;
     m_dataTotal = 0;
@@ -40,7 +40,7 @@ void QnStatistics::resetStatistics()
 void QnStatistics::stop()
 {
     if (!m_runing) return; 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     m_stopTime = QDateTime::currentDateTime();
     m_runing = false;
 }
@@ -48,7 +48,7 @@ void QnStatistics::stop()
 void QnStatistics::onData(unsigned int datalen)
 {
     if (!m_runing) return; 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
 
     if (datalen)
     {
@@ -108,13 +108,13 @@ void QnStatistics::onData(unsigned int datalen)
 
 float QnStatistics::getBitrate() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_bitrate;
 }
 
 float QnStatistics::getFrameRate() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_framerate;
 }
 
@@ -136,7 +136,7 @@ bool QnStatistics::badSensor() const
 void QnStatistics::onEvent(QnStatisticsEvent event)
 {
     if (!m_runing) return; 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
 
     QDateTime current = QDateTime::currentDateTime();
     m_events[event].ammount++;
@@ -150,13 +150,13 @@ void QnStatistics::onEvent(QnStatisticsEvent event)
 
 unsigned long QnStatistics::totalEvents(QnStatisticsEvent event) const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_events[event].ammount;
 }
 
 float QnStatistics::eventsPerHour(QnStatisticsEvent event) const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
 
     unsigned long seconds = m_startTime.secsTo(current); 
@@ -169,19 +169,19 @@ float QnStatistics::eventsPerHour(QnStatisticsEvent event) const
 
 QDateTime QnStatistics::firstOccurred(QnStatisticsEvent event) const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_events[event].firtTime;
 }
 
 QDateTime QnStatistics::lastOccurred(QnStatisticsEvent event) const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_events[event].lastTime;
 }
 
 float QnStatistics::getavBitrate() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
     unsigned long seconds = m_startTime.secsTo(current); 
 
@@ -194,7 +194,7 @@ float QnStatistics::getavBitrate() const
 
 float QnStatistics::getavFrameRate() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
     unsigned long seconds = m_startTime.secsTo(current); 
 
@@ -207,7 +207,7 @@ float QnStatistics::getavFrameRate() const
 
 unsigned long QnStatistics::totalSecs() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
     return m_startTime.secsTo(current); 
 
@@ -215,7 +215,7 @@ unsigned long QnStatistics::totalSecs() const
 
 void QnStatistics::onLostConnection()
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     m_connectionLost = true;
     m_connectionLostTime = QDateTime::currentDateTime();
 }
@@ -227,7 +227,7 @@ bool QnStatistics::isConnectionLost() const
 
 int QnStatistics::connectionLostSec() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     QDateTime current = QDateTime::currentDateTime();
     return m_connectionLostTime.secsTo(current); 
 }

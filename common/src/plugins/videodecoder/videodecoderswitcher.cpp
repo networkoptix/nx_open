@@ -6,7 +6,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 #include "decoders/abstractvideodecoderplugin.h"
 #include "decoders/video/ffmpeg.h"
@@ -39,7 +39,7 @@ QnAbstractPictureDataRef::PicStorageType VideoDecoderSwitcher::targetMemoryType(
 //!Implementation of QnAbstractVideoDecoder::decode
 bool VideoDecoderSwitcher::decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     bool res = false;
     for( int i = 0; i < 2; ++i )
@@ -132,7 +132,7 @@ unsigned int VideoDecoderSwitcher::getDecoderCaps() const
 
 void VideoDecoderSwitcher::setSpeed( float newValue )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     if( m_decoder.get() )
         m_decoder->setSpeed( newValue );
@@ -162,7 +162,7 @@ void VideoDecoderSwitcher::setHWDecoder( QnAbstractVideoDecoder* hwDecoder )
 //!Switches to ffmpeg decoder, destroys hardware decoder object
 void VideoDecoderSwitcher::switchToSoftwareDecoding()
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     m_switchToSWDecoding = true;
 }
 

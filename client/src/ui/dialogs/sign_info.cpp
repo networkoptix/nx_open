@@ -17,7 +17,7 @@ void QnSignInfo::at_gotSignature(QByteArray calculatedSign, QByteArray signFromF
 {
     m_finished = true;
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_sign = calculatedSign;
     m_signFromFrame = signFromFrame;
     update();
@@ -32,7 +32,7 @@ void QnSignInfo::at_gotSignatureDescription(QString version, QString hwId, QStri
 
 void QnSignInfo::at_calcSignInProgress(QByteArray sign, int progress)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_sign = sign;
     m_progress = progress;
     update();
@@ -53,7 +53,7 @@ void QnSignInfo::paintEvent(QPaintEvent *)
     float opacity = qAbs(sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5;
 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         //if (m_sign.isEmpty())
         //    return;
         m_signHelper.setSign(m_sign);

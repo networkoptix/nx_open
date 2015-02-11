@@ -9,8 +9,8 @@
 #include <map>
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
+#include <utils/common/mutex.h>
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
@@ -40,7 +40,7 @@ namespace ec2
     public:
         virtual ~ClientQueryProcessor()
         {
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
             while( !m_runningHttpRequests.empty() )
             {
                 nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
@@ -88,7 +88,7 @@ namespace ec2
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
             if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
             {
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
@@ -127,7 +127,7 @@ namespace ec2
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
             if( !httpClient->doGet( requestUrl ) )
             {
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
@@ -142,7 +142,7 @@ namespace ec2
         {
             std::function<void()> handler;
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 auto it = m_runningHttpRequests.find( httpClient );
                 assert( it != m_runningHttpRequests.end() );
                 handler = std::move(it->second);
@@ -154,7 +154,7 @@ namespace ec2
         }
 
     private:
-        QMutex m_mutex;
+        QnMutex m_mutex;
         std::map<nx_http::AsyncHttpClientPtr, std::function<void()> > m_runningHttpRequests;
 
         template<class OutputData, class HandlerType>

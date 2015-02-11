@@ -1,7 +1,7 @@
 #ifndef __BUSINESS_RULE_PROCESSOR_H_
 #define __BUSINESS_RULE_PROCESSOR_H_
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <QtCore/QMultiMap>
@@ -239,7 +239,7 @@ private:
 
     QMap<QString, QnProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
     QMap<QString, int> m_actionInProgress;              // remove duplicates for long actions
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QTimer m_timer;
     QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
 

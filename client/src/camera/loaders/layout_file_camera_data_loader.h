@@ -2,7 +2,7 @@
 #define QN_LAYOUT_FILE_CAMERA_DATA_LOADER_H
 
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <camera/data/camera_data_fwd.h>
 #include <camera/loaders/abstract_camera_data_loader.h>

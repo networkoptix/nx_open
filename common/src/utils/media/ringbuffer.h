@@ -2,7 +2,7 @@
 #define CL_ringbuffer_1842
 
 #include <QtCore/QIODevice>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 
 class CLRingBuffer : public QIODevice
@@ -30,7 +30,7 @@ private:
 	char* m_pw;
 	char* m_pr;
 
-	mutable QMutex m_mtx;
+	mutable QnMutex m_mtx;
 };
 
 #endif //CL_ringbuffer_1842

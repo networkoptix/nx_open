@@ -8,7 +8,7 @@
 #include <QtCore/QStringList>
 
 class QSettings;
-class QMutex;
+class QnMutex;
 class QTextStream;
 
 class QnPropertyStorageLocker;
@@ -151,7 +151,7 @@ private:
 
 private:
     bool m_threadSafe;
-    QScopedPointer<QMutex> m_mutex;
+    QScopedPointer<QnMutex> m_mutex;
     mutable int m_lockDepth;
     mutable QSet<int> m_pendingNotifications;
 

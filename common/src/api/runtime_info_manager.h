@@ -62,8 +62,8 @@ private:
     virtual void storedItemChanged(const QnPeerRuntimeInfo &item) override;
 private:
     /** Mutex that is to be used when accessing items. */
-    mutable QMutex m_mutex;
-    mutable QMutex m_updateMutex;
+    mutable QnMutex m_mutex;
+    mutable QnMutex m_updateMutex;
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
 };
 

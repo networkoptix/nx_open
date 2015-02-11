@@ -9,9 +9,9 @@
 #include <atomic>
 #include <functional>
 
-#include <QMutex>
+#include <utils/common/mutex.h>
 #include <QMutexLocker>
-#include <QWaitCondition>
+#include <utils/common/wait_condition.h>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/singleton.h>
@@ -82,8 +82,8 @@ private:
     };
 
     bool m_terminated;
-    mutable QMutex m_mutex;
-    mutable QWaitCondition m_cond;
+    mutable QnMutex m_mutex;
+    mutable QnWaitCondition m_cond;
     std::list<ResolveTask> m_taskQueue;
     RequestID m_runningTaskReqID;
     size_t m_currentSequence;

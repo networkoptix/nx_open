@@ -4,7 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QDateTime>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #define CL_STATISTICS_WINDOW_MS 2000
 #define CL_STATISTICS_UPDATE_PERIOD_MS 700
@@ -65,7 +65,7 @@ public:
     //========
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     QDateTime m_startTime, m_stopTime;
     unsigned long m_frames;

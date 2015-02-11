@@ -1,6 +1,6 @@
 #include "avi_playlist_archive_delegate.h"
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <core/resource/resource.h>
 #include "utils/common/util.h"

@@ -40,13 +40,13 @@ namespace ec2
         }
 
         void addToCache(const QnAbstractTransaction::PersistentInfo& key, ApiCommand::Value command, const QByteArray& data) {
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             m_cache.insert(CacheKey(key, command), new QByteArray(data), data.size());
         }
 
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
@@ -83,7 +83,7 @@ namespace ec2
         static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
     private:
 
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         QCache<CacheKey, const QByteArray> m_cache;
     };
 

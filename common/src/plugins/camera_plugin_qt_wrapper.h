@@ -11,7 +11,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "camera_plugin.h"
 
@@ -88,7 +88,7 @@ namespace nxcip_qt
         const CameraDiscoveryManager& operator=(const CameraDiscoveryManager& right);
 
     private:
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         char* m_texBuf;
     };
 
@@ -157,7 +157,7 @@ namespace nxcip_qt
         QString getLastErrorString() const;
 
     private:
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         int m_prevErrorCode;
         char* m_textBuf;
 

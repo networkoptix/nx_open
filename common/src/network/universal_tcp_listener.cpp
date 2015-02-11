@@ -113,7 +113,7 @@ void QnUniversalTcpListener::addProxySenderConnections(int size)
 
 QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(const QString& guid, int timeout)
 {
-    QMutexLocker lock(&m_proxyMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_proxyMutex);
     ProxyList::iterator itr = m_awaitingProxyConnections.find(guid);
     while (itr == m_awaitingProxyConnections.end() && m_proxyConExists.contains(guid)) {
         if (!m_proxyWaitCond.wait(&m_proxyMutex, timeout))
@@ -136,7 +136,7 @@ void QnUniversalTcpListener::setProxyPoolSize(int value)
 
 bool QnUniversalTcpListener::registerProxyReceiverConnection(const QString& guid, QSharedPointer<AbstractStreamSocket> socket)
 {
-    QMutexLocker lock(&m_proxyMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_proxyMutex);
     if (m_awaitingProxyConnections.size() < m_proxyPoolSize * 2) {
         m_awaitingProxyConnections.insert(guid, AwaitProxyInfo(socket));
         socket->setNonBlockingMode(true);
@@ -151,7 +151,7 @@ void QnUniversalTcpListener::doPeriodicTasks()
 {
     QnTcpListener::doPeriodicTasks();
 
-    QMutexLocker lock(&m_proxyMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_proxyMutex);
 
     for (ProxyList::Iterator itr = m_awaitingProxyConnections.begin(); itr != m_awaitingProxyConnections.end();)
     {

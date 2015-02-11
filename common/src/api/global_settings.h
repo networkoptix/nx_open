@@ -1,7 +1,7 @@
 #ifndef QN_GLOBAL_SETTINGS_H
 #define QN_GLOBAL_SETTINGS_H
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QObject>
 
 #include <nx_ec/data/api_fwd.h>
@@ -67,7 +67,7 @@ private:
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnUserResourcePtr m_admin;
 };
 

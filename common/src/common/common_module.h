@@ -2,8 +2,8 @@
 #define QN_COMMON_MODULE_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
+#include <utils/common/mutex.h>
 
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
@@ -111,7 +111,7 @@ private:
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;
     qint64 m_systemIdentityTime;

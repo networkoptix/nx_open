@@ -185,7 +185,7 @@ public:
         m_recvBuffer = buf;
         m_recvHandler = std::move( handler );
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        SCOPED_MUTEX_LOCK( lk,  aio::AIOService::instance()->mutex() );
         ++m_recvAsyncCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etRead, this );
     }
@@ -209,7 +209,7 @@ public:
         m_sendHandler = std::move( handler );
         m_sendBufPos = 0;
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        SCOPED_MUTEX_LOCK( lk,  aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etWrite, this );
     }
@@ -221,7 +221,7 @@ public:
 
         m_timerHandler = std::move( handler );
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        SCOPED_MUTEX_LOCK( lk,  aio::AIOService::instance()->mutex() );
         ++m_registerTimerCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etTimedOut, this, timeoutMs );
     }
@@ -322,7 +322,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            SCOPED_MUTEX_LOCK( lk,  aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
         };
@@ -343,7 +343,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            SCOPED_MUTEX_LOCK( lk,  aio::AIOService::instance()->mutex() );
             if( recvAsyncCallCounterBak == m_recvAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etRead );
         };
@@ -367,7 +367,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            SCOPED_MUTEX_LOCK( lk,  aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
         };
@@ -387,7 +387,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            SCOPED_MUTEX_LOCK( lk,  aio::AIOService::instance()->mutex() );
             if( registerTimerCallCounterBak == m_registerTimerCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etTimedOut );
         };
@@ -566,7 +566,7 @@ private:
         m_asyncSendIssued = true;
 #endif
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        SCOPED_MUTEX_LOCK( lk,  aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etWrite, this );
     }

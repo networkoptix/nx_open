@@ -5,7 +5,7 @@
 
 #include "camera_driver_restriction_list.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 
 static CameraDriverRestrictionList* CameraDriverRestrictionList_instance = nullptr;
@@ -23,7 +23,7 @@ CameraDriverRestrictionList::~CameraDriverRestrictionList()
 
 void CameraDriverRestrictionList::allow( const QString& driverName, const QString& cameraVendor, const QString& cameraModelMask )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     std::vector<AllowRuleData>& rules = m_allowRulesByVendor[cameraVendor.toLower()];
     AllowRuleData ruleData;
@@ -34,7 +34,7 @@ void CameraDriverRestrictionList::allow( const QString& driverName, const QStrin
 
 bool CameraDriverRestrictionList::driverAllowedForCamera( const QString& driverName, const QString& cameraVendor, const QString& cameraModel ) const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     std::map<QString, std::vector<AllowRuleData> >::const_iterator it = m_allowRulesByVendor.find(cameraVendor.toLower());
     if( it == m_allowRulesByVendor.end() )

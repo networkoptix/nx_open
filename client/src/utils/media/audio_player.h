@@ -9,8 +9,8 @@
 #include <memory>
 
 #include <QtCore/QBuffer>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 
 #include <core/datapacket/abstract_data_packet.h>
 #include <plugins/storage/memory/ext_iodevice_storage.h>
@@ -137,8 +137,8 @@ private:
     QnAudioStreamDisplay* m_renderer;
     qint64 m_rtStartTime;
     qint64 m_lastRtTime;
-    mutable QMutex m_mutex;
-    QWaitCondition m_cond;
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_cond;
     State m_state;
     QnExtIODeviceStorageResourcePtr m_storage;
     std::auto_ptr<QBuffer> m_synthesizingTarget;

@@ -45,7 +45,7 @@ void QnCameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr 
     if (m_camera == camera)
         return;
 
-    QMutexLocker locker(&m_cameraMutex);
+    SCOPED_MUTEX_LOCK( locker, &m_cameraMutex);
     m_camera = camera;
     m_cameraAdvancedSettingsWebPage->setCamera(m_camera);
     ui->cameraAdvancedParamsWidget->setCamera(m_camera);
@@ -180,7 +180,7 @@ void QnCameraAdvancedSettingsWidget::initWebView() {
 }
 
 void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*reply*/, QAuthenticator * authenticator) {
-    QMutexLocker locker(&m_cameraMutex);
+    SCOPED_MUTEX_LOCK( locker, &m_cameraMutex);
     if (!m_camera)
         return;
 
@@ -189,7 +189,7 @@ void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*
 }
 
 void QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetworkProxy & , QAuthenticator * authenticator) {    
-    QMutexLocker locker(&m_cameraMutex);
+    SCOPED_MUTEX_LOCK( locker, &m_cameraMutex);
     if (!m_camera)
         return;
 

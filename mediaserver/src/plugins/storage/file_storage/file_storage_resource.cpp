@@ -44,7 +44,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
 
 bool QnFileStorageResource::updatePermissions() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     if (m_durty) {
         m_durty = false;
         QUrl storageUrl(getUrl());
@@ -67,7 +67,7 @@ bool QnFileStorageResource::updatePermissions() const
 
 void QnFileStorageResource::setUrl(const QString& url)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QnStorageResource::setUrl(url);
     m_durty = true;
 }

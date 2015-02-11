@@ -2,7 +2,7 @@
 #define QN_BUFFERED_FRAME_DISPLAYER_H
 
 #include <QtCore/QTime>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
@@ -47,10 +47,10 @@ private:
     QTime m_timer;
     QTime m_alignedTimer;
     qint64 m_currentTime;
-    mutable QMutex m_sync;
+    mutable QnMutex m_sync;
     //!This mutex is used for clearing frame queue only
-    QMutex m_processFrameMutex;
-    QMutex m_renderMtx;
+    QnMutex m_processFrameMutex;
+    QnMutex m_renderMtx;
     qint64 m_lastDisplayedTime;
 };
 

@@ -25,7 +25,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 #include <QtCore/QThread>
 
 #include <utils/common/log.h>
@@ -101,7 +101,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     bool httpClientHasBeenJustCreated = false;
     QSharedPointer<nx_http::HttpClient> localHttpClientPtr;
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         if( !m_httpClient )
         {
             m_httpClient = QSharedPointer<nx_http::HttpClient>( new nx_http::HttpClient() );
@@ -151,7 +151,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             {
                 const nx_http::BufferType& msgBodyBuf = localHttpClientPtr->fetchMessageBodyBuffer();
                 {
-                    QMutexLocker lk( &m_mutex );
+                    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                     if( m_terminated )
                     {
                         m_terminated = false;
@@ -178,7 +178,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             {
                 m_multipartContentParser.processData( localHttpClientPtr->fetchMessageBodyBuffer() );
                 {
-                    QMutexLocker lk( &m_mutex );
+                    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                     if( m_terminated )
                     {
                         m_terminated = false;
@@ -198,7 +198,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_NO_ERROR;
     }
 
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     if( m_httpClient )
     {
         //reconnecting
@@ -210,7 +210,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     m_terminated = true;
     m_cond.wakeAll();
 
@@ -282,7 +282,7 @@ bool StreamReader::waitForNextFrameTime()
         const qint64 msecToSleep = m_frameDurationMSec - (currentTime - m_prevFrameClock);
         if( msecToSleep > 0 )
         {
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
             QElapsedTimer monotonicTimer;
             monotonicTimer.start();
             qint64 msElapsed = monotonicTimer.elapsed();

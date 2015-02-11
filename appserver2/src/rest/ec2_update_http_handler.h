@@ -7,9 +7,9 @@
 #define EC2_UPDATE_HTTP_HANDLER_H
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 
 #include <common/common_module.h>
 
@@ -119,14 +119,14 @@ namespace ec2
             auto queryDoneHandler = [&errorCode, &finished, this]( ErrorCode _errorCode )
             {
                 errorCode = _errorCode;
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 finished = true;
                 m_cond.wakeAll();
             };
             m_connection->queryProcessor()->processUpdateAsync( tran, queryDoneHandler );
 
             {
-                QMutexLocker lk( &m_mutex );
+                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
                 while( !finished )
                     m_cond.wait( lk.mutex() );
             }
@@ -145,8 +145,8 @@ namespace ec2
 
     private:
         Ec2DirectConnectionPtr m_connection;
-        QWaitCondition m_cond;
-        QMutex m_mutex;
+        QnWaitCondition m_cond;
+        QnMutex m_mutex;
         CustomActionFuncType m_customAction;
     };
 }

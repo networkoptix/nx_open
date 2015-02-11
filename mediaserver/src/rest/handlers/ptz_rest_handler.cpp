@@ -16,7 +16,7 @@ static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
 
 QMap<QString, QnPtzRestHandler::AsyncExecInfo> QnPtzRestHandler::m_workers;
-QMutex QnPtzRestHandler::m_asyncExecMutex;
+QnMutex QnPtzRestHandler::m_asyncExecMutex;
 
 void QnPtzRestHandler::cleanupOldSequence()
 {
@@ -33,7 +33,7 @@ void QnPtzRestHandler::cleanupOldSequence()
 
 bool QnPtzRestHandler::checkSequence(const QString& id, int sequence)
 {
-    QMutexLocker lock(&m_sequenceMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_sequenceMutex);
     cleanupOldSequence();
     if (id.isEmpty() || sequence == -1)
         return true; // do not check if empty
@@ -65,7 +65,7 @@ void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function
 
 int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc function)
 {
-    QMutexLocker lock(&m_asyncExecMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_asyncExecMutex);
 
     if (m_workers[sequence].inProgress) {
         m_workers[sequence].nextCommand = function;

@@ -7,8 +7,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QThread>
 #include <QtCore/QSharedPointer>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 #include <QtCore/QCoreApplication>
 
 #include "warnings.h"
@@ -18,8 +18,8 @@
 namespace detail {
     struct QnObjectThreadPullerData {
         QSet<QObject *> objects;
-        QMutex mutex;
-        QWaitCondition condition;
+        QnMutex mutex;
+        QnWaitCondition condition;
     };
 
     typedef QSharedPointer<QnObjectThreadPullerData> QnObjectThreadPullerDataPtr;
@@ -33,7 +33,7 @@ namespace detail {
             m_object->moveToThread(m_thread);
             emit pushed(m_object);
 
-            QMutexLocker locker(&d->mutex);
+            SCOPED_MUTEX_LOCK( locker, &d->mutex);
             d->objects.remove(m_object);
             d->condition.wakeAll();
         }
@@ -87,7 +87,7 @@ public:
             return false;
         }
 
-        QMutexLocker locker(&d->mutex);
+        SCOPED_MUTEX_LOCK( locker, &d->mutex);
         if(d->objects.contains(object)) {
             qnWarning("Given object is already being moved.");
             return false;
@@ -103,7 +103,7 @@ public:
     }
 
     void wait(QObject *object = NULL) {
-        QMutexLocker locker(&d->mutex);
+        SCOPED_MUTEX_LOCK( locker, &d->mutex);
         while (true) {
             if(object == NULL && d->objects.isEmpty())
                 break;

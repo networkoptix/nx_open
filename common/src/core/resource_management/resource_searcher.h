@@ -1,7 +1,7 @@
 #ifndef QN_RESOURCE_SEARCHER_H
 #define QN_RESOURCE_SEARCHER_H
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QStringList>
 
 #include <core/resource/resource_factory.h>
@@ -121,7 +121,7 @@ public:
     QnResourceList checkFiles(const QStringList &files) const;
 
 protected:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QStringList m_pathListToCheck;
 };
 

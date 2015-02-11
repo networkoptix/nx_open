@@ -167,7 +167,7 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
         motionFile->setFileName(fileName + QString("motion_detailed_data") + getChannelPrefix() + ".bin");
     if (indexFile)
         indexFile->setFileName(fileName + QString("motion_detailed_index") + getChannelPrefix() + ".bin");
-    QMutex m_fileAccessMutex;
+    QnMutex m_fileAccessMutex;
     QDir dir;
     dir.mkpath(fileName);
 }
@@ -339,12 +339,12 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
         int indexRecords = qMax((m_detailedIndexFile.size() - MOTION_INDEX_HEADER_SIZE) / MOTION_INDEX_RECORD_SIZE, 0ll);
         int dataRecords  = m_detailedMotionFile.size() / MOTION_DATA_RECORD_SIZE;
         if (indexRecords > dataRecords) {
-            QMutexLocker lock(&m_fileAccessMutex);
+            SCOPED_MUTEX_LOCK( lock, &m_fileAccessMutex);
             if (!m_detailedIndexFile.resize(dataRecords*MOTION_INDEX_RECORD_SIZE + MOTION_INDEX_HEADER_SIZE))
                 return false;
         }
         else if ((indexRecords < dataRecords)) {
-            QMutexLocker lock(&m_fileAccessMutex);
+            SCOPED_MUTEX_LOCK( lock, &m_fileAccessMutex);
             if (!m_detailedMotionFile.resize(indexRecords*MOTION_DATA_RECORD_SIZE))
                 return false;
         }

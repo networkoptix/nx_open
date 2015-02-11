@@ -6,7 +6,7 @@ static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include "core/datapacket/media_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 #include "decoders/video/ffmpeg.h"
@@ -46,7 +46,7 @@ private:
 	void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,uint8_t* prevFrameBuffer, uint8_t* deltaBuffer);
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     CLFFmpegVideoDecoder* m_decoder;
     QSharedPointer<CLVideoDecoderOutput> m_frames[2];
     

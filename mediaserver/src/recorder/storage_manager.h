@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMap>
 #include <QtCore/QFile>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
 
@@ -69,7 +69,7 @@ public:
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const QString& separator);
 
     QnStorageResourcePtr getStorageByUrl(const QString& fileName);
-    QnStorageResourcePtr storageRoot(int storage_index) const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots.value(storage_index); }
+    QnStorageResourcePtr storageRoot(int storage_index) const { SCOPED_MUTEX_LOCK( lock, &m_mutexStorages); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const; 
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const; 
 
@@ -165,8 +165,8 @@ private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
 
-    mutable QMutex m_mutexStorages;
-    mutable QMutex m_mutexCatalog;
+    mutable QnMutex m_mutexStorages;
+    mutable QnMutex m_mutexCatalog;
 
     QMap<QString, QSet<int> > m_storageIndexes;
     bool m_storagesStatisticsReady;
@@ -174,7 +174,7 @@ private:
 
     typedef QMap<QString, QPair<QString, int > > FileNumCache;
     FileNumCache m_fileNumCache;
-    QMutex m_cacheMutex;
+    QnMutex m_cacheMutex;
     bool m_catalogLoaded;
     bool m_warnSended;
     bool m_isWritableStorageAvail;
@@ -194,7 +194,7 @@ private:
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     bool m_initInProgress;
-    mutable QMutex m_sdbMutex;
+    mutable QnMutex m_sdbMutex;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
 };
 

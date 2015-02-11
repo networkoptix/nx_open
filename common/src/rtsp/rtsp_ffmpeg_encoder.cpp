@@ -113,7 +113,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
         //m_mutex.unlock();
 
         //buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
-        //QMutexLocker lock(&m_owner->getSockMutex());
+        //SCOPED_MUTEX_LOCK( lock, &m_owner->getSockMutex());
         //sendBuffer->write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         quint8 packetType = m_media->dataType;
         sendBuffer.write((const char*) &packetType, 1);

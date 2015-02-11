@@ -3,7 +3,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QMetaType>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QStack>
 
 #include <utils/common/long_runnable.h>
@@ -101,7 +101,7 @@ private:
 private:
     friend class QnThumbnailsLoaderHelper;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     const QnResourcePtr m_resource;
     const Mode m_mode;
 

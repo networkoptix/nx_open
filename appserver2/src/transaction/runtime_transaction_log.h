@@ -3,7 +3,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "transaction.h"
 #include "nx_ec/ec_api.h"
@@ -42,7 +42,7 @@ private slots:
     private:
         QnTranState m_state;
         QMap<QnTranStateKey, ApiRuntimeData> m_data;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
     };
 };
 

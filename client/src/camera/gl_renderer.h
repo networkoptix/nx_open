@@ -106,7 +106,7 @@ private:
 
     QSharedPointer<QnGlRendererShaders> m_shaders;
     bool m_timeChangeEnabled;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     bool m_paused;
     ScreenshotInterface* m_screenshotInterface;
     ImageCorrectionResult m_imageCorrector;

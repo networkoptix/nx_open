@@ -12,7 +12,7 @@
 
 QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),
-    m_mutex(QMutex::Recursive),
+    m_mutex(QnMutex::Recursive),
     m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
     m_moduleFinder(moduleFinder)
 {
@@ -38,7 +38,7 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject
 }
 
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     ec2::AbstractECConnectionPtr oldConnection = m_connection.lock();
     QList<QnModuleInformation> foundModules = m_moduleInformationById.values();
@@ -94,7 +94,7 @@ void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data,
 }
 
 QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QList<QnModuleInformation> result;
     for (const QnModuleInformation &moduleInformation: m_moduleInformationById) {
@@ -105,7 +105,7 @@ QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
 }
 
 QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QnUuid &id) const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_moduleInformationById[id];
 }
 
@@ -120,7 +120,7 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     addModule(moduleInformation);
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     ec2::AbstractECConnectionPtr connection = m_connection.lock();
     lock.unlock();
 
@@ -129,7 +129,7 @@ void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformati
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     ec2::AbstractECConnectionPtr connection = m_connection.lock();
     lock.unlock();
 
@@ -143,7 +143,7 @@ void QnGlobalModuleFinder::at_router_connectionAdded(const QnUuid &discovererId,
 		return;
 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
         QSet<QString> &addresses = m_discoveredAddresses[peerId][discovererId];
         auto it = addresses.find(host);
@@ -160,7 +160,7 @@ void QnGlobalModuleFinder::at_router_connectionRemoved(const QnUuid &discovererI
 		return;
 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
         if (!m_discoveredAddresses[peerId][discovererId].remove(host))
             return;
@@ -169,7 +169,7 @@ void QnGlobalModuleFinder::at_router_connectionRemoved(const QnUuid &discovererI
 }
 
 void QnGlobalModuleFinder::updateAddresses(const QnUuid &id) {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QnModuleInformation moduleInformation = m_moduleInformationById.value(id);
     if (moduleInformation.id.isNull())
@@ -199,7 +199,7 @@ void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformatio
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QnModuleInformation updatedModuleInformation = moduleInformation;
     updatedModuleInformation.remoteAddresses = getModuleAddresses(moduleInformation.id);

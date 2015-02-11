@@ -2,7 +2,7 @@
 #define __CAMERA_POOL_H__
 
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 #include "camera/video_camera.h"
@@ -28,7 +28,7 @@ public:
 private:
     typedef QMap<QnResourcePtr, QnVideoCamera*> CameraMap;
     CameraMap m_cameras;
-    static QMutex m_staticMtx;
+    static QnMutex m_staticMtx;
 };
 
 #endif //  __CAMERA_POOL_H__

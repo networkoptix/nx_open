@@ -72,7 +72,7 @@ private:
     int m_maxStoreTime; // in seconds
     bool m_usedForWriting;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
-    mutable QMutex m_bitrateMtx;
+    mutable QnMutex m_bitrateMtx;
 };
 
 Q_DECLARE_METATYPE(QnAbstractStorageResourcePtr);

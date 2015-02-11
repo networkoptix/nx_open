@@ -59,7 +59,7 @@ bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits
     if(!base_type::getLimits(space, limits))
         return false;
 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     if(space == Qn::DevicePtzCoordinateSpace) {
         if(m_data.fields & Qn::DeviceLimitsPtzField) {
             *limits = m_data.deviceLimits;
@@ -81,7 +81,7 @@ bool QnCachingPtzController::getFlip(Qt::Orientations *flip) {
     if(!base_type::getFlip(flip))
         return false;
 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     if(m_data.fields & Qn::FlipPtzField) {
         *flip = m_data.flip;
         return true;
@@ -110,7 +110,7 @@ bool QnCachingPtzController::getPresets(QnPtzPresetList *presets) {
     if(!base_type::getPresets(presets))
         return false;
 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     if(m_data.fields & Qn::PresetsPtzField) {
         *presets = m_data.presets;
         return true;
@@ -135,7 +135,7 @@ bool QnCachingPtzController::getTours(QnPtzTourList *tours) {
     if(!base_type::getTours(tours))
         return false;
 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     if(m_data.fields & Qn::ToursPtzField) {
         *tours = m_data.tours;
         return true;
@@ -148,7 +148,7 @@ bool QnCachingPtzController::getActiveObject(QnPtzObject *activeObject) {
     if(!base_type::getActiveObject(activeObject))
         return false;
 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     if(m_data.fields & Qn::ActiveObjectPtzField) {
         *activeObject = m_data.activeObject;
         return true;
@@ -165,7 +165,7 @@ bool QnCachingPtzController::getHomeObject(QnPtzObject *homeObject) {
     if(!base_type::getHomeObject(homeObject))
         return false;
 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     if(m_data.fields & Qn::HomeObjectPtzField) {
         *homeObject = m_data.homeObject;
         return true;
@@ -178,7 +178,7 @@ bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryT
     if(!base_type::getAuxilaryTraits(auxilaryTraits))
         return false;
 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     if(m_data.fields & Qn::AuxilaryTraitsPtzField) {
         *auxilaryTraits = m_data.auxilaryTraits;
         return true;
@@ -195,7 +195,7 @@ bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
     if(!baseController()->getData(query, data)) // TODO: #Elric should be base_type::getData => bad design =(
         return false;
 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     *data = m_data;
     data->query = query;
     data->fields &= query;
@@ -206,7 +206,7 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
     Qn::PtzDataFields changedFields = Qn::NoPtzFields;
 
     if(data.isValid()) {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         switch (command) {
         case Qn::CreatePresetPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {

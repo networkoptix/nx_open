@@ -3,7 +3,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "transaction.h"
 #include "nx_ec/ec_api.h"
@@ -250,7 +250,7 @@ namespace ec2
         QnTranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
         
-        mutable QMutex m_timeMutex;
+        mutable QnMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
         qint64 m_baseTime;
         qint64 m_lastTimestamp;

@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QPair>
 
 #include <core/ptz/basic_ptz_controller.h>
@@ -65,7 +65,7 @@ private:
     QMap<QString, QString> m_presetNameByToken;
     bool m_ptzPresetsReaded;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 #endif //ENABLE_ONVIF

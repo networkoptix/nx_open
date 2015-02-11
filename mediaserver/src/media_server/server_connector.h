@@ -2,7 +2,7 @@
 #define SERVER_CONNECTOR_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <utils/common/singleton.h>
 
 class QnModuleFinder;
@@ -32,7 +32,7 @@ private slots:
     void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     const QnModuleFinder *m_moduleFinder;
     QHash<QUrl, UrlInfo> m_usedUrls;
 };

@@ -8,7 +8,7 @@
 
 #include <map>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "core/resource/storage_resource.h"
 
@@ -73,7 +73,7 @@ public:
 
 private:
     std::map<QString, QIODevice*> m_urlToDevice;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 typedef QnSharedResourcePointer<QnExtIODeviceStorageResource> QnExtIODeviceStorageResourcePtr;

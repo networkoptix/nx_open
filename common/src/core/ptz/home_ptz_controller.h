@@ -1,7 +1,7 @@
 #ifndef QN_HOME_PTZ_CONTROLLER_H
 #define QN_HOME_PTZ_CONTROLLER_H
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "proxy_ptz_controller.h"
 

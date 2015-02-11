@@ -222,8 +222,8 @@ quint64 getUsecTimer()
 
     static quint32 prevTics = 0;
     static quint64 cycleCount = 0;
-    static QMutex timeMutex;
-    QMutexLocker lock(&timeMutex);
+    static QnMutex timeMutex;
+    SCOPED_MUTEX_LOCK( lock, &timeMutex);
     quint32 tics = (qint32) timeGetTime();
     if (tics < prevTics) 
         cycleCount+= 0x100000000ull;

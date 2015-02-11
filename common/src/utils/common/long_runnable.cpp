@@ -4,8 +4,8 @@
 #include <typeinfo>
 
 #include <QtCore/QSet>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 
 #include <common/systemexcept_win32.h>
 
@@ -24,19 +24,19 @@ public:
     QnLongRunnablePoolPrivate() {}
 
     void stopAll() {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         for(QnLongRunnable *runnable: m_created)
             runnable->pleaseStop();
         waitAllLocked();
     }
 
     void waitAll() {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         waitAllLocked();
     }
 
     void createdNotify(QnLongRunnable *runnable) {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
 
         assert(runnable && !m_created.contains(runnable));
 
@@ -44,7 +44,7 @@ public:
     }
 
     void startedNotify(QnLongRunnable *runnable) {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
 
         assert(runnable && !m_running.contains(runnable));
 
@@ -52,7 +52,7 @@ public:
     }
 
     void finishedNotify(QnLongRunnable *runnable) {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
 
         assert(runnable); //  && m_running.contains(runnable)
 
@@ -62,7 +62,7 @@ public:
     }
 
     void destroyedNotify(QnLongRunnable *runnable) {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
 
         assert(runnable && m_created.contains(runnable));
 
@@ -76,8 +76,8 @@ private:
     }
 
 private:
-    QMutex m_mutex;
-    QWaitCondition m_waitCondition;
+    QnMutex m_mutex;
+    QnWaitCondition m_waitCondition;
     QSet<QnLongRunnable *> m_created, m_running;
 };
 

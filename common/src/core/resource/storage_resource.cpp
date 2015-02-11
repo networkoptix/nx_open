@@ -17,13 +17,13 @@ QnStorageResource::~QnStorageResource()
 /*
 qint64 QnStorageResource::getWritedSpace() const
 {
-    QMutexLocker lock(&m_writedSpaceMtx);
+    SCOPED_MUTEX_LOCK( lock, &m_writedSpaceMtx);
     return m_writedSpace;
 }
 
 void QnStorageResource::addWritedSpace(qint64 value)
 {
-    QMutexLocker lock(&m_writedSpaceMtx);
+    SCOPED_MUTEX_LOCK( lock, &m_writedSpaceMtx);
     m_writedSpace += value;
 }
 */

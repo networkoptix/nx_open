@@ -15,7 +15,7 @@ namespace {
 
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) :
     QObject(parent),
-    m_mutex(QMutex::Recursive),
+    m_mutex(QnMutex::Recursive),
     m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
     m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID())),
     m_passive(passive),
@@ -40,17 +40,17 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
 QnRouter::~QnRouter() {}
 
 QMultiHash<QnUuid, QnRouter::Endpoint> QnRouter::connections() const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return m_connections;
 }
 
 QHash<QnUuid, QnRoute> QnRouter::routes() const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return m_routeBuilder->routes();
 }
 
 QnRoute QnRouter::routeTo(const QnUuid &id, const QnUuid &via) const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return m_routeBuilder->routeTo(id, via);
 }
 
@@ -72,7 +72,7 @@ QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
 }
 
 QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
 
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
         if (it->host == host && it->port == port)
@@ -82,12 +82,12 @@ QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
 }
 
 QnRoutePoint QnRouter::enforcedConnection() const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return m_routeBuilder->enforcedConnection();
 }
 
 void QnRouter::setEnforcedConnection(const QnRoutePoint &enforcedConnection) {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     m_routeBuilder->setEnforcedConnection(enforcedConnection);
 }
 
@@ -157,7 +157,7 @@ void QnRouter::at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo 
 }
 
 bool QnRouter::addConnection(const QnUuid &id, const QnRouter::Endpoint &endpoint) {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
 
     if (m_connections.contains(id, endpoint))
         return false;
@@ -174,7 +174,7 @@ bool QnRouter::addConnection(const QnUuid &id, const QnRouter::Endpoint &endpoin
 }
 
 bool QnRouter::removeConnection(const QnUuid &id, const QnRouter::Endpoint &endpoint) {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
 
     if (!m_connections.remove(id, endpoint))
         return false;

@@ -2,7 +2,7 @@
 #define MULTICAST_MODULE_FINDER_H
 
 #include <QtCore/QHash>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/long_runnable.h>
@@ -89,7 +89,7 @@ private:
         ModuleContext(const RevealResponse &response);
     };
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     aio::PollSet m_pollSet;
     QHash<QHostAddress, UDPSocket*> m_clientSockets;
     UDPSocket *m_serverSocket;

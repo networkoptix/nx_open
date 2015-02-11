@@ -9,11 +9,11 @@
 #include <memory>
 
 #include <QByteArray>
-#include <QMutex>
+#include <utils/common/mutex.h>
 #include <QObject>
 #include <QSize>
 #include <QString>
-#include <QWaitCondition>
+#include <utils/common/wait_condition.h>
 
 #include <utils/network/buffer.h>
 #include <utils/network/http/httptypes.h>
@@ -127,11 +127,11 @@ signals:
 
 private:
     StreamingChunkCacheKey m_params;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     nx::Buffer m_data;
     bool m_isOpenedForModification;
-    mutable QMutex m_signalEmitMutex;
-    QWaitCondition m_cond;
+    mutable QnMutex m_signalEmitMutex;
+    QnWaitCondition m_cond;
 #ifdef DUMP_CHUNK_TO_FILE
     std::ofstream m_dumpFile;
 #endif

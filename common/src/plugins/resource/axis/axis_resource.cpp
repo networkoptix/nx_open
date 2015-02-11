@@ -117,7 +117,7 @@ bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     }
     requestUrl.setPath( requestPath );
 
-    QMutexLocker lk( &m_inputPortMutex );
+    SCOPED_MUTEX_LOCK( lk, &m_inputPortMutex );
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     connect( httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnPlAxisResource::onMonitorResponseReceived, Qt::DirectConnection );
     connect( httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnPlAxisResource::onMonitorMessageBodyAvailable, Qt::DirectConnection );
@@ -135,7 +135,7 @@ bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 
 void QnPlAxisResource::stopInputPortMonitoringAsync()
 {
-    QMutexLocker lk( &m_inputPortMutex );
+    SCOPED_MUTEX_LOCK( lk, &m_inputPortMutex );
 
     if( !m_inputPortHttpMonitor )
         return;
@@ -149,13 +149,13 @@ void QnPlAxisResource::stopInputPortMonitoringAsync()
 
 bool QnPlAxisResource::isInputPortMonitored() const
 {
-    QMutexLocker lk( &m_inputPortMutex );
+    SCOPED_MUTEX_LOCK( lk, &m_inputPortMutex );
     return m_inputPortHttpMonitor.get() != nullptr;
 }
 
 bool QnPlAxisResource::isInitialized() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return !m_resolutionList.isEmpty();
 }
 
@@ -206,7 +206,7 @@ bool QnPlAxisResource::readMotionInfo()
 {
     
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         qint64 time = qnSyncTime->currentMSecsSinceEpoch();
         if (time - m_lastMotionReadTime < qint64(MOTION_INFO_UPDATE_INTERVAL))
             return true;
@@ -259,7 +259,7 @@ bool QnPlAxisResource::readMotionInfo()
     }
 
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     for (QMap<int,WindowInfo>::const_iterator itr = windows.begin(); itr != windows.end(); ++itr)
     {
@@ -348,7 +348,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     http.readAll(body);
 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
         m_resolutionList.clear();
         int paramValuePos = body.indexOf('=');
@@ -433,7 +433,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
 QnPlAxisResource::AxisResolution QnPlAxisResource::getMaxResolution() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return !m_resolutionList.isEmpty() ? m_resolutionList[0] : AxisResolution();
 }
 
@@ -448,7 +448,7 @@ float QnPlAxisResource::getResolutionAspectRatio(const AxisResolution& resolutio
 
 QnPlAxisResource::AxisResolution QnPlAxisResource::getNearestResolution(const QSize& resolution, float aspectRatio) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     float requestSquare = resolution.width() * resolution.height();
     int bestIndex = -1;
@@ -471,7 +471,7 @@ QnPlAxisResource::AxisResolution QnPlAxisResource::getNearestResolution(const QS
 
 QRect QnPlAxisResource::getMotionWindow(int num) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_motionWindows.value(num);
 }
 
@@ -483,7 +483,7 @@ QMap<int, QRect> QnPlAxisResource::getMotionWindows() const
 
 bool QnPlAxisResource::removeMotionWindow(int wndNum)
 {
-    //QMutexLocker lock(&m_mutex);
+    //SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=remove&group=Motion.M%1")).arg(wndNum));
@@ -492,7 +492,7 @@ bool QnPlAxisResource::removeMotionWindow(int wndNum)
 
 int QnPlAxisResource::addMotionWindow()
 {
-    //QMutexLocker lock(&m_mutex);
+    //SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QLatin1String("axis-cgi/param.cgi?action=add&group=Motion&template=motion&Motion.M.WindowType=include&Motion.M.ImageSource=0"));
@@ -506,7 +506,7 @@ int QnPlAxisResource::addMotionWindow()
 
 bool QnPlAxisResource::updateMotionWindow(int wndNum, int sensitivity, const QRect& rect)
 {
-    //QMutexLocker lock(&m_mutex);
+    //SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=update&group=Motion&\
@@ -754,7 +754,7 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
         NX_LOG( lit("Axis camera %1. Failed to subscribe to input port(s) monitoring. %2").
             arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
 
-        QMutexLocker lk( &m_inputPortMutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_inputPortMutex );
         if( m_inputPortHttpMonitor == httpClient )
             m_inputPortHttpMonitor.reset();
         return;
@@ -769,7 +769,7 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
         NX_LOG( lit("Error monitoring input port(s) on Axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
             arg(getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)), cl_logWARNING );
 
-        QMutexLocker lk( &m_inputPortMutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_inputPortMutex );
         if( m_inputPortHttpMonitor == httpClient )
             m_inputPortHttpMonitor.reset();
         return;

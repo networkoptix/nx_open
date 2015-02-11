@@ -41,7 +41,7 @@ void DecodedPictureToOpenGLUploadThread::push( UploadFrameRunnable* toRun )
 {
 #ifdef NX_GLCONTEXT_PRESENT
     //m_taskQueue.push( toRun );
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     m_taskQueue.push_back( toRun );
     m_cond.wakeAll();
 #endif
@@ -68,7 +68,7 @@ void DecodedPictureToOpenGLUploadThread::run()
         //if( !get )
         //    continue;
         {
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
             while( m_taskQueue.empty() )
                 m_cond.wait( lk.mutex() );
             toRun = m_taskQueue.front();
@@ -124,7 +124,7 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
     int poolSizeIncrement )
 {
 #ifdef NX_GLCONTEXT_PRESENT
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     UploaderPoolContext& pool = m_auxiliaryGLContextPool[shareWidget->context()];
 
@@ -161,7 +161,7 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
 
 const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& DecodedPictureToOpenGLUploaderContextPool::getPoolOfContextsSharedWith( const QGLContext* const parentContext ) const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& pool = m_auxiliaryGLContextPool[parentContext].uploaders;
     return pool;
@@ -175,7 +175,7 @@ DecodedPictureToOpenGLUploaderContextPool* DecodedPictureToOpenGLUploaderContext
 void DecodedPictureToOpenGLUploaderContextPool::onShareWidgetDestroyed( QObject* obj )
 {
 #ifdef NX_GLCONTEXT_PRESENT
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     for( std::map<const QGLContext*, UploaderPoolContext>::const_iterator
         it = m_auxiliaryGLContextPool.begin();
         it != m_auxiliaryGLContextPool.end();

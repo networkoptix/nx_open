@@ -8,7 +8,7 @@
 
 
 QnPlColdStoreStorage::QnPlColdStoreStorage():
-    m_mutex(QMutex::Recursive),
+    m_mutex(QnMutex::Recursive),
     m_connectionPool(this),
     m_metaDataPool(this),
     m_cswriterThread(0),
@@ -110,7 +110,7 @@ QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMo
         buff->open(QIODevice::WriteOnly);
     
         {
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             m_listOfWritingFiles.insert(nfileName);
             //qWarning() << "file started : " << nfileName;
 
@@ -126,7 +126,7 @@ QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMo
 
 void QnPlColdStoreStorage::onWriteBuffClosed(QnColdStoreIOBuffer* buff)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if (!m_cswriterThread)
     {
@@ -147,7 +147,7 @@ void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
 
     QString csFileName = fileName2csFileName(fn);
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     
     
 
@@ -274,7 +274,7 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
     
     QnColdStoreMetaDataPtr md = getMetaDataFileForCsFile(csFileName);
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     // also add files still open files 
     QFileInfoList result;
     for(const QString& fn: m_listOfWritingFiles)
@@ -379,7 +379,7 @@ QnCSFileInfo QnPlColdStoreStorage::getFileInfo(const QString& fn)
 
 bool QnPlColdStoreStorage::hasOpenFilesFor(const QString& csFile) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for(const QString& fn: m_listOfWritingFiles)
     {
         if (fileName2csFileName(fn) == csFile)
@@ -391,7 +391,7 @@ bool QnPlColdStoreStorage::hasOpenFilesFor(const QString& csFile) const
 
 QnCsTimeunitConnectionHelper* QnPlColdStoreStorage::getPropriteConnectionForCsFile(const QString& csFile)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if (m_currH == 0)
     {
@@ -422,7 +422,7 @@ QnCsTimeunitConnectionHelper* QnPlColdStoreStorage::getPropriteConnectionForCsFi
 QnColdStoreMetaDataPtr QnPlColdStoreStorage::getMetaDataFileForCsFile(const QString& csFile)
 {
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         if (m_currH && m_currH->getCsFileName() == csFile)
         {
             return m_currH->getMD();

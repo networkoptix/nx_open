@@ -10,14 +10,14 @@ QnUserResource::QnUserResource():
 
 QByteArray QnUserResource::getHash() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_hash;
 }
 
 void QnUserResource::setHash(const QByteArray& hash)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if (m_hash == hash)
             return;
         m_hash = hash;
@@ -27,14 +27,14 @@ void QnUserResource::setHash(const QByteArray& hash)
 
 QString QnUserResource::getPassword() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_password;
 }
 
 void QnUserResource::setPassword(const QString& password)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if (m_password == password)
             return;
         m_password = password;
@@ -75,7 +75,7 @@ bool QnUserResource::checkPassword(const QString &password) {
 void QnUserResource::setDigest(const QByteArray& digest)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if (m_digest == digest)
             return;
         m_digest = digest;
@@ -85,19 +85,19 @@ void QnUserResource::setDigest(const QByteArray& digest)
 
 QByteArray QnUserResource::getDigest() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_digest;
 }
 quint64 QnUserResource::getPermissions() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_permissions;
 }
 
 void QnUserResource::setPermissions(quint64 permissions)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if (m_permissions == permissions)
             return;
         m_permissions = permissions;
@@ -107,14 +107,14 @@ void QnUserResource::setPermissions(quint64 permissions)
 
 bool QnUserResource::isAdmin() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_isAdmin;
 }
 
 void QnUserResource::setAdmin(bool isAdmin)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if (m_isAdmin == isAdmin)
             return;
         m_isAdmin = isAdmin;
@@ -124,14 +124,14 @@ void QnUserResource::setAdmin(bool isAdmin)
 
 QString QnUserResource::getEmail() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_email;
 }
 
 void QnUserResource::setEmail(const QString& email)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if (email.trimmed() == m_email)
             return;
         m_email = email.trimmed();

@@ -5,8 +5,8 @@
 
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
+#include <utils/common/mutex.h>
 
 #include "semaphore.h"
 
@@ -25,7 +25,7 @@ public:
         : m_headIndex(0),
         m_bufferLen(0),
         m_maxSize( maxSize ),
-        m_cs(QMutex::Recursive)
+        m_cs(QnMutex::Recursive)
     {
         reallocateBuffer(maxSize);
     }
@@ -41,7 +41,7 @@ public:
     
     bool push(const T& val) 
     { 
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs);
 
 
         if ((uint)m_bufferLen == m_buffer.size())
@@ -63,13 +63,13 @@ public:
 
     T front() const
     {
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs);
         return m_buffer[m_headIndex];
     }
     
     const T& at(int i) const
     {
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs);
         int index = m_headIndex + i;
         return m_buffer[index % m_buffer.size()];
     }
@@ -82,14 +82,14 @@ public:
 
     void setAt(const T& value, int i)
     {
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs);
         int index = m_headIndex + i;
         m_buffer[index % m_buffer.size()] = value;
     }
 
     T last() const
     {
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs);
         int index = m_headIndex + m_bufferLen - 1;
         return m_bufferLen > 0 ? m_buffer[index % m_buffer.size()]: T();
     }
@@ -100,7 +100,7 @@ public:
         if (!m_sem.tryAcquire(1,time)) // in case of INFINITE wait the value passed to tryAcquire will be negative ( it will wait forever )
             return false;
 
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs);
 
         if (m_bufferLen > 0)
         {
@@ -118,7 +118,7 @@ public:
     void removeFirst(int count)
     {
         m_sem.tryAcquire(count);
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs);
         for (int i = 0; i < count; ++i)
         {
             m_buffer[m_headIndex++] = T();
@@ -141,7 +141,7 @@ public:
     template <class ConditionFunc>
     void detachDataByCondition(const ConditionFunc& cond, QVariant opaque)
     {
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs);
         int index = m_headIndex;
         for (int i = 0; i < m_bufferLen; ++i)
         {
@@ -169,7 +169,7 @@ public:
 
     void clear()
     {
-        QMutexLocker mutex(&this->m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &this->m_cs);
 
         this->m_sem.tryAcquire(m_bufferLen);
         int index = m_headIndex;
@@ -186,7 +186,7 @@ private:
     // for grow only
     void reallocateBuffer(int newSize)
     {
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs);
 
         int oldSize = (int) m_buffer.size();
         m_buffer.resize(newSize);
@@ -217,7 +217,7 @@ protected:
     int m_bufferLen;
 
     int m_maxSize;
-    mutable QMutex m_cs;
+    mutable QnMutex m_cs;
     QnSemaphore m_sem;
 };
 

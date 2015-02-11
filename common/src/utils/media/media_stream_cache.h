@@ -12,7 +12,7 @@
 #include <functional> /* For std::function. */
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <core/dataconsumer/abstract_data_receptor.h>
 
@@ -145,7 +145,7 @@ private:
 
     unsigned int m_cacheSizeMillis;
     PacketContainerType m_packetsByTimestamp;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     qint64 m_prevPacketSrcTimestamp;
     //!In micros
     quint64 m_currentPacketTimestamp;

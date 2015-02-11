@@ -4,7 +4,7 @@
 #ifdef ENABLE_AXIS
 
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -105,7 +105,7 @@ private:
     //!map<name, index based on 1>
     std::map<QString, unsigned int> m_inputPortNameToIndex;
     std::map<QString, unsigned int> m_outputPortNameToIndex;
-    mutable QMutex m_inputPortMutex;
+    mutable QnMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
     std::shared_ptr<nx_http::AsyncHttpClient> m_inputPortHttpMonitor;
     nx_http::MultipartContentParserHelper m_multipartContentParser;

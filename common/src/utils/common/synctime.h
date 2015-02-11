@@ -2,7 +2,7 @@
 #define QN_SYNC_TIME_H
 
 #include <QtCore/QDateTime>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api.h>
@@ -39,7 +39,7 @@ signals:
 private:
     QTime m_timer;
     qint64 m_lastReceivedTime;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     qint64 m_lastWarnTime;
     qint64 m_lastLocalTime;
     bool m_syncTimeRequestIssued;

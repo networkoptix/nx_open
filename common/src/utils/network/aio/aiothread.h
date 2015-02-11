@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <utils/common/long_runnable.h>
 
@@ -34,7 +34,7 @@ namespace aio
         /*!
             \param mutex Mutex to use for exclusive access to internal data
         */
-        AIOThread( QMutex* const mutex );
+        AIOThread( QnMutex* const mutex );
         virtual ~AIOThread();
 
         //!Implementation of QnLongRunnable::pleaseStop

@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 #include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>
@@ -68,13 +68,13 @@ namespace ec2
 
     void Ec2DirectConnectionFactory::pleaseStop()
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
         m_terminated = true;
     }
 
     void Ec2DirectConnectionFactory::join()
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
         while( m_runningRequests > 0 )
         {
             lk.unlock();
@@ -296,7 +296,7 @@ namespace ec2
         connectionInfo.ecUrl = url;
         ec2::ErrorCode connectionInitializationResult = ec2::ErrorCode::ok;
         {
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk, &m_mutex );
             if( !m_directConnection ) {
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
                 if( !m_directConnection->initialized() )
@@ -316,7 +316,7 @@ namespace ec2
 
         ////TODO: #ak return existing connection, if one
         //{
-        //    QMutexLocker lk( &m_mutex );
+        //    SCOPED_MUTEX_LOCK( lk, &m_mutex );
         //    auto it = m_urlToConnection.find( addr );
         //    if( it != m_urlToConnection.end() )
         //        AbstractECConnectionPtr connection = it->second.second;
@@ -326,7 +326,7 @@ namespace ec2
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
         {
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk, &m_mutex );
             if( m_terminated )
                 return INVALID_REQ_ID;
             ++m_runningRequests;
@@ -405,7 +405,7 @@ namespace ec2
                 break;
         }
 
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
         --m_runningRequests;
     }
 
@@ -458,7 +458,7 @@ namespace ec2
             errorCode,
             connection);
 
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
         --m_runningRequests;
     }
 
@@ -472,7 +472,7 @@ namespace ec2
         if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
         {
             handler->done( reqID, errorCode, connectionInfo );
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk, &m_mutex );
             --m_runningRequests;
             return;
         }
@@ -515,7 +515,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         {
-            QMutexLocker lk( &m_mutex );
+            SCOPED_MUTEX_LOCK( lk, &m_mutex );
             if( m_terminated )
                 return INVALID_REQ_ID;
             ++m_runningRequests;

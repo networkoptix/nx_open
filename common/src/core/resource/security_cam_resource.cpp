@@ -1,6 +1,6 @@
 #include "security_cam_resource.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 #include <api/global_settings.h>
 
@@ -19,7 +19,7 @@
 #include "core/resource/media_server_resource.h"
 #include "resource_data.h"
 
-#define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
+#define SAFE(expr) {SCOPED_MUTEX_LOCK( lock, &m_mutex); expr;}
 
 
 namespace {
@@ -334,7 +334,7 @@ bool QnSecurityCamResource::setRelayOutputState(const QString& ouputID, bool act
 }
 
 void QnSecurityCamResource::inputPortListenerAttached() {
-    QMutexLocker lk( &m_initMutex );
+    SCOPED_MUTEX_LOCK( lk, &m_initMutex );
 
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
     const int inputPortListenerCount = m_inputPortListenerCount.fetchAndAddOrdered( 1 );
@@ -344,7 +344,7 @@ void QnSecurityCamResource::inputPortListenerAttached() {
 }
 
 void QnSecurityCamResource::inputPortListenerDetached() {
-    QMutexLocker lk( &m_initMutex );
+    SCOPED_MUTEX_LOCK( lk, &m_initMutex );
  
     if( m_inputPortListenerCount.load() <= 0 )
         return;
@@ -521,7 +521,7 @@ QString QnSecurityCamResource::getDefaultGroupName() const
 
 void QnSecurityCamResource::setGroupName(const QString& value) {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if(m_groupName == value)
             return;
         m_groupName = value;
@@ -548,7 +548,7 @@ QString QnSecurityCamResource::getGroupId() const {
 
 void QnSecurityCamResource::setGroupId(const QString& value) {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if(m_groupId == value)
             return;
         m_groupId = value;

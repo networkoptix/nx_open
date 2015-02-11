@@ -2,7 +2,7 @@
 #define QN_CAMERA_HISTORY_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <utils/common/uuid.h>
 
 #include "recording/time_period.h"
@@ -77,7 +77,7 @@ private:
 
     QnServerHistoryMap m_fullTimePeriods;
     QString m_cameraUniqueId;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 Q_DECLARE_METATYPE(QnCameraHistoryList)
@@ -115,7 +115,7 @@ private:
 private:
     typedef QMap<QString, QnCameraHistoryPtr> CameraHistoryMap; /* Map by camera unique id */
     CameraHistoryMap m_cameraHistory;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 

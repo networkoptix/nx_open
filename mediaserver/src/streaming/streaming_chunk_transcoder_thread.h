@@ -6,9 +6,9 @@
 #define STREAMING_CHUNK_TRANSCODER_THREAD_H
 
 #include <QElapsedTimer>
-#include <QMutex>
+#include <utils/common/mutex.h>
 #include <QSharedPointer>
-#include <QWaitCondition>
+#include <utils/common/wait_condition.h>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 #include <utils/common/long_runnable.h>
@@ -83,14 +83,14 @@ private:
     std::map<int, TranscodeContext*> m_transcodeContext;
     //map<data source, transcoding id>
     std::map<AbstractOnDemandDataProvider*, int> m_dataSourceToID;
-    mutable QMutex m_mutex;
-    QWaitCondition m_cond;
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_cond;
     QElapsedTimer m_monotonicClock;
 
     void removeTranscodingNonSafe(
         const std::map<int, TranscodeContext*>::iterator& transcodingIter,
         bool transcodingFinishedSuccessfully,
-        QMutexLocker* const lk );
+        QnMutexLocker* const lk );
 };
 
 #endif  //STREAMING_CHUNK_TRANSCODER_THREAD_H

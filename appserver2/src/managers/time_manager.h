@@ -8,7 +8,7 @@
 
 #include <map>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QObject>
 #include <QtGlobal>
 #include <QtCore/QElapsedTimer>
@@ -192,7 +192,7 @@ namespace ec2
         QElapsedTimer m_monotonicClock;
         //!priority key of current server
         TimePriorityKey m_localTimePriorityKey;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         TimeSyncInfo m_usedTimeSyncInfo;
         quint64 m_broadcastSysTimeTaskID;
         quint64 m_internetSynchronizationTaskID;
@@ -218,7 +218,7 @@ namespace ec2
                 - low DWORD - some random number
         */
         void remotePeerTimeSyncUpdate(
-            QMutexLocker* const lock,
+            QnMutexLocker* const lock,
             const QnUuid& remotePeerID,
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,

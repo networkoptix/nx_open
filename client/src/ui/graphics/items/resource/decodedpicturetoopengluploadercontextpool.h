@@ -9,10 +9,10 @@
 #include <deque>
 
 #include <QtOpenGL/QGLWidget>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QRunnable>
 #include <QtCore/QThread>
-#include <QtCore/QWaitCondition>
+#include <utils/common/wait_condition.h>
 
 #include <utils/common/safepool.h>
 #include <utils/common/threadqueue.h>
@@ -50,8 +50,8 @@ private:
     //CLThreadQueue<QRunnable*> m_taskQueue;
     GLContext* m_glContext;
     std::deque<UploadFrameRunnable*> m_taskQueue;
-    mutable QMutex m_mutex;
-    mutable QWaitCondition m_cond;
+    mutable QnMutex m_mutex;
+    mutable QnWaitCondition m_cond;
 };
 
 //!Pool of ogl contexts, used to upload decoded pictures to opengl textures
@@ -94,7 +94,7 @@ private:
         UploaderPoolContext();
     };
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     //map<parent context, pool of contexts shared with parent>
     mutable std::map<const QGLContext*, UploaderPoolContext> m_auxiliaryGLContextPool;
     WId m_paintWindowId;

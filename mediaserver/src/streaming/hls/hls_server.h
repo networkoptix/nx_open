@@ -6,8 +6,8 @@
 #define HLS_SERVER_H
 
 #include <QDateTime>
-#include <QMutex>
-#include <QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 
 #include <core/resource/media_resource.h>
 #include <utils/network/http/httpstreamreader.h>
@@ -60,8 +60,8 @@ namespace nx_hls
         StreamingChunkPtr m_currentChunk;
         //!For reading data from \a m_currentChunk
         std::unique_ptr<AbstractInputByteStream> m_chunkInputStream;
-        QMutex m_mutex;
-        QWaitCondition m_cond;
+        QnMutex m_mutex;
+        QnWaitCondition m_cond;
         bool m_switchToChunkedTransfer;
         bool m_useChunkedTransfer;
         QString m_currentFileName;

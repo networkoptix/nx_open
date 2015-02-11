@@ -74,7 +74,7 @@ void QnSyncPlayArchiveDelegate::jumpTo (qint64 time)
 
 qint64 QnSyncPlayArchiveDelegate::seek (qint64 time, bool findIFrame)
 {
-    //QMutexLocker lock(&m_mutex);
+    //SCOPED_MUTEX_LOCK( lock, &m_mutex);
     //m_nextData.clear();
     return m_ownerDelegate->seek(time, findIFrame);
 }

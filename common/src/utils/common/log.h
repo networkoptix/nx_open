@@ -1,7 +1,7 @@
 #ifndef QN_LOG_H
 #define QN_LOG_H
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>

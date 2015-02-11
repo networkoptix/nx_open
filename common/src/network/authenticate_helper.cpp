@@ -146,7 +146,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
             const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, "NX-User-Name" );
             if( !nxUserName.isEmpty() )
             {
-                QMutexLocker lock(&m_mutex);
+                SCOPED_MUTEX_LOCK( lock, &m_mutex);
                 for( const QnUserResourcePtr& user: m_users )
                 {
                     if( user->getName().toUtf8().toLower() == nxUserName )
@@ -244,7 +244,7 @@ bool QnAuthHelper::authenticate(
 
 bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest ) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for(const QnUserResourcePtr& user: m_users)
     {
         if (user->getName().toLower() == login.toLower())
@@ -361,7 +361,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     //if (isNonceValid(nonce))
     if (checkNonceFunc(nonce))
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         for(const QnUserResourcePtr& user: m_users)
         {
             if (user->getName().toUtf8().toLower() == userName)
@@ -453,7 +453,7 @@ bool QnAuthHelper::isCookieNonceValid(const QByteArray& nonce)
 {
     static const qint64 USEC_IN_SEC = 1000000ll;
 
-    QMutexLocker lock(&m_cookieNonceCacheMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_cookieNonceCacheMutex);
 
     qint64 n1 = nonce.toLongLong(0, 16);
     qint64 n2 = qnSyncTime->currentUSecsSinceEpoch();
@@ -524,7 +524,7 @@ QByteArray QnAuthHelper::getNonce()
 
 void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QnUserResourcePtr user = res.dynamicCast<QnUserResource>();
     QnMediaServerResourcePtr server = res.dynamicCast<QnMediaServerResource>();
@@ -536,7 +536,7 @@ void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)
 
 void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     m_users.remove(res->getId());
     m_servers.remove(res->getId());

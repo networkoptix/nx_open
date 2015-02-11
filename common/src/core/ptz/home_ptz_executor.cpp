@@ -1,6 +1,6 @@
 #include "home_ptz_executor.h"
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "abstract_ptz_controller.h"
 #include "ptz_object.h"
@@ -28,7 +28,7 @@ public:
     QBasicTimer timer;
     QAtomicInt isRunning;
 
-    QMutex mutex;
+    QnMutex mutex;
     QnPtzObject homePosition;
 };
 
@@ -47,7 +47,7 @@ bool QnHomePtzExecutorPrivate::handleTimer(int timerId) {
 
     QnPtzObject homePosition;
     {
-        QMutexLocker locker(&mutex);
+        SCOPED_MUTEX_LOCK( locker, &mutex);
         homePosition = this->homePosition;
     }
 
@@ -99,13 +99,13 @@ bool QnHomePtzExecutor::isRunning() {
 }
 
 void QnHomePtzExecutor::setHomePosition(const QnPtzObject &homePosition) {
-    QMutexLocker locker(&d->mutex);
+    SCOPED_MUTEX_LOCK( locker, &d->mutex);
 
     d->homePosition = homePosition;
 }
 
 QnPtzObject QnHomePtzExecutor::homePosition() const {
-    QMutexLocker locker(&d->mutex);
+    SCOPED_MUTEX_LOCK( locker, &d->mutex);
 
     return d->homePosition;
 }

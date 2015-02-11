@@ -37,7 +37,7 @@ private:
     QnFfmpegRtpParser m_parsers[2];
     QElapsedTimer m_keepaliveTimer;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
-    mutable QMutex m_audioLayoutMutex;
+    mutable QnMutex m_audioLayoutMutex;
 };
 
 #endif  //ENABLE_DESKTOP_CAMERA

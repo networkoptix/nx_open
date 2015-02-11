@@ -9,7 +9,7 @@
 #include <memory>
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "abstract_accurate_time_fetcher.h"
 #include "utils/network/abstract_socket.h"
@@ -40,7 +40,7 @@ private:
     std::shared_ptr<AbstractStreamSocket> m_tcpSock;
     QByteArray m_timeStr;
     std::function<void(qint64, SystemError::ErrorCode)> m_handlerFunc;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     void onConnectionEstablished( SystemError::ErrorCode errorCode );
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );

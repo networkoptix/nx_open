@@ -9,7 +9,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>
@@ -136,7 +136,7 @@ private:
     };
 
     const unsigned int m_discoverTryTimeoutMS;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     quint64 m_timerID;
     std::list<UPNPSearchHandler*> m_handlers;
     //map<local interface ip, socket>

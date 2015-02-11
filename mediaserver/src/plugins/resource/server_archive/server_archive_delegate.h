@@ -1,7 +1,7 @@
 #ifndef _SERVER_ARCHIVE_DELEGATE_H__
 #define _SERVER_ARCHIVE_DELEGATE_H__
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtGui/QRegion>
 
 #include "core/resource/resource_fwd.h"
@@ -85,7 +85,7 @@ private:
 
     ArchiveChunkInfo m_currentChunkInfo;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

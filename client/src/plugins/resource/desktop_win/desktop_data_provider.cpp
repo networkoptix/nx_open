@@ -170,7 +170,7 @@ void QnDesktopDataProvider::EncodedAudioInfo::gotData()
 {
     if (m_terminated)
         return;
-    QMutexLocker lock(&m_mtx);
+    SCOPED_MUTEX_LOCK( lock, &m_mtx);
     if (m_buffers.isEmpty())
         return;
     WAVEHDR* data = m_buffers.front();
@@ -214,7 +214,7 @@ bool QnDesktopDataProvider::EncodedAudioInfo::addBuffer()
 void QnDesktopDataProvider::EncodedAudioInfo::stop()
 {
     m_terminated = true;
-    QMutexLocker lock(&m_mtx);
+    SCOPED_MUTEX_LOCK( lock, &m_mtx);
     waveInReset(hWaveIn);
     waveInClose(hWaveIn);
     clearBuffers();
@@ -691,7 +691,7 @@ int QnDesktopDataProvider::processData(bool flush)
 
 void QnDesktopDataProvider::start(Priority priority)
 {
-    QMutexLocker lock(&m_startMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_startMutex);
     if (m_started)
         return;
     m_started = true;
@@ -828,7 +828,7 @@ qint64 QnDesktopDataProvider::currentTime() const
 
 void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer* consumer)
 {
-    QMutexLocker lock(&m_startMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_startMutex);
     removeDataProcessor(consumer);
     if (processorsCount() == 0) 
         pleaseStop();
@@ -836,7 +836,7 @@ void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer* co
 
 void QnDesktopDataProvider::addDataProcessor(QnAbstractDataConsumer* consumer)
 {
-    QMutexLocker lock(&m_startMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_startMutex);
     if (needToStop()) {
         wait(); // wait previous thread instance
         m_started = false; // now we ready to restart
@@ -846,7 +846,7 @@ void QnDesktopDataProvider::addDataProcessor(QnAbstractDataConsumer* consumer)
 
 bool QnDesktopDataProvider::readyToStop() const
 {
-    QMutexLocker lock(&m_startMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_startMutex);
     return processorsCount() == 0;
 }
 
@@ -857,7 +857,7 @@ void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
     if (!media)
         return;
 
-    QMutexLocker mutex(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataConsumer* dp = m_dataprocessors.at(i);

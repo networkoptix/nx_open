@@ -5,7 +5,7 @@
 
 #include "httpclient.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 
 namespace nx_http
@@ -29,7 +29,7 @@ namespace nx_http
 
     void HttpClient::pleaseStop()
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         m_terminated = true;
         m_cond.wakeAll();
     }
@@ -41,7 +41,7 @@ namespace nx_http
         if( !m_asyncHttpClient->doGet( url ) )
             return false;
 
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         while( !m_terminated && (m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived) )
             m_cond.wait( lk.mutex() );
 
@@ -58,7 +58,7 @@ namespace nx_http
         if( !m_asyncHttpClient->doPost( url, contentType, messageBody ) )
             return false;
 
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         while( m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived )
             m_cond.wait( lk.mutex() );
 
@@ -73,7 +73,7 @@ namespace nx_http
     //!
     bool HttpClient::eof() const
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         return m_done && m_msgBodyBuffer.isEmpty();
     }
 
@@ -83,7 +83,7 @@ namespace nx_http
     */
     BufferType HttpClient::fetchMessageBodyBuffer()
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         while( !m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done) )
             m_cond.wait( lk.mutex() );
         nx_http::BufferType result = m_msgBodyBuffer;
@@ -133,7 +133,7 @@ namespace nx_http
 
     void HttpClient::onResponseReceived()
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         //message body buffer can be non-empty
         m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
         m_cond.wakeAll();
@@ -141,14 +141,14 @@ namespace nx_http
 
     void HttpClient::onSomeMessageBodyAvailable()
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
         m_cond.wakeAll();
     }
 
     void HttpClient::onDone()
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         m_done = true;
         m_cond.wakeAll();
     }

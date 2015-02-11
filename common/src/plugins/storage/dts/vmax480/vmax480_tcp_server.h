@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_VMAX
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QMap>
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
@@ -32,7 +32,7 @@ protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
 private:
     QMap<QString, VMaxStreamFetcher*> m_providers;
-    QMutex m_mutexProvider;
+    QnMutex m_mutexProvider;
 };
 
 class QnVMax480ConnectionProcessor: virtual public QnTCPConnectionProcessor

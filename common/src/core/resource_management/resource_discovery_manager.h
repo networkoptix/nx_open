@@ -3,7 +3,7 @@
 
 #include <memory> // for auto_ptr
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
@@ -112,7 +112,7 @@ public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
 protected:
-    QMutex m_discoveryMutex;
+    QnMutex m_discoveryMutex;
 
     unsigned int m_runNumber;
 
@@ -142,7 +142,7 @@ private:
     void updateSearchersUsage();
 
 private:
-    QMutex m_searchersListMutex;
+    QnMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
     QnManualCameraInfoMap m_manualCameraMap;
@@ -161,7 +161,7 @@ private:
     QHash<QnUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
     QHash<QnUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 
-    mutable QMutex m_resListMutex;
+    mutable QnMutex m_resListMutex;
     QnResourceList m_lastDiscoveredResources[6];
     int m_discoveryUpdateIdx;
 protected:

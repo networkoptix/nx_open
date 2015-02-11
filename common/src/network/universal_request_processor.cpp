@@ -141,7 +141,7 @@ bool QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
 
-    QMutexLocker lock(&d->mutex);
+    SCOPED_MUTEX_LOCK( lock, &d->mutex);
     d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, d->request.requestLine.version.protocol, d->request);
     if( !d->processor )
         return false;
@@ -163,7 +163,7 @@ bool QnUniversalRequestProcessor::processRequest()
 void QnUniversalRequestProcessor::pleaseStop()
 {
     Q_D(QnUniversalRequestProcessor);
-    QMutexLocker lock(&d->mutex);
+    SCOPED_MUTEX_LOCK( lock, &d->mutex);
     QnTCPConnectionProcessor::pleaseStop();
     if (d->processor)
         d->processor->pleaseStop();

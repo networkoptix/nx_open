@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <client/client_globals.h>
 
@@ -131,7 +131,7 @@ private:
     QSize m_sourceSize;
 
     /** Mutex that is used for synchronization. */
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     /** Current screen size of a single channel, in pixels. */
     QSize m_channelScreenSize;

@@ -19,14 +19,14 @@ WaitingForQThreadToEmptyEventQueue::WaitingForQThreadToEmptyEventQueue( QThread*
 
 void WaitingForQThreadToEmptyEventQueue::join()
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     while( m_waitsDone < m_howManyTimesToWait )
         m_condVar.wait( lk.mutex() );
 }
 
 void WaitingForQThreadToEmptyEventQueue::doneWaiting()
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     ++m_waitsDone;
     if( m_waitsDone < m_howManyTimesToWait )

@@ -41,7 +41,7 @@ private slots:
 
     void at_remotePeerUnauthorized(const QnUuid& id);
 private:
-    mutable QMutex m_mutexAddrList;
+    mutable QnMutex m_mutexAddrList;
     const int m_serverPort;
     mutable QnMediaServerResourcePtr m_mServer;
     QSet<QnUuid> m_delayedOnlineStatus;

@@ -2,10 +2,10 @@
 #define TEXT_TO_WAV_H
 
 #include <QtCore/QIODevice>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
-#include <QtCore/QWaitCondition>
+#include <utils/common/wait_condition.h>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
@@ -73,8 +73,8 @@ private:
 
     CLThreadQueue<QSharedPointer<SynthetiseSpeechTask> > m_textQueue;
     QAtomicInt m_prevTaskID;
-    QWaitCondition m_cond;
-    QMutex m_mutex;
+    QnWaitCondition m_cond;
+    QnMutex m_mutex;
 
     QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
 };

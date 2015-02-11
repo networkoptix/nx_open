@@ -44,7 +44,7 @@ QnCommonModule::~QnCommonModule() {
 
 void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         if (m_remoteUuid == guid)
             return;
         m_remoteUuid = guid;
@@ -53,7 +53,7 @@ void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
 }
 
 QnUuid QnCommonModule::remoteGUID() const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_remoteUuid;
 }
 
@@ -62,7 +62,7 @@ void QnCommonModule::setLocalSystemName(const QString &value) {
         return;
 
     {
-        QMutexLocker lk(&m_mutex);
+        SCOPED_MUTEX_LOCK( lk, &m_mutex);
         m_localSystemName = value;
     }
     emit systemNameChanged(m_localSystemName);
@@ -70,22 +70,22 @@ void QnCommonModule::setLocalSystemName(const QString &value) {
 
 QString QnCommonModule::localSystemName() const
 {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return m_localSystemName;
 }
 
 QnSoftwareVersion QnCommonModule::engineVersion() const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     return m_engineVersion;
 }
 
 void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     m_engineVersion = version;
 }
 
 void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation) {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex);
     m_moduleInformation = moduleInformation;
 }
 
@@ -93,7 +93,7 @@ QnModuleInformation QnCommonModule::moduleInformation() const
 {
     QnModuleInformation moduleInformationCopy;
     {
-        QMutexLocker lk(&m_mutex);
+        SCOPED_MUTEX_LOCK( lk, &m_mutex);
         moduleInformationCopy = m_moduleInformation;
         moduleInformationCopy.systemName = m_localSystemName;
     }

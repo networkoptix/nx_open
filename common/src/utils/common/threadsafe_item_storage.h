@@ -1,7 +1,7 @@
 #ifndef THREADSAFE_ITEM_STORAGE_H
 #define THREADSAFE_ITEM_STORAGE_H
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <utils/common/warnings.h>
 
@@ -31,7 +31,7 @@ public:
     typedef QList<T> ItemList;
     typedef QHash<QnUuid, T> ItemMap;
 
-    QnThreadsafeItemStorage(QMutex *mutex, QnThreadsafeItemStorageNotifier<T>* notifier): 
+    QnThreadsafeItemStorage(QnMutex *mutex, QnThreadsafeItemStorageNotifier<T>* notifier): 
         m_mutex(mutex),
         m_notifier(notifier)
     {}
@@ -44,7 +44,7 @@ public:
     }
 
     void setItems(const ItemMap &items) {
-        QMutexLocker locker(m_mutex);
+        SCOPED_MUTEX_LOCK( locker, m_mutex);
         setItemsUnderLock(items);
     }
 
@@ -53,22 +53,22 @@ public:
     }
 
     ItemMap getItems() const { 
-        QMutexLocker locker(m_mutex);
+        SCOPED_MUTEX_LOCK( locker, m_mutex);
         return m_itemByUuid; 
     }
 
     T getItem(const QnUuid &uuid) const {
-        QMutexLocker locker(m_mutex);
+        SCOPED_MUTEX_LOCK( locker, m_mutex);
         return m_itemByUuid.value(uuid);
     }
 
     bool hasItem(const QnUuid &uuid) const {
-        QMutexLocker locker(m_mutex);
+        SCOPED_MUTEX_LOCK( locker, m_mutex);
         return m_itemByUuid.contains(uuid);
     }
 
     void addItem(const T &item) {
-        QMutexLocker locker(m_mutex);
+        SCOPED_MUTEX_LOCK( locker, m_mutex);
         addItemUnderLock(item);
     }
 
@@ -77,17 +77,17 @@ public:
     }
 
     void removeItem(const QnUuid &uuid) {
-        QMutexLocker locker(m_mutex);
+        SCOPED_MUTEX_LOCK( locker, m_mutex);
         removeItemUnderLock(uuid);
     }
 
     void updateItem(const T &item) {
-        QMutexLocker locker(m_mutex);
+        SCOPED_MUTEX_LOCK( locker, m_mutex);
         updateItemUnderLock(item);
     }
 
     void addOrUpdateItem(const T &item) {
-        QMutexLocker locker(m_mutex);
+        SCOPED_MUTEX_LOCK( locker, m_mutex);
         if (m_itemByUuid.contains(item.uuid))
             updateItemUnderLock(item);
         else
@@ -158,7 +158,7 @@ private:
 
 private:
     ItemMap m_itemByUuid;
-    QMutex* m_mutex;
+    QnMutex* m_mutex;
     QnThreadsafeItemStorageNotifier<T> *m_notifier;
 };
 

@@ -99,7 +99,7 @@ private:
         QnDesktopDataProvider* m_owner;
         HWAVEIN hWaveIn;
         QQueue<WAVEHDR*> m_buffers;
-        QMutex m_mtx;
+        QnMutex m_mtx;
         bool m_terminated;
     };
 
@@ -134,7 +134,7 @@ private:
     const QPixmap m_logo;
     //QSet<void*> m_needKeyData;
     qint64 m_initTime;
-    mutable QMutex m_startMutex;
+    mutable QnMutex m_startMutex;
     bool m_started;
     bool m_isInitialized;
 

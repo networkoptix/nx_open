@@ -296,14 +296,14 @@ private:
 
 protected:
     /** Mutex that is to be used when accessing a set of all consumers. */
-    mutable QMutex m_consumersMtx;
+    mutable QnMutex m_consumersMtx;
 
     /** Set of consumers for this resource. */
     QSet<QnResourceConsumer *> m_consumers;
 
     /** Mutex that is to be used when accessing resource fields. */
-    mutable QMutex m_mutex;
-    QMutex m_initMutex;
+    mutable QnMutex m_mutex;
+    QnMutex m_initMutex;
 
     static bool m_appStopping;
 
@@ -358,7 +358,7 @@ private:
     QStringList m_tags;
 
     bool m_initialized;    
-    QMutex m_initAsyncMutex;
+    QnMutex m_initAsyncMutex;
 
     static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;

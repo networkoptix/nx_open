@@ -2,7 +2,7 @@
 #define __UNIVERSAL_TCP_LISTENER_H__
 
 #include <QMultiMap>
-#include <QWaitCondition>
+#include <utils/common/wait_condition.h>
 #include <QtCore/QElapsedTimer>
 
 #include "utils/network/tcp_listener.h"
@@ -94,8 +94,8 @@ private:
     ProxyInfo m_proxyInfo;
     QUrl m_proxyServerUrl;
     QString m_selfIdForProxy;
-    QMutex m_proxyMutex;
-    QWaitCondition m_proxyWaitCond;
+    QnMutex m_proxyMutex;
+    QnWaitCondition m_proxyWaitCond;
 
     typedef QMultiMap<QString, AwaitProxyInfo> ProxyList;
     ProxyList m_awaitingProxyConnections;

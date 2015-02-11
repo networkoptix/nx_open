@@ -3,7 +3,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QObject>
 #include <utils/common/uuid.h>
 #include <QtNetwork/QHostAddress>
@@ -63,7 +63,7 @@ public:
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources() const {
-        QMutexLocker locker(&m_resourcesMtx);
+        SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
         QnSharedResourcePointerList<Resource> result;
         for (const QnResourcePtr &resource : m_resources)
             if(QnSharedResourcePointer<Resource> derived = resource.template dynamicCast<Resource>())
@@ -151,7 +151,7 @@ private:
     */
     void invalidateCache();
 private:
-    mutable QMutex m_resourcesMtx;
+    mutable QnMutex m_resourcesMtx;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;

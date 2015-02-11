@@ -1019,7 +1019,7 @@ void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if (m_decoder == 0 && !(videoData->flags & AV_PKT_FLAG_KEY))
         return false;
@@ -1240,7 +1240,7 @@ QSize QnMotionEstimation::videoResolution() const
 
 void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     qFreeAligned(m_motionMask);
     qFreeAligned(m_motionSensMask);
     m_motionMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);

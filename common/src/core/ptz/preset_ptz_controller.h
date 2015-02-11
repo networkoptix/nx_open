@@ -1,7 +1,7 @@
 #ifndef QN_PRESET_PTZ_CONTROLLER_H
 #define QN_PRESET_PTZ_CONTROLLER_H
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "proxy_ptz_controller.h"
 
@@ -30,7 +30,7 @@ public:
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzPresetRecordHash> *m_adaptor;
 };
 

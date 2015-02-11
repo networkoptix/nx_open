@@ -74,7 +74,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
         return false;
 
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         QnPtzPresetRecordHash records = m_adaptor->value();
         records.insert(preset.id, QnPtzPresetRecord(preset, data));
 
@@ -87,7 +87,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
 
 bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
 
         QnPtzPresetRecordHash records = m_adaptor->value();
         if(!records.contains(preset.id))
@@ -107,7 +107,7 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
 
 bool QnPresetPtzController::removePreset(const QString &presetId) {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
 
         QnPtzPresetRecordHash records = m_adaptor->value();
         if(records.remove(presetId) == 0)

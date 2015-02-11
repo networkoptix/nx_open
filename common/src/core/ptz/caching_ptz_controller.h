@@ -1,7 +1,7 @@
 #ifndef QN_CACHING_PTZ_CONTROLLER_H
 #define QN_CACHING_PTZ_CONTROLLER_H
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "proxy_ptz_controller.h"
 
@@ -60,7 +60,7 @@ private:
 
 private:
     bool m_initialized;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QnPtzData m_data;
 };
 

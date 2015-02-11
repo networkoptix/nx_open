@@ -5,7 +5,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QMap>
 #include <QtCore/QSet>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
@@ -45,7 +45,7 @@ private slots:
     void at_zipExtractor_extractionFinished(int error);
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
 
     QString m_updateId;
     QScopedPointer<QFile> m_file;

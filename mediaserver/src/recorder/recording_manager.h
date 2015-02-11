@@ -95,7 +95,7 @@ private:
     };
     std::map<QString, LockData> m_lockInProgress;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
     QTimer m_licenseTimer;

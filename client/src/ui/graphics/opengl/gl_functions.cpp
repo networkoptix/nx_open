@@ -2,7 +2,7 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QRegExp>
 #include <QtGui/QOpenGLContext>
 
@@ -41,7 +41,7 @@ public:
     }
 
     void initialize(const QGLContext *context) {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         if(m_initialized)
             return;
 
@@ -71,7 +71,7 @@ public:
     }
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     bool m_initialized;
     GLint m_maxTextureSize;
 };

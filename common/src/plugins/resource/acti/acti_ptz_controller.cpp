@@ -134,8 +134,8 @@ public:
     bool getPosition(ActiPtzVector *position);
 
 public:
-    QMutex mutex;
-    QMutex queryMutex;
+    QnMutex mutex;
+    QnMutex queryMutex;
 
     /* Unprotected block. */
 
@@ -231,7 +231,7 @@ bool QnActiPtzControllerPrivate::processQueriesLocked() {
         bool status = true;
 
         {
-            QMutexLocker locker(&mutex);
+            SCOPED_MUTEX_LOCK( locker, &mutex);
             command = pendingCommand;
             speed = pendingSpeed;
             position = pendingPosition;
@@ -314,7 +314,7 @@ bool QnActiPtzControllerPrivate::processQueries() {
 
 bool QnActiPtzControllerPrivate::continuousMove(const ActiPtzVector &speed) {
     {
-        QMutexLocker locker(&mutex);
+        SCOPED_MUTEX_LOCK( locker, &mutex);
         pendingSpeed = speed;
         pendingCommand = Qn::ContinuousMovePtzCommand;
     }
@@ -325,7 +325,7 @@ bool QnActiPtzControllerPrivate::continuousMove(const ActiPtzVector &speed) {
 
 bool QnActiPtzControllerPrivate::absoluteMove(const ActiPtzVector &position, int panTiltSpeed) {
     {
-        QMutexLocker locker(&mutex);
+        SCOPED_MUTEX_LOCK( locker, &mutex);
         pendingPosition = position;
         pendingSpeed = ActiPtzVector(panTiltSpeed, panTiltSpeed, 0);
         pendingCommand = Qn::AbsoluteDeviceMovePtzCommand;

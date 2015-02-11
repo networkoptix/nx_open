@@ -31,7 +31,7 @@ private:
 private:
     QnDigitalWatchdogResourcePtr m_resource;
     QMap<QString, QString> m_extIdToIntId;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QMap<QString, QString> m_cachedData;
     QTime m_cacheUpdateTimer;
 };

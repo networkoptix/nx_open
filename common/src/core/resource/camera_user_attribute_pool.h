@@ -7,9 +7,9 @@
 #define CAMERA_USER_ATTRIBUTE_POOL_H
 
 #include <QtCore/QList>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
-#include <QtCore/QWaitCondition>
+#include <utils/common/mutex.h>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 #include <QtCore/QSharedPointer>
 
 #include "camera_user_attributes.h"
@@ -74,7 +74,7 @@ public:
 
     void clear()
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         m_elements.clear();
     }
 
@@ -93,8 +93,8 @@ private:
     };
 
     std::map<KeyType, std::unique_ptr<DataCtx>> m_elements;
-    QMutex m_mutex;
-    QWaitCondition m_cond;
+    QnMutex m_mutex;
+    QnWaitCondition m_cond;
     std::function<void(const KeyType&, MappedType&)> m_customInitializer;
 
     //!If element already locked, blocks till element has been unlocked
@@ -103,7 +103,7 @@ private:
     */
     MappedType* lock( const KeyType& key )
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         auto p = m_elements.emplace( std::make_pair( key, nullptr ) );
         if( p.second )
         {
@@ -119,7 +119,7 @@ private:
 
     void unlock( const KeyType& key )
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         auto it = m_elements.find( key );
         assert( it != m_elements.end() );
         assert( it->second->locked );

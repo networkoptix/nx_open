@@ -68,11 +68,11 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 {
     static QList<QnInterfaceAndAddr> lastResult;
     static QElapsedTimer timer;
-    static QMutex mutex;
+    static QnMutex mutex;
 
     {
         // speed optimization
-        QMutexLocker lock(&mutex);
+        SCOPED_MUTEX_LOCK( lock, &mutex);
         if (!lastResult.isEmpty() && timer.elapsed() < 5000)
             return lastResult;
     }
@@ -136,7 +136,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
         }
     }
 
-    QMutexLocker lock(&mutex);
+    SCOPED_MUTEX_LOCK( lock, &mutex);
     timer.restart();
     lastResult = result;
 

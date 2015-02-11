@@ -1,7 +1,7 @@
 #ifndef __TCP_CONNECTION_PROCESSOR_H__
 #define __TCP_CONNECTION_PROCESSOR_H__
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QUrl>
 
 #include "utils/common/long_runnable.h"
@@ -32,7 +32,7 @@ public:
     bool sendChunk(const QByteArray& chunk);
     bool sendChunk(const char* data, int size);
 
-    void execute(QMutex& mutex);
+    void execute(QnMutex& mutex);
     virtual void pleaseStop();
     QSharedPointer<AbstractStreamSocket> socket() const;
     QUrl getDecodedUrl() const;

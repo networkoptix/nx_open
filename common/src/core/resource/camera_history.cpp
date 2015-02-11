@@ -12,7 +12,7 @@ extern "C"
 #include <core/resource/media_server_resource.h>
 
 QnCameraHistory::QnCameraHistory():
-    m_mutex(QMutex::Recursive)
+    m_mutex(QnMutex::Recursive)
 {
 }
 
@@ -26,7 +26,7 @@ void QnCameraHistory::setCameraUniqueId(const QString &cameraUniqueId) {
 
 QnServerHistoryMap QnCameraHistory::getOnlineTimePeriods() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QnServerHistoryMap result;
     for (QnServerHistoryMap::const_iterator itr = m_fullTimePeriods.constBegin(); itr != m_fullTimePeriods.constEnd(); ++itr)
     {
@@ -49,7 +49,7 @@ QnServerHistoryMap::const_iterator QnCameraHistory::getMediaServerOnTimeItr(cons
 
 QnMediaServerResourcePtr QnCameraHistory::getMediaServerOnTime(qint64 timestamp, bool allowOfflineServers) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QnServerHistoryMap timePeriods = allowOfflineServers ? m_fullTimePeriods : getOnlineTimePeriods();
 
     QnServerHistoryMap::const_iterator itr;
@@ -64,7 +64,7 @@ QnMediaServerResourcePtr QnCameraHistory::getMediaServerOnTime(qint64 timestamp,
 
 QnMediaServerResourcePtr QnCameraHistory::getMediaServerAndPeriodOnTime(qint64 timestamp, QnTimePeriod& currentPeriod, bool allowOfflineServers)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QnServerHistoryMap timePeriods = allowOfflineServers ? m_fullTimePeriods : getOnlineTimePeriods();
 
     QnServerHistoryMap::const_iterator itr;
@@ -138,33 +138,33 @@ QnMediaServerResourcePtr QnCameraHistory::getPrevMediaServerAndPeriodFromTime(co
 
 QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerOnTime(qint64 timestamp, bool searchForward) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QnServerHistoryMap timePeriods = getOnlineTimePeriods();
     return searchForward ? getNextMediaServerFromTime(timePeriods, timestamp) : getPrevMediaServerFromTime(timePeriods, timestamp);
 }
 
 QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerAndPeriodOnTime(qint64 timestamp, QnTimePeriod& currentPeriod, bool searchForward)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QnServerHistoryMap timePeriods = getOnlineTimePeriods();
     return searchForward ? getNextMediaServerAndPeriodFromTime(timePeriods, timestamp, currentPeriod) : getPrevMediaServerAndPeriodFromTime(timePeriods, timestamp, currentPeriod);
 }
 
 void QnCameraHistory::addTimePeriod(qint64 timestamp, const QnUuid& serverId)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_fullTimePeriods.insert(timestamp, serverId);
 }
 
 void QnCameraHistory::removeTimePeriod(const qint64 timestamp)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_fullTimePeriods.remove(timestamp);
 }
 
 qint64 QnCameraHistory::getMinTime() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     if (m_fullTimePeriods.isEmpty())
         return AV_NOPTS_VALUE;
     return m_fullTimePeriods.begin().key();
@@ -174,7 +174,7 @@ QnMediaServerResourceList QnCameraHistory::getAllCameraServersInternal(const QnT
 {
     QSet<QnMediaServerResourcePtr> rez;
 
-    QMutexLocker lock (&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QnServerHistoryMap::const_iterator itrStart = getMediaServerOnTimeItr(cameraHistory, timePeriod.startTimeMs);
     QnServerHistoryMap::const_iterator itrEnd = getMediaServerOnTimeItr(cameraHistory, timePeriod.endTimeMs());
@@ -205,7 +205,7 @@ QnMediaServerResourceList QnCameraHistory::getAllCameraServers() const {
 
 void QnCameraHistory::getItemsBefore(qint64 timestamp,  const QnUuid& serverId, QList<QnCameraHistoryItem>& result)
 {
-    QMutexLocker lock (&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for (auto itr = m_fullTimePeriods.begin(); itr != m_fullTimePeriods.end() && itr.key() < timestamp; ++itr)
     {
         if (itr.value() == serverId)
@@ -217,7 +217,7 @@ void QnCameraHistory::getItemsBefore(qint64 timestamp,  const QnUuid& serverId, 
 
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     QObject(parent),
-    m_mutex(QMutex::Recursive)
+    m_mutex(QnMutex::Recursive)
 {}
 
 QnCameraHistoryPool::~QnCameraHistoryPool() {
@@ -232,12 +232,12 @@ QnCameraHistoryPool* QnCameraHistoryPool::instance()
 }
 
 QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QnResourcePtr& camera) const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_cameraHistory.value(camera->getUniqueId());
 }
 
 QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QString& uniqueId) const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_cameraHistory.value(uniqueId);
 }
 
@@ -287,7 +287,7 @@ qint64 QnCameraHistoryPool::getMinTime(const QnNetworkResourcePtr &camera)
 }
 
 void QnCameraHistoryPool::resetCameraHistory(const QnCameraHistoryList& cameraHistoryList) {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_cameraHistory.clear();
     for(const QnCameraHistoryPtr& history: cameraHistoryList)
         m_cameraHistory[history->getCameraUniqueId()] = history;
@@ -296,13 +296,13 @@ void QnCameraHistoryPool::resetCameraHistory(const QnCameraHistoryList& cameraHi
 
 void QnCameraHistoryPool::addCameraHistory(const QnCameraHistoryPtr &history)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_cameraHistory[history->getCameraUniqueId()] = history;
 }
 
 void QnCameraHistoryPool::addCameraHistoryItem(const QnCameraHistoryItem &historyItem)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     CameraHistoryMap::const_iterator iter = m_cameraHistory.find(historyItem.cameraUniqueId);
     QnCameraHistoryPtr cameraHistory;
@@ -327,7 +327,7 @@ void QnCameraHistoryPool::removeCameraHistoryItem(const QnCameraHistoryItem& his
 /*
 QList<QnCameraHistoryItem> QnCameraHistoryPool::getUnusedItems(const QMap<QString, qint64>& archiveMinTimes, const QnUuid& serverId)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     QList<QnCameraHistoryItem> result;
     for(auto itr = archiveMinTimes.begin(); itr != archiveMinTimes.end(); ++itr)

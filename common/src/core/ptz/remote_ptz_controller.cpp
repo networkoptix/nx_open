@@ -61,7 +61,7 @@ int QnRemotePtzController::nextSequenceNumber() {
                                                                                 \
         int handle = getMediaServer()->apiConnection()->FUNCTION(m_resource, ##__VA_ARGS__, this, SLOT(at_replyReceived(int, const QVariant &, int))); \
                                                                                 \
-        QMutexLocker locker(&m_mutex);                                          \
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);                                          \
         m_dataByHandle[handle] = PtzCommandData(command, QVariant::fromValue(RETURN_VALUE)); \
         return true;                                                            \
     }
@@ -162,7 +162,7 @@ bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
 void QnRemotePtzController::at_replyReceived(int status, const QVariant &reply, int handle) {
     PtzCommandData data;
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
 
         auto pos = m_dataByHandle.find(handle);
         if(pos == m_dataByHandle.end())

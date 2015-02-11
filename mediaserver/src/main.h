@@ -76,12 +76,12 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;
-    mutable QMutex m_stopMutex;
+    mutable QnMutex m_stopMutex;
 };
 
 #endif // MAIN_H

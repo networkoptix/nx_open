@@ -38,7 +38,7 @@ private:
     };
     QMap<QString, LockData> m_lockInProgress;
     ec2::QnMutexCameraDataHandler* m_cameraDataHandler;
-    QMutex m_mutex;
+    QnMutex m_mutex;
 
 private:
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);

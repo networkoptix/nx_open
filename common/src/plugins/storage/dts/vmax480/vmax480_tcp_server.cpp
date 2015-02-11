@@ -29,10 +29,10 @@ public:
     QnMediaContextPtr context;
     VMaxStreamFetcher* streamFetcher;
     int openedChannels;
-    static QMutex connectMutex;
+    static QnMutex connectMutex;
     QnTcpListener* owner;
 };
-QMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
+QnMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
 QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket)
@@ -53,7 +53,7 @@ void QnVMax480ConnectionProcessor::vMaxConnect(const QString& url, int channel, 
 {
     Q_D(QnVMax480ConnectionProcessor);
 
-    QMutexLocker lock(&d->connectMutex);
+    SCOPED_MUTEX_LOCK( lock, &d->connectMutex);
 
     VMaxParamList params;
     params["url"] = url.toUtf8();
@@ -71,7 +71,7 @@ void QnVMax480ConnectionProcessor::vMaxDisconnect()
 {
     Q_D(QnVMax480ConnectionProcessor);
 
-    QMutexLocker lock(&d->connectMutex);
+    SCOPED_MUTEX_LOCK( lock, &d->connectMutex);
 
     QElapsedTimer t;
     t.restart();
@@ -371,7 +371,7 @@ QnVMax480Server::QnVMax480Server(): QnTcpListener(QHostAddress(QLatin1String("12
 
 QString QnVMax480Server::registerProvider(VMaxStreamFetcher* provider)
 {
-    QMutexLocker lock(&m_mutexProvider);
+    SCOPED_MUTEX_LOCK( lock, &m_mutexProvider);
     QString result = QnUuid::createUuid().toString();
     m_providers.insert(result, provider);
     return result;
@@ -379,7 +379,7 @@ QString QnVMax480Server::registerProvider(VMaxStreamFetcher* provider)
 
 void QnVMax480Server::unregisterProvider(VMaxStreamFetcher* provider)
 {
-    QMutexLocker lock(&m_mutexProvider);
+    SCOPED_MUTEX_LOCK( lock, &m_mutexProvider);
     for (QMap<QString, VMaxStreamFetcher*>::iterator itr = m_providers.begin(); itr != m_providers.end(); ++itr)
     {
         if (itr.value() == provider) {
@@ -391,7 +391,7 @@ void QnVMax480Server::unregisterProvider(VMaxStreamFetcher* provider)
 
 VMaxStreamFetcher* QnVMax480Server::bindConnection(const QString& tcpID, QnVMax480ConnectionProcessor* connection)
 {
-    QMutexLocker lock(&m_mutexProvider);
+    SCOPED_MUTEX_LOCK( lock, &m_mutexProvider);
     VMaxStreamFetcher* fetcher = m_providers.value(tcpID);
     if (fetcher) {
         removeOwnership(connection); // fetcher is going to take ownership

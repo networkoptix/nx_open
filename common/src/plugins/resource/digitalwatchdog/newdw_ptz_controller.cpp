@@ -97,7 +97,7 @@ bool QnNewDWPtzController::getPresets(QnPtzPresetList *presets)
         bool rez = doQuery(lit("/cgi-bin/ptz.cgi?list=preset"), &body);
         if (!rez)
             return rez;
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         for(QByteArray line: body.split(L'\n'))
         {
             line = line.trimmed();
@@ -121,7 +121,7 @@ bool QnNewDWPtzController::getPresets(QnPtzPresetList *presets)
 
 QString QnNewDWPtzController::toInternalID(const QString& externalId)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     int num = 1;
     static const int MAX_PRESETS = 16;
@@ -137,7 +137,7 @@ QString QnNewDWPtzController::toInternalID(const QString& externalId)
 
 QString QnNewDWPtzController::fromExtarnalID(const QString& externalId)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     QString result = m_extIdToIntId.value(externalId);
     return result.isEmpty() ? externalId : result;
 }

@@ -66,7 +66,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &
 
     QnManualCameraSearcher* searcher = new QnManualCameraSearcher();
     {
-        QMutexLocker lock(&m_searchProcessMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_searchProcessMutex);
         m_searchProcesses.insert(processUuid, searcher);
 
         //TODO #ak better not to use concurrent here, since calling QtConcurrent::run from running task looks unreliable in some extreme case
@@ -108,7 +108,7 @@ int QnManualCameraAdditionRestHandler::searchStopAction(const QnRequestParams &p
 
     QnManualCameraSearcher* process(NULL);
     {
-        QMutexLocker lock(&m_searchProcessMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_searchProcessMutex);
         if (m_searchProcesses.contains(processUuid)) 
         {
             process = m_searchProcesses[processUuid];
@@ -190,7 +190,7 @@ int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnR
 }
 
 QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchStatus(const QnUuid &searchProcessUuid) {
-    QMutexLocker lock(&m_searchProcessMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_searchProcessMutex);
 
     if (!m_searchProcesses.contains(searchProcessUuid))
         return QnManualCameraSearchProcessStatus();
@@ -199,7 +199,7 @@ QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchSt
 }
 
 bool QnManualCameraAdditionRestHandler::isSearchActive(const QnUuid &searchProcessUuid) {
-    QMutexLocker lock(&m_searchProcessMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_searchProcessMutex);
     return m_searchProcesses.contains(searchProcessUuid);
 }
 

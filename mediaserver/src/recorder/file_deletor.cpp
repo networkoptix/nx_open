@@ -105,7 +105,7 @@ void QnFileDeletor::deleteFile(const QString& fileName)
 
 void QnFileDeletor::postponeFile(const QString& fileName)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_newPostponedFiles << fileName;
 }
 
@@ -130,7 +130,7 @@ void QnFileDeletor::processPostponedFiles()
 
     QQueue<QString> newPostponedFiles;
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         newPostponedFiles = m_newPostponedFiles;
         m_newPostponedFiles.clear();
     }

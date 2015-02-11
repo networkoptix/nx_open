@@ -10,7 +10,7 @@
 
 #include <map>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 #include <soapNotificationConsumerBindingService.h>
@@ -39,7 +39,7 @@ public:
 private:
     std::map<QString, QWeakPointer<QnPlOnvifResource>> m_notificationProducerAddressToResource;
     std::map<QString, QWeakPointer<QnPlOnvifResource>> m_subscriptionReferenceToResource;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 #endif  //ENABLE_ONVIF

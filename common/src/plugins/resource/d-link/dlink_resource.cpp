@@ -196,7 +196,7 @@ void QnPlDlinkResource::setCroppingPhysical(QRect /*cropping*/)
 
 QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     return m_camInfo;
 }
 

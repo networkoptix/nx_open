@@ -21,7 +21,7 @@
 #include <iostream>
 
 int QnSessionManagerSyncReply::wait(QnHTTPRawResponse& response) {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     while (!m_finished)
         m_condition.wait(&m_mutex);
 
@@ -30,7 +30,7 @@ int QnSessionManagerSyncReply::wait(QnHTTPRawResponse& response) {
 }
 
 void QnSessionManagerSyncReply::terminate() {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     m_finished = true;
     m_condition.wakeOne();
 }
@@ -38,7 +38,7 @@ void QnSessionManagerSyncReply::terminate() {
 void QnSessionManagerSyncReply::requestFinished(const QnHTTPRawResponse& response, int handle) 
 {
     Q_UNUSED(handle)
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     m_response = response;
     m_finished = true;
     m_condition.wakeOne();
@@ -75,7 +75,7 @@ QnSessionManager::~QnSessionManager() {
     disconnect(this, NULL, this, NULL);
 
     {
-        QMutexLocker lock(&m_syncReplyMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_syncReplyMutex);
         for(QnSessionManagerSyncReply* syncReply: m_syncReplyInProgress)
             syncReply->terminate();
     }
@@ -126,7 +126,7 @@ void QnSessionManager::stop() {
 }
 
 bool QnSessionManager::isReady() const {
-    QMutexLocker locker(&m_accessManagerMutex);
+    SCOPED_MUTEX_LOCK( locker, &m_accessManagerMutex);
     return m_accessManager != 0;
 }
 
@@ -178,7 +178,7 @@ int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QStr
 
     int result = syncReply.wait(response);
    
-    QMutexLocker lock(&m_syncReplyMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_syncReplyMutex);
     m_syncReplyInProgress.remove(reqInfo.handle);
     
     return result;
@@ -186,7 +186,7 @@ int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QStr
 
 void QnSessionManager::at_SyncRequestFinished(const QnHTTPRawResponse& response, int handle) 
 {
-    QMutexLocker lock(&m_syncReplyMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_syncReplyMutex);
     QnSessionManagerSyncReply* reply = m_syncReplyInProgress.value(handle);
     assert(reply);
     if (reply)
@@ -275,7 +275,7 @@ int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &obj
 void QnSessionManager::at_aboutToBeStarted() {
     assert(QThread::currentThread() == this->thread());
 
-    QMutexLocker locker(&m_accessManagerMutex);
+    SCOPED_MUTEX_LOCK( locker, &m_accessManagerMutex);
     if (m_accessManager)
         return;
 
@@ -291,7 +291,7 @@ void QnSessionManager::at_aboutToBeStarted() {
 void QnSessionManager::at_aboutToBeStopped() {
     assert(QThread::currentThread() == this->thread());
 
-    QMutexLocker locker(&m_accessManagerMutex);
+    SCOPED_MUTEX_LOCK( locker, &m_accessManagerMutex);
     if (!m_accessManager)
         return;
 
@@ -339,7 +339,7 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
     assert(QThread::currentThread() == this->thread());
 
     {
-        QMutexLocker lock(&m_accessManagerMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_accessManagerMutex);
         if (!m_accessManager) {
             qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
             return;

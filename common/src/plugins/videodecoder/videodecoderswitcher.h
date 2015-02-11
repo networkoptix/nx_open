@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "abstract_decoder_event_receiver.h"
 #include "../../decoders/video/abstractdecoder.h"
@@ -87,7 +87,7 @@ private:
     QnCompressedVideoDataPtr m_mediaSequenceHeader;
     const QnAbstractVideoDecoderPlugin& m_decoderFactory;
     bool m_switchToSWDecoding;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

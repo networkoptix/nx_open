@@ -10,7 +10,7 @@
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QThread>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
@@ -93,7 +93,7 @@ private:
 
     bool m_terminated;
     Flags m_flags;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     //!map<transcoding id, data>
     std::map<int, TranscodeContext> m_scheduledTranscodings;
     //!map<task id, transcoding id>

@@ -81,7 +81,7 @@ private slots:
 private:
     const size_t m_maxRecordQueueSizeBytes;
     const size_t m_maxRecordQueueSizeElements;
-    mutable QMutex m_scheduleMutex;
+    mutable QnMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;
     QnScheduleTask m_currentScheduleTask;
@@ -100,7 +100,7 @@ private:
     bool m_usedSpecialRecordingMode;
     bool m_lastMotionState; // true if motion in progress
     size_t m_queuedSize;
-    QMutex m_queueSizeMutex;
+    QnMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;

@@ -10,8 +10,8 @@
 #include <memory>
 #include <thread>
 
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
+#include <utils/common/mutex.h>
 #include <QtCore/QThread>
 #include <qglobal.h>
 

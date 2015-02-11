@@ -56,7 +56,7 @@ static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
 static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
-QMutex RtspServerTrackInfo::m_createSocketMutex;
+QnMutex RtspServerTrackInfo::m_createSocketMutex;
 
 bool updatePort(AbstractDatagramSocket* &socket, int port)
 {
@@ -68,7 +68,7 @@ bool updatePort(AbstractDatagramSocket* &socket, int port)
 bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
-    QMutexLocker lock(&m_createSocketMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_createSocketMutex);
     mediaSocket = SocketFactory::createDatagramSocket();
     rtcpSocket = SocketFactory::createDatagramSocket();
 
@@ -186,7 +186,7 @@ public:
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
-    QMutex mutex;
+    QnMutex mutex;
     int lastPlayCSeq;
     MediaQuality quality;
     bool qualityFastSwitch;
@@ -353,7 +353,7 @@ QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
     if (!d->mediaRes)
         return QString(); // prevent deadlock
 
-    QMutexLocker lock(&d->mutex);
+    SCOPED_MUTEX_LOCK( lock, &d->mutex);
 
     if (!d->archiveDP)
         return QString();
@@ -890,7 +890,7 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
 void QnRtspConnectionProcessor::at_camera_resourceChanged()
 {
     Q_D(QnRtspConnectionProcessor);
-    QMutexLocker lock(&d->mutex);
+    SCOPED_MUTEX_LOCK( lock, &d->mutex);
 
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
@@ -908,7 +908,7 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    QMutexLocker lock(&d->mutex);
+    SCOPED_MUTEX_LOCK( lock, &d->mutex);
     if (d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
         m_needStop = true;
         d->socket->close();
@@ -1302,7 +1302,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
 void QnRtspConnectionProcessor::processRequest()
 {
     Q_D(QnRtspConnectionProcessor);
-    QMutexLocker lock(&d->mutex);
+    SCOPED_MUTEX_LOCK( lock, &d->mutex);
 
     if (d->dataProcessor)
         d->dataProcessor->pauseNetwork();

@@ -53,7 +53,7 @@ private:
     QMap<QString, CashedDevInfo> m_cashedDevInfo;
 
     QMap<QString, std::shared_ptr<nx_http::AsyncHttpClient> > m_httpInProgress;
-    QMutex m_mutex;
+    QnMutex m_mutex;
 
     QByteArray getDeviceXml(const QUrl& url);
 

@@ -2,7 +2,7 @@
 
 #include "sony_resource.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 #include <utils/common/log.h>
 
@@ -56,7 +56,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     typedef QSharedPointer<QList<QSize> > ResolutionListPtr;
     ResolutionListPtr resolutionListPtr(0);
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         resolutionListPtr = ResolutionListPtr(new QList<QSize>(m_resolutionList)); //Sorted desc
     }
 
@@ -112,7 +112,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         return CameraDiagnostics::NoErrorResult();
     }
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_resolutionList = *resolutionListPtr.data();
 
     return CameraDiagnostics::NoErrorResult();
@@ -148,7 +148,7 @@ CameraDiagnostics::Result QnPlSonyResource::initInternal()
 
 bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
-    QMutexLocker lk( &m_inputPortMutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_inputPortMutex );
 
     if( hasFlags(Qn::foreigner) ||      //we do not own camera
         !hasCameraCapabilities(Qn::RelayInputCapability) )
@@ -185,7 +185,7 @@ void QnPlSonyResource::stopInputPortMonitoringAsync()
 {
     std::shared_ptr<nx_http::AsyncHttpClient> inputMonitorHttpClient = m_inputMonitorHttpClient;
     {
-        QMutexLocker lk( &m_inputPortMutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_inputPortMutex );
         if( !m_inputMonitorHttpClient )
             return;
         m_inputMonitorHttpClient.reset();
@@ -196,13 +196,13 @@ void QnPlSonyResource::stopInputPortMonitoringAsync()
 
 bool QnPlSonyResource::isInputPortMonitored() const
 {
-    QMutexLocker lk( &m_inputPortMutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_inputPortMutex );
     return m_inputMonitorHttpClient.get() != NULL;
 }
 
 void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient )
 {
-    QMutexLocker lk( &m_inputPortMutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_inputPortMutex );
 
     if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortMonitoringAsync() call
         return;
@@ -222,7 +222,7 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient 
 
 void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpClient )
 {
-    QMutexLocker lk( &m_inputPortMutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_inputPortMutex );
 
     if( m_inputMonitorHttpClient != httpClient )
         return;

@@ -56,7 +56,7 @@ namespace ec2
 
         static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
     private:
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
     };
 

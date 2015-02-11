@@ -70,7 +70,7 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
 }
 
 bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk, &m_mutex );
 
     if( !m_cameraManager3 )
         return false;
@@ -106,7 +106,7 @@ bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
 }
 
 bool QnThirdPartyResource::setParamPhysical(const QString& id, const QString &value) {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk, &m_mutex );
     if( !m_cameraManager3 )
         return false;
 
@@ -369,7 +369,7 @@ void QnThirdPartyResource::inputPortStateChanged(
 
 const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( int encoderNumber ) const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk, &m_mutex );
     return m_encoderData[encoderNumber].resolutionList;
 }
 
@@ -381,7 +381,7 @@ bool QnThirdPartyResource::hasDualStreaming() const
 
 nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int encoderIndex ) const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk, &m_mutex );
     if( (size_t)encoderIndex < m_selectedEncoderResolutions.size() )
         return m_selectedEncoderResolutions[encoderIndex];
     return nxcip::Resolution();
@@ -393,7 +393,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     if( !m_camManager )
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
 
         //restoring camera parameters
         if( strlen(m_camInfo.uid) == 0 )
@@ -593,7 +593,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
 
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
         m_encoderData = encoderDataTemp;
     }
 
@@ -647,7 +647,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
 
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
         m_selectedEncoderResolutions = std::move( selectedEncoderResolutions );
     }
 

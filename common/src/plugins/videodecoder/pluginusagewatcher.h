@@ -7,7 +7,7 @@
 
 #include <set>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QSharedMemory>
 
 #include "pluginusagerecord.h"
@@ -110,7 +110,7 @@ protected:
     virtual void run();
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QString m_uniquePluginID;
     std::set<stree::AbstractResourceReader*> m_currentSessions;
     bool m_sharedMemoryLocked;

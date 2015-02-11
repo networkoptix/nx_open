@@ -1,7 +1,7 @@
 #ifndef __DUAL_STREAMING_HELPER_H__
 #define __DUAL_STREAMING_HELPER_H__
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/resource_media_layout.h"
@@ -16,7 +16,7 @@ public:
     qint64 getLastMotionTime();
     void onMotion(const QnMetaDataV1* motion);
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     qint64 m_lastMotionTime;
 };
 

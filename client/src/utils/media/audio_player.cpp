@@ -55,7 +55,7 @@ AudioPlayer::~AudioPlayer()
 
 bool AudioPlayer::isOpened() const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     return isOpenedNonSafe();
 }
 
@@ -127,14 +127,14 @@ void AudioPlayer::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
 
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     m_adaptiveSleep.breakSleep();
     m_cond.wakeAll();
 }
 
 bool AudioPlayer::open( QIODevice* dataSource )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     m_resultCode = rcNoError;
     if( isOpenedNonSafe() )
@@ -155,7 +155,7 @@ bool AudioPlayer::open( const QString& filePath )
 
 bool AudioPlayer::prepareTextPlayback( const QString& text )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     m_resultCode = rcNoError;
 
@@ -173,7 +173,7 @@ bool AudioPlayer::prepareTextPlayback( const QString& text )
 
 bool AudioPlayer::playAsync()
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     if( !isOpenedNonSafe() )
         return false;
@@ -192,7 +192,7 @@ bool AudioPlayer::playAsync()
 
 void AudioPlayer::close()
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     closeNonSafe();
 }
 
@@ -200,7 +200,7 @@ static const int AUDIO_PRE_BUFFER = AUDIO_BUF_SIZE / 2;
 
 void AudioPlayer::run()
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     for( ;; )
     {
         while( m_state <= sReady && !needToStop() )

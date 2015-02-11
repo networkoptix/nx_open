@@ -33,7 +33,7 @@ QnIpRangeCheckerAsync::~QnIpRangeCheckerAsync()
 void QnIpRangeCheckerAsync::pleaseStop()
 {
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         m_terminated = true;
     }
 }
@@ -41,7 +41,7 @@ void QnIpRangeCheckerAsync::pleaseStop()
 void QnIpRangeCheckerAsync::join()
 {
     //waiting for scan to finish
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     while( !m_socketsBeingScanned.empty() )
         m_cond.wait( lk.mutex() );
 }
@@ -49,7 +49,7 @@ void QnIpRangeCheckerAsync::join()
 QStringList QnIpRangeCheckerAsync::onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan )
 {
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         m_openedIPs.clear();
 
         m_portToScan = portToScan;
@@ -74,7 +74,7 @@ QStringList QnIpRangeCheckerAsync::onlineHosts( const QHostAddress& startAddr, c
 
 size_t QnIpRangeCheckerAsync::hostsChecked() const
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     return (m_nextIPToCheck - m_startIpv4) - m_socketsBeingScanned.size();
 }
 
@@ -111,7 +111,7 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
 
 void QnIpRangeCheckerAsync::onDone( nx_http::AsyncHttpClientPtr httpClient )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     std::set<nx_http::AsyncHttpClientPtr>::iterator it = m_socketsBeingScanned.find( httpClient );
     Q_ASSERT( it != m_socketsBeingScanned.end() );

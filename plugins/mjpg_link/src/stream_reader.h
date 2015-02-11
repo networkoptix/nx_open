@@ -8,9 +8,9 @@
 
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QUrl>
-#include <QtCore/QWaitCondition>
+#include <utils/common/wait_condition.h>
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
@@ -69,8 +69,8 @@ private:
     qint64 m_prevFrameClock;
     qint64 m_frameDurationMSec;
     bool m_terminated;
-    QWaitCondition m_cond;
-    QMutex m_mutex;
+    QnWaitCondition m_cond;
+    QnMutex m_mutex;
     CyclicAllocator m_allocator;
  
     int doRequest( nx_http::HttpClient* const httpClient );

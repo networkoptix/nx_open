@@ -40,7 +40,7 @@ qint64 QueueFileWriter::write(QBufferedFile* file, const char * data, qint64 len
         return -1;
 
     FileBlockInfo fb(file, data, len);
-    QMutexLocker lock(&fb.mutex);
+    SCOPED_MUTEX_LOCK( lock, &fb.mutex);
     m_dataQueue.push(&fb);
     fb.condition.wait(&fb.mutex);
     return fb.result;
@@ -75,7 +75,7 @@ void QueueFileWriter::run()
         {
             qint64 currentTime = getUsecTimer();
             {
-                QMutexLocker lock(&fileBlock->mutex);
+                SCOPED_MUTEX_LOCK( lock, &fileBlock->mutex);
 #ifdef MEASURE_WRITE_TIME
                 writeTimeCalculationTimer.restart();
                 if( !totalTimeCalculationTimer.isValid() )
@@ -92,7 +92,7 @@ void QueueFileWriter::run()
             }
             qint64 now = getUsecTimer();
 
-            QMutexLocker lock(&m_timingsMutex);
+            SCOPED_MUTEX_LOCK( lock, &m_timingsMutex);
             removeOldWritingStatistics(currentTime);
             m_writeTime += now - currentTime;
             m_writeTimings << WriteTimingInfo(currentTime, now - currentTime);
@@ -112,7 +112,7 @@ void QueueFileWriter::run()
 
     while (m_dataQueue.pop(fileBlock, 1))
     {
-        QMutexLocker lock(&fileBlock->mutex);
+        SCOPED_MUTEX_LOCK( lock, &fileBlock->mutex);
         fileBlock->result = -1;
         fileBlock->condition.wakeAll();
     }
@@ -131,7 +131,7 @@ QnWriterPool::~QnWriterPool()
 
 QnWriterPool::WritersMap QnWriterPool::getAllWriters()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_writers;
 }
 
@@ -144,7 +144,7 @@ QueueFileWriter* QnWriterPool::getWriter(const QString& fileName)
     if (drive.endsWith('/'))
         drive = drive.left(drive.length()-1);
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     WritersMap::iterator itr = m_writers.find(drive);
     if (itr == m_writers.end())
     {
@@ -449,7 +449,7 @@ void QBufferedFile::setSystemFlags(int systemFlags)
 
 float QueueFileWriter::getAvarageUsage()
 {
-    QMutexLocker lock(&m_timingsMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_timingsMutex);
     removeOldWritingStatistics(getUsecTimer());
     return m_writeTime / (float) AVG_USAGE_AGGREGATE_TIME;
 }

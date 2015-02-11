@@ -11,7 +11,7 @@
 #include <memory>
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 #include <plugins/resource/avi/thumbnails_archive_delegate.h>
@@ -53,7 +53,7 @@ namespace nx_hls
         const qint64 m_targetDurationUsec;
         const qint64 m_getNextIFrameLoopMaxSize;
         MediaQuality m_streamQuality;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
         qint64 m_totalPlaylistDuration;
         qint64 m_prevChunkEndTimestamp;

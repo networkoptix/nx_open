@@ -16,7 +16,7 @@ static const int MAX_QUEUE_SIZE = 150;
 static const qint64 EMPTY_PACKET_REPEAT_INTERVAL = 1000ll * 400;
 static const qint64 RECONNECT_TIMEOUT_USEC = 4000 * 1000;
 
-QMutex VMaxStreamFetcher::m_instMutex;
+QnMutex VMaxStreamFetcher::m_instMutex;
 QMap<QByteArray, VMaxStreamFetcher*> VMaxStreamFetcher::m_instances;
 
 
@@ -89,7 +89,7 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
         return false;
 
 
-    QMutexLocker  lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if (timeUsec == m_lastSeekPos && m_seekTimer.elapsed() < 5000)
         return true;
@@ -122,14 +122,14 @@ bool VMaxStreamFetcher::vmaxPlayRange(QnVmax480DataConsumer* consumer, const QLi
     if (!safeOpen())
         return false;
 
-    QMutexLocker  lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_vmaxConnection->vmaxPlayRange(pointsUsec, ++m_sequence);
     return true;
 }
 
 void VMaxStreamFetcher::onConnectionEstablished(QnVMax480ConnectionProcessor* connection)
 {
-    QMutexLocker lock(&m_connectMtx);
+    SCOPED_MUTEX_LOCK( lock, &m_connectMtx);
     m_vmaxConnection = connection;
     m_vmaxConnectionCond.wakeOne();
 }
@@ -169,7 +169,7 @@ bool VMaxStreamFetcher::vmaxConnect()
     {
         QElapsedTimer t;
         t.restart();
-        QMutexLocker lock(&m_connectMtx);
+        SCOPED_MUTEX_LOCK( lock, &m_connectMtx);
         while (!m_vmaxConnection && t.elapsed() < PROCESS_TIMEOUT && !m_needStop)
             m_vmaxConnectionCond.wait(&m_connectMtx, PROCESS_TIMEOUT);
 
@@ -210,21 +210,21 @@ void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDate
 {
     dynamic_cast<QnPlVmax480Resource*>(m_res)->setArchiveRange(startDateTime * 1000000ll, endDateTime * 1000000ll);
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for(QnVmax480DataConsumer* consumer: m_dataConsumers.keys())
         consumer->onGotArchiveRange(startDateTime, endDateTime);
 }
 
 void VMaxStreamFetcher::onGotMonthInfo(const QDate& month, int monthInfo)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for(QnVmax480DataConsumer* consumer: m_dataConsumers.keys())
         consumer->onGotMonthInfo(month, monthInfo);
 }
 
 void VMaxStreamFetcher::onGotDayInfo(int dayNum, const QByteArray& data)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for(QnVmax480DataConsumer* consumer: m_dataConsumers.keys())
         consumer->onGotDayInfo(dayNum, data);
 }
@@ -274,7 +274,7 @@ QnAbstractMediaDataPtr VMaxStreamFetcher::createEmptyPacket(qint64 timestamp)
 int VMaxStreamFetcher::getMaxQueueSize() const
 {
     int maxQueueSize = 0;
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     for (ConsumersMap::const_iterator itr = m_dataConsumers.constBegin(); itr != m_dataConsumers.constEnd(); ++itr)
     {
         //QnVmax480DataConsumer* consumer = itr.key();
@@ -330,7 +330,7 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
     }
 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
         if (mediaData->opaque != m_sequence)
             return;
@@ -381,7 +381,7 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
     if (!safeOpen())
         return false;
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_dataConsumers.insert(consumer, new CLDataQueue(MAX_QUEUE_SIZE));
     if (count) {
         *count = 0;
@@ -422,7 +422,7 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
 {
     int ch = consumer->getChannel();
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     ConsumersMap::Iterator itr = m_dataConsumers.find(consumer);
     if (itr != m_dataConsumers.end()) {
@@ -475,7 +475,7 @@ VMaxStreamFetcher* VMaxStreamFetcher::getInstance(const QByteArray& clientGroupI
     QByteArray vmaxIP = QUrl(res->getUrl()).host().toUtf8();
     const QByteArray key = getInstanceKey(clientGroupID, vmaxIP, isLive);
 
-    QMutexLocker lock(&m_instMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_instMutex);
     VMaxStreamFetcher* result = m_instances.value(key);
     if (result == 0) {
         result = new VMaxStreamFetcher(res, isLive);
@@ -492,7 +492,7 @@ void VMaxStreamFetcher::freeInstance(const QByteArray& clientGroupID, QnResource
 
     VMaxStreamFetcher* result = 0;
     {
-        QMutexLocker lock(&m_instMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_instMutex);
         result = m_instances.value(key);
         if (result) {
             result->notInUse();
@@ -511,7 +511,7 @@ void VMaxStreamFetcher::freeInstance(const QByteArray& clientGroupID, QnResource
 
 bool VMaxStreamFetcher::safeOpen()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     if (m_needStop)
         return false;
     if (!isOpened()) 
@@ -537,7 +537,7 @@ QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* co
             
     CLDataQueue* dataQueue = 0;
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         ConsumersMap::Iterator itr = m_dataConsumers.find(consumer);
         if (itr == m_dataConsumers.end())
             return QnAbstractDataPacketPtr();
@@ -560,20 +560,20 @@ QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* co
 
 bool VMaxStreamFetcher::isPlaying() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_lastSeekPos != (qint64)AV_NOPTS_VALUE;
 }
 
 void VMaxStreamFetcher::pleaseStop()
 {
-    QMutexLocker lock(&m_connectMtx);
+    SCOPED_MUTEX_LOCK( lock, &m_connectMtx);
     m_needStop = true;
     m_vmaxConnectionCond.wakeAll();
 }
 
 void VMaxStreamFetcher::pleaseStopAll()
 {
-    QMutexLocker lock(&m_instMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_instMutex);
     for(VMaxStreamFetcher* fetcher: m_instances.values())
         fetcher->pleaseStop();
 }

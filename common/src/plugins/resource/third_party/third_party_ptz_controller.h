@@ -42,7 +42,7 @@ private:
     QnPtzLimits m_limits;
     //QnLinearFunction m_35mmEquivToCameraZoom, m_cameraTo35mmEquivZoom;
 
-    //mutable QMutex m_mutex;
+    //mutable QnMutex m_mutex;
     //QByteArray m_cookie;
 };
 

@@ -14,7 +14,7 @@ extern "C"
     #include <libavutil/pixfmt.h>
 }
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QRect>
 #include <QtGui/QRegion>
 #include <QtCore/QScopedPointer>
@@ -83,8 +83,8 @@ private:
 
     static const unsigned int MAX_PLANE_COUNT = 3;
 
-    mutable QMutex m_mutex;
-    mutable QMutex m_uploadMutex;
+    mutable QnMutex m_mutex;
+    mutable QnMutex m_uploadMutex;
     mutable std::vector<GLuint> m_glTextureIDs;
     QScopedPointer<QnGlRendererTexture1> m_textures[MAX_PLANE_COUNT];
     SysMemPlane m_buffers[MAX_PLANE_COUNT];
@@ -160,7 +160,7 @@ public:
 private:
     typedef std::multimap<std::pair<const GLContext*, PixelFormat>, QSharedPointer<AggregationSurface> > AggregationSurfaceContainer;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
     AggregationSurfaceContainer m_surfaces;
 };
 

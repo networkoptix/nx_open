@@ -44,7 +44,7 @@ QString QnNetworkResource::getUniqueId() const
 
 QString QnNetworkResource::getHostAddress() const
 {
-    //QMutexLocker mutex(&m_mutex);
+    //SCOPED_MUTEX_LOCK( mutex, &m_mutex);
     //return m_hostAddr;
     QString url = getUrl();
     if (url.indexOf(QLatin1String("://")) == -1)
@@ -55,7 +55,7 @@ QString QnNetworkResource::getHostAddress() const
 
 void QnNetworkResource::setHostAddress(const QString &ip)
 {
-    //QMutexLocker mutex(&m_mutex);
+    //SCOPED_MUTEX_LOCK( mutex, &m_mutex);
     //m_hostAddr = ip;
     QUrl currentValue(getUrl());
     if (currentValue.scheme().isEmpty()) {
@@ -69,13 +69,13 @@ void QnNetworkResource::setHostAddress(const QString &ip)
 
 QnMacAddress QnNetworkResource::getMAC() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     return m_macAddress;
 }
 
 void QnNetworkResource::setMAC(const QnMacAddress &mac)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     m_macAddress = mac;
 
     if (m_physicalId.isEmpty() && !mac.isNull())
@@ -84,13 +84,13 @@ void QnNetworkResource::setMAC(const QnMacAddress &mac)
 
 QString QnNetworkResource::getPhysicalId() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     return m_physicalId;
 }
 
 void QnNetworkResource::setPhysicalId(const QString &physicalId)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     m_physicalId = physicalId;
 }
 
@@ -164,43 +164,43 @@ QString QnNetworkResource::toSearchString() const
 
 void QnNetworkResource::addNetworkStatus(NetworkStatus status)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     m_networkStatus |= status;
 }
 
 void QnNetworkResource::removeNetworkStatus(NetworkStatus status)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     m_networkStatus &= (~status);
 }
 
 bool QnNetworkResource::checkNetworkStatus(NetworkStatus status) const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     return (m_networkStatus & status) == status;
 }
 
 void QnNetworkResource::setNetworkStatus(NetworkStatus status)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     m_networkStatus = status;
 }
 
 void QnNetworkResource::setNetworkTimeout(unsigned int timeout)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     m_networkTimeout = timeout;
 }
 
 unsigned int QnNetworkResource::getNetworkTimeout() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     return m_networkTimeout;
 }
 
 void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
-    QMutexLocker mutexLocker(&m_mutex);
+    SCOPED_MUTEX_LOCK( mutexLocker, &m_mutex);
     QnResource::updateInner(other, modifiedFields);
     QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);
     if (other_casted)

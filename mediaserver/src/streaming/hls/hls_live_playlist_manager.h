@@ -10,7 +10,7 @@
 #include <queue>
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include "hls_playlist_manager.h"
 
@@ -54,7 +54,7 @@ namespace nx_hls
         const quint64 m_targetDurationUSec;
         mutable unsigned int m_mediaSequence;
         AbstractPlaylistManager::ChunkData m_currentChunk;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         quint64 m_totalPlaylistDuration;
         //queue<pair<timestamp to block; playlist start timestamp, blocking lives to> >
         std::queue<std::pair<quint64, quint64> > m_timestampToBlock;

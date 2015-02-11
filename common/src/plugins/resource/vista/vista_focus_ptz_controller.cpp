@@ -148,7 +148,7 @@ bool QnVistaFocusPtzController::continuousFocus(qreal speed) {
     if(!(m_capabilities & Qn::ContinuousFocusCapability))
         return base_type::continuousFocus(speed);
 
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     if(m_isMotor) {
         return queryLocked(lit("mptz/control.php?focus=%1").arg(vistaFocusDirection(speed)));
     } else {
@@ -171,7 +171,7 @@ bool QnVistaFocusPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &tra
         return base_type::runAuxilaryCommand(trait, data);
 
     if(trait.standardTrait() == Qn::ManualAutoFocusPtzTrait) {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         return queryLocked(lit("live/live_control.php?smart_focus=1"));
     } else {
         return base_type::runAuxilaryCommand(trait, data);

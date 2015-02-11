@@ -2,7 +2,7 @@
 
 #include "cpul_tftp_dataprovider.h"
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <utils/common/log.h>
 #include <utils/common/util.h>
@@ -68,7 +68,7 @@ AVClientPullSSTFTPStreamreader::~AVClientPullSSTFTPStreamreader()
 
 CameraDiagnostics::Result AVClientPullSSTFTPStreamreader::diagnoseMediaStreamConnection()
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk, &m_mutex );
     return m_prevDataReadResult;
 }
 
@@ -104,7 +104,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     bool h264 =  isH264();
 
     {
-            QMutexLocker mutex(&m_mutex);
+            SCOPED_MUTEX_LOCK( mutex, &m_mutex);
 
             if (!m_streamParam.contains("Quality") || !m_streamParam.contains("resolution") ||
                 !m_streamParam.contains("image_left") || !m_streamParam.contains("image_top") ||
@@ -259,7 +259,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     int readed = m_tftp_client->read(request, img);
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         m_prevDataReadResult = m_tftp_client->prevIOResult();
     }
 

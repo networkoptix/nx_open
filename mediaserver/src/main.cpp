@@ -349,10 +349,10 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 static int lockmgr(void **mtx, enum AVLockOp op)
 {
-    QMutex** qMutex = (QMutex**) mtx;
+    QnMutex** qMutex = (QnMutex**) mtx;
     switch(op) {
         case AV_LOCK_CREATE:
-            *qMutex = new QMutex();
+            *qMutex = new QnMutex();
             return 0;
         case AV_LOCK_OBTAIN:
             (*qMutex)->lock();
@@ -611,7 +611,7 @@ void QnMain::dumpSystemUsageStats()
     qnPlatform->monitor()->totalHddLoad();
     qnPlatform->monitor()->totalNetworkLoad();
 
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk, &m_mutex );
     if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
         return;
     m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
@@ -852,7 +852,7 @@ QnMain::~QnMain()
 
 bool QnMain::isStopping() const
 {
-    QMutexLocker lock(&m_stopMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_stopMutex);
     return m_stopping;
 }
 
@@ -883,7 +883,7 @@ void QnMain::stopSync()
     qWarning()<<"Stopping server";
     if (serviceMainInstance) {
         {
-            QMutexLocker lock(&m_stopMutex);
+            SCOPED_MUTEX_LOCK( lock, &m_stopMutex);
             m_stopping = true;
         }
         serviceMainInstance->pleaseStop();
@@ -1983,7 +1983,7 @@ void QnMain::run()
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk, &m_mutex );
         dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
         m_dumpSystemResourceUsageTaskID = 0;
     }

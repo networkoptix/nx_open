@@ -153,10 +153,10 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 
 static int lockmgr(void **mtx, enum AVLockOp op)
 {
-    QMutex** qMutex = (QMutex**) mtx;
+    QnMutex** qMutex = (QnMutex**) mtx;
     switch(op) {
         case AV_LOCK_CREATE:
-            *qMutex = new QMutex();
+            *qMutex = new QnMutex();
             return 0;
         case AV_LOCK_OBTAIN:
             (*qMutex)->lock();

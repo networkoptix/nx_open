@@ -2,7 +2,7 @@
 #define QN_COUNTER_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 class QnCounter: public QObject {
     Q_OBJECT;
@@ -17,19 +17,19 @@ signals:
 
 public slots:
     void increment() {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         m_count++;
     }
 
     void decrement() {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex);
         m_count--;
         if(m_count == 0)
             emit reachedZero();
     }
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     int m_count;
 };
 

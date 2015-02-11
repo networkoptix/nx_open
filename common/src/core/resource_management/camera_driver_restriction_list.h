@@ -9,7 +9,7 @@
 #include <map>
 #include <vector>
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QRegExp>
 #include <QtCore/QString>
 
@@ -45,7 +45,7 @@ private:
 
     //!map<vendor name, array of rules>
     std::map<QString, std::vector<AllowRuleData> > m_allowRulesByVendor;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 #endif  //CAMERA_DRIVER_RESTRICTION_LIST_H

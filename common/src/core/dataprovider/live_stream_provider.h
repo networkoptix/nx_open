@@ -90,7 +90,7 @@ protected:
     virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
 
 protected:
-    mutable QMutex m_livemutex;
+    mutable QnMutex m_livemutex;
 
 
 private:
@@ -103,7 +103,7 @@ private:
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 
-    QMutex m_motionRoleMtx;
+    QnMutex m_motionRoleMtx;
     Qn::ConnectionRole m_softMotionRole;
     QString m_forcedMotionStream;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION

@@ -52,7 +52,7 @@ int QnAudioStreamDisplay::msInBuffer() const
 
 void QnAudioStreamDisplay::suspend()
 {
-    QMutexLocker lock(&m_guiSync);
+    SCOPED_MUTEX_LOCK( lock, &m_guiSync);
     if (m_audioSound) {
         m_tooFewDataDetected = true;
         m_audioSound->suspend();
@@ -61,7 +61,7 @@ void QnAudioStreamDisplay::suspend()
 
 void QnAudioStreamDisplay::resume()
 {
-    QMutexLocker lock(&m_guiSync);
+    SCOPED_MUTEX_LOCK( lock, &m_guiSync);
     if (m_audioSound)
         m_audioSound->resume();
 }
@@ -249,7 +249,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
         {
             if (m_audioSound)
             {
-                QMutexLocker lock(&m_guiSync);
+                SCOPED_MUTEX_LOCK( lock, &m_guiSync);
                 QtvAudioDevice::instance()->removeSound(m_audioSound);
                 m_audioSound = 0;
             }
@@ -273,7 +273,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
         // play audio
         if (!m_audioSound) 
         {
-            QMutexLocker lock(&m_guiSync);
+            SCOPED_MUTEX_LOCK( lock, &m_guiSync);
             m_audioSound = QtvAudioDevice::instance()->addSound(audioFormat);
             if (!m_audioSound)
                 m_isConvertMethodInitialized = false; // I have found PC where: 32-bit format sometime supported, sometimes not supported (may be several dll)

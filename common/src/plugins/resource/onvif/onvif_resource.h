@@ -13,7 +13,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QPair>
 #include <QSharedPointer>
-#include <QtCore/QWaitCondition>
+#include <utils/common/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>
 
 #include <core/resource/security_cam_resource.h>
@@ -235,7 +235,7 @@ public:
     bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const override;
 
-    QMutex* getStreamConfMutex();
+    QnMutex* getStreamConfMutex();
     void beforeConfigureStream();
     void afterConfigureStream();
 
@@ -457,7 +457,7 @@ private:
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
-    mutable QMutex m_ioPortMutex;
+    mutable QnMutex m_ioPortMutex;
     bool m_inputMonitored;
     EventMonitorType m_eventMonitorType;
     quint64 m_nextPullMessagesTimerID;
@@ -465,8 +465,8 @@ private:
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     
-    QMutex m_streamConfMutex;
-    QWaitCondition m_streamConfCond;
+    QnMutex m_streamConfMutex;
+    QnWaitCondition m_streamConfCond;
     int m_streamConfCounter;
     CameraDiagnostics::Result m_prevOnvifResultCode; 
     QString m_onvifNotificationSubscriptionReference;
@@ -498,7 +498,7 @@ private:
     QnAbstractPtzController* createSpecialPtzController();
     bool trustMaxFPS();
 
-    mutable QMutex m_physicalParamsMutex;
+    mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
     QDateTime m_advSettingsLastUpdated;

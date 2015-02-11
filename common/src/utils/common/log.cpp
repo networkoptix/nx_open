@@ -83,7 +83,7 @@ public:
 
         const std::string& str = ostr.str();
         {
-            QMutexLocker mutx(&m_mutex);
+            SCOPED_MUTEX_LOCK( mutx, &m_mutex);
             if (!m_file.isOpen()) {
 
                 switch (logLevel) {
@@ -111,7 +111,7 @@ public:
 
     QString syncCurrFileName() const
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         return m_baseName + QLatin1String(".log");
     }
 
@@ -178,7 +178,7 @@ private:
 
     QFile m_file;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 
@@ -199,7 +199,7 @@ public:
 
     QnLog* get( int logID )
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         QnLog*& log = m_logs[logID];
         if( !log )
             log = new QnLog();
@@ -208,13 +208,13 @@ public:
 
     bool put( int logID, QnLog* log )
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         return m_logs.insert( std::make_pair( logID, log ) ).second;
     }
 
 private:
     std::map<int, QnLog*> m_logs;
-    QMutex m_mutex;
+    QnMutex m_mutex;
 };
 
 Q_GLOBAL_STATIC(QnLogs, qn_logsInstance);

@@ -4,7 +4,7 @@
 
 #include "data_source_cache.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/common/mutex.h>
 
 #include "streaming_chunk_cache_key.h"
 
@@ -20,7 +20,7 @@ DataSourceCache::~DataSourceCache()
     //removing all timers
         //only DataSourceCache::onTimer method can be called while we are here
     {
-        QMutexLocker lk( &m_mutex );
+        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         m_terminated = true;
     }
 
@@ -30,7 +30,7 @@ DataSourceCache::~DataSourceCache()
 
 DataSourceContextPtr DataSourceCache::find( const StreamingChunkCacheKey& key )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
     //searching reader in cache
     for( auto it = m_cachedDataProviders.begin(); it != m_cachedDataProviders.end(); )
@@ -64,7 +64,7 @@ void DataSourceCache::put(
     DataSourceContextPtr data,
     const unsigned int livetimeMs )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     m_cachedDataProviders.insert( std::make_pair( key, data ) );
     const quint64 timerID = TimerManager::instance()->addTimer( this, livetimeMs == 0 ? DEFAULT_LIVE_TIME_MS : livetimeMs );
     m_timers[timerID] = key;
@@ -72,7 +72,7 @@ void DataSourceCache::put(
 
 void DataSourceCache::onTimer( const quint64& timerID )
 {
-    QMutexLocker lk( &m_mutex );
+    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
     if( m_terminated )
         return;
 

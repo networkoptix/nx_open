@@ -262,7 +262,7 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_maxChannels(1),
     m_streamConfCounter(0),
     m_prevPullMessageResponseClock(0),
-    m_physicalParamsMutex(QMutex::Recursive)
+    m_physicalParamsMutex(QnMutex::Recursive)
 {
     m_monotonicClock.start();
 }
@@ -270,7 +270,7 @@ QnPlOnvifResource::QnPlOnvifResource()
 QnPlOnvifResource::~QnPlOnvifResource()
 {
     {
-        QMutexLocker lk( &m_ioPortMutex );
+        SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex );
         while( !m_triggerOutputTasks.empty() )
         {
             const quint64 timerID = m_triggerOutputTasks.begin()->first;
@@ -351,7 +351,7 @@ void QnPlOnvifResource::setHostAddress(const QString &ip)
 {
     //QnPhysicalCameraResource::se
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
         QString mediaUrl = getMediaUrl();
         if (!mediaUrl.isEmpty())
@@ -427,7 +427,7 @@ QString QnPlOnvifResource::getDriverName() const
 
 const QSize QnPlOnvifResource::getVideoSourceSize() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_videoSourceSize;
 }
 
@@ -443,13 +443,13 @@ int QnPlOnvifResource::getAudioSamplerate() const
 
 QnPlOnvifResource::CODECS QnPlOnvifResource::getCodec(bool isPrimary) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return isPrimary ? m_primaryCodec : m_secondaryCodec;
 }
 
 void QnPlOnvifResource::setCodec(QnPlOnvifResource::CODECS c, bool isPrimary)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     if (isPrimary)
         m_primaryCodec = c;
     else
@@ -458,13 +458,13 @@ void QnPlOnvifResource::setCodec(QnPlOnvifResource::CODECS c, bool isPrimary)
 
 QnPlOnvifResource::AUDIO_CODECS QnPlOnvifResource::getAudioCodec() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_audioCodec;
 }
 
 void QnPlOnvifResource::setAudioCodec(QnPlOnvifResource::AUDIO_CODECS c)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_audioCodec = c;
 }
 
@@ -610,13 +610,13 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
 QSize QnPlOnvifResource::getMaxResolution() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_resolutionList.isEmpty()? EMPTY_RESOLUTION_PAIR: m_resolutionList.front();
 }
 
 QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
@@ -656,7 +656,7 @@ QSize QnPlOnvifResource::findSecondaryResolution(const QSize& primaryRes, const 
 
 void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if (m_resolutionList.isEmpty()) {
         return;
@@ -708,25 +708,25 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 
 QSize QnPlOnvifResource::getPrimaryResolution() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_primaryResolution;
 }
 
 QSize QnPlOnvifResource::getSecondaryResolution() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_secondaryResolution;
 }
 
 int QnPlOnvifResource::getPrimaryH264Profile() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_primaryH264Profile;
 }
 
 int QnPlOnvifResource::getSecondaryH264Profile() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_secondaryH264Profile;
 }
 
@@ -737,31 +737,31 @@ void QnPlOnvifResource::setMaxFps(int f)
 
 const QString QnPlOnvifResource::getPrimaryVideoEncoderId() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_primaryVideoEncoderId;
 }
 
 const QString QnPlOnvifResource::getSecondaryVideoEncoderId() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_secondaryVideoEncoderId;
 }
 
 const QString QnPlOnvifResource::getAudioEncoderId() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_audioEncoderId;
 }
 
 const QString QnPlOnvifResource::getVideoSourceId() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_videoSourceId;
 }
 
 const QString QnPlOnvifResource::getAudioSourceId() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_audioSourceId;
 }
 
@@ -1003,7 +1003,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
 
 void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsLocal& opts)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_secondaryResolutionList = opts.resolutions;
     qSort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
 }
@@ -1039,7 +1039,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsLocal& opts
 
     if (opts.govMin >= 0) 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         m_iframeDistance = DEFAULT_IFRAME_DISTANCE <= opts.govMin ? opts.govMin : (DEFAULT_IFRAME_DISTANCE >= opts.govMax ? opts.govMax: DEFAULT_IFRAME_DISTANCE);
         NX_LOG(QString(lit("ONVIF iframe distance: %1")).arg(m_iframeDistance), cl_logDEBUG1);
     } 
@@ -1056,13 +1056,13 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsLocal& opts
     } 
     else 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         m_resolutionList = opts.resolutions;
         qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
 
     }
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     //Printing fetched resolutions
     if (cl_log.logLevel() > cl_logDEBUG1) {
@@ -1090,12 +1090,12 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts
     } 
     else 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         m_resolutionList = opts.resolutions;
         qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
     }
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     //Printing fetched resolutions
     if (cl_log.logLevel() > cl_logDEBUG1) {
         NX_LOG(QString(lit("ONVIF resolutions:")), cl_logDEBUG1);
@@ -1198,57 +1198,57 @@ void QnPlOnvifResource::setMediaUrl(const QString& src)
 
 QString QnPlOnvifResource::getImagingUrl() const 
 { 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_imagingUrl;
 }
 
 void QnPlOnvifResource::setImagingUrl(const QString& src) 
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_imagingUrl = src;
 }
 
 QString QnPlOnvifResource::getVideoSourceToken() const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_videoSourceToken;
 }
 
 void QnPlOnvifResource::setVideoSourceToken(const QString &src) {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_videoSourceToken = src;
 }
 
 QString QnPlOnvifResource::getPtzUrl() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_ptzUrl;
 }
 
 void QnPlOnvifResource::setPtzUrl(const QString& src) 
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_ptzUrl = src;
 }
 
 QString QnPlOnvifResource::getPtzConfigurationToken() const {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_ptzConfigurationToken;
 }
 
 void QnPlOnvifResource::setPtzConfigurationToken(const QString &src) {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_ptzConfigurationToken = src;
 }
 
 QString QnPlOnvifResource::getPtzProfileToken() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_ptzProfileToken;
 }
 
 void QnPlOnvifResource::setPtzProfileToken(const QString& src) 
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_ptzProfileToken = src;
 }
 
@@ -1373,7 +1373,7 @@ bool QnPlOnvifResource::setRelayOutputState(
     bool active,
     unsigned int autoResetTimeoutMS )
 {
-    QMutexLocker lk( &m_ioPortMutex );
+    SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex );
 
     using namespace std::placeholders;
     const quint64 timerID = TimerManager::instance()->addTimer(
@@ -1442,7 +1442,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     if (m_appStopping)
         return false;
 
-    QMutexLocker lk( &m_ioPortMutex );
+    SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex );
 
     //determining local address, accessible by onvif device
     QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
@@ -1733,7 +1733,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     if (dualStreamingAllowed)
     {
         int secondaryIndex = getSecondaryIndex(optionsList);
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
         m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;
         if (optionsList[secondaryIndex].isH264) {
@@ -1753,7 +1753,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
 bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper*/)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     bool dualStreaming = m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
     if (dualStreaming) {
@@ -1886,7 +1886,7 @@ void QnPlOnvifResource::setAudioEncoderOptions(const AudioOptions& options)
 #endif
 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
         m_audioSamplerate = sampleRate;
         m_audioBitrate = bitRate;
     }
@@ -1927,7 +1927,7 @@ int QnPlOnvifResource::findClosestRateFloor(const std::vector<int>& values, int 
 
 CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     if (!m_videoSourceSize.isValid()) {
         return CameraDiagnostics::NoErrorResult();
@@ -1947,7 +1947,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
 
 int QnPlOnvifResource::getGovLength() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     return m_iframeDistance;
 }
@@ -1982,7 +1982,7 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
         {
             onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             //TODO: #vasilenko UTF unuse std::string
             m_audioEncoderId = QString::fromStdString(conf->token);
         }
@@ -2123,7 +2123,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
     if (!conf)
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), QLatin1String("missing video source configuration (2)"));
 
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_videoSourceToken = QString::fromStdString(conf->token);
     //m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
 
@@ -2206,7 +2206,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
             continue;
 
         {
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             m_videoSourceId = QString::fromStdString(conf->token);
         }
 
@@ -2260,7 +2260,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
     } else {
         onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
-            QMutexLocker lock(&m_mutex);
+            SCOPED_MUTEX_LOCK( lock, &m_mutex);
             //TODO: #vasilenko UTF unuse std::string
             m_audioSourceId = QString::fromStdString(conf->token);
             return CameraDiagnostics::NoErrorResult();
@@ -2302,7 +2302,7 @@ bool QnPlOnvifResource::getParamPhysical(const QString &id, QString &value) {
 
     //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
-    QMutexLocker lock(&m_physicalParamsMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_physicalParamsMutex);
     QDateTime curTime = QDateTime::currentDateTime();
     if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(curTime) > ADVANCED_SETTINGS_VALID_TIME) {
         m_advancedParamsCache.clear();
@@ -2333,7 +2333,7 @@ bool QnPlOnvifResource::setParamPhysical(const QString &id, const QString& value
 
     bool result = false;
     {
-        QMutexLocker lock(&m_physicalParamsMutex);
+        SCOPED_MUTEX_LOCK( lock, &m_physicalParamsMutex);
         if (!m_advancedParamsCache.contains(id))
             return false;
 
@@ -2382,7 +2382,7 @@ QSet<QString> QnPlOnvifResource::calculateSupportedAdvancedParameters() const {
 }
 
 void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
-    QMutexLocker lock(&m_physicalParamsMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_physicalParamsMutex);
     m_advancedParameters.clear();
 
     QnCameraAdvancedParams params;
@@ -2427,7 +2427,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
 
 void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
 {
-    QMutexLocker lk( &m_ioPortMutex );
+    SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex );
 
     if( !m_eventCapabilities.get() )
         return;
@@ -2593,7 +2593,7 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>
         return false;
 
     {
-        QMutexLocker lk(&m_ioPortMutex);
+        SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
         Q_ASSERT( !m_inputMonitored );
         m_inputMonitored = true;
     }
@@ -2612,7 +2612,7 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
     quint64 nextPullMessagesTimerIDBak = 0;
     quint64 renewSubscriptionTimerIDBak = 0;
     {
-        QMutexLocker lk(&m_ioPortMutex);
+        SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
         m_inputMonitored = false;
         nextPullMessagesTimerIDBak = m_nextPullMessagesTimerID;
         m_nextPullMessagesTimerID = 0;
@@ -2630,7 +2630,7 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper;
     {
-        QMutexLocker lk(&m_ioPortMutex);
+        SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
         std::swap(asyncPullMessagesCallWrapper, m_asyncPullMessagesCallWrapper);
     }
 
@@ -2833,7 +2833,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     //adding task to refresh subscription
     unsigned int renewSubsciptionTimeoutSec = response.oasisWsnB2__TerminationTime - response.oasisWsnB2__CurrentTime;
 
-    QMutexLocker lk(&m_ioPortMutex);
+    SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
 
     if( !m_inputMonitored )
         return true;
@@ -2896,7 +2896,7 @@ void QnPlOnvifResource::removePullPointSubscription()
 
 bool QnPlOnvifResource::isInputPortMonitored() const
 {
-    QMutexLocker lk(&m_ioPortMutex);
+    SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
     return m_inputMonitored;
 }
 
@@ -2912,7 +2912,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 {
     static const int MAX_MESSAGES_TO_PULL = 10;
 
-    QMutexLocker lk(&m_ioPortMutex);
+    SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
 
     if( timerID != m_nextPullMessagesTimerID )
         return; //not expected event. This can actually happen if we call
@@ -3003,7 +3003,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
             arg(resultCode), cl_logDEBUG1 );
         //re-subscribing
 
-        QMutexLocker lk(&m_ioPortMutex);
+        SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
 
         if( !m_inputMonitored )
             return;
@@ -3011,7 +3011,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
             [this]( qint64 /*timerID*/ )
             {
-                QMutexLocker lk(&m_ioPortMutex);
+                SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
                 if( !m_inputMonitored )
                     return;
                 lk.unlock();
@@ -3027,7 +3027,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
 
     onPullMessagesResponseReceived(asyncWrapper->syncWrapper(), resultCode, asyncWrapper->response());
 
-    QMutexLocker lk(&m_ioPortMutex);
+    SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
 
     if( !m_inputMonitored )
         return;
@@ -3177,7 +3177,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     unsigned int autoResetTimeoutMS )
 {
     {
-        QMutexLocker lk(&m_ioPortMutex);
+        SCOPED_MUTEX_LOCK( lk, &m_ioPortMutex);
         m_triggerOutputTasks.erase( timerID );
     }
 
@@ -3265,14 +3265,14 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     return /*true*/;
 }
 
-QMutex* QnPlOnvifResource::getStreamConfMutex()
+QnMutex* QnPlOnvifResource::getStreamConfMutex()
 {
     return &m_streamConfMutex;
 }
 
 void QnPlOnvifResource::beforeConfigureStream()
 {
-    QMutexLocker lock (&m_streamConfMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_streamConfMutex);
     ++m_streamConfCounter;
     while (m_streamConfCounter > 1)
         m_streamConfCond.wait(&m_streamConfMutex);
@@ -3280,7 +3280,7 @@ void QnPlOnvifResource::beforeConfigureStream()
 
 void QnPlOnvifResource::afterConfigureStream()
 {
-    QMutexLocker lock (&m_streamConfMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_streamConfMutex);
     --m_streamConfCounter;
     m_streamConfCond.wakeAll();
     while (m_streamConfCounter > 0)

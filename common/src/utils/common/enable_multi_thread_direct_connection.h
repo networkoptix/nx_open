@@ -6,7 +6,7 @@
 #ifndef ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
 #define ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QObject>
 
 
@@ -17,7 +17,7 @@ class EnableMultiThreadDirectConnection
 public:
     EnableMultiThreadDirectConnection()
     :
-        m_signalEmitMutex( QMutex::Recursive )
+        m_signalEmitMutex( QnMutex::Recursive )
     {
     }
 
@@ -30,12 +30,12 @@ public:
     void disconnectAndJoin( QObject* receiver )
     {
         QObject::disconnect( static_cast<Derived*>(this), nullptr, receiver, nullptr );
-        QMutexLocker lk( &m_signalEmitMutex );  //waiting for signals to be emitted in other threads to be processed
+        SCOPED_MUTEX_LOCK( lk,  &m_signalEmitMutex );  //waiting for signals to be emitted in other threads to be processed
     }
 
 protected:
     //!Successors have to lock this mutex for emiting signal which allows to be connected to directly
-    QMutex m_signalEmitMutex;
+    QnMutex m_signalEmitMutex;
 };
 
 #endif  //ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H

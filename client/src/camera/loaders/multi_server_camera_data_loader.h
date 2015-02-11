@@ -2,7 +2,7 @@
 #define QN_MULTI_SERVER_CAMERA_DATA_LOADER_H
 
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <common/common_globals.h>
 

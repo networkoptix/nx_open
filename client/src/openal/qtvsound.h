@@ -8,7 +8,7 @@
 #ifndef __QTVSOUND_H__
 #define __QTVSOUND_H__
 
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QtCore/QVector>
 
 #ifndef Q_OS_WIN
@@ -57,7 +57,7 @@ private:
     void clearBuffers(bool clearAll);
 
 private:
-    mutable QMutex m_mtx;
+    mutable QnMutex m_mtx;
     QnAudioFormat m_audioFormat;
 
 #ifdef OPENAL_NEW_ALGORITHM

@@ -19,7 +19,7 @@ struct CacheEntry
 
 
 static QCache<QString, CacheEntry> cachedFiles(CACHE_SIZE);
-static QMutex cacheMutex;
+static QnMutex cacheMutex;
 
 struct HttpContentTypes
 {
@@ -113,7 +113,7 @@ void QnFileConnectionProcessor::run()
 
     if (rez == CODE_OK)
     {
-        QMutexLocker lock(&cacheMutex);
+        SCOPED_MUTEX_LOCK( lock, &cacheMutex);
 
         CacheEntry* cachedData = cachedFiles.object(path);
         if (cachedData && cachedData->lastModified == lastModified)

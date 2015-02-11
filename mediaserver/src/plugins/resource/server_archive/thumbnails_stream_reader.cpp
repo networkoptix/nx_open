@@ -46,7 +46,7 @@ QnThumbnailsStreamReader::~QnThumbnailsStreamReader()
 
 void QnThumbnailsStreamReader::setRange(qint64 startTime, qint64 endTime, qint64 frameStep, int cseq)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_delegate->setRange(startTime, endTime, frameStep);
     m_cseq = cseq;
 }

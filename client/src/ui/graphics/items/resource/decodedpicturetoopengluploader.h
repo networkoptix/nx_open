@@ -12,9 +12,9 @@
 #include <vector>
 
 #include <QtOpenGL/QGLContext>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 #include <QSharedPointer>
-#include <QtCore/QWaitCondition>
+#include <utils/common/wait_condition.h>
 
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>
@@ -255,9 +255,9 @@ private:
     uchar* m_yuv2rgbBuffer;
     int m_yuv2rgbBufferLen;
     qreal m_painterOpacity;
-    mutable QMutex m_mutex;
-    mutable QMutex m_uploadMutex;
-    mutable QWaitCondition m_cond;
+    mutable QnMutex m_mutex;
+    mutable QnMutex m_uploadMutex;
+    mutable QnWaitCondition m_cond;
     unsigned int m_previousPicSequence;
     mutable std::deque<UploadedPicture*> m_emptyBuffers;
     mutable std::deque<UploadedPicture*> m_renderedPictures;

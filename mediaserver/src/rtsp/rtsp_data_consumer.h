@@ -88,12 +88,12 @@ private:
     qint64 m_lastRtTime; // used for realtime streaming mode
     qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)
     //char m_rtpHeader[RtpHeader::RTP_HEADER_SIZE];
-    QMutex m_mutex;
-    QMutex m_qualityChangeMutex;
+    QnMutex m_mutex;
+    QnMutex m_qualityChangeMutex;
     int m_waitSCeq;
     bool m_liveMode;
     bool m_pauseNetwork;
-    QMutex m_dataQueueMtx;
+    QnMutex m_dataQueueMtx;
     bool m_singleShotMode;
     int m_packetSended;
     QnAbstractStreamDataProvider* m_prefferedProvider;
@@ -104,7 +104,7 @@ private:
 
     static QHash<QHostAddress, qint64> m_lastSwitchTime;
     static QSet<QnRtspDataConsumer*> m_allConsumers;
-    static QMutex m_allConsumersMutex;
+    static QnMutex m_allConsumersMutex;
     bool m_realtimeMode;
     bool m_multiChannelVideo;
     QnAdaptiveSleep m_adaptiveSleep;
@@ -114,7 +114,7 @@ private:
     qint64 m_firstLiveTime;
     qint64 m_lastLiveTime;
     QElapsedTimer m_liveTimer;
-    mutable QMutex m_liveTimingControlMtx;
+    mutable QnMutex m_liveTimingControlMtx;
     bool m_allowAdaptiveStreaming;
 
     QnByteArray m_sendBuffer;

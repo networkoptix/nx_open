@@ -6,7 +6,7 @@
 
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QScopedPointer>
-#include <QtCore/QMutex>
+#include <utils/common/mutex.h>
 
 #include <QtWidgets/QErrorMessage>
 
@@ -244,7 +244,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                 Q_ASSERT( false );
         }
 
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
         if( picLock->pts() != AV_NOPTS_VALUE && m_prevFrameSequence != picLock->sequence()) 
         {
@@ -609,7 +609,7 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
 
 qint64 QnGLRenderer::lastDisplayedTime() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_lastDisplayedTime;
 }
 
@@ -620,7 +620,7 @@ bool QnGLRenderer::isLowQualityImage() const
 
 QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
 {
-    QMutexLocker locker(&m_mutex);
+    SCOPED_MUTEX_LOCK( locker, &m_mutex);
     return m_lastDisplayedMetadata;
 }
 
@@ -665,12 +665,12 @@ void QnGLRenderer::setHistogramConsumer(QnHistogramConsumer* value)
 
 void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_fisheyeController = controller;
 }
 
 bool QnGLRenderer::isFisheyeEnabled() const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoCapabilities;
 }
