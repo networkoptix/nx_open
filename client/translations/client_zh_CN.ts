@@ -1983,7 +1983,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>联网到当前系统...</translation>
     </message>
     <message>
         <source>Ctrl+Alt+T</source>
@@ -3515,7 +3515,10 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器上已运行不同版本:
+ - 客户端版本: %1.
+ - 服务端版本: %2.
+建议下载客户端版本 %3 </translation>
     </message>
     <message>
         <source>Selected Server has a different version:
@@ -3998,11 +4001,11 @@ These versions are not compatible. Please update your %3</source>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>发现已使用的显卡不支持，继续使用将可能影响解码显示。</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>安装或者更新显卡驱动有可能解决此问题。</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
@@ -4010,11 +4013,11 @@ These versions are not compatible. Please update your %3</source>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>检测到显卡驱动未安装或者驱动未更新，请检查显卡驱动并更新。</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>安装或更新显卡驱动程序，可提高系统完成视频预览和使用视频的性能。</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
@@ -4316,7 +4319,7 @@ Try to activate your license manually.</source>
     <name>QnLicenseWidget</name>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>请通过发送电子邮件将硬件ID信息来获取激活授权密钥 %1。</translation>
     </message>
     <message>
         <source>Success</source>
@@ -5469,7 +5472,7 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>添加外部存储...</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5552,15 +5555,15 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>版本说明</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>获取特殊版本</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>获取最新版本</translation>
     </message>
     <message>
         <source>Update from Internet...</source>
@@ -7186,7 +7189,7 @@ Please wait for the camera to go online.</source>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
         <source>Newer version is available</source>
-        <translation>有可用的更新八本</translation>
+        <translation>有可用的更新版本</translation>
     </message>
     <message>
         <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
@@ -7202,7 +7205,7 @@ Please wait for the camera to go online.</source>
     </message>
     <message>
         <source>Major issues have been fixed.</source>
-        <translation>重大问题已解决。</translation>
+        <translation>问题已解决。</translation>
     </message>
     <message>
         <source>Update is strongly recommended.</source>
@@ -7529,7 +7532,7 @@ You&apos;ll have to start it manually.</source>
     <name>SayTextBusinessActionWidget</name>
     <message>
         <source>Speak the following:</source>
-        <translation>说以下内容:</translation>
+        <translation>广播以下内容:</translation>
     </message>
     <message>
         <source>Type any text here</source>
@@ -7548,7 +7551,7 @@ You&apos;ll have to start it manually.</source>
     <name>SendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
-        <translation>&amp;其他收件人:</translation>
+        <translation>&amp;其它收件人:</translation>
     </message>
     <message>
         <source>&amp;Global Email Settings...</source>
@@ -7836,7 +7839,7 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>Enter short system description here...</source>
-        <translation>在这里输入短的系统描述...</translation>
+        <translation>在这里输入系统描述...</translation>
     </message>
     <message>
         <source>Support Signature:</source>
@@ -7892,7 +7895,7 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>Progress:</source>
-        <translation>进展:</translation>
+        <translation>进程:</translation>
     </message>
     <message>
         <source>Result:</source>

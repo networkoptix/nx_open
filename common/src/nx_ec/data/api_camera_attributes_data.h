@@ -44,6 +44,7 @@ namespace ec2
 
         QnUuid              cameraID;
         QString             cameraName;
+        QString             userDefinedGroupName;
         bool                scheduleEnabled;
         Qn::MotionType      motionType;
         QnLatin1Array       motionMask;
@@ -56,7 +57,7 @@ namespace ec2
         int                 maxArchiveDays;
         QnUuid              preferedServerId;
     };
-#define ApiCameraAttributesData_Fields_Short (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
+#define ApiCameraAttributesData_Fields_Short (userDefinedGroupName)(scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
     (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
 #define ApiCameraAttributesData_Fields (cameraID) (cameraName) ApiCameraAttributesData_Fields_Short
 

@@ -28,6 +28,8 @@ void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<Q
 {
     if( name != right.name )
         *modifiedFields << "nameChanged";
+    if( groupName != right.groupName )
+        *modifiedFields << "groupNameChanged";
     if( dewarpingParams != right.dewarpingParams )
         *modifiedFields << "mediaDewarpingParamsChanged";
     if( scheduleDisabled != right.scheduleDisabled )
