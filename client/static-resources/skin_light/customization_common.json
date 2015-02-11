@@ -354,7 +354,7 @@
             "normalLabel": "#000000",
             "weekendLabel": "custom_red",
             "selectedLabel": "custom_blue",
-            "disabledLable": "dark_grey"
+            "disabledLabel": "dark_grey"
         }
     }
 
