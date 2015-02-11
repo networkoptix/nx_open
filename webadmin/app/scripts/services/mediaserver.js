@@ -37,7 +37,10 @@ angular.module('webadminApp')
             // Check 401 against offline
 
             if(error.status === 401) {
-                if (loginDialog === null) { //Dialog is not displayed
+
+                var isInFrame = window.self !== window.top; // If we are in frame - do not show dialog
+
+                if (!isInFrame && loginDialog === null) { //Dialog is not displayed
                     loginDialog = $modal.open({
                         templateUrl: 'views/login.html',
                         keyboard:false,

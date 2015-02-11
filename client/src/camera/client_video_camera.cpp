@@ -10,6 +10,8 @@
 #include <plugins/resource/archive/rtsp_client_archive_delegate.h>
 #include <plugins/resource/archive/archive_stream_reader.h>
 
+#include <recording/time_period.h>
+
 QString QnClientVideoCamera::errorString(int errCode) {
     switch (errCode) {
     case NoError:
@@ -28,7 +30,6 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
     m_camdispay(resource, dynamic_cast<QnArchiveStreamReader*>(reader)),
     m_reader(reader),
     m_extTimeSrc(NULL),
-    m_isVisible(true),
     m_exportRecorder(0),
     m_exportReader(0),
     m_displayStarted(false)
@@ -136,20 +137,19 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
     m_camdispay.setLightCPUMode(val);
 }
 
-void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const
-                                            QString& fileName, const QString& format, 
-                                            QnStorageResourcePtr storage, 
-                                            QnStreamRecorder::Role role, 
-                                            Qn::Corner timestamps,
-                                            qint64 timeOffsetMs, qint64 serverTimeZoneMs,
-                                            QRectF srcRect,
-                                            const ImageCorrectionParams& contrastParams,
-                                            const QnItemDewarpingParams& itemDewarpingParams,
-                                            int rotationAngle,
-                                            qreal customAR)
+void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
+                                                  const QString& fileName, 
+                                                  const QString& format, 
+                                                  const QnStorageResourcePtr &storage, 
+                                                  QnStreamRecorder::Role role, 
+                                                  const QnImageFilterHelper &imageParameters,
+                                                  qint64 serverTimeZoneMs)
 {
-    if (startTime > endTime)
-        qSwap(startTime, endTime);
+    qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
+    Q_ASSERT_X(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
+    qint64 endTimeUs = timePeriod.durationMs > 0
+        ? timePeriod.endTimeMs() * 1000ll
+        : DATETIME_NOW;
 
     QMutexLocker lock(&m_exportMutex);
     if (m_exportRecorder == 0)
@@ -178,15 +178,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         if (storage)
             m_exportRecorder->setStorage(storage);
 
-        QnImageFilterHelper extraParams;
-        extraParams.setSrcRect(srcRect);
-        extraParams.setContrastParams(contrastParams);
-        extraParams.setDewarpingParams(resource()->getDewarpingParams(), itemDewarpingParams);
-        extraParams.setRotation(rotationAngle);
-        extraParams.setCustomAR(customAR);
-        extraParams.setTimeCorner(timestamps, timeOffsetMs, 0);
-        extraParams.setVideoLayout(resource()->getVideoLayout());
-        m_exportRecorder->setExtraTranscodeParams(extraParams);
+        m_exportRecorder->setExtraTranscodeParams(imageParameters);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
@@ -203,7 +195,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
     }
 
     m_exportRecorder->clearUnprocessedData();
-    m_exportRecorder->setEofDateTime(endTime);
+    m_exportRecorder->setEofDateTime(endTimeUs);
     m_exportRecorder->setFileName(fileName);
     m_exportRecorder->setRole(role);
     m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
@@ -211,7 +203,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
     m_exportRecorder->setNeedCalcSignature(true);
 
     m_exportReader->addDataProcessor(m_exportRecorder);
-    m_exportReader->jumpTo(startTime, startTime);
+    m_exportReader->jumpTo(startTimeUs, startTimeUs);
     m_exportReader->start();
     m_exportRecorder->start();
 }

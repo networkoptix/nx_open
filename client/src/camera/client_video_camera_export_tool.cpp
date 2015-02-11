@@ -2,31 +2,22 @@
 
 #include <QtCore/QFileInfo>
 
+#include <camera/client_video_camera.h>
+
 QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
         QnClientVideoCamera *camera,
         const QnTimePeriod &timePeriod,
         const QString &fileName,
-        Qn::Corner timestamps,
-        qint64 timeOffsetMs, qint64 serverTimeZoneMs,
-        QRectF sourceRect,
-        const ImageCorrectionParams &imageCorrectionParams,
-        const QnItemDewarpingParams &itemDewarpingParams,
-        int rotationAngle,
-        qreal customAR,
+        const QnImageFilterHelper &imageParameters,
+        qint64 serverTimeZoneMs,
         QObject *parent) :
     QObject(parent),
     m_camera(camera),
     m_timePeriod(timePeriod),
     m_fileName(fileName),
-    m_timestampPos(timestamps),
-    m_timeOffsetMs(timeOffsetMs),
+    m_parameters(imageParameters),
     m_serverTimeZoneMs(serverTimeZoneMs),
-    m_sourceRect(sourceRect),
-    m_imageCorrectionParams(imageCorrectionParams),
-    m_itemDewarpingParams(itemDewarpingParams),
-    m_status(QnClientVideoCamera::NoError),
-    m_rotationAngle(rotationAngle),
-    m_customAR(customAR)
+    m_status(QnClientVideoCamera::NoError)
 {
     connect(camera,     &QnClientVideoCamera::exportProgress,   this,   &QnClientVideoCameraExportTool::valueChanged);
     connect(camera,     &QnClientVideoCamera::exportFinished,   this,   &QnClientVideoCameraExportTool::at_camera_exportFinished);
@@ -38,18 +29,12 @@ void QnClientVideoCameraExportTool::start() {
     emit valueChanged(0);
 
     m_camera->exportMediaPeriodToFile(
-                m_timePeriod.startTimeMs * 1000ll, (m_timePeriod.startTimeMs + m_timePeriod.durationMs) * 1000ll,
-                m_fileName, QFileInfo(m_fileName).suffix(),
+                m_timePeriod,
+                m_fileName,
+                QFileInfo(m_fileName).suffix(),
                 QnStorageResourcePtr(),
                 QnStreamRecorder::Role_FileExport,
-                m_timestampPos,
-                m_timeOffsetMs,
-                m_serverTimeZoneMs,
-                m_sourceRect,
-                m_imageCorrectionParams,
-                m_itemDewarpingParams,
-                m_rotationAngle,
-                m_customAR);
+                m_parameters);
 }
 
 int QnClientVideoCameraExportTool::status() const {

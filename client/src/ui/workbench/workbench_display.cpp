@@ -596,6 +596,47 @@ void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
     item->setOpacity(0.0);
 }
 
+QRectF QnWorkbenchDisplay::raisedGeometry(QnResourceWidget *widget) const {
+    if (!widget->item())
+        return QRectF();
+
+    QRectF enclosingGeometry = itemEnclosingGeometry(widget->item());
+
+    QRectF originGeometry = enclosingGeometry;
+    if (widget->hasAspectRatio())
+        originGeometry = expanded(widget->aspectRatio(), originGeometry, Qt::KeepAspectRatio);
+
+    raisedConeItem(widget)->setOriginGeometry(originGeometry);
+
+    QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
+
+    QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
+
+    qreal magicConst = maxExpandedSize;
+    if (qnSettings->isVideoWallMode())
+        magicConst = 0.8;   //TODO: #Elric magic const
+    else
+    if (
+        !(m_lightMode & Qn::LightModeNoLayoutBackground) &&
+        (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+    )
+        magicConst = 0.33;  //TODO: #Elric magic const
+    QSizeF maxWidgetSize = viewportGeometry.size() * magicConst;
+
+    QPointF viewportCenter = viewportGeometry.center();
+
+    /* Allow expansion no further than the maximal size, but no less than current size. */
+    newWidgetSize =  bounded(newWidgetSize, maxWidgetSize,   Qt::KeepAspectRatio);
+    newWidgetSize = expanded(newWidgetSize, enclosingGeometry.size(), Qt::KeepAspectRatio);
+
+    /* Calculate expansion values. Expand towards the screen center. */
+    qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
+    calculateExpansionValues(enclosingGeometry.left(), enclosingGeometry.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
+    calculateExpansionValues(enclosingGeometry.top(),  enclosingGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
+
+    return enclosingGeometry.adjusted(xp1, yp1, xp2, yp2);
+}
+
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) {
     if(role < 0 || role >= Qn::ItemRoleCount) {
         qnWarning("Invalid item role '%1'.", static_cast<int>(role));
@@ -1337,40 +1378,8 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
-        QRectF originGeometry = enclosingGeometry;
-        if (widget->hasAspectRatio())
-            originGeometry = expanded(widget->aspectRatio(), originGeometry, Qt::KeepAspectRatio);
-
         ensureRaisedConeItem(widget);
-        raisedConeItem(widget)->setOriginGeometry(originGeometry);
-
-        QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
-
-        QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
-
-        qreal magicConst = maxExpandedSize;
-        if (qnSettings->isVideoWallMode())
-            magicConst = 0.8;   //TODO: #Elric magic const
-        else
-        if (
-            !(m_lightMode & Qn::LightModeNoLayoutBackground) &&
-            (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
-        ) 
-            magicConst = 0.33;  //TODO: #Elric magic const
-        QSizeF maxWidgetSize = viewportGeometry.size() * magicConst;
-
-        QPointF viewportCenter = viewportGeometry.center();
-
-        /* Allow expansion no further than the maximal size, but no less than current size. */
-        newWidgetSize =  bounded(newWidgetSize, maxWidgetSize,   Qt::KeepAspectRatio);
-        newWidgetSize = expanded(newWidgetSize, enclosingGeometry.size(), Qt::KeepAspectRatio);
-
-        /* Calculate expansion values. Expand towards the screen center. */
-        qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
-        calculateExpansionValues(enclosingGeometry.left(), enclosingGeometry.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
-        calculateExpansionValues(enclosingGeometry.top(),  enclosingGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
-
-        enclosingGeometry = enclosingGeometry.adjusted(xp1, yp1, xp2, yp2);
+        enclosingGeometry = raisedGeometry(widget);
     }
 
     /* Update Z value. */

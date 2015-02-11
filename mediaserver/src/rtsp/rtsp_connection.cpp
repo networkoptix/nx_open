@@ -1102,7 +1102,20 @@ int QnRtspConnectionProcessor::composePlay()
     d->dataProcessor->setLiveMode(d->liveMode == Mode_Live);
 
     if (!d->useProprietaryFormat)
+    {
         d->quality = MEDIA_Quality_High; 
+
+        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
+        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
+        if( !streamIndexStr.isEmpty() )
+        {
+            const int streamIndex = streamIndexStr.toInt();
+            if( streamIndex == 0 )
+                d->quality = MEDIA_Quality_High;
+            else if( streamIndex == 1 )
+                d->quality = MEDIA_Quality_Low;
+        }
+    }
     
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
     if (d->liveMode == Mode_Live) 

@@ -35,21 +35,6 @@ private:
     mutable QMutex m_mutex;
 };
 
-
-/*
-struct QnMotionWindow
-{
-    bool operator==(const QnMotionWindow& other) const;
-    QnMotionWindow(): sensitivity(0) {}
-    QnMotionWindow(int i, const QRegion& r): sensitivity(i), region(r) {}
-
-    int sensitivity;
-    QRegion region;
-};
-*/
-
-//typedef QnMotionWindow[QnMotionWindow::MAX_SENSITIVITY-QnMotionWindow::MIN_SENSITIVITY+1] QnMotionRegion;
-
 // TODO: #Elric rename header
 
 class QnMotionRegion
@@ -121,6 +106,12 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnMotionRegion);
+
+void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString);
+QString serializeMotionRegion(const QnMotionRegion& region);
+
+void parseMotionRegionList(QList<QnMotionRegion>& regions, const QByteArray& regionsString);
+QString serializeMotionRegionList(const QList<QnMotionRegion>& regions);
 
 
 #endif // __MOTION_WINDOW_H__

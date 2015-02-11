@@ -91,7 +91,12 @@ namespace {
     const QSize showHideButtonSize(15, 45);
     const QMargins showHideButtonMargins(0, 10, 0, 10);
 
-    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, int helpTopicId = -1, QGraphicsItem *parent = NULL) {
+    const qreal kDefaultSizeMultiplier = 1.0;
+    const int kDefaultHelpTopicId = -1;
+
+    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = kDefaultSizeMultiplier
+        , int helpTopicId = kDefaultHelpTopicId, QGraphicsItem *parent = nullptr)
+    {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
         qreal height = baseSize * sizeMultiplier;
@@ -296,9 +301,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsXAnimator(NULL),
     m_notificationsOpacityAnimatorGroup(NULL),
 
+    m_calendarPinButton(nullptr),
+    m_dayTimeMinimizeButton(nullptr),
     m_inCalendarGeometryUpdate(false),
     m_inDayTimeGeometryUpdate(false),
-    m_inSearchGeometryUpdate(false)
+    m_inSearchGeometryUpdate(false),
+
+    m_calendarPinOffset(),
+    m_dayTimeOffset()
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -389,6 +399,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setTitleOpened(qnSettings->isTitleOpened(), false, false);
     setSliderOpened(qnSettings->isSliderOpened(), false, false);
     setNotificationsOpened(notificationsOpened, false);
+
+    m_calendarPinButton->setChecked(qnSettings->isCalendarPinned());
 
     /* Set up title D&D. */
     DropInstrument *dropInstrument = new DropInstrument(true, context(), this);
@@ -864,6 +876,11 @@ bool QnWorkbenchUi::isTreePinned() const {
     return action(Qn::PinTreeAction)->isChecked();
 }
 
+bool QnWorkbenchUi::isCalendarPinned() const
+{
+    return action(Qn::PinCalendarAction)->isChecked();
+}
+
 bool QnWorkbenchUi::isTreeOpened() const {
     return action(Qn::ToggleTreeAction)->isChecked();
 }
@@ -1167,6 +1184,7 @@ void QnWorkbenchUi::createTreeWidget() {
     connect(action(Qn::ToggleTreeAction),       &QAction::toggled,                  this,                               [this](bool checked){ if (!m_ignoreClickEvent) setTreeOpened(checked);});
     connect(action(Qn::PinTreeAction),          &QAction::toggled,                  this,                               &QnWorkbenchUi::at_pinTreeAction_toggled);
     connect(action(Qn::PinNotificationsAction), &QAction::toggled,                  this,                               &QnWorkbenchUi::at_pinNotificationsAction_toggled);
+    connect(action(Qn::PinCalendarAction),      &QAction::toggled,                  QnClientSettings::instance(),       &QnClientSettings::setCalendarPinned);
 }
 
 #pragma endregion Tree widget methods
@@ -1340,7 +1358,8 @@ void QnWorkbenchUi::createTitleWidget() {
     windowButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
     windowButtonsLayout->addItem(newActionButton(action(Qn::WhatsThisAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction), 1.0, Qn::MainWindow_Fullscreen_Help));
+    windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction)
+        , kDefaultSizeMultiplier, Qn::MainWindow_Fullscreen_Help));
     windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
 
     m_windowButtonsWidget = new GraphicsWidget();
@@ -1359,11 +1378,15 @@ void QnWorkbenchUi::createTitleWidget() {
     m_titleRightButtonsLayout = new QGraphicsLinearLayout();
     m_titleRightButtonsLayout->setSpacing(2);
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)
+        , kDefaultSizeMultiplier, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
     m_titleRightButtonsLayout->addStretch(0x1000);
     if (QnScreenRecorder::isSupported())
-        m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction), 1.0, Qn::MainWindow_ScreenRecording_Help));
+    {
+        m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)
+        , kDefaultSizeMultiplier, Qn::MainWindow_ScreenRecording_Help));
+    }
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenLoginDialogAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);
@@ -1649,7 +1672,7 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged() {
     m_notificationsBackgroundItem->setGeometry(backgroundGeometry);
     m_notificationsShowButton->setPos(QPointF(
         qMin(m_controlsWidgetRect.right(), headerGeometry.left()),
-        (headerGeometry.top() + headerGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
+        (headerGeometry.top() + headerGeometry.bottom() - showHideButtonSize.height()) / 2
     ));
     m_notificationsPinButton->setPos(headerGeometry.topLeft() + QPointF(m_pinOffset, m_pinOffset));
     if (isNotificationsOpened())
@@ -1747,15 +1770,25 @@ void QnWorkbenchUi::setCalendarOpacity(qreal opacity, bool animate) {
         m_calendarOpacityAnimatorGroup->pause();
         opacityAnimator(m_calendarItem)->setTargetValue(opacity);
         opacityAnimator(m_dayTimeItem)->setTargetValue(opacity);
+        opacityAnimator(m_calendarPinButton)->setTargetValue(opacity);
+        opacityAnimator(m_dayTimeMinimizeButton)->setTargetValue(opacity);
         m_calendarOpacityAnimatorGroup->start();
     } else {
         m_calendarOpacityAnimatorGroup->stop();
         m_calendarItem->setOpacity(opacity);
         m_dayTimeItem->setOpacity(opacity);
+        m_calendarPinButton->setOpacity(opacity);
+        m_dayTimeMinimizeButton->setOpacity(opacity);
     }
 }
 
-void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate) {
+void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate) 
+{
+    if (!opened && isCalendarPinned() && action(Qn::ToggleCalendarAction)->isChecked())
+    {
+        return;
+    }
+
     ensureAnimationAllowed(animate);
 
     m_inFreespace = false;
@@ -1863,7 +1896,11 @@ void QnWorkbenchUi::updateDayTimeWidgetGeometry() {
     m_dayTimeItem->setPos(geometry.topLeft());
 }
 
-void QnWorkbenchUi::at_calendarItem_paintGeometryChanged() {
+void QnWorkbenchUi::at_calendarItem_paintGeometryChanged() 
+{
+    const QRectF paintGeometry = m_calendarItem->paintGeometry();
+    m_calendarPinButton->setPos(paintGeometry.topRight() + m_calendarPinOffset);
+
     if(m_inCalendarGeometryUpdate)
         return;
 
@@ -1874,7 +1911,12 @@ void QnWorkbenchUi::at_calendarItem_paintGeometryChanged() {
     updateNotificationsGeometry();
 }
 
-void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged() {
+void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged() 
+{
+    const QRectF paintGeomerty = m_dayTimeItem->paintGeometry();
+    m_dayTimeMinimizeButton->setPos(paintGeomerty.topRight() + m_dayTimeOffset);
+    m_dayTimeMinimizeButton->setVisible(paintGeomerty.height());
+
     if(m_inDayTimeGeometryUpdate)
         return;
 
@@ -1884,15 +1926,20 @@ void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged() {
     updateNotificationsGeometry();
 }
 
-void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date) {
+void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date) 
+{
+    const bool sameDate = (m_dayTimeWidget->date() == date); 
     m_dayTimeWidget->setDate(date);
 
     if(isCalendarOpened())
-        setDayTimeWidgetOpened(true, true);
+    {
+        const bool shouldBeOpened = !sameDate || !m_dayTimeOpened;
+        setDayTimeWidgetOpened(shouldBeOpened, true);
+    }
 }
 
 void QnWorkbenchUi::createCalendarWidget() {
-    QnCalendarWidget *calendarWidget = new QnCalendarWidget();
+    QnCalendarWidget *calendarWidget = new QnCalendarWidget();    
     setHelpTopic(calendarWidget, Qn::MainWindow_Calendar_Help);
     navigator()->setCalendar(calendarWidget);
 
@@ -1906,6 +1953,9 @@ void QnWorkbenchUi::createCalendarWidget() {
     m_calendarItem->resize(250, 200);
     m_calendarItem->setProperty(Qn::NoHandScrollOver, true);
 
+    m_calendarPinButton = newPinButton(m_controlsWidget, action(Qn::PinCalendarAction));
+    m_calendarPinButton->setFocusProxy(m_calendarItem);
+
     m_dayTimeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_dayTimeItem->setWidget(m_dayTimeWidget);
     m_dayTimeWidget->installEventFilter(m_calendarItem);
@@ -1913,13 +1963,20 @@ void QnWorkbenchUi::createCalendarWidget() {
     m_dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
     m_dayTimeItem->stackBefore(m_calendarItem);
 
+    m_dayTimeMinimizeButton = newActionButton(action(Qn::MinimizeDayTimeViewAction)
+        , kDefaultSizeMultiplier, kDefaultHelpTopicId, m_controlsWidget);
+    m_dayTimeMinimizeButton->setFocusProxy(m_dayTimeItem);
+
     m_calendarOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_calendarOpacityProcessor->addTargetItem(m_calendarItem);
     m_calendarOpacityProcessor->addTargetItem(m_dayTimeItem);
+    m_calendarOpacityProcessor->addTargetItem(m_calendarPinButton);
+    m_calendarOpacityProcessor->addTargetItem(m_dayTimeMinimizeButton);
 
     HoverFocusProcessor* calendarHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
     calendarHidingProcessor->addTargetItem(m_calendarItem);
     calendarHidingProcessor->addTargetItem(m_dayTimeItem);
+    calendarHidingProcessor->addTargetItem(m_calendarPinButton);
     calendarHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
     calendarHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
 
@@ -1941,10 +1998,13 @@ void QnWorkbenchUi::createCalendarWidget() {
     m_calendarOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarItem));
     m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_dayTimeItem));
+    m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarPinButton));
+    m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_dayTimeMinimizeButton));
 
     connect(calendarWidget,             &QnCalendarWidget::emptyChanged,        this,   &QnWorkbenchUi::updateCalendarVisibilityAnimated);
     connect(calendarWidget,             &QnCalendarWidget::dateClicked,         this,   &QnWorkbenchUi::at_calendarWidget_dateClicked);
     connect(m_dayTimeItem,              &QnMaskedProxyWidget::paintRectChanged, this,   &QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged);
+    connect(m_dayTimeItem,              &QGraphicsWidget::geometryChanged,      this,   &QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged);
     connect(m_calendarOpacityProcessor, &HoverFocusProcessor::hoverLeft,        this,   &QnWorkbenchUi::updateCalendarOpacityAnimated);
     connect(m_calendarOpacityProcessor, &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateCalendarOpacityAnimated);
     connect(m_calendarOpacityProcessor, &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
@@ -1953,6 +2013,13 @@ void QnWorkbenchUi::createCalendarWidget() {
     connect(m_calendarItem,             &QnMaskedProxyWidget::paintRectChanged, this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
     connect(m_calendarItem,             &QGraphicsWidget::geometryChanged,      this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
     connect(action(Qn::ToggleCalendarAction), &QAction::toggled,                this,   [this](bool checked) { setCalendarOpened(checked); });
+    connect(action(Qn::MinimizeDayTimeViewAction), &QAction::triggered,        this,   [this]() { setDayTimeWidgetOpened(false, true); });
+
+    enum { kCellsCountOffset = 2 };
+    const int size = calendarWidget->headerHeight();
+    m_calendarPinOffset = QPoint(-kCellsCountOffset * size
+        , (size - m_calendarPinButton->size().height()) / 2.0f);
+    m_dayTimeOffset = QPoint(-m_dayTimeWidget->headerHeight() , 0);
 }
 
 #pragma endregion Calendar and DayTime widget methods

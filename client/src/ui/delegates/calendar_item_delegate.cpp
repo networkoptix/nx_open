@@ -9,36 +9,70 @@
 #include <ui/style/globals.h>
 
 
-namespace {
-    QnCalendarItemDelegate::FillType fillType(const QnTimePeriod &period, const QnTimePeriodStorage &periodStorage) {
-        if(periodStorage.periods(Qn::MotionContent).intersects(period)) {
-            return QnCalendarItemDelegate::MotionFill;
-        } else if(periodStorage.periods(Qn::RecordingContent).intersects(period)) {
-            return QnCalendarItemDelegate::RecordingFill;
-        } else {
-            return QnCalendarItemDelegate::EmptyFill;
+namespace 
+{
+    enum FillType 
+    {
+        kRecordingFill   = 0x1,
+        kBookmarkFill    = 0x2,
+        kMotionFill      = 0x4
+    };
+
+    const Qt::BrushStyle kPrimaryBrushStyle = Qt::SolidPattern;
+    const Qt::BrushStyle kSecondaryBrushStyle = Qt::Dense5Pattern;
+    const QPoint kRightOffset = QPoint(1, 0);
+    const QPoint kBottomOffset = QPoint(0, 1);
+    const QPoint kBottomRightOffset = kRightOffset + kBottomOffset;
+
+    int fillType(const QnTimePeriod &period, const QnTimePeriodStorage &periodStorage) 
+    {
+        enum { kNoFlag = 0 };
+        return ((periodStorage.periods(Qn::MotionContent).intersects(period) ? kMotionFill : kNoFlag)
+            | (periodStorage.periods(Qn::RecordingContent).intersects(period) ? kRecordingFill : kNoFlag)
+            | (periodStorage.periods(Qn::BookmarksContent).intersects(period) ? kBookmarkFill : kNoFlag));
+    }
+
+    bool paintBackground(int fillType
+        , bool isPrimary
+        , const QRect &rect
+        , const QnCalendarColors &colors
+        , QPainter &painter)
+    {
+        const bool isRecording = (fillType & kRecordingFill);
+        if (isRecording || (fillType & kBookmarkFill))
+        {
+            const Qt::BrushStyle style = (isPrimary ? kPrimaryBrushStyle : kSecondaryBrushStyle);
+            const QBrush brush(colors.getBackground(fillType, isPrimary), style);
+    
+            painter.setPen(Qt::NoPen);
+            painter.fillRect(rect, brush);
+            return true;
         }
+        return false;
     }
 
 } // anonymous namespace
 
 
-QColor QnCalendarColors::primary(int fillType) const {
-    switch(fillType) {
-    case QnCalendarItemDelegate::MotionFill:    return primaryMotion;
-    case QnCalendarItemDelegate::RecordingFill: return primaryRecording;
-    default:                                    return QColor();
+QColor QnCalendarColors::getBackground(int fillType
+    , bool isPrimary) const
+{
+    /// Note! Bookmark priority is higher than recording
+    if (fillType & kBookmarkFill)		
+    {
+        return (isPrimary ? primaryBookmark : secondaryBookmark);
     }
+    else if (fillType & kRecordingFill)
+    {
+        return (isPrimary ? primaryRecording : secondaryRecording);
+    }
+    return QColor();
 }
 
-QColor QnCalendarColors::secondary(int fillType) const {
-    switch(fillType) {
-    case QnCalendarItemDelegate::MotionFill:    return secondaryMotion;
-    case QnCalendarItemDelegate::RecordingFill: return secondaryRecording;
-    default:                                    return QColor();
-    }
+QColor QnCalendarColors::getMotionBackground(bool isPrimary) const
+{
+    return (isPrimary ? primaryMotion : secondaryMotion);
 }
-
 
 QnCalendarItemDelegate::QnCalendarItemDelegate(QObject *parent):
     base_type(parent) 
@@ -56,54 +90,64 @@ void QnCalendarItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     base_type::paint(painter, option, index);
 }
 
-void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, const QnTimePeriod &period, qint64 localOffset, const QnTimePeriod &enabledRange, const QnTimePeriod &selectedRange, const QnTimePeriodStorage &primaryPeriods, const QnTimePeriodStorage &secondaryPeriods, const QString &text) const {
-    QnTimePeriod localPeriod(period.startTimeMs - localOffset, period.durationMs);
-    paintCell(
-        painter, 
-        palette, 
-        rect,
-        enabledRange.intersects(localPeriod),
-        selectedRange.intersects(localPeriod),
-        fillType(localPeriod, primaryPeriods),
-        fillType(localPeriod, secondaryPeriods),
-        text
-    );
-}
+void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette, const QRect &rect
+    , const QnTimePeriod &period, qint64 localOffset, const QnTimePeriod &enabledRange
+    , const QnTimePeriod &selectedRange, const QnTimePeriodStorage &primaryPeriods
+    , const QnTimePeriodStorage &secondaryPeriods, const QString &text) const 
+{
+    assert(painter);
+    
+    const QnTimePeriod localPeriod(period.startTimeMs - localOffset, period.durationMs);
+    const bool isEnabled = enabledRange.intersects(localPeriod);
+    const bool isSelected = selectedRange.intersects(localPeriod);
+    const int primaryFill = fillType(localPeriod, primaryPeriods);
+    const int secondaryFill = fillType(localPeriod, secondaryPeriods);
+    
+    const QnScopedPainterBrushRollback brushRollback(painter);
+    const QnScopedPainterPenRollback penRollback(painter);
+    const QnScopedPainterFontRollback fontRollback(painter);
 
-void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, bool isEnabled, bool isSelected, FillType primaryFill, FillType secondaryFill, const QString &text) const {
-    QnScopedPainterBrushRollback brushRollback(painter);
-    QnScopedPainterPenRollback penRollback(painter);
-    QnScopedPainterFontRollback fontRollback(painter);
+    /* Draws the background - could be one of the recording or bookmark fill types*/
+    if (!paintBackground(primaryFill, true, rect, m_colors, *painter))
+        paintBackground(secondaryFill, false, rect, m_colors, *painter);
 
-    /* Draw background. */
-    if(primaryFill != EmptyFill)
-        painter->fillRect(rect, QBrush(m_colors.primary(primaryFill), Qt::SolidPattern));
-    if(secondaryFill != EmptyFill && secondaryFill != primaryFill)
-        painter->fillRect(rect, QBrush(m_colors.secondary(secondaryFill), Qt::Dense6Pattern));
+    /* Draws motion mark */
+    const bool isPrimaryMotion = (primaryFill & kMotionFill);
+    if (isPrimaryMotion || (secondaryFill & kMotionFill))
+    {
+        QPolygon poly;
+        poly.append(rect.bottomLeft() + kBottomOffset);
+        poly.append(rect.topRight() + kRightOffset);
+        poly.append(rect.bottomRight() + kBottomRightOffset);
+
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(QBrush(m_colors.getMotionBackground(isPrimaryMotion)
+            , (isPrimaryMotion ? kPrimaryBrushStyle : kSecondaryBrushStyle)));
+        painter->drawPolygon(poly, Qt::WindingFill);
+    }
 
     /* Selection frame. */
-    if (isSelected) {
-        painter->setPen(QPen(m_colors.selection, 3, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+    if (isSelected) 
+    {
+        enum { kOffset = 2, kWidth = 3 };
+        painter->setPen(QPen(m_colors.selection, kWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         painter->setBrush(Qt::NoBrush);
-        painter->drawRect(rect.adjusted(2, 2, -2, -2));
+        painter->drawRect(rect.adjusted(kOffset, kOffset, -kOffset, -kOffset));
     }
 
     /* Common black frame. */
-    painter->setPen(QPen(m_colors.separator, 1));
+    enum { kPenWidth = 1 };
+    painter->setPen(QPen(m_colors.separator, kPenWidth));
     painter->setBrush(Qt::NoBrush);
     painter->drawRect(rect);
 
     /* Text. */
+    const QColor color = (isEnabled ? palette.color(QPalette::Active, QPalette::Text)
+        : palette.color(QPalette::Disabled, QPalette::Text));
     QFont font = painter->font();
-    QColor color;
-    if (!isEnabled) {
-        color = palette.color(QPalette::Disabled, QPalette::Text);
-    } else {
-        color = palette.color(QPalette::Active, QPalette::Text);
-        font.setBold(true);
-    }
+    font.setBold(isEnabled);
 
-    painter->setPen(QPen(color, 1));
+    painter->setPen(QPen(color, kPenWidth));
     painter->setFont(font);
     painter->drawText(rect, Qt::AlignCenter, text);
 }

@@ -40,6 +40,11 @@ public:
     qint64 localOffset() const;
     void setLocalOffset(qint64 utcOffset);
 
+    /**
+     * Returns the header height of the calendar
+     */
+    int headerHeight() const;
+
 signals:
     /**
      * Signal is emitted when empty state is changed, e.g. loaded new time periods.
@@ -76,6 +81,8 @@ private:
     qint64 m_currentTime;
 
     qint64 m_localOffset;
+
+    QWidget *m_navigationBar;
 };
 
 

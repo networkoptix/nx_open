@@ -114,6 +114,9 @@ public:
 
     bool isNotificationsOpened() const;
 
+    /** Whether the calendar is pinned */
+    bool isCalendarPinned() const;
+
     bool isCalendarOpened() const {
         return m_calendarOpened;
     }
@@ -459,6 +462,10 @@ private:
 
     QnMaskedProxyWidget *m_calendarItem;
 
+    QnImageButtonWidget *m_calendarPinButton;
+
+    QnImageButtonWidget *m_dayTimeMinimizeButton;
+
     VariantAnimator *m_calendarSizeAnimator;
 
     AnimatorGroup *m_calendarOpacityAnimatorGroup;
@@ -484,6 +491,8 @@ private:
     bool m_inSearchGeometryUpdate;
 
     qreal m_pinOffset;
+    QPoint m_calendarPinOffset;
+    QPoint m_dayTimeOffset;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)

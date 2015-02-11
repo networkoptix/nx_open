@@ -20,6 +20,8 @@
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
+
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 
@@ -100,7 +102,6 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
@@ -1148,6 +1149,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     url.setUserName(QString());
     url.setPassword(QString());
     url.setScheme(lit("http"));
+    url.setPath(lit("/static/index.html"));
     QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
 }
 
@@ -1489,7 +1491,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::clearLoaderCache);
+    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->instance<QnCameraDataManager>(), &QnCameraDataManager::clearCache);
 
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
@@ -1719,22 +1721,20 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         foreach(const QnVirtualCameraResourcePtr &cam, qnResPool->getResources<QnVirtualCameraResource>()) {
             if (!cam || cam->getGroupId() != groupId)
                 continue;
-            cam->setGroupName(name);
+            cam->setUserDefinedGroupName(name);
             modified << cam;
         }
         if (modified.isEmpty())
             return; // very strange outcome - at least camera should be in the list
-        const QList<QnUuid>& idList = idListFromResList(modified);
         connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idList),
+            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modified)),
             this, 
             [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
                 at_resources_saved( reqID, errorCode, modified );
                 if (errorCode != ec2::ErrorCode::ok)
                     foreach (const QnVirtualCameraResourcePtr &camera, modified)
-                        camera->setGroupName(oldName);
+                        camera->setUserDefinedGroupName(oldName);
             } );
-        propertyDictionary->saveParamsAsync(idList);
     } else {
         if (!validateResourceName(resource, name))
             return;

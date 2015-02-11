@@ -309,26 +309,48 @@ namespace nx_hls
             requestParams.insert( std::make_pair( it->first, it->second ) );
         }
 
-        if( extension.isEmpty() || extension == QLatin1String("ts") )
+        if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
         {
-            //no extension, assuming media stream has been requested...
-            return getResourceChunk(
+            return getPlaylist(
                 request,
-                fileName,
                 camResource,
+                camera,
                 requestParams,
                 response );
         }
         else
         {
-            //found extension
-            if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
-                return getPlaylist(
+            //chunk requsted, checking requested container format...
+            QString containerFormat;
+            std::multimap<QString, QString>::const_iterator containerIter = requestParams.find(StreamingParams::CONTAINER_FORMAT_PARAM_NAME);
+            if( containerIter != requestParams.end() )
+            {
+                containerFormat = containerIter->second;
+            }
+            else
+            {
+                //detecting container format by extension
+                if( extension.isEmpty() || extension == lit("ts") )
+                    containerFormat = lit("mpegts");
+                else if( extension == lit("mkv") )
+                    containerFormat = lit("matroska");
+                else if( extension == lit("mp4") )
+                    containerFormat = lit("mp4");
+            }
+
+            if( containerFormat == "mpegts" ||
+                //containerFormat == "mp4" ||       //TODO #ak ffmpeg: muxer does not support unseekable output
+                containerFormat == "matroska" )     //some supported format has been requested
+            {
+                if( containerIter == requestParams.end() )
+                    requestParams.emplace( StreamingParams::CONTAINER_FORMAT_PARAM_NAME, containerFormat );
+                return getResourceChunk(
                     request,
+                    shortFileName,
                     camResource,
-                    camera,
                     requestParams,
                     response );
+            }
         }
 
         return StatusCode::notFound;
@@ -663,7 +685,7 @@ namespace nx_hls
             else
             {
                 hlsChunkUrlQuery.addQueryItem( StreamingParams::START_TIMESTAMP_PARAM_NAME, QString::number(chunkList[i].startTimestamp) );
-                hlsChunkUrlQuery.addQueryItem( StreamingParams::DURATION_MS_PARAM_NAME, QString::number(chunkList[i].duration) );
+                hlsChunkUrlQuery.addQueryItem( StreamingParams::DURATION_USEC_PARAM_NAME, QString::number(chunkList[i].duration) );
             }
             if( session->isLive() )
                 hlsChunkUrlQuery.addQueryItem( StreamingParams::LIVE_PARAM_NAME, QString() );
@@ -706,7 +728,8 @@ namespace nx_hls
             containerFormat = "mpegts";
         std::multimap<QString, QString>::const_iterator startTimestampIter = requestParams.find(QLatin1String(StreamingParams::START_TIMESTAMP_PARAM_NAME));
         //std::multimap<QString, QString>::const_iterator endTimestampIter = requestParams.find(QLatin1String(StreamingParams::STOP_TIMESTAMP_PARAM_NAME));
-        std::multimap<QString, QString>::const_iterator durationIter = requestParams.find(QLatin1String(StreamingParams::DURATION_MS_PARAM_NAME));
+        std::multimap<QString, QString>::const_iterator durationUSecIter = requestParams.find(QLatin1String(StreamingParams::DURATION_USEC_PARAM_NAME));
+        std::multimap<QString, QString>::const_iterator durationSecIter = requestParams.find(QLatin1String(StreamingParams::DURATION_SEC_PARAM_NAME));
         //std::multimap<QString, QString>::const_iterator pictureSizeIter = requestParams.find(QLatin1String(StreamingParams::PICTURE_SIZE_PIXELS_PARAM_NAME));
         //std::multimap<QString, QString>::const_iterator audioCodecIter = requestParams.find(QLatin1String(StreamingParams::AUDIO_CODEC_PARAM_NAME));
         //std::multimap<QString, QString>::const_iterator videoCodecIter = requestParams.find(QLatin1String(StreamingParams::VIDEO_CODEC_PARAM_NAME));
@@ -727,9 +750,11 @@ namespace nx_hls
                 startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
             }
         }
-        quint64 chunkDuration = durationIter != requestParams.end()
-            ? durationIter->second.toLongLong()
-            : nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
+        quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
+        if( durationUSecIter != requestParams.end() )
+            chunkDuration = durationUSecIter->second.toLongLong();
+        else if( durationSecIter != requestParams.end() )
+            chunkDuration = durationSecIter->second.toLongLong() * MSEC_IN_SEC * USEC_IN_MSEC;
 
         if( aliasIter != requestParams.end() )
         {
