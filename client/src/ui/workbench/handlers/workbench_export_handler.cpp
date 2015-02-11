@@ -10,6 +10,7 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/client_video_camera.h>
 #include <camera/client_video_camera_export_tool.h>
+#include <camera/camera_data_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -34,7 +35,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/extensions/workbench_layout_export_tool.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
@@ -319,7 +319,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         }
 
         if (dialog->selectedNameFilter().contains(aviFileFilter)) {
-            QnCachingCameraDataLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
+            QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(widget->resource()->toResourcePtr());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);

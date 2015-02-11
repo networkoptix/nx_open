@@ -8,6 +8,7 @@
 
 #include <client/client_settings.h>
 
+#include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/client_video_camera.h>
 
@@ -26,7 +27,6 @@
 #include <recording/stream_recorder.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
@@ -168,10 +168,10 @@ bool QnLayoutExportTool::start() {
     uuidFile->write(m_layout->getId().toByteArray());
     uuidFile.reset();
 
-    foreach (const QnMediaResourcePtr resource, m_resources) {
+    foreach (const QnMediaResourcePtr &resource, m_resources) {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        QnCachingCameraDataLoader* loader = navigator()->loader(resource->toResourcePtr());
+        QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(resource->toResourcePtr());
         if (loader) {
             QScopedPointer<QIODevice> chunkFile(m_storage->open(lit("chunk_%1.bin").arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly));
             QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);

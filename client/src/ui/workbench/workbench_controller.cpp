@@ -145,6 +145,8 @@ namespace {
 
     /** Countdown value before screen recording starts. */
     const int recordingCountdownMs = 3000;
+
+    const qreal raisedGeometryThreshold = 0.002;
 } // anonymous namespace
 
 
@@ -1144,12 +1146,20 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if(widget == NULL)
         return;
 
-    /* Don't raise if there's only one item in the layout. */
-    if (workbench()->currentLayout() && workbench()->currentLayout()->items().size() == 1)
-        return;
-
     QnWorkbenchItem *workbenchItem = widget->item();
-    workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
+
+    if (workbench()->item(Qn::RaisedRole) != workbenchItem) {
+        /* Don't raise if there's only one item in the layout. */
+        QRectF enclosingRect = display()->itemEnclosingGeometry(widget->item());
+        enclosingRect = dilated(enclosingRect, enclosingRect.size() * raisedGeometryThreshold);
+        if (enclosingRect.contains(display()->raisedGeometry(widget)))
+            return;
+
+        workbench()->setItem(Qn::RaisedRole, workbenchItem);
+        return;
+    }
+
+    workbench()->setItem(Qn::RaisedRole, NULL);
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {

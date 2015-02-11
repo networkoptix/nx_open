@@ -167,6 +167,7 @@ protected:
     void suspendHomePtzController();
     void resumeHomePtzController();
 
+    virtual void createCustomOverlays() override;
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -186,6 +187,7 @@ private slots:
     void at_videoLayoutChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
+    void createButtons();
 
     Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();

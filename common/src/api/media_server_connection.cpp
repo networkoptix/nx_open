@@ -25,7 +25,6 @@
 #include <utils/common/request_param.h>
 #include <utils/common/model_functions.h>
 
-#include <api/serializer/serializer.h>
 #include <event_log/events_serializer.h>
 
 #include <recording/time_period_list.h>

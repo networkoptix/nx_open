@@ -129,7 +129,7 @@ if __name__ == '__main__':
                     else:
 	                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
-    exceptions = ['vmsclient.png', '.ai', '.profile']
+    exceptions = ['vmsclient.png', '.ai', '.svg', '.profile']
     genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], exceptions)  
     
     if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):

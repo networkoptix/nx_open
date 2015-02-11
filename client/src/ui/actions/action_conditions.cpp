@@ -314,25 +314,31 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 
 Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters &parameters) {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
-    QnResourcePtr target = parameters.resource();
-    if (!target)
-        return Qn::InvisibleAction;
 
     switch (nodeType) {
     case Qn::ResourceNode:
-        /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
-        if (target->hasFlags(Qn::user))
-            return Qn::InvisibleAction;
+        {
+            if (parameters.resources().size() != 1)
+                return Qn::InvisibleAction;
 
-        /* Edge servers renaming is forbidden. */
-        if (QnMediaServerResource::isEdgeServer(target))
-            return Qn::InvisibleAction;
+            QnResourcePtr target = parameters.resource();
+            if (!target)
+                return Qn::InvisibleAction;
 
-        /* Incompatible resources cannot be renamed */
-        if (target->getStatus() == Qn::Incompatible)
-            return Qn::InvisibleAction;
+            /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
+            if (target->hasFlags(Qn::user))
+                return Qn::InvisibleAction;
 
-        return Qn::EnabledAction;
+            /* Edge servers renaming is forbidden. */
+            if (QnMediaServerResource::isEdgeServer(target))
+                return Qn::InvisibleAction;
+
+            /* Incompatible resources cannot be renamed */
+            if (target->getStatus() == Qn::Incompatible)
+                return Qn::InvisibleAction;
+
+            return Qn::EnabledAction;
+                          }
     case Qn::EdgeNode:
     case Qn::RecorderNode:
         return Qn::EnabledAction;
@@ -393,6 +399,10 @@ Qn::ActionVisibility QnSaveLayoutAsActionCondition::check(const QnResourceList &
         return Qn::InvisibleAction;
 
     if (layout->data().contains(Qn::VideoWallResourceRole))
+        return Qn::InvisibleAction;
+
+    /* Save as.. for exported layouts works very strange, disabling it for now. */
+    if (snapshotManager()->isFile(layout))
         return Qn::InvisibleAction;
 
     return Qn::EnabledAction;

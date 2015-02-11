@@ -62,9 +62,7 @@ namespace {
     QToolButton *createCloseButton(QnSearchLineEdit *parent)
     {
         QToolButton *result = new QToolButton(parent);
-        const QIcon icon = qnSkin->icon(lit("titlebar/close_tab.png"));
-        result->setIcon(icon);
-
+        result->setIcon(qnSkin->icon(lit("titlebar/close_tab.png")));
         result->setToolTip(QObject::tr("Close"));
         QObject::connect(result, &QAbstractButton::clicked, parent, &QnSearchLineEdit::escKeyPressed);
 
@@ -129,18 +127,21 @@ void QnSearchLineEdit::updateGeometries() {
     initStyleOption(&panel);
     QRect rect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
 
-    int height = rect.height();
-    int buttonSize = height;
+    const int height = rect.height();
+    const int width = rect.width();
+    const int buttonSize = height;
     
+    const int closeButtonSize = height * 3 / 4;
     // left edge
     m_searchButton->setGeometry(rect.x(), rect.y(), buttonSize, buttonSize);
 
     // right edge
-    m_closeButton->setGeometry(rect.width() - buttonSize, rect.y() + 1, buttonSize, buttonSize);
-    int labelWidth = m_occurencesLabel->sizeHint().width();
-    int labelOffset = 2;
+    m_closeButton->setGeometry(width - (buttonSize + closeButtonSize) / 2
+        , rect.y() + (buttonSize - closeButtonSize) / 2 + 1, closeButtonSize, closeButtonSize);
+    const int labelWidth = m_occurencesLabel->sizeHint().width();
+    const int labelOffset = 2;
 
-    m_occurencesLabel->setGeometry(m_closeButton->x() - labelWidth, labelOffset, labelWidth, height - labelOffset*2);
+    m_occurencesLabel->setGeometry(width - buttonSize - labelWidth, labelOffset, labelWidth, height - labelOffset*2);
 
     m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, m_occurencesLabel->x() - buttonSize, height);
     

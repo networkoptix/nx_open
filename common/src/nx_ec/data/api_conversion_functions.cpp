@@ -1,7 +1,5 @@
 #include "api_conversion_functions.h"
 
-#include <api/serializer/serializer.h>
-
 #include <utils/serialization/json.h>
 
 #include <business/business_event_parameters.h>

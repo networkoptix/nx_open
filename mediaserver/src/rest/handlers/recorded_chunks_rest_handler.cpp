@@ -10,7 +10,9 @@
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
 #include "motion/motion_helper.h"
-#include "api/serializer/serializer.h"
+
+#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
@@ -99,8 +101,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         break;
     case Qn::MotionContent:
         {
-            QList<QRegion> motionRegions;
-            parseRegionList(motionRegions, filter);
+            QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
             periods = QnMotionHelper::instance()->matchImage(motionRegions, resList, startTime, endTime, detailLevel);
         }
         break;

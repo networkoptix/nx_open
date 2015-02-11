@@ -2,8 +2,6 @@
 
 #include <QtCore/QMetaType>
 
-#include <api/serializer/serializer.h>
-
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <utils/common/warnings.h>
@@ -12,7 +10,11 @@
 
 #include <camera/loaders/multi_server_camera_data_loader.h>
 #include <camera/loaders/layout_file_camera_data_loader.h>
+
 #include "api/common_message_processor.h"
+
+#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 
 namespace {
     const qint64 minTimePeriodLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
@@ -302,7 +304,7 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type, const QnTimePeriod
         break;
     case Qn::MotionTimePeriod:
         if(!isMotionRegionsEmpty()) {
-            QString filter = serializeRegionList(m_motionRegions);
+            QString filter = QString::fromUtf8(QJson::serialized(m_motionRegions));
             loader->load(targetPeriod, filter);
         } else if(!m_timePeriodCameraData[Qn::MotionContent].isEmpty()) {
             m_requestedTimePeriods[Qn::MotionContent].clear();
