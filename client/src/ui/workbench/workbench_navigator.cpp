@@ -758,7 +758,11 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
     }
 
+#ifdef QN_ENABLE_BOOKMARKS
     action(Qn::ToggleBookmarksSearchAction)->setEnabled(m_currentMediaWidget && m_currentWidget->resource()->flags() & Qn::utc);
+#else 
+    action(Qn::ToggleBookmarksSearchAction)->setEnabled(false);
+#endif // QN_ENABLE_BOOKMARKS   
 
     updateLocalOffset();
     updateCurrentPeriods();
