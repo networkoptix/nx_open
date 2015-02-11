@@ -11,20 +11,76 @@
 
 namespace ite
 {
+    // Pool (avoid memory allocations)
+    template<typename T, unsigned MAX_ELEMENTS>
+    class Pool
+    {
+    public:
+        Pool()
+        {
+            m_pool.reserve(MAX_ELEMENTS);
+        }
+
+        void push(T elem)
+        {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            if (m_pool.size() < MAX_ELEMENTS)
+            {
+                m_pool.push_back(elem);
+                elem.reset(); // under lock
+            }
+            // else do nothing => free
+        }
+
+        T pop()
+        {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            if (m_pool.empty())
+                return T();
+
+            T elem = m_pool.back();
+            m_pool.pop_back();
+            return elem;
+        }
+
+    private:
+        std::mutex m_mutex;
+        std::vector<T> m_pool;
+    };
+
     /// Buffer for MpegTsPacket to place it in std container
     class TsBuffer
     {
     public:
+        enum
+        {
+            MAX_ELEMENTS = 8 * 1024
+        };
+
         typedef std::vector<uint8_t> ContT;
         typedef std::shared_ptr<ContT> BufT;
+        typedef Pool<BufT, MAX_ELEMENTS> PoolT;
 
-        TsBuffer()
-        :   m_buf(std::make_shared<ContT>(MpegTsPacket::PACKET_SIZE()))
-        {}
+        TsBuffer(PoolT& pool)
+        :   m_buf(pool.pop()),
+            m_pool(&pool)
+        {
+            if (!m_buf)
+            {
+#if 0
+                ContextTimer("TS alloc");
+#endif
+                m_buf = std::make_shared<ContT>(MpegTsPacket::PACKET_SIZE());
+            }
+        }
 
-        TsBuffer(const TsBuffer& p)
-        :   m_buf(p.m_buf)
-        {}
+        ~TsBuffer()
+        {
+            if (m_buf.unique())
+                m_pool->push(m_buf);
+        }
 
         MpegTsPacket packet() const { return MpegTsPacket(data()); }
 
@@ -35,6 +91,7 @@ namespace ite
 
     private:
         BufT m_buf;
+        PoolT * m_pool;
     };
 
     typedef std::deque<TsBuffer> TsQueue;
@@ -116,9 +173,9 @@ namespace ite
 
                 memcpy(&m_data[oldSize], apData, dataSize);
             }
-#if 1
+#if 0
             else
-                printf("empty TS: data %p; len %d\n", apData, dataSize);
+                printf("TS empty: data %p; len %d\n", apData, dataSize);
 #endif
         }
     };
@@ -129,73 +186,15 @@ namespace ite
     class Demux
     {
     public:
-        static constexpr unsigned MAX_TS_QUEUE_SIZE() { return 1024; }
+        static constexpr unsigned MAX_TS_QUEUE_SIZE() { return TsBuffer::MAX_ELEMENTS; }
 
         void addPid(uint16_t pid)
         {
             m_queues[pid] = TsQueue();
         }
 
-        void push(TsBuffer& ts)
-        {
-            uint16_t pid = ts.packet().pid();
-            TsQueue * q = queue(pid);
-            if (!q)
-                return;
-
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            if (q->size() >= MAX_TS_QUEUE_SIZE())
-            {
-                q->pop_front(); // TODO: save TsBuffer for future use
-#if 0
-                printf("lost TS\n");
-#endif
-            }
-
-#if 0
-            if (ts.packet().checkbit())
-                printf("TS error bit\n");
-#endif
-#if 1
-            if (q->size())
-            {
-                if ((q->back().packet().counter() + 1) % 16 != ts.packet().counter())
-                    printf("TS wrong count: %d -> %d\n", q->back().packet().counter(), ts.packet().counter());
-            }
-#endif
-            q->push_back(ts);
-        }
-
-        void pushFront(TsBuffer& ts)
-        {
-            uint16_t pid = ts.packet().pid();
-            TsQueue * q = queue(pid);
-            if (!q)
-                return;
-
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            q->push_front(ts);
-        }
-
-        bool pop(uint16_t pid, TsBuffer& ts)
-        {
-            TsQueue * q = queue(pid);
-            if (!q)
-                return false;
-
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            if (q->size())
-            {
-                ts = q->front(); // TODO: save TsBuffer for future use
-                q->pop_front();
-                return true;
-            }
-
-            return false;
-        }
+        void push(TsBuffer& ts);
+        bool pop(uint16_t pid, TsBuffer& ts);
 
         size_t size(uint16_t pid) const
         {
@@ -336,6 +335,7 @@ namespace ite
 
         DeviceBuffer m_buf;
         Demux m_demux;
+        TsBuffer::PoolT m_poolTs;
         std::map<uint16_t, PacketsQueue> m_packetQueues;
 
         DevReadThread * m_threadObject;

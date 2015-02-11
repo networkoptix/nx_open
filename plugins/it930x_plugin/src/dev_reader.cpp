@@ -84,6 +84,55 @@ namespace ite
 
     // Demux
 
+    void Demux::push(TsBuffer& ts)
+    {
+        uint16_t pid = ts.packet().pid();
+        TsQueue * q = queue(pid);
+        if (!q)
+            return;
+
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        if (q->size() >= MAX_TS_QUEUE_SIZE())
+        {
+            q->pop_front();
+#if 0
+            printf("lost TS\n");
+#endif
+        }
+
+#if 0
+        if (ts.packet().checkbit())
+            printf("TS error bit\n");
+#endif
+#if 0
+        if (q->size())
+        {
+            if ((q->back().packet().counter() + 1) % 16 != ts.packet().counter())
+                printf("TS wrong count: %d -> %d\n", q->back().packet().counter(), ts.packet().counter());
+        }
+#endif
+        q->push_back(ts);
+    }
+
+    bool Demux::pop(uint16_t pid, TsBuffer& ts)
+    {
+        TsQueue * q = queue(pid);
+        if (!q)
+            return false;
+
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        if (q->size())
+        {
+            ts = q->front();
+            q->pop_front();
+            return true;
+        }
+
+        return false;
+    }
+
     ContentPacketPtr Demux::dumpPacket(uint16_t pid)
     {
         TsQueue * q = queue(pid);
@@ -127,6 +176,15 @@ namespace ite
         m_demux.addPid(Pacidal::PID_VIDEO_HD);
         m_demux.addPid(Pacidal::PID_VIDEO_SD);
         m_demux.addPid(Pacidal::PID_VIDEO_CIF);
+
+        // alloc TS pool
+        {
+            std::vector<TsBuffer> vecTS;
+            vecTS.reserve(TsBuffer::MAX_ELEMENTS);
+
+            for (size_t i=0; i< TsBuffer::MAX_ELEMENTS; ++i)
+                vecTS.push_back(TsBuffer(m_poolTs));
+        }
     }
 
     bool DevReader::subscribe(uint16_t pid)
@@ -186,7 +244,7 @@ namespace ite
 
     bool DevReader::readStep()
     {
-        TsBuffer ts;
+        TsBuffer ts(m_poolTs);
         if (! m_buf.readTSPacket(ts))
             return false;
 
@@ -205,7 +263,7 @@ namespace ite
 
     void DevReader::dumpPacket(uint16_t pid)
     {
-        static const unsigned MAX_QUEUE_SIZE = 128;
+        static const unsigned MAX_QUEUE_SIZE = 32; // 30 fps => ~1 sec
 
         ContentPacketPtr pkt = m_demux.dumpPacket(pid);
 
@@ -258,7 +316,7 @@ namespace ite
     {
         sync();
 
-        TsBuffer ts;
+        TsBuffer ts(m_poolTs);
 
         static const unsigned MAX_READS = 1000;
         for (unsigned i=0; i < MAX_READS; ++i)
@@ -286,7 +344,8 @@ namespace ite
 
     bool DevReader::getRetChanCmd(RCCommand& cmd)
     {
-        TsBuffer ts;
+        TsBuffer ts(m_poolTs);
+
         if (m_demux.pop(It930x::PID_RETURN_CHANNEL, ts))
         {
 #if 1

@@ -1,3 +1,6 @@
+#ifndef ITE_TIMER_H
+#define ITE_TIMER_H
+
 #include <chrono>
 #include <thread>
 #include <atomic>
@@ -103,3 +106,5 @@ namespace ite
         const char * m_msg;
     };
 }
+
+#endif
