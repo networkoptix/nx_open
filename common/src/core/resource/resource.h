@@ -199,6 +199,7 @@ public:
     //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
     void emitModificationSignals( const QSet<QByteArray>& modifiedFields );
 
+    static QnInitResPool* initAsyncPoolInstance();
     static bool isStopping() { return m_appStopping; }
     void setRemovedFromPool(bool value);
 signals:

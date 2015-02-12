@@ -744,6 +744,10 @@ void QnResource::emitModificationSignals( const QSet<QByteArray>& modifiedFields
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
+QnInitResPool* QnResource::initAsyncPoolInstance()
+{
+    return initResPool();
+}
 // -----------------------------------------------------------------------------
 
 #ifdef ENABLE_DATA_PROVIDERS
