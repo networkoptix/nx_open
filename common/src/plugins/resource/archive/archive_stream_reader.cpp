@@ -339,10 +339,11 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMo
     return rez;
 }
 
-void QnArchiveStreamReader::startPaused()
+void QnArchiveStreamReader::startPaused(qint64 startTime)
 {
     m_pausedStart = true;
     m_singleQuantProcessed = true;
+    channeljumpToUnsync(startTime, 0, startTime);
     start();
 }
 

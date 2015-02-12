@@ -81,7 +81,7 @@ public:
 
     virtual QnMediaContextPtr getCodecContext() const override;
 
-    virtual void startPaused() override;
+    virtual void startPaused(qint64 startTime) override;
 
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
