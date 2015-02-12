@@ -32,3 +32,6 @@
         </nav>
     </div>
 </header>
+<div class="container">
+    <alert ng-if="alertVisible" type="info" close="closeAlert()">You are currently connected to the system '{{settings.systemName}}' through '{{settings.name}}' server</alert>
+</div>
