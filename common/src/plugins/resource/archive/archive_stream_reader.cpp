@@ -653,10 +653,14 @@ begin_label:
                     {
                         if (m_cycleMode)
                         {
-                            if (m_delegate->endTime() != DATETIME_NOW)
-                                seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
-                            else
-                                seekTime = qnSyncTime->currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
+                            if (m_delegate->endTime() != DATETIME_NOW) {
+                                m_topIFrameTime = m_delegate->endTime();
+                                seekTime = m_topIFrameTime - BACKWARD_SEEK_STEP;
+                            }
+                            else {
+                                m_topIFrameTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+                                seekTime = m_topIFrameTime - LIVE_SEEK_OFFSET;
+                            }
                         }
                         else {
                             m_eof = true;
