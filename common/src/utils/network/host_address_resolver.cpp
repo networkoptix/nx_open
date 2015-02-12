@@ -15,8 +15,6 @@
 #include <algorithm>
 #include <atomic>
 
-#include <QMutexLocker>
-
 
 HostAddressResolver::ResolveTask::ResolveTask(
     HostAddress _hostAddress,

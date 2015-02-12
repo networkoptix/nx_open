@@ -6,12 +6,12 @@
 #define STREAMING_CHUNK_TRANSCODER_THREAD_H
 
 #include <QElapsedTimer>
-#include <utils/common/mutex.h>
 #include <QSharedPointer>
-#include <utils/common/wait_condition.h>
 
-#include <core/dataprovider/abstract_ondemand_data_provider.h>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 #include <utils/common/long_runnable.h>
+#include <core/dataprovider/abstract_ondemand_data_provider.h>
 
 #include "data_source_cache.h"
 #include "streaming_chunk.h"

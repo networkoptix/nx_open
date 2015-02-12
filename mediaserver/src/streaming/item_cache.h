@@ -8,8 +8,8 @@
 #include <map>
 
 #include <QCache>
+
 #include <utils/common/mutex.h>
-#include <QMutexLocker>
 
 
 template<class KeyType, class CachedType>

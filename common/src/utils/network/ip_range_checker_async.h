@@ -8,12 +8,12 @@
 
 #include <set>
 
-#include <utils/common/mutex.h>
 #include <QtCore/QObject>
-#include <utils/common/wait_condition.h>
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/joinable.h>
+#include <utils/common/mutex.h>
+#include <utils/common/wait_condition.h>
 
 #include "http/asynchttpclient.h"
 #include "../common/stoppable.h"

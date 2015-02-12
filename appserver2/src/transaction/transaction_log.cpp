@@ -415,13 +415,13 @@ void QnTransactionLog::fillPersistentInfo(QnAbstractTransaction& tran)
 
 qint64 QnTransactionLog::getTransactionLogTime() const
 {
-    QMutexLocker lock(&m_timeMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_timeMutex );
     return m_lastTimestamp;
 }
 
 void QnTransactionLog::setTransactionLogTime(qint64 value)
 {
-    QMutexLocker lock(&m_timeMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_timeMutex );
     m_lastTimestamp = qMax(value, m_lastTimestamp);
 }
 

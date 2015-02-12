@@ -6,8 +6,6 @@
 
 #include <fstream>
 
-#include <QMutexLocker>
-
 #include <transcoding/ffmpeg_transcoder.h>
 #include <utils/common/log.h>
 

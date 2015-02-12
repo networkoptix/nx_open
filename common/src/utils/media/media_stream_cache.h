@@ -12,9 +12,9 @@
 #include <functional> /* For std::function. */
 
 #include <QtCore/QElapsedTimer>
-#include <utils/common/mutex.h>
 
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <utils/common/mutex.h>
 
 
 

@@ -10,9 +10,7 @@
 #include <functional>
 
 #include <utils/common/mutex.h>
-#include <QMutexLocker>
 #include <utils/common/wait_condition.h>
-
 #include <utils/common/long_runnable.h>
 #include <utils/common/singleton.h>
 #include <utils/common/systemerror.h>

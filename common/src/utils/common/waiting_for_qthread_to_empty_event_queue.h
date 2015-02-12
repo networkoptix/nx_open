@@ -6,9 +6,10 @@
 #ifndef WAITING_FOR_QTHREAD_TO_EMPTY_EVENT_QUEUE_H
 #define WAITING_FOR_QTHREAD_TO_EMPTY_EVENT_QUEUE_H
 
-#include <utils/common/mutex.h>
 #include <QObject>
 #include <QThread>
+
+#include <utils/common/mutex.h>
 #include <utils/common/wait_condition.h>
 
 #include "joinable.h"

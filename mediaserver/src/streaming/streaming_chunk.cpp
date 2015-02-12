@@ -6,8 +6,6 @@
 
 #include <atomic>
 
-#include <QMutexLocker>
-
 
 StreamingChunk::SequentialReadingContext::SequentialReadingContext()
 :

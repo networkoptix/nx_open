@@ -8,9 +8,10 @@
 #include <map>
 #include <set>
 
-#include <utils/common/mutex.h>
 #include <QSharedPointer>
 #include <QString>
+
+#include <utils/common/mutex.h>
 #include <utils/common/wait_condition.h>
 
 #include <core/datapacket/media_data_packet.h>

@@ -4,8 +4,6 @@
 
 #include "hls_session_pool.h"
 
-#include <QMutexLocker>
-
 #include "camera/video_camera.h"
 
 

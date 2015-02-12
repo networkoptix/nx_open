@@ -5,8 +5,6 @@
 
 #include "ip_range_checker_async.h"
 
-#include <QMutexLocker>
-
 #include <utils/common/log.h>
 
 #include "socket.h"

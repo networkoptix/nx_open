@@ -5,8 +5,6 @@
 
 #include "waiting_for_qthread_to_empty_event_queue.h"
 
-#include <QMutexLocker>
-
 
 WaitingForQThreadToEmptyEventQueue::WaitingForQThreadToEmptyEventQueue( QThread* thread, int howManyTimesToWait )
 :

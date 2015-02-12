@@ -7,8 +7,6 @@
 #include <cstdlib>
 #include <algorithm>
 
-#include <QMutexLocker>
-
 //#define DEBUG_OUTPUT
 #ifdef DEBUG_OUTPUT
 #include <malloc.h>
