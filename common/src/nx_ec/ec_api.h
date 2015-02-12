@@ -1009,15 +1009,15 @@ namespace ec2
                  std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, TargetType *target, HandlerType handler) {
-            return changeSystemName(systemName, sysIdTime, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, TargetType *target, HandlerType handler) {
+            return changeSystemName(systemName, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        ErrorCode changeSystemNameSync(const QString &systemName, qint64 sysIdTime) {
+        ErrorCode changeSystemNameSync(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) {
             return impl::doSyncCall<impl::SimpleHandler>(
                 [=](const impl::SimpleHandlerPtr &handler) {
-                    return this->changeSystemName(systemName, sysIdTime, handler);
+                    return this->changeSystemName(systemName, sysIdTime, tranLogTime, handler);
                 }
             );
         }
@@ -1035,12 +1035,12 @@ namespace ec2
 
     signals:
         void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive);
-        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime);
+        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, impl::SimpleHandlerPtr handler) = 0;
-        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, impl::SimpleHandlerPtr handler) = 0;
+        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
@@ -1070,6 +1070,9 @@ namespace ec2
         virtual void addRemotePeer(const QUrl& url) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
+        
+        virtual qint64 getTransactionLogTime() const = 0;
+        virtual void setTransactionLogTime(qint64 value) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;

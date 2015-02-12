@@ -2327,7 +2327,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>Unifier au Système Actuellement Connecté...</translation>
     </message>
     <message>
         <source>Export Selected Area...</source>
@@ -3564,7 +3564,10 @@ Une erreur s&apos;est produite lors du redémarrage en mode compatible.</transla
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur avec une version différente:
+ - version Client: %1.
+ - verison EC: %2.
+Vous devez télécharger le client %3 pour connecter</translation>
     </message>
     <message>
         <source>Selected Server has a different version:
@@ -4053,11 +4056,11 @@ Ces versions ne sont pas compatible. S.V.P. faire la MàJ du %3</translation>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nous avons détecté que votre carte vidéo n&apos;est pas supportée. Vous pouvez procéder à vos propres risques.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer ou une MàJ de votre pilote vidéo peut résoudre le problème.</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
@@ -4065,11 +4068,11 @@ Ces versions ne sont pas compatible. S.V.P. faire la MàJ du %3</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nous avons détecté que votre pilote de carte vidéo n&apos;est peut-être pas installé ou à jour.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer ou une MàJ de votre pilote vidéo peut considérablement améliorer les performances lors de la visualisation vidéo.</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
@@ -4381,7 +4384,7 @@ Essayez d&apos;activer la licence manuellement.</translation>
     <name>QnLicenseWidget</name>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. envoyez un courriel avec le numéro de série et l&apos;ID matériel fournis à %1 pour obtenir une clé d&apos;activation.</translation>
     </message>
     <message>
         <source>Success</source>
@@ -5551,7 +5554,7 @@ Ces tours seront invalides si vous le supprimez.</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter stockage externe...</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -5633,15 +5636,15 @@ Ces tours seront invalides si vous le supprimez.</translation>
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Notes de Version</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>Obtenir une vers. spécifique</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>Obtenir la dernière Version</translation>
     </message>
     <message>
         <source>Update from Internet...</source>

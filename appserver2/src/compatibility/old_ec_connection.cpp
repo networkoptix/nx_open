@@ -128,6 +128,16 @@ namespace ec2
     {
     }
 
+    qint64 OldEcConnection::getTransactionLogTime() const {
+        return -1;
+    }
+
+    void OldEcConnection::setTransactionLogTime(qint64 /* value */)
+    {
+
+    }
+
+
     void OldEcConnection::startReceivingNotifications()
     {
     }

@@ -1846,7 +1846,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>接続しているシステムに統合...</translation>
     </message>
     <message>
         <source>Close</source>
@@ -3513,7 +3513,10 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーのバージョンが異なります:
+ - クライアントバージョン: %1.
+ - エンタープライズコントローラーバージョン: %2.
+You need to download client %3 to connect</translation>
     </message>
     <message>
         <source>Selected Server has a different version:
@@ -3997,11 +4000,11 @@ These versions are not compatible. Please update your %3</source>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>サポートされないビデオカードが検出されました　正常に表示出来ない可能性があります.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオドライバーのインストールまたは更新で問題が解決される可能性があります.</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
@@ -4009,11 +4012,11 @@ These versions are not compatible. Please update your %3</source>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオカードのドライバーがインストールされていないかサポート外のビデオカードです.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオカードのインストールまたは更新を行う事でビデオ表示パフォーマンスが向上します.</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
@@ -4323,7 +4326,7 @@ Try to activate your license manually.</source>
     </message>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>シリアルキーとハードウェアIDをEmailで %1 に送信して下さい。アクティベーションキーが後で返信されます.</translation>
     </message>
     <message>
         <source>Success</source>
@@ -5479,7 +5482,7 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>外部ストレージの追加...</translation>
     </message>
 </context>
 <context>
@@ -5553,15 +5556,15 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>リリースノート</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>ビルドの取得</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>最新バージョンの取得</translation>
     </message>
     <message>
         <source>Update from Internet...</source>

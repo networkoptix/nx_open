@@ -501,7 +501,22 @@ void QnSecurityCamResource::recordingEventDetached() {
 }
 
 QString QnSecurityCamResource::getGroupName() const {
-    SAFE(return m_groupName)
+    if( !getId().isNull() )
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(
+            QnCameraUserAttributePool::instance(),
+            getId() );
+        if( !(*userAttributesLock)->groupName.isEmpty() )
+            return (*userAttributesLock)->groupName;
+    }
+
+    return getDefaultGroupName();
+}
+
+QString QnSecurityCamResource::getDefaultGroupName() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_groupName;
 }
 
 void QnSecurityCamResource::setGroupName(const QString& value) {
@@ -511,7 +526,19 @@ void QnSecurityCamResource::setGroupName(const QString& value) {
             return;
         m_groupName = value;
     }
+    emit groupNameChanged(::toSharedPointer(this));
+}
 
+void QnSecurityCamResource::setUserDefinedGroupName( const QString& value )
+{
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(
+            QnCameraUserAttributePool::instance(),
+            getId() );
+        if( (*userAttributesLock)->groupName == value )
+            return;
+        (*userAttributesLock)->groupName = value;
+    }
     emit groupNameChanged(::toSharedPointer(this));
 }
 

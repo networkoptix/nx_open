@@ -453,7 +453,7 @@ void QnThumbnailsLoader::process() {
             QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
             outFrame->setUseExternalData(false);
 
-            while (frame) {
+            while (frame && !m_needStop) {
                 if (!m_resource->hasFlags(Qn::utc))
                     frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
 

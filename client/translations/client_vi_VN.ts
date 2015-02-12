@@ -2266,7 +2266,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>Hợp nhất để kết nối hệ thống Hiện nay ...</translation>
     </message>
     <message>
         <source>Change Cell Aspect Ratio...</source>
@@ -4009,11 +4009,11 @@ Những phiên bản này không tương thích. Hãy cập nhật %3 của bạ
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chúng tôi đã phát hiện ra rằng video card của bạn không được hỗ trợ. Bạn có thể tiến hành có nguy cơ của riêng bạn.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt và / hoặc cập nhật các trình điều khiển video của bạn có thể giải quyết vấn đề.</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
@@ -4021,11 +4021,11 @@ Những phiên bản này không tương thích. Hãy cập nhật %3 của bạ
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chúng tôi đã phát hiện ra rằng trình điều khiển card màn hình của bạn có thể không được cài đặt hoặc hết hạn.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt và / hoặc cập nhật các trình điều khiển video của bạn có thể làm tăng đáng kể hiệu năng hệ thống của bạn khi xem và làm việc với video.</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
@@ -4337,7 +4337,7 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
     </message>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xin vui lòng gửi email với các khóa tiếp và các ID phần cứng cung cấp cho %1  để có được một khóa tập tin kích hoạt.</translation>
     </message>
     <message>
         <source>Success</source>
@@ -5490,7 +5490,7 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Thêm lưu trữ gắn ngoài ...</translation>
     </message>
 </context>
 <context>
@@ -5564,15 +5564,15 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>ghi chú Phát hành</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhận một xây dựng cụ thể</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật phiên bản mới nhất</translation>
     </message>
     <message>
         <source>Update from Internet...</source>
@@ -6398,7 +6398,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message numerus="yes">
         <source>Pc %1 - Screens %2</source>
         <translation>
-            <numerusform>Pc %1 - Screens %2</numerusform>
+            <numerusform>%nPc %1 - màn hình %2</numerusform>
         </translation>
     </message>
 </context>

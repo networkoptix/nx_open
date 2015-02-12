@@ -1835,7 +1835,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 연결된 시스템 병합...</translation>
     </message>
     <message>
         <source>Close</source>
@@ -3502,7 +3502,10 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>선택된 서버의 버젼이 다릅니다:
+ - Client version: %1.
+ - EC version: %2.
+%3에 연결하여 클라리언트를 다운 받드십시오</translation>
     </message>
     <message>
         <source>Selected Server has a different version:
@@ -3988,11 +3991,11 @@ These versions are not compatible. Please update your %3</source>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>설치된 비디오 카드를 지원하지 않습니다.성능상의 문제가 자체 리스트를 가지고 진행합니다.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 드라이버 설치 또는 업데이트를 통해 문제를 해결할 수 었습니다.</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
@@ -4000,11 +4003,11 @@ These versions are not compatible. Please update your %3</source>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 카드 드라이버가 감지되지 않거나, 최신버젼이 감지 되었습니다.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>비디어 카드 드라이버의 업데이트 또는 설치하는 것은 영상 모니터링을 하거나 위치 조정 및 검색 동작 시의 성능을 향상 시킵니다.</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
@@ -4313,7 +4316,7 @@ Try to activate your license manually.</source>
     </message>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>인증 키를 얻기 위해 %1에 제공받은 Serial Key와 하드웨어 ID를 이메일로 보내주세요.</translation>
     </message>
     <message>
         <source>Success</source>
@@ -5471,7 +5474,7 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>외부 저장 장치 추가...</translation>
     </message>
 </context>
 <context>
@@ -5545,15 +5548,15 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>업데이트 내용</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>특정 빌드 얻기</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>최종 버젼 얻기</translation>
     </message>
     <message>
         <source>Update from Internet...</source>

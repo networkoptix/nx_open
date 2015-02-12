@@ -408,7 +408,7 @@
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">¡ ADVERTENCIA! Configuración de FPS y calidad en horario de grabación no funcionará!</translation>
+        <translation>ADVERTENCIA! Configuración de FPS y calidad en horario de grabación no funcionará!</translation>
     </message>
 </context>
 <context>
@@ -1733,7 +1733,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Ctrl+Alt+S</source>
@@ -1854,7 +1854,7 @@ Acerca de ...</translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>Combinar con sistema conectado en ese momento...</translation>
     </message>
     <message>
         <source>Close</source>
@@ -3014,7 +3014,7 @@ Puede llevar unos momentos para rellenar en el árbol.</numerusform>
     <message numerus="yes">
         <source>Error while adding camera(s).</source>
         <translation>
-            <numerusform>Error al añadir cámara.</numerusform>
+            <numerusform>Error al añadir cámara(s).</numerusform>
             <numerusform>Error al añadir cámaras.</numerusform>
         </translation>
     </message>
@@ -3304,7 +3304,7 @@ Esto puede tomar mucho tiempo.</translation>
         <source>%1 have no output relays</source>
         <translation>
             <numerusform>%1 no tiene relés de salida</numerusform>
-            <numerusform>%1 no tiene relés de salida</numerusform>
+            <numerusform>%1 no tienen relés de salida</numerusform>
         </translation>
     </message>
 </context>
@@ -3546,7 +3546,10 @@ La otra versión del cliente es necesaria para establecer la conexión con el se
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor tiene una versión diferente:
+ - versión de cliente: %1.
+ - Versión de servidor: %2.
+Tienes que descargar cliente %3 para conectar</translation>
     </message>
     <message>
         <source>You are about to connect to Server which has a different version:
@@ -4025,11 +4028,11 @@ Estas versiones no son compatibles. Por favor, actualice su %3</translation>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hemos detectado que tu tarjeta de video no es compatible. Puede proceder a su propio riesgo.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalar y/o actualizar los controladores de vídeo puede resolver el problema.</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
@@ -4037,11 +4040,11 @@ Estas versiones no son compatibles. Por favor, actualice su %3</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hemos detectado que los controladores de la tarjeta de vídeo puede que no esté instalada o están fuera de fecha.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>La instalación y/o la actualización de sus controladores de vídeo pueden aumentar considerablemente su rendimiento del sistema viendo y trabajando con el vídeo.</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
@@ -4358,7 +4361,7 @@ Intente activar su licencia manualmente.</translation>
     </message>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor envíe el correo electrónico con la Clave de producto y el Hardware ID proporcionado a %1 para obtener un archivo de la Llave de Activación.</translation>
     </message>
     <message>
         <source>Success</source>
@@ -5519,7 +5522,7 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir Almacenamiento externo ...</translation>
     </message>
 </context>
 <context>
@@ -5593,15 +5596,15 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Notas de la versión</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>Obtener una compilación específica</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>Obtenga la Última versión</translation>
     </message>
     <message>
         <source>Update from Internet...</source>
@@ -5717,30 +5720,30 @@ Cierre la aplicación y comenzar de nuevo mediante el acceso directo del menú i
     </message>
     <message numerus="yes">
         <source>The problem is caused by %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>El problema es causado por %n servidor:</numerusform>
+            <numerusform>El problema es causado por %n servidores:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>No free space left on %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>No hay espacio libre en %n servidor:</numerusform>
+            <numerusform>No hay espacio libre en %n servidores:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers are not responding:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n servidor no responden:</numerusform>
+            <numerusform>%n servidores no responden:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers have gone offline:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n servidor ha quedado sin conexión:</numerusform>
+            <numerusform>%n servidores han quedado sin conexión:</numerusform>
         </translation>
     </message>
     <message>
@@ -6330,7 +6333,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>User was renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>El usuario fue renombrado. La contraseña debe ser actualizada.</translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
@@ -6437,7 +6440,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>Pc %1 - Screens %2</source>
         <translation>
             <numerusform>Pc %1 - Pantalla %2</numerusform>
-            <numerusform>Pc %1 - Pantalla %2</numerusform>
+            <numerusform>Pc %1 - Pantallas %2</numerusform>
         </translation>
     </message>
 </context>

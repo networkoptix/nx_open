@@ -10,10 +10,26 @@ import imp
 
 colorizer = None
 
-defaultProfile = "-d180"
+defaultProfile = '-d180'
 srcExtensions = ['.svg', '.ai']
 defaultCustomization = 'default'
 baseCustomizations = ['default', 'digitalwatchdog', 'vista']
+profileFileName = '.profile'
+colorsFileName = '.colors'
+
+def getProfile(sourceFile):
+    fileName = os.path.join(os.path.dirname(sourceFile), profileFileName)
+    if os.path.isfile(fileName):
+        with open(fileName) as file:
+            profile = json.load(file)
+            baseName = os.path.basename(sourceFile)
+            baseName, _ = os.path.splitext(baseName)
+            if profile.has_key(baseName):
+                return profile.get(baseName)
+            else:
+                return profile.get('*', defaultProfile)
+            
+    return defaultProfile
 
 def convert(sourceFile, exportFile, profile):
     with open(os.devnull, 'w') as devnull:
@@ -22,13 +38,15 @@ def convert(sourceFile, exportFile, profile):
 def convertIcon(srcFile, dstFile, colors):
     tmpFile = None
     
+    profile = getProfile(srcFile)
+
     if not colors is None:
         path, _ = os.path.splitext(dstFile)
         tmpFile = path + '__.svg'
         colorizer.colorize(srcFile, tmpFile, colors)
         srcFile = tmpFile
         
-    convert(srcFile, dstFile, defaultProfile)
+    convert(srcFile, dstFile, profile)
     
     if tmpFile:
         os.remove(tmpFile)
