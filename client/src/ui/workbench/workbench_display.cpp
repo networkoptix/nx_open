@@ -1831,10 +1831,11 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
         qDebug() << "thumbnail with time" << dt(thumbnail.actualTime()) << "set to widget" << dt(bestMatching->item()->data<qint64>(Qn::ItemTimeRole, -1));
 #endif
 
+        qint64 targetTime = bestMatching->item()->data<qint64>(Qn::ItemTimeRole, 0);
         bestMatching->display()->camDisplay()->setMTDecoding(false);
         bestMatching->display()->camDisplay()->putData(thumbnail.data());
         bestMatching->display()->camDisplay()->start();
-        bestMatching->display()->archiveReader()->startPaused(thumbnail.time() * 1000ll);
+        bestMatching->display()->archiveReader()->startPaused(targetTime * 1000ll);
     }
 
 }

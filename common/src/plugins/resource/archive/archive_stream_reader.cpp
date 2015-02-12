@@ -343,7 +343,7 @@ void QnArchiveStreamReader::startPaused(qint64 startTime)
 {
     m_pausedStart = true;
     m_singleQuantProcessed = true;
-    channeljumpToUnsync(startTime, 0, startTime);
+    m_requiredJumpTime = m_tmpSkipFramesToTime = startTime;
     start();
 }
 
