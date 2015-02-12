@@ -373,6 +373,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
 
     if (transport && transport->isSyncDone() && aliveData.isAlive)
     {
+        bool needResync = false;
         if (!aliveData.persistentState.values.empty() && transactionLog) 
         {
             // check current persistent state
@@ -382,10 +383,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
                     arg(transport->remotePeer().id.toString()), cl_logDEBUG1 );
                 NX_LOG( QnLog::EC2_TRAN_LOG, lit("peer state:"), cl_logDEBUG1 );
                 printTranState(aliveData.persistentState);
-                if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
-                    queueSyncRequest(transport);
-                else
-                    transport->setState(QnTransactionTransport::Error);
+                needResync = true;
             }
         }
 
@@ -394,11 +392,15 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
             // check current persistent state
             if (!m_runtimeTransactionLog->contains(aliveData.runtimeState)) {
                 qWarning() << "DETECT runtime transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
-                if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
-                    queueSyncRequest(transport);
-                else
-                    transport->setState(QnTransactionTransport::Error);
+                needResync = true;
             }
+        }
+
+        if (needResync) {
+            if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
+                queueSyncRequest(transport);
+            else
+                transport->setState(QnTransactionTransport::Error);
         }
 
     }
@@ -1364,3 +1366,4 @@ void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* han
 }
 
 }
+

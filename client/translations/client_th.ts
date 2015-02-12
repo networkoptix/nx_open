@@ -2785,7 +2785,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1375"/>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>ผสานการเชื่อมต่อกับระบบปัจจุบัน ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1387"/>
@@ -3699,7 +3699,7 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="643"/>
         <source>Error while adding camera(s).</source>
         <translation>
-            <numerusform>เกิดข้อผิดพลาดในขณะที่การเพิ่มกล้อง(s).</numerusform>
+            <numerusform>%n เกิดข้อผิดพลาดขึ้น ในขณะที่เพิ่มกล้อง.</numerusform>
         </translation>
     </message>
     <message>
@@ -3736,7 +3736,7 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="754"/>
         <source>Scanning hosts... (%1)</source>
         <translation>
-            <numerusform>กำลังสแกนโฮสต์ ...(%1)</numerusform>
+            <numerusform>กำลังสแกนโฮสต์ ... (%1)%n</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -3935,7 +3935,7 @@ This can take a lot of time.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="61"/>
         <source>%1 have no input ports</source>
         <translation>
-            <numerusform>%1 ไม่มีพอร์ตเชื่อมต่อ</numerusform>
+            <numerusform>%1 ไม่มีพอร์ตเชื่อมต่อ %n</numerusform>
         </translation>
     </message>
 </context>
@@ -4050,7 +4050,7 @@ This can take a lot of time.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="81"/>
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform>การตรวจสอบการบันทึกหรือการเคลื่อนไหวที่ถูกปิดใช้งานสำหรับ %1</numerusform>
+            <numerusform>การตรวจสอบการบันทึกหรือการเคลื่อนไหวที่ถูกปิดใช้งานสำหรับ %1 %n</numerusform>
         </translation>
     </message>
 </context>
@@ -4068,7 +4068,7 @@ This can take a lot of time.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="71"/>
         <source>%1 have no output relays</source>
         <translation>
-            <numerusform>%1 ไม่มีการแสดงผล</numerusform>
+            <numerusform>%1 ไม่มีการแสดงผล %n</numerusform>
         </translation>
     </message>
 </context>
@@ -4078,7 +4078,7 @@ This can take a lot of time.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="91"/>
         <source>Recording is disabled for %1</source>
         <translation>
-            <numerusform>การบันทึกถูกปิดไว้ สำหรับ %1</numerusform>
+            <numerusform>การบันทึกถูกปิดไว้ สำหรับ %1 %n</numerusform>
         </translation>
     </message>
 </context>
@@ -4364,7 +4364,10 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ที่เลือกไว้มีรุ่นที่แตกต่างกัน:
+  - รุ่นไคลเอนต์: %1
+  - รุ่นของเซิร์ฟเวอร์:%2
+คุณจำเป็นต้องดาวโหลด รุ่นไคลเอนต์ %3 เพื่อเชื่อมต่อ</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="225"/>
@@ -4944,12 +4947,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="38"/>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>เราตรวจพบว่าการ์ดจอของคุณจะไม่ได้รับการสนับสนุน คุณสามารถดำเนินการภายใต้ความเสี่ยงของคุณเอง.</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="39"/>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>การติดตั้งและ / หรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณอาจแก้ไขปัญหา.</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="40"/>
@@ -4959,12 +4962,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="43"/>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>เราตรวจพบว่าไดรเวอร์การ์ดจอของคุณอาจจะไม่ได้ติดตั้งหรือหมดอายุ.</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="44"/>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>การติดตั้งและ / หรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณสามารถเพิ่มประสิทธิภาพระบบของคุณเมื่อคุณจะดูและทำงานร่วมกับวิดีโอ.</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="45"/>
@@ -5352,7 +5355,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="45"/>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาส่งอีเมลที่มีซีรี่คีย์และหมายเลขของฮาร์ดแวร์ให้กับ %1 ที่จะได้รับแฟ้มคีย์การเปิดใช้งาน.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="66"/>
@@ -6774,7 +6777,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="633"/>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>เพื่อหน่วยความจำภายนอก...</translation>
     </message>
 </context>
 <context>
@@ -6866,17 +6869,17 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="119"/>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>หมายเหตุการเผยแพร่</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="120"/>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>รับเฉพาะการสร้าง</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="121"/>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>ได้รับรุ่นล่าสุด</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="160"/>

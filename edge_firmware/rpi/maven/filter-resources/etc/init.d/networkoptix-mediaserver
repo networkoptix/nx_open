@@ -43,6 +43,17 @@ case "$1" in
         fi
         ;;
 
+    start_console)
+        if [ ! -z "$RUNNING_APP_PID" ]; then
+            echo "$APPLICATION_NAME is already running with pid $RUNNING_APP_PID"
+            exit 0
+        fi
+
+        ulimit -n 3072
+        ulimit -c unlimited
+        $BIN_PATH $RUN_ARGS
+        ;;
+
     stop)
         if [ -z "$RUNNING_APP_PID" ]; then
             echo "$APPLICATION_NAME is not running"

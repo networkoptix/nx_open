@@ -272,6 +272,7 @@ QnDbManager::QnDbManager()
     m_needResyncLog(false),
     m_needResyncLicenses(false),
     m_needResyncFiles(false),
+    m_needResyncCameraUserAttributes(false),
     m_dbJustCreated(false),
     m_isBackupRestore(false)
 {
@@ -516,6 +517,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         }
         if (m_needResyncFiles) {
             if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+                return false;
+        }
+        if (m_needResyncCameraUserAttributes) {
+            if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
                 return false;
         }
     }
@@ -1141,6 +1146,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/27_remove_server_status.sql")) {
         return removeServerStatusFromTransactionLog();
     }
+    else if (updateName == lit(":/updates/31_move_group_name_to_user_attrs.sql")) {
+        m_needResyncCameraUserAttributes = true;
+    }
 
     return true;
 }
@@ -1437,6 +1445,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
         INSERT OR REPLACE INTO vms_camera_user_attributes ( \
             camera_guid,                    \
             camera_name,                    \
+            group_name,                     \
             audio_enabled,                  \
             control_enabled,                \
             region,                         \
@@ -1450,6 +1459,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
          VALUES (                           \
             :cameraID,                      \
             :cameraName,                    \
+            :userDefinedGroupName,          \
             :audioEnabled,                  \
             :controlEnabled,                \
             :motionMask,                    \
@@ -2755,6 +2765,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
         SELECT                                           \
             camera_guid as cameraID,                     \
             camera_name as cameraName,                   \
+            group_name as userDefinedGroupName,          \
             audio_enabled as audioEnabled,               \
             control_enabled as controlEnabled,           \
             region as motionMask,                        \
@@ -2809,7 +2820,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList
             coalesce(nullif(cu.camera_name, \"\"), r.name) as name, r.url, \
             coalesce(rs.status, 0) as status, \
             c.vendor, c.manually_added as manuallyAdded, \
-            c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
+            coalesce(nullif(cu.group_name, \"\"), c.group_name) as groupName, \
+            c.group_id as groupId, c.mac, c.model, \
             c.status_flags as statusFlags, c.physical_id as physicalId, \
             cu.audio_enabled as audioEnabled,                  \
             cu.control_enabled as controlEnabled,              \

@@ -1722,22 +1722,20 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         foreach(const QnVirtualCameraResourcePtr &cam, qnResPool->getResources<QnVirtualCameraResource>()) {
             if (!cam || cam->getGroupId() != groupId)
                 continue;
-            cam->setGroupName(name);
+            cam->setUserDefinedGroupName(name);
             modified << cam;
         }
         if (modified.isEmpty())
             return; // very strange outcome - at least camera should be in the list
-        const QList<QnUuid>& idList = idListFromResList(modified);
         connection2()->getCameraManager()->saveUserAttributes(
-            QnCameraUserAttributePool::instance()->getAttributesList(idList),
+            QnCameraUserAttributePool::instance()->getAttributesList(idListFromResList(modified)),
             this, 
             [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
                 at_resources_saved( reqID, errorCode, modified );
                 if (errorCode != ec2::ErrorCode::ok)
                     foreach (const QnVirtualCameraResourcePtr &camera, modified)
-                        camera->setGroupName(oldName);
+                        camera->setUserDefinedGroupName(oldName);
             } );
-        propertyDictionary->saveParamsAsync(idList);
     } else {
         if (!validateResourceName(resource, name))
             return;

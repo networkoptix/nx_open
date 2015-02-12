@@ -323,7 +323,6 @@
             </activation>
             <properties>
                 <qtlib19>DBus</qtlib19>
-                <box>${platform}</box>
             </properties>
             <modules>                       
                 <module>applauncher</module> 
@@ -357,9 +356,9 @@
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
+                <box>windows</box>
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
-                <box>win78</box>
                 <force_x86>false</force_x86>
                 <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
                 <!-- <qt.spec>win32-msvc2012</qt.spec>
@@ -628,6 +627,7 @@
             <properties>
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
+		<target.arch>amd64</target.arch>
             </properties>
         </profile>
         <profile>
@@ -646,6 +646,7 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
+		<target.arch>i386</target.arch>
             </properties>
         </profile>  
         <profile>
@@ -665,6 +666,7 @@
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
                 <arch.dir>i386-linux-gnu/</arch.dir>
+		<target.arch>i386</target.arch>
             </properties>
         </profile>          
         <profile>
