@@ -46,7 +46,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_currentDP(0),
     m_liveQuality(MEDIA_Quality_High),
     m_newLiveQuality(MEDIA_Quality_None),
-    m_streamingSpeed(1),
+    m_streamingSpeed(MAX_STREAMING_SPEED),
     m_multiChannelVideo(false),
     m_adaptiveSleep(MAX_FRAME_DURATION*1000),
     m_useUTCTime(true),
