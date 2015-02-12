@@ -409,7 +409,7 @@ void QnRtspDataConsumer::doRealtimeDelay(QnConstAbstractMediaDataPtr media)
     else {
         qint64 timeDiff = media->timestamp - m_lastRtTime;
         if (timeDiff <= MAX_FRAME_DURATION*1000)
-            m_adaptiveSleep.terminatedSleep(timeDiff / m_streamingSpeed, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
+            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
     }
     m_lastRtTime = media->timestamp;
 }
@@ -452,6 +452,15 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
     if (!media)
         return true;
+
+    if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
+    {
+        Q_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
+        //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
+            //Introduce safe solution
+        if( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) )
+            (static_cast<QnAbstractMediaData*>(nonConstData.data()))->timestamp /= m_streamingSpeed;
+    }
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(data.data());
@@ -546,17 +555,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     static AVRational r = {1, 1000000};
     AVRational time_base = {1, (int)codecEncoder->getFrequency() };
 
-    qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
-    //TODO implying m_streamingSpeed
-    if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
-    {
-        const qint64 packetTimeBak = packetTime;
-        if( m_previousRtpTimestamp != -1 )
-            packetTime = m_previousScaledRtpTimestamp + (packetTime - m_previousRtpTimestamp) * m_streamingSpeed;
-        m_previousRtpTimestamp = packetTimeBak;
-        m_previousScaledRtpTimestamp = packetTime;
-    }
-
+    const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
 
     m_sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && codecEncoder->getNextPacket(m_sendBuffer))

@@ -291,11 +291,32 @@ void QnRtspConnectionProcessor::parseRequest()
 
     QString q = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
     if (q == QString("low"))
+    {
         d->quality = MEDIA_Quality_Low;
+    }
     else if (q == QString("force-high"))
+    {
         d->quality = MEDIA_Quality_ForceHigh;
+    }
+    else if( q.isEmpty() )
+    {
+        d->quality = MEDIA_Quality_High; 
+
+        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
+        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
+        if( !streamIndexStr.isEmpty() )
+        {
+            const int streamIndex = streamIndexStr.toInt();
+            if( streamIndex == 0 )
+                d->quality = MEDIA_Quality_High;
+            else if( streamIndex == 1 )
+                d->quality = MEDIA_Quality_Low;
+        }
+    }
     else
+    {
         d->quality = MEDIA_Quality_High;
+    }
     d->qualityFastSwitch = true;
     d->clientRequest.clear();
 }
