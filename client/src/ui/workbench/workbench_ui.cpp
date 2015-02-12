@@ -2425,7 +2425,6 @@ void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
 
     m_inFreespace = false;
 
-    const bool wasOpened = m_searchOpened;
     m_searchOpened = opened;
 
     QSizeF newSize = opened ? QSizeF(250, 21) : QSizeF(250, 0);
@@ -2437,11 +2436,6 @@ void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
     }
     
     QnSearchLineEdit *searchWidget = navigator()->bookmarksSearchWidget();
-    if (opened && !wasOpened)
-    {
-        searchWidget->enterKeyPressed();
-    }
-    
     searchWidget->setEnabled(opened);
     action(Qn::ToggleBookmarksSearchAction)->setChecked(opened);
 }

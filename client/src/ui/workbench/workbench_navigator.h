@@ -9,7 +9,6 @@
 
 #include <client/client_globals.h>
 
-#include <ui/common/fwd.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -32,6 +31,7 @@ class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 class QnSearchLineEdit;
+class QnSearchQueryStrategy;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;

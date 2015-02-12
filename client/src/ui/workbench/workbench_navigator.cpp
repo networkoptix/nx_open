@@ -262,18 +262,24 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_dayTimeWidget,                    SIGNAL(timeClicked(const QTime &)),                 this,   SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
 
     connect(m_bookmarksSearchWidget, &QnSearchLineEdit::textChanged
-        , m_searchQueryStrategy, &QnSearchQueryStrategy::queryChanged);
+        , m_searchQueryStrategy, &QnSearchQueryStrategy::changeQuery);
     connect(m_bookmarksSearchWidget, &QnSearchLineEdit::enterKeyPressed, this, [this]() 
     { 
         const QString query = m_bookmarksSearchWidget->lineEdit()->text();
-        m_searchQueryStrategy->forciblyQueryChanged(query);
+        m_searchQueryStrategy->changeQueryForcibly(query);
     });
-    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::escKeyPressed, this, [this] 
+    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::enabledChanged, this, [this]()
     {
-        m_searchQueryStrategy->forciblyQueryChanged(lit("")); 
+        const QString query = m_bookmarksSearchWidget->lineEdit()->text();
+        m_searchQueryStrategy->changeQueryForcibly(query);
     });
 
-    connect(m_searchQueryStrategy, &QnSearchQueryStrategy::updateQuery, this, [this](const QString &text)
+    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::escKeyPressed, this, [this] 
+    {
+        m_searchQueryStrategy->changeQueryForcibly(QString()); 
+    });
+
+    connect(m_searchQueryStrategy, &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text)
     {
         if (!m_currentMediaWidget)
             return;

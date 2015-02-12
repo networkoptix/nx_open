@@ -83,8 +83,8 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     , m_occurencesLabel(new QLabel(this))
     , m_searchButton(new QnSearchButton(this))
 
-    , m_foundBookmarks(0)
-    , m_overallBookmarks(0)
+    , m_foundItems(0)
+    , m_overallItems(0)
 
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
@@ -108,7 +108,7 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     connect(m_lineEdit, &QLineEdit::textChanged, this, &QnSearchLineEdit::textChanged);
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
 
-    m_occurencesLabel->setText(getBookmarksCountText(m_foundBookmarks, m_overallBookmarks));
+    m_occurencesLabel->setText(getBookmarksCountText(m_foundItems, m_overallItems));
     m_occurencesLabel->setAutoFillBackground(true);
     setPaletteColor(m_occurencesLabel, QPalette::Base, QColor(50, 127, 50));
 
@@ -170,16 +170,16 @@ QSize QnSearchLineEdit::sizeHint() const {
     return size;
 }
 
-void QnSearchLineEdit::updateFoundBookmarksCount(int count)
+void QnSearchLineEdit::updateFoundItemsCount(int count)
 {
-    m_foundBookmarks = count;
-    m_occurencesLabel->setText(getBookmarksCountText(m_foundBookmarks, m_overallBookmarks));
+    m_foundItems = count;
+    m_occurencesLabel->setText(getBookmarksCountText(m_foundItems, m_overallItems));
 }
 
-void QnSearchLineEdit::updateOverallBookmarksCount(int count)
+void QnSearchLineEdit::updateOverallItemsCount(int count)
 {
-    m_overallBookmarks = count;
-    m_occurencesLabel->setText(getBookmarksCountText(m_foundBookmarks, m_overallBookmarks));
+    m_overallItems = count;
+    m_occurencesLabel->setText(getBookmarksCountText(m_foundItems, m_overallItems));
 }
 
 void QnSearchLineEdit::focusInEvent(QFocusEvent *event) 
@@ -210,6 +210,15 @@ void QnSearchLineEdit::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void QnSearchLineEdit::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::EnabledChange)
+    {
+        m_closeButton->setVisible(isEnabled()); /// To update close button state when hiding/showing
+        emit enabledChanged();
+    }
+}
+
 bool QnSearchLineEdit::event(QEvent *event)
 {
     if (event->type() == QEvent::ShortcutOverride)
@@ -222,10 +231,6 @@ bool QnSearchLineEdit::event(QEvent *event)
             keyEvent->accept();
         }
         return result;
-    }
-    else if (event->type() == QEvent::EnabledChange)
-    {
-        m_closeButton->setVisible(isEnabled()); /// To update close button state when hiding/showing
     }
 
     return QWidget::event(event);

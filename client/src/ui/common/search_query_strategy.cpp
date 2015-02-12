@@ -17,22 +17,22 @@ public:
 
     virtual ~Impl();
 
-    void queryChanged(const QString& query
+    void changeQuery(const QString &query
         , bool forcibly);
 
 private:
-    void updateQuery(const QString& query
+    void updateQuery(const QString &query
         , bool forcibly);
 
 private:
-    void timerEvent(QTimerEvent * event) override;
+    void timerEvent(QTimerEvent *event) override;
 
     void killDelayTimer();
 
 private:
     const int m_minSymbolsCount;
     const int m_delayOnTypingDurationMs;
-    QnSearchQueryStrategy& m_owner;
+    QnSearchQueryStrategy &m_owner;
 
     QString m_currentQuery;
     int m_delayTimerId;
@@ -54,7 +54,7 @@ QnSearchQueryStrategy::Impl::~Impl()
 {
 }
 
-void QnSearchQueryStrategy::Impl::queryChanged(const QString& query
+void QnSearchQueryStrategy::Impl::changeQuery(const QString &query
     , bool forcibly)
 {
     killDelayTimer();
@@ -77,16 +77,16 @@ void QnSearchQueryStrategy::Impl::queryChanged(const QString& query
     }
 }
 
-void QnSearchQueryStrategy::Impl::updateQuery(const QString& query
+void QnSearchQueryStrategy::Impl::updateQuery(const QString &query
     , bool forcibly)
 {
     if (forcibly || (m_currentQuery.size() >= m_minSymbolsCount))
     {
-        m_owner.updateQuery(query);
+        m_owner.queryUpdated(query);
     }
 }
 
-void QnSearchQueryStrategy::Impl::timerEvent(QTimerEvent * event)
+void QnSearchQueryStrategy::Impl::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_delayTimerId)
     {
@@ -118,12 +118,12 @@ QnSearchQueryStrategy::~QnSearchQueryStrategy()
 {
 }
 
-void QnSearchQueryStrategy::queryChanged(const QString& query)
+void QnSearchQueryStrategy::changeQuery(const QString &query)
 {
-    m_impl->queryChanged(query, false);
+    m_impl->changeQuery(query, false);
 }
 
-void QnSearchQueryStrategy::forciblyQueryChanged(const QString& query)
+void QnSearchQueryStrategy::changeQueryForcibly(const QString &query)
 {
-    m_impl->queryChanged(query, true);
+    m_impl->changeQuery(query, true);
 }

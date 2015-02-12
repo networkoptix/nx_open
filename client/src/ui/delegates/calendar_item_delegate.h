@@ -24,12 +24,21 @@ public:
     void setColors(const QnCalendarColors &colors);
 
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    void paintCell(QPainter *painter
+        , const QRect &rect
+        , const QnTimePeriod &localPeriod
+        , const QnTimePeriodStorage &primaryPeriods
+        , const QnTimePeriodStorage &secondaryPeriods
+        , bool isEnabled
+        , bool isSelected) const;
+
+    void paintCellText(QPainter *painter
+        , const QPalette &palette
+        , const QRect &rect
+        , const QString &text
+        , bool isEnabled) const;
     
-    void paintCell(QPainter *painter, const QPalette &palette, const QRect &rect
-        , const QnTimePeriod &period, qint64 localOffset, const QnTimePeriod &enabledRange
-        , const QnTimePeriod &selectedRange, const QnTimePeriodStorage &primaryPeriods
-        , const QnTimePeriodStorage &secondaryPeriods, const QString &text) const;
-   
 private:
     QnCalendarColors m_colors;
 };

@@ -17,12 +17,12 @@ public:
     virtual ~QnSearchQueryStrategy();
 
 signals:
-    void updateQuery(const QString& query);
+    void queryUpdated(const QString &query);
 
 public slots:
-    void queryChanged(const QString& query);
+    void changeQuery(const QString &query);
 
-    void forciblyQueryChanged(const QString& query);
+    void changeQueryForcibly(const QString &query);
 
 private:
     class Impl;

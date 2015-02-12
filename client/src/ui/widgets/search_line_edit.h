@@ -19,10 +19,11 @@ signals:
     void textChanged(const QString &text);
     void escKeyPressed();
     void enterKeyPressed();
+    void enabledChanged();
 
 public slots:
-    void updateFoundBookmarksCount(int count);
-    void updateOverallBookmarksCount(int count);
+    void updateFoundItemsCount(int count);
+    void updateOverallItemsCount(int count);
 
 protected:
     void focusInEvent(QFocusEvent *event) override;
@@ -32,6 +33,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     void inputMethodEvent(QInputMethodEvent *e) override;
     bool event(QEvent *event) override;
+    void changeEvent(QEvent *event);
 
 protected:
     void updateGeometries();
@@ -42,8 +44,8 @@ protected:
     QLabel *m_occurencesLabel;
     QAbstractButton *m_searchButton;
 
-    int m_foundBookmarks;
-    int m_overallBookmarks;
+    int m_foundItems;
+    int m_overallItems;
 };
 
 #endif // SEARCH_LINE_EDIT_H

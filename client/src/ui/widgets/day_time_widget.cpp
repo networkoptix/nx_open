@@ -216,18 +216,13 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
     if (period.startTimeMs - m_localOffset > m_currentTime)
         period = QnTimePeriod();
 
-    m_delegate->paintCell(
-        painter, 
-        palette(), 
-        rect, 
-        period, 
-        m_localOffset,
-        m_enabledPeriod, 
-        m_selectedPeriod, 
-        m_primaryPeriodStorage, 
-        m_secondaryPeriodStorage, 
-        time.toString(m_timeFormat)
-    );
+    const QnTimePeriod localPeriod(period.startTimeMs - m_localOffset, period.durationMs);
+    const bool isEnabled = m_enabledPeriod.intersects(localPeriod);
+    const bool isSelected = m_selectedPeriod.intersects(localPeriod);
+
+    m_delegate->paintCell(painter, rect, localPeriod, m_primaryPeriodStorage
+        , m_secondaryPeriodStorage, isEnabled, isSelected);
+    m_delegate->paintCellText(painter, palette(), rect, time.toString(m_timeFormat), isEnabled);
 }
 
 void QnDayTimeWidget::updateHeaderText() {
