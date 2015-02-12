@@ -10,7 +10,8 @@
 
 QnMutexImpl::QnMutexImpl( QMutex::RecursionMode mode )
 :
-    mutex( mode )
+    mutex( mode ),
+    threadHoldingMutex( 0 )
 {
 }
 

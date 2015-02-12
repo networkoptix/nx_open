@@ -8,6 +8,7 @@
 #include "mutex.h"
 
 #include "mutex_impl.h"
+#include "long_runnable.h"
 
 
 QnMutex::QnMutex( QnMutex::RecursionMode mode )
@@ -28,16 +29,23 @@ void QnMutex::lock(
     int /*lockID*/ )
 {
     m_impl->mutex.lock();
+    m_impl->threadHoldingMutex = QnLongRunnable::currentThreadSystemId();
 }
 
 void QnMutex::unlock()
 {
+    m_impl->threadHoldingMutex = 0;
     m_impl->mutex.unlock();
 }
 
 bool QnMutex::tryLock()
 {
-    return m_impl->mutex.tryLock();
+    if( m_impl->mutex.tryLock() )
+    {
+        m_impl->threadHoldingMutex = QnLongRunnable::currentThreadSystemId();
+        return true;
+    }
+    return false;
 }
 
 

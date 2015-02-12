@@ -8,6 +8,8 @@
 
 #ifdef _DEBUG
 
+#include <cstdint>
+
 #include <QtCore/QMutex>
 
 
@@ -15,6 +17,8 @@ class QnMutexImpl
 {
 public:
     QMutex mutex;
+    //!Thread, that have locked mutex is saved here
+    std::uintptr_t threadHoldingMutex;
 
     QnMutexImpl( QMutex::RecursionMode mode );
 };
