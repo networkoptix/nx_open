@@ -16,8 +16,6 @@ static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
 static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;
 
-static const QLatin1String anyResolution( "*" );
-
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0)
 {}
@@ -151,6 +149,7 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
     CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>( mediaStreamsStr.toLatin1() );
 
     //checking if stream info has been changed
+    QString previouslySavedResolution;
     for( auto it = supportedMediaStreams.streams.begin();
         it != supportedMediaStreams.streams.end();
         ++it )
@@ -160,27 +159,37 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
             if( *it == mediaStreamInfo ||
                 //if new media stream info does not contain resolution, preferring existing one
                 (mediaStreamInfo.codec == it->codec &&
+                 mediaStreamInfo.customStreamParams == it->customStreamParams &&
                  mediaStreamInfo.resolution != it->resolution &&
-                 mediaStreamInfo.resolution == anyResolution) )
+                 mediaStreamInfo.resolution == CameraMediaStreamInfo::anyResolution) )
             {
                 return false;   //stream info has not been changed
             }
+            previouslySavedResolution = std::move(it->resolution);
             supportedMediaStreams.streams.erase( it );
             break;
         }
     }
 
+    CameraMediaStreamInfo newMediaStreamInfo = mediaStreamInfo; //have to copy it anyway to save to supportedMediaStreams.streams
+    if( !previouslySavedResolution.isEmpty() &&
+        newMediaStreamInfo.resolution == CameraMediaStreamInfo::anyResolution )
+    {
+        newMediaStreamInfo.resolution = std::move(previouslySavedResolution);
+    }
 
     //removing non-native streams (they will be re-generated)
     supportedMediaStreams.streams.erase(
         std::remove_if(
             supportedMediaStreams.streams.begin(),
             supportedMediaStreams.streams.end(),
-            []( const CameraMediaStreamInfo& mediaStreamInfo ) -> bool { return mediaStreamInfo.transcodingRequired; } ),
+            []( const CameraMediaStreamInfo& mediaStreamInfo ) -> bool {
+                return mediaStreamInfo.transcodingRequired;
+            } ),
         supportedMediaStreams.streams.end() );
 
     //saving new stream info
-    supportedMediaStreams.streams.push_back( mediaStreamInfo );
+    supportedMediaStreams.streams.push_back( std::move(newMediaStreamInfo) );
 
     saveResolutionList( supportedMediaStreams );
 
@@ -352,26 +361,7 @@ void QnVirtualCameraResource::noCameraIssues()
 }
 
 
-CameraMediaStreamInfo::CameraMediaStreamInfo()
-:
-    encoderIndex( -1 ),
-    resolution( lit("*") ),
-    transcodingRequired( false ),
-    codec( CODEC_ID_NONE )
-{
-}
-
-CameraMediaStreamInfo::CameraMediaStreamInfo(
-    int _encoderIndex,
-    const QSize& _resolution,
-    CodecID _codec )
-:
-    encoderIndex( _encoderIndex ),
-    resolution( _resolution.isValid() ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height()) : anyResolution ),
-    transcodingRequired( false ),
-    codec( _codec )
-{
-}
+const QLatin1String CameraMediaStreamInfo::anyResolution( "*" );
 
 bool CameraMediaStreamInfo::operator==( const CameraMediaStreamInfo& rhs ) const
 {

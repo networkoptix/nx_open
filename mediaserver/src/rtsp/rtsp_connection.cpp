@@ -39,6 +39,7 @@
 #include "utils/network/tcp_listener.h"
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
+#include <utils/common/model_functions.h>
 
 
 class QnTcpListener;
@@ -706,10 +707,28 @@ int QnRtspConnectionProcessor::composeDescribe()
         d->trackInfo.insert(i, trackInfo);
         //d->encoders.insert(i, encoder);
 
+        const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(
+            d->mediaRes->toResource()->getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME ).toLatin1() );
+
+        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
+        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
+        const int mediaStreamIndex = streamIndexStr.isEmpty() ? 0 : streamIndexStr.toInt();
+
+        auto mediaStreamIter = std::find_if(
+            supportedMediaStreams.streams.cbegin(),
+            supportedMediaStreams.streams.cend(),
+            [mediaStreamIndex]( const CameraMediaStreamInfo& streamInfo ) {
+                return streamInfo.encoderIndex == mediaStreamIndex;
+            } );
+        const std::map<QString, QString>& streamParams =
+            mediaStreamIter != supportedMediaStreams.streams.cend()
+            ? mediaStreamIter->customStreamParams
+            : std::map<QString, QString>();
+
         //sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << 0 << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "a=control:trackID=" << i << ENDL;
-        QByteArray additionSDP = encoder->getAdditionSDP();
+        QByteArray additionSDP = encoder->getAdditionSDP( streamParams );
         if (!additionSDP.contains("a=rtpmap:"))
             sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;
         sdp << additionSDP;
