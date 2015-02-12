@@ -100,6 +100,9 @@ namespace ite
     class ContentPacket
     {
     public:
+        static constexpr unsigned MAX_PACKET_SIZE() { return 8 * 1024 * 1024; }
+        static constexpr float TS_ERROR_LIMIT() { return 0.2f; }
+
         enum Flags
         {
             F_IsKey         = 0x1,
@@ -108,6 +111,7 @@ namespace ite
 
         ContentPacket()
         :   m_gotPES(0),
+            m_tsErrCoef(0.0f),
             m_pesPTS(0),
             m_pesDTS(0),
             m_adaptPCR(0),
@@ -155,6 +159,22 @@ namespace ite
                 m_adaptPCR = pkt.adaptPCR();
             if (!m_adaptOPCR)
                 m_adaptOPCR = pkt.adaptOPCR();
+
+            m_tsErrCoef = 0.95f * m_tsErrCoef + 0.05f * (unsigned)pkt.checkbit();
+            if (m_tsErrCoef > TS_ERROR_LIMIT())
+            {
+                printf("Too many TS packets errors.\n");
+                m_gotPES = 0;
+                m_data.clear();
+            }
+
+            // memory limit
+            if (size() >= MAX_PACKET_SIZE())
+            {
+                printf("Elementary stream packet is too big. Something goes wrong.\n");
+                m_gotPES = 0;
+                m_data.clear();
+            }
         }
 
         const uint8_t * data() const { return &m_data[0]; }
@@ -168,6 +188,7 @@ namespace ite
     private:
         std::vector<uint8_t> m_data;
         unsigned m_gotPES;
+        float m_tsErrCoef;
         int64_t m_pesPTS;
         int64_t m_pesDTS;
         uint64_t m_adaptPCR;
@@ -260,12 +281,11 @@ namespace ite
 
         void setDevice(It930x * dev);
 
-        bool synced() const
+        bool synced(uint8_t shift = 0) const
         {
             if (m_buf.size() < MIN_PACKETS_COUNT() * MpegTsPacket::PACKET_SIZE())
                 return false;
 
-            uint8_t shift = m_pos % MpegTsPacket::PACKET_SIZE();
             if (MpegTsPacket(&m_buf[shift] + MpegTsPacket::PACKET_SIZE() * 0).syncOK() &&
                 MpegTsPacket(&m_buf[shift] + MpegTsPacket::PACKET_SIZE() * 1).syncOK() &&
                 MpegTsPacket(&m_buf[shift] + MpegTsPacket::PACKET_SIZE() * 2).syncOK() &&

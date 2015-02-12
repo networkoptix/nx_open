@@ -843,10 +843,10 @@ namespace ite
 
             if (pkt)
             {
+#if 0
                 if (!pkt->size())
                     printf("%s empty packet", __FUNCTION__);
-
-                // TODO: better ContentPacket -> VideoPacket
+#endif
                 VideoPacket * packet = new VideoPacket(pkt->data(), pkt->size());
 
                 packet->setPTS(pkt->pts());

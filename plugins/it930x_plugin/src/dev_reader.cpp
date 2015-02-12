@@ -11,16 +11,41 @@ namespace ite
 
     bool DeviceBuffer::sync()
     {
-        static const unsigned SYNC_COUNT = 2;
+        if (synced())
+            return true;
 
-        for (unsigned i = 0; i < SYNC_COUNT * MpegTsPacket::PACKET_SIZE(); ++i)
+        unsigned shift = 0;
+        for (unsigned i = 0; i < MpegTsPacket::PACKET_SIZE(); ++i)
         {
-            if (synced())
-                return true;
-            uint8_t val;
-            read(&val, 1);
+            if (synced(i))
+            {
+                shift = i;
+                break;
+            }
         }
-        return false;
+
+        if (!shift)
+        {
+#if 1
+        printf("Can't align device reading\n");
+#endif
+            return false;
+        }
+
+#if 1
+        printf("Aligning device reading: %d\n", shift);
+#endif
+        {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            uint8_t buf[MpegTsPacket::PACKET_SIZE()];
+
+            m_buf.clear();
+            m_device->read(buf, MpegTsPacket::PACKET_SIZE() - shift);
+        }
+
+        readDevice();
+        return synced();
     }
 
     int DeviceBuffer::read(uint8_t * buf, int bufSize)
@@ -316,6 +341,7 @@ namespace ite
     bool DevReader::readRetChanCmd(RCCommand& cmd)
     {
         static const unsigned WAIT_TIME_MS = 1000;
+        static const unsigned READ_BLOCK = 1024;
 
         sync();
 
@@ -324,19 +350,23 @@ namespace ite
 
         while (t.elapsed() < WAIT_TIME_MS)
         {
-            if (m_buf.readTSPacket(ts))
+            // check time time to time - sometimes
+            for (unsigned i = 0; i < READ_BLOCK; ++i)
             {
-                MpegTsPacket pkt = ts.packet();
-                if (pkt.syncOK())
+                if (m_buf.readTSPacket(ts))
                 {
-                    uint16_t pid = pkt.pid();
-                    if (pid == It930x::PID_RETURN_CHANNEL)
+                    MpegTsPacket pkt = ts.packet();
+                    if (pkt.syncOK())
                     {
+                        uint16_t pid = pkt.pid();
+                        if (pid == It930x::PID_RETURN_CHANNEL)
+                        {
 #if 1
-                        printf("got RC cmd (TX search)\n");
+                            printf("got RC cmd (TX search)\n");
 #endif
-                        cmd.add(pkt.tsPayload(), pkt.tsPayloadLen());
-                        return true;
+                            cmd.add(pkt.tsPayload(), pkt.tsPayloadLen());
+                            return true;
+                        }
                     }
                 }
             }

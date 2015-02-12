@@ -13,9 +13,10 @@ namespace
 {
     enum FillType 
     {
-        kRecordingFill   = 0x1,
-        kBookmarkFill    = 0x2,
-        kMotionFill      = 0x4
+        kNoFlag         = 0x0,
+        kRecordingFill  = 0x1,
+        kBookmarkFill   = 0x2,
+        kMotionFill     = 0x4
     };
 
     const Qt::BrushStyle kPrimaryBrushStyle = Qt::SolidPattern;
@@ -26,7 +27,6 @@ namespace
 
     int fillType(const QnTimePeriod &period, const QnTimePeriodStorage &periodStorage) 
     {
-        enum { kNoFlag = 0 };
         return ((periodStorage.periods(Qn::MotionContent).intersects(period) ? kMotionFill : kNoFlag)
             | (periodStorage.periods(Qn::RecordingContent).intersects(period) ? kRecordingFill : kNoFlag)
             | (periodStorage.periods(Qn::BookmarksContent).intersects(period) ? kBookmarkFill : kNoFlag));
