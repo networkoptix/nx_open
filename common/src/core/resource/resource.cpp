@@ -29,8 +29,8 @@
 #include "../resource_management/status_dictionary.h"
 
 bool QnResource::m_appStopping = false;
-QnInitResPool QnResource::m_initAsyncPool;
-
+// TODO: #rvasilenko move it to QnResourcePool
+Q_GLOBAL_STATIC(QnInitResPool, initResPool)
 
 static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
@@ -744,11 +744,6 @@ void QnResource::emitModificationSignals( const QSet<QByteArray>& modifiedFields
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
-QnInitResPool* QnResource::initAsyncPoolInstance()
-{
-    return &m_initAsyncPool;
-}
-
 // -----------------------------------------------------------------------------
 
 #ifdef ENABLE_DATA_PROVIDERS
@@ -856,7 +851,7 @@ private:
 void QnResource::stopAsyncTasks()
 {
     m_appStopping = true;
-    m_initAsyncPool.waitForDone();
+    initResPool()->waitForDone();
 }
 
 void QnResource::pleaseStopAsyncTasks()
@@ -881,7 +876,7 @@ void QnResource::initAsync(bool optional)
 
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (optional) {
-        if (m_initAsyncPool.tryStart(task))
+        if (initResPool()->tryStart(task))
             m_lastInitTime = t;
         else
             delete task;
@@ -889,7 +884,7 @@ void QnResource::initAsync(bool optional)
     else {
         m_lastInitTime = t;
         lock.unlock();
-        m_initAsyncPool.start(task);
+        initResPool()->start(task);
     }
 }
 
