@@ -1834,7 +1834,7 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
         bestMatching->display()->camDisplay()->setMTDecoding(false);
         bestMatching->display()->camDisplay()->putData(thumbnail.data());
         bestMatching->display()->camDisplay()->start();
-        bestMatching->display()->archiveReader()->startPaused(thumbnail.time() * 1000ll);
+        bestMatching->display()->archiveReader()->startPaused();
     }
 
 }
