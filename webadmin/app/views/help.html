@@ -1,19 +1,17 @@
 
 
-<div class="row">
-    <ul class="nav col-xs-4">
-        <!--<li>
-            <a href="#help1">Help</a>
-        </li>-->
-        <li ng-repeat="(key, link) in config.helpLinks">
-            <a ng-href="{{link.url}}" target="{{link.target=='new'?'_blank':'_top'}}">{{link.title}}</a>
-        </li>
-    </ul>
-    <div class="col-xs-8">
-        <h1>Help & Support</h1>
-        <h3><a name="help1"></a></h3>
-        <p>Here you can find some usefull links</p>
+    <p>Tools and links to help you better understand/interact with your VMS system</p>
+    <div class="col-xs-12" ng-repeat="(key, link) in config.helpLinks">
+        <h2>{{link.title}}</h2>
+        <p>
+            {{link.description}}
+        </p>
+
+        <a ng-if="link.url" class="btn btn-default pull-right" ng-href="link.url" target="{{link.target=='new'?'_blank':'_top'}}">{{link.button}}</a>
+        <a ng-repeat="(key1, url) in link.urls"
+           class="btn btn-default pull-right"
+           ng-href="url.url"
+           ng-class="url.class"
+           target="{{link.target=='new'?'_blank':'_top'}}">{{url.button}}</a>
+
     </div>
-</div>
-
-

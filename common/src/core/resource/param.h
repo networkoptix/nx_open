@@ -35,6 +35,8 @@ namespace Qn
     static const QString PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME = lit("physicalCameraSettingsXml");
     //!ID of camera in camera_settings.xml or in parameter \a PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME value
     static const QString CAMERA_SETTINGS_ID_PARAM_NAME = lit("cameraSettingsId");
+    static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
+    static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
 }
 
 #endif // QN_PARAM_H
