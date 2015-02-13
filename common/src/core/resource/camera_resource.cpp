@@ -369,7 +369,8 @@ bool CameraMediaStreamInfo::operator==( const CameraMediaStreamInfo& rhs ) const
         && codec == rhs.codec
         && encoderIndex == rhs.encoderIndex
         && resolution == rhs.resolution
-        && transports == rhs.transports;
+        && transports == rhs.transports
+        && customStreamParams == rhs.customStreamParams;
 }
 
 bool CameraMediaStreamInfo::operator!=( const CameraMediaStreamInfo& rhs ) const
