@@ -193,6 +193,16 @@ int NALUnit::decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* ds
     return dstBuffer - initDstBuffer;
 }
 
+QByteArray NALUnit::decodeNAL( const QByteArray& srcBuf )
+{
+    QByteArray decodedStreamBuf;
+    decodedStreamBuf.resize( srcBuf.size() );
+    decodedStreamBuf.resize( NALUnit::decodeNAL(
+        (const quint8*)srcBuf.constData(), (const quint8*)srcBuf.constData() + srcBuf.size(),
+        (quint8*)decodedStreamBuf.data(), decodedStreamBuf.size() ) );
+    return decodedStreamBuf;
+}
+
 int NALUnit::extractUEGolombCode()
 {
     uint cnt = 0;
