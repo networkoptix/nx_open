@@ -37,12 +37,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_defaultParams[QualityParam] = Qn::QualityNormal;
     m_defaultParams[RecordTypeParam] = Qn::RT_Always;
 
-    m_insideColors[Qn::RT_Never] = m_cellColors[Qn::RT_Never] = qnGlobals->noRecordColor();
-    m_insideColors[Qn::RT_MotionOnly] = m_cellColors[Qn::RT_MotionOnly] = qnGlobals->recordMotionColor();
-    m_insideColors[Qn::RT_Always] = m_cellColors[Qn::RT_Always] = qnGlobals->recordAlwaysColor();
-
-    m_cellColors[Qn::RT_MotionAndLowQuality] = qnGlobals->recordMotionColor(); 
-    m_insideColors[Qn::RT_MotionAndLowQuality] = qnGlobals->recordAlwaysColor();
+    updateCellColors();
 
     resetCellValues();
 
@@ -613,8 +608,11 @@ const QnScheduleGridColors &QnScheduleGridWidget::colors() const {
 
 void QnScheduleGridWidget::setColors(const QnScheduleGridColors &colors) {
     m_colors = colors;
+    updateCellColors();
 
     update();
+
+    emit colorsChanged();
 }
 
 QColor QnScheduleGridWidget::disabledCellColor(const QColor &baseColor) const {
@@ -631,4 +629,13 @@ void QnScheduleGridWidget::updateSelectedCellsRect() {
         qSwap(topLeft.ry(), bottomRight.ry());
 
     m_selectedCellsRect = QRect(topLeft, bottomRight);
+}
+
+void QnScheduleGridWidget::updateCellColors() {
+    m_insideColors[Qn::RT_Never] = m_cellColors[Qn::RT_Never] = m_colors.recordNever;
+    m_insideColors[Qn::RT_MotionOnly] = m_cellColors[Qn::RT_MotionOnly] = m_colors.recordMotion;
+    m_insideColors[Qn::RT_Always] = m_cellColors[Qn::RT_Always] = m_colors.recordAlways;
+
+    m_cellColors[Qn::RT_MotionAndLowQuality] = m_colors.recordMotion;
+    m_insideColors[Qn::RT_MotionAndLowQuality] = m_colors.recordAlways;
 }

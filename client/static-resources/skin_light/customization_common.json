@@ -354,7 +354,11 @@
             "normalLabel": "#000000",
             "weekendLabel": "custom_red",
             "selectedLabel": "custom_blue",
-            "disabledLabel": "dark_grey"
+            "disabledLabel": "dark_grey",
+
+            "recordAlways": "#00aa00",
+            "recordNever": "#a0a0a0",
+            "recordMotion": "#be3938"
         }
     }
 

@@ -62,6 +62,8 @@ signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);
 
+    void colorsChanged();
+
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -89,6 +91,9 @@ private:
     QColor disabledCellColor(const QColor &baseColor) const;
 
     void updateSelectedCellsRect();
+
+    void updateCellColors();
+
 private:
     CellParams m_defaultParams;
     CellParams m_gridParams[COL_COUNT][ROW_COUNT];
