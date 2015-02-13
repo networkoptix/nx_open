@@ -70,9 +70,9 @@ QnScheduleGridWidget::~QnScheduleGridWidget() {
     return;
 }
 
-qreal QnScheduleGridWidget::cellSize() const {
-    qreal cellWidth = ((qreal)width() - 0.5 - m_gridLeftOffset)/columnCount();
-    qreal cellHeight = ((qreal)height() - 0.5 - m_gridTopOffset)/rowCount();
+int QnScheduleGridWidget::cellSize() const {
+    int cellWidth = qFloor((width() - 0.5 - m_gridLeftOffset) / columnCount());
+    int cellHeight = qFloor((height() - 0.5 - m_gridTopOffset) / rowCount());
     return qMin(cellWidth, cellHeight);
 }
 
@@ -201,61 +201,63 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
 
     p.setFont(m_gridFont);
+
     p.translate(m_gridLeftOffset, m_gridTopOffset);
 
     // draw grid colors/text
+    qreal trOffset = cellSize / 6;
+    qreal trSize = cellSize / 10;
+
+    QPointF points[6];
+    points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
+    points[1] = QPointF(cellSize - trOffset, trOffset);
+    points[2] = QPointF(cellSize - trOffset, trOffset + trSize);
+    points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
+    points[4] = QPointF(trOffset, cellSize - trOffset);
+    points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
+
     for (int x = 0; x < columnCount(); ++x)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
             uint recordTypeIdx(m_gridParams[x][y][RecordTypeParam].toUInt());
+
             QColor color(m_cellColors[recordTypeIdx]);
             QColor colorInside(m_insideColors[recordTypeIdx]);
-            if (!m_mousePressed) {
-                if ((y == m_mouseMoveCell.y()  && x == m_mouseMoveCell.x()) ||
-                    (m_mouseMoveCell.y() == -1 && x == m_mouseMoveCell.x()) ||
-                    (m_mouseMoveCell.x() == -1 && y == m_mouseMoveCell.y()) ||
-                    (m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == -1))
-                {
-                    color = color.lighter();
-                    colorInside = colorInside.lighter();
-                }
-            }
             if (!m_enabled) {
                 color = disabledCellColor(color);
                 colorInside = disabledCellColor(colorInside);
+            } else {
+                if (!m_mousePressed) {
+                    if ((x == m_mouseMoveCell.x() || m_mouseMoveCell.x() == -1) &&
+                        (y == m_mouseMoveCell.y() || m_mouseMoveCell.y() == -1))
+                    {
+                        color = color.lighter();
+                        colorInside = colorInside.lighter();
+                    }
+                } else if (m_selectedCellsRect.normalized().contains(x, y)) {
+                    uint type = m_defaultParams[RecordTypeParam].toUInt();
+                    color = m_cellColors[type].lighter();
+                    colorInside = m_insideColors[type].lighter();
+                }
             }
 
-            QPointF leftTop(cellSize*x, cellSize*y);
-            p.translate(leftTop);
+            QTransform transform = p.transform();
+            p.translate(x * cellSize, y * cellSize);
 
-            p.fillRect(QRectF(0.0, 0.0, cellSize, cellSize), color);
+            p.fillRect(0.0, 0.0, cellSize, cellSize, color);
 
             {
                 QColor penClr(toTransparent(m_enabled ? m_colors.normalLabel : m_colors.disabledLabel, 0.5));
                 p.setPen(penClr);
 
-                if (m_showFps && m_showQuality) {
-                    QPointF p1(0.0, cellSize);
-                    QPointF p2(cellSize, 0.0);
-                    p.drawLine(p1, p2);
-                }
+                if (m_showFps && m_showQuality)
+                    p.drawLine(1, cellSize - 1, cellSize - 1, 1);
 
                 if (colorInside.toRgb() != color.toRgb()) {
                     p.setBrush(m_enabled ? colorInside : disabledCellColor(colorInside));
                     QColor penClr(toTransparent(m_enabled ? m_colors.disabledLabel : m_colors.normalLabel, 0.5));
                     p.setPen(penClr);
-
-                    qreal trOffset = cellSize/6;
-                    qreal trSize = cellSize/10;
-
-                    QPointF points[6];
-                    points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
-                    points[1] = QPointF(cellSize - trOffset, trOffset);
-                    points[2] = QPointF(cellSize - trOffset, trOffset + trSize);
-                    points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
-                    points[4] = QPointF(trOffset, cellSize - trOffset);
-                    points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
                     p.drawPolygon(points, 6);
                 }
             }
@@ -277,62 +279,40 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
                     p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
             }
 
-            p.setPen(m_colors.normalLabel);
-
-            p.translate(-leftTop.x(),-leftTop.y());
-
+            p.setTransform(transform);
         }
     }
 
     // draw grid lines
-    QColor penClr(m_colors.normalLabel);
-    if (!m_enabled)
-        penClr = m_colors.disabledLabel;
+    p.setPen(m_enabled ? m_colors.normalLabel : m_colors.disabledLabel);
 
-    p.setPen(penClr);
-    for (int x = 0; x <= columnCount(); ++x)
-        p.drawLine(QPointF(cellSize*x, 0), QPointF(cellSize * x, cellSize * rowCount()));
-    for (int y = 0; y <= rowCount(); ++y)
-        p.drawLine(QPointF(0, y*cellSize), QPointF(cellSize * columnCount(), y * cellSize));
+    if (m_cornerText.isEmpty() && m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
+        p.fillRect(-m_gridLeftOffset, -m_gridTopOffset, m_gridLeftOffset, m_gridTopOffset, m_colors.selectedLabel);
+
+    qreal w = cellSize * columnCount();
+    qreal h = cellSize * rowCount();
+
+    p.drawLine(0, -m_gridTopOffset, 0, h);
+    p.drawLine(-m_gridLeftOffset, 0, w, 0);
+
+    for (int x = 1; x <= columnCount(); ++x)
+        p.drawLine(cellSize * x, 0, cellSize * x, h);
+    for (int y = 1; y <= rowCount(); ++y)
+        p.drawLine(0, y * cellSize, w, y * cellSize);
 
     p.translate(-m_gridLeftOffset, -m_gridTopOffset);
 
-
-    QSize max = *(std::max_element(m_weekDaysSize.begin(), m_weekDaysSize.end(),
-        [](QSize a, QSize b){ return a.width() < b.width() || a.height() < b.height(); }));
-
-    QSize spacing(m_gridLeftOffset, m_gridTopOffset);
-    spacing -= max;
-    spacing -= QSize(TEXT_SPACING, TEXT_SPACING);
-
-    penClr = QColor(255, 255, 255, 128);
-    if (!m_enabled)
-        penClr = m_colors.disabledLabel;
-    p.setPen(penClr);
-    p.drawLine(QPoint(spacing.width(), m_gridTopOffset), QPoint(m_gridLeftOffset, m_gridTopOffset));
-    p.drawLine(QPoint(m_gridLeftOffset, spacing.height()), QPoint(m_gridLeftOffset, m_gridTopOffset));
-    
-    if(m_cornerText.isEmpty())
-        if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
-            p.fillRect(QRectF(QPointF(spacing.width(), spacing.height()),
-                              QPointF(m_gridLeftOffset - TEXT_SPACING, m_gridTopOffset - TEXT_SPACING)),
-                       m_colors.selectedLabel);
-
-
     // draw selection
-    QColor defColor = m_cellColors[m_defaultParams[RecordTypeParam].toUInt()];
-    penClr = subColor(defColor, qnGlobals->selectionBorderDelta());
-    if (!m_enabled)
-        penClr = m_colors.disabledLabel;
+    if (!m_selectedRect.isEmpty()) {
+        QColor defColor = m_cellColors[m_defaultParams[RecordTypeParam].toUInt()];
+        QColor brushColor = subColor(defColor, qnGlobals->selectionOpacityDelta());
+        if (!m_enabled)
+            brushColor = disabledCellColor(brushColor);
 
-    p.setPen(penClr);
-    QColor brushClr = subColor(defColor, qnGlobals->selectionOpacityDelta());
-    if (!m_enabled)
-        brushClr = disabledCellColor(brushClr);
-
-    p.setBrush(brushClr);
-    if (!m_selectedRect.isEmpty())
+        p.setPen(m_enabled ? subColor(defColor, qnGlobals->selectionBorderDelta()) : m_colors.disabledLabel);
+        p.setBrush(brushColor);
         p.drawRect(m_selectedRect);
+    }
 }
 
 void QnScheduleGridWidget::resizeEvent(QResizeEvent *event)
@@ -345,6 +325,7 @@ void QnScheduleGridWidget::leaveEvent(QEvent *)
 {
     m_mouseMovePos = QPoint(-1,-1);
     m_mouseMoveCell = QPoint(-2, -2);
+    m_selectedCellsRect = QRect();
     update();
 }
 
@@ -362,6 +343,8 @@ void QnScheduleGridWidget::mouseMoveEvent(QMouseEvent *event)
         m_mouseMoveCell = cell;
         update();
     }
+    if (m_mousePressed)
+        updateSelectedCellsRect();
 }
 
 QPoint QnScheduleGridWidget::mapToGrid(const QPoint &pos, bool doTruncate) const
@@ -399,6 +382,7 @@ void QnScheduleGridWidget::mousePressEvent(QMouseEvent *event)
 
     m_mousePressPos = event->pos();
     m_mousePressed = true;
+    m_mousePressCell = cell;
     if (cell.x() == -1 && cell.y() == -1)
     {
         for (int y = 0; y < rowCount(); ++y)
@@ -419,6 +403,9 @@ void QnScheduleGridWidget::mousePressEvent(QMouseEvent *event)
     {
         updateCellValueInternal(cell);
     }
+
+    m_selectedCellsRect = QRect(cell, cell);
+
     update();
     setEnabled(true);
 }
@@ -632,4 +619,16 @@ void QnScheduleGridWidget::setColors(const QnScheduleGridColors &colors) {
 
 QColor QnScheduleGridWidget::disabledCellColor(const QColor &baseColor) const {
     return toGrayscale(linearCombine(0.5, baseColor, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
+}
+
+void QnScheduleGridWidget::updateSelectedCellsRect() {
+    QPoint topLeft = mapToGrid(m_mousePressPos, true);
+    QPoint bottomRight = mapToGrid(m_mouseMovePos, true);
+
+    if (topLeft.x() > bottomRight.x())
+        qSwap(topLeft.rx(), bottomRight.rx());
+    if (topLeft.y() > bottomRight.y())
+        qSwap(topLeft.ry(), bottomRight.ry());
+
+    m_selectedCellsRect = QRect(topLeft, bottomRight);
 }

@@ -79,7 +79,7 @@ private:
 
     QPoint mapToGrid(const QPoint &pos, bool doTruncate) const;
 
-    qreal cellSize() const;
+    int cellSize() const;
     void initMetrics();
 
     bool isValidCell(const QPoint &cell) const;
@@ -87,6 +87,8 @@ private:
     bool isValidColumn(int column) const;
 
     QColor disabledCellColor(const QColor &baseColor) const;
+
+    void updateSelectedCellsRect();
 private:
     CellParams m_defaultParams;
     CellParams m_gridParams[COL_COUNT][ROW_COUNT];
@@ -100,6 +102,8 @@ private:
     QPoint m_mousePressPos;
     QPoint m_mouseMovePos;
     QPoint m_mouseMoveCell;
+    QPoint m_mousePressCell;
+    QRect m_selectedCellsRect;
     QRect m_selectedRect;
     bool m_mousePressed;
     QFont m_labelsFont;
