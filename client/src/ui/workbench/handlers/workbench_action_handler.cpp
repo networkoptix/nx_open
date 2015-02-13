@@ -1332,20 +1332,16 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     qreal desiredItemAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
     QnResourceWidget *widget = parameters.widget();
     if (widget && widget->hasAspectRatio())
-        desiredItemAspectRatio = widget->aspectRatio();
+        desiredItemAspectRatio = widget->visualAspectRatio();
 
     /* Calculate best size for layout cells. */
     qreal desiredCellAspectRatio = desiredItemAspectRatio;
-    /* If the item is rotated, use its enclosing geometry to get best tiling. */
-    if (!qFuzzyIsNull(widget->item()->rotation())) {
-        QTransform rotationTransform;
-        rotationTransform.rotate(widget->item()->rotation());
-        QRectF rotated = rotationTransform.mapRect(widget->rect());
-        desiredCellAspectRatio = QnGeometry::aspectRatio(rotated);
-    }
 
     /* Aspect ratio of the screen free space. */
-    qreal displayAspectRatio = QnGeometry::aspectRatio(display()->layoutBoundingGeometry());
+    QRectF viewportGeometry = display()->viewportGeometry();
+    qreal displayAspectRatio = viewportGeometry.isNull()
+        ? desiredItemAspectRatio
+        : QnGeometry::aspectRatio(display()->viewportGeometry());
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 
