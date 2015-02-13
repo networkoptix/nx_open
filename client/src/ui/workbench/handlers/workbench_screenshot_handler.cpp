@@ -475,7 +475,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     if (!result.isNull()) {
         qint64 timeMsec = parameters.time == latestScreenshotTime 
             ? QDateTime::currentMSecsSinceEpoch()
-            : parameters.time / 1000;
+            : parameters.adjustedTime / 1000;
 
         QnImageFilterHelper transcodeParams;
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots

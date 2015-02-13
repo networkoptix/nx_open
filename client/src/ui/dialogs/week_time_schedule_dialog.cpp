@@ -21,11 +21,8 @@ QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
     setHelpTopic(this, Qn::EventsActions_Schedule_Help);
 
     // init buttons
-    ui->valueOnButton->setColor(qnGlobals->recordAlwaysColor());
-    ui->valueOnButton->setCheckedColor(qnGlobals->recordAlwaysColor().lighter());
-
-    ui->valueOffButton->setColor(qnGlobals->noRecordColor());
-    ui->valueOffButton->setCheckedColor(qnGlobals->noRecordColor().lighter());
+    connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this, &QnWeekTimeScheduleDialog::updateColors);
+    updateColors();
 
     connect(ui->valueOnButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->valueOffButton,          SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
@@ -131,6 +128,14 @@ void QnWeekTimeScheduleDialog::updateGridParams(bool fromUserInput)
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::RecordTypeParam, recordType);
 
     emit gridParamsChanged();
+}
+
+void QnWeekTimeScheduleDialog::updateColors() {
+    ui->valueOnButton->setColor(ui->gridWidget->colors().recordAlways);
+    ui->valueOnButton->setCheckedColor(ui->gridWidget->colors().recordAlways.lighter());
+
+    ui->valueOffButton->setColor(ui->gridWidget->colors().recordNever);
+    ui->valueOffButton->setCheckedColor(ui->gridWidget->colors().recordNever.lighter());
 }
 
 // -------------------------------------------------------------------------- //

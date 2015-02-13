@@ -602,6 +602,8 @@ void QnLiveStreamProvider::extractSpsPps(
     //generating profile-level-id and sprop-parameter-sets as in rfc6184
     QByteArray profileLevelID;
     QByteArray spropParameterSets;
+    bool spsFound = false;
+    bool ppsFound = false;
 
     for( const std::pair<const quint8*, size_t>& nalu: nalUnits )
     {
@@ -610,15 +612,26 @@ void QnLiveStreamProvider::extractSpsPps(
             case nuSPS:
                 if( nalu.second < 3 )
                     continue;   //invalid sps
+
+                if( spsFound )
+                    continue;
+                else
+                    spsFound = true;
+
                 profileLevelID = QByteArray::fromRawData( (const char*)nalu.first, 3 ).toHex();
-                spropParameterSets =
-                    QByteArray::fromRawData( (const char*)nalu.first, nalu.second ).toBase64() +
+                spropParameterSets = NALUnit::decodeNAL( 
+                    QByteArray::fromRawData( (const char*)nalu.first, nalu.second ) ).toBase64() +
                         "," + spropParameterSets;
                 break;
 
             case nuPPS:
-                spropParameterSets +=
-                    QByteArray::fromRawData( (const char*)nalu.first, nalu.second ).toBase64();
+                if( ppsFound )
+                    continue;
+                else
+                    ppsFound = true;
+
+                spropParameterSets += NALUnit::decodeNAL( 
+                    QByteArray::fromRawData( (const char*)nalu.first, nalu.second ) ).toBase64();
                 break;
         }
     }
