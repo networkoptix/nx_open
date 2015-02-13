@@ -1877,7 +1877,7 @@ void QnWorkbenchUi::updateCalendarGeometry() {
     m_calendarItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
-    m_calendarItem->setPos(geometry.topLeft());
+    m_calendarItem->setPos(geometry.topLeft() - QPointF(0, m_searchWidget->paintSize().height()));
 }
 
 QRectF QnWorkbenchUi::updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry) {
@@ -2498,6 +2498,7 @@ void QnWorkbenchUi::createSearchWidget() {
     m_searchWidget->setProperty(Qn::NoHandScrollOver, true);
     connect(m_searchWidget,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
     connect(m_searchWidget,   &QGraphicsWidget::geometryChanged,          this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
+    connect(m_searchWidget,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
 
     // slider should be highlighted when search widget is hovered
     m_sliderOpacityProcessor->addTargetItem(m_searchWidget);
