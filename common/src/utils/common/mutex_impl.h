@@ -9,8 +9,11 @@
 #ifdef _DEBUG
 
 #include <cstdint>
+#include <stack>
 
 #include <QtCore/QMutex>
+
+#include "../thread/mutex_lock_analyzer.h"
 
 
 class QnMutexImpl
@@ -19,6 +22,8 @@ public:
     QMutex mutex;
     //!Thread, that have locked mutex is saved here
     std::uintptr_t threadHoldingMutex;
+    size_t recursiveLockCount;
+    std::stack<MutexLockKey> currentLockStack;
 
     QnMutexImpl( QMutex::RecursionMode mode );
 };

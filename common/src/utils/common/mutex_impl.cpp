@@ -11,7 +11,8 @@
 QnMutexImpl::QnMutexImpl( QMutex::RecursionMode mode )
 :
     mutex( mode ),
-    threadHoldingMutex( 0 )
+    threadHoldingMutex( 0 ),
+    recursiveLockCount( 0 )
 {
 }
 
