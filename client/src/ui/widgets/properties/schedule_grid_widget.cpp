@@ -79,14 +79,17 @@ void QnScheduleGridWidget::initMetrics() {
     do {
         m_gridLeftOffset = 0;
         m_gridTopOffset = 0;
-        m_weekDaysSize.clear();
+        int maxWidth = 0;
+        int maxHeight = 0;
         QFontMetrics metric(m_labelsFont);
         foreach (const QString &weekDay, m_weekDays) {
             QSize sz = metric.size(Qt::TextSingleLine, weekDay);
-            m_weekDaysSize << sz;
+            maxWidth = qMax(maxWidth, sz.width());
+            maxHeight = qMax(maxHeight, sz.height());
             m_gridLeftOffset = qMax(sz.width(), m_gridLeftOffset);
             m_gridTopOffset = qMax(sz.height(), m_gridTopOffset);
         }
+        m_cornerSize = QSize(maxWidth + TEXT_SPACING, maxHeight + TEXT_SPACING);
         m_gridLeftOffset += TEXT_SPACING;
         m_gridTopOffset += TEXT_SPACING;
         m_labelsFont.setPointSizeF(m_labelsFont.pointSizeF() + fontIncreaseStep);
@@ -149,7 +152,7 @@ QSize QnScheduleGridWidget::minimumSizeHint() const {
 void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
-    if (m_weekDaysSize.isEmpty())
+    if (!m_cornerSize.isValid())
         initMetrics();
     qreal cellSize = this->cellSize();
 
@@ -282,13 +285,13 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
     p.setPen(m_enabled ? m_colors.normalLabel : m_colors.disabledLabel);
 
     if (m_cornerText.isEmpty() && m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
-        p.fillRect(-m_gridLeftOffset, -m_gridTopOffset, m_gridLeftOffset, m_gridTopOffset, m_colors.selectedLabel);
+        p.fillRect(-m_cornerSize.width(), -m_cornerSize.height(), m_cornerSize.width(), m_cornerSize.height(), m_colors.selectedLabel);
 
     qreal w = cellSize * columnCount();
     qreal h = cellSize * rowCount();
 
-    p.drawLine(0, -m_gridTopOffset, 0, h);
-    p.drawLine(-m_gridLeftOffset, 0, w, 0);
+    p.drawLine(0, -m_cornerSize.height(), 0, h);
+    p.drawLine(-m_cornerSize.width(), 0, w, 0);
 
     for (int x = 1; x <= columnCount(); ++x)
         p.drawLine(cellSize * x, 0, cellSize * x, h);

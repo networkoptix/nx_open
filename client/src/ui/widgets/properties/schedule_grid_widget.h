@@ -101,7 +101,7 @@ private:
     bool m_showQuality;
     QString m_cornerText;
     QStringList m_weekDays;
-    QVector<QSize> m_weekDaysSize;
+    QSize m_cornerSize;
     int m_gridLeftOffset;
     int m_gridTopOffset;
     QPoint m_mousePressPos;
