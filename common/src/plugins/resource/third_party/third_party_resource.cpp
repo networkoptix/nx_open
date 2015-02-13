@@ -691,7 +691,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         m_selectedEncoderResolutions = std::move( selectedEncoderResolutions );
     }
 
-    saveResolutionList( mediaStreams );
+    //saveMediaStreamInfoIfNeeded( mediaStreams );
 
     saveParams();
 

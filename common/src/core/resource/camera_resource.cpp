@@ -139,6 +139,25 @@ CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
     return CameraDiagnostics::NoErrorResult();
 }
 
+bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams )
+{
+    bool rez = false;
+    for (const auto& streamInfo: streams.streams)
+        rez |= saveMediaStreamInfoIfNeeded(streamInfo);
+    return rez;
+}
+
+bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMediaStreamInfo& oldParams)
+{
+    if (newParams.codec != oldParams.codec)
+        return false;
+    bool streamParamsMatched = newParams.customStreamParams == oldParams.customStreamParams ||
+         newParams.customStreamParams.empty() && !oldParams.customStreamParams.empty();
+    bool resolutionMatched = newParams.resolution == oldParams.resolution ||
+         newParams.resolution == CameraMediaStreamInfo::anyResolution && oldParams.resolution != CameraMediaStreamInfo::anyResolution;
+    return streamParamsMatched && resolutionMatched;
+}
+
 bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
 {
     //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
@@ -154,17 +173,14 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
         it != supportedMediaStreams.streams.end();
         ++it )
     {
+
         if( it->encoderIndex == mediaStreamInfo.encoderIndex )
         {
-            if( *it == mediaStreamInfo ||
-                //if new media stream info does not contain resolution, preferring existing one
-                (mediaStreamInfo.codec == it->codec &&
-                 mediaStreamInfo.customStreamParams == it->customStreamParams &&
-                 mediaStreamInfo.resolution != it->resolution &&
-                 mediaStreamInfo.resolution == CameraMediaStreamInfo::anyResolution) )
-            {
+            if( *it == mediaStreamInfo)
+                return false;
+            //if new media stream info does not contain resolution, preferring existing one
+            if (isParamsCompatible(mediaStreamInfo, *it))
                 return false;   //stream info has not been changed
-            }
             previouslySavedResolution = std::move(it->resolution);
             supportedMediaStreams.streams.erase( it );
             break;

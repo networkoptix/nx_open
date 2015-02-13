@@ -585,11 +585,13 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         return CameraDiagnostics::ServerTerminatedResult();
 
     //detecting and saving selected resolutions
+    /*
     CameraMediaStreams mediaStreams;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_primaryResolution, m_primaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
     if( m_secondaryResolution.width() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_secondaryResolution, m_secondaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
-    saveResolutionList( mediaStreams );
+    saveMediaStreamInfoIfNeeded( mediaStreams );
+    */
     
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);

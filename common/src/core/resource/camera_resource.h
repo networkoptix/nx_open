@@ -75,14 +75,15 @@ public:
         \return \a true if \a mediaStreamInfo differs from existing and has been saved
     */
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
+    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams );
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
+private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
-
 private:
     QMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
