@@ -193,6 +193,10 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     }
 
     m_locallySavedProperties = other->m_locallySavedProperties;
+    if (m_id.isNull() && !other->m_id.isNull()) {
+        for (const auto& p: other->getProperties())
+            m_locallySavedProperties.emplace(p.name, LocalPropertyValue(p.value, true, true));
+    }
 }
 
 void QnResource::update(const QnResourcePtr& other, bool silenceMode) {

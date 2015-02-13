@@ -3319,7 +3319,8 @@ CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
 #endif
         if (soapWrapper.isNotAuthenticated())
         {
-            setStatus(Qn::Unauthorized);
+            if (!getId().isNull())
+                setStatus(Qn::Unauthorized);
             return CameraDiagnostics::NotAuthorisedResult( getDeviceOnvifUrl() );
         }
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getCapabilities"), soapWrapper.getLastError());
