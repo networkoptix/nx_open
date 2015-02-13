@@ -1338,10 +1338,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     qreal desiredCellAspectRatio = desiredItemAspectRatio;
 
     /* Aspect ratio of the screen free space. */
-    QRectF viewportGeometry = display()->viewportGeometry();
+    QRectF viewportGeometry = display()->boundedViewportGeometry();
+
     qreal displayAspectRatio = viewportGeometry.isNull()
         ? desiredItemAspectRatio
-        : QnGeometry::aspectRatio(display()->viewportGeometry());
+        : QnGeometry::aspectRatio(viewportGeometry);
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 

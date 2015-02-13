@@ -1298,6 +1298,14 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const {
     }
 }
 
+QRectF QnWorkbenchDisplay::boundedViewportGeometry() const {
+    if(m_view == NULL)
+        return QRectF();
+
+    QRect boundedRect = QnGeometry::eroded(m_view->viewport()->rect(), viewportMargins());
+    return QnSceneTransformations::mapRectToScene(m_view, boundedRect);
+}
+
 QPoint QnWorkbenchDisplay::mapViewportToGrid(const QPoint &viewportPoint) const {
     if(m_view == NULL)
         return QPoint();
