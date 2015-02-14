@@ -610,7 +610,7 @@ void QnLiveStreamProvider::extractSpsPps(
         switch( *nalu.first & 0x1f )
         {
             case nuSPS:
-                if( nalu.second < 3 )
+                if( nalu.second < 4 )
                     continue;   //invalid sps
 
                 if( spsFound )
@@ -618,7 +618,7 @@ void QnLiveStreamProvider::extractSpsPps(
                 else
                     spsFound = true;
 
-                profileLevelID = QByteArray::fromRawData( (const char*)nalu.first, 3 ).toHex();
+                profileLevelID = QByteArray::fromRawData( (const char*)nalu.first + 1, 3 ).toHex();
                 spropParameterSets = NALUnit::decodeNAL( 
                     QByteArray::fromRawData( (const char*)nalu.first, nalu.second ) ).toBase64() +
                         "," + spropParameterSets;
