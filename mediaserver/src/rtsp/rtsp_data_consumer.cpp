@@ -555,8 +555,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     static AVRational r = {1, 1000000};
     AVRational time_base = {1, (int)codecEncoder->getFrequency() };
 
-    const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
-
     m_sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && codecEncoder->getNextPacket(m_sendBuffer))
     {
@@ -578,6 +576,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             }
         }
         else {
+            const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
             QnRtspEncoder::buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 
         }
         
