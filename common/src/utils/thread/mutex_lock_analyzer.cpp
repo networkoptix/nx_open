@@ -90,17 +90,11 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
     const MutexLockKey& prevLock = currentThreadPath.front();
     currentThreadPath.push_front( mutexLockPosition );
-    const Digraph<MutexLockKey>::Result res =
-        m_lockDigraph.addEdge( currentThreadPath.front(), mutexLockPosition );
+    std::list<MutexLockKey> existingPath;
+    const Digraph<MutexLockKey>::Result res = m_lockDigraph.addEdge(
+        currentThreadPath.front(), mutexLockPosition, &existingPath );
     if( res != Digraph<MutexLockKey>::loopDetected )
         return;
-
-    //added new edge, checking graph for a loop
-    std::list<MutexLockKey> existingPath;
-    assert( m_lockDigraph.findAnyPath(
-                mutexLockPosition,
-                currentThreadPath.front(),
-                &existingPath ) == Digraph<MutexLockKey>::ok );
 
     //found deadlock between currentThreadPath.top() and mutexLockPosition
     const QString& deadLockMsg = QString::fromLatin1(
@@ -114,6 +108,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
     lk.unlock();
 
     NX_LOG( deadLockMsg, cl_logALWAYS );
+    assert( false );
 }
 
 void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPosition )
@@ -122,8 +117,8 @@ void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPositi
 
     std::deque<MutexLockKey>& currentThreadPath = 
         m_currentLockPathByThread[QnLongRunnable::currentThreadSystemId()];
-    Q_ASSERT( !currentThreadPath.empty() );
-    Q_ASSERT( mutexLockPosition == currentThreadPath.front() );
+    assert( !currentThreadPath.empty() );
+    assert( mutexLockPosition == currentThreadPath.front() );
     currentThreadPath.pop_front();
 }
 

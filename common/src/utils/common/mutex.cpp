@@ -10,6 +10,8 @@
 #include "mutex_impl.h"
 #include "long_runnable.h"
 
+#define ANALYZE_MUTEX_LOCKS
+
 
 ////////////////////////////////////////////////////////////
 //// class QnMutex
@@ -36,20 +38,16 @@ void QnMutex::lock(
     m_impl->threadHoldingMutex = QnLongRunnable::currentThreadSystemId();
     ++m_impl->recursiveLockCount;
 
-    MutexLockKey lockKey(
-        sourceFile,
-        sourceLine,
-        this,
-        lockID );
-    //recursive mutex can be locked multiple times, that's why we need stack
-    MutexLockAnalyzer::instance()->afterMutexLocked( lockKey );
-    m_impl->currentLockStack.push( std::move(lockKey) );
+#ifdef ANALYZE_MUTEX_LOCKS
+    m_impl->afterMutexLocked( sourceFile, sourceLine, lockID );
+#endif
 }
 
 void QnMutex::unlock()
 {
-    MutexLockAnalyzer::instance()->beforeMutexUnlocked( m_impl->currentLockStack.top() );
-    m_impl->currentLockStack.pop();
+#ifdef ANALYZE_MUTEX_LOCKS
+    m_impl->beforeMutexUnlocked();
+#endif
 
     if( --m_impl->recursiveLockCount == 0 )
         m_impl->threadHoldingMutex = 0;

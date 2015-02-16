@@ -26,6 +26,12 @@ public:
     std::stack<MutexLockKey> currentLockStack;
 
     QnMutexImpl( QMutex::RecursionMode mode );
+
+    void afterMutexLocked(
+        const char* sourceFile,
+        int sourceLine,
+        int lockID );
+    void beforeMutexUnlocked();
 };
 
 #endif

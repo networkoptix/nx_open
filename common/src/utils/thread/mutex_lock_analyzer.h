@@ -52,10 +52,13 @@ private:
     std::map<std::uintptr_t, std::deque<MutexLockKey>> m_currentLockPathByThread;
 
     template<class _Iter>
-    QString pathToString( const _Iter& pathStart, const _Iter& /*pathEnd*/ )
+    QString pathToString( const _Iter& pathStart, const _Iter& pathEnd )
     {
-        //TODO
-        return pathStart->toString();
+        QString pathStr;
+        for( _Iter it = pathStart; it != pathEnd; ++it )
+            pathStr += pathStart->toString() + QLatin1String("\n");
+
+        return pathStr;
     }
 };
 

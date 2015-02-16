@@ -31,7 +31,11 @@ QnWaitCondition::~QnWaitCondition()
     
 bool QnWaitCondition::wait( QnMutex* mutex, unsigned long time )
 {
-    return m_impl->cond.wait( &mutex->m_impl->mutex, time );
+    mutex->m_impl->beforeMutexUnlocked();
+    const bool res = m_impl->cond.wait( &mutex->m_impl->mutex, time );
+    //TODO #ak pass proper parameters to the following call
+    mutex->m_impl->afterMutexLocked( nullptr, 0, (int)this );
+    return res;
 }
 
 void QnWaitCondition::wakeAll()

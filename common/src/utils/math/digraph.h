@@ -47,9 +47,16 @@ public:
 
     //!Creates edge between two vertices. If either vertice does not exists, it is added first
     /*!
-        \return \a ok or \a alreadyExists
+        \param foundLoopPath If not \a nullptr, found loop path (if any) is stored here
+        \return\n
+            - \a ok
+            - \a alreadyExists
+            - \a loopDetected
     */
-    Result addEdge( const VerticeKey& from, const VerticeKey& to )
+    Result addEdge(
+        const VerticeKey& from,
+        const VerticeKey& to,
+        std::list<VerticeKey>* const foundLoopPath = nullptr )
     {
         const VIndex vFrom = getVerticeIndex( from );
         const VIndex vTo = getVerticeIndex( to );
@@ -65,8 +72,7 @@ public:
             return alreadyExists;   //edge is already there
 
         //detecting what-if loop
-        std::list<VerticeKey> foundLoopPath;
-        if( findAnyPath( to, from, &foundLoopPath ) == ok )
+        if( findAnyPath( to, from, foundLoopPath ) == ok )
             return loopDetected;
 
         //adding new edge
@@ -75,7 +81,7 @@ public:
     }
 
     /*!
-        \param foundPath In case of success, any path is stored here. \a from and \a to are included
+        \param foundPath In case of success, any path is stored here. \a from and \a to are included. Can be \a nullptr
         \return \a ok or \a notFound
     */
     Result findAnyPath(
@@ -93,7 +99,8 @@ public:
         const Result res = findAnyPathInternal( vFrom, vTo, foundPath );
         if( res != ok )
             return res;
-        foundPath->push_front( from );
+        if( foundPath )
+            foundPath->push_front( from );
         return ok;
     }
 
@@ -163,7 +170,8 @@ private:
             if( (i == to) || (findAnyPathInternal( i, to, foundPath ) == ok) )
             {
                 //saving path
-                foundPath->push_front( startVerticeEdges[i].get().key );
+                if( foundPath )
+                    foundPath->push_front( startVerticeEdges[i].get().key );
                 //unrolling recursive calls
                 return ok;
             }
