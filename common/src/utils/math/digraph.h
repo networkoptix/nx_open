@@ -11,6 +11,7 @@
 #include <limits>
 #include <list>
 #include <vector>
+#include <unordered_map>
 
 #include <boost/optional.hpp>
 
@@ -60,15 +61,11 @@ public:
     {
         const VIndex vFrom = getVerticeIndex( from );
         const VIndex vTo = getVerticeIndex( to );
-        
-        if( m_edges.size() <= vFrom )
-            m_edges.resize( vFrom+1 );
-        if( !m_edges[vFrom] )
-            m_edges[vFrom] = Vertice( from, vFrom );
 
-        if( m_edges[vFrom].get().edges.size() <= vTo )
-            m_edges[vFrom].get().edges.resize( vTo+1 );
-        if( m_edges[vFrom].get().edges[vTo] )
+        auto vFromIter = m_edges.insert( std::make_pair( vFrom, Vertice(from, vFrom) ) );
+        
+        auto vToIter = vFromIter.first->second.edges.find( vTo );
+        if( vToIter != vFromIter.first->second.edges.end() )
             return alreadyExists;   //edge is already there
 
         //detecting what-if loop
@@ -76,7 +73,7 @@ public:
             return loopDetected;
 
         //adding new edge
-        m_edges[vFrom].get().edges[vTo] = Vertice( to, vTo );
+        vFromIter.first->second.edges.insert( std::make_pair( vTo, Vertice(to, vTo) ) );
         return ok;
     }
 
@@ -112,7 +109,7 @@ private:
     {
         VerticeKey key;
         VIndex index;
-        std::vector<boost::optional<Vertice>> edges;
+        std::unordered_map<VIndex, Vertice> edges;
 
         Vertice()
         :
@@ -133,7 +130,7 @@ private:
     static const VIndex npos = VIndex(-1);
 
     std::map<VerticeKey, VIndex, Comp> m_verticeKeyToIndex;
-    std::vector<boost::optional<Vertice>> m_edges;
+    std::unordered_map<VIndex, Vertice> m_edges;
     VIndex m_prevGivenVIndex;
 
     VIndex getVerticeIndex( const VerticeKey& vKey ) const
@@ -158,20 +155,19 @@ private:
         const VIndex& to,
         std::list<VerticeKey>* const foundPath ) const
     {
-        if( (m_edges.size() <= from) || (!m_edges[from]) )
+        auto vIter = m_edges.find( from );
+        if( vIter == m_edges.end() )
             return notFound;
 
-        const std::vector<boost::optional<Vertice>>& startVerticeEdges = m_edges[from].get().edges;
+        const std::unordered_map<VIndex, Vertice>& startVerticeEdges = vIter->second.edges;
         for( size_t i = 0; i < startVerticeEdges.size(); ++i )
+        for( const std::pair<VIndex, Vertice>& vertice: startVerticeEdges )
         {
-            if( !startVerticeEdges[i] )
-                continue;
-
-            if( (i == to) || (findAnyPathInternal( i, to, foundPath ) == ok) )
+            if( (vertice.first == to) || (findAnyPathInternal( vertice.first, to, foundPath ) == ok) )
             {
                 //saving path
                 if( foundPath )
-                    foundPath->push_front( startVerticeEdges[i].get().key );
+                    foundPath->push_front( vertice.second.key );
                 //unrolling recursive calls
                 return ok;
             }
