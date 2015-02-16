@@ -163,7 +163,7 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
     return RTP_FFMPEG_GENERIC_CODE;
 }
 
-QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
+QByteArray QnRtspFfmpegEncoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
 {
     if (!m_codecCtxData.isEmpty()) {
         QString result(lit("a=fmtp:%1 config=%2\r\n"));

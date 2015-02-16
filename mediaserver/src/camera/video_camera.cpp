@@ -203,8 +203,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
             lastKeyTime = m_lastKeyFrame[0]->timestamp;
     }
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
-       (lastKeyTime == AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&
-       m_catalog == QnServer::HiQualityCatalog)
+       (lastKeyTime == AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL))
     {
         if (m_nextMinTryTime == 0)
             m_nextMinTryTime = usecTime + (rand()%5000 + 5000) * 1000ll; // get first screenshot after minor delay

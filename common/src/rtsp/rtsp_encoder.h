@@ -17,7 +17,7 @@ public:
     virtual ~QnRtspEncoder() {}
     void setMediaData(QnConstAbstractMediaDataPtr ctx);
     
-    virtual QByteArray getAdditionSDP() = 0;
+    virtual QByteArray getAdditionSDP( const std::map<QString, QString>& streamParams ) = 0;
 
     /*
     * Set media packet to encode

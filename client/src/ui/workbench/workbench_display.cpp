@@ -1298,6 +1298,14 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const {
     }
 }
 
+QRectF QnWorkbenchDisplay::boundedViewportGeometry() const {
+    if(m_view == NULL)
+        return QRectF();
+
+    QRect boundedRect = QnGeometry::eroded(m_view->viewport()->rect(), viewportMargins());
+    return QnSceneTransformations::mapRectToScene(m_view, boundedRect);
+}
+
 QPoint QnWorkbenchDisplay::mapViewportToGrid(const QPoint &viewportPoint) const {
     if(m_view == NULL)
         return QPoint();
@@ -1831,10 +1839,11 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
         qDebug() << "thumbnail with time" << dt(thumbnail.actualTime()) << "set to widget" << dt(bestMatching->item()->data<qint64>(Qn::ItemTimeRole, -1));
 #endif
 
+        qint64 targetTime = bestMatching->item()->data<qint64>(Qn::ItemTimeRole, 0);
         bestMatching->display()->camDisplay()->setMTDecoding(false);
         bestMatching->display()->camDisplay()->putData(thumbnail.data());
         bestMatching->display()->camDisplay()->start();
-        bestMatching->display()->archiveReader()->startPaused();
+        bestMatching->display()->archiveReader()->startPaused(targetTime * 1000ll);
     }
 
 }

@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <map>
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
@@ -120,8 +122,15 @@ private:
     int m_framesSincePrevMediaStreamCheck;
 
     void updateStreamResolution( int channelNumber, const QSize& newResolution );
-    void extractCodedPictureResolution( const QnCompressedVideoDataPtr& videoData, QSize* const newResolution );
+    void extractMediaStreamParams(
+        const QnCompressedVideoDataPtr& videoData,
+        QSize* const newResolution,
+        std::map<QString, QString>* const customStreamParams = nullptr );
     void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
+    void extractSpsPps(
+        const QnCompressedVideoDataPtr& videoData,
+        std::map<QString, QString>* const customStreamParams );
+
 private:
     QnAbstractVideoCamera* m_owner;
 };

@@ -25,6 +25,8 @@ static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interv
 class QnRtspDataConsumer: public QnAbstractDataConsumer, public QnlTimeSource
 {
 public:
+    static const int MAX_STREAMING_SPEED = INT_MAX;
+
     QnRtspDataConsumer(QnRtspConnectionProcessor* owner);
     ~QnRtspDataConsumer();
 
@@ -56,7 +58,7 @@ public:
 
     // put data without mutex. Used for RTSP connection after lockDataQueue
     void addData(const QnAbstractMediaDataPtr& data);
-    void setUseRealTimeStreamingMode(bool value);
+    void setStreamingSpeed(int speed);
     void setMultiChannelVideo(bool value);
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
@@ -105,7 +107,7 @@ private:
     static QHash<QHostAddress, qint64> m_lastSwitchTime;
     static QSet<QnRtspDataConsumer*> m_allConsumers;
     static QnMutex m_allConsumersMutex;
-    bool m_realtimeMode;
+    int m_streamingSpeed;
     bool m_multiChannelVideo;
     QnAdaptiveSleep m_adaptiveSleep;
     bool m_useUTCTime; // use absolute UTC file for RTP (used for proprietary format)
@@ -119,5 +121,7 @@ private:
 
     QnByteArray m_sendBuffer;
     bool m_someDataIsDropped;
+    qint64 m_previousRtpTimestamp;
+    qint64 m_previousScaledRtpTimestamp;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

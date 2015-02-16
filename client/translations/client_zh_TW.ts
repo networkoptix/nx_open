@@ -1858,7 +1858,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>合併至目前連線的系統...</translation>
     </message>
     <message>
         <source>Close</source>
@@ -3525,7 +3525,10 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>所選伺服器為不同版本:
+ - 客戶端版本: %1.
+ - 企業伺服器版本: %2.
+您必須下載客戶端 %3 才能連線</translation>
     </message>
     <message>
         <source>Selected Server has a different version:
@@ -4010,11 +4013,11 @@ These versions are not compatible. Please update your %3</source>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>我們偵測到您的顯示卡太老舊或不支援. 若要繼續執行程式造成之風險請自行承擔.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>安裝或更新您的顯示卡驅動程式可能可以解決這問題.</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
@@ -4022,11 +4025,11 @@ These versions are not compatible. Please update your %3</source>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>我們偵測到您的顯示卡可能未安裝驅動程式或版本太老舊.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>安裝或更新您的顯示卡驅動程式可有效增進您瀏覽影像時的系統效能.</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
@@ -4338,7 +4341,7 @@ Try to activate your license manually.</source>
     </message>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>請將序號以及硬體ID email給 %1 以取得啟動檔案.</translation>
     </message>
     <message>
         <source>Success</source>
@@ -5493,7 +5496,7 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>新增外部儲存裝置...</translation>
     </message>
 </context>
 <context>
@@ -5567,15 +5570,15 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>更新說明</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>取得特定版號</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>取得最新版本</translation>
     </message>
     <message>
         <source>Update from Internet...</source>

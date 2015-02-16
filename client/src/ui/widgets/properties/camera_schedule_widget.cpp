@@ -163,18 +163,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     // init buttons
-    ui->recordAlwaysButton->setColor(qnGlobals->recordAlwaysColor());
-    ui->recordAlwaysButton->setCheckedColor(qnGlobals->recordAlwaysColor().lighter());
-
-    ui->recordMotionButton->setColor(qnGlobals->recordMotionColor());
-    ui->recordMotionButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
-
-    ui->recordMotionPlusLQButton->setColor(qnGlobals->recordMotionColor());
-    ui->recordMotionPlusLQButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
-    ui->recordMotionPlusLQButton->setInsideColor(qnGlobals->recordAlwaysColor());
-
-    ui->noRecordButton->setColor(qnGlobals->noRecordColor());
-    ui->noRecordButton->setCheckedColor(qnGlobals->noRecordColor().lighter());
+    connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this, &QnCameraScheduleWidget::updateColors);
+    updateColors();
 
     QnCamLicenseUsageHelper helper;
     ui->licensesUsageWidget->init(&helper);
@@ -765,6 +755,14 @@ void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled) {
         ui->fpsSpinBox->setMaximum(m_maxDualStreamingFps);
     else
         ui->fpsSpinBox->setMaximum(m_maxFps);
+}
+
+void QnCameraScheduleWidget::updateColors() {
+    ui->recordAlwaysButton->setColor(ui->gridWidget->colors().recordAlways);
+    ui->recordMotionButton->setColor(ui->gridWidget->colors().recordMotion);
+    ui->recordMotionPlusLQButton->setColor(ui->gridWidget->colors().recordMotion);
+    ui->recordMotionPlusLQButton->setInsideColor(ui->gridWidget->colors().recordAlways);
+    ui->noRecordButton->setColor(ui->gridWidget->colors().recordNever);
 }
 
 // -------------------------------------------------------------------------- //

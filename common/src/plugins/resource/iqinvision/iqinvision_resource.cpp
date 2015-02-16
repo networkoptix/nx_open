@@ -58,13 +58,14 @@ CameraDiagnostics::Result QnPlIqResource::initInternal()
     //TODO #ak: have to 
         //- find request to receive resolution 
         //- or create data provider and decode first frame to find out params (undesirable)
+    /*
     CameraMediaStreams mediaStreams;
     mediaStreams.streams.push_back( CameraMediaStreamInfo(
         PRIMARY_ENCODER_INDEX,
         QSize(1920, 1080),
         isRtp() ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
-    saveResolutionList( mediaStreams );
-
+    saveMediaStreamInfoIfNeeded( mediaStreams );
+    */
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();

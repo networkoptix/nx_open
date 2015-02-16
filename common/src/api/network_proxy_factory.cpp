@@ -17,8 +17,7 @@
 QnNetworkProxyFactory::QnNetworkProxyFactory() {}
 QnNetworkProxyFactory::~QnNetworkProxyFactory() {}
 
-QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, QnNetworkProxyFactory::WhereToPlaceProxyCredentials credentialsBehavior) {
-    Q_UNUSED(credentialsBehavior)
+QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName) {
     const QNetworkProxy &proxy = proxyToResource(resource);
 
     switch (proxy.type()) {
@@ -27,16 +26,18 @@ QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourceP
     case QNetworkProxy::HttpProxy: {
         QUrl url(baseUrl);
         QUrlQuery query(url.query());
-        query.addQueryItem(lit("proxy"), resource->getId().toString());
-        url.setQuery(query);
+        if (proxyQueryParameterName.isEmpty())
+            url.setPath(lit("/proxy/%1%2").arg(resource->getId().toString()).arg(url.path()));
+        else
+            query.addQueryItem(proxyQueryParameterName, resource->getId().toString());
 
+        url.setQuery(query);
         url.setHost(proxy.hostName());
         url.setPort(proxy.port());
 
-        if (!url.userName().isEmpty()) {
+        if (!proxy.user().isEmpty()) {
             QUrlQuery urlQuery(url);
             urlQuery.addQueryItem(lit("proxy_auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(proxy.user(), proxy.password())));
-            urlQuery.addQueryItem(lit("auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(url.userName(), url.password())));
             url.setQuery(urlQuery);
         }
 

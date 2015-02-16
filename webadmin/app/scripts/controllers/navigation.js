@@ -29,5 +29,9 @@ angular.module('webadminApp')
             ipCookie.remove('realm',{ path: '/' });
             ipCookie.remove('username',{ path: '/' });
             window.location.reload();
+        };
+        $scope.alertVisible = true;
+        $scope.closeAlert = function(){
+            $scope.alertVisible = false;
         }
     });

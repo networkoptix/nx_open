@@ -34,7 +34,7 @@ namespace {
         "-----END PUBLIC KEY-----";
 
     /* One analog encoder requires one license to maintain this number of cameras. */
-    const int camerasPerAnalogEncoderCount = 8;
+    const int camerasPerAnalogEncoderCount = 4;
 
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {

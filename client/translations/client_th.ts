@@ -2235,7 +2235,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>ผสานการเชื่อมต่อกับระบบปัจจุบัน ...</translation>
     </message>
     <message>
         <source>Change Cell Aspect Ratio...</source>
@@ -2975,7 +2975,7 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <source>Error while adding camera(s).</source>
         <translation>
-            <numerusform>เกิดข้อผิดพลาดในขณะที่การเพิ่มกล้อง(s).</numerusform>
+            <numerusform>%n เกิดข้อผิดพลาดขึ้น ในขณะที่เพิ่มกล้อง.</numerusform>
         </translation>
     </message>
     <message>
@@ -3005,7 +3005,7 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <source>Scanning hosts... (%1)</source>
         <translation>
-            <numerusform>กำลังสแกนโฮสต์ ...(%1)</numerusform>
+            <numerusform>กำลังสแกนโฮสต์ ... (%1)%n</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -3168,7 +3168,7 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>%1 have no input ports</source>
         <translation>
-            <numerusform>%1 ไม่มีพอร์ตเชื่อมต่อ</numerusform>
+            <numerusform>%1 ไม่มีพอร์ตเชื่อมต่อ %n</numerusform>
         </translation>
     </message>
 </context>
@@ -3262,7 +3262,7 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform>การตรวจสอบการบันทึกหรือการเคลื่อนไหวที่ถูกปิดใช้งานสำหรับ %1</numerusform>
+            <numerusform>การตรวจสอบการบันทึกหรือการเคลื่อนไหวที่ถูกปิดใช้งานสำหรับ %1 %n</numerusform>
         </translation>
     </message>
 </context>
@@ -3278,7 +3278,7 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>%1 have no output relays</source>
         <translation>
-            <numerusform>%1 ไม่มีการแสดงผล</numerusform>
+            <numerusform>%1 ไม่มีการแสดงผล %n</numerusform>
         </translation>
     </message>
 </context>
@@ -3287,7 +3287,7 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>Recording is disabled for %1</source>
         <translation>
-            <numerusform>การบันทึกถูกปิดไว้ สำหรับ %1</numerusform>
+            <numerusform>การบันทึกถูกปิดไว้ สำหรับ %1 %n</numerusform>
         </translation>
     </message>
 </context>
@@ -3517,7 +3517,10 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ที่เลือกไว้มีรุ่นที่แตกต่างกัน:
+  - รุ่นไคลเอนต์: %1
+  - รุ่นของเซิร์ฟเวอร์:%2
+คุณจำเป็นต้องดาวโหลด รุ่นไคลเอนต์ %3 เพื่อเชื่อมต่อ</translation>
     </message>
     <message>
         <source>You are about to connect to Server which has a different version:
@@ -3992,11 +3995,11 @@ These versions are not compatible. Please update your %3</source>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>เราตรวจพบว่าการ์ดจอของคุณจะไม่ได้รับการสนับสนุน คุณสามารถดำเนินการภายใต้ความเสี่ยงของคุณเอง.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>การติดตั้งและ / หรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณอาจแก้ไขปัญหา.</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
@@ -4004,11 +4007,11 @@ These versions are not compatible. Please update your %3</source>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>เราตรวจพบว่าไดรเวอร์การ์ดจอของคุณอาจจะไม่ได้ติดตั้งหรือหมดอายุ.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>การติดตั้งและ / หรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณสามารถเพิ่มประสิทธิภาพระบบของคุณเมื่อคุณจะดูและทำงานร่วมกับวิดีโอ.</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
@@ -4320,7 +4323,7 @@ Try to activate your license manually.</source>
     </message>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาส่งอีเมลที่มีซีรี่คีย์และหมายเลขของฮาร์ดแวร์ให้กับ %1 ที่จะได้รับแฟ้มคีย์การเปิดใช้งาน.</translation>
     </message>
     <message>
         <source>Success</source>
@@ -5476,7 +5479,7 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>เพื่อหน่วยความจำภายนอก...</translation>
     </message>
 </context>
 <context>
@@ -5550,15 +5553,15 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>หมายเหตุการเผยแพร่</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>รับเฉพาะการสร้าง</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>ได้รับรุ่นล่าสุด</translation>
     </message>
     <message>
         <source>Update from Internet...</source>

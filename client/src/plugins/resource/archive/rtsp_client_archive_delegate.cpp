@@ -246,7 +246,8 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
-        checkMinTimeFromOtherServer(m_camera);
+        if (m_isMultiserverAllowed)
+            checkMinTimeFromOtherServer(m_camera);
 
         qint64 endTime = m_position;
         if (m_forcedEndTime)

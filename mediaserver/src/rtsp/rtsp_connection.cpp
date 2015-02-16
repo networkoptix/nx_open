@@ -39,6 +39,7 @@
 #include "utils/network/tcp_listener.h"
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
+#include <utils/common/model_functions.h>
 
 
 class QnTcpListener;
@@ -115,7 +116,7 @@ public:
         prevEndTime(AV_NOPTS_VALUE),
         metadataChannelNum(7),
         audioEnabled(false),
-		wasDualStreaming(false),
+        wasDualStreaming(false),
         wasCameraControlDisabled(false),
         tcpMode(true),
         transcodedVideoSize(640, 480)
@@ -194,7 +195,7 @@ public:
     qint64 prevEndTime;
     int metadataChannelNum;
     bool audioEnabled;
-	bool wasDualStreaming;
+    bool wasDualStreaming;
     bool wasCameraControlDisabled;
     bool tcpMode;
     QSize transcodedVideoSize;
@@ -209,7 +210,7 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStre
 {
     Q_D(QnRtspConnectionProcessor);
     Q_UNUSED(_owner)
-	d->codecId = CODEC_ID_NONE;
+    d->codecId = CODEC_ID_NONE;
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -290,11 +291,32 @@ void QnRtspConnectionProcessor::parseRequest()
 
     QString q = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
     if (q == QString("low"))
+    {
         d->quality = MEDIA_Quality_Low;
+    }
     else if (q == QString("force-high"))
+    {
         d->quality = MEDIA_Quality_ForceHigh;
+    }
+    else if( q.isEmpty() )
+    {
+        d->quality = MEDIA_Quality_High; 
+
+        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
+        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
+        if( !streamIndexStr.isEmpty() )
+        {
+            const int streamIndex = streamIndexStr.toInt();
+            if( streamIndex == 0 )
+                d->quality = MEDIA_Quality_High;
+            else if( streamIndex == 1 )
+                d->quality = MEDIA_Quality_Low;
+        }
+    }
     else
+    {
         d->quality = MEDIA_Quality_High;
+    }
     d->qualityFastSwitch = true;
     d->clientRequest.clear();
 }
@@ -706,10 +728,28 @@ int QnRtspConnectionProcessor::composeDescribe()
         d->trackInfo.insert(i, trackInfo);
         //d->encoders.insert(i, encoder);
 
+        const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(
+            d->mediaRes->toResource()->getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME ).toLatin1() );
+
+        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
+        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
+        const int mediaStreamIndex = streamIndexStr.isEmpty() ? 0 : streamIndexStr.toInt();
+
+        auto mediaStreamIter = std::find_if(
+            supportedMediaStreams.streams.cbegin(),
+            supportedMediaStreams.streams.cend(),
+            [mediaStreamIndex]( const CameraMediaStreamInfo& streamInfo ) {
+                return streamInfo.encoderIndex == mediaStreamIndex;
+            } );
+        const std::map<QString, QString>& streamParams =
+            mediaStreamIter != supportedMediaStreams.streams.cend()
+            ? mediaStreamIter->customStreamParams
+            : std::map<QString, QString>();
+
         //sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << 0 << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "a=control:trackID=" << i << ENDL;
-        QByteArray additionSDP = encoder->getAdditionSDP();
+        QByteArray additionSDP = encoder->getAdditionSDP( streamParams );
         if (!additionSDP.contains("a=rtpmap:"))
             sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;
         sdp << additionSDP;
@@ -895,12 +935,12 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
         if (cameraResource->isAudioEnabled() != d->audioEnabled ||
-		    cameraResource->hasDualStreaming2() != d->wasDualStreaming ||
+            cameraResource->hasDualStreaming2() != d->wasDualStreaming ||
             (!cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled)) 
         {
-			m_needStop = true;
-			d->socket->close();
-		}
+            m_needStop = true;
+            d->socket->close();
+        }
     }
 }
 
@@ -919,12 +959,29 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
 
+    const QUrlQuery urlQuery( d->request.requestLine.url.query() );
+    QString speedStr = urlQuery.queryItemValue( "speed" );
+    if( speedStr.isEmpty() )
+        speedStr = nx_http::getHeaderValue( d->request.headers, "Speed" );
+
     if (!d->dataProcessor) {
         d->dataProcessor = new QnRtspDataConsumer(this);
-	    d->dataProcessor->pauseNetwork();
-	    d->dataProcessor->setUseRealTimeStreamingMode(!d->useProprietaryFormat);
-	    d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
-	}
+        d->dataProcessor->pauseNetwork();
+        int speed = 1;  //real time
+        if( d->useProprietaryFormat )
+        {
+            speed = QnRtspDataConsumer::MAX_STREAMING_SPEED;
+        }
+        else if( !speedStr.isEmpty() )
+        {
+            bool ok = false;
+            const int tmpSpeed = speedStr.toInt(&ok);
+            if( ok && (tmpSpeed > 0) )
+                speed = tmpSpeed;
+        }
+        d->dataProcessor->setStreamingSpeed(speed);
+        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
+    }
     else 
         d->dataProcessor->clearUnprocessedData();
 
@@ -990,9 +1047,9 @@ void QnRtspConnectionProcessor::checkQuality()
             qWarning() << "Primary stream has big fps for camera" << d->mediaRes->toResource()->getUniqueId() << ". Secondary stream is disabled.";
         }
     }
-	QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
-	if (cameraRes) {
-		d->wasDualStreaming = cameraRes->hasDualStreaming2();
+    QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
+    if (cameraRes) {
+        d->wasDualStreaming = cameraRes->hasDualStreaming2();
         d->wasCameraControlDisabled = cameraRes->isCameraControlDisabled();
     }
 }

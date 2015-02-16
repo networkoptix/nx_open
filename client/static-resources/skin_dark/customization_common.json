@@ -6,7 +6,7 @@
         "custom_red":               "#C10505",
         "custom_grey":              "#D4D4D4",
         "custom_green":             "#8ABF22",
-        "darkGrey":                 "#231F20",
+        "dark_grey":                "#231F20",
         "opaqueSelection":          "custom_blue",
         "ptz":                      "opaqueSelection",
         "selection":                "opaqueSelection.setAlpha(110)",

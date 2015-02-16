@@ -110,7 +110,7 @@
     </message>
     <message>
         <source>Camera IP Conflict</source>
-        <translation>IP Konflikt bei Kamera</translation>
+        <translation>IP-Konflikt bei Kamera</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -118,7 +118,7 @@
     </message>
     <message>
         <source>Server Conflict</source>
-        <translation>Server Konflikt</translation>
+        <translation>Serverkonflikt</translation>
     </message>
     <message>
         <source>Server Started</source>
@@ -608,8 +608,8 @@ Parameter: </translation>
     <message numerus="yes">
         <source>%n more %2 will be used. </source>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n %2 mehr wird verwendet.</numerusform>
+            <numerusform>%n %2 mehr werden verwendet.</numerusform>
         </translation>
     </message>
     <message>
@@ -794,7 +794,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Some users have not set their email addresses</source>
-        <translation>Einige Benutzer haben keine Emailadressen gesetzt</translation>
+        <translation>Einige Benutzer haben keine Email Adressen gesetzt</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
@@ -806,7 +806,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Error while sending email</source>
-        <translation>Fehler beim Emailversand</translation>
+        <translation>Fehler beim Email Versand</translation>
     </message>
     <message>
         <source>Storages are full</source>

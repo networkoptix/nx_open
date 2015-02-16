@@ -1591,6 +1591,17 @@
                                 </value>
                             </values>
                         </param>
+                        <param>
+                            <name>stream</name>
+                            <description>Open high quality stream if parameter is 0 or low quality stream if parameter is 1. 
+                                         By default media server auto detect preffered stream index based on destination resolution.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>speed</name>
+                            <description>Playback speed. Only values in range [1..32] are supported. Default value is 1.</description>
+                            <optional>true</optional>
+                        </param>
                     </params>
                     <result>
                         <caption>Return RTSP video stream</caption>
