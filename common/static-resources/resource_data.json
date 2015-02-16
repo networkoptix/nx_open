@@ -28,7 +28,8 @@
         {
             "keys": [
                 "VISTA|VK2-ENCODER",
-                "*|DW-CP04"
+                "*|DW-CP04",
+                "Avigilon|ENC-*"
             ],
             "analogEncoder": true
         },

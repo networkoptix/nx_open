@@ -406,9 +406,15 @@ xiph_fail:
     return NULL;
 }
 
-static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c, int payload_type, AVFormatContext *fmt)
+static char *sdp_write_media_attributes(
+    char *buff,
+    int size,
+    AVCodecContext *c,
+    int payload_type,
+    AVFormatContext *fmt,
+    const std::map<QString, QString>& streamParams )
 {
-    char *config = NULL;
+    char* config = NULL;
 
     switch (c->codec_id) {
         case CODEC_ID_H264: {
@@ -416,13 +422,28 @@ static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c,
             if (fmt && fmt->oformat->priv_class &&
                 av_opt_flag_is_set(fmt->priv_data, "rtpflags", "h264_mode0"))
                 mode = 0;
-            if (c->extradata_size) {
-                config = extradata2psets(c);
-            }
             av_strlcatf(buff, size, "a=rtpmap:%d H264/90000\r\n"
-                                    "a=fmtp:%d packetization-mode=%d%s\r\n",
-                                     payload_type,
-                                     payload_type, mode, config ? config : "");
+                                    "a=fmtp:%d packetization-mode=%d",
+                                     payload_type, payload_type, mode );
+
+            if (c->extradata_size)
+                config = extradata2psets(c);
+            if( config )
+            {
+                av_strlcatf( buff, size, config );
+            }
+            else
+            {
+                auto profileLevelIdIter = streamParams.find( Qn::PROFILE_LEVEL_ID_PARAM_NAME );
+                if( profileLevelIdIter != streamParams.end() )
+                    av_strlcatf( buff, size, "; profile-level-id=%s", profileLevelIdIter->second.toLatin1().constData() );
+
+                auto spropParameterSetsIter = streamParams.find( Qn::SPROP_PARAMETER_SETS_PARAM_NAME );
+                if( spropParameterSetsIter != streamParams.end() )
+                    av_strlcatf( buff, size, "; sprop-parameter-sets=%s", spropParameterSetsIter->second.toLatin1().constData() );
+            }
+
+            av_strlcatf( buff, size, "\r\n" );
             break;
         }
         case CODEC_ID_H263:
@@ -632,12 +653,18 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media,
         m_isOpened = m_transcoder.open(QnConstCompressedVideoDataPtr(), media.dynamicCast<const QnCompressedAudioData>()) == 0;
 }
 
-QByteArray QnUniversalRtpEncoder::getAdditionSDP()
+QByteArray QnUniversalRtpEncoder::getAdditionSDP( const std::map<QString, QString>& streamParams )
 {
     char buffer[1024*16];
     memset(buffer, 0, sizeof(buffer));
     AVCodecContext* ctx = m_isVideo ? m_transcoder.getVideoCodecContext() : m_transcoder.getAudioCodecContext();
-    sdp_write_media_attributes(buffer, sizeof(buffer), ctx, getPayloadtype(), m_transcoder.getFormatContext());
+    sdp_write_media_attributes(
+        buffer,
+        sizeof(buffer),
+        ctx,
+        getPayloadtype(),
+        m_transcoder.getFormatContext(),
+        streamParams );
     return QByteArray(buffer);
 }
 

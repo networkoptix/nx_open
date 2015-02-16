@@ -6,7 +6,7 @@
         "custom_red":               "#C10505",
         "custom_grey":              "#D4D4D4",
         "custom_green":             "#8ABF22",
-        "darkGrey":                 "#231F20",
+        "dark_grey":                 "#231F20",
         "opaqueSelection":          "custom_blue",
         "ptz":                      "opaqueSelection",
         "selection":                "opaqueSelection.setAlpha(110)",
@@ -150,7 +150,7 @@
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, title bar, notifications panel).",
         
-        "colors": ["custom_grey.setAlpha(128)", "darkGrey.setAlpha(32)"],
+        "colors": ["custom_grey.setAlpha(128)", "dark_grey.setAlpha(32)"],
         "frameColor": "#80808080",
         "frameWidth": 1.0
     },
@@ -231,7 +231,7 @@
 
     "QnGridItem": {
         "colors": {
-            "grid": "darkGrey.setAlpha(64)",
+            "grid": "dark_grey.setAlpha(64)",
             "allowed": "#00ff00.setAlpha(64)",
             "disallowed": "#ff0000.setAlpha(64)"
         }
@@ -354,7 +354,11 @@
             "normalLabel": "#000000",
             "weekendLabel": "custom_red",
             "selectedLabel": "custom_blue",
-            "disabledLabel": "dark_grey"
+            "disabledLabel": "dark_grey",
+
+            "recordAlways": "#00aa00",
+            "recordNever": "#a0a0a0",
+            "recordMotion": "#be3938"
         }
     }
 

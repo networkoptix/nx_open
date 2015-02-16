@@ -254,6 +254,7 @@ bool QnArchiveStreamReader::init()
     if (!m_delegate->open(m_resource)) {
         if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
             emit jumpOccured(requiredJumpTime); 
+        m_requiredJumpTime = AV_NOPTS_VALUE;
         return false;
     }
     m_delegate->setAudioChannel(m_selectedAudioChannel);
@@ -338,10 +339,11 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMo
     return rez;
 }
 
-void QnArchiveStreamReader::startPaused()
+void QnArchiveStreamReader::startPaused(qint64 startTime)
 {
     m_pausedStart = true;
     m_singleQuantProcessed = true;
+    m_requiredJumpTime = m_tmpSkipFramesToTime = startTime;
     start();
 }
 
@@ -651,10 +653,14 @@ begin_label:
                     {
                         if (m_cycleMode)
                         {
-                            if (m_delegate->endTime() != DATETIME_NOW)
-                                seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
-                            else
-                                seekTime = qnSyncTime->currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
+                            if (m_delegate->endTime() != DATETIME_NOW) {
+                                m_topIFrameTime = m_delegate->endTime();
+                                seekTime = m_topIFrameTime - BACKWARD_SEEK_STEP;
+                            }
+                            else {
+                                m_topIFrameTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+                                seekTime = m_topIFrameTime - LIVE_SEEK_OFFSET;
+                            }
                         }
                         else {
                             m_eof = true;

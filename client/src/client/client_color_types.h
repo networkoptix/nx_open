@@ -99,8 +99,12 @@ public:
     QColor weekendLabel;
     QColor selectedLabel;
     QColor disabledLabel;
+
+    QColor recordNever;
+    QColor recordAlways;
+    QColor recordMotion;
 };
-#define QnScheduleGridColors_Fields (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel)
+#define QnScheduleGridColors_Fields (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel)(recordNever)(recordAlways)(recordMotion)
 
 
 struct QnGridColors {

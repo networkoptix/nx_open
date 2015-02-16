@@ -105,13 +105,6 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     if( allowedAuthMethods & AuthMethod::noAuth )
         return true;
 
-    if( allowedAuthMethods & AuthMethod::cookie )
-    {
-        const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
-        int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
-        if (customAuthInfoPos >= 0)
-            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId);
-    }
 
     if( allowedAuthMethods & AuthMethod::videowall )
     {
@@ -134,6 +127,14 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
                     return true;
             }
         }
+    }
+
+    if( allowedAuthMethods & AuthMethod::cookie )
+    {
+        const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
+        int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
+        if (customAuthInfoPos >= 0)
+            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId);
     }
 
     if( allowedAuthMethods & AuthMethod::http )
