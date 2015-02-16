@@ -70,8 +70,10 @@ QnSignHelper::QnSignHelper():
     m_licensedToStr = tr("Trial license");
     for (const QnLicensePtr& license: list)
     {
-        if (license->type() != Qn::LC_Trial)
+        if (license->type() != Qn::LC_Trial && license->isValid()) {
             m_licensedToStr = license->name();
+            break;
+        }
     }
 }
 
