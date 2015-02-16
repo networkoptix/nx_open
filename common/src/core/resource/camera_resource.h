@@ -75,14 +75,15 @@ public:
         \return \a true if \a mediaStreamInfo differs from existing and has been saved
     */
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
+    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams );
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
+private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
-
 private:
     QMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
@@ -91,6 +92,8 @@ private:
 class CameraMediaStreamInfo
 {
 public:
+    static const QLatin1String anyResolution;
+
     //!0 - primary stream, 1 - secondary stream
     int encoderIndex;
     //!has format "1920x1080" or "*" to notify that any resolution is supported
@@ -107,17 +110,53 @@ public:
     //!if \a true this stream is produced by transcoding one of native (having this flag set to \a false) stream
     bool transcodingRequired;
     int codec;
+    std::map<QString, QString> customStreamParams;
 
-    CameraMediaStreamInfo();
+    CameraMediaStreamInfo()
+    :
+        encoderIndex( -1 ),
+        resolution( lit("*") ),
+        transcodingRequired( false ),
+        codec( CODEC_ID_NONE )
+    {
+    }
+
     CameraMediaStreamInfo(
         int _encoderIndex,
         const QSize& _resolution,
-        CodecID _codec );
+        CodecID _codec )
+    :
+        encoderIndex( _encoderIndex ),
+        resolution( _resolution.isValid()
+            ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height())
+            : anyResolution ),
+        transcodingRequired( false ),
+        codec( _codec )
+    {
+        //TODO #ak delegate to next constructor after moving to vs2013
+    }
+
+    template<class CustomParamDictType>
+        CameraMediaStreamInfo(
+            int _encoderIndex,
+            const QSize& _resolution,
+            CodecID _codec,
+            CustomParamDictType&& _customStreamParams )
+    :
+        encoderIndex( _encoderIndex ),
+        resolution( _resolution.isValid()
+            ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height())
+            : anyResolution ),
+        transcodingRequired( false ),
+        codec( _codec ),
+        customStreamParams( std::forward<CustomParamDictType>(_customStreamParams) )
+    {
+    }
 
     bool operator==( const CameraMediaStreamInfo& rhs ) const;
     bool operator!=( const CameraMediaStreamInfo& rhs ) const;
 };
-#define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)
+#define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)(customStreamParams)
 
 
 class CameraMediaStreams

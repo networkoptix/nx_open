@@ -80,64 +80,37 @@ module.exports = function (grunt) {
                 livereload: 35729
             },
             proxies: [
-                /*{
-                    context: '/ec2/',
-                    host: '10.0.2.229',
-                    port: 7039,
-                    headers: { //admin:123
-                        'Authorization': 'Basic YWRtaW46MTIz'
-                    }
-                 },
-                 {
-                     context: '/',
-                     host: 'mono',
-                     port: 41000,
-                 }
-                 */
-
-                //'Authorization': 'Basic YWRtaW46MTIz' //admin:123
-                //'Authorization': 'Basic dXNlcjoxMjM='//user:123
-
                 //Total proxy
-                //{context: '/',host: '192.168.56.101',port: 7002,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-
+                //{context: '/',host: '192.168.56.101',port: 9000},
 
                 //Evgeniy
+                {context: '/api/',      host: '192.168.56.101', port: 9000},
+                {context: '/ec2/',      host: '192.168.56.101', port: 9000},
+                {context: '/hls/',      host: '192.168.56.101',port: 9000},
+                {context: '/media/',    host: '192.168.56.101', port: 9000},
+                {context: '/proxy/',    host: '192.168.56.101',port: 9000}/**/
 
-                {context: '/api/', host: '192.168.56.101', port: 9000},
-                {context: '/ec2/', host: '192.168.56.101', port: 9000},
-                {context: '/media/', host: '192.168.56.101', port: 9000},
-                {context: '/hls/', host: '192.168.56.101',port: 9000},
-                {context: '/proxy/', host: '192.168.56.101',port: 9000}
+/*                //Sergey Yuldashev
+                {context: '/api/',      host: '10.0.2.203', port: 8901},
+                {context: '/ec2/',      host: '10.0.2.203', port: 8901},
+                {context: '/hls/',      host: '10.0.2.203', port: 8901},
+                {context: '/media/',    host: '10.0.2.203', port: 8901},
+                {context: '/proxy/',    host: '10.0.2.203', port: 8901}/**/
 
-                //Sergey Yuldashev
-/*                {context: '/api/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/ec2/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/media/',    host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/hls/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
-*/
-                // Sasha
-                /*{context: '/api/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/ec2/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/media/',    host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/hls/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/proxy/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
-*/
-                //Roman Vasilenko  port: 7003,7004,7005,2006
-                /*
+/*                // Sasha
+                {context: '/api/',      host: '10.0.2.119', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.119', port: 7001},
+                {context: '/hls/',      host: '10.0.2.119', port: 7001},
+                {context: '/media/',    host: '10.0.2.119', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.119', port: 7001}/**/
+
+/*                //Roman Vasilenko  port: 7003,7004,7005,2006
                 {context: '/api/', host: '10.0.2.244', port: 7005},
                 {context: '/ec2/', host: '10.0.2.244', port: 7005},
                 {context: '/hls/', host: '10.0.2.244', port: 7005},
                 {context: '/media/', host: '10.0.2.244', port: 7005},
-                {context: '/proxy/', host: '10.0.2.244', port: 7005}
-*/
-                //Daria
-                //{context: '/api/', host: '10.0.2.229', port: 7039, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                //{context: '/ec2/', host: '10.0.2.229', port: 7039, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
+                {context: '/proxy/', host: '10.0.2.244', port: 7005}/**/
 
-                //Denis
-                //{context: '/api/', host: '10.0.2.182', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                //{context: '/ec2/', host: '10.0.2.182', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
             ],
             livereload: {
                 options: {

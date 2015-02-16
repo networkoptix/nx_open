@@ -145,6 +145,9 @@ void QnGridRaisedConeItem::updateGeometry() {
     m_targetRect = m_widget->geometry();
     m_rotation = m_widget->rotation();
 
+    if (!this->scene())
+        return;
+
     qreal coneOpacity = m_effectEnabled
             ? m_originRect.width() > 0
               ? qBound(0.0, m_targetRect.width() / m_originRect.width() - 1.0, 1.0)

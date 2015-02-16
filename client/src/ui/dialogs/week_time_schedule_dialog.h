@@ -29,6 +29,8 @@ signals:
 private slots:
     void updateGridParams(bool fromUserInput = false);
 
+    void updateColors();
+
     void at_gridWidget_cellActivated(const QPoint &cell);
 private:
     void connectToGridWidget();

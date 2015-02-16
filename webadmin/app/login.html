@@ -28,6 +28,10 @@
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
 
+<navbar no-panel="true"></navbar>
+
+<div class="container" ng-view=""></div>
+
 <!--[if lt IE 9]>
 <script src="bower_components/es5-shim/es5-shim.js"></script>
 <script src="bower_components/json3/lib/json3.min.js"></script>
@@ -44,7 +48,7 @@
 <script src="bower_components/angular-route/angular-route.js"></script>
 <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 <script src="bower_components/underscore/underscore.js"></script>
-<script src="bower_components/Chart.js/Chart.min.js"></script>
+<script src="bower_components/Chart.js/Chart.js"></script>
 <script src="bower_components/tc-angular-chartjs/dist/tc-angular-chartjs.min.js"></script>
 <script src="bower_components/videogular/videogular.js"></script>
 <script src="bower_components/videogular-buffering/buffering.js"></script>
@@ -72,8 +76,6 @@
 <script src="scripts/services/auth.js"></script>
 
 <script src="scripts/directives/navbar.js"></script>
-
-<script src="scripts/controllers/main.js"></script>
 <script src="scripts/controllers/navigation.js"></script>
 <script src="scripts/controllers/login.js"></script>
 <!-- endbuild -->

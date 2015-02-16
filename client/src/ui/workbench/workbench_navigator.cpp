@@ -472,6 +472,8 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
     m_syncedWidgets.insert(widget);
     m_syncedResources.insert(widget->resource()->toResourcePtr(), QHashDummyValue());
 
+    connect(widget->resource()->toResource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+
     updateCurrentWidget();
     updateSyncedPeriods();
 }
@@ -479,6 +481,8 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
 void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     if(!m_syncedWidgets.remove(widget))
         return;
+
+    disconnect(widget->resource()->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
     if (display() && !display()->isChangingLayout()){
         if(m_syncedWidgets.contains(m_currentMediaWidget))
@@ -696,7 +700,13 @@ void QnWorkbenchNavigator::updateCentralWidget() {
     if(m_centralWidget == centralWidget)
         return;
 
+    if (m_centralWidget && m_centralWidget->resource())
+        disconnect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+
     m_centralWidget = centralWidget;
+
+    if (m_centralWidget && m_centralWidget->resource())
+        connect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
     updateCurrentWidget();
     updateThumbnailsLoader();
@@ -706,7 +716,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     QnResourceWidget *widget = m_centralWidget;
     if (m_currentWidget == widget)
         return;
-    
+
     QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
 
     emit currentWidgetAboutToBeChanged();
@@ -720,6 +730,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         else
             updateItemDataFromSlider(m_currentWidget);
         disconnect(m_currentWidget->resource(), NULL, this, NULL);
+        connect(m_currentWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
     } else {
         m_sliderDataInvalid = true;
         m_sliderWindowInvalid = true;

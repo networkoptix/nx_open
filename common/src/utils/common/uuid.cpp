@@ -24,7 +24,7 @@ QnUuid::QnUuid( const QString& text )
     {
         if (text.size() == 38)
             m_stringRepresentation = text;
-        assert(
+        Q_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
             text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
@@ -38,7 +38,7 @@ QnUuid::QnUuid( const QByteArray& text )
     {
         if (text.size() == 38)
             m_byteArrayRepresentation = text;
-        assert(
+        Q_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
             text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }

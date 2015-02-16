@@ -18,7 +18,7 @@ public:
     QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, CodecID transcodeToCodec, const QSize& videoSize,
                           const QnImageFilterHelper& extraTranscodeParams);
 
-    virtual QByteArray getAdditionSDP() override;
+    virtual QByteArray getAdditionSDP( const std::map<QString, QString>& streamParams ) override;
 
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
