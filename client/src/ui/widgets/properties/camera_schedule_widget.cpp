@@ -759,17 +759,10 @@ void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled) {
 
 void QnCameraScheduleWidget::updateColors() {
     ui->recordAlwaysButton->setColor(ui->gridWidget->colors().recordAlways);
-    ui->recordAlwaysButton->setCheckedColor(ui->gridWidget->colors().recordAlways.lighter());
-
     ui->recordMotionButton->setColor(ui->gridWidget->colors().recordMotion);
-    ui->recordMotionButton->setCheckedColor(ui->gridWidget->colors().recordMotion.lighter());
-
     ui->recordMotionPlusLQButton->setColor(ui->gridWidget->colors().recordMotion);
-    ui->recordMotionPlusLQButton->setCheckedColor(ui->gridWidget->colors().recordMotion.lighter());
     ui->recordMotionPlusLQButton->setInsideColor(ui->gridWidget->colors().recordAlways);
-
     ui->noRecordButton->setColor(ui->gridWidget->colors().recordNever);
-    ui->noRecordButton->setCheckedColor(ui->gridWidget->colors().recordNever.lighter());
 }
 
 // -------------------------------------------------------------------------- //

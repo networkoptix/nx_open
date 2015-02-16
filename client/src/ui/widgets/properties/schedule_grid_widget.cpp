@@ -25,6 +25,8 @@ namespace {
 
     const qreal fontIncreaseStep = 0.5;
 
+    const int highlightFactor = 120;
+
 } // anonymous namespace
 
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
@@ -230,13 +232,13 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
                     if ((x == m_mouseMoveCell.x() || m_mouseMoveCell.x() == -1) &&
                         (y == m_mouseMoveCell.y() || m_mouseMoveCell.y() == -1))
                     {
-                        color = color.lighter();
-                        colorInside = colorInside.lighter();
+                        color = color.lighter(highlightFactor);
+                        colorInside = colorInside.lighter(highlightFactor);
                     }
                 } else if (m_selectedCellsRect.normalized().contains(x, y)) {
                     uint type = m_defaultParams[RecordTypeParam].toUInt();
-                    color = m_cellColors[type].lighter();
-                    colorInside = m_insideColors[type].lighter();
+                    color = m_cellColors[type].lighter(highlightFactor);
+                    colorInside = m_insideColors[type].lighter(highlightFactor);
                 }
             }
 
