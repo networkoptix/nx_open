@@ -19,16 +19,16 @@ namespace ite
     DEFAULT_REF_COUNTER(VideoPacket)
 
     VideoPacket::VideoPacket(const uint8_t* data, unsigned size)
-    :   m_refManager( this ),
+    :   m_refManager(this),
         m_size(0),
         m_pts(0),
         m_time(0),
         m_flags(0)
     {
-        if (data)
+        if (data && size)
         {
             m_data = std::shared_ptr<uint8_t>(
-                (uint8_t*)nxpt::mallocAligned( size + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT), freeAlignedX );
+                (uint8_t*) nxpt::mallocAligned(size + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT), freeAlignedX );
             memcpy( m_data.get(), data, size );
             memset( m_data.get() + size, 0, nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE );
             m_size = size;

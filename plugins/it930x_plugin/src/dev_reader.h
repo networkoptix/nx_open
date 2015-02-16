@@ -63,17 +63,17 @@ namespace ite
         typedef std::shared_ptr<ContT> BufT;
         typedef Pool<BufT, MAX_ELEMENTS> PoolT;
 
+        TsBuffer()
+        :   m_pool(nullptr)
+        {
+        }
+
         TsBuffer(PoolT& pool)
         :   m_buf(pool.pop()),
             m_pool(&pool)
         {
             if (!m_buf)
-            {
-#if 0
-                ContextTimer("TS alloc");
-#endif
                 m_buf = std::make_shared<ContT>(MpegTsPacket::PACKET_SIZE());
-            }
         }
 
         ~TsBuffer()
@@ -81,6 +81,24 @@ namespace ite
             if (m_buf.unique())
                 m_pool->push(m_buf);
         }
+
+        TsBuffer(const TsBuffer& ts)
+        :   m_buf(ts.m_buf),
+            m_pool(ts.m_pool)
+        {
+        }
+
+        TsBuffer& operator = (const TsBuffer& ts)
+        {
+            if (m_buf && m_buf.unique())
+                m_pool->push(m_buf);
+
+            m_buf = ts.m_buf;
+            m_pool = ts.m_pool;
+            return *this;
+        }
+
+        operator bool() const { return m_buf.get(); }
 
         MpegTsPacket packet() const { return MpegTsPacket(data()); }
 
@@ -123,9 +141,9 @@ namespace ite
             m_data.reserve(SIZE_RESERVE);
         }
 
-        void append(const TsBuffer& buf)
+        void append(const TsBuffer& ts)
         {
-            MpegTsPacket pkt = buf.packet();
+            MpegTsPacket pkt = ts.packet();
             if (!m_gotPES && !pkt.isPES())
             {
                 //printf("TS lost: waiting for PES\n");
@@ -224,8 +242,8 @@ namespace ite
             m_queues[pid] = TsQueue();
         }
 
-        void push(TsBuffer& ts);
-        bool pop(uint16_t pid, TsBuffer& ts);
+        void push(const TsBuffer& ts);
+        TsBuffer pop(uint16_t pid);
 
         size_t size(uint16_t pid) const
         {

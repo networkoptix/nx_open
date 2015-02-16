@@ -140,11 +140,16 @@ namespace ite
                 rxDevs[rxID] = std::make_shared<RxDevice>(rxID); // create RxDevice
         }
 
+        size_t numRx = 0;
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             m_rxDevs.swap(rxDevs);
+            numRx = m_rxDevs.size();
         }
+#if 1
+        printf("got RX devices: %ld\n", numRx);
+#endif
     }
 
     void DeviceMapper::updateTxDevices(unsigned chan)
@@ -170,6 +175,19 @@ namespace ite
             link.frequency = freq;
             checkLink(scanDevs[i], link);
         }
+
+#if 1
+        size_t numTx = 0;
+        size_t numLinks = 0;
+        {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            numTx = m_txDevs.size();
+            numLinks = m_devLinks.size();
+        }
+        printf("got TX devices: %ld\n", numTx);
+        printf("got TX-RX links: %ld\n", numLinks);
+#endif
     }
 
     // THINK: could check TxID changes here

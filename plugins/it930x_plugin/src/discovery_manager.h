@@ -39,11 +39,6 @@ namespace ite
         virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
         virtual int getReservedModelList( char** modelList, int* count ) override;
 
-        //
-
-        static nxpt::CommonRefManager * refManager() { return &(Instance->m_refManager); }
-        static DiscoveryManager * instance() { return Instance; }
-
     private:
         static DiscoveryManager * Instance;
 

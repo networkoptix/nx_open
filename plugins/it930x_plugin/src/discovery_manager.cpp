@@ -25,7 +25,7 @@ namespace ite
     DiscoveryManager * DiscoveryManager::Instance;
 
     DiscoveryManager::DiscoveryManager()
-    :   m_refManager( this )
+    :   m_refManager(this)
     {
         Instance = this;
     }
@@ -152,7 +152,6 @@ namespace ite
                 auto sp = std::make_shared<CameraManager>(info, &m_devMapper);  // create CameraManager
                 m_cameras[txID] = sp;
                 cam = sp.get();
-                cam->addRef();
 
                 m_devMapper.restoreCamera(info);
             }

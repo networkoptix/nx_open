@@ -103,10 +103,9 @@ namespace ite
 #endif
 
     StreamReader::StreamReader(CameraManager * cameraManager, int encoderNumber)
-    :
-        m_refManager( this ),
-        m_cameraManager( cameraManager ),
-        m_encoderNumber( encoderNumber )
+    :   m_refManager(this),
+        m_cameraManager(cameraManager),
+        m_encoderNumber(encoderNumber)
     {
         m_cameraManager->openStream(m_encoderNumber);
     }

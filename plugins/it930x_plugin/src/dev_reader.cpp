@@ -27,7 +27,7 @@ namespace ite
         if (!shift)
         {
 #if 1
-        printf("Can't align device reading\n");
+            printf("Can't align device reading\n");
 #endif
             return false;
         }
@@ -109,7 +109,7 @@ namespace ite
 
     // Demux
 
-    void Demux::push(TsBuffer& ts)
+    void Demux::push(const TsBuffer& ts)
     {
         uint16_t pid = ts.packet().pid();
         TsQueue * q = queue(pid);
@@ -140,29 +140,29 @@ namespace ite
         q->push_back(ts);
     }
 
-    bool Demux::pop(uint16_t pid, TsBuffer& ts)
+    TsBuffer Demux::pop(uint16_t pid)
     {
         TsQueue * q = queue(pid);
         if (!q)
-            return false;
+            return TsBuffer();
 
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         if (q->size())
         {
-            ts = q->front();
+            TsBuffer ts = q->front();
             q->pop_front();
-            return true;
+            return ts;
         }
 
-        return false;
+        return TsBuffer();
     }
 
     ContentPacketPtr Demux::dumpPacket(uint16_t pid)
     {
         TsQueue * q = queue(pid);
         if (!q)
-            return 0;
+            return ContentPacketPtr();
 
         ContentPacketPtr pkt = std::make_shared<ContentPacket>();
 
@@ -171,8 +171,6 @@ namespace ite
         bool gotPES = false;
         while (q->size())
         {
-            TsBuffer ts = q->front();
-
             if (q->front().packet().isPES())
             {
                 if (gotPES)
@@ -201,6 +199,12 @@ namespace ite
         m_demux.addPid(Pacidal::PID_VIDEO_HD);
         m_demux.addPid(Pacidal::PID_VIDEO_SD);
         m_demux.addPid(Pacidal::PID_VIDEO_CIF);
+
+        m_packetQueues[It930x::PID_RETURN_CHANNEL] = PacketsQueue();
+        m_packetQueues[Pacidal::PID_VIDEO_FHD] = PacketsQueue();
+        m_packetQueues[Pacidal::PID_VIDEO_HD] = PacketsQueue();
+        m_packetQueues[Pacidal::PID_VIDEO_SD] = PacketsQueue();
+        m_packetQueues[Pacidal::PID_VIDEO_CIF] = PacketsQueue();
 
         // alloc TS pool
         {
@@ -296,23 +300,22 @@ namespace ite
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-            PacketsQueue * q = nullptr;
             auto it = m_packetQueues.find(pid);
-            if (it != m_packetQueues.end())
-                q = &it->second;
-            else
-                q = &m_packetQueues[pid];
+            if (it == m_packetQueues.end())
+            {
+#if 1
+                printf("Packet for unknown PID: %d\n", pid);
+#endif
+                return;
+            }
+            PacketsQueue * q = &it->second;
 
-            // TODO: could unlock DevReader, lock just one queue here
+            // TODO: could unlock DevReader (and lock queue) here
 
             if (q->size() >= MAX_QUEUE_SIZE)
             {
                 q->pop_front();
                 q->front()->flags() |= ContentPacket::F_StreamReset;
-#if 0
-                if (pid == Pacidal::PID_VIDEO_SD)
-                    printf("lost packet\n");
-#endif
             }
 
             q->push_back(pkt);
@@ -377,9 +380,8 @@ namespace ite
 
     bool DevReader::getRetChanCmd(RCCommand& cmd)
     {
-        TsBuffer ts(m_poolTs);
-
-        if (m_demux.pop(It930x::PID_RETURN_CHANNEL, ts))
+        TsBuffer ts = m_demux.pop(It930x::PID_RETURN_CHANNEL);
+        if (ts)
         {
 #if 1
             printf("getting RC cmd (from RC queue)\n");

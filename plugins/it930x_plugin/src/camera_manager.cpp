@@ -161,7 +161,7 @@ namespace ite
     DEFAULT_REF_COUNTER(CameraManager)
 
     CameraManager::CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper)
-    :   m_refManager( DiscoveryManager::refManager() ),
+    :   m_refManager(this),
         m_devMapper(devMapper),
         m_loading(false),
         m_errorStr( nullptr )
@@ -802,7 +802,7 @@ namespace ite
 
             if (i >= m_encoders.size())
             {
-                auto enc = std::shared_ptr<MediaEncoder>( new MediaEncoder(this, i, res), MediaEncoder::fakeFree ); // FIXME
+                auto enc = std::shared_ptr<MediaEncoder>( new MediaEncoder(this, i, res) );
                 m_encoders.push_back(enc);
             }
             else
@@ -859,7 +859,7 @@ namespace ite
                 return packet;
             }
 
-            Timer::sleep(SLEEP_DURATION_MS);
+            Timer::sleep(SLEEP_DURATION_MS); // TODO: conditional variable
         }
 
         return nullptr;

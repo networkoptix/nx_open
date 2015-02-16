@@ -23,10 +23,10 @@ namespace ite
 #endif
 
     MediaEncoder::MediaEncoder(CameraManager * const cameraManager, int encoderNumber, const nxcip::ResolutionInfo& res)
-    :   m_refManager( this ),
-        m_cameraManager( cameraManager ),
-        m_encoderNumber( encoderNumber ),
-        m_resolution( res )
+    :   m_refManager(this),
+        m_cameraManager(cameraManager),
+        m_encoderNumber(encoderNumber),
+        m_resolution(res)
     {
     }
 
@@ -96,7 +96,6 @@ namespace ite
     nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     {
         StreamReader * stream = new StreamReader(m_cameraManager, m_encoderNumber);
-        //stream->addRef();
         return stream;
     }
 

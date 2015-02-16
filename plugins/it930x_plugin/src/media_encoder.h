@@ -36,7 +36,7 @@ namespace ite
 
         //
 
-        static void fakeFree(MediaEncoder * ) {}
+        //static void fakeFree(MediaEncoder * ) {}
         void updateResolution(const nxcip::ResolutionInfo& res) { m_resolution = res; }
 
     private:
