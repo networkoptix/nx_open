@@ -303,6 +303,36 @@ bool QnDbManager::migrateServerGUID(const QString& table, const QString& field)
     return true;
 }
 
+static std::array<QString, 3> DB_POSTFIX_LIST = 
+{
+    QLatin1String(""),
+    QLatin1String("-shm"),
+    QLatin1String("-wal")
+};
+
+bool removeDbFile(const QString& dbFileName)
+{
+    for(const QString& postfix: DB_POSTFIX_LIST) {
+        if (!removeFile(dbFileName + postfix))
+            return false;
+    }
+    return true;
+}
+
+bool createCorruptedDbBackup(const QString& dbFileName)
+{
+    QString newFileName = dbFileName.left(dbFileName.lastIndexOf(L'.') + 1) + lit("corrupted.sqlite");
+    if (!removeDbFile(newFileName))
+        return false;
+    for(const QString& postfix: DB_POSTFIX_LIST)
+    {
+        if (QFile::exists(dbFileName + postfix) && !QFile::copy(dbFileName + postfix, newFileName + postfix))
+            return false;
+    }
+
+    return true;
+}
+
 bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 {
     m_resourceFactory = factory;
@@ -317,11 +347,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");
     if (QFile::exists(backupDbFileName) || needCleanup) 
     {
-        if (!removeFile(dbFileName))
-            return false;
-        if (!removeFile(dbFileName + lit("-shm")))
-            return false;
-        if (!removeFile(dbFileName + lit("-wal")))
+        if (removeDbFile(dbFileName))
             return false;
         if (QFile::exists(backupDbFileName)) 
         {
@@ -373,8 +399,18 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     }
 
     //tuning DB
-    if( !tuneDBAfterOpen() )
+    if( !tuneDBAfterOpen() ) 
+    {
+        m_sdb.close();
+        qWarning() << "Corrupted database file " << m_sdb.databaseName() << "!";
+        if (!createCorruptedDbBackup(dbFileName)) {
+            qWarning() << "Can't create database backup before removing file";
+            return false;
+        }
+        if (!removeDbFile(dbFileName))
+            qWarning() << "Can't delete corrupted database file " << m_sdb.databaseName();
         return false;
+    }
 
     if( !createDatabase() )
     {
