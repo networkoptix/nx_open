@@ -342,7 +342,7 @@
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Niedrige Qualität kann zu Bildern mit geringer Auflösung führen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
-    <message utf8="true">
+    <message>
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation>Die Einstellung Hohe Qualität kann eine Serverüberlastung oder Netzwerk-Kapazitätsprobleme zur Folge haben.</translation>
     </message>
@@ -417,7 +417,7 @@
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">Achtung: Die Einstellungen FPS und Aufnahmequalität funktionieren nicht im Aufnahmeplan!</translation>
+        <translation>Achtung! Die Einstellungen FPS und Aufnahmequalität funktionieren nicht im Aufnahmeplan!</translation>
     </message>
 </context>
 <context>
@@ -518,7 +518,7 @@
     <message>
         <source>Motion Recording</source>
         <translatorcomment>It would be greater if this title will be shorter</translatorcomment>
-        <translation type="unfinished">Bewegungsgesteuerte Aufnahme</translation>
+        <translation>Bewegungssteuerung</translation>
     </message>
     <message>
         <source>Pre-Recording</source>
@@ -543,7 +543,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Copy Schedule...</source>
         <translatorcomment>Additional spaces are required to make place for the long &quot;Motion Recording&quot; caption</translatorcomment>
-        <translation type="unfinished">       Aufnahmeplan kopieren...       </translation>
+        <translation>Planung kopieren...</translation>
     </message>
 </context>
 <context>
@@ -2584,11 +2584,11 @@ Generiert für %5-%6 mit %7.&lt;br/&gt;
     </message>
     <message>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
+        <translation>STRG+Shift+S</translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mit dem aktuellen System verschmelzen...</translation>
     </message>
 </context>
 <context>
@@ -3621,7 +3621,10 @@ Wiederherstellung von Version %1 versuchen?</translation>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Der ausgewählte Server hat eine andere Version:
+ - Client Version: %1
+ - EC Version: %2
+Sie müssen Client %3 herunterladen, um sich zu verbinden</translation>
     </message>
 </context>
 <context>
@@ -4065,19 +4068,19 @@ Diese Versionen sind nicht kompatibel. Bitte aktualisieren Sie %3</translation>
     </message>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihre Grafikkarte wird nicht unterstützt. Sie können auf eigenes Risiko fortfahren.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Installieren und/oder Aktualisieren der Grafikkartentreiber sollte das Problem lösen.</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es wurde festgestellt, dass Ihre Grafikkartentreiber nicht installiert oder veraltet sind.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Installieren und/oder Aktualisieren Ihrer Grafikkartentreiber kann Ihre System-Performance beim Ansehen und Bearbeiten von Videos erheblich verbessern.</translation>
     </message>
 </context>
 <context>
@@ -4422,7 +4425,7 @@ Versuchen Sie Ihre Lizenz manuell zu aktivieren.</translation>
     </message>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Senden Sie bitte eine Email mit dem Serienschlüssel und der Hardware-ID, die an %1 gesendet wurde, um eine Aktivierungsschlüsseldatei zu bekommen.</translation>
     </message>
 </context>
 <context>
@@ -5551,7 +5554,7 @@ Diese Touren werden ungültig, wenn Sie diese entfernen.</translation>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Externen Speicher hinzufügen...</translation>
     </message>
 </context>
 <context>
@@ -5813,42 +5816,42 @@ Bitte schließen Sie die Applikation und starten Sie diese erneut über die Verk
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Release Notes</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>Holen Sie sich die spezielle Version</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>Holen Sie sich die neueste Version</translation>
     </message>
     <message numerus="yes">
         <source>The problem is caused by %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Das Problem wurde von folgendem %n Server verursacht:</numerusform>
+            <numerusform>Das Problem wurde von folgenden %n Servern verursacht:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>No free space left on %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kein freier Speicher mehr auf %n Server:</numerusform>
+            <numerusform>Kein freier Speicher mehr auf %n Servern:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers are not responding:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Server antwortet nicht:</numerusform>
+            <numerusform>%n Server antworten nicht:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers have gone offline:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Server ist Offline gegangen:</numerusform>
+            <numerusform>%n Server sind Offline gegangen:</numerusform>
         </translation>
     </message>
 </context>
@@ -6422,7 +6425,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>User was renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Benutzer wurde unbenannt. Passwort muss aktualisiert werden.</translation>
     </message>
 </context>
 <context>

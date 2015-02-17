@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<WixLocalization Culture="en-US" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="ko-kr" xmlns="http://schemas.microsoft.com/wix/2006/localization">
     <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
     <String Id="BrowseDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
     <String Id="CancelDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
@@ -89,7 +89,9 @@
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">제어 서버</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">저장 서버 설정</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">저장 서버</String>  
-
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">시스템 이름</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">비밀번호 확인</String>  
+    
     <!-- MyExitDialog -->
 
     <!-- MyFeaturesDlg -->

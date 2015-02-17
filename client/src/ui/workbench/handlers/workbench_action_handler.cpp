@@ -1150,15 +1150,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     url.setPassword(QString());
     url.setScheme(lit("http"));
     url.setPath(lit("/static/index.html"));
-
-    const QNetworkProxy &proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);
-    if (proxy.type() == QNetworkProxy::HttpProxy) {
-        QUrlQuery query(url.query());
-        query.addQueryItem(lit("proxy"), server->getId().toString());
-        url.setQuery(query);
-        url.setHost(proxy.hostName());
-        url.setPort(proxy.port());
-    }
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
     QDesktopServices::openUrl(url);
 }
 
@@ -1523,9 +1515,6 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
     QUrl url = server->getApiUrl();
     url.setScheme(lit("http"));
-    //url.setPath(lit("/static/index.html"));
-    //url.setFragment(lit("/log")); // add hashtag postfix. It's required for our web page java script
-    //url.setQuery(lit("lines=1000"));
     url.setPath(lit("/api/showLog"));
 
     QString login = QnAppServerConnectionFactory::url().userName();
@@ -1534,13 +1523,8 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     urlQuery.addQueryItem(lit("auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(login, password)));
     urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
     url.setQuery(urlQuery);
-    
-    
-    //setting credentials for access to resource
-    //url.setUserName(QnAppServerConnectionFactory::url().userName());
-    //url.setPassword(QnAppServerConnectionFactory::url().password());
-
-    QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server);
+    QDesktopServices::openUrl(url);
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
