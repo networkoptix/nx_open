@@ -1500,9 +1500,7 @@ void QnMain::run()
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
-#ifdef __arm__
     runtimeData.box = QnAppInfo::armBox();
-#endif
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
     int guidCompatibility = 0;

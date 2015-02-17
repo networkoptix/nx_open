@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx_ec/ec_proto_version.h>
 #include <api/model/upload_update_reply.h>
+#include <utils/common/log.h>
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
@@ -43,9 +44,14 @@ void QnRestUpdatePeerTask::doCancel() {
 }
 
 void QnRestUpdatePeerTask::doStart() {
+    NX_LOG(lit("Update: QnRestUpdatePeerTask: Starting."), cl_logDEBUG1);
+
     foreach (const QnUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         Q_ASSERT_X(server, "An incompatible server resource is expected here.", Q_FUNC_INFO);
+
+        NX_LOG(lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
+               .arg(m_updateId).arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
 
         int handle = server->apiConnection()->installUpdate(m_updateId, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
         m_serverByRequest[handle] = server;
@@ -89,11 +95,16 @@ void QnRestUpdatePeerTask::finishPeer(const QnUuid &id) {
     if (!server)
         return;
 
+    NX_LOG(lit("Update: QnRestUpdatePeerTask: Installation finished [%1, %2].")
+           .arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG1);
+
     emit peerFinished(server->getId());
     emit peerUpdateFinished(server->getId(), getGuid(server));
 
-    if (m_serverByRealId.isEmpty())
+    if (m_serverByRealId.isEmpty()) {
+        NX_LOG(lit("Update: QnRestUpdatePeerTask: Installation finished."), cl_logDEBUG1);
         finish(NoError);
+    }
 }
 
 void QnRestUpdatePeerTask::at_updateInstalled(int status, const QnUploadUpdateReply &reply, int handle) {
@@ -105,6 +116,9 @@ void QnRestUpdatePeerTask::at_updateInstalled(int status, const QnUploadUpdateRe
     QnMediaServerResourcePtr server = m_serverByRequest.take(handle);
     if (!server)
         return;
+
+    NX_LOG(lit("Update: QnRestUpdatePeerTask: Reply [%1, %2, %3].")
+           .arg(reply.offset).arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
 
     if (status != 0 || reply.offset != ec2::AbstractUpdatesManager::NoError) {
         finish(UploadError, QSet<QnUuid>() << server->getId());
