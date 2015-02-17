@@ -240,7 +240,9 @@ void QnVideoCameraGopKeeper::clearVideoData()
     QMutexLocker lock(&m_queueMtx);
 
     for( QnConstCompressedVideoDataPtr& frame: m_lastKeyFrame )
-        frame = QnConstCompressedVideoDataPtr();
+        frame.clear();
+    for( auto& lastKeyFramesForChannel: m_lastKeyFrames )
+        lastKeyFramesForChannel.clear();
     m_nextMinTryTime = 0;
 }
 
