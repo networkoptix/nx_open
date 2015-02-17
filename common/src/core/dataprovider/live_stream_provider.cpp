@@ -387,6 +387,7 @@ void QnLiveStreamProvider::startIfNotRunning()
     QMutexLocker mtx(&m_mutex);
     if (!isRunning())    
     {
+        m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
         start();
     }
 }

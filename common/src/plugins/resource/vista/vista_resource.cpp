@@ -13,6 +13,7 @@ QnVistaResource::~QnVistaResource() {
     return;
 }
 
+/*
 int QnVistaResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const 
 {
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
@@ -32,6 +33,7 @@ int QnVistaResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolut
 
     return qMax(192,result);
 }
+*/
 
 QnAbstractPtzController *QnVistaResource::createPtzControllerInternal() {
     QScopedPointer<QnAbstractPtzController> result(base_type::createPtzControllerInternal());

@@ -319,7 +319,7 @@ public:
 
     void ensureRaisedConeItem(QnResourceWidget *widget);
 
-    QRectF raisedGeometry(QnResourceWidget *widget) const;
+    QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
 
     QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
 

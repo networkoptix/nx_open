@@ -49,6 +49,9 @@ public:
     QnConstCompressedAudioDataPtr getLastAudioFrame() const;
     void updateCameraActivity();
     virtual bool needConfigureProvider() const override { return false; }
+
+    void clearVideoData();
+
 private:
     mutable QMutex m_queueMtx;
     int m_lastKeyFrameChannel;
@@ -232,6 +235,15 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
     
 }
 
+void QnVideoCameraGopKeeper::clearVideoData()
+{
+    QMutexLocker lock(&m_queueMtx);
+
+    for( QnConstCompressedVideoDataPtr& frame: m_lastKeyFrame )
+        frame = QnConstCompressedVideoDataPtr();
+    m_nextMinTryTime = 0;
+}
+
 // --------------- QnVideoCamera ----------------------------
 
 QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
@@ -304,6 +316,15 @@ void QnVideoCamera::at_camera_resourceChanged()
 				m_secondaryReader->pleaseStop();
 		}
 	}
+
+    if( cameraResource->flags() & Qn::foreigner )
+    {
+        //clearing saved key frames
+        if (m_primaryGopKeeper)
+            m_primaryGopKeeper->clearVideoData();
+        if (m_secondaryGopKeeper)
+            m_secondaryGopKeeper->clearVideoData();
+    }
 }
 
 void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
