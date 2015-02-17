@@ -347,7 +347,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");
     if (QFile::exists(backupDbFileName) || needCleanup) 
     {
-        if (removeDbFile(dbFileName))
+        if (!removeDbFile(dbFileName))
             return false;
         if (QFile::exists(backupDbFileName)) 
         {
