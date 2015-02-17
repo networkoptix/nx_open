@@ -546,12 +546,7 @@ QRectF QnGeometry::encloseRotatedGeometry(const QRectF &enclosingGeometry, qreal
     QRectF geom = expanded(aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
 
     /* 2. Rotate it */
-    QPointF c = geom.center();
-    QTransform transform;
-    transform.translate(c.x(), c.y());
-    transform.rotate(rotation);
-    transform.translate(-c.x(), -c.y());
-    QRectF rotated = transform.mapRect(geom);
+    QRectF rotated = QnGeometry::rotated(geom, rotation);
 
     /* 3. Scale it to fit enclosing geometry */
     QSizeF scaledSize = bounded(expanded(rotated.size(), enclosingGeometry.size(), Qt::KeepAspectRatio), enclosingGeometry.size(), Qt::KeepAspectRatio);

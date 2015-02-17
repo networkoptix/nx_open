@@ -1150,10 +1150,10 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 
     if (workbench()->item(Qn::RaisedRole) != workbenchItem) {
         /* Don't raise if there's only one item in the layout. */
-        QRectF enclosingRect = display()->itemEnclosingGeometry(widget->item());
-        enclosingRect = dilated(enclosingRect, enclosingRect.size() * raisedGeometryThreshold);
+        QRectF occupiedGeometry = widget->geometry();
+        occupiedGeometry = dilated(occupiedGeometry, occupiedGeometry.size() * raisedGeometryThreshold);
 
-        if (enclosingRect.contains(display()->raisedGeometry(widget)))
+        if (occupiedGeometry.contains(display()->raisedGeometry(widget->geometry(), widget->rotation())))
             workbenchItem = NULL;
 
         workbench()->setItem(Qn::RaisedRole, workbenchItem);
