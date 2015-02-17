@@ -90,7 +90,7 @@
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">저장 서버 설정</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">저장 서버</String>  
     <String Id="MediaServerDlg_SystemName"                          Overridable="yes">시스템 이름</String>  
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">확인</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">비밀번호 확인</String>  
     
     <!-- MyExitDialog -->
 
