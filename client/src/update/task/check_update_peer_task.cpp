@@ -20,6 +20,7 @@
 #include <utils/network/http/async_http_client_reply.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/log.h>
 
 #define QnNetworkReplyError static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error)
 
@@ -94,6 +95,8 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
         bool updateServer = this->needUpdate(server->getVersion(), m_target.version);
         if (updateServer && !m_updateFiles.value(server->getSystemInfo())) {
             finishTask(QnCheckForUpdateResult::ServerUpdateImpossible);
+            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No update file for server [%1 : %2]")
+                   .arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
             return;
         }
         needUpdate |= updateServer;
@@ -104,6 +107,7 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
 
         if (updateClient && !m_clientUpdateFile) {
             finishTask(QnCheckForUpdateResult::ClientUpdateImpossible);
+            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No update file for client."), cl_logDEBUG2);
             return;
         }
 
@@ -121,6 +125,7 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline() {
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(url.toString()), cl_logDEBUG2);
     if (!httpClient->doGet(url))
         finishTask(QnCheckForUpdateResult::InternetProblem);
     else 
@@ -143,10 +148,13 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
     m_targetMustBeNewer = m_target.version.isNull();
     m_checkLatestVersion = m_target.version.isNull();
 
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Checking online updates [%1]").arg(m_target.version.toString()), cl_logDEBUG1);
+
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
     QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(m_updatesUrl.toString()), cl_logDEBUG2);
     if (!httpClient->doGet(m_updatesUrl))
         finishTask(QnCheckForUpdateResult::InternetProblem);
     else 
@@ -158,6 +166,8 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates() {
     m_clientUpdateFile.clear();
     m_targetMustBeNewer = false;
     m_releaseNotesUrl.clear();
+
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Checking local update [%1]").arg(m_target.fileName), cl_logDEBUG1);
 
     if (!QFile::exists(m_target.fileName)) {
         finishTask(QnCheckForUpdateResult::BadUpdateFile);
@@ -176,9 +186,12 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     reply->deleteLater();
 
     if (reply->isFailed()) {
+        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request failed."), cl_logDEBUG2);
         finishTask(QnCheckForUpdateResult::InternetProblem);
         return;
     }
+
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request received."), cl_logDEBUG2);
 
     QByteArray data = reply->data();
     
@@ -214,9 +227,12 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
     reply->deleteLater();
 
     if (reply->isFailed()) {
+        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request failed."), cl_logDEBUG2);
         finishTask(QnCheckForUpdateResult::NoSuchBuild);
         return;
     }
+
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request received."), cl_logDEBUG2);
 
     QByteArray data = reply->data();
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
@@ -224,6 +240,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
     m_target.version = QnSoftwareVersion(map.value(lit("version")).toString());
 
     if (m_target.version.isNull()) {
+        NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No such build."), cl_logDEBUG1);
         finishTask(QnCheckForUpdateResult::NoSuchBuild);
         return;
     }
@@ -249,7 +266,14 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
             info->baseFileName = fileName;
             info->fileSize = package.value(lit("size")).toLongLong();
             info->md5 = package.value(lit("md5")).toString();
-            m_updateFiles.insert(QnSystemInformation(platform.key(), architecture, modification), info);
+            QnSystemInformation systemInformation(platform.key(), architecture, modification);
+            m_updateFiles.insert(systemInformation, info);
+
+            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Server update file [%1, %2, %3].")
+                   .arg(systemInformation.toString())
+                   .arg(info->baseFileName)
+                   .arg(info->fileSize)
+                   , cl_logDEBUG1);
         }
     }
 
@@ -267,6 +291,11 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
             m_clientUpdateFile->baseFileName = fileName;
             m_clientUpdateFile->fileSize = package.value(lit("size")).toLongLong();
             m_clientUpdateFile->md5 = package.value(lit("md5")).toString();
+
+            NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Client update file [%2, %3].")
+                   .arg(m_clientUpdateFile->baseFileName)
+                   .arg(m_clientUpdateFile->fileSize)
+                   , cl_logDEBUG1);
         }
 
         QnSoftwareVersion minimalVersionToUpdate(map.value(lit("minimalClientVersion")).toString());
@@ -274,6 +303,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
     } else {
         m_clientRequiresInstaller = true;
     }
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Client requires installer [%1].").arg(m_clientRequiresInstaller), cl_logDEBUG1);
 
     checkUpdateCoverage();
 }
@@ -352,6 +382,9 @@ void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) 
     result.systems = m_updateFiles.keys().toSet();
     result.clientInstallerRequired = m_clientRequiresInstaller;
     result.releaseNotesUrl = m_releaseNotesUrl;
+
+    NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Check finished [%1, %2].")
+           .arg(value).arg(result.latestVersion.toString()), cl_logDEBUG1);
 
     emit checkFinished(result);
     finish(static_cast<int>(value));

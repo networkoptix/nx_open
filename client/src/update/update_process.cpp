@@ -20,6 +20,7 @@
 #include <utils/common/sleep.h>
 #include <utils/update/update_utils.h>
 #include <utils/common/app_info.h>
+#include <utils/common/log.h>
 
 #include <api/runtime_info_manager.h>
 
@@ -316,10 +317,13 @@ void QnUpdateProcess::at_clientUpdateInstalled() {
         return;
 
     if (futureWatcher->result() != applauncher::api::ResultType::ok) {
+        NX_LOG(lit("Update: QnUpdateProcess: Client update failed."), cl_logDEBUG1);
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::ClientInstallationFailed);
         return;
     }
+
+    NX_LOG(lit("Update: QnUpdateProcess: Client update installed."), cl_logDEBUG1);
 
     prepareToUpload();
 }
