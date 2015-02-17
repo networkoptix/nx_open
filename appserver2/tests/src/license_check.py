@@ -10,7 +10,7 @@ class LicenseCheck:
         cfg.read("config.cfg")
 
         # get the configuration
-        self._server_list = cfg.get("LicenseActivate","serverList").split('\n')
+        self._server_list = cfg.get("LicenseActivate","serverList").split(',')
         self._license_file= cfg.get("LicenseActivate","licenseFile")
         self._log_name = cfg.get("LicenseActivate","logFile")
         
@@ -30,26 +30,37 @@ class LicenseCheck:
     def check(self):
         with open(self._license_file,"r") as f:
             with open(self._log_name,"w+") as log:
-                lines = f.read().splitlines()
-                for line in lines:
-                    for s in self._server_list:
-                        request = urllib2.urlopen(
-                            "https://{server}/api/activateLicense?key={seria_num}".\
-                                format(server=s,seria_num=line))
-                         
-                        reply = json.loads(request.read())
+                with open("success.log","w+") as slog:
+                    lines = f.read().splitlines()
+                    for line in lines:
+                        for s in self._server_list:
+                            request = urllib2.urlopen(
+                                "https://{server}/api/activateLicense?key={seria_num}".\
+                                    format(server=s,seria_num=line))
+                             
+                            reply = json.loads(request.read())
 
-                        if "error" in reply:
-                            if reply["error"] != "0" :
-                                log.write("SeriaNum:{seria_num}\n".format(seria_num=line))
-                                log.write("Server:{server}\n".format(server=s))
-                                if "errorString" in reply:
-                                    log.write("ErrorString:{error}\n".format(error=reply["errorString"]))
-                                else:
-                                    log.write("ErrorString is not shown,error code is:{ec}\n".format(ec=reply["error"]))
-                                log.write("=======================================================\n")
-                                log.flush()
-                        request.close()
+                            if "error" in reply:
+                                if reply["error"] != "0" :
+                                    log.write("SeriaNum:{seria_num}\n".format(seria_num=line))
+                                    log.write("Server:{server}\n".format(server=s))
+                                    if "errorString" in reply:
+                                        log.write("ErrorString:{error}\n".format(error=reply["errorString"]))
+                                    else:
+                                        log.write("ErrorString is not shown,error code is:{ec}\n".format(ec=reply["error"]))
+                                    log.write("=======================================================\n")
+                                    log.flush()
+                            else:
+                                slog.write("SeriaNum:{seria_num}\n".format(seria_num=line))
+                                slog.write("Server:{server}\n".format(server=s))
+                                slog.write("Class:{cls}".format(cls=reply["reply"]["name"]))
+                                slog.wirte("Brand:{brd}".format(brd=reply["reply"]["brand"]))
+                                slog.write("LicenseType:{tp}".format(tp=reply["reply"]["licenseType"]))
+                                slog.write("cameraCount:{cc}".format(cc=reply["reply"]["cameraCount"]))
+                                slog.write("=======================================================\n")
+                                slog.flush()
+                                
+                            request.close()
 
 if __name__ == "__main__":
     LicenseCheck().check()
