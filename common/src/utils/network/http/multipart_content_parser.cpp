@@ -218,7 +218,7 @@ namespace nx_http
                 {
                     supposedBoundary = QnByteArrayConstRef( m_supposedBoundary );
                 }
-                else if( m_supposedBoundary.isEmpty() && (data.size() - *offset >= m_boundaryForUnsizedBinaryParsing.size()) )   //supposed boundary is in the source data
+                else if( m_supposedBoundary.isEmpty() && (data.size() - *offset >= (size_t)m_boundaryForUnsizedBinaryParsing.size()) )   //supposed boundary is in the source data
                 {
                     supposedBoundary = data.mid( *offset, m_boundaryForUnsizedBinaryParsing.size() );
                     *offset += m_boundaryForUnsizedBinaryParsing.size();
