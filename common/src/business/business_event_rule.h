@@ -67,6 +67,7 @@ public:
     bool isScheduleMatchTime(const QDateTime& datetime) const;
 
     static QnBusinessEventRuleList getDefaultRules();
+    static QnBusinessEventRuleList getSystemRules();
 
     QnBusinessEventRule* clone();
     void removeResource(const QnUuid& resId);

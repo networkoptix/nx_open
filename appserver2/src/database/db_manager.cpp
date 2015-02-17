@@ -36,6 +36,7 @@
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "restype_xml_parser.h"
+#include "business/business_event_rule.h"
 
 using std::nullptr_t;
 
@@ -1184,6 +1185,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/31_move_group_name_to_user_attrs.sql")) {
         m_needResyncCameraUserAttributes = true;
+    }
+    else if (updateName == lit(":/updates/32_default_business_rules.sql")) {
+        for(const auto& bRule: QnBusinessEventRule::getSystemRules())
+        {
+            ApiBusinessRuleData bRuleData;
+            fromResourceToApi(bRule, bRuleData);
+            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+                return false;
+        }
     }
 
     return true;
