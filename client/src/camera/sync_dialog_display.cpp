@@ -100,7 +100,8 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         // update digest from current frame
         if (media && media->dataSize() > 4) {
             const quint8* data = (const quint8*) media->data();
-            QnSignHelper::updateDigest(media->context->ctx(), m_mdctx, data, media->dataSize());
+            AVCodecContext* avCtx = media->context ? media->context->ctx() : 0;
+            QnSignHelper::updateDigest(avCtx, m_mdctx, data, media->dataSize());
         }
 #else
         // update digest from previous frames because of last frame it is sign frame itself
