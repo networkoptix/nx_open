@@ -40,5 +40,61 @@
                 default_value ="25"/>
             </params>
         </resource>   
+        <resource name = "AXISQ7406" public = "AXIS_ENCODER"/>
+        <resource name = "AXISQ7436" public = "AXIS_ENCODER"/>
+        <resource name = "AXISQ7436Channel1" public = "AXISQ7436"/>
+        <resource name = "AXISQ7436Channel2" public = "AXISQ7436Channel1"/>
+        <resource name = "AXISQ7436Channel3" public = "AXISQ7436Channel1"/>
+        <resource name = "AXISQ7436Channel4" public = "AXISQ7436Channel1"/>
+        <resource name = "AXISQ7436Channel5" public = "AXISQ7436Channel1"/>
+        <resource name = "AXISQ7436Channel6" public = "AXISQ7436Channel1"/>
+        <resource name = "AXISP1311" public = "AXISM1103"/>
+        <resource name = "AXISQ3214" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="30"/>
+            </params>
+        </resource>
+        <resource name = "AXISQ3215" public = "AXISQ3214">
+        <resource name = "AXISP8535" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="30"/>
+            </params>
+        </resource>
+        <resource name = "AXISP8514" public = "AXISP8535">        
+        <resource name = "AXISP1224" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="25"/>
+            </params>
+        </resource>
+        <resource name = "AXISQ1635" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="60"/>
+            </params>
+        </resource>
+        <resource name = "AXISF41" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="60"/>
+            </params>
+        </resource>
+        <resource name = "AXISF44" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="15"/>
+            </params>
+        </resource>
+        
+                
+        
+                
+        
+        
+        
+        
+        
     </oem>
 </resources>
