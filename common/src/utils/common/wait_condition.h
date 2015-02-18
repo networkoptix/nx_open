@@ -6,7 +6,7 @@
 #ifndef NX_WAIT_CONDITION_H
 #define NX_WAIT_CONDITION_H
 
-#ifdef _DEBUG
+#ifdef USE_OWN_MUTEX
 
 #include <memory>
 
@@ -29,12 +29,12 @@ private:
     std::unique_ptr<QnWaitConditionImpl> m_impl;
 };
 
-#else
+#else   //USE_OWN_MUTEX
 
 #include <QtCore/QWaitCondition>
 
 typedef QWaitCondition QnWaitCondition;
 
-#endif
+#endif   //USE_OWN_MUTEX
 
 #endif //NX_WAIT_CONDITION_H

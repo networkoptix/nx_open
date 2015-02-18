@@ -3,7 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifdef _DEBUG
+#ifdef USE_OWN_MUTEX
 
 #include "wait_condition.h"
 

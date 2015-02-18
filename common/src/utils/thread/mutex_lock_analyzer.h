@@ -3,6 +3,8 @@
 * akolesnikov@networkoptix.com
 ***********************************************************/
 
+#ifdef USE_OWN_MUTEX
+
 #ifndef MUTEX_LOCK_ANALYZER_H
 #define MUTEX_LOCK_ANALYZER_H
 
@@ -63,3 +65,5 @@ private:
 };
 
 #endif  //MUTEX_LOCK_ANALYZER_H
+
+#endif  //USE_OWN_MUTEX

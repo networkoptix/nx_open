@@ -3,7 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifdef _DEBUG
+#ifdef USE_OWN_MUTEX
 
 #include "mutex_impl.h"
 
@@ -37,4 +37,4 @@ void QnMutexImpl::beforeMutexUnlocked()
     currentLockStack.pop();
 }
 
-#endif
+#endif  //USE_OWN_MUTEX

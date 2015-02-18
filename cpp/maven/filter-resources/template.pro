@@ -30,6 +30,7 @@ CONFIG(debug, debug|release) {
   win* {
     LIBS = ${windows.oslibs.debug}
   }
+  DEFINES += USE_OWN_MUTEX ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
 }
 else {
   CONFIG += silent
@@ -113,16 +114,16 @@ CONFIG += ${arch}
 
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${customization.dir}/icons/hdw_logo.ico	
+  ICON = ${customization.dir}/icons/hdw_logo.ico    
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
   DEFINES += ${global.windows.defines}  
   win32-msvc* {
     # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj
-	# /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
-	QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
-	QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF 
+    # /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
+    QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
+    QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF 
     QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
   }
   

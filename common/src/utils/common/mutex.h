@@ -6,7 +6,7 @@
 #ifndef NX_MUTEX_H
 #define NX_MUTEX_H
 
-#ifdef _DEBUG
+#ifdef USE_OWN_MUTEX
 
 #include <memory>
 
@@ -62,7 +62,7 @@ private:
 #define SCOPED_MUTEX_LOCK( lockerName, mutexExpr ) \
     QnMutexLocker lockerName( mutexExpr, __FILE__, __LINE__ )
 
-#else
+#else   //USE_OWN_MUTEX
 
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
@@ -72,6 +72,6 @@ typedef QMutexLocker QnMutexLocker;
 #define SCOPED_MUTEX_LOCK( lockerName, mutexExpr ) \
     QnMutexLocker lockerName( mutexExpr )
 
-#endif
+#endif  //USE_OWN_MUTEX
 
 #endif  //NX_MUTEX_H

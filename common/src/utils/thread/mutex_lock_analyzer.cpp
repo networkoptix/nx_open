@@ -3,6 +3,8 @@
 * akolesnikov@networkoptix.com
 ***********************************************************/
 
+#ifdef USE_OWN_MUTEX
+
 #include "mutex_lock_analyzer.h"
 
 #include <QtGlobal>
@@ -128,3 +130,5 @@ MutexLockAnalyzer* MutexLockAnalyzer::instance()
 {
     return MutexLockAnalyzer_instance();
 }
+
+#endif  //USE_OWN_MUTEX

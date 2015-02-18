@@ -3,14 +3,12 @@
 * akolesnikov
 ***********************************************************/
 
-#ifdef _DEBUG
+#ifdef USE_OWN_MUTEX
 
 #include "mutex.h"
 
 #include "mutex_impl.h"
 #include "long_runnable.h"
-
-#define ANALYZE_MUTEX_LOCKS
 
 
 ////////////////////////////////////////////////////////////
@@ -38,14 +36,14 @@ void QnMutex::lock(
     m_impl->threadHoldingMutex = QnLongRunnable::currentThreadSystemId();
     ++m_impl->recursiveLockCount;
 
-#ifdef ANALYZE_MUTEX_LOCKS
+#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
     m_impl->afterMutexLocked( sourceFile, sourceLine, lockID );
 #endif
 }
 
 void QnMutex::unlock()
 {
-#ifdef ANALYZE_MUTEX_LOCKS
+#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
     m_impl->beforeMutexUnlocked();
 #endif
 
@@ -112,4 +110,4 @@ void QnMutexLocker::unlock()
     m_locked = false;
 }
 
-#endif
+#endif  //USE_OWN_MUTEX

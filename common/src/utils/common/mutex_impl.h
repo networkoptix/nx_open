@@ -3,10 +3,10 @@
 * akolesnikov
 ***********************************************************/
 
+#ifdef USE_OWN_MUTEX
+
 #ifndef NX_MUTEX_IMPL_H
 #define NX_MUTEX_IMPL_H
-
-#ifdef _DEBUG
 
 #include <cstdint>
 #include <stack>
@@ -34,6 +34,6 @@ public:
     void beforeMutexUnlocked();
 };
 
-#endif
-
 #endif  //NX_MUTEX_IMPL_H
+
+#endif  //USE_OWN_MUTEX
