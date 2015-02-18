@@ -1265,9 +1265,9 @@ int QnRtspConnectionProcessor::composePlay()
 int QnRtspConnectionProcessor::composeTeardown()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->mediaRes = QnMediaResourcePtr(0);
 
     d->deleteDP();
+    d->mediaRes = QnMediaResourcePtr(0);
 
     d->rtspScale = 1.0;
     d->startTime = d->endTime = 0;
