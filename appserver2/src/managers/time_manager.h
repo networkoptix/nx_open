@@ -16,6 +16,7 @@
 #include <common/common_globals.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_peer_system_time_data.h>
+#include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
 #include <utils/network/time/abstract_accurate_time_fetcher.h>
 #include <utils/network/http/httptypes.h>
@@ -104,7 +105,8 @@ namespace ec2
     class TimeSynchronizationManager
     :
         public QObject,
-        public QnStoppable
+        public QnStoppable,
+        public EnableMultiThreadDirectConnection<TimeSynchronizationManager>
     {
         Q_OBJECT
 
