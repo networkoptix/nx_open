@@ -120,7 +120,8 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames[ch].empty() || m_lastKeyFrames[ch].back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));
-            while (!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold)
+            while (!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold || 
+                    m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames[ch].pop_front();
         }
 
