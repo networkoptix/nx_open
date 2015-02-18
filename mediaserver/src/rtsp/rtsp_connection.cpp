@@ -949,7 +949,7 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged()
     Q_D(QnRtspConnectionProcessor);
 
     QMutexLocker lock(&d->mutex);
-    if (d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
+    if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
         m_needStop = true;
         d->socket->close();
     }
