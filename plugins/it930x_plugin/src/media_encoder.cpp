@@ -6,9 +6,11 @@
 
 namespace ite
 {
-#if 1
+
+    INIT_OBJECT_COUNTER(MediaEncoder)
     DEFAULT_REF_COUNTER(MediaEncoder)
-#else
+
+#if 0
     unsigned int MediaEncoder::addRef()
     {
         unsigned count = m_refManager.addRef();

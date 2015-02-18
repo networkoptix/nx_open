@@ -122,11 +122,12 @@ namespace ite
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-        if (!m_device)
-            return;
+        if (m_devReader)
+            m_devReader->stop();
 
-        m_devReader->stop();
-        m_device->closeStream();
+        if (m_device)
+            m_device->closeStream();
+
         m_txDev.reset();
         m_frequency = 0;
         m_txID = 0;

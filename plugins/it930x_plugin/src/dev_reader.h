@@ -5,7 +5,10 @@
 #include <deque>
 #include <map>
 #include <mutex>
+#include <condition_variable>
 #include <thread>
+
+#include "object_counter.h"
 
 #include "mpeg_ts_packet.h"
 
@@ -115,11 +118,10 @@ namespace ite
     typedef std::deque<TsBuffer> TsQueue;
 
     ///
-    class ContentPacket
+    class ContentPacket : public ObjectCounter<ContentPacket>
     {
     public:
         static constexpr unsigned MAX_PACKET_SIZE() { return 8 * 1024 * 1024; }
-        static constexpr float TS_ERROR_LIMIT() { return 0.2f; }
 
         enum Flags
         {
@@ -129,12 +131,12 @@ namespace ite
 
         ContentPacket()
         :   m_gotPES(0),
-            m_tsErrCoef(0.0f),
+            m_flags(0),
+            m_tsErrors(0),
             m_pesPTS(0),
-            m_pesDTS(0),
-            m_adaptPCR(0),
-            m_adaptOPCR(0),
-            m_flags(0)
+            m_pesDTS(0)
+            //m_adaptPCR(0),
+            //m_adaptOPCR(0),
         {
             static const unsigned SIZE_RESERVE = 16 * 1024;
 
@@ -164,27 +166,22 @@ namespace ite
                 MpegTsPacket::PesFlags flags = pkt.pesFlags();
 
                 if (flags.hasPTS())
-                    m_pesPTS = pkt.pesPTS();
+                    m_pesPTS = pkt.pesPTS32();
                 if (flags.hasDTS())
-                    m_pesDTS = pkt.pesDTS();
+                    m_pesDTS = pkt.pesDTS32();
 
                 append(pkt.pesPayload(), pkt.pesPayloadLen());
             }
             else
                 append(pkt.tsPayload(), pkt.tsPayloadLen());
-
+#if 0
             if (!m_adaptPCR)
                 m_adaptPCR = pkt.adaptPCR();
             if (!m_adaptOPCR)
                 m_adaptOPCR = pkt.adaptOPCR();
-
-            m_tsErrCoef = 0.95f * m_tsErrCoef + 0.05f * (unsigned)pkt.checkbit();
-            if (m_tsErrCoef > TS_ERROR_LIMIT())
-            {
-                printf("Too many TS packets errors.\n");
-                m_gotPES = 0;
-                m_data.clear();
-            }
+#endif
+            if (pkt.checkbit())
+                ++m_tsErrors;
 
             // memory limit
             if (size() >= MAX_PACKET_SIZE())
@@ -199,19 +196,22 @@ namespace ite
         size_t size() const { return m_data.size(); }
         bool empty() const { return m_data.empty(); }
 
-        int64_t pts() const { return m_pesPTS; }
-
+        uint32_t pts() const { return m_pesPTS; }
         unsigned& flags() { return m_flags; }
+
+        unsigned errors() const { return m_tsErrors; }
 
     private:
         std::vector<uint8_t> m_data;
         unsigned m_gotPES;
-        float m_tsErrCoef;
-        int64_t m_pesPTS;
-        int64_t m_pesDTS;
+        unsigned m_flags;
+        unsigned m_tsErrors;
+        uint32_t m_pesPTS;
+        uint32_t m_pesDTS;
+#if 0
         uint64_t m_adaptPCR;
         uint64_t m_adaptOPCR;
-        unsigned m_flags;
+#endif
 
         void append(const uint8_t * apData, uint8_t dataSize)
         {
@@ -232,7 +232,7 @@ namespace ite
     typedef std::shared_ptr<ContentPacket> ContentPacketPtr;
 
     /// Splits transport stream by PID
-    class Demux
+    class Demux : public ObjectCounter<Demux>
     {
     public:
         static constexpr unsigned MAX_TS_QUEUE_SIZE() { return TsBuffer::MAX_ELEMENTS; }
@@ -244,17 +244,6 @@ namespace ite
 
         void push(const TsBuffer& ts);
         TsBuffer pop(uint16_t pid);
-
-        size_t size(uint16_t pid) const
-        {
-            const TsQueue * q = queue(pid);
-            if (!q)
-                return 0;
-
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            return q->size();
-        }
 
         ContentPacketPtr dumpPacket(uint16_t pid);
 
@@ -282,7 +271,7 @@ namespace ite
     class It930x;
 
     ///
-    class DeviceBuffer
+    class DeviceBuffer : public ObjectCounter<DeviceBuffer>
     {
     public:
         static constexpr unsigned MIN_PACKETS_COUNT() { return 5; }
@@ -348,13 +337,13 @@ namespace ite
     class RCCommand;
 
     ///
-    class DevReader
+    class DevReader : public ObjectCounter<DevReader>
     {
     public:
         DevReader(It930x * dev = nullptr);
 
         bool subscribe(uint16_t pid);
-        void unsubscribe(uint16_t /*pid*/) {}
+        void unsubscribe(uint16_t pid);
 
         void setDevice(It930x * dev) { m_buf.setDevice(dev); }
         void start(It930x * dev);
@@ -374,12 +363,14 @@ namespace ite
         bool readRetChanCmd(RCCommand& cmd);
         bool getRetChanCmd(RCCommand& cmd);
 
-        ContentPacketPtr getPacket(uint16_t pid);
+        ContentPacketPtr getPacket(uint16_t pid, const std::chrono::milliseconds& timeout);
+        void interrupt() const { m_cond.notify_all(); }
 
     private:
         typedef std::deque<ContentPacketPtr> PacketsQueue;
 
         mutable std::mutex m_mutex;
+        mutable std::condition_variable m_cond;
 
         DeviceBuffer m_buf;
         Demux m_demux;

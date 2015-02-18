@@ -1,16 +1,15 @@
-#include <ctime>
 #include <memory>
-#include <utility>
 
 #include "discovery_manager.h"
-#include "stream_reader.h"
+#include "camera_manager.h"
 #include "video_packet.h"
+#include "dev_reader.h"
+#include "stream_reader.h"
 
 #if 1
 #include "../../../common/src/utils/media/nalUnits.h"
 #include "../../../common/src/utils/media/bitStream.h"
 #endif
-
 
 namespace
 {
@@ -82,30 +81,58 @@ namespace
             return UnknownFrameType;
         }
     };
+
+    bool isKey(ite::ContentPacketPtr packet)
+    {
+        try
+        {
+            auto type = FrameTypeExtractor::getH264FrameType(packet->data(), packet->size());
+#if 0
+            const char * strFrameType = "Unknown";
+            switch(type)
+            {
+                case FrameTypeExtractor::I_Frame:
+                    strFrameType = "I-frame";
+                    break;
+
+                case FrameTypeExtractor::P_Frame:
+                    strFrameType = "P-frame";
+                    break;
+
+                case FrameTypeExtractor::B_Frame:
+                    strFrameType = "B-frame";
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (type == FrameTypeExtractor::I_Frame)
+                printf("%s (size %ld; pts %ld; time %ld)\n", strFrameType, packet->size(), packet->pts(), time(NULL));
+#endif
+            return type == FrameTypeExtractor::I_Frame;
+        }
+        catch (...)
+        {
+#if 1
+            printf("exception in getH264FrameType()\n");
+#endif
+        }
+
+        return false;
+    }
 }
 
 namespace ite
 {
-#if 1
+    INIT_OBJECT_COUNTER(StreamReader)
     DEFAULT_REF_COUNTER(StreamReader)
-#else
-    unsigned int StreamReader::addRef()
-    {
-        unsigned count = m_refManager.addRef();
-        return count;
-    }
-
-    unsigned int StreamReader::releaseRef()
-    {
-        unsigned count = m_refManager.releaseRef();
-        return count;
-    }
-#endif
 
     StreamReader::StreamReader(CameraManager * cameraManager, int encoderNumber)
     :   m_refManager(this),
         m_cameraManager(cameraManager),
-        m_encoderNumber(encoderNumber)
+        m_encoderNumber(encoderNumber),
+        m_interrupted(false)
     {
         m_cameraManager->openStream(m_encoderNumber);
     }
@@ -132,67 +159,79 @@ namespace ite
 
     int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     {
-        VideoPacket * packet = m_cameraManager->nextPacket( m_encoderNumber );
+        ContentPacketPtr pkt = nextPacket();
+        if (!pkt || pkt->empty())
+        {
+            *lpPacket = nullptr;
+            return nxcip::NX_TRY_AGAIN;
+        }
+
+        bool key = isKey(pkt);
+        uint64_t timestamp = m_ptsTime.pts2usec(pkt->pts());
+#if 0
+        if (key && !m_encoderNumber)
+            printf("pts: %u; time: %lu; stamp: %lu\n", pkt->pts(), time(NULL), timestamp / 1000 / 1000);
+#endif
+
+        VideoPacket * packet = new VideoPacket(pkt->data(), pkt->size(), timestamp);
         if (!packet)
         {
             *lpPacket = nullptr;
             return nxcip::NX_TRY_AGAIN;
         }
 
-        auto type = FrameTypeExtractor::getH264FrameType((const uint8_t *)packet->data(), packet->dataSize());
-        if (type == FrameTypeExtractor::I_Frame)
-            packet->setKeyFlag();
-#if 0
-        const char * strFrameType = "Unknown";
-        switch(type)
-        {
-            case FrameTypeExtractor::I_Frame:
-                strFrameType = "I-frame";
-                break;
+        if (key)
+            packet->setFlag(nxcip::MediaDataPacket::fKeyPacket);
 
-            case FrameTypeExtractor::P_Frame:
-                strFrameType = "P-frame";
-                break;
+        if (pkt->flags() & ContentPacket::F_StreamReset)
+            packet->setFlag(nxcip::MediaDataPacket::fStreamReset);
 
-            case FrameTypeExtractor::B_Frame:
-                strFrameType = "B-frame";
-                break;
+        if (m_encoderNumber)
+            packet->setFlag(nxcip::MediaDataPacket::fLowQuality);
 
-            default:
-                break;
-        }
-
-        printf("%s cam: %d enc: %d (size %d; pts %ld; time %ld)\n", strFrameType, m_cameraManager->txID(), m_encoderNumber, packet->dataSize(), packet->pts(), time(NULL));
-#endif
-        packet->setTime( usecTime(packet->pts()) );
         *lpPacket = packet;
         return nxcip::NX_NO_ERROR;
     }
 
     void StreamReader::interrupt()
     {
+        DevReader * devReader = m_cameraManager->devReader();
+        if (devReader)
+        {
+            m_interrupted = true;
+            devReader->interrupt();
+        }
     }
 
     //
 
-    // TODO: PTS overflow
-    uint64_t StreamReader::usecTime(PtsT pts)
+    ContentPacketPtr StreamReader::nextPacket()
     {
-        static const unsigned USEC_IN_SEC = 1000 * 1000;
-        static const unsigned MAX_PTS_DRIFT = 63000;    // 700 ms
-        static const double timeBase = 1.0 / 9000;
+        static const unsigned TIMEOUT_MS = 10000;
+        std::chrono::milliseconds timeout(TIMEOUT_MS);
 
-        PtsT drift = pts - m_ptsPrev;
-        if (drift < 0) // abs
-            drift = -drift;
-
-        if (!m_ptsPrev || drift > MAX_PTS_DRIFT)
+        Timer timer(true);
+        while (timer.elapsedMS() < TIMEOUT_MS)
         {
-            m_time.pts = pts;
-            m_time.sec = time(NULL);
+            DevReader * devReader = m_cameraManager->devReader();
+            if (! devReader)
+                break;
+
+            ContentPacketPtr pkt = devReader->getPacket(RxDevice::stream2pid(m_encoderNumber), timeout);
+            if (m_interrupted)
+                break;
+
+            if (pkt)
+            {
+#if 1
+                if (pkt->errors())
+                    printf("TS errors: %d\n", pkt->errors());
+#endif
+                return pkt;
+            }
         }
 
-        m_ptsPrev = pts;
-        return (m_time.sec + (pts - m_time.pts) * timeBase) * USEC_IN_SEC;
+        m_interrupted = false;
+        return nullptr;
     }
 }

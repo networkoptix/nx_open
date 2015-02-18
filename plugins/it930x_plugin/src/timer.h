@@ -54,15 +54,25 @@ namespace ite
         void stop() { m_started = false; }
         bool isStarted() const { return m_started; }
 
-        int64_t elapsed() const
+        int64_t elapsedUS() const
         {
             return std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - m_start).count();
+        }
+
+        int64_t elapsedMS() const
+        {
+            return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - m_start).count();
         }
 
         static void sleep(unsigned msec)
         {
             std::chrono::milliseconds duration(msec);
             std::this_thread::sleep_for(duration);
+        }
+
+        static uint64_t usecNow()
+        {
+            return std::chrono::duration_cast<std::chrono::microseconds>(Clock::now().time_since_epoch()).count();
         }
 
     private:
@@ -98,12 +108,48 @@ namespace ite
 
         void print()
         {
-            printf("%s. Context timer %ld\n", m_msg, m_timer.elapsed());
+            printf("%s. Context timer %ld\n", m_msg, m_timer.elapsedUS());
         }
 
     private:
         Timer m_timer;
         const char * m_msg;
+    };
+
+    ///
+    class PtsTime
+    {
+    public:
+        typedef uint32_t PtsT;
+
+        static constexpr unsigned MAX_PTS_DRIFT() { return 63000; } // 700 ms
+
+        PtsTime()
+        :   m_baseUsec(0),
+            m_basePTS(0),
+            m_prevPTS(0)
+        {}
+
+        uint64_t pts2usec(PtsT pts)
+        {
+            // - first fime
+            // - drift
+            // - overflow
+            // - fix frozen PTS
+            if (pts <= m_prevPTS || (pts - m_prevPTS) > PtsTime::MAX_PTS_DRIFT())
+            {
+                m_baseUsec = Timer::usecNow();
+                m_basePTS = pts;
+            }
+
+            m_prevPTS = pts;
+            return m_baseUsec + (pts - m_basePTS) * 100 / 9; // 90kHz -> usec
+        }
+
+    private:
+        uint64_t m_baseUsec;
+        PtsT m_basePTS;
+        PtsT m_prevPTS;
     };
 }
 

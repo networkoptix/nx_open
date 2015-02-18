@@ -6,13 +6,15 @@
 
 #include <plugins/camera_plugin.h>
 
+#include "object_counter.h"
+
 #include "rx_device.h"
 #include "tx_device.h"
 
 namespace ite
 {
     //! Rx - Tx bidirectional mapper
-    class DeviceMapper
+    class DeviceMapper : public ObjectCounter<DeviceMapper>
     {
     public:
         struct DevLink

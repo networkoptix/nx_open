@@ -239,7 +239,7 @@ namespace ite
         }
 
         // Parse MPEG-PES five-byte timestamp
-        static int64_t parsePesPTS(const uint8_t * buf)
+        static uint64_t parsePesPTS(const uint8_t * buf)
         {
             int64_t val = buf[0] & 0x0e; val <<= 7;
             val += buf[1]; val <<= 8;
@@ -249,19 +249,22 @@ namespace ite
             return val;
         }
 
-        int64_t pesPTS() const
+        uint64_t pesPTS() const
         {
             if (pesFlags().hasPTS())
                 return parsePesPTS(tsPayload() + PES_HEADER_SIZE());
             return 0;
         }
 
-        int64_t pesDTS() const
+        uint64_t pesDTS() const
         {
             if (pesFlags().hasDTS())
                 return parsePesPTS(tsPayload() + PES_HEADER_SIZE() + PES_PTS_SIZE());
             return 0;
         }
+
+        uint32_t pesPTS32() const { return pesPTS() & 0xfffffffful; }
+        uint32_t pesDTS32() const { return pesDTS() & 0xfffffffful; }
 
         // PES payload
 

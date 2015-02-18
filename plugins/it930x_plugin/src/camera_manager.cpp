@@ -6,9 +6,6 @@
 #include "camera_manager.h"
 #include "media_encoder.h"
 
-#include "video_packet.h"
-#include "dev_reader.h"
-
 #include "discovery_manager.h"
 
 namespace
@@ -158,12 +155,12 @@ namespace ite
 {
     //
 
+    INIT_OBJECT_COUNTER(CameraManager)
     DEFAULT_REF_COUNTER(CameraManager)
 
     CameraManager::CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper)
     :   m_refManager(this),
         m_devMapper(devMapper),
-        m_loading(false),
         m_errorStr( nullptr )
     {
         updateCameraInfo(info);
@@ -640,11 +637,11 @@ namespace ite
         if (! m_rxDevice->frequency())
             return STATE_NO_FREQUENCY;
 
-        if (m_rxDevice && ! m_loading && ! m_rxDevice->isLocked())
+        if (m_rxDevice && ! m_rxDevice->isLocked())
             return STATE_DEVICE_READY;
 
-        if (m_loading)
-            return STATE_STREAM_LOADING;
+        //if (m_loading)
+        //    return STATE_STREAM_LOADING;
 
         if (m_rxDevice->isLocked() && ! m_rxDevice->isReading())
             return STATE_STREAM_LOST;
@@ -690,8 +687,6 @@ namespace ite
 
     void CameraManager::reloadMedia()
     {
-        m_loading = true;
-
         stopEncoders();
         if (m_rxDevice && m_rxDevice->isLocked())
         {
@@ -699,15 +694,13 @@ namespace ite
             if (! m_rxDevice->isReading())
                 freeDevice();
         }
-
-        m_loading = false;
     }
 
     bool CameraManager::stopIfNeedIt()
     {
-        static const unsigned WAIT_TO_STOP_MS = 30000; // 30 sec
+        static const unsigned WAIT_TO_STOP_MS = 10000;
 
-        if (m_stopTimer.isStarted() && m_stopTimer.elapsed() > WAIT_TO_STOP_MS)
+        if (m_stopTimer.isStarted() && m_stopTimer.elapsedMS() > WAIT_TO_STOP_MS)
             return stopStreams();
 
         return false;
@@ -820,48 +813,12 @@ namespace ite
 
     // from StreamReader thread
 
-    VideoPacket * CameraManager::nextPacket(unsigned encoderNumber)
+    DevReader * CameraManager::devReader() const
     {
-        static const unsigned MAX_READ_ATTEMPTS = 500;
-        static const unsigned SLEEP_DURATION_MS = 20;
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-        for (unsigned i = 0; i < MAX_READ_ATTEMPTS; ++i)
-        {
-            DevReader * devReader = nullptr;
-
-            {
-                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-                if (m_rxDevice)
-                    devReader = m_rxDevice->reader();
-            }
-
-            if (! devReader)
-                return nullptr;
-
-            ContentPacketPtr pkt = devReader->getPacket( RxDevice::stream2pid(encoderNumber) );
-
-            if (pkt)
-            {
-#if 0
-                if (!pkt->size())
-                    printf("%s empty packet", __FUNCTION__);
-#endif
-                VideoPacket * packet = new VideoPacket(pkt->data(), pkt->size());
-
-                packet->setPTS(pkt->pts());
-
-                if (encoderNumber)
-                    packet->setLowQualityFlag();
-                if (pkt->flags() & ContentPacket::F_StreamReset)
-                    packet->setStreamReset();
-
-                return packet;
-            }
-
-            Timer::sleep(SLEEP_DURATION_MS); // TODO: conditional variable
-        }
-
+        if (m_rxDevice)
+            return m_rxDevice->reader();
         return nullptr;
     }
 

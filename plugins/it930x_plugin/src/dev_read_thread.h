@@ -5,6 +5,15 @@
 
 #include "dev_reader.h"
 
+#ifdef COUNT_OBJECTS
+#include "device_mapper.h"
+#include "discovery_manager.h"
+#include "camera_manager.h"
+#include "media_encoder.h"
+#include "stream_reader.h"
+#include "video_packet.h"
+#endif
+
 namespace ite
 {
     ///
@@ -38,6 +47,7 @@ namespace ite
 
 #if 1
             printf("stop reading TS stream\n");
+            printCouners();
 #endif
             m_devReader->setThreadObj(nullptr);
         }
@@ -50,6 +60,35 @@ namespace ite
 
         DevReadThread(const DevReadThread&);
         DevReadThread& operator = (const DevReadThread&);
+
+#ifdef COUNT_OBJECTS
+        void printCouners()
+        {
+            printf("\n");
+            printCtorDtor<ContentPacket>();
+            printCtorDtor<Demux>();
+            printCtorDtor<DeviceBuffer>();
+            printCtorDtor<DevReader>();
+            printCtorDtor<DeviceMapper>();
+
+            printCtorDtor<DiscoveryManager>();
+            printCtorDtor<CameraManager>();
+            printCtorDtor<MediaEncoder>();
+            printCtorDtor<StreamReader>();
+            printCtorDtor<VideoPacket>();
+            printf("\n");
+        }
+
+        template <typename T>
+        void printCtorDtor()
+        {
+            typedef ObjectCounter<T> Counter;
+
+            printf("%s:\t%d - %d = %d\n", Counter::name(), Counter::ctorCount(), Counter::dtorCount(), Counter::diffCount());
+        }
+#else
+        static void printCouners() {}
+#endif
     };
 }
 

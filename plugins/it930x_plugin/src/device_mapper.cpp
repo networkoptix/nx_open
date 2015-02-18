@@ -10,6 +10,8 @@
 
 namespace ite
 {
+    INIT_OBJECT_COUNTER(DeviceMapper)
+
     class RC_DiscoveryThread;
     static RC_DiscoveryThread * updateThreadObj = nullptr;
     static std::thread updateThread;

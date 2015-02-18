@@ -7,6 +7,12 @@
 
 namespace ite
 {
+    INIT_OBJECT_COUNTER(ContentPacket)
+    INIT_OBJECT_COUNTER(Demux)
+    INIT_OBJECT_COUNTER(DeviceBuffer)
+    INIT_OBJECT_COUNTER(DevReader)
+
+
     // DeviceBuffer
 
     bool DeviceBuffer::sync()
@@ -200,12 +206,6 @@ namespace ite
         m_demux.addPid(Pacidal::PID_VIDEO_SD);
         m_demux.addPid(Pacidal::PID_VIDEO_CIF);
 
-        m_packetQueues[It930x::PID_RETURN_CHANNEL] = PacketsQueue();
-        m_packetQueues[Pacidal::PID_VIDEO_FHD] = PacketsQueue();
-        m_packetQueues[Pacidal::PID_VIDEO_HD] = PacketsQueue();
-        m_packetQueues[Pacidal::PID_VIDEO_SD] = PacketsQueue();
-        m_packetQueues[Pacidal::PID_VIDEO_CIF] = PacketsQueue();
-
         // alloc TS pool
         {
             std::vector<TsBuffer> vecTS;
@@ -224,10 +224,24 @@ namespace ite
             case Pacidal::PID_VIDEO_HD:
             case Pacidal::PID_VIDEO_SD:
             case Pacidal::PID_VIDEO_CIF:
+                m_packetQueues[pid] = PacketsQueue();
                 return true;
         }
 
         return false;
+    }
+
+    void DevReader::unsubscribe(uint16_t pid)
+    {
+        switch (pid)
+        {
+            case Pacidal::PID_VIDEO_FHD:
+            case Pacidal::PID_VIDEO_HD:
+            case Pacidal::PID_VIDEO_SD:
+            case Pacidal::PID_VIDEO_CIF:
+                m_packetQueues.erase(pid);
+                break;
+        }
     }
 
     void DevReader::start(It930x * dev)
@@ -303,7 +317,7 @@ namespace ite
             auto it = m_packetQueues.find(pid);
             if (it == m_packetQueues.end())
             {
-#if 1
+#if 0
                 printf("Packet for unknown PID: %d\n", pid);
 #endif
                 return;
@@ -312,26 +326,33 @@ namespace ite
 
             // TODO: could unlock DevReader (and lock queue) here
 
-            if (q->size() >= MAX_QUEUE_SIZE)
+            while (q->size() >= MAX_QUEUE_SIZE)
             {
                 q->pop_front();
                 q->front()->flags() |= ContentPacket::F_StreamReset;
             }
 
             q->push_back(pkt);
+            m_cond.notify_all();
         }
     }
 
-    ContentPacketPtr DevReader::getPacket(uint16_t pid)
+    ContentPacketPtr DevReader::getPacket(uint16_t pid, const std::chrono::milliseconds& timeout)
     {
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+        using std::chrono::system_clock;
+
+        std::unique_lock<std::mutex> lock( m_mutex ); // LOCK
 
         ContentPacketPtr pkt;
         auto it = m_packetQueues.find(pid);
         if (it != m_packetQueues.end())
         {
             PacketsQueue& q = it->second;
-            if (q.size())
+
+            if (q.empty())
+                m_cond.wait_until(lock, system_clock::now() + timeout);
+
+            if (! q.empty())
             {
                 pkt = q.front();
                 q.pop_front();
@@ -351,7 +372,7 @@ namespace ite
         Timer t(true);
         TsBuffer ts(m_poolTs);
 
-        while (t.elapsed() < WAIT_TIME_MS)
+        while (t.elapsedUS() < WAIT_TIME_MS)
         {
             // check time time to time - sometimes
             for (unsigned i = 0; i < READ_BLOCK; ++i)

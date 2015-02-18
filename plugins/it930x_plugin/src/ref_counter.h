@@ -3,6 +3,8 @@
 
 #include <plugins/plugin_tools.h>
 
+#include "object_counter.h"
+
 namespace nxpl
 {
     inline bool operator == ( const nxpl::NX_GUID& id1, const nxpl::NX_GUID& id2 )

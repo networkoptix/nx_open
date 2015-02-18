@@ -158,11 +158,15 @@ bool PluginManager::loadNxPlugin( const QString& fullFilePath )
 {
     QLibrary lib( fullFilePath );
     if( !lib.load() )
+    {
+        NX_LOG( lit("Failed to load %1: %2").arg(fullFilePath).arg(lib.errorString()), cl_logERROR );
         return false;
+    }
     
     nxpl::CreateNXPluginInstanceProc entryProc = (nxpl::CreateNXPluginInstanceProc)lib.resolve( "createNXPluginInstance" );
     if( entryProc == NULL )
     {
+        NX_LOG( lit("Failed to load %1: no createNXPluginInstance").arg(fullFilePath), cl_logERROR );
         lib.unload();
         return false;
     }
@@ -170,6 +174,7 @@ bool PluginManager::loadNxPlugin( const QString& fullFilePath )
     nxpl::PluginInterface* obj = entryProc();
     if( !obj )
     {
+        NX_LOG( lit("Failed to load %1: no PluginInterface").arg(fullFilePath), cl_logERROR );
         lib.unload();
         return false;
     }

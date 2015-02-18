@@ -16,11 +16,11 @@
 namespace ite
 {
     class MediaEncoder;
-    class VideoPacket;
     class DeviceMapper;
+    class DevReader;
 
     //!
-    class CameraManager : public nxcip::BaseCameraManager3
+    class CameraManager : public nxcip::BaseCameraManager3, public ObjectCounter<CameraManager>
     {
         DEF_REF_COUNTER
 
@@ -55,7 +55,7 @@ namespace ite
 
         // for StreamReader
 
-        VideoPacket * nextPacket(unsigned encoderNumber);
+        DevReader * devReader() const;
 
         void openStream(unsigned encNo);
         void closeStream(unsigned encNo);
@@ -76,15 +76,12 @@ namespace ite
 
         const DeviceMapper * m_devMapper;
         unsigned short m_txID;
-        std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
+        std::vector<std::shared_ptr<MediaEncoder>> m_encoders; // FIXME: do not use smart ptr for ref-counted object
 
         std::set<unsigned> m_openedStreams;
-        //std::atomic_bool m_waitStop;
-        //time_t m_stopTime;
         Timer m_stopTimer;
 
         RxDevicePtr m_rxDevice;
-        bool m_loading;
 
         mutable const char * m_errorStr;
         nxcip::CameraInfo m_info;
@@ -100,8 +97,6 @@ namespace ite
         void tryLoad();
 
         bool stopStreams(bool force = false);
-
-        std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum);
 
         typedef enum
         {

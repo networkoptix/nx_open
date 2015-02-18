@@ -12,7 +12,7 @@
 namespace ite
 {
     ///
-    class MediaEncoder : public nxcip::CameraMediaEncoder2
+    class MediaEncoder : public nxcip::CameraMediaEncoder2, public ObjectCounter<MediaEncoder>
     {
         DEF_REF_COUNTER
 

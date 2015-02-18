@@ -20,6 +20,7 @@ namespace ite
 
     //
 
+    INIT_OBJECT_COUNTER(DiscoveryManager)
     DEFAULT_REF_COUNTER(DiscoveryManager)
 
     DiscoveryManager * DiscoveryManager::Instance;

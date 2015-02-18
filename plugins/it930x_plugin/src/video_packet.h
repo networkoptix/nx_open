@@ -11,15 +11,15 @@
 namespace ite
 {
     //!
-    class VideoPacket : public nxcip::VideoDataPacket
+    class VideoPacket : public nxcip::VideoDataPacket, public ObjectCounter<VideoPacket>
     {
         DEF_REF_COUNTER
 
     public:
-        VideoPacket(const uint8_t* data, unsigned size);
+        VideoPacket(const uint8_t * data, unsigned size, uint64_t ts);
         virtual ~VideoPacket();
 
-        // nxpl::MediaDataPacket
+        // nxpl::VideoDataPacket
 
         virtual nxcip::UsecUTCTimestamp timestamp() const override;
         virtual nxcip::DataPacketType type() const override;
@@ -33,31 +33,11 @@ namespace ite
 
         //
 
-        int64_t pts() const { return m_pts; }
-        void setPTS(int64_t pts) { m_pts = pts; }
-
-        void setTime(uint64_t ts) { m_time = ts; }
-        void setKeyFlag() { m_flags |= MediaDataPacket::fKeyPacket; }
-        void setLowQualityFlag() { m_flags |= MediaDataPacket::fLowQuality; }
-        void setStreamReset() { m_flags |= MediaDataPacket::fStreamReset; }
-
-        bool isKey() const { return m_flags & MediaDataPacket::fKeyPacket; }
-
-        void swap(VideoPacket& vp)
-        {
-            using std::swap;
-
-            m_data.swap(vp.m_data);
-            swap(m_size, vp.m_size);
-            swap(m_pts, vp.m_pts);
-            swap(m_time, vp.m_time);
-            swap(m_flags, vp.m_flags);
-        }
+        void setFlag(MediaDataPacket::Flags f) { m_flags |= f; }
 
     private:
-        std::shared_ptr<uint8_t> m_data;
+        void * m_data;
         size_t m_size;
-        int64_t m_pts;
         nxcip::UsecUTCTimestamp m_time;
         unsigned m_flags;
     };

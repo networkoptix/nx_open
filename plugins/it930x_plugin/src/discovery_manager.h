@@ -15,7 +15,7 @@ namespace ite
     class CameraManager;
 
     //!
-    class DiscoveryManager : public nxcip::CameraDiscoveryManager
+    class DiscoveryManager : public nxcip::CameraDiscoveryManager, public ObjectCounter<DiscoveryManager>
     {
         DEF_REF_COUNTER
 
