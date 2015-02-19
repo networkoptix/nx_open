@@ -1,0 +1,88 @@
+Login Dialog, Saved Connections - connecting_to_enterprise_contr.htm
+Click on compatibility warning (Client/Server version mismatch  or connection test warning) - launching_product_name_in_comp.htm
+Main Menu - main_menu.htm
+Side Panels (buttons that show/hide panels) - showing_and_hiding_side_panels.htm
+Tab - tabs.htm
+Items on Scene - viewing_camera_stream_information.htm
+Resource Tree (Empty Space) - working_with_a_resource_tree.htm
+Resource Tree - Search (Empty Space) - search.htm
+Playback Panel (empty Space) - playback_panel.htm
+FullScreen Button on top - full_screen_and_windowed_mode.htm
+Local Settings -> Look and Feel - customizing_product_name.htm
+Analog cameras (items in Scene) if not licensed - obtaining_and_activating_hd_witness_licenses.htm
+Licenses Form - obtaining_and_activating_hd_witness_licenses.htm
+Media Server Settings (upper part) - configuring_media_servers_additional_settings_(ad.htm
+Media Server Settings (storage part) - configuring_media_server_storages_(admin_only).htm
+Monitoring Item on Scene - monitoring_media_servers.htm
+Connect to Current System -> Password - join_server_from_different_sys.htm
+Merge Systems - merge_all_servers_to_another_s.htm
+Routing Management - configuring_routing_within_mul.htm
+Time Sync - configuring_time_synchronizati.htm
+Component version mismatch Form (Servers are diff. version) - upgrading_product_name.htm
+System Admin Form (Empty Space) - system-wide_configurations.htm
+Cameras List - viewing_full_cameras_list.htm
+Enable camera auto discovery checkbox - disabling_automatic_discovery.htm
+Manual Camera Addition - adding_cameras_manually.htm
+
+
+
+Mail Server Settings Form - upper part (mail server) - configuring_mail_server_for_e-.htm
+Mail Server Settings Form - lower part (backup) - backing_up_and_restoring_produ.htm
+
+
+Notification Settings,Notification panel - notifications.htm
+
+Event/Action Form - configuring_events_and_actions.htm
+Events Schedule - setting_up_schedule_for_tracki.htm
+   - Events: 
+     - Motion - motion_on_camera.htm
+     - Camera Disconnected - camera_disconnection_malfuncti.htm
+     - Storage Failure - storage_failure.htm
+     - Network Issue - network_issue.htm
+     - Camera IP Conflict - camera_ip_conflict.htm
+     - Input Signal on Camera - input_signal_on_camera.htm
+     - Media Server Failure - media_server_failure.htm
+     - Media Servers Conflict - media_servers_conflict.htm
+   - Actions: 
+     - Camera Recording - start_recording_on_camera.htm
+     - Panic Recording - start_panic_recording.htm
+     - Send Mail - mail_notifications.htm
+     - Show Notification - notifications.htm
+     - Camera Output - trigger_camera_output.htm
+     - Play Sound (advanced Event settings) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/play_sound.htm
+     - Say (advanced Event settings) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/say_text.htm
+     - Instant Output (advanced Event settings) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/trigger_camera_output.htm     
+
+Item on Scene (if PTZ enabled) - setting_up_ptz.htm
+
+
+
+Zoom windows (click on item with zoom windows or on zoom window) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/zoom_windows.htm
+E-mapping (layout with background (void) or Layout Properties if click on image) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/e-mapping.htm
+Event Log - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/viewing_events_log.htm
+
+Gamma corrected item or Gamma Correction settings form - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/color_correction.htm
+Expert tab in camera settings - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/adjusting_second_stream_qualit.htm
+Click on Layout (void) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/locking_layouts.htm
+De-warped item - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/working_with_fish-eye_cameras.htm
+Dewarping tab in Camera Settings - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/working_with_fish-eye_cameras.htm
+Offline cameras diagnostics (offline camera or diagnostics form) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/diagnosing_offline_cameras.htm
+ - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/launching_product_name_in_comp.htm
+time selector in CLND - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/using_calendar.htm
+
+Look and Feel section of System Settings->General - customizing_product_name.htm
+Rebuild Archive part of Media Server's settings - restoring_broken_archive.htm
+
+Force Aspect Ratio checkbox - forcing_aspect_ratio_for_camer.htm 
+This is a fish-eye Lens checkbox and Dewarping Tab - setting_up_fish-eye_cameras.htm
+Positions section in PTZ Tours form - saving_and_restoring_ptz_posit.htm
+Tours section in PTZ Tours form - setting_up_ptz_tours.htm
+Home Checkbox in PTZ Tours form - home_positions_and_tours_for_p.htm
+Keep Camera streans and profile settings checkbox - preventing_product_name_from_c.htm
+Media Server Started event in E&A form and its adv. settings part - media_server_started.htm
+Repeat Soud Action in E&A form and its adv. settings part - repeat_sound.htm
+Write to Log Action in E&A form and its adv. settings part - write_to_log.htm
+Auto Pause Video setting - cpu_and_bandwidth_saving_durin.htm
+Browse Logs button - collecting_logs.htm
+Positions section in PTZ Tours form - saving_and_restoring_ptz_posit.htm - doesn't work w/o positions (empty list)
+Keep Camera streams and profile settings checkbox - preventing_product_name_from_c.htm
