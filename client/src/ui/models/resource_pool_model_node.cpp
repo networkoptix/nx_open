@@ -534,6 +534,10 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return Qn::MainWindow_Tree_Local_Help;
         } else if(m_type == Qn::RecorderNode) {
             return Qn::MainWindow_Tree_Recorder_Help;
+        } else if(m_type == Qn::VideoWallItemNode) {
+            return Qn::Videowall_Help;
+        } else if(m_type == Qn::VideoWallMatrixNode) {
+            return Qn::Videowall_Matrix_Help;
         } else if(m_flags & Qn::layout) {
             if(m_model->context()->snapshotManager()->isFile(m_resource.dynamicCast<QnLayoutResource>())) {
                 return Qn::MainWindow_Tree_MultiVideo_Help;
@@ -546,6 +550,10 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return Qn::MainWindow_Tree_Local_Help;
         } else if(m_flags & Qn::server) {
             return Qn::MainWindow_Tree_Servers_Help;
+        } else if(m_flags & Qn::live_cam) {
+            return Qn::MainWindow_Tree_Camera_Help;
+        } else if(m_flags & Qn::videowall) {
+            return Qn::Videowall_Display_Help;
         } else {
             return -1;
         }

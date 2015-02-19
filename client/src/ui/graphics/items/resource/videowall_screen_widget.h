@@ -36,6 +36,9 @@ protected:
     virtual QString calculateTitleText() const override;
 
     virtual void at_itemDataChanged(int role) override;
+
+    virtual int helpTopicAt(const QPointF &pos) const override;
+
 private:
     void updateItems();
     void updateLayout(bool force = false);

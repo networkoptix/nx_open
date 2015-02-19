@@ -110,6 +110,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(this,                  Qn::CameraSettings_Multi_Help);
     setHelpTopic(ui->tabRecording,      Qn::CameraSettings_Recording_Help);
     setHelpTopic(ui->fisheyeCheckBox,   Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(ui->arOverrideCheckBox, ui->arComboBox,    Qn::CameraSettings_AspectRatio_Help);
+    setHelpTopic(ui->rotCheckBox, ui->rotComboBox,          Qn::CameraSettings_Rotation_Help);
 
     auto updateLicensesIfNeeded = [this] { 
         if (!isVisible())

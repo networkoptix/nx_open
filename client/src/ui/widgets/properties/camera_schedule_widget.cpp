@@ -160,6 +160,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHighest), Qn::QualityHighest);
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
 
+    setHelpTopic(ui->archiveGroupBox, Qn::CameraSettings_Recording_ArchiveLength_Help);
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     // init buttons

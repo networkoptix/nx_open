@@ -22,6 +22,9 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include <ui/style/skin.h>
 
 #include <utils/common/warnings.h>
@@ -219,6 +222,11 @@ void QnVideowallScreenWidget::at_itemDataChanged(int role) {
         return;
 
     updateItems();
+}
+
+int QnVideowallScreenWidget::helpTopicAt(const QPointF &pos) const {
+    Q_UNUSED(pos)
+    return Qn::Videowall_Display_Help;
 }
 
 void QnVideowallScreenWidget::updateItems() {
