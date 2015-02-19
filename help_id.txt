@@ -11,28 +11,50 @@ FullScreen Button on top - full_screen_and_windowed_mode.htm
 Local Settings -> Look and Feel - customizing_product_name.htm
 Analog cameras (items in Scene) if not licensed - obtaining_and_activating_hd_witness_licenses.htm
 Licenses Form - obtaining_and_activating_hd_witness_licenses.htm
+Server in tree - Configuring_Media_Servers_Additional_Settings_(Ad.htm
 Media Server Settings (upper part) - configuring_media_servers_additional_settings_(ad.htm
 Media Server Settings (storage part) - configuring_media_server_storages_(admin_only).htm
+Media Server Settings - Open Web Client - Using_Media_Servers_Web_Interf.htm
 Monitoring Item on Scene - monitoring_media_servers.htm
+System Administration - General - Health Monitoring - monitoring_media_servers.htm 
 Connect to Current System -> Password - join_server_from_different_sys.htm
 Merge Systems - merge_all_servers_to_another_s.htm
 Routing Management - configuring_routing_within_mul.htm
 Time Sync - configuring_time_synchronizati.htm
 Component version mismatch Form (Servers are diff. version) - upgrading_product_name.htm
 System Admin Form (Empty Space) - system-wide_configurations.htm
+System Admin Form, Cameras List - viewing_full_cameras_list.htm
 Cameras List - viewing_full_cameras_list.htm
 Enable camera auto discovery checkbox - disabling_automatic_discovery.htm
 Manual Camera Addition - adding_cameras_manually.htm
-
-
-
-Mail Server Settings Form - upper part (mail server) - configuring_mail_server_for_e-.htm
-Mail Server Settings Form - lower part (backup) - backing_up_and_restoring_produ.htm
-
-
-Notification Settings,Notification panel - notifications.htm
-
+Camera in Tree - Configuring_Cameras.htm
+Analog Camera Properties - setting_up_analog_cameras.htm
+IP Camera Properties (top, address, empty space) - obtaining_cameras_ip_and_mac.htm
+IP Camera Properties (audio) - configuring_audio_for_the_camera_(admin_only).htm
+IP Camera Properties (login/pass) - configuring_camera_authentication_(admin_only).htm
+IP Camera Properties (aspect Ratio) - forcing_aspect_ratio_for_camer.htm
+IP Camera Properties (Rotation) - setting_up_camera_orientation.htm
+IP Camera Properties (fisheye) - setting_up_fish-eye_cameras.htm
+IP Camera Properties (fisheye tab) - setting_up_fish-eye_cameras.htm
+Item on Scene (if PTZ enabled) - setting_up_ptz.htm
+Positions section in PTZ Tours form - saving_and_restoring_ptz_posit.htm
+Tours section in PTZ Tours form - setting_up_ptz_tours.htm
+Home Checkbox in PTZ Tours form - home_positions_and_tours_for_p.htm
+IP Camera Properties (Recording tab) - editing_recording_schedule.htm
+IP Camera Properties (Recording tab, copy button) - copying_recording_schedule_fro.htm
+IP Camera Properties (Recording tab, min/max section) - configuring_maximum_and_minimu.htm
+IP Camera Properties (Motion Detection tab) - setting_up_motion_mask_and_motion_sensitivity_(adm.htm
+IP Camera Properties (Advanced tab) - configuring_proprietary_camera_parameters.htm
+Expert tab in camera settings (Empty space) - adjusting_second_stream_qualit.htm
+Sysadmin - Enable Camera Discovery - disabling_recording_of_primary.htm
+Expert tab, Keep Camera streams and profile settings checkbox - preventing_product_name_from_c.htm
+Expert tab, Do not archive primary stream - disabling_recording_of_primary.htm
+Swapping warning (when drop cameras between servers) - swapping_cameras_between_media_servers_(admin_only.htm
+Delete Camera Warning - deleting_a_camera_(admin_only).htm
+Server Settings, Failover checkbox - configuring_failover.htm
+Media Server Settings, Camera Capacity - configuring_failover.htm
 Event/Action Form - configuring_events_and_actions.htm
+System Administration - General - Alarm/Event Rules - configuring_events_and_actions.htm
 Events Schedule - setting_up_schedule_for_tracki.htm
    - Events: 
      - Motion - motion_on_camera.htm
@@ -44,45 +66,64 @@ Events Schedule - setting_up_schedule_for_tracki.htm
      - Media Server Failure - media_server_failure.htm
      - Media Servers Conflict - media_servers_conflict.htm
    - Actions: 
+     - Show Notification - notifications.htm
+- Notification Settings,Notification panel - notifications.htm
      - Camera Recording - start_recording_on_camera.htm
      - Panic Recording - start_panic_recording.htm
      - Send Mail - mail_notifications.htm
-     - Show Notification - notifications.htm
+System Administration - EMail - configuring_mail_server_for_e-.htm
      - Camera Output - trigger_camera_output.htm
-     - Play Sound (advanced Event settings) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/play_sound.htm
-     - Say (advanced Event settings) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/say_text.htm
-     - Instant Output (advanced Event settings) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/trigger_camera_output.htm     
-
-Item on Scene (if PTZ enabled) - setting_up_ptz.htm
-
-
-
+     - Play Sound (advanced Event settings) - play_sound.htm
+     - Say (advanced Event settings) - say_text.htm
+     - Instant Output (advanced Event settings) - trigger_camera_output.htm 
+     - Write to Log - write_to_log.htm
+     - Media Server Started event in E&A form and its adv. settings part - media_server_started.htm
+     - Repeat Sound Action in E&A form and its adv. settings part - repeat_sound.htm
+System Administration - General - Event Log - viewing_events_log.htm
+Event Log Form - viewing_events_log.htm
+Create User - creating_a_new_user_(admin_only).htm
+User in Tree - users_management.htm
+Modifying User - changing_user_settings.htm
+E-mapping (layout with background (void) or Layout Properties Void) - e-mapping.htm
+Layout in Tree - Adjusting_the_Layout_Look_and_Feel.htm
 Zoom windows (click on item with zoom windows or on zoom window) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/zoom_windows.htm
-E-mapping (layout with background (void) or Layout Properties if click on image) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/e-mapping.htm
-Event Log - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/viewing_events_log.htm
-
-Gamma corrected item or Gamma Correction settings form - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/color_correction.htm
-Expert tab in camera settings - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/adjusting_second_stream_qualit.htm
-Click on Layout (void) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/locking_layouts.htm
-De-warped item - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/working_with_fish-eye_cameras.htm
-Dewarping tab in Camera Settings - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/working_with_fish-eye_cameras.htm
-Offline cameras diagnostics (offline camera or diagnostics form) - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/diagnosing_offline_cameras.htm
- - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/launching_product_name_in_comp.htm
-time selector in CLND - file:///C:/develop/projects/netoptix_vms/build_environment/x64/bin/help/using_calendar.htm
-
-Look and Feel section of System Settings->General - customizing_product_name.htm
-Rebuild Archive part of Media Server's settings - restoring_broken_archive.htm
-
-Force Aspect Ratio checkbox - forcing_aspect_ratio_for_camer.htm 
-This is a fish-eye Lens checkbox and Dewarping Tab - setting_up_fish-eye_cameras.htm
-Positions section in PTZ Tours form - saving_and_restoring_ptz_posit.htm
-Tours section in PTZ Tours form - setting_up_ptz_tours.htm
-Home Checkbox in PTZ Tours form - home_positions_and_tours_for_p.htm
-Keep Camera streans and profile settings checkbox - preventing_product_name_from_c.htm
-Media Server Started event in E&A form and its adv. settings part - media_server_started.htm
-Repeat Soud Action in E&A form and its adv. settings part - repeat_sound.htm
-Write to Log Action in E&A form and its adv. settings part - write_to_log.htm
+Layout Properties (General Settings) - locking_layouts.htm
+Unsaved Layout Warning - Saving_Layouts_(Admin_Only).htm
+Delete Layout Warning - Deleting_Layouts_(Admin_Only).htm
+System Administration - lower part (backup) - backing_up_and_restoring_produ.htm
+VW in Tree - Configuring_Video_Wall.htm
+Attach to VW form - Adding_or_Removing_Physical_Di.htm
+Switch to VW mode warning - Switching_to_Video_Wall_Mode.htm
+Scene with VW Displays (Empty Space) - Changing_Appearance_of_Video_W.htm
+VW Matrix in Tree - Saving_and_Restoring_Video_Wal.htm
+VW-Display in Tree - Controlling_Video_Wall_Display.htm
+Scene with VW Displays (Display) - Controlling_Video_Wall_Display.htm
 Auto Pause Video setting - cpu_and_bandwidth_saving_durin.htm
-Browse Logs button - collecting_logs.htm
-Positions section in PTZ Tours form - saving_and_restoring_ptz_posit.htm - doesn't work w/o positions (empty list)
-Keep Camera streams and profile settings checkbox - preventing_product_name_from_c.htm
+Live/Playback Buttons - Navigating_through_Archive_and.htm
+TimeLine - Pan-Temporal_Timeline.htm
+Sync Button - Navigating_through_several_cameras_synchronously.htm
+CLND - Using_Calendar.htm
+Date/time selector in CLND - using_calendar.htm
+Item on Scene (Smart Search On) - Performing_Smart_Search.htm
+TimeLine (Smart Search On) - Performing_Smart_Search.htm
+Timeline (Thumbnails) - Using_Thumbnails_for_Better_Navigation.htm
+Preview Search Layout (everything, including items) - Thumbnail_Search.htm
+Local files and all resources under in Resource Tree (except exported) - Local_files_structure_in_Resource_Tree.htm
+Local Settings - Media Folders - Configuring_Media_Folders.htm
+De-warped item - working_with_fish-eye_cameras.htm
+Gamma corrected item or Gamma Correction settings form - color_correction.htm
+Export form - Exporting.htm
+Local files - Exported File in Tree - Viewing_Videos_Exported_from_a.htm
+Local files - Multi-Video in Tree - Viewing_Multi-Channel_Videos.htm
+Multi-Video Scene (items as well) - Viewing_Multi-Channel_Videos.htm
+Watermark form - Viewing_and_Checking_the_Validity_of_Exported_Vide.htm
+Screenshot Saving Form - Taking_a_Screenshot.htm
+Tour in progress - Tours.htm
+Local Settings - Screen Recording - Setting_up_Screen_Recording.htm
+Screen Recording button on top - Performing_Screen_Recording.htm
+System Admin - Upgrade - Upgrading_PRODUCT.NAME.htm
+Local Settings - Autorun when PC boots - Run_DISPLAY.PRODUCT.NAME_when_.htm
+Offline cameras diagnostics (offline camera or diagnostics form) - diagnosing_offline_cameras.htm
+Local Settings - Double Buffering - Double_Buffering.htm
+Rebuild Archive part of Media Server's settings - restoring_broken_archive.htm
+About form - collecting_additional_informat.htm
