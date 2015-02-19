@@ -1383,8 +1383,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         ensureRaisedConeItem(widget);
         QRectF targetGeometry = widget->calculateGeometry(enclosingGeometry, rotation);
         raisedConeItem(widget)->setOriginGeometry(rotated(targetGeometry, rotation));
-        qreal scale = scaleFactor(targetGeometry.size(), raisedGeometry(targetGeometry, rotation).size(), Qt::KeepAspectRatio);
+        QRectF raisedGeometry = this->raisedGeometry(targetGeometry, rotation);
+        qreal scale = scaleFactor(targetGeometry.size(), raisedGeometry.size(), Qt::KeepAspectRatio);
         enclosingGeometry = scaled(enclosingGeometry, scale, enclosingGeometry.center());
+        enclosingGeometry.moveCenter(enclosingGeometry.center() + raisedGeometry.center() - targetGeometry.center());
     }
 
     /* Update Z value. */
