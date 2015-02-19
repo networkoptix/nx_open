@@ -1870,9 +1870,23 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if (moreResourceToDelete.isEmpty())
         return;
     
+    int helpId = -1;
+    for (const QnResourcePtr &resource: resources) {
+        if (resource->hasFlags(Qn::live_cam)) {
+            helpId = Qn::DeletingCamera_Help;
+            break;
+        }
+        if (resource->hasFlags(Qn::layout)) {
+            helpId = Qn::DeletingLayout_Help;
+            /* We don't break here because camera could be in the list,
+             * and camera has a preference. */
+        }
+    }
+
     QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
         mainWindow(),
         resources,
+        helpId,
         tr("Delete Resources"),
         question,
         QDialogButtonBox::Yes | QDialogButtonBox::No

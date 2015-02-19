@@ -22,6 +22,7 @@
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/videowall_resource.h>
 
 #include <api/session_manager.h>
 
@@ -53,6 +54,7 @@
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/watchers/workbench_system_name_watcher.h>
 #include <ui/workbench/watchers/workbench_server_address_watcher.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
@@ -187,6 +189,16 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up scene & view. */
     m_scene.reset(new QnGraphicsScene(this));
     setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
+
+    connect(workbench(), &QnWorkbench::currentLayoutChanged, this, [this]() {
+        if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
+            if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+                setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);
+                return;
+            }
+        }
+        setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
+    });
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
