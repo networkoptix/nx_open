@@ -11,6 +11,8 @@
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <update/connect_to_current_system_tool.h>
 #include <utils/merge_systems_tool.h>
@@ -58,6 +60,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
         dialog.setLabelText(tr("Administrator Password"));
         dialog.setTextEchoMode(QLineEdit::Password);
         dialog.setTextValue(password);
+        setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
 
         if (dialog.exec() != QDialog::Accepted)
             return;

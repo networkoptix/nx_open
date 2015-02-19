@@ -38,6 +38,9 @@
 #include <ui/workbench/extensions/workbench_layout_export_tool.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
 #include <utils/common/string.h>
@@ -273,6 +276,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         ));
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
+
+        setHelpTopic(dialog.data(), Qn::Exporting_Help);
 
         QnAbstractWidgetControlDelegate* delegate = NULL;
 #ifdef Q_OS_WIN

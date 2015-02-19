@@ -10,6 +10,8 @@
 #include "core/resource/media_server_resource.h"
 #include "ui/common/ui_resource_name.h"
 #include "ui/style/warning_style.h"
+#include "ui/help/help_topics.h"
+#include "ui/help/help_topic_accessor.h"
 #include "utils/merge_systems_tool.h"
 #include "utils/common/util.h"
 
@@ -25,6 +27,8 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     setWarningStyle(ui->errorLabel);
     m_mergeButton->hide();
     ui->buttonBox->button(QDialogButtonBox::Close)->hide();
+
+    setHelpTopic(this, Qn::Systems_MergeSystems_Help);
 
     QButtonGroup *buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->currentSystemRadioButton);
