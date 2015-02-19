@@ -269,6 +269,7 @@ void QnClientSettings::load() {
 
 void QnClientSettings::save() {
     submitToSettings(m_settings);
+    m_settings->sync();
 }
 
 bool QnClientSettings::isWritable() const {
