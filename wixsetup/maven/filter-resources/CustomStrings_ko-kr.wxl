@@ -141,7 +141,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">이전 버전 감지</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">설치 방식</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">업그레이드가 진행 됩니다.</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">데이터 베이스가 손상되어 복구 할 수 없어 새 데이터 베이스가 설치 되었습니다. 연결하시려면 ID: admin / PW: admin을 사용하십시오. 첫 번째 로그인 시에 권한 정보를 변경하십시오.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">데이터 베이스가 손상되어 복구 할 수 없어 새 데이터 베이스가 설치 되었습니다. 연결하시려면 ID: admin / PW: 123을 사용하십시오. 첫 번째 로그인 시에 권한 정보를 변경하십시오.</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Window 방화벽에 연결할 수 없습니다.  ([2]   [3]   [4]   [5])</String>    

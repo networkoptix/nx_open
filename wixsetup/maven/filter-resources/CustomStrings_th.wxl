@@ -139,7 +139,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">รุ่นก่อนหน้านี้ที่ตรวจพบ</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">ประเภทการติดตั้ง</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">ระบบของคุณจะได้รับการอัพเกรด</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">ฐานข้อมูลของคุณได้รับความเสียหายและไม่สามารถกู้คืนได้ ติดตั้งฐานข้อมูลใหม่เสร็จสิ้น  ในการเข้าสู่ระบบ ผู้ใช้าน "admin" รหัสผ่าน "admin" กรุณาเปลี่ยนข้อมูลประจำตัวหลังจากเข้าใช้งานครั้งแรก</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">ฐานข้อมูลของคุณได้รับความเสียหายและไม่สามารถกู้คืนได้ ติดตั้งฐานข้อมูลใหม่เสร็จสิ้น  ในการเข้าสู่ระบบ ผู้ใช้าน "admin" รหัสผ่าน "123" กรุณาเปลี่ยนข้อมูลประจำตัวหลังจากเข้าใช้งานครั้งแรก</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">ไม่สามารถเชื่อมต่อกับ Windows Firewall  ([2]   [3]   [4]   [5])</String>    
