@@ -139,7 +139,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Ältere Version gefunden</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Installationstyp</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Update wird eingespielt</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Ihre Datenbank ist beschädigt und kann nicht wiederhergestellt werden. Eine neue Datenbank wurde installiert. Um sich am System anzumelden, verwenden Sie die Benutzerkennung "admin" und das Passwort "admin". Bitte ändern Sie diese Angaben bei der ersten Anmeldung.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Ihre Datenbank ist beschädigt und kann nicht wiederhergestellt werden. Eine neue Datenbank wurde installiert. Um sich am System anzumelden, verwenden Sie die Benutzerkennung "admin" und das Passwort "123". Bitte ändern Sie diese Angaben bei der ersten Anmeldung.</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Verbindung zur Windows-Firewall kann nicht aufgebaut werden.  ([2]   [3]   [4]   [5])</String>    

@@ -1416,8 +1416,8 @@ void QnMain::run()
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
-    // Create SessionManager
-    QnSessionManager::instance()->start();
+    // todo: #rvasilenko this class doesn't used any more on the server side
+    //QnSessionManager::instance()->start();
 
 #ifdef ENABLE_ONVIF
     QnSoapServer soapServer;    //starting soap server to accept event notifications from onvif cameras
@@ -1997,6 +1997,8 @@ void QnMain::run()
     stopObjects();
 
     QnResource::stopCommandProc();
+    // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
+    TimerManager::instance()->stop();
 
     hlsSessionPool.reset();
 
