@@ -144,8 +144,6 @@ void QnArchiveSyncPlayWrapper::pauseMedia()
     d->paused = true;
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (!info.reader->isEnabled())
-            continue;
         info.reader->setNavDelegate(0);
         info.reader->pauseMedia();
         info.reader->setNavDelegate(this);
