@@ -999,11 +999,13 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
-
-                d->liveDpHi->addDataProcessor(d->dataProcessor);
-                d->liveDpHi->startIfNotRunning();
             }
         }
+        if (d->liveDpHi) {
+            d->liveDpHi->addDataProcessor(d->dataProcessor);
+            d->liveDpHi->startIfNotRunning();
+        }
+
         if (!d->liveDpLow && d->liveDpHi)
         {
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
@@ -1012,13 +1014,11 @@ void QnRtspConnectionProcessor::createDataProvider()
             bool canRunSecondStream = cameraRes && liveHiProvider && (cameraRes->streamFpsSharingMethod() != Qn::BasicFpsSharing || cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS);
 
             if (canRunSecondStream)
-            {
                 d->liveDpLow = camera->getLiveReader(QnServer::LowQualityCatalog);
-                if (d->liveDpLow) {
-                    d->liveDpLow->addDataProcessor(d->dataProcessor);
-                    d->liveDpLow->startIfNotRunning();
-                }
-            }
+        }
+        if (d->liveDpLow) {
+            d->liveDpLow->addDataProcessor(d->dataProcessor);
+            d->liveDpLow->startIfNotRunning();
         }
     }
     if (!d->archiveDP) {
