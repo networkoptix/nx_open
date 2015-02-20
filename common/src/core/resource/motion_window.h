@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 #include <QtCore/QMultiMap>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtGui/QRegion>
 #include <QtGui/QPainterPath>
 

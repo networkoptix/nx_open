@@ -5,7 +5,7 @@
 #include "pluginusagewatcher.h"
 
 #include <QtCore/QDateTime>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/log.h>
 

@@ -7,7 +7,7 @@
 
 #include "mutex_impl.h"
 
-#include "long_runnable.h"
+#include "../common/long_runnable.h"
 
 
 QnMutexImpl::QnMutexImpl( QMutex::RecursionMode mode, QnMutex* const _mutexPtr )

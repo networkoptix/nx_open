@@ -7,7 +7,7 @@
 
 #include <map>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>

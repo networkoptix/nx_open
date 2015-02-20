@@ -7,9 +7,9 @@
 #define EC2_UPDATE_HTTP_HANDLER_H
 
 #include <QtCore/QByteArray>
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include <common/common_module.h>
 

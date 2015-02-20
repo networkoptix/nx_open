@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMap>
 #include <QtCore/QFile>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
 

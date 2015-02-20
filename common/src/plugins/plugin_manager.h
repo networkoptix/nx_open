@@ -10,8 +10,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QPluginLoader>
 #include <QSharedPointer>
 #include <QtCore/QString>

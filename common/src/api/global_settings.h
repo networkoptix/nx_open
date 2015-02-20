@@ -1,7 +1,7 @@
 #ifndef QN_GLOBAL_SETTINGS_H
 #define QN_GLOBAL_SETTINGS_H
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 
 #include <nx_ec/data/api_fwd.h>

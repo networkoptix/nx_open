@@ -2,7 +2,7 @@
 
 #include "cpul_tftp_dataprovider.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/log.h>
 #include <utils/common/util.h>

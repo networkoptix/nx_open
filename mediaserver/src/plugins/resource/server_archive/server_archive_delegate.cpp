@@ -1,7 +1,7 @@
 
 #include "server_archive_delegate.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <server/server_globals.h>
 

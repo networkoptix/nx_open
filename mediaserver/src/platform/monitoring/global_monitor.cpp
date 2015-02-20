@@ -3,8 +3,8 @@
 #include <QtCore/QBasicTimer>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/delete_later.h>

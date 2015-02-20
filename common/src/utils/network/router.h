@@ -2,7 +2,7 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <api/abstract_connection.h>
 #include <api/runtime_info_manager.h>

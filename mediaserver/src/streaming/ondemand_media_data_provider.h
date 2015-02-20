@@ -8,7 +8,7 @@
 #include <memory>
 #include <queue>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QSharedPointer>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>

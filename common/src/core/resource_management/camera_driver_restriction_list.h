@@ -9,7 +9,7 @@
 #include <map>
 #include <vector>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QRegExp>
 #include <QtCore/QString>
 

@@ -8,9 +8,9 @@
 
 #include <map>
 
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 
 //!Associative thread-safe container, which allows to lock elements from accessing from other threads

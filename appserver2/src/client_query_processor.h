@@ -9,8 +9,8 @@
 #include <map>
 
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>

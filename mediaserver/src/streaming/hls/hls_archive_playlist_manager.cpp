@@ -6,7 +6,7 @@
 
 #include <limits>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <core/resource/security_cam_resource.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>

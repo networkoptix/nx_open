@@ -12,9 +12,9 @@
 #include <vector>
 
 #include <QtOpenGL/QGLContext>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QSharedPointer>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>

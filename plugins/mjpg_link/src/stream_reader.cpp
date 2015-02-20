@@ -25,7 +25,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QThread>
 
 #include <utils/common/log.h>

@@ -2,7 +2,7 @@
 #define QN_RESOURCE_DATA_POOL_H
 
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_fwd.h>

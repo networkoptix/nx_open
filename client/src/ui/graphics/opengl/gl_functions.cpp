@@ -2,7 +2,7 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QRegExp>
 #include <QtGui/QOpenGLContext>
 

@@ -2,7 +2,7 @@
 #define __UNIVERSAL_TCP_LISTENER_H__
 
 #include <QMultiMap>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 #include <QtCore/QElapsedTimer>
 
 #include "utils/network/tcp_listener.h"

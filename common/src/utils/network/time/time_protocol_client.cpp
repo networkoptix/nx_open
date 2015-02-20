@@ -8,7 +8,7 @@
 #include <sys/timeb.h>
 #include <sys/types.h>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "utils/common/log.h"
 #include "utils/network/socket_factory.h"

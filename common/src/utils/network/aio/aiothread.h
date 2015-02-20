@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/long_runnable.h>
 

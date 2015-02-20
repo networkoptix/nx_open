@@ -12,8 +12,8 @@
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/joinable.h>
-#include <utils/common/mutex.h>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include "http/asynchttpclient.h"
 #include "../common/stoppable.h"

@@ -4,7 +4,7 @@
 
 #include "streaming_chunk_transcoder.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>

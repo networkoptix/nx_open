@@ -9,7 +9,7 @@
 #include <mutex>
 
 #include <QtCore/QCryptographicHash>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "utils/network/socket_factory.h"
 #include "../../common/log.h"

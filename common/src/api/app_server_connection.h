@@ -1,7 +1,7 @@
 #ifndef QN_APP_SERVER_CONNECTION_H
 #define QN_APP_SERVER_CONNECTION_H
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/request_param.h>
 #include <utils/common/software_version.h>

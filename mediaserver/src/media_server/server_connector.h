@@ -2,7 +2,7 @@
 #define SERVER_CONNECTOR_H
 
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <utils/common/singleton.h>
 
 class QnModuleFinder;

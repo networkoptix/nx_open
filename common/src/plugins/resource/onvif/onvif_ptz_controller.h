@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QPair>
 
 #include <core/ptz/basic_ptz_controller.h>

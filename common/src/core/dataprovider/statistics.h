@@ -4,7 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QDateTime>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #define CL_STATISTICS_WINDOW_MS 2000
 #define CL_STATISTICS_UPDATE_PERIOD_MS 700

@@ -3,7 +3,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <utils/common/uuid.h>
 #include <QtNetwork/QHostAddress>

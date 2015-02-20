@@ -9,8 +9,8 @@
 #include <map>
 #include <set>
 
-#include <utils/common/mutex.h>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include <core/resource/resource_fwd.h>
 

@@ -1,7 +1,7 @@
 #include "tour_ptz_controller.h"
 
 #include <QtCore/QMetaObject>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/serialization/json_functions.h>
 #include <utils/common/long_runnable.h>

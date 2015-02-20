@@ -2,7 +2,7 @@
 
 #include "sony_resource.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/log.h>
 

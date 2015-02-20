@@ -14,7 +14,7 @@ extern "C"
     #include <libavutil/pixfmt.h>
 }
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QRect>
 #include <QtGui/QRegion>
 #include <QtCore/QScopedPointer>

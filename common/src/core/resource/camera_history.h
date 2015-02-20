@@ -2,7 +2,7 @@
 #define QN_CAMERA_HISTORY_H
 
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <utils/common/uuid.h>
 
 #include "recording/time_period.h"

@@ -4,7 +4,7 @@
 
 #include <QtCore/QMetaType>
 #include <QtCore/QSettings>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtGui/QColor>
 
 #include <utils/serialization/json_functions.h>

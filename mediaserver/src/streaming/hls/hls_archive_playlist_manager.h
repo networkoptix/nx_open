@@ -11,7 +11,7 @@
 #include <memory>
 
 #include <QtCore/QElapsedTimer>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 #include <plugins/resource/avi/thumbnails_archive_delegate.h>

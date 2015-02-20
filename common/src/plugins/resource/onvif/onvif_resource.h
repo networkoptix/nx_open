@@ -13,7 +13,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QPair>
 #include <QSharedPointer>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>
 
 #include <core/resource/security_cam_resource.h>

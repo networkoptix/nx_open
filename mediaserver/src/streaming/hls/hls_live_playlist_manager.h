@@ -10,7 +10,7 @@
 #include <queue>
 
 #include <QtCore/QElapsedTimer>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "hls_playlist_manager.h"
 

@@ -8,9 +8,9 @@
 
 #include <memory>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QUrl>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>

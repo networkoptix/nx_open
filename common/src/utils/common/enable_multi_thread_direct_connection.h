@@ -6,7 +6,7 @@
 #ifndef ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
 #define ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 
 

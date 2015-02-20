@@ -8,8 +8,8 @@
 
 #include "asynchttpclient.h"
 
-#include <utils/common/wait_condition.h>
-#include <utils/common/mutex.h>
+#include <utils/thread/wait_condition.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/stoppable.h>
 

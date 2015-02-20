@@ -10,8 +10,8 @@
 #include <memory>
 #include <type_traits>
 
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <onvif/stdsoap2.h>
 

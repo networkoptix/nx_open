@@ -1,7 +1,7 @@
 #ifndef _SERVER_ARCHIVE_DELEGATE_H__
 #define _SERVER_ARCHIVE_DELEGATE_H__
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtGui/QRegion>
 
 #include "core/resource/resource_fwd.h"

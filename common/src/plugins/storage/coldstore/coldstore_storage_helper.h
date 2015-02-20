@@ -7,7 +7,7 @@
 #include <QtCore/QFileInfoList>
 #include <QHash>
 #include <QtCore/QTime>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QSharedPointer>
 
 

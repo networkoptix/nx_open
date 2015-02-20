@@ -93,8 +93,7 @@ extern "C" {
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtGui/QMouseEvent>
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtNetwork/QNetworkAddressEntry>
 #include <QtNetwork/QNetworkInterface>
 #include <QtCore/QObject>
@@ -124,7 +123,7 @@ extern "C" {
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtNetwork/QUdpSocket>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 #include <QtGui/QWheelEvent>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/qmath.h>

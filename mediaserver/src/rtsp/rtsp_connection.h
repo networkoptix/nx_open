@@ -2,7 +2,7 @@
 #define __RTSP_CONNECTION_H_
 
 #include <QtNetwork/QHostAddress>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
 #include <core/resource/resource_fwd.h>

@@ -8,7 +8,7 @@
 #ifndef __QTVSOUND_H__
 #define __QTVSOUND_H__
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QVector>
 
 #ifndef Q_OS_WIN

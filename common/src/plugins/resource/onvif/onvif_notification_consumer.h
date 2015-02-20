@@ -10,7 +10,7 @@
 
 #include <map>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 #include <soapNotificationConsumerBindingService.h>

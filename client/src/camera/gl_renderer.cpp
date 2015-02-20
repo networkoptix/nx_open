@@ -6,7 +6,7 @@
 
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QScopedPointer>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <QtWidgets/QErrorMessage>
 

@@ -102,7 +102,7 @@ extern "C" {
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QMouseEvent>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QMutexLocker>
 #include <QtNetwork/QNetworkAddressEntry>
 #include <QtNetwork/QNetworkInterface>
@@ -142,7 +142,7 @@ extern "C" {
 #include <QtCore/QTimer>
 #include <QtNetwork/QUdpSocket>
 #include <QtWidgets/QVBoxLayout>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QWidget>
 #include <QtConcurrent/QtConcurrentMap>

@@ -13,8 +13,8 @@
 #include <utils/common/log.h>
 #include <utils/common/long_runnable.h>
 
-#include "../common/mutex.h"
-#include "../common/mutex_impl.h"
+#include "mutex.h"
+#include "mutex_impl.h"
 
 
 ////////////////////////////////////////////////////////////

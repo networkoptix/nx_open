@@ -5,8 +5,8 @@
 
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "semaphore.h"
 

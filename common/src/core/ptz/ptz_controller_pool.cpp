@@ -1,6 +1,6 @@
 #include "ptz_controller_pool.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QThreadPool>
 #include <QtCore/QAtomicInt>
 

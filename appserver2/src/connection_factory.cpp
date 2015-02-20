@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>

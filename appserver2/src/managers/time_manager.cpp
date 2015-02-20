@@ -10,7 +10,7 @@
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #ifdef Q_OS_MACX
 #include <zlib.h>
 #else

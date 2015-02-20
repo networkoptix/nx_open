@@ -7,7 +7,7 @@
 
 #include "onvif_notification_consumer.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/network/system_socket.h>
 

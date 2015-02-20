@@ -1,7 +1,7 @@
 #ifndef __BUFFERED_FILE_H__
 #define __BUFFERED_FILE_H__
 
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 #include <QtCore/QString>
 #include <QtCore/QQueue>
 #include "utils/fs/file.h"

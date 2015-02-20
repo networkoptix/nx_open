@@ -3,7 +3,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QElapsedTimer>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "transaction.h"
 #include "nx_ec/ec_api.h"

@@ -6,7 +6,7 @@
 #ifndef PTS_TO_CLOCK_MAPPER_H
 #define PTS_TO_CLOCK_MAPPER_H
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 
 /*!

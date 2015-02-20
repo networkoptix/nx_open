@@ -6,7 +6,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QProcess>
 #include <QtCore/QSet>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 
 #include "core/resource/resource_fwd.h"
 #include "core/datapacket/media_data_packet.h"

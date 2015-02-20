@@ -4,7 +4,7 @@
 #ifdef ENABLE_DESKTOP_CAMERA
 
 #include <QMap>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "core/resource/camera_resource.h"
 

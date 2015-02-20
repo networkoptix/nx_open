@@ -11,8 +11,8 @@
 #include <memory>
 
 #include <QtCore/QIODevice>
-#include <utils/common/mutex.h>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 extern "C"
 {

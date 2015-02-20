@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 
 //!Fetches time from multiple time fetchers. If all succeeded than returns mean value

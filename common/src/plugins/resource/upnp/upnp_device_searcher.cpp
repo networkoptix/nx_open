@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <memory>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtXml/QXmlDefaultHandler>
 
 #include <api/global_settings.h>

@@ -4,8 +4,8 @@
 #include <typeinfo>
 
 #include <QtCore/QSet>
-#include <utils/common/mutex.h>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include <common/systemexcept_win32.h>
 

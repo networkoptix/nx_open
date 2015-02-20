@@ -8,7 +8,7 @@
 
 #include <map>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "core/resource/storage_resource.h"
 

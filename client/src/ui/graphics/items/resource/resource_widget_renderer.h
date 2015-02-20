@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <client/client_globals.h>
 

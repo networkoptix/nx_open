@@ -10,7 +10,7 @@
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QThread>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>

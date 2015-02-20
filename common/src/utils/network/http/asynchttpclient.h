@@ -9,7 +9,7 @@
 #include <map>
 #include <memory>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QSharedPointer>

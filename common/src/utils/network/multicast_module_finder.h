@@ -2,7 +2,7 @@
 #define MULTICAST_MODULE_FINDER_H
 
 #include <QtCore/QHash>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/long_runnable.h>

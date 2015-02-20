@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/network/http/httptypes.h>
 

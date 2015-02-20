@@ -1,7 +1,7 @@
 #include "syncplay_wrapper.h"
 
 #include <QtCore/QElapsedTimer>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 #include <QtCore/QCoreApplication>
 
 #include "utils/common/util.h"

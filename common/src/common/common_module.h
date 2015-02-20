@@ -2,8 +2,8 @@
 #define QN_COMMON_MODULE_H
 
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>

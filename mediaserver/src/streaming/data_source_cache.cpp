@@ -4,7 +4,7 @@
 
 #include "data_source_cache.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "streaming_chunk_cache_key.h"
 

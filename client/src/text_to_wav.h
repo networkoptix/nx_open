@@ -2,10 +2,10 @@
 #define TEXT_TO_WAV_H
 
 #include <QtCore/QIODevice>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>

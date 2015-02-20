@@ -5,9 +5,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QFileInfo>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <deque>
 #include <QtCore/QFileInfo>

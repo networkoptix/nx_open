@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <utils/common/wait_condition.h>
+#include <utils/thread/wait_condition.h>
 
 #include "abstract_media_stream_provider.h"
 #include "core/dataprovider/live_stream_provider.h"

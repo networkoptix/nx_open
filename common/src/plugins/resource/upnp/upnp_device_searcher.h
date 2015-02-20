@@ -9,7 +9,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>

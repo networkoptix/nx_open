@@ -6,7 +6,7 @@
 #include <map>
 #include <memory>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"

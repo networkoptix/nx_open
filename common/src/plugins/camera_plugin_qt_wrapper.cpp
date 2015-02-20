@@ -5,7 +5,7 @@
 
 #include "camera_plugin_qt_wrapper.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 
 namespace nxcip_qt

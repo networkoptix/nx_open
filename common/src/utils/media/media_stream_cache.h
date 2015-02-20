@@ -14,7 +14,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <core/dataconsumer/abstract_data_receptor.h>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 
 

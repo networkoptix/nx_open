@@ -7,9 +7,9 @@
 #define CAMERA_USER_ATTRIBUTE_POOL_H
 
 #include <QtCore/QList>
-#include <utils/common/mutex.h>
-#include <utils/common/mutex.h>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 #include <QtCore/QSharedPointer>
 
 #include "camera_user_attributes.h"

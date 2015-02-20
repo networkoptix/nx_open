@@ -6,8 +6,8 @@
 #define HLS_SERVER_H
 
 #include <QDateTime>
-#include <utils/common/mutex.h>
-#include <utils/common/wait_condition.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include <core/resource/media_resource.h>
 #include <utils/network/http/httpstreamreader.h>

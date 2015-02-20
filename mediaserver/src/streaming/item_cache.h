@@ -9,7 +9,7 @@
 
 #include <QCache>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 
 template<class KeyType, class CachedType>

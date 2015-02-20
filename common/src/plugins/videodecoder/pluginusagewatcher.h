@@ -7,7 +7,7 @@
 
 #include <set>
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QSharedMemory>
 
 #include "pluginusagerecord.h"

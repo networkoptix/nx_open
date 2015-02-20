@@ -2,7 +2,7 @@
 #define sequrity_cam_resource_h_1239
 
 #include <QtGui/QRegion>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "media_resource.h"
 #include "motion_window.h"

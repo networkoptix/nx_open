@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_VMAX
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QMap>
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"

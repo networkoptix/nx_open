@@ -8,7 +8,7 @@
 #include <QHash>
 #include <QtCore/QIODevice>
 #include <QtCore/QTime>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 
 #define CS_ACTUAL_DATA_CHANNEL 0

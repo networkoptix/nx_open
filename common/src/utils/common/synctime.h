@@ -2,7 +2,7 @@
 #define QN_SYNC_TIME_H
 
 #include <QtCore/QDateTime>
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api.h>

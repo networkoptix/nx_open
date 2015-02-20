@@ -5,7 +5,7 @@
 
 #include "pts_to_clock_mapper.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/log.h>
 

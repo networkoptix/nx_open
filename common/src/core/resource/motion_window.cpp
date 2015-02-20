@@ -1,7 +1,7 @@
 
 #include "motion_window.h"
 
-#include <utils/common/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include "core/datapacket/media_data_packet.h"
 
