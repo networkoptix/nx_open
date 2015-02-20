@@ -16,6 +16,7 @@ class QnMutexImpl;
 class QnMutex
 {
     friend class QnWaitCondition;
+    friend class MutexLockAnalyzer;
 
 public:
     enum RecursionMode {

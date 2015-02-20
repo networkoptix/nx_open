@@ -6,11 +6,13 @@
 #ifndef NX_DIGRAPH_H
 #define NX_DIGRAPH_H
 
+#include <deque>
 #include <functional>
 #include <map>
+#include <memory>
 #include <limits>
 #include <list>
-#include <vector>
+#include <set>
 #include <unordered_map>
 
 #include <boost/optional.hpp>
@@ -21,159 +23,225 @@
     \param NodeKey Requirements: comparable, copyable
     \note Class methods are not thread-safe
     \note No loops allowed
+    \param VerticeKeyType Comparable type 
+    \param EdgeDataType Data stored with edge type
 */
-template<class VerticeKey, class Comp = std::less<VerticeKey>>
+template<class VerticeKeyType, class EdgeDataType, class Comp = std::less<VerticeKeyType>>
 class Digraph
 {
 public:
-    enum Result
-    {
-        ok,
-        alreadyExists,
-        loopDetected,
-        notFound
-    };
-
+    typedef VerticeKeyType vertice_key_type;
+    typedef EdgeDataType edge_data_type;
+    typedef EdgeDataType* edge_data_pointer;
 
     Digraph()
-    :
-        m_prevGivenVIndex( 0 )
     {
     }
 
-    void addVertice( const VerticeKey& key )
+    template<class VerticeOneRef>
+    void addVertice( VerticeOneRef&& key )
     {
-        getVerticeIndex( key );
+        getOrAddVertice( std::forward<VerticeOneRef>(key) );
+    }
+
+    template<class VerticeOneRef>
+    void removeVertice( const VerticeOneRef& key )
+    {
+        m_keyToVertice.erase( key );
     }
 
     //!Creates edge between two vertices. If either vertice does not exists, it is added first
     /*!
-        \param foundLoopPath If not \a nullptr, found loop path (if any) is stored here
-        \return\n
-            - \a ok
-            - \a alreadyExists
-            - \a loopDetected
+        \return \a true if added, \a false if edge already exists
+        \note Loops are allowed
     */
-    Result addEdge(
-        const VerticeKey& from,
-        const VerticeKey& to,
-        std::list<VerticeKey>* const foundLoopPath = nullptr )
+    template<
+        class VerticeOneRef,
+        class VerticeTwoRef,
+        class EdgeDataRef>
+    std::pair<edge_data_type*, bool> addEdge(
+        VerticeOneRef&& startVerticeKey,
+        VerticeTwoRef&& endVerticeKey,
+        EdgeDataRef&& edgeData )
     {
-        const VIndex vFrom = getVerticeIndex( from );
-        const VIndex vTo = getVerticeIndex( to );
+        Vertice* vFrom = getOrAddVertice( std::forward<VerticeOneRef>(startVerticeKey) );
+        Vertice* vTo = getOrAddVertice( std::forward<VerticeTwoRef>(endVerticeKey) );
 
-        auto vFromIter = m_edges.insert( std::make_pair( vFrom, Vertice(from, vFrom) ) );
-        
-        auto vToIter = vFromIter.first->second.edges.find( vTo );
-        if( vToIter != vFromIter.first->second.edges.end() )
-            return alreadyExists;   //edge is already there
+        auto edgeInsertionPair = vFrom->edges.emplace( vTo, std::forward<EdgeDataRef>(edgeData) );
+        if( edgeInsertionPair.second )
+            vTo->incomingEdges.insert( vFrom ); //added new edge, adding back path
+        return std::pair<edge_data_type*, bool>(
+            &edgeInsertionPair.first->second,
+            edgeInsertionPair.second );
+    }
 
-        //detecting what-if loop
-        if( findAnyPath( to, from, foundLoopPath ) == ok )
-            return loopDetected;
+    bool findEdge(
+        const vertice_key_type& from,
+        const vertice_key_type& to,
+        edge_data_type** edgeData )
+    {
+        Vertice* vFrom = getOrAddVertice( from );
+        Vertice* vTo = getOrAddVertice( to );
 
-        //adding new edge
-        vFromIter.first->second.edges.insert( std::make_pair( vTo, Vertice(to, vTo) ) );
-        return ok;
+        auto edgeIter = vFrom->edges.find( vTo );
+        if( edgeIter == vFrom->edges.end() )
+            return false;
+
+        *edgeData = &edgeIter->second;
+        return true;
     }
 
     /*!
-        \param foundPath In case of success, any path is stored here. \a from and \a to are included. Can be \a nullptr
-        \return \a ok or \a notFound
+        \param foundPath In case of success, vertices along found path are stored here.
+            \a from and \a to are included. Can be \a nullptr
     */
-    Result findAnyPath(
-        const VerticeKey& from,
-        const VerticeKey& to,
-        std::list<VerticeKey>* const foundPath ) const
+    bool findAnyPath(
+        const vertice_key_type& from,
+        const vertice_key_type& to,
+        std::list<vertice_key_type>* const foundPath,
+        std::list<edge_data_type>* const edgesTravelled = nullptr ) const
     {
-        const VIndex vFrom = getVerticeIndex( from );
-        if( vFrom == npos )
-            return notFound;
-        const VIndex vTo = getVerticeIndex( to );
-        if( vTo == npos )
-            return notFound;
+        return findAnyPathIf(
+            from,
+            to,
+            foundPath,
+            edgesTravelled,
+            []( const edge_data_type& ){ return true; } );
+    }
 
-        const Result res = findAnyPathInternal( vFrom, vTo, foundPath );
-        if( res != ok )
-            return res;
-        if( foundPath )
-            foundPath->push_front( from );
-        return ok;
+    //!Finds any path between two vertices using only edges for which \a edgeSelectionPred returns \a true
+    template<class EdgeSelectionPredicateType>
+    bool findAnyPathIf(
+        const vertice_key_type& from,
+        const vertice_key_type& to,
+        std::list<vertice_key_type>* const foundPath,
+        std::list<edge_data_type>* const edgesTravelled,
+        EdgeSelectionPredicateType edgeSelectionPred ) const
+    {
+        const Vertice* vFrom = findVertice( from );
+        if( vFrom == nullptr )
+            return false;
+        const Vertice* vTo = findVertice( to );
+        if( vTo == nullptr )
+            return false;
+
+        std::deque<const Vertice*> pathTravelled;
+        const bool res = findAnyPathInternal(
+            vFrom, vTo, foundPath, edgesTravelled, &pathTravelled, edgeSelectionPred );
+        if( res && foundPath )
+            foundPath->push_front( vFrom->key );  //findAnyPathInternal does not add start vertice to the path
+        return res;
     }
 
 private:
-    typedef std::map<VerticeKey, size_t, Comp> VerticeKeyToIndexMap;
-    typedef size_t VIndex;
+    struct Vertice;
+
+    //!map<vertice key, vertice>
+    typedef std::map<vertice_key_type, std::unique_ptr<Vertice>, Comp> KeyToVerticeDictionary;
+    //!map<end vertice, edge>
+    typedef std::unordered_map<Vertice*, EdgeDataType> EdgeDictionary;
 
     struct Vertice
     {
-        VerticeKey key;
-        VIndex index;
-        std::unordered_map<VIndex, Vertice> edges;
+        vertice_key_type key;
+        //!Edges, outgoing from this vertice
+        EdgeDictionary edges;
+        //!Vertices, having edges to this vertice
+        std::set<Vertice*> incomingEdges;
 
         Vertice()
-        :
-            index(std::numeric_limits<VIndex>::max())
         {
         }
 
-        Vertice(
-            const VerticeKey& _key,
-            VIndex _index )
+        template<class VerticeKeyRef>
+        Vertice( VerticeKeyRef&& _key )
         :
-            key(_key),
-            index(_index)
+            key( std::forward<VerticeKeyRef>(_key) )
         {
+        }
+
+        ~Vertice()
+        {
+            for( std::pair<Vertice* const, EdgeDataType>& edge: edges )
+                edge.first->incomingEdges.erase( this );
+            for( Vertice* const vertice: incomingEdges )
+                vertice->edges.erase( this );
         }
     };
 
-    static const VIndex npos = VIndex(-1);
+    KeyToVerticeDictionary m_keyToVertice;
 
-    std::map<VerticeKey, VIndex, Comp> m_verticeKeyToIndex;
-    std::unordered_map<VIndex, Vertice> m_edges;
-    VIndex m_prevGivenVIndex;
 
-    VIndex getVerticeIndex( const VerticeKey& vKey ) const
+    const Vertice* findVertice( const vertice_key_type& vKey ) const
     {
-        auto iter = m_verticeKeyToIndex.find( vKey );
-        return iter != m_verticeKeyToIndex.end() ? iter->second : npos;
+        auto iter = m_keyToVertice.find( vKey );
+        return iter != m_keyToVertice.end() ? iter->second.get() : nullptr;
     }
 
-    VIndex getVerticeIndex( const VerticeKey& vKey )
+    template<class VerticeKeyRef>
+    Vertice* getOrAddVertice( VerticeKeyRef&& vKey )
     {
-        auto iter = m_verticeKeyToIndex.lower_bound( vKey );
-        if( iter == m_verticeKeyToIndex.end() || 
-            (Comp()(iter->first, vKey) || Comp()(vKey, iter->first)) )    //iter.first != vKey
-        {
-            iter = m_verticeKeyToIndex.emplace_hint( iter, vKey, m_prevGivenVIndex++ );
-        }
-        return iter->second;
+        auto it = m_keyToVertice.emplace(
+            vKey,
+            std::unique_ptr<Vertice>() ).first;
+        if( !it->second )
+            it->second.reset( new Vertice( std::forward<VerticeKeyRef>(vKey) ) );
+        return it->second.get();
     }
 
-    Result findAnyPathInternal(
-        const VIndex& from,
-        const VIndex& to,
-        std::list<VerticeKey>* const foundPath ) const
+    template<class EdgeSelectionPredicateType>
+    bool findAnyPathInternal(
+        const Vertice* from,
+        const Vertice* to,
+        std::list<vertice_key_type>* const foundPath,
+        std::list<edge_data_type>* const edgesTravelled,
+        std::deque<const Vertice*>* const pathTravelled,
+        EdgeSelectionPredicateType edgeSelectionPred ) const
     {
-        auto vIter = m_edges.find( from );
-        if( vIter == m_edges.end() )
-            return notFound;
+        pathTravelled->push_back( from );
 
-        const std::unordered_map<VIndex, Vertice>& startVerticeEdges = vIter->second.edges;
-        for( size_t i = 0; i < startVerticeEdges.size(); ++i )
-        for( const std::pair<VIndex, Vertice>& vertice: startVerticeEdges )
+        for( const std::pair<Vertice*, EdgeDataType>& edge: from->edges )
         {
-            if( (vertice.first == to) || (findAnyPathInternal( vertice.first, to, foundPath ) == ok) )
+            if( !edgeSelectionPred( edge.second ) )
+                continue;
+
+            bool result = false;
+            if( edge.first == to )
             {
-                //saving path
+                result = true;  //found path
+            }
+            else if( std::find(     //detecting path loops to prevent infinite recursion
+                        pathTravelled->cbegin(),
+                        pathTravelled->cend(),
+                        edge.first ) != pathTravelled->cend() )
+            {
+                result = false;   //loop detected, not found
+            }
+            else
+            {
+                result = findAnyPathInternal(
+                    edge.first, to,
+                    foundPath, edgesTravelled, pathTravelled,
+                    edgeSelectionPred );
+            }
+
+            if( result )
+            {
                 if( foundPath )
-                    foundPath->push_front( vertice.second.key );
-                //unrolling recursive calls
-                return ok;
+                    foundPath->push_front( edge.first->key );    //reached target, saving path found
+                if( edgesTravelled )
+                    edgesTravelled->push_front( edge.second );
+            }
+            //unrolling recursive calls
+            if( result )
+            {
+                pathTravelled->pop_back();
+                return true;    //found some path
             }
         }
 
-        return notFound;
+        pathTravelled->pop_back();
+        return false;
     }
 };
 

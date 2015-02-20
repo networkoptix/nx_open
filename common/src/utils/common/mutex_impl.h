@@ -16,6 +16,8 @@
 #include "../thread/mutex_lock_analyzer.h"
 
 
+class QnMutex;
+
 class QnMutexImpl
 {
 public:
@@ -24,8 +26,11 @@ public:
     std::uintptr_t threadHoldingMutex;
     size_t recursiveLockCount;
     std::stack<MutexLockKey> currentLockStack;
+    QnMutex* const mutexPtr;
+    const bool recursive;
 
-    QnMutexImpl( QMutex::RecursionMode mode );
+    QnMutexImpl( QMutex::RecursionMode mode, QnMutex* const mutexPtr );
+    ~QnMutexImpl();
 
     void afterMutexLocked(
         const char* sourceFile,

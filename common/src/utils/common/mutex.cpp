@@ -17,9 +17,9 @@
 
 QnMutex::QnMutex( QnMutex::RecursionMode mode )
 :
-    m_impl( new QnMutexImpl( mode == QnMutex::Recursive
-                             ? QMutex::Recursive 
-                             : QMutex::NonRecursive ) )
+    m_impl( new QnMutexImpl(
+        mode == QnMutex::Recursive ? QMutex::Recursive  : QMutex::NonRecursive,
+        this ) )
 {
 }
 
@@ -33,22 +33,14 @@ void QnMutex::lock(
     int lockID )
 {
     m_impl->mutex.lock();
-    m_impl->threadHoldingMutex = QnLongRunnable::currentThreadSystemId();
-    ++m_impl->recursiveLockCount;
 
-#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
     m_impl->afterMutexLocked( sourceFile, sourceLine, lockID );
-#endif
 }
 
 void QnMutex::unlock()
 {
-#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
     m_impl->beforeMutexUnlocked();
-#endif
 
-    if( --m_impl->recursiveLockCount == 0 )
-        m_impl->threadHoldingMutex = 0;
     m_impl->mutex.unlock();
 }
 
