@@ -3276,7 +3276,7 @@ Das kann recht lange dauern.</translation>
     </message>
     <message>
         <source>Model</source>
-        <translation>Model</translation>
+        <translation>Modell</translation>
     </message>
     <message>
         <source>Firmware</source>

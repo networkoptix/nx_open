@@ -5,7 +5,7 @@
     <name>Language</name>
     <message>
         <source>Language Name</source>
-        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
+        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translatorcomment>Translated for the ALLNET Group by Richard Heider - heider@allnet.kg</translatorcomment>
         <translation>Deutsch</translation>
     </message>
@@ -110,7 +110,7 @@
     </message>
     <message>
         <source>Camera IP Conflict</source>
-        <translation>IP-Konflikt bei Kamera</translation>
+        <translation>IP Konflikt bei Kamera</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -118,7 +118,7 @@
     </message>
     <message>
         <source>Server Conflict</source>
-        <translation>Serverkonflikt</translation>
+        <translation>Server Konflikt</translation>
     </message>
     <message>
         <source>Server Started</source>
@@ -263,11 +263,11 @@
     </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation></translation>
+        <translation>RTP-Paket-Verlust identifiziert, vorherige Sequ. = %1 nächste Sequ. = %2.</translation>
     </message>
     <message>
         <source>RTP packet loss detected.</source>
-        <translation></translation>
+        <translation>RTP-Paket-Verlust identifiziert.</translation>
     </message>
     <message>
         <source>Server terminated.</source>
@@ -279,11 +279,11 @@
     </message>
     <message>
         <source>I/O error has occurred at %1.</source>
-        <translation></translation>
+        <translation>I/O Fehler aufgetreten auf %1.</translation>
     </message>
     <message>
         <source>Not enough HDD/SSD speed for recording to %1.</source>
-        <translation>HDD/SSD Zugriffsgeschwindigkeit zur gering für Aufnahme auf %1.</translation>
+        <translation>HDD/SSD Zugriffsgeschwindigkeit zu gering für Aufnahme auf %1.</translation>
     </message>
     <message>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
@@ -291,7 +291,7 @@
     </message>
     <message>
         <source>Recording on %n camera(s) is disabled: </source>
-        <translation>Aufnahme ist bei %n Kameras deaktiviert: </translation>
+        <translation>Aufnahme ist bei %n Kamera(s) deaktiviert: </translation>
     </message>
 </context>
 <context>
@@ -395,7 +395,7 @@ Bitte kontaktieren Sie den Support.</translation>
     </message>
     <message>
         <source>Camera initialization process in progress</source>
-        <translation>Initalisierungsprozess der Kamera läuft</translation>
+        <translation>Initialisierungsprozess der Kamera läuft</translation>
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
@@ -423,7 +423,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>Ungültiger Wert für den &apos;%1&apos; Parameter - erwartet %2, geliefert &apos;%3&apos;.</translation>
+        <translation>Ungültiger Wert für den &apos;%1&apos; Parameter - erwartet %2, vorausgesetzt &apos;%3&apos;.</translation>
     </message>
 </context>
 <context>
@@ -434,7 +434,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>Konnte explorer.exe innerhalb des Suchpfads nicht finden um Windows Explorer zu starten.</translation>
+        <translation>Konnte explorer.exe innerhalb des Suchpfades nicht finden, um Windows Explorer zu starten.</translation>
     </message>
 </context>
 <context>
@@ -445,7 +445,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Could not find encoder for codec %1.</source>
-        <translation>Encoder für codec %1 konnte nicht gefunden werden.</translation>
+        <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
@@ -460,7 +460,7 @@ Parameter: </translation>
     <name>QnFfmpegTranscoder</name>
     <message>
         <source>Container %1 was not found in FFMPEG library.</source>
-        <translation>Container %1 wurde in FFMPEG library nicht gefunden.</translation>
+        <translation>Container %1 wurde in der FFMPEG Library nicht gefunden.</translation>
     </message>
     <message>
         <source>Could not create output context for format %1.</source>
@@ -472,7 +472,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Could not perform direct stream copy because frame size is undefined.</source>
-        <translation>Direct Stream Copy kann nicht aufgeführt werden, da die Frame Size nicht definiert wurde.</translation>
+        <translation>Direct Stream Copy kann nicht ausgeführt werden, da die Frame Size nicht definiert wurde.</translation>
     </message>
     <message>
         <source>Could not find codec %1.</source>
@@ -480,14 +480,14 @@ Parameter: </translation>
     </message>
     <message>
         <source>Video or audio codec is incompatible with container %1.</source>
-        <translation>Video- oder Audio-Codec ist mit container %1 nicht kompatibel.</translation>
+        <translation>Video- oder Audio-Codec ist mit Container %1 nicht kompatibel.</translation>
     </message>
 </context>
 <context>
     <name>QnFfmpegVideoTranscoder</name>
     <message>
         <source>Could not find encoder for codec %1.</source>
-        <translation>Encoder für codec %1 konnte nicht gefunden werden.</translation>
+        <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
@@ -527,31 +527,31 @@ Parameter: </translation>
     </message>
     <message>
         <source>Trial licenses</source>
-        <translation>Trial Lizenzen</translation>
+        <translation>Trial Lizenz(en)</translation>
     </message>
     <message>
         <source>Analog licenses</source>
-        <translation>Analog Lizenzen</translation>
+        <translation>Analog Lizenz(en)</translation>
     </message>
     <message>
         <source>Professional licenses</source>
-        <translation>Professional Lizenzen</translation>
+        <translation>Professional Lizenz(en)</translation>
     </message>
     <message>
         <source>Edge licenses</source>
-        <translation>Edge Lizenzen</translation>
+        <translation>Edge Lizenz(en)</translation>
     </message>
     <message>
         <source>Vmax licenses</source>
-        <translation>Vmax Lizenzen</translation>
+        <translation>Vmax Lizenz(en)</translation>
     </message>
     <message>
         <source>Analog encoder licenses</source>
-        <translation>Analog Encoder Lizenzen</translation>
+        <translation>Analog Encoder Lizenz(en)</translation>
     </message>
     <message>
         <source>Video Wall licenses</source>
-        <translation>Video-Wand Lizenzen</translation>
+        <translation>Video-Wand Lizenz(en)</translation>
     </message>
     <message>
         <source>Invalid signature</source>
@@ -563,7 +563,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation></translation>
+        <translation>Ungültige Anpassung</translation>
     </message>
     <message>
         <source>Expired</source>
@@ -601,15 +601,15 @@ Parameter: </translation>
     <message numerus="yes">
         <source>Activate %n more %2. </source>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Aktiviere %n %2.</numerusform>
+            <numerusform>Aktiviere %n %2.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %2 will be used. </source>
         <translation>
-            <numerusform>%n %2 mehr wird verwendet.</numerusform>
-            <numerusform>%n %2 mehr werden verwendet.</numerusform>
+            <numerusform>%n %2 wird verwendet.</numerusform>
+            <numerusform>%n %2 werden verwendet.</numerusform>
         </translation>
     </message>
     <message>
@@ -622,7 +622,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support Team,falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten, bzw. ihren Lizenzschlüssel zu prüfen.</translation>
+        <translation>Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support Team,falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. ihren Lizenzschlüssel zu prüfen.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
@@ -651,7 +651,7 @@ Parameter: </translation>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>Ungültiger Wert für den &apos;%1&apos; Parameter - erwartet %2, geliefert &apos;%3&apos;.</translation>
+        <translation>Ungültiger Wert für den &apos;%1&apos; Parameter - erwartet %2, vorausgesetzt &apos;%3&apos;.</translation>
     </message>
 </context>
 <context>
@@ -794,7 +794,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Some users have not set their email addresses</source>
-        <translation>Einige Benutzer haben keine Email Adressen gesetzt</translation>
+        <translation>Einige Benutzer haben keine Emailadressen gesetzt</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
@@ -802,11 +802,11 @@ Parameter: </translation>
     </message>
     <message>
         <source>Select server for others to synchronise time with</source>
-        <translation>Wählen Sie den Server mit dem andere ihre Zeit syncronisieren</translation>
+        <translation>Wählen Sie den Server mit dem andere ihre Zeit synchronisieren</translation>
     </message>
     <message>
         <source>Error while sending email</source>
-        <translation>Fehler beim Email Versand</translation>
+        <translation>Fehler beim Emailversand</translation>
     </message>
     <message>
         <source>Storages are full</source>
@@ -887,7 +887,7 @@ Sie können keine Videos mit Ihren Kameras aufnehmen.</translation>
     </message>
     <message>
         <source>Unsupported Transport</source>
-        <translation>Transport nicht unterstützt</translation>
+        <translation>Transport wird nicht unterstützt</translation>
     </message>
     <message>
         <source>Internal Server Error</source>
