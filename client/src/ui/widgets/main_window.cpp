@@ -310,17 +310,23 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Tab bar layout. To snap tab bar to graphics view. */
-    QVBoxLayout *tabBarLayout = new QVBoxLayout();
+    QWidget *tabBarWidget = new QWidget(this);
+    setHelpTopic(tabBarWidget, Qn::MainWindow_TitleBar_Tabs_Help);
+
+    QBoxLayout *tabBarLayout = new QHBoxLayout(tabBarWidget);
     tabBarLayout->setContentsMargins(0, 0, 0, 0);
     tabBarLayout->setSpacing(0);
-    tabBarLayout->addStretch(0x1000);
     tabBarLayout->addWidget(m_tabBar);
+    tabBarLayout->addSpacing(6);
+    tabBarLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
+    tabBarLayout->addSpacing(6);
+    tabBarLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
+    tabBarLayout->addStretch(0x1000);
 
     /* Layout for window buttons that can be removed from the title bar. */
     m_windowButtonsLayout = new QHBoxLayout();
-    m_windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
-    m_windowButtonsLayout->setSpacing(2);
-    m_windowButtonsLayout->addSpacing(6);
+    m_windowButtonsLayout->setContentsMargins(4, 0, 2, 0);
+    m_windowButtonsLayout->setSpacing(4);
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction), false, 1.0, Qn::MainWindow_ContextHelp_Help));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
@@ -335,10 +341,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
-    m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
-    m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
-    m_titleLayout->addStretch(0x1000);
+    m_titleLayout->addWidget(tabBarWidget, 0x1000, Qt::AlignBottom);
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
