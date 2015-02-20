@@ -218,6 +218,8 @@ namespace ite
 
     bool DevReader::subscribe(uint16_t pid)
     {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
         switch (pid)
         {
             case Pacidal::PID_VIDEO_FHD:
@@ -233,13 +235,16 @@ namespace ite
 
     void DevReader::unsubscribe(uint16_t pid)
     {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
         switch (pid)
         {
             case Pacidal::PID_VIDEO_FHD:
             case Pacidal::PID_VIDEO_HD:
             case Pacidal::PID_VIDEO_SD:
             case Pacidal::PID_VIDEO_CIF:
-                m_packetQueues.erase(pid);
+                //m_packetQueues.erase(pid);
+                m_packetQueues[pid] = PacketsQueue();
                 break;
         }
     }
@@ -343,7 +348,6 @@ namespace ite
 
         std::unique_lock<std::mutex> lock( m_mutex ); // LOCK
 
-        ContentPacketPtr pkt;
         auto it = m_packetQueues.find(pid);
         if (it != m_packetQueues.end())
         {
@@ -352,14 +356,16 @@ namespace ite
             if (q.empty())
                 m_cond.wait_until(lock, system_clock::now() + timeout);
 
+            // could be unsubscribed here
             if (! q.empty())
             {
-                pkt = q.front();
+                ContentPacketPtr pkt = q.front();
                 q.pop_front();
+                return pkt;
             }
         }
 
-        return pkt;
+        return ContentPacketPtr();
     }
 
     bool DevReader::readRetChanCmd(RCCommand& cmd)
