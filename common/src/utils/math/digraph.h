@@ -21,10 +21,10 @@
 //!Directed graph
 /*!
     \param NodeKey Requirements: comparable, copyable
-    \note Class methods are not thread-safe
-    \note No loops allowed
     \param VerticeKeyType Comparable type 
     \param EdgeDataType Data stored with edge type
+    \note Class methods are not thread-safe
+    \note Edge loops are allowed
 */
 template<class VerticeKeyType, class EdgeDataType, class Comp = std::less<VerticeKeyType>>
 class Digraph
