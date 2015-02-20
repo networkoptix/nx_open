@@ -59,7 +59,7 @@ namespace ite
     public:
         enum
         {
-            MAX_ELEMENTS = 8 * 1024
+            MAX_ELEMENTS = 4 * 1024
         };
 
         typedef std::vector<uint8_t> ContT;
