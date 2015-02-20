@@ -3006,6 +3006,12 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
 {
+    auto SCOPED_GUARD_FUNC = [this]( QnPlOnvifResource* ){
+        m_asyncPullMessagesCallWrapper.clear();
+    };
+    std::unique_ptr<QnPlOnvifResource, decltype(SCOPED_GUARD_FUNC)>
+        SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+
     if( resultCode != SOAP_OK && resultCode != SOAP_MUSTUNDERSTAND )
     {
         NX_LOG( lit("Failed to pull messages in NotificationProducer. endpoint %1, result code %2").
@@ -3056,8 +3062,6 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
-
-    m_asyncPullMessagesCallWrapper.clear();
 }
 
 void QnPlOnvifResource::onPullMessagesResponseReceived(

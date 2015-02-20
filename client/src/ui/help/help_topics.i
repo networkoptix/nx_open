@@ -190,6 +190,9 @@ QN_HELP_TOPIC(PrimaryTimeServerSelection_Help,                  "selecting_time_
 
 QN_HELP_TOPIC(Exporting_Help,                                   "exporting.htm")
 
+QN_HELP_TOPIC(DeletingCamera_Help,                              "deleting_a_camera_(admin_only).htm")
+QN_HELP_TOPIC(DeletingLayout_Help,                              "deleting_layouts_(admin_only).htm")
+
 QN_HELP_TOPIC(Systems_ConnectToCurrentSystem_Help,              "join_server_from_different_sys.htm")
 QN_HELP_TOPIC(Systems_MergeSystems_Help,                        "merge_all_servers_to_another_s.htm")
 
