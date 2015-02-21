@@ -64,6 +64,7 @@
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -190,14 +191,19 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_scene.reset(new QnGraphicsScene(this));
     setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
+    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, [this]() {
+        if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
+            if (QnLayoutResourcePtr resource = layout->resource())
+                disconnect(resource.data(), NULL, this, NULL);
+        }
+    });
+
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this, [this]() {
         if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
-            if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
-                setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);
-                return;
-            }
+            if (QnLayoutResourcePtr resource = layout->resource())
+                connect(resource.data(), &QnLayoutResource::backgroundImageChanged, this, &QnMainWindow::updateHelpTopic);
         }
-        setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
+        updateHelpTopic();
     });
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
@@ -493,6 +499,30 @@ void QnMainWindow::showNormal() {
 
 void QnMainWindow::skipDoubleClick() {
     m_skipDoubleClick = true;
+}
+
+void QnMainWindow::updateHelpTopic() {
+    if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
+        if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+            setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);
+            return;
+        }
+        if (layout->data().contains(Qn::LayoutSearchStateRole)) {
+            setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help);
+            return;
+        }
+        if (QnLayoutResourcePtr resource = layout->resource()) {
+            if (context()->snapshotManager()->isFile(resource.dynamicCast<QnLayoutResource>())) {
+                setHelpTopic(m_scene.data(), Qn::MainWindow_Tree_MultiVideo_Help);
+                return;
+            }
+            if (!resource->backgroundImageFilename().isEmpty()) {
+                setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_EMapping_Help);
+                return;
+            }
+        }
+    }
+    setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 }
 
 void QnMainWindow::minimize() {

@@ -86,3 +86,14 @@ QPushButton* QnMessageBox::addCustomButton(const QString &text, QMessageBox::But
     
     return button;
 }
+
+int QnMessageBox::exec() {
+    Qt::WindowFlags flags = windowFlags();
+    if (helpTopic(this) != -1)
+        flags |= Qt::WindowContextHelpButtonHint;
+    else
+        flags &= ~Qt::WindowContextHelpButtonHint;
+    setWindowFlags(flags);
+
+    return base_type::exec();
+}

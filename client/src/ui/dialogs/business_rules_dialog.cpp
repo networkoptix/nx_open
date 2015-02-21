@@ -65,6 +65,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(m_resetDefaultsButton, &QPushButton::clicked, this, &QnBusinessRulesDialog::at_resetDefaultsButton_clicked);
 
     setHelpTopic(this, Qn::EventsActions_Help);
+    setHelpTopic(ui->eventLogButton, Qn::EventLog_Help);
 
     m_currentDetailsWidget = ui->detailsWidget;
 

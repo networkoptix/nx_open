@@ -10,9 +10,6 @@
 #include <ui/processors/drag_processor.h>
 #include <ui/widgets/videowall_manage_widget_p.h>
 
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-
 #include <utils/common/string.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -27,8 +24,6 @@ QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /*= 0*/):
     m_skipReleaseEvent(false),
     m_pressedButtons(Qt::NoButton)
 {
-    setHelpTopic(this, Qn::Videowall_Help);
-
     installEventFilter(this);
     setMouseTracking(true);
 

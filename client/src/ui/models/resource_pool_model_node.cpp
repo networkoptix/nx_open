@@ -535,7 +535,7 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
         } else if(m_type == Qn::RecorderNode) {
             return Qn::MainWindow_Tree_Recorder_Help;
         } else if(m_type == Qn::VideoWallItemNode) {
-            return Qn::Videowall_Help;
+            return Qn::Videowall_Display_Help;
         } else if(m_type == Qn::VideoWallMatrixNode) {
             return Qn::Videowall_Matrix_Help;
         } else if(m_flags & Qn::layout) {
@@ -547,13 +547,15 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
         } else if(m_flags & Qn::user) {
             return Qn::MainWindow_Tree_Users_Help;
         } else if(m_flags & Qn::local) {
+            if(m_flags & Qn::video)
+                return Qn::MainWindow_Tree_Exported_Help;
             return Qn::MainWindow_Tree_Local_Help;
         } else if(m_flags & Qn::server) {
             return Qn::MainWindow_Tree_Servers_Help;
         } else if(m_flags & Qn::live_cam) {
             return Qn::MainWindow_Tree_Camera_Help;
         } else if(m_flags & Qn::videowall) {
-            return Qn::Videowall_Display_Help;
+            return Qn::Videowall_Help;
         } else {
             return -1;
         }

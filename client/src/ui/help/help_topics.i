@@ -80,7 +80,7 @@ QN_HELP_TOPIC(SystemSettings_General_NetworkInterfaces_Help,    "obtaining_the_c
 QN_HELP_TOPIC(SystemSettings_General_Customizing_Help,          "customizing_product_name.htm")
 QN_HELP_TOPIC(SystemSettings_General_Logs_Help,                 "collecting_logs.htm")
 QN_HELP_TOPIC(SystemSettings_General_AutoPause_Help,            "cpu_and_bandwidth_saving_durin.htm")
-QN_HELP_TOPIC(SystemSettings_General_AutoStartWithSystem_Help,  "run_display.product.name_when_.htm")
+QN_HELP_TOPIC(SystemSettings_General_AutoStartWithSystem_Help,  "run_display_product_name_when_.htm")
 QN_HELP_TOPIC(SystemSettings_General_DoubleBuffering_Help,      "double_buffering.htm")
 QN_HELP_TOPIC(SystemSettings_ScreenRecording_Help,              "setting_up_screen_recording.htm")
 QN_HELP_TOPIC(SystemSettings_Licenses_Help,                     "obtaining_and_activating_hd_witness_licenses.htm")
@@ -92,7 +92,7 @@ QN_HELP_TOPIC(SystemSettings_Notifications_Help,                "notifications.h
 QN_HELP_TOPIC(Administration_Help,                              "system-wide_configurations.htm")
 QN_HELP_TOPIC(Administration_General_CamerasList_Help,          "viewing_full_cameras_list.htm")
 QN_HELP_TOPIC(Administration_General_HealthMonitoring_Help,     "monitoring_media_servers.htm")
-QN_HELP_TOPIC(Administration_Update_Help,                       "upgrading_product.name.htm")
+QN_HELP_TOPIC(Administration_Update_Help,                       "upgrading_product_name.htm")
 QN_HELP_TOPIC(Administration_RoutingManagement_Help,            "configuring_routing_within_mul.htm")
 QN_HELP_TOPIC(Administration_TimeSynchronization_Help,          "configuring_time_synchronizati.htm")
 
@@ -128,6 +128,7 @@ QN_HELP_TOPIC(CameraSettings_AspectRatio_Help,                  "forcing_aspect_
 QN_HELP_TOPIC(CameraSettings_Rotation_Help,                     "setting_up_camera_orientation.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_SettingsControl_Help,       "preventing_product_name_from_c.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_DisableArchivePrimary_Help, "disabling_recording_of_primary.htm")
+QN_HELP_TOPIC(CameraSettings_Expert_Rtp_Help,                   "setting_up_camera_transport_pr.htm")
 
 QN_HELP_TOPIC(EventsActions_Help,                               "configuring_events_and_actions.htm")
 QN_HELP_TOPIC(EventsActions_Schedule_Help,						"setting_up_schedule_for_tracki.htm")
@@ -189,6 +190,7 @@ QN_HELP_TOPIC(Upgrade_Help,										"upgrading_product_name.htm")
 QN_HELP_TOPIC(PrimaryTimeServerSelection_Help,                  "selecting_time_server.htm")
 
 QN_HELP_TOPIC(Exporting_Help,                                   "exporting.htm")
+QN_HELP_TOPIC(Exporting_Layout_Help,                            "exporting_the_layout_in_multi-.htm")
 
 QN_HELP_TOPIC(DeletingCamera_Help,                              "deleting_a_camera_(admin_only).htm")
 QN_HELP_TOPIC(DeletingLayout_Help,                              "deleting_layouts_(admin_only).htm")
@@ -197,10 +199,10 @@ QN_HELP_TOPIC(Systems_ConnectToCurrentSystem_Help,              "join_server_fro
 QN_HELP_TOPIC(Systems_MergeSystems_Help,                        "merge_all_servers_to_another_s.htm")
 
 QN_HELP_TOPIC(Videowall_Help,                                   "configuring_video_wall.htm")
-QN_HELP_TOPIC(Videowall_Matrix_Help,                            "Saving_and_Restoring_Video_Wal.htm")
-QN_HELP_TOPIC(Videowall_Display_Help,                           "Controlling_Video_Wall_Display.htm")
-QN_HELP_TOPIC(Videowall_Attach_Help,                            "Adding_or_Removing_Physical_Di.htm")
-QN_HELP_TOPIC(Videowall_VwModeWarning_Help,                     "Switching_to_Video_Wall_Mode.htm")
-QN_HELP_TOPIC(Videowall_Appearance_Help,                        "Changing_Appearance_of_Video_W.htm")
+QN_HELP_TOPIC(Videowall_Matrix_Help,                            "saving_and_restoring_video_wal.htm")
+QN_HELP_TOPIC(Videowall_Display_Help,                           "controlling_video_wall_display.htm")
+QN_HELP_TOPIC(Videowall_Attach_Help,                            "adding_or_removing_physical_di.htm")
+QN_HELP_TOPIC(Videowall_VwModeWarning_Help,                     "switching_to_video_wall_mode.htm")
+QN_HELP_TOPIC(Videowall_Appearance_Help,                        "changing_appearance_of_video_w.htm")
 
 #undef QN_HELP_TOPIC

@@ -572,6 +572,8 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         dialog->setAcceptMode(QFileDialog::AcceptSave);
         dialog->addCheckBox(tr("Make file read-only"), &readOnly);
 
+        setHelpTopic(dialog.data(), Qn::Exporting_Layout_Help);
+
         if (!dialog->exec())
             return false;
 
