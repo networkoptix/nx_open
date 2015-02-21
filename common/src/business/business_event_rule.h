@@ -7,6 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include "business_action_parameters.h"
+#include "core/resource_management/resource_pool.h"
 
 /**
 * This class define relation between business event and action
@@ -29,7 +30,7 @@ public:
 
     QVector<QnUuid> eventResources() const;
     void setEventResources(const QVector<QnUuid> &value);
-    QnResourceList eventResourceObjects() const;
+    template <class T> QnSharedResourcePointerList<T> eventResourceObjects() const { return qnResPool->getResources<T>(m_eventResources); }
 
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
@@ -41,7 +42,7 @@ public:
     void setActionType(QnBusiness::ActionType actionType);
 
     QVector<QnUuid> actionResources() const;
-    QnResourceList actionResourceObjects() const;
+    template <class T> QnSharedResourcePointerList<T> actionResourceObjects() const { return qnResPool->getResources<T>(m_actionResources); }
     void setActionResources(const QVector<QnUuid> &value);
 
     QnBusinessActionParameters actionParams() const;
