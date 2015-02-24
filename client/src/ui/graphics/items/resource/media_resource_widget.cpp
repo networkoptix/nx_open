@@ -821,6 +821,7 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
+    QnPtzObject activeObject;
 
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
@@ -828,6 +829,8 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
     } else if(statusOverlay == Qn::UnauthorizedOverlay) {
         return Qn::MainWindow_MediaItem_Unauthorized_Help;
+    } else if (m_ptzController->getActiveObject(&activeObject) && activeObject.type == Qn::TourPtzObject) {
+        return Qn::Ptz_TourInProgress_Help;
     } else if(options() & ControlPtz) {
         if(m_dewarpingParams.enabled) {
             return Qn::MainWindow_MediaItem_Dewarping_Help;
@@ -994,11 +997,16 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         && item()->layout() 
         && snapshotManager()->isFile(item()->layout()->resource());
 
+    bool isPreviewSearchLayout = item() 
+        && item()->layout() 
+        && item()->layout()->data().contains(Qn::LayoutSearchStateRole);
+
     if(m_camera
         && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
         && !m_camera->hasPtzCapabilities(Qn::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
         && !isExportedLayout
+        && !isPreviewSearchLayout
     ) {
         result |= PtzButton;
     }

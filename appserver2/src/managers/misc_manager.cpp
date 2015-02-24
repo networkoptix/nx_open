@@ -23,7 +23,7 @@ void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModul
 }
 
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &transaction) {
-    emit systemNameChangeRequested(transaction.params.systemName, transaction.params.sysIdTime);
+    emit systemNameChangeRequested(transaction.params.systemName, transaction.params.sysIdTime, transaction.params.tranLogTime);
 }
 
 template<class QueryProcessorType>
@@ -58,9 +58,9 @@ int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnM
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &systemName, qint64 sysIdTime, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(systemName, sysIdTime);
+    auto transaction = prepareTransaction(systemName, sysIdTime, tranLogTime);
 
     using namespace std::placeholders;
     m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
@@ -92,10 +92,11 @@ QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTrans
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiSystemNameData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QString &systemName, qint64 sysIdTime) const {
+QnTransaction<ApiSystemNameData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) const {
     QnTransaction<ApiSystemNameData> transaction(ApiCommand::changeSystemName);
     transaction.params.systemName = systemName;
     transaction.params.sysIdTime = sysIdTime;
+    transaction.params.tranLogTime = tranLogTime;
     return transaction;
 }
 

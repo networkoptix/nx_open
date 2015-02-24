@@ -412,3 +412,22 @@ html, body {height: 100%;}
 span.danger{
   color:$alert-danger-text;
 }
+
+.btn.appstore{
+  width:130px;
+  height:40px;
+  background: url('../images/appstore.png');
+  background-size:130px 40px;
+  margin:5px;
+  color:transparent;
+  border:none;
+}
+.btn.googleplay{
+  width:130px;
+  height:40px;
+  background: url('../images/googleplay.png');
+  background-size:130px 40px;
+  margin:5px;
+  color:transparent;
+  border:none;
+}

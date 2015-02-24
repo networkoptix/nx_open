@@ -143,7 +143,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Previous version detected</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Installation Type</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Your system is going to be upgraded</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Your database has been corrupted and cannot be recovered. The fresh database has been installed. To access the system use login "admin" and password "admin". Please change the credentials after the first login.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Your database has been corrupted and cannot be recovered. The fresh database has been installed. To access the system use login "admin" and password "123". Please change the credentials after the first login.</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>    

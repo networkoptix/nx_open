@@ -18,6 +18,7 @@
 #include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/animation/animated.h>
+#include <ui/common/help_topic_queryable.h>
 
 #include "time_step.h"
 
@@ -28,7 +29,7 @@ class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 class QnTimePeriodList;
 
-class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
+class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart)
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd)
@@ -178,6 +179,8 @@ public:
 
     void setLastMinuteIndicatorVisible(int line, bool visible);
     bool isLastMinuteIndicatorVisible(int line) const;
+
+    virtual int helpTopicAt(const QPointF &pos) const override;
 
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);

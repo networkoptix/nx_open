@@ -1390,3 +1390,4 @@ void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* han
 }
 
 }
+

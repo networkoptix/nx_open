@@ -62,6 +62,8 @@ signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);
 
+    void colorsChanged();
+
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -79,7 +81,7 @@ private:
 
     QPoint mapToGrid(const QPoint &pos, bool doTruncate) const;
 
-    qreal cellSize() const;
+    int cellSize() const;
     void initMetrics();
 
     bool isValidCell(const QPoint &cell) const;
@@ -87,6 +89,11 @@ private:
     bool isValidColumn(int column) const;
 
     QColor disabledCellColor(const QColor &baseColor) const;
+
+    void updateSelectedCellsRect();
+
+    void updateCellColors();
+
 private:
     CellParams m_defaultParams;
     CellParams m_gridParams[COL_COUNT][ROW_COUNT];
@@ -94,12 +101,14 @@ private:
     bool m_showQuality;
     QString m_cornerText;
     QStringList m_weekDays;
-    QVector<QSize> m_weekDaysSize;
+    QSize m_cornerSize;
     int m_gridLeftOffset;
     int m_gridTopOffset;
     QPoint m_mousePressPos;
     QPoint m_mouseMovePos;
     QPoint m_mouseMoveCell;
+    QPoint m_mousePressCell;
+    QRect m_selectedCellsRect;
     QRect m_selectedRect;
     bool m_mousePressed;
     QFont m_labelsFont;

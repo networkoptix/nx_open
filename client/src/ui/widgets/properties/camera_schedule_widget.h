@@ -106,6 +106,8 @@ private slots:
     void updateRecordSpinboxes();
     void updateMaxFpsValue(bool motionPlusLqToggled);
 
+    void updateColors();
+
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();
     void at_checkBoxArchive_clicked();

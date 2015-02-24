@@ -141,7 +141,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Обнаружена предыдущая версия</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Способ установки</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Система будет обновлена</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">База данных повреждена и не может быть восстановлена. Была установлена "чистая" БД. Для доступа к системе используйте имя "admin" и пароль "admin". Рекомендуется сменить параметры доступа при первом входе в систему.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">База данных повреждена и не может быть восстановлена. Была установлена "чистая" БД. Для доступа к системе используйте имя "admin" и пароль "123". Рекомендуется сменить параметры доступа при первом входе в систему.</String>    
     
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Невозможно получить доступ к брандмауэру Windows.  ([2]   [3]   [4]   [5])</String>    

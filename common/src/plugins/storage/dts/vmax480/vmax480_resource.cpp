@@ -144,9 +144,11 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 
     //detecting and saving selected resolutions
+    /*
     CameraMediaStreams mediaStreams;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, QSize(640, 480), CODEC_ID_H264 ) );
-    saveResolutionList( mediaStreams );
+    saveMediaStreamInfoIfNeeded( mediaStreams );
+    */
 
     saveParams();
 

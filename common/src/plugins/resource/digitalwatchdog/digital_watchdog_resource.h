@@ -23,7 +23,7 @@ public:
     QnPlWatchDogResource();
     ~QnPlWatchDogResource();
 
-    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
+    //virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 

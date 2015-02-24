@@ -1039,7 +1039,11 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
         return CLVideoDecoderOutputPtr();    //screenshot will be received from the server      
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
-    CLVideoDecoderOutput::copy(m_lastDisplayedFrame.data(), outFrame.data());
+    if (!m_decoder.isEmpty())
+        getLastDecodedFrame(m_decoder.begin().value(), &outFrame);
+    else
+        CLVideoDecoderOutput::copy(m_lastDisplayedFrame.data(), outFrame.data());
+
     return outFrame;
 }
 
