@@ -14,6 +14,9 @@
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
 
+static const int PRIMARY_ENCODER_INDEX = 0;
+static const int SECONDARY_ENCODER_INDEX = 1;
+
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     typedef QnNetworkResource base_type;
     Q_OBJECT
@@ -130,8 +133,17 @@ public:
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
+    //!Returns user-defined group name (if not empty) or server-defined group name
     virtual QString getGroupName() const;
+    //!Returns server-defined group name
+    QString getDefaultGroupName() const;
     virtual void setGroupName(const QString& value);
+    //!Set group name (the one is show to the user in client)
+    /*!
+        This name is set by user.
+        \a setGroupName name is generally set automatically (e.g., by server)
+    */
+    void setUserDefinedGroupName( const QString& value );
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
 
@@ -208,6 +220,12 @@ public:
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
+    //TODO: #rvasilenko #High #2.4 get rid of this temporary solution
+    /**
+     * Temporary solution to correctly detach desktop cameras when user reconnects from one server to another.
+     * Implemented in QnDesktopCameraResource.
+     */
+    virtual bool isReadyToDetach() const {return true;}
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -239,8 +257,9 @@ signals:
         qint64 timestamp );
 
 protected slots:
-    virtual void at_parentIdChanged();
+    virtual void at_initializedChanged();
     virtual void at_motionRegionChanged();
+
 protected:
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 

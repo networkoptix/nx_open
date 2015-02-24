@@ -29,6 +29,8 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 
+#include <ui/help/help_topics.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
@@ -1242,6 +1244,24 @@ bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
     return m_lastMinuteIndicatorVisible[line];
 }
 
+int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
+    if (thumbnailsRect().contains(pos))
+        return Qn::MainWindow_Thumbnails_Help;
+
+    bool hasMotion = false;
+    for (int i = 0; i < m_lineCount; i++) {
+        if (!timePeriods(i, Qn::MotionContent).isEmpty()) {
+            hasMotion = true;
+            break;
+        }
+    }
+
+    if (hasMotion)
+        return Qn::MainWindow_MediaItem_SmartSearch_Help;
+
+    return Qn::MainWindow_Slider_Timeline_Help;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
@@ -2066,7 +2086,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
                 continue;
 
             qreal x = rect.width() / 2 + data.pos * thumbnailWidth;;
-            QSizeF targetSize(data.thumbnail.aspectRatio() * rect.height(), rect.height());
+            QSizeF targetSize(m_thumbnailsAspectRatio * rect.height(), rect.height());
             QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
 
             drawThumbnail(painter, data, targetRect, boundingRect);
@@ -2091,7 +2111,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
                 continue;
 
             qreal x = quickPositionFromValue(time, false);
-            QSizeF targetSize(data.thumbnail.aspectRatio() * rect.height(), rect.height());
+            QSizeF targetSize(m_thumbnailsAspectRatio * rect.height(), rect.height());
             QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
 
             drawThumbnail(painter, data, targetRect, boundingRect);

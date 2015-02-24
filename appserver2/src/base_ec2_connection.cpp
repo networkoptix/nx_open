@@ -207,8 +207,6 @@ namespace ec2
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
-        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
-        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
@@ -219,8 +217,6 @@ namespace ec2
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
-        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
-        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
     }
@@ -234,6 +230,17 @@ namespace ec2
         qnTransactionBus->sendTransaction(tran);
     }
 
+    template<class T>
+    qint64 ec2::BaseEc2Connection<T>::getTransactionLogTime() const {
+        return transactionLog ? transactionLog->getTransactionLogTime() : -1;
+    }
+
+    template<class T>
+    void ec2::BaseEc2Connection<T>::setTransactionLogTime(qint64 value)
+    {
+        if (transactionLog)
+            transactionLog->setTransactionLogTime(value);
+    }
 
 
     template class BaseEc2Connection<FixedUrlClientQueryProcessor>;

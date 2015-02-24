@@ -33,6 +33,9 @@ public:
     void releaseConnection(const TCPSocketPtr& socket);
 
     virtual bool isVirtualResource() const override { return true; }
+
+    /** Check if camera really connected to our server. */
+    bool isCameraConnected(const QnVirtualCameraResourcePtr &camera);
 private:
     struct ClientConnectionInfo
     {

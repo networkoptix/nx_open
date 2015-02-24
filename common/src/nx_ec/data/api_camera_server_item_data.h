@@ -8,14 +8,23 @@
 
 namespace ec2
 {
-    struct ApiCameraServerItemData: ApiData {
-        ApiCameraServerItemData(): timestamp(0) {}
+    struct ApiCameraServerItemDataOld: ApiData {
+        ApiCameraServerItemDataOld(): timestamp(0) {}
 
         QString cameraUniqueId;
         QnLatin1Array serverId;
         qint64   timestamp;
     };
-#define ApiCameraServerItemData_Fields (cameraUniqueId)(serverId)(timestamp)
+
+    struct ApiCameraServerItemData: ApiData {
+        ApiCameraServerItemData(): timestamp(0) {}
+
+        QString cameraUniqueId;
+        QnUuid serverGuid;
+        qint64   timestamp;
+    };
+#define ApiCameraServerItemDataOld_Fields (cameraUniqueId)(serverId)(timestamp)
+#define ApiCameraServerItemData_Fields (cameraUniqueId)(serverGuid)(timestamp)
 
 }
 

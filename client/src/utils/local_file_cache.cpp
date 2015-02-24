@@ -15,7 +15,7 @@ QnLocalFileCache::~QnLocalFileCache() {
 
 QString QnLocalFileCache::getFullPath(const QString &filename) const {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/local/%2/%3"))
+    return QDir::toNativeSeparators(QString(lit("%1/cache/local/%2/%3"))
                                     .arg(path)
                                     .arg(folderName())
                                     .arg(filename)

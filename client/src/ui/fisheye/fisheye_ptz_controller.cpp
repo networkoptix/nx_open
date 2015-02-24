@@ -42,9 +42,8 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     updateLimits();
 }
 
-qreal QnFisheyePtzController::customAR() const
-{
-    return m_widget->resource()->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+qreal QnFisheyePtzController::customAR() const {
+    return m_widget->resource()->customAspectRatio();
 }
 
 QnFisheyePtzController::~QnFisheyePtzController() {

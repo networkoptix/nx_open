@@ -19,14 +19,19 @@
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
 
-class QnVideoCamera: public QObject
+class QnVideoCamera: public QObject, public QnAbstractVideoCamera
 {
     Q_OBJECT
 
 public:
     QnVideoCamera(const QnResourcePtr& resource);
     virtual ~QnVideoCamera();
+    
     QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog);
+    virtual QnLiveStreamProviderPtr getPrimaryReader() override;
+    virtual QnLiveStreamProviderPtr getSecondaryReader() override;
+
+
     int copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue, int cseq);
 
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);

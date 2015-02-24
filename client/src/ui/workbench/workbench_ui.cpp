@@ -88,6 +88,9 @@
 
 namespace {
 
+    const QSize showHideButtonSize(15, 45);
+    const QMargins showHideButtonMargins(0, 10, 0, 10);
+
     QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, int helpTopicId = -1, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
@@ -118,7 +121,8 @@ namespace {
 
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
-        button->resize(15, 45);
+        button->setFixedSize(showHideButtonSize);
+        button->setImageMargins(showHideButtonMargins);
         if (action)
             button->setDefaultAction(action);
         else
@@ -145,13 +149,6 @@ namespace {
         button->setCached(true);
         setHelpTopic(button, Qn::MainWindow_Pin_Help);
         return button;
-    }
-
-    QGraphicsWidget *newSpacerWidget(qreal w, qreal h) {
-        GraphicsWidget *result = new GraphicsWidget();
-        result->setMinimumSize(QSizeF(w, h));
-        result->setMaximumSize(result->minimumSize());
-        return result;
     }
 
     class QnResizerWidget: public GraphicsWidget {
@@ -1338,10 +1335,27 @@ void QnWorkbenchUi::createTitleWidget() {
 
     m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
 
+    QGraphicsLinearLayout *tabBarLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    tabBarLayout->setContentsMargins(0, 0, 0, 0);
+    tabBarLayout->setSpacing(0);
+    tabBarLayout->addItem(m_tabBarItem);
+    tabBarLayout->setItemSpacing(tabBarLayout->count() - 1, 6);
+    GraphicsWidget *newTabButton = newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help);
+    tabBarLayout->addItem(newTabButton);
+    tabBarLayout->setAlignment(newTabButton, Qt::AlignVCenter);
+    tabBarLayout->setItemSpacing(tabBarLayout->count() - 1, 6);
+    GraphicsWidget *layoutMenuButton = newActionButton(action(Qn::OpenCurrentUserLayoutMenu));
+    tabBarLayout->addItem(layoutMenuButton);
+    tabBarLayout->setAlignment(layoutMenuButton, Qt::AlignVCenter);
+    tabBarLayout->addStretch(0x1000);
+
+    QGraphicsWidget *tabBarWidget = new GraphicsWidget();
+    setHelpTopic(tabBarWidget, Qn::MainWindow_TitleBar_Tabs_Help);
+    tabBarWidget->setLayout(tabBarLayout);
+
     QGraphicsLinearLayout * windowButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
-    windowButtonsLayout->setSpacing(2);
-    windowButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
+    windowButtonsLayout->setContentsMargins(0, 0, 2, 0);
+    windowButtonsLayout->setSpacing(4);
     windowButtonsLayout->addItem(newActionButton(action(Qn::WhatsThisAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction), 1.0, Qn::MainWindow_Fullscreen_Help));
@@ -1351,24 +1365,17 @@ void QnWorkbenchUi::createTitleWidget() {
     m_windowButtonsWidget->setLayout(windowButtonsLayout);
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->setSpacing(2);
-    titleLayout->setContentsMargins(4, 0, 4, 0);
-    QGraphicsLinearLayout *titleLeftButtonsLayout = new QGraphicsLinearLayout();
-    titleLeftButtonsLayout->setSpacing(2);
-    titleLeftButtonsLayout->setContentsMargins(0, 0, 0, 0);
-    titleLeftButtonsLayout->addItem(m_mainMenuButton);
-    titleLayout->addItem(titleLeftButtonsLayout);
-    titleLayout->addItem(m_tabBarItem);
-    titleLayout->setAlignment(m_tabBarItem, Qt::AlignBottom);
+    titleLayout->addItem(m_mainMenuButton);
+    titleLayout->addItem(tabBarWidget);
+    titleLayout->setAlignment(tabBarWidget, Qt::AlignBottom);
+    titleLayout->setStretchFactor(tabBarWidget, 0x1000);
     m_titleRightButtonsLayout = new QGraphicsLinearLayout();
-    m_titleRightButtonsLayout->setSpacing(2);
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
-    m_titleRightButtonsLayout->addStretch(0x1000);
     if (QnScreenRecorder::isSupported())
         m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction), 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenLoginDialogAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenLoginDialogAction), 1.0, Qn::Login_Help));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);
     m_titleItem->setLayout(titleLayout);
@@ -1653,7 +1660,7 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged() {
     m_notificationsBackgroundItem->setGeometry(backgroundGeometry);
     m_notificationsShowButton->setPos(QPointF(
         qMin(m_controlsWidgetRect.right(), headerGeometry.left()),
-        (headerGeometry.top() + headerGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
+        (headerGeometry.top() + headerGeometry.bottom() - showHideButtonSize.height()) / 2
     ));
     m_notificationsPinButton->setPos(headerGeometry.topLeft() + QPointF(m_pinOffset, m_pinOffset));
     if (isNotificationsOpened())
@@ -1675,7 +1682,8 @@ void QnWorkbenchUi::createNotificationsWidget() {
 
     QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
     m_notificationsShowButton = blinker;
-    m_notificationsShowButton->resize(15, 45);
+    m_notificationsShowButton->setFixedSize(showHideButtonSize);
+    m_notificationsShowButton->setImageMargins(showHideButtonMargins);
     m_notificationsShowButton->setCached(true);
     m_notificationsShowButton->setCheckable(true);
     m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));

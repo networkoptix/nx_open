@@ -167,7 +167,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.manuallyAdded = src->isManuallyAdded();
     dst.model = src->getModel();
     dst.groupId = src->getGroupId();
-    dst.groupName = src->getGroupName();
+    dst.groupName = src->getDefaultGroupName();
     dst.statusFlags = src->statusFlags();
     dst.vendor = src->getVendor();
 }
@@ -226,6 +226,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
 {
     dst->cameraID = src.cameraID;
     dst->name = src.cameraName;
+    dst->groupName = src.userDefinedGroupName;
     dst->scheduleDisabled = !src.scheduleEnabled;
     dst->motionType = src.motionType;
 
@@ -255,6 +256,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
 {
     dst.cameraID = src->cameraID;
     dst.cameraName = src->name;
+    dst.userDefinedGroupName = src->groupName;
     dst.scheduleEnabled = !src->scheduleDisabled;
     dst.motionType = src->motionType;
 
@@ -339,24 +341,24 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
 
 void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst) {
     dst.cameraUniqueId = src.cameraUniqueId;
-    dst.serverId = src.mediaServerGuid.toString().toLatin1();
+    dst.serverGuid = src.mediaServerGuid;
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
     dst.cameraUniqueId = src.cameraUniqueId;
-    dst.mediaServerGuid = QnUuid(src.serverId);
+    dst.mediaServerGuid = src.serverGuid;
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
 {
     /* CameraUniqueId -> (Timestamp -> ServerGuid). */
-    QMap<QString, QMap<qint64, QByteArray> > history;
+    QMap<QString, QMap<qint64, QnUuid> > history;
 
     /* Fill temporary history map. */
     for (auto pos = src.begin(); pos != src.end(); ++pos)
-        history[pos->cameraUniqueId][pos->timestamp] = pos->serverId;
+        history[pos->cameraUniqueId][pos->timestamp] = pos->serverGuid;
 
     for(auto pos = history.begin(); pos != history.end(); ++pos) {
         QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
@@ -364,7 +366,7 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         if (pos.value().isEmpty())
             continue;
 
-        QMapIterator<qint64, QByteArray> camit(pos.value());
+        QMapIterator<qint64, QnUuid> camit(pos.value());
         camit.toFront();
 
         cameraHistory->setCameraUniqueId(pos.key());

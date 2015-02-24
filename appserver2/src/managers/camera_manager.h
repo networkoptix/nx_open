@@ -76,7 +76,7 @@ namespace ec2
             QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
                 tran.params.cameraUniqueId,
                 tran.params.timestamp,
-                tran.params.serverId ) );
+                tran.params.serverGuid ) );
             if (tran.command == ApiCommand::addCameraHistoryItem)
                 emit cameraHistoryChanged( std::move(cameraHistoryItem ));
             else

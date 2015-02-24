@@ -8,7 +8,11 @@ enum class QnConnectionState {
     Connected,
     Reconnecting,
     Ready
+};
 
+class QnConnectionStateUtils {
+public:
+    static QString toString(QnConnectionState state);
 };
 
 class QnClientConnectionStatus {

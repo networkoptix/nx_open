@@ -52,7 +52,7 @@ private:
     bool isPointless(Qn::PtzCommand command);
 
     int nextSequenceNumber();
-
+    QnMediaServerResourcePtr getMediaServer() const;
 private:
     struct PtzCommandData {
         PtzCommandData(): command(Qn::InvalidPtzCommand) {}
@@ -63,7 +63,6 @@ private:
     };
 
     QnNetworkResourcePtr m_resource;
-    QnMediaServerResourcePtr m_server;
     QnUuid m_sequenceId;
     QAtomicInt m_sequenceNumber;
 

@@ -4,6 +4,7 @@
 void mac_initFullScreen(void *winId, void *qnmainwindow);
 void mac_showFullScreen(void *winId, bool);
 bool mac_isFullscreen(void *winId);
+void mac_disableFullscreenButton(void *winId);
 
 void mac_saveFileBookmark(const QString& path);
 

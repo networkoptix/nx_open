@@ -58,6 +58,19 @@ QnFileConnectionProcessor::~QnFileConnectionProcessor()
     stop();
 }
 
+QByteArray QnFileConnectionProcessor::readStaticFile(const QString& path)
+{
+    QString fileName = getDataDirectory() + "/web/" + path;
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+    {
+        file.setFileName(QString(":") + path); // check file into internal resources
+        if (!file.open(QFile::ReadOnly))
+            return QByteArray();
+    }
+    return file.readAll();
+}
+
 void QnFileConnectionProcessor::run()
 {
     Q_D(QnFileConnectionProcessor);
@@ -133,6 +146,6 @@ void QnFileConnectionProcessor::run()
         }
 #endif
     }
-    d->response.headers.insert(nx_http::HttpHeader("Last-Modified", lastModified.toString(Qt::RFC2822Date).toUtf8()));
+    d->response.headers.insert(nx_http::HttpHeader("Last-Modified", dateTimeToHTTPFormat(lastModified).toUtf8()));
     sendResponse(rez, contentType, contentEncoding, false);
 }

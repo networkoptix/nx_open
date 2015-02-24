@@ -22,10 +22,11 @@ QnUuid::QnUuid( const QString& text )
 {
     if( !text.isEmpty() )
     {
-        m_stringRepresentation = text;
-        assert(
-            text.size() == 36 ||    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-            text.size() == 38 );    //xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        if (text.size() == 38)
+            m_stringRepresentation = text;
+        Q_ASSERT(
+            text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
 }
 
@@ -35,10 +36,11 @@ QnUuid::QnUuid( const QByteArray& text )
 {
     if( !text.isEmpty() )
     {
-        m_byteArrayRepresentation = text;
-        assert(
-            text.size() == 36 ||    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-            text.size() == 38 );    //xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        if (text.size() == 38)
+            m_byteArrayRepresentation = text;
+        Q_ASSERT(
+            text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
 }
 

@@ -99,7 +99,6 @@ private:
     int composeGetParameter();
     void createDataProvider();
     void putLastIFrameToQueue();
-    void connectToLiveDataProviders();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
     QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QSharedPointer<const QnResourceVideoLayout> vLayout);

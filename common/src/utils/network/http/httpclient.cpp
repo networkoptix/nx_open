@@ -36,6 +36,8 @@ namespace nx_http
 
     bool HttpClient::doGet( const QUrl& url )
     {
+        m_done = false;
+
         if( !m_asyncHttpClient->doGet( url ) )
             return false;
 
@@ -51,6 +53,8 @@ namespace nx_http
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody )
     {
+        m_done = false;
+
         if( !m_asyncHttpClient->doPost( url, contentType, messageBody ) )
             return false;
 
@@ -85,6 +89,11 @@ namespace nx_http
         nx_http::BufferType result = m_msgBodyBuffer;
         m_msgBodyBuffer.clear();
         return result;
+    }
+
+    void HttpClient::addRequestHeader( const StringType& key, const StringType& value )
+    {
+        m_asyncHttpClient->addRequestHeader( key, value );
     }
 
     const QUrl& HttpClient::url() const

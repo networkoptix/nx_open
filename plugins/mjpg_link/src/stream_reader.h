@@ -73,6 +73,7 @@ private:
     QMutex m_mutex;
     CyclicAllocator m_allocator;
  
+    int doRequest( nx_http::HttpClient* const httpClient );
     void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );
     /*!
         \return false, if has been interrupted. Otherwise \a true

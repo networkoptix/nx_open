@@ -23,8 +23,6 @@ namespace {
         ResultFail,
         ResultSkip
     };
-
-    ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 }
 
 int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
@@ -37,10 +35,12 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     QString oldPassword = params.value(lit("oldPassword"));
     QByteArray passwordHash = params.value(lit("passwordHash")).toLatin1();
     QByteArray passwordDigest = params.value(lit("passwordDigest")).toLatin1();
+    qint64 sysIdTime = params.value(lit("sysIdTime")).toLongLong();
+    qint64 tranLogTime = params.value(lit("tranLogTime")).toLongLong();
     int port = params.value(lit("port")).toInt();
 
     /* set system name */
-    int changeSystemNameResult = changeSystemName(systemName, wholeSystem);
+    int changeSystemNameResult = changeSystemName(systemName, sysIdTime, wholeSystem, tranLogTime);
     if (changeSystemNameResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("SYSTEM_NAME"));
@@ -70,24 +70,18 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     return CODE_OK;
 }
 
-int QnConfigureRestHandler::changeSystemName(const QString &systemName, bool wholeSystem) {
+int QnConfigureRestHandler::changeSystemName(const QString &systemName, qint64 sysIdTime, bool wholeSystem, qint64 remoteTranLogTime) {
     if (systemName.isEmpty() || systemName == qnCommon->localSystemName())
         return ResultSkip;
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return ResultFail;
 
     if (!backupDatabase())
         return ResultFail;
 
-    MSSettings::roSettings()->setValue("systemName", systemName);
-    qnCommon->setLocalSystemName(systemName);
-
-    server->setSystemName(systemName);
-    ec2Connection()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    if (!::changeSystemName(systemName, sysIdTime, remoteTranLogTime))
+        return ResultFail;
 
     if (wholeSystem)
-        QnAppServerConnectionFactory::getConnection2()->getMiscManager()->changeSystemName(systemName, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        QnAppServerConnectionFactory::getConnection2()->getMiscManager()->changeSystemName(systemName, sysIdTime, remoteTranLogTime, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return ResultOk;
 }
@@ -149,5 +143,10 @@ int QnConfigureRestHandler::changePort(int port) {
 
 void QnConfigureRestHandler::resetConnections() {
     if (QnServerConnector::instance())
-        QnServerConnector::instance()->restart();
+        QnServerConnector::instance()->stop();
+
+    qnTransactionBus->dropConnections();
+
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->start();
 }

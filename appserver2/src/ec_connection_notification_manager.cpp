@@ -136,6 +136,11 @@ namespace ec2
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDatabaseDumpData> & /*tran*/)
     {
+        databaseReplaceRequired();
+    }
+
+    void ECConnectionNotificationManager::databaseReplaceRequired()
+    {
         emit m_ecConnection->databaseDumped();
     }
 

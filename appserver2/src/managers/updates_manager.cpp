@@ -68,7 +68,6 @@ namespace ec2 {
         auto transaction = prepareTransaction(updateId, data, offset);
 
         QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
@@ -91,7 +90,6 @@ namespace ec2 {
         auto transaction = prepareTransaction(updateId);
 
         QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
         return reqId;

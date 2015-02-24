@@ -409,18 +409,17 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
                 }
             }
 
-            AVDictionaryEntry* dewarpInfo = av_dict_get(m_formatContext->metadata,getTagName(DewarpingTag, format), 0, 0);
-            if (dewarpInfo) {
-                QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>();
-                if (mediaRes)
+            QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>();
+            if (mediaRes) {
+                AVDictionaryEntry* dewarpInfo = av_dict_get(m_formatContext->metadata,getTagName(DewarpingTag, format), 0, 0);
+                if (dewarpInfo)
                     mediaRes->setDewarpingParams(QnMediaDewarpingParams::deserialized(dewarpInfo->value));
-            }
 
-            AVDictionaryEntry* customInfo = av_dict_get(m_formatContext->metadata,getTagName(CustomTag, format), 0, 0);
-            if (customInfo) {
-                QnAviArchiveCustomData data = QJson::deserialized<QnAviArchiveCustomData>(customInfo->value);
-                if (!qFuzzyIsNull(data.overridenAr))
-                    m_resource->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(data.overridenAr));
+                AVDictionaryEntry* customInfo = av_dict_get(m_formatContext->metadata,getTagName(CustomTag, format), 0, 0);
+                if (customInfo) {
+                    QnAviArchiveCustomData data = QJson::deserialized<QnAviArchiveCustomData>(customInfo->value);
+                    mediaRes->setCustomAspectRatio(data.overridenAr);
+                }
             }
 
         }

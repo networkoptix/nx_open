@@ -14,33 +14,31 @@ angular.module('webadminApp')
             systemFound: false
         };
 
-        mediaserver.discoveredPeers().then(function (r) {
-            var systems = _.map(r.data.reply, function(module)
-            {
-                return {
-                    url: 'http://' + module.remoteAddresses[0] + ':' + module.port,
-                    systemName: module.systemName,
-                    ip: module.remoteAddresses[0],
-                    name: module.name
-                };
-            });
-
-            _.filter(systems, function(module){
-                return module.systemName !== $scope.systems.systemName;
-            });
-
-            $scope.systems.discoveredUrls = systems;
-        });
 
         mediaserver.getSettings().then(function (r) {
             $scope.systems.systemName =  r.data.reply.systemName;
 
-            $scope.systems.discoveredUrls = _.filter($scope.systems.discoveredUrls, function(module){
+            /*$scope.systems.discoveredUrls = _.filter($scope.systems.discoveredUrls, function(module){
                 return module.systemName !== $scope.systems.systemName;
+            });*/
+
+            mediaserver.discoveredPeers().then(function (r) {
+                var systems = _.map(r.data.reply, function(module)
+                {
+                    return {
+                        url: 'http://' + module.remoteAddresses[0] + ':' + module.port,
+                        systemName: module.systemName,
+                        ip: module.remoteAddresses[0],
+                        name: module.name
+                    };
+                });
+
+                $scope.systems.discoveredUrls = _.filter(systems, function(module){
+                    return module.systemName !== $scope.systems.systemName;
+                });
+
             });
         });
-
-
 
 
         $scope.test = function () {

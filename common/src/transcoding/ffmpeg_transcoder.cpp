@@ -344,7 +344,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 {
     Q_UNUSED(result)
     if ((quint64)m_baseTime == AV_NOPTS_VALUE)
-        m_baseTime = media->timestamp - 1000*100;
+        m_baseTime = media->timestamp;
 
     if (m_audioCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
         return 0;

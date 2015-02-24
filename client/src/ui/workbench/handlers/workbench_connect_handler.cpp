@@ -297,6 +297,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     context()->setUserName(appServerUrl.userName());
 
     QnGlobalModuleFinder::instance()->setConnection(result.connection());
+    QnRouter::instance()->setEnforcedConnection(QnRoutePoint(connectionInfo.ecsGuid, connectionInfo.ecUrl.host(), connectionInfo.ecUrl.port()));
 
     return ec2::ErrorCode::ok;
 }
@@ -312,6 +313,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 
     hideMessageBox();
 
+    QnRouter::instance()->setEnforcedConnection(QnRoutePoint());
     QnGlobalModuleFinder::instance()->setConnection(NULL);
     QnClientMessageProcessor::instance()->init(NULL);
     QnAppServerConnectionFactory::setEc2Connection(NULL);
@@ -398,7 +400,6 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     reconnectInfoDialog->setServers(reconnectHelper->servers());
 
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QDialog::hide);
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QObject::deleteLater);
     reconnectInfoDialog->show();
 
     bool success = false;
@@ -408,7 +409,19 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
 
         /* Here inner event loop will be started. */
-        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), true); 
+        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), true);
+
+        /* Main window can be closed in the event loop so the dialog will be freed. */
+        if (!reconnectInfoDialog)
+            return true;
+
+        /* If user press cancel while we are connecting, connection should be broken. */
+        if (reconnectInfoDialog && reconnectInfoDialog->wasCanceled()) {
+            reconnectInfoDialog->hide();
+            reconnectInfoDialog->deleteLater();
+            return false;
+        }
+
         if (errCode == ec2::ErrorCode::ok) {
             success = true;
             break;

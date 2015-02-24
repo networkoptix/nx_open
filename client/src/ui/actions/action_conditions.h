@@ -551,6 +551,7 @@ public:
         m_disableIfPtzDialogVisible(disableIfPtzDialogVisible)
     {}
     
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 

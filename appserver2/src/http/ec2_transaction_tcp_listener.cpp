@@ -58,6 +58,7 @@ void QnTransactionTcpProcessor::run()
     bool isMobileClient = query.hasQueryItem("isMobile");
     QnUuid remoteGuid  = QnUuid(query.queryItemValue("guid"));
     QnUuid remoteRuntimeGuid  = QnUuid(query.queryItemValue("runtime-guid"));
+    qint64 remoteSystemIdentityTime  = query.queryItemValue("system-identity-time").toLongLong();
     if (remoteGuid.isNull())
         remoteGuid = QnUuid::createUuid();
     QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
@@ -76,6 +77,7 @@ void QnTransactionTcpProcessor::run()
 
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
     d->response.headers.insert(nx_http::HttpHeader("runtime-guid", qnCommon->runningInstanceGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader("system-identity-time", QByteArray::number(qnCommon->systemIdentityTime())));
     d->response.headers.insert(nx_http::HttpHeader(
         nx_ec::EC2_PROTO_VERSION_HEADER_NAME,
         nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
@@ -111,6 +113,7 @@ void QnTransactionTcpProcessor::run()
 
         d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
         d->response.headers.insert(nx_http::HttpHeader("runtime-guid", qnCommon->runningInstanceGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader("system-identity-time", QByteArray::number(qnCommon->systemIdentityTime())));
         d->response.headers.insert(nx_http::HttpHeader(
             nx_ec::EC2_PROTO_VERSION_HEADER_NAME,
             nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
@@ -140,7 +143,7 @@ void QnTransactionTcpProcessor::run()
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
     else {
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer);
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer, remoteSystemIdentityTime);
         d->socket.clear();
     }
 }

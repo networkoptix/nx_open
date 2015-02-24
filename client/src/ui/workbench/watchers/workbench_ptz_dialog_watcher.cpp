@@ -39,6 +39,7 @@ void QnWorkbenchPtzDialogWatcher::closePtzManageDialog(QnWorkbenchItem *item) {
     if (item && item->resourceUid() != dialog->resource()->getUniqueId())
         return;
 
-    dialog->askToSaveChanges(false);
+    if (dialog->isModified())
+        dialog->askToSaveChanges(false);
     dialog->hide();
 }

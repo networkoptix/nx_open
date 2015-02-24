@@ -50,6 +50,7 @@ namespace ec2
         };
 
         QnTransactionLog(QnDbManager* db);
+        virtual ~QnTransactionLog();
 
         static QnTransactionLog* instance();
 
@@ -136,7 +137,7 @@ namespace ec2
         }
 
         qint64 getTimeStamp();
-        void init();
+        bool init();
 
         int getLatestSequence(const QnTranStateKey& key) const;
         QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
@@ -214,6 +215,9 @@ namespace ec2
         void beginTran();
         void commit();
         void rollback();
+
+        qint64 getTransactionLogTime() const;
+        void setTransactionLogTime(qint64 value);
     private:
         friend class QnDbManager;
 

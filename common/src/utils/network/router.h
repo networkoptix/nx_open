@@ -12,6 +12,7 @@
 class QnRouteBuilder;
 class QnModuleFinder;
 struct QnModuleInformation;
+class QElapsedTimer;
 
 class QnRouter : public QObject, public Singleton<QnRouter> {
     Q_OBJECT
@@ -36,6 +37,9 @@ public:
 
     QnUuid whoIs(const QString &host, quint16 port) const;
 
+    QnRoutePoint enforcedConnection() const;
+    void setEnforcedConnection(const QnRoutePoint &enforcedConnection);
+
 signals:
     void connectionAdded(const QnUuid &discovererId, const QnUuid &peerId, const QString &host, quint16 port);
     void connectionRemoved(const QnUuid &discovererId, const QnUuid &peerId, const QString &host, quint16 port);
@@ -52,12 +56,16 @@ private:
     bool addConnection(const QnUuid &id, const Endpoint &endpoint);
     bool removeConnection(const QnUuid &id, const Endpoint &endpoint);
 
+    void updateRuntimeData(bool force = false);
+
 private:
     mutable QMutex m_mutex;
     std::weak_ptr<ec2::AbstractECConnection> m_connection;
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QnUuid, Endpoint> m_connections;
     bool m_passive;
+    QTimer *m_runtimeDataUpdateTimer;
+    QScopedPointer<QElapsedTimer> m_runtimeDataElapsedTimer;
 };
 
 #endif // ROUTER_H

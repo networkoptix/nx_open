@@ -73,7 +73,7 @@ private:
     */
     nxpt::ScopedRef<IsdNativePlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
-    unsigned int m_capabilities;
+    mutable unsigned int m_capabilities;
     std::auto_ptr<MediaEncoder> m_encoder[2];
     nxcip::Picture* m_motionMask;
     bool m_audioEnabled;

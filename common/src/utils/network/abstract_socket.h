@@ -183,10 +183,16 @@ public:
         \param foreignPort foreign port
         \param timeoutMillis connection timeout, 0 - no timeout
         \return false if unable to establish connection
-     */
-    virtual bool connect(
+    */
+    bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS )
+    {
+        return connect( SocketAddress(foreignAddress, foreignPort), timeoutMillis );
+    }
+    virtual bool connect(
+        const SocketAddress& remoteSocketAddress,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
     //!Read into the given \a buffer up to \a bufferLen bytes data from this socket
     /*!

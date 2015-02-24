@@ -17,7 +17,7 @@
 namespace ec2
 {
 
-static QnTransactionLog* globalInstance = 0;
+static QnTransactionLog* globalInstance = nullptr;
 
 QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
 {
@@ -27,11 +27,22 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
     m_baseTime = 0;
 }
 
-void QnTransactionLog::init()
+QnTransactionLog::~QnTransactionLog()
+{
+    Q_ASSERT(globalInstance == this);
+    globalInstance = nullptr;
+}
+
+bool QnTransactionLog::init()
 {
     QSqlQuery delQuery(m_dbManager->getDB());
-    delQuery.prepare("DELETE FROM transaction_sequence WHERE not exists(select 1 from transaction_log tl where tl.peer_guid = transaction_sequence.peer_guid and tl.db_guid = transaction_sequence.db_guid)");
-    delQuery.exec();
+    delQuery.prepare("DELETE FROM transaction_sequence \
+                       WHERE NOT (transaction_sequence.peer_guid = ? AND transaction_sequence.db_guid = ?) \
+                         AND NOT exists(select 1 from transaction_log tl where tl.peer_guid = transaction_sequence.peer_guid and tl.db_guid = transaction_sequence.db_guid)");
+    delQuery.addBindValue(QnSql::serialized_field(qnCommon->moduleGUID()));
+    delQuery.addBindValue(QnSql::serialized_field(m_dbManager->getID()));
+    if (!delQuery.exec())
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
 
     QSqlQuery query(m_dbManager->getDB());
     bool seqFound = false;
@@ -43,6 +54,10 @@ void QnTransactionLog::init()
             QnTranStateKey key(QnUuid::fromRfc4122(query.value(0).toByteArray()), QnUuid::fromRfc4122(query.value(1).toByteArray()));
             m_state.values.insert(key, query.value(2).toInt());
         }
+    }
+    else
+    {
+        return false;
     }
     if (!seqFound) {
         // migrate from previous version. Init sequence table
@@ -59,6 +74,10 @@ void QnTransactionLog::init()
                 updateSequenceNoLock(peerID, dbID, sequence);
             }
         }
+        else
+        {
+            return false;
+        }
     }
 
     QSqlQuery query2(m_dbManager->getDB());
@@ -72,15 +91,23 @@ void QnTransactionLog::init()
             m_updateHistory.insert(hash, UpdateHistoryData(QnTranStateKey(peerID, dbID), timestamp));
         }     
     }
+    else
+    {
+        return false;
+    }
 
     m_lastTimestamp = qnSyncTime->currentMSecsSinceEpoch();
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
-    if (queryTime.exec() && queryTime.next()) {
+    if( !queryTime.exec() )
+        return false;
+    if (queryTime.next()) {
         m_lastTimestamp = qMax(m_lastTimestamp, queryTime.value(0).toLongLong());
     }
     m_baseTime = m_lastTimestamp;
     m_relativeTimer.start();
+
+    return true;
 }
 
 qint64 QnTransactionLog::getTimeStamp()
@@ -384,6 +411,18 @@ void QnTransactionLog::fillPersistentInfo(QnAbstractTransaction& tran)
         tran.persistentInfo.dbID = m_dbManager->getID();
         tran.persistentInfo.timestamp = getTimeStamp();
     }
+}
+
+qint64 QnTransactionLog::getTransactionLogTime() const
+{
+    QMutexLocker lock(&m_timeMutex);
+    return m_lastTimestamp;
+}
+
+void QnTransactionLog::setTransactionLogTime(qint64 value)
+{
+    QMutexLocker lock(&m_timeMutex);
+    m_lastTimestamp = qMax(value, m_lastTimestamp);
 }
 
 

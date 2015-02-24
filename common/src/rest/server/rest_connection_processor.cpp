@@ -108,6 +108,9 @@ void QnRestConnectionProcessor::run()
             contentEncoding = "gzip";
         }
     }
+    nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"));
+    nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "post-check=0, pre-check=0"));
+    nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Pragma", "no-cache"));
     sendResponse(rez, contentType, contentEncoding, false);
 }
 

@@ -237,7 +237,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnUpdateTarget &target, std:
         connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,  this,  &QnMediaServerUpdateTool::checkForUpdatesFinished);
     connect(checkForUpdatesTask,  &QnNetworkPeerTask::finished,             checkForUpdatesTask, &QObject::deleteLater);
     QtConcurrent::run(checkForUpdatesTask, &QnCheckForUpdatesPeerTask::start);
-    //checkForUpdatesTask->start();
+    setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
 }
 
 
@@ -258,7 +258,6 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     connect(m_updateProcess, &QThread::finished, this, [this]{
         m_updateProcess->deleteLater();
         m_updateProcess = NULL;
-        setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
     });
 
     m_updateProcess->start();

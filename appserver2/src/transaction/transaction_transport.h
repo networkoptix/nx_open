@@ -75,6 +75,9 @@ public:
         Q_ASSERT_X(!transaction.isLocal || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
 
+        if (m_remotePeer.peerType == Qn::PT_MobileClient && skipTransactionForMobileClient(transaction.command))
+            return;
+
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:
             addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
@@ -116,6 +119,9 @@ public:
     void setState(State state);
     State getState() const;
 
+    void setRemoteIdentityTime(qint64 time);
+    qint64 remoteIdentityTime() const;
+
     //!Set \a eventHandler that will receive all http chunk extensions
     /*!
         \return event handler id that may be used to remove event handler with \a QnTransactionTransport::removeEventHandler call
@@ -144,6 +150,7 @@ public:
 
     void transactionProcessed();
 
+    static bool skipTransactionForMobileClient(ApiCommand::Value command);
 private:
     struct DataToSend
     {
@@ -191,7 +198,7 @@ private:
     QByteArray m_emptyChunkData;
     int m_postedTranCount;
     bool m_asyncReadScheduled;
-
+    qint64 m_remoteIdentityTime;
 private:
     void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();

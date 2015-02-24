@@ -26,6 +26,7 @@ private:
     int m_bufXOffs;
     int m_bufYOffs;
     QImage* m_timeImg;
+    QSize m_timeImgSrcSiz;
     qint64 m_onscreenDateOffset;
     quint8* m_imageBuffer;
     Qn::Corner m_dateTextPos;

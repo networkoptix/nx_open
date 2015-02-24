@@ -22,6 +22,9 @@
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
 
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include <update/media_server_update_tool.h>
 
 #include <utils/applauncher_utils.h>
@@ -51,6 +54,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_lastAutoUpdateCheck(0)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::Administration_Update_Help);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);
@@ -115,6 +120,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->dayWarningLabel->setVisible(false);
     ui->connectionProblemLabel->setVisible(false);
     ui->longUpdateWarning->setVisible(false);
+
+    ui->releaseNotesLabel->setText(lit("<a href='notes'>%1</a>").arg(tr("Release notes")));
+    ui->specificBuildLabel->setText(lit("<a href='spec'>%1</a>").arg(tr("Get a specific build")));
+    ui->latestBuildLabel->setText(lit("<a href='latest'>%1</a>").arg(tr("Get the latest version")));
 
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
@@ -328,7 +337,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                 }
 
                 if (unholdConnection)
-                    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
+                    qnClientMessageProcessor->setHoldConnection(false);
             }
             break;
         case QnUpdateResult::Cancelled:

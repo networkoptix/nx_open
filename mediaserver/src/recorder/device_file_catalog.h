@@ -144,7 +144,7 @@ public:
     QnServer::ChunksCatalog getRole() const;
 private:
 
-    bool fileExists(const Chunk& chunk, bool checkDirOnly);
+    bool csvMigrationCheckFile(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, const QnStorageResourcePtr &storage);
     QSet<QDate> recordedMonthList();

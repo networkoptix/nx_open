@@ -526,7 +526,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
 
         if (!isTranscode) {
             QnAviArchiveCustomData customData;
-            customData.overridenAr = m_device->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+            customData.overridenAr = mediaDev->customAspectRatio();
             av_dict_set(&m_formatCtx->metadata,
                 QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::CustomTag, fileExt),
                 QJson::serialized<QnAviArchiveCustomData>(customData), 0);

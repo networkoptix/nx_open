@@ -55,7 +55,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         break;
     case Qn::OtherSystemsNode:
         m_displayName = m_name = tr("Other Systems");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystems);
         m_bastard = true; /* Invisible by default until has children. */
         break;
     case Qn::UsersNode:
@@ -74,7 +74,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         break;
     case Qn::SystemNode:
         m_displayName = m_name = name;
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystem);
         m_bastard = true; /* Invisible by default until has children. */
         m_state = Invalid;
         break;
@@ -337,8 +337,11 @@ bool QnResourcePoolModelNode::calculateBastard() const {
                 return true;
             
             /* Hide edge servers, camera will be displayed instead. */
-            if (QnMediaServerResource::isHiddenServer(m_resource))
+            if (QnMediaServerResource::isHiddenServer(m_resource) &&
+                !qnResPool->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
+            {
                 return true;
+            }
         }
         return false;
 
@@ -531,6 +534,10 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return Qn::MainWindow_Tree_Local_Help;
         } else if(m_type == Qn::RecorderNode) {
             return Qn::MainWindow_Tree_Recorder_Help;
+        } else if(m_type == Qn::VideoWallItemNode) {
+            return Qn::Videowall_Display_Help;
+        } else if(m_type == Qn::VideoWallMatrixNode) {
+            return Qn::Videowall_Matrix_Help;
         } else if(m_flags & Qn::layout) {
             if(m_model->context()->snapshotManager()->isFile(m_resource.dynamicCast<QnLayoutResource>())) {
                 return Qn::MainWindow_Tree_MultiVideo_Help;
@@ -540,9 +547,15 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
         } else if(m_flags & Qn::user) {
             return Qn::MainWindow_Tree_Users_Help;
         } else if(m_flags & Qn::local) {
+            if(m_flags & Qn::video)
+                return Qn::MainWindow_Tree_Exported_Help;
             return Qn::MainWindow_Tree_Local_Help;
         } else if(m_flags & Qn::server) {
             return Qn::MainWindow_Tree_Servers_Help;
+        } else if(m_flags & Qn::live_cam) {
+            return Qn::MainWindow_Tree_Camera_Help;
+        } else if(m_flags & Qn::videowall) {
+            return Qn::Videowall_Help;
         } else {
             return -1;
         }

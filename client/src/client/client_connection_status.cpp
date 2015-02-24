@@ -2,21 +2,17 @@
 
 //#define STRICT_STATE_CONTROL
 
-namespace {
-
-    QString stateToString(QnConnectionState state) {
-        switch (state) {
-        case QnConnectionState::Invalid:                return lit("Invalid");
-        case QnConnectionState::Disconnected:           return lit("Disconnected");
-        case QnConnectionState::Connecting:             return lit("Connecting");
-        case QnConnectionState::Connected:              return lit("Connected");
-        case QnConnectionState::Reconnecting:           return lit("Reconnecting");
-        case QnConnectionState::Ready:                  return lit("Ready");
-        }
-        qWarning() << "invalid state" << QString::number(static_cast<int>(state));
-        return QString();
+QString QnConnectionStateUtils::toString(QnConnectionState state) {
+    switch (state) {
+    case QnConnectionState::Invalid:                return lit("Invalid");
+    case QnConnectionState::Disconnected:           return lit("Disconnected");
+    case QnConnectionState::Connecting:             return lit("Connecting");
+    case QnConnectionState::Connected:              return lit("Connected");
+    case QnConnectionState::Reconnecting:           return lit("Reconnecting");
+    case QnConnectionState::Ready:                  return lit("Ready");
     }
-
+    qWarning() << "invalid state" << QString::number(static_cast<int>(state));
+    return QString();
 }
 
 QnClientConnectionStatus::QnClientConnectionStatus():
@@ -54,7 +50,7 @@ void QnClientConnectionStatus::setState(QnConnectionState state) {
 #endif
 
     if (!m_allowedTransactions.values(m_state).contains(state))
-        warn(lit("Invalid state transaction %1 -> %2").arg(stateToString(m_state)).arg(stateToString(state)));
+        warn(lit("Invalid state transaction %1 -> %2").arg(QnConnectionStateUtils::toString(m_state)).arg(QnConnectionStateUtils::toString(state)));
 
     m_state = state;
 }

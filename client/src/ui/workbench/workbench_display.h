@@ -256,6 +256,11 @@ public:
     QRectF viewportGeometry() const;
 
     /**
+     * \returns                         Current viewport geometry, in scene coordinates, calculated taking viewport margins into account.
+     */
+    QRectF boundedViewportGeometry() const;
+
+    /**
      * This function can be used in case the "actual" viewport differs from the 
      * "real" one. This can be the case if control panels are drawn on the scene.
      *
@@ -313,6 +318,8 @@ public:
     QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
 
     void ensureRaisedConeItem(QnResourceWidget *widget);
+
+    QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
 
     QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
 
@@ -426,7 +433,7 @@ protected slots:
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
 
-    void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
+    void at_previewSearch_thumbnailLoaded(const QnThumbnail &thumbnail);
 
     void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
     void at_notificationTimer_timeout(const QVariant &resource, const QVariant &type);

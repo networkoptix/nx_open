@@ -25,7 +25,7 @@ def update(project, translationDir, projectFile):
             
         entries.append(path)
             
-    command = 'lupdate -no-obsolete -pro ' + projectFile + ' -locations absolute -ts'
+    command = 'lupdate -no-obsolete -no-ui-lines -pro ' + projectFile + ' -locations none -ts'
     for path in entries:
         command = command + ' ' + path
     print command

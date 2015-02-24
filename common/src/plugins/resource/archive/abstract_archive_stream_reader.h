@@ -83,8 +83,11 @@ public:
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) = 0;
     virtual double getSpeed() const = 0;
 
-    virtual void startPaused() = 0;
+    virtual void startPaused(qint64 startTime) = 0;
     virtual void setGroupId(const QByteArray& groupId)  = 0;
+
+    bool isEnabled() const { return m_enabled; }
+    void setEnabled(bool value) { m_enabled = value; }
 protected:
 
     /**
@@ -108,6 +111,8 @@ protected:
     qint64 m_needToSleep;
     QnAbstractArchiveDelegate* m_delegate;
     QnAbstractNavigator* m_navDelegate;
+private:
+    bool m_enabled;
 };
 
 #endif // ENABLE_ARCHIVE

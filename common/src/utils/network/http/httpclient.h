@@ -52,6 +52,7 @@ namespace nx_http
             Blocks, if internal message body buffer is empty
         */
         BufferType fetchMessageBodyBuffer();
+        void addRequestHeader(const StringType& key, const StringType& value);
         const QUrl& url() const;
         StringType contentType() const;
 

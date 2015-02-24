@@ -1,0 +1,5 @@
+{
+    "settings": {
+        "translationPath":          ":/translations/common_${translation1}.qm"
+    }
+}

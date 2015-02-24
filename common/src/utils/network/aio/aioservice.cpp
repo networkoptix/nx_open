@@ -5,6 +5,7 @@
 
 #include "aioservice.h"
 
+#include <atomic>
 #include <iostream>
 #include <memory>
 #include <thread>
@@ -21,15 +22,12 @@ using namespace std;
 
 namespace aio
 {
-    static unsigned int threadCountArgValue = 0;
-
     typedef AIOThread<Pollable> SystemAIOThread;
+
+    static std::atomic<AIOService*> AIOService_instance( nullptr );
 
     AIOService::AIOService( unsigned int threadCount )
     {
-        if( !threadCount )
-            threadCount = threadCountArgValue;
-
         if( !threadCount )
             threadCount = QThread::idealThreadCount();
 
@@ -50,6 +48,9 @@ namespace aio
             std::cerr << "Could not start a single AIO thread. Terminating..." << std::endl;
             exit(1);
         }
+
+        Q_ASSERT( AIOService_instance.load() == nullptr );
+        AIOService_instance = this;
     }
 
     AIOService::~AIOService()
@@ -63,20 +64,21 @@ namespace aio
             delete *it;
         }
         m_systemSocketAIO.aioThreadPool.clear();
+
+        Q_ASSERT( AIOService_instance == this );
+        AIOService_instance = nullptr;
+    }
+
+    AIOService* AIOService::instance()
+    {
+        SocketGlobalRuntime::instance();    //instanciates socket-related globals in correct order
+        return AIOService_instance.load( std::memory_order_relaxed );
     }
 
     //!Returns true, if object has been successfully initialized
     bool AIOService::isInitialized() const
     {
         return !m_systemSocketAIO.aioThreadPool.empty();
-    }
-
-    Q_GLOBAL_STATIC( AIOService, aioServiceInstance )
-    
-    AIOService* AIOService::instance( unsigned int threadCount )
-    {
-        threadCountArgValue = threadCount;
-        return aioServiceInstance();
     }
 
     template<> AIOService::SocketAIOContext<Pollable>& AIOService::getAIOHandlingContext()

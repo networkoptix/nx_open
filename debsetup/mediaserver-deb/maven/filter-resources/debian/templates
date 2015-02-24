@@ -1,7 +1,7 @@
 
 Template: ${deb.customization.company.name}-mediaserver/appserverPassword
 Type: string
-Default: 
+Default:
 Description: Admin's password:
 
 Template: ${deb.customization.company.name}-mediaserver/appserverPassword_invalid
@@ -10,7 +10,7 @@ Description: Password can't be empty
 
 Template: ${deb.customization.company.name}-mediaserver/port
 Type: string
-Default: 
+Default:
 Description: Port:
 
 Template: ${deb.customization.company.name}-mediaserver/port_invalid
@@ -27,7 +27,7 @@ Type: select
 Choices: ${choices}
 Description: Keep the database, remove or revert to previous version (if any)
 
-Template: ${deb.customization.company.name}-mediaserver/allowCameraChanges
+Template: ${deb.customization.company.name}-mediaserver/cameraSettingsOptimization
 Type: boolean
 Description: Allow system to optimize cameras settings (Recommended)
 

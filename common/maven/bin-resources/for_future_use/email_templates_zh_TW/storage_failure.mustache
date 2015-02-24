@@ -1,0 +1,17 @@
+﻿<div class="content">
+    <div class="callout">
+        <h4>詳細資訊:</h4>
+        <table class="details">
+            <tr>
+                <th>原因</th>
+                <th>時間</th>
+            </tr>
+            {{#aggregated}}
+                <tr>
+                    <td class="error">{{reason}}</td>
+                    <td><i>{{timestamp}}</i></td>
+                </tr>
+            {{/aggregated}}
+        </table>
+    </div>
+</div>

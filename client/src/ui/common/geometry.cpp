@@ -540,3 +540,22 @@ QPointF QnGeometry::rotated(const QPointF &point, const QPointF &center, qreal d
     transform.translate(-center.x(), -center.y());
     return transform.map(point);
 }
+
+QRectF QnGeometry::encloseRotatedGeometry(const QRectF &enclosingGeometry, qreal aspectRatio, qreal rotation) {
+    /* 1. Take a rectangle with our aspect ratio */
+    QRectF geom = expanded(aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
+
+    /* 2. Rotate it */
+    QRectF rotated = QnGeometry::rotated(geom, rotation);
+
+    /* 3. Scale it to fit enclosing geometry */
+    QSizeF scaledSize = bounded(expanded(rotated.size(), enclosingGeometry.size(), Qt::KeepAspectRatio), enclosingGeometry.size(), Qt::KeepAspectRatio);
+
+    /* 4. Get scale factor */
+    qreal scale = QnGeometry::scaleFactor(rotated.size(), scaledSize, Qt::KeepAspectRatio);
+
+    /* 5. Scale original non-rotated geometry */
+    geom = scaled(geom, scale, geom.center());
+
+    return geom;
+}

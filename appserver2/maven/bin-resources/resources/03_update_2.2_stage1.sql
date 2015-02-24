@@ -6,9 +6,6 @@ INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_con
 INSERT INTO "vms_businessrule_action_resources" ( "businessrule_id","resource_id" ) VALUES ( '10022','1' );
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'0',NULL,'0','8','2','10023','10' );
 
-update vms_resource set guid = id
-where guid = "";
-
 DELETE FROM vms_businessrule_action_resources where resource_id in (SELECT id from vms_resource where disabled > 0);
 DELETE FROM vms_businessrule_event_resources where resource_id in (SELECT id from vms_resource where disabled > 0);
 DELETE FROM vms_scheduletask WHERE source_id in (SELECT id from vms_resource where disabled > 0);

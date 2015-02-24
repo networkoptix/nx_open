@@ -113,5 +113,10 @@ QByteArray formatJSonString(const QByteArray& data);
 QString debugTime(qint64 timeMSec, const QString &fmt = QString());
 #endif
 
+/**
+ * Convert QDateTime to HTTP header date format
+ */
+QString dateTimeToHTTPFormat(const QDateTime& value);
+
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

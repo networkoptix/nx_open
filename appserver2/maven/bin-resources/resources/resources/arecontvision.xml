@@ -23,5 +23,20 @@
                 <param name = "MaxFPS" default_value ="20"/>
             </params>
         </resource>
+        <resource name = "1225" public ="ArecontVision_Abstract">
+            <params>
+                <param name = "MaxSensorWidth" default_value ="1280"/>
+                <param name = "MaxSensorHeight" default_value ="960"/>
+                <param name = "MaxFPS" default_value ="37"/>
+            </params>
+        </resource>
+        <resource name = "1245" public ="ArecontVision_Abstract">
+            <params>
+                <param name = "MaxSensorWidth" default_value ="1280"/>
+                <param name = "MaxSensorHeight" default_value ="1024"/>
+                <param name = "MaxFPS" default_value ="42"/>
+            </params>
+        </resource>
+
     </oem>
 </resources>

@@ -46,7 +46,8 @@ namespace aio
     {
     public:
         /*!
-            Using iterator in other thread than \a poll() results in undefined behavour
+            Using iterator in other thread than \a poll() results in undefined behavour.
+            \note If element, iterator is pointing to, has been removed, it is still safe to increment iterator
         */
         class const_iterator
         {
@@ -59,8 +60,14 @@ namespace aio
 
             const_iterator& operator=( const const_iterator& );
             //!Selects next socket which state has been changed with previous \a poll call
+            /*!
+                \note If iterator points to removed element, it is safe to increment iterator
+            */
             const_iterator operator++(int);    //it++
             //!Selects next socket which state has been changed with previous \a poll call
+            /*!
+                \note If iterator points to removed element, it is safe to increment iterator
+            */
             const_iterator& operator++();       //++it
 
             Pollable* socket();
@@ -103,7 +110,8 @@ namespace aio
         bool add( Pollable* const sock, EventType eventType, void* userData = NULL );
         //!Do not monitor event \a eventType on socket \a sock anymore
         /*!
-            \note Ivalidates all iterators to the left of removed element. So, it is ok to iterate signalled sockets and remove current element
+            \note Ivalidates all iterators to the left of removed element. So, it is ok to iterate signalled sockets and remove current element:
+                following iterator increment operation will perform safely
         */
         void remove( Pollable* const sock, EventType eventType );
         //!Returns number of sockets in pollset

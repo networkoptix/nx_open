@@ -364,6 +364,8 @@ public:
 
     static QRectF rotated(const QRectF &rect, qreal degrees);
     static QPointF rotated(const QPointF &point, const QPointF &center, qreal degrees);
+
+    static QRectF encloseRotatedGeometry(const QRectF &enclosingGeometry, qreal aspectRatio, qreal rotation);
 };
 
 #endif // QN_GEOMETRY_H

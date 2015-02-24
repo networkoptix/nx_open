@@ -88,7 +88,7 @@ namespace nxcip
         }
     };
 
-    static const int CAMERA_INFO_ARRAY_SIZE = 1024;
+    static const int CAMERA_INFO_ARRAY_SIZE = 256;
     static const int MAX_MODEL_NAME_SIZE = 256;
 
     //!This interface is used to find cameras and create \a BaseCameraManager instance

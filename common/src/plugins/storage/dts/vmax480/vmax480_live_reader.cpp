@@ -129,6 +129,7 @@ void QnVMax480LiveProvider::beforeRun()
 void QnVMax480LiveProvider::afterRun()
 {
     //msleep(300);
+    CLServerPushStreamReader::afterRun();
     closeStream();
 }
 

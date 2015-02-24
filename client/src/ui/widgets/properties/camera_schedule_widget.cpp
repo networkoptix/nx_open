@@ -160,21 +160,12 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHighest), Qn::QualityHighest);
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
 
+    setHelpTopic(ui->archiveGroupBox, Qn::CameraSettings_Recording_ArchiveLength_Help);
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     // init buttons
-    ui->recordAlwaysButton->setColor(qnGlobals->recordAlwaysColor());
-    ui->recordAlwaysButton->setCheckedColor(qnGlobals->recordAlwaysColor().lighter());
-
-    ui->recordMotionButton->setColor(qnGlobals->recordMotionColor());
-    ui->recordMotionButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
-
-    ui->recordMotionPlusLQButton->setColor(qnGlobals->recordMotionColor());
-    ui->recordMotionPlusLQButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
-    ui->recordMotionPlusLQButton->setInsideColor(qnGlobals->recordAlwaysColor());
-
-    ui->noRecordButton->setColor(qnGlobals->noRecordColor());
-    ui->noRecordButton->setCheckedColor(qnGlobals->noRecordColor().lighter());
+    connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this, &QnCameraScheduleWidget::updateColors);
+    updateColors();
 
     QnCamLicenseUsageHelper helper;
     ui->licensesUsageWidget->init(&helper);
@@ -197,8 +188,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->enableRecordingCheckBox,SIGNAL(clicked()),                  this,   SLOT(at_enableRecordingCheckBox_clicked()));
     connect(ui->enableRecordingCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(updateGridEnabledState()));
     connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SIGNAL(scheduleEnabledChanged(int)));
-    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
-    connect(qnLicensePool,              SIGNAL(licensesChanged()),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
+    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()));
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
 
@@ -236,8 +226,16 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connectToGridWidget();
 
     updateGridEnabledState();
-    updateLicensesLabelText();
     updateMotionButtons();
+
+    auto updateLicensesIfNeeded = [this] { 
+        if (!isVisible())
+            return;
+        updateLicensesLabelText();
+    };
+
+    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
+    connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
 }
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget() {
@@ -758,6 +756,14 @@ void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled) {
         ui->fpsSpinBox->setMaximum(m_maxDualStreamingFps);
     else
         ui->fpsSpinBox->setMaximum(m_maxFps);
+}
+
+void QnCameraScheduleWidget::updateColors() {
+    ui->recordAlwaysButton->setColor(ui->gridWidget->colors().recordAlways);
+    ui->recordMotionButton->setColor(ui->gridWidget->colors().recordMotion);
+    ui->recordMotionPlusLQButton->setColor(ui->gridWidget->colors().recordMotion);
+    ui->recordMotionPlusLQButton->setInsideColor(ui->gridWidget->colors().recordAlways);
+    ui->noRecordButton->setColor(ui->gridWidget->colors().recordNever);
 }
 
 // -------------------------------------------------------------------------- //

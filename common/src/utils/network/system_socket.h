@@ -126,16 +126,6 @@ public:
      */
     bool setLocalPort(unsigned short localPort) ;
 
-    /**
-     *   Set the local port to the specified port and the local address
-     *   to the specified address.  If you omit the port, a random port
-     *   will be selected.
-     *   @param localAddress local address
-     *   @param localPort local port
-     */
-    bool setLocalAddressAndPort(const QString &localAddress,
-                                unsigned short localPort = 0) ;
-
     //!Returns socket write/connect timeout in millis
     unsigned int getWriteTimeOut() const;
 
@@ -164,7 +154,7 @@ public:
 
     bool failed() const;
 
-    bool fillAddr( const QString &address, unsigned short port, sockaddr_in &addr );
+    bool fillAddr( const SocketAddress& socketAddress, sockaddr_in &addr );
     bool createSocket( int type, int protocol );
 
 protected:
@@ -198,8 +188,7 @@ public:
 
     //!Implementation of AbstractCommunicatingSocket::connect
     bool connect(
-        const QString &foreignAddress,
-        unsigned short foreignPort,
+        const SocketAddress& remoteAddress,
         unsigned int timeoutMillis );
     //!Implementation of AbstractCommunicatingSocket::recv
     int recv( void* buffer, unsigned int bufferLen, int flags );
@@ -379,11 +368,10 @@ public:
 
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
-        const QString& foreignAddress,
-        unsigned short foreignPort,
+        const SocketAddress& remoteAddress,
         unsigned int timeoutMillis ) override
     {
-        return this->m_implDelegate.connect( foreignAddress, foreignPort, timeoutMillis );
+        return this->m_implDelegate.connect( remoteAddress, timeoutMillis );
     }
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return this->m_implDelegate.recv( buffer, bufferLen, flags ); }
@@ -432,13 +420,6 @@ public:
      */
     TCPSocket() ;
 
-    /**
-     *   Construct a TCP socket with a connection to the given foreign address
-     *   and port
-     *   @param foreignAddress foreign address (IP address or name)
-     *   @param foreignPort foreign port
-     */
-    TCPSocket(const QString &foreignAddress, unsigned short foreignPort);
     //!User by \a TCPServerSocket class
     TCPSocket( int newConnSD );
     virtual ~TCPSocket();
@@ -514,19 +495,6 @@ public:
      *   Construct a UDP socket
      */
     UDPSocket() ;
-
-    /**
-     *   Construct a UDP socket with the given local port
-     *   @param localPort local port
-     */
-    UDPSocket(unsigned short localPort) ;
-
-    /**
-     *   Construct a UDP socket with the given local port and address
-     *   @param localAddress local address
-     *   @param localPort local port
-     */
-    UDPSocket(const QString &localAddress, unsigned short localPort);
 
     void setDestPort(unsigned short foreignPort);
 

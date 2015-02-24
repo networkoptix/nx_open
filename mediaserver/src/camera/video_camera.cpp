@@ -48,6 +48,10 @@ public:
     QnConstCompressedVideoDataPtr GetIFrameByTime(qint64 time, bool iFrameAfterTime, int channel) const;
     QnConstCompressedAudioDataPtr getLastAudioFrame() const;
     void updateCameraActivity();
+    virtual bool needConfigureProvider() const override { return false; }
+
+    void clearVideoData();
+
 private:
     mutable QMutex m_queueMtx;
     int m_lastKeyFrameChannel;
@@ -119,7 +123,8 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames[ch].empty() || m_lastKeyFrames[ch].back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));
-            while (!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold)
+            while (!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold || 
+                    m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames[ch].pop_front();
         }
 
@@ -167,30 +172,16 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, 
 
 QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bool iFrameAfterTime, int channel) const
 {
-    QnConstCompressedVideoDataPtr result;
-
     QMutexLocker lock(&m_queueMtx);
-    if (m_lastKeyFrames[channel].empty() || 
-        m_lastKeyFrames[channel].front()->timestamp > time + KEEP_IFRAMES_DISTANCE ||
-        m_lastKeyFrames[channel].back()->timestamp < time - KEEP_IFRAMES_DISTANCE)
-    {
-        return result;
-    }
-
-    //TODO #ak looks like std::lower_bound will do fine here
-    for (int i = 0; i < (int)m_lastKeyFrames[channel].size(); ++i)
-    {
-        if (m_lastKeyFrames[channel][i]->timestamp >= time) {
-            if (iFrameAfterTime || m_lastKeyFrames[channel][i]->timestamp == time || i == 0)
-                return m_lastKeyFrames[channel][i];
-            else
-                return m_lastKeyFrames[channel][i-1];
-        }
-    }
-    if (iFrameAfterTime || m_lastKeyFrames[channel].empty())
-        return m_lastKeyFrame[channel];
-    else
-        return m_lastKeyFrames[channel].back();
+    const auto &queue = m_lastKeyFrames[channel];
+    if (queue.empty())
+        return QnConstCompressedVideoDataPtr(); // no video data
+    auto itr = std::lower_bound(queue.begin(), queue.end(), time, [](const QnConstCompressedVideoDataPtr& data, qint64 time) { return data->timestamp < time; } );
+    if (itr == queue.end())
+        return queue.back();
+    if (itr != queue.begin() && (*itr)->timestamp > time && !iFrameAfterTime)
+        --itr; // prefer frame before defined time if no exact match
+    return *itr;
 }
 
 
@@ -218,6 +209,9 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
        (lastKeyTime == AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL))
     {
+        if (m_nextMinTryTime == 0)
+            m_nextMinTryTime = usecTime + (rand()%5000 + 5000) * 1000ll; // get first screenshot after minor delay
+
         if (!m_activityStarted && usecTime > m_nextMinTryTime) {
             m_activityStarted = true;
             m_activityStartTime = usecTime;
@@ -240,6 +234,17 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
         }
     }
     
+}
+
+void QnVideoCameraGopKeeper::clearVideoData()
+{
+    QMutexLocker lock(&m_queueMtx);
+
+    for( QnConstCompressedVideoDataPtr& frame: m_lastKeyFrame )
+        frame.clear();
+    for( auto& lastKeyFramesForChannel: m_lastKeyFrames )
+        lastKeyFramesForChannel.clear();
+    m_nextMinTryTime = 0;
 }
 
 // --------------- QnVideoCamera ----------------------------
@@ -314,6 +319,15 @@ void QnVideoCamera::at_camera_resourceChanged()
 				m_secondaryReader->pleaseStop();
 		}
 	}
+
+    if( cameraResource->flags() & Qn::foreigner )
+    {
+        //clearing saved key frames
+        if (m_primaryGopKeeper)
+            m_primaryGopKeeper->clearVideoData();
+        if (m_secondaryGopKeeper)
+            m_secondaryGopKeeper->clearVideoData();
+    }
 }
 
 void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
@@ -338,6 +352,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 				delete dataProvider;
 			} else
 			{
+                reader->setOwner(this);
 				if ( role ==  Qn::CR_LiveVideo )
 					connect(reader->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
 					
@@ -350,6 +365,16 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 			}			
 		}
     }
+}
+
+QnLiveStreamProviderPtr QnVideoCamera::getPrimaryReader()
+{
+    return getLiveReader(QnServer::HiQualityCatalog);
+}
+
+QnLiveStreamProviderPtr QnVideoCamera::getSecondaryReader()
+{
+    return getLiveReader(QnServer::LowQualityCatalog);
 }
 
 QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog catalog)

@@ -189,7 +189,7 @@
                         <configuration>
                             <executable>${project.build.directory}/sign.bat</executable>
                             <workingDirectory>${project.build.directory}</workingDirectory>
-                            <skip>${skip.sign}</skip>
+                            <skip>${windows.skip.sign}</skip>
                         </configuration>
                     </execution>        
 

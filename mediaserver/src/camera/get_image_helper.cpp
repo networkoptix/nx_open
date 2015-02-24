@@ -62,8 +62,8 @@ QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnVirtualCameraResour
     dstSize.setWidth(qMin(dstSize.width(), outFrame->width * sar));
     dstSize.setHeight(qMin(dstSize.height(), outFrame->height));
 
-    qreal customAR = res->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
-    if (customAR != 0.0)
+    qreal customAR = res->customAspectRatio();
+    if (!qFuzzyIsNull(customAR))
         dstSize.setWidth(dstSize.height() * customAR);
 
     return QnCodecTranscoder::roundSize(dstSize);

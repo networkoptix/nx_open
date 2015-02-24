@@ -36,6 +36,8 @@ public:
     QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
 
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
+
+    virtual bool isReadyToDetach() const override;
 };
 
 #endif //ENABLE_DESKTOP_CAMERA

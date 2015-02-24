@@ -121,7 +121,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     Qn::StreamQuality currentQuality = getQuality();
     Qn::StreamQuality secondaryQuality = m_onvifRes->getSecondaryStreamQuality();
 
-    if (!m_streamUrl.isEmpty() && isCameraControlDisabled())
+    if (!m_streamUrl.isEmpty() && !isCameraControlRequired())
     {
         m_cachedFps = -1;
         *streamUrl = m_streamUrl;
@@ -423,7 +423,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoap
     //TODO: #vasilenko UTF unuse std::string
     info.videoEncoderId = QString::fromStdString(encoderParamsToSet->token);
 
-    if (isCameraControlDisabled())
+    if (!isCameraControlRequired())
         return CameraDiagnostics::NoErrorResult(); // do not update video encoder params
 
     updateVideoEncoder(*encoderParamsToSet, isPrimary);
@@ -490,7 +490,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
             return result;
     }
 
-    if (m_onvifRes->isCameraControlDisabled()) {
+    if (!isCameraControlRequired()) {
         // TODO: #Elric need to untangle this evil.
         m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
 
@@ -724,7 +724,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoap
     //TODO: #vasilenko UTF unuse std::string
     info.audioEncoderId = QString::fromStdString(result->token);
 
-    if (isCameraControlDisabled())
+    if (!isCameraControlRequired())
         return CameraDiagnostics::NoErrorResult();    // do not update audio encoder params
 
     updateAudioEncoder(*result, isPrimary);

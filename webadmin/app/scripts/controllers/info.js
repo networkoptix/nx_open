@@ -3,6 +3,11 @@
 
 angular.module('webadminApp')
     .controller('InfoCtrl', function ($scope, mediaserver) {
+
+
+        $scope.logUrl = mediaserver.logUrl();
+
+
         mediaserver.getSettings().then(function (r) {
             $scope.settings = r.data.reply;
         });

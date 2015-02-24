@@ -94,8 +94,9 @@ public:
     QnSystrayWindow();
 
     virtual ~QnSystrayWindow();
-    QSystemTrayIcon *trayIcon() const { return m_trayIcon; }
-    void executeAction(QString cmd);
+    void executeAction(const QString &cmd);
+
+    void showMessage(const QString &title, const QString &msg, QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information);
 
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
@@ -105,10 +106,8 @@ private slots:
     
     void onDelayedMessage();
 
-    void setIcon(int index);
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void showMessage(const QString& message);
-    void messageClicked();
+    
 
     void at_mediaServerStartAction();
     void at_mediaServerStopAction();
@@ -127,21 +126,16 @@ private:
     void updateServiceInfoInternal(SC_HANDLE handle, DWORD status, QAction* startAction, QAction* stopAction);
 
     void createActions();
+    void updateActions();
     void createTrayIcon();
 
-    void initTranslations();
-
+    bool isServerInstalled() const;
 private:
     QSettings m_mediaServerSettings;
 
     QAction *m_quitAction;
 
     QSystemTrayIcon *m_trayIcon;
-    QMenu *m_trayIconMenu;
-
-    QString m_detailedErrorText;
-    QIcon m_iconOK;
-    QIcon m_iconBad;
 
     SC_HANDLE m_scManager;
     SC_HANDLE m_mediaServerHandle;
@@ -151,17 +145,21 @@ private:
     QAction* m_mediaServerStopAction;
     QAction* m_mediaServerWebAction;
     bool m_firstTimeToolTipError;
-    QTimer m_findServices;
-    QTimer m_updateServiceStatus;
 
     bool m_needStartMediaServer;
-    int m_skipTicks;
-
     int m_prevMediaServerStatus;
 
     QList<QAction *> m_actions;
     QTime m_lastMessageTimer;
-    QQueue<QString> m_delayedMessages;
+
+    struct DelayedMessage {
+        QString title;
+        QString msg;
+        QSystemTrayIcon::MessageIcon icon;
+        DelayedMessage(const QString &title, const QString &msg, QSystemTrayIcon::MessageIcon icon);
+    };
+
+    QQueue<DelayedMessage> m_delayedMessages;
     QString m_mediaServerServiceName;
 };
 

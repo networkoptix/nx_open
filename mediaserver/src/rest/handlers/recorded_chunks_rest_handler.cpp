@@ -15,7 +15,9 @@
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
-    qint64 startTime = -1, endTime = 1, detailLevel = -1;
+    qint64 startTime = -1;
+    qint64 endTime = -1;
+    qint64 detailLevel = -1;
     QnResourceList resList;
     QByteArray errStr;
     QByteArray errStrPhysicalId;

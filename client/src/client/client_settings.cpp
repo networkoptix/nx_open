@@ -96,7 +96,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QJsonObject jsonObject;
         if(!QJson::deserialize(file.readAll(), &jsonObject)) {
-            qWarning() << "Client settings file could not be parsed!";
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Client settings file could not be parsed!");
         } else {
             updateFromJson(jsonObject.value(lit("settings")).toObject());
         }
@@ -269,6 +269,7 @@ void QnClientSettings::load() {
 
 void QnClientSettings::save() {
     submitToSettings(m_settings);
+    m_settings->sync();
 }
 
 bool QnClientSettings::isWritable() const {

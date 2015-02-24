@@ -94,7 +94,6 @@ private:
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
-    void at_camera_resourceChanged(const QnResourcePtr& );
 private:
     RTPSession m_RtpSession;
     QVector<bool> m_gotKeyDataInfo;

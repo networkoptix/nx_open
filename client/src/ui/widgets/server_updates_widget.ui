@@ -70,16 +70,7 @@
      </property>
      <widget class="QWidget" name="internetPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
+       <property name="margin">
         <number>0</number>
        </property>
        <item>
@@ -88,16 +79,7 @@
           <enum>QFrame::StyledPanel</enum>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,1">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
+          <property name="margin">
            <number>0</number>
           </property>
           <item>
@@ -127,16 +109,7 @@
                 </size>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_7">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
+                <property name="margin">
                  <number>0</number>
                 </property>
                 <item>
@@ -171,16 +144,7 @@
                 </size>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
+                <property name="margin">
                  <number>0</number>
                 </property>
                 <item>
@@ -233,7 +197,7 @@
             <item>
              <widget class="QLabel" name="releaseNotesLabel">
               <property name="text">
-               <string>&lt;a href='notes'&gt;release notes&lt;/a&gt;</string>
+               <string notr="true" extracomment="Text should not be translatable, set from cpp">&lt;a href='notes'&gt;Release notes&lt;/a&gt;</string>
               </property>
              </widget>
             </item>
@@ -262,20 +226,11 @@
      </widget>
      <widget class="QWidget" name="localPage">
       <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
+       <property name="margin">
         <number>0</number>
        </property>
        <item>
-        <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0" columnstretch="0,1,0,0" rowminimumheight="0,0,0,20">
+        <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0" columnstretch="0,1,0" rowminimumheight="0,0,0,20">
          <item row="2" column="0">
           <widget class="QLabel" name="fileTitleLabel">
            <property name="text">
@@ -330,16 +285,7 @@
              </property>
              <widget class="QWidget" name="localBrowsePage">
               <layout class="QHBoxLayout" name="horizontalLayout_10">
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
+               <property name="margin">
                 <number>0</number>
                </property>
                <item>
@@ -359,16 +305,7 @@
              </widget>
              <widget class="QWidget" name="localProgressPage">
               <layout class="QHBoxLayout" name="horizontalLayout_9">
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
+               <property name="margin">
                 <number>0</number>
                </property>
                <item>
@@ -413,16 +350,7 @@
      </property>
      <widget class="QWidget" name="updateTargetPage">
       <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
+       <property name="margin">
         <number>0</number>
        </property>
        <item>
@@ -441,14 +369,14 @@
        <item>
         <widget class="QLabel" name="specificBuildLabel">
          <property name="text">
-          <string>&lt;a href='spec'&gt;I want specific build&lt;/a&gt;</string>
+          <string notr="true" extracomment="Text should not be translatable, set from cpp">&lt;a href='spec'&gt;Get a specific build&lt;/a&gt;</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="latestBuildLabel">
          <property name="text">
-          <string>&lt;a href='latest'&gt;I want latest version&lt;/a&gt;</string>
+          <string notr="true" extracomment="Text should not be translatable, set from cpp">&lt;a href='latest'&gt;Get the latest version&lt;/a&gt;</string>
          </property>
         </widget>
        </item>
@@ -456,16 +384,7 @@
      </widget>
      <widget class="QWidget" name="updateRunningPage">
       <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
+       <property name="margin">
         <number>0</number>
        </property>
        <item>

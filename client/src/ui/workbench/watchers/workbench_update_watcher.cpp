@@ -13,6 +13,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
+#include <ui/common/geometry.h>
 
 namespace {
     const int updatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
@@ -82,7 +83,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
         message += tr("Would you like to update?");
     }
 
-    QnCheckableMessageBox messageBox(mainWindow());
+    QnCheckableMessageBox messageBox(0);
     messageBox.setWindowTitle(title);
     messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
     messageBox.setRichText(message);
@@ -96,6 +97,10 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
             QDesktopServices::openUrl(releaseNotesUrl);
         });
     }
+
+    //TODO: #dklychkov refactor update notifications in 2.4
+    messageBox.adjustSize();
+    messageBox.setGeometry(QnGeometry::aligned(messageBox.size(), mainWindow()->geometry(), Qt::AlignCenter));
 
     int res = messageBox.exec();
 

@@ -30,6 +30,7 @@
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
+
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
@@ -293,14 +294,19 @@ namespace ec2
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( loginInfo, &connectionInfo );   //todo: #ak not appropriate here
         connectionInfo.ecUrl = url;
+        ec2::ErrorCode connectionInitializationResult = ec2::ErrorCode::ok;
         {
             QMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
+                if( !m_directConnection->initialized() )
+                {
+                    connectionInitializationResult = ec2::ErrorCode::dbError;
+                    m_directConnection.reset();
+                }
             }
         }
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
-        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
+        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, connectionInitializationResult, m_directConnection ) );
         return reqID;
     }
 
@@ -415,7 +421,6 @@ namespace ec2
         if( (errorCode != ErrorCode::ok) && (errorCode != ErrorCode::unauthorized) )
         {
             //checking for old EC
-            QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
             QnConcurrent::run(
                 Ec2ThreadPool::instance(),
                 [this, ecURL, handler, reqID]() {
@@ -473,7 +478,6 @@ namespace ec2
         }
 
         //checking for old EC
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(
             Ec2ThreadPool::instance(),
             [this, ecURL, handler, reqID]() {
@@ -491,7 +495,9 @@ namespace ec2
         connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
+#ifdef __arm__
         connectionInfo->box = QnAppInfo::armBox();
+#endif
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
         return ErrorCode::ok;
@@ -502,7 +508,6 @@ namespace ec2
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( ApiLoginData(), &connectionInfo );
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
         return reqID;
     }

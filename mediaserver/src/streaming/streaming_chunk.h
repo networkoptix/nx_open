@@ -165,12 +165,12 @@ public:
 
     virtual bool tryRead( nx::Buffer* const dataBuffer ) override;
 
-    void setByteRange( const nx_http::header::Range& range );
+    void setByteRange( const nx_http::header::ContentRange& range );
 
 private:
     StreamingChunk* m_chunk;
     StreamingChunk::SequentialReadingContext m_readCtx;
-    boost::optional<nx_http::header::Range> m_range;
+    boost::optional<nx_http::header::ContentRange> m_range;
 };
 
 #endif  //STREAMINGCHUNK_H

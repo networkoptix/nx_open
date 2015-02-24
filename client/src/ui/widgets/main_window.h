@@ -100,6 +100,8 @@ private:
 
     void updateScreenInfo();
 
+    void updateHelpTopic();
+
 private:
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGraphicsView> m_view;

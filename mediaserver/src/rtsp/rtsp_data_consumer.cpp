@@ -31,31 +31,33 @@ QMutex QnRtspDataConsumer::m_allConsumersMutex(QMutex::Recursive);
 
 
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
-  QnAbstractDataConsumer(MAX_QUEUE_SIZE),
-  m_owner(owner),
-  m_lastSendTime(0),
-  m_rtStartTime(AV_NOPTS_VALUE),
-  m_lastRtTime(0),
-  m_lastMediaTime(0),
-  m_waitSCeq(-1),
-  m_liveMode(false),
-  m_pauseNetwork(false),
-  m_singleShotMode(false),
-  m_packetSended(false),
-  m_prefferedProvider(0),
-  m_currentDP(0),
-  m_liveQuality(MEDIA_Quality_High),
-  m_newLiveQuality(MEDIA_Quality_None),
-  m_realtimeMode(false),
-  m_multiChannelVideo(false),
-  m_adaptiveSleep(MAX_FRAME_DURATION*1000),
-  m_useUTCTime(true),
-  m_fastChannelZappingSize(0),
-  m_firstLiveTime(AV_NOPTS_VALUE),
-  m_lastLiveTime(AV_NOPTS_VALUE),
-  m_allowAdaptiveStreaming(true),
-  m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
-  m_someDataIsDropped(false)
+    QnAbstractDataConsumer(MAX_QUEUE_SIZE),
+    m_owner(owner),
+    m_lastSendTime(0),
+    m_rtStartTime(AV_NOPTS_VALUE),
+    m_lastRtTime(0),
+    m_lastMediaTime(0),
+    m_waitSCeq(-1),
+    m_liveMode(false),
+    m_pauseNetwork(false),
+    m_singleShotMode(false),
+    m_packetSended(false),
+    m_prefferedProvider(0),
+    m_currentDP(0),
+    m_liveQuality(MEDIA_Quality_High),
+    m_newLiveQuality(MEDIA_Quality_None),
+    m_streamingSpeed(MAX_STREAMING_SPEED),
+    m_multiChannelVideo(false),
+    m_adaptiveSleep(MAX_FRAME_DURATION*1000),
+    m_useUTCTime(true),
+    m_fastChannelZappingSize(0),
+    m_firstLiveTime(AV_NOPTS_VALUE),
+    m_lastLiveTime(AV_NOPTS_VALUE),
+    m_allowAdaptiveStreaming(true),
+    m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
+    m_someDataIsDropped(false),
+    m_previousRtpTimestamp(-1),
+    m_previousScaledRtpTimestamp(-1)
 {
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
@@ -388,9 +390,10 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
 }
 */
 
-void QnRtspDataConsumer::setUseRealTimeStreamingMode(bool value)
+void QnRtspDataConsumer::setStreamingSpeed(int speed)
 {
-    m_realtimeMode = value;
+    Q_ASSERT( speed > 0 );
+    m_streamingSpeed = speed <= 0 ? 1 : speed;
 }
 
 void QnRtspDataConsumer::setMultiChannelVideo(bool value)
@@ -449,6 +452,15 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
     if (!media)
         return true;
+
+    if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
+    {
+        Q_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
+        //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
+            //Introduce safe solution
+        if( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) )
+            (static_cast<QnAbstractMediaData*>(nonConstData.data()))->timestamp /= m_streamingSpeed;
+    }
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(data.data());
@@ -512,7 +524,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         m_someDataIsDropped = false;
     }
 
-    if (m_realtimeMode && !isLive)
+    if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (!isLive) )
         doRealtimeDelay(media);
 
     if (isLive && media->dataType == QnAbstractMediaData::VIDEO) 
@@ -543,8 +555,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     static AVRational r = {1, 1000000};
     AVRational time_base = {1, (int)codecEncoder->getFrequency() };
 
-    qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
-
     m_sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && codecEncoder->getNextPacket(m_sendBuffer))
     {
@@ -566,6 +576,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             }
         }
         else {
+            const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
             QnRtspEncoder::buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 
         }
         

@@ -47,23 +47,6 @@ CREATE TABLE "vms_scheduletask" (
     FOREIGN KEY(camera_attrs_id)    REFERENCES vms_camera_user_attributes(id)
 );
 
-INSERT INTO vms_scheduletask
-   SELECT
-    id,
-    source_id,
-    start_time,
-    end_time,
-    do_record_audio,
-    record_type,
-    day_of_week,
-    before_threshold,
-    after_threshold,
-    stream_quality,
-    fps
-  FROM vms_scheduletask_tmp;
-
-DROP TABLE vms_scheduletask_tmp;
-
 INSERT INTO vms_camera
   SELECT
     resource_ptr_id,
@@ -94,6 +77,23 @@ INSERT INTO vms_camera_user_attributes
     c.prefered_server_id
   FROM vms_camera_tmp c
   JOIN vms_resource r on r.id = c.resource_ptr_id;
+
+INSERT INTO vms_scheduletask
+   SELECT
+    id,
+    source_id,
+    start_time,
+    end_time,
+    do_record_audio,
+    record_type,
+    day_of_week,
+    before_threshold,
+    after_threshold,
+    stream_quality,
+    fps
+  FROM vms_scheduletask_tmp;
+
+DROP TABLE vms_scheduletask_tmp;
 
 INSERT INTO vms_kvpair (resource_guid, name, value)
      SELECT r.guid, "credentials", c.login || ":" || c.password

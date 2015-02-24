@@ -113,6 +113,7 @@ namespace ec2
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
 
+        void databaseReplaceRequired();
     private:
         ResourceContext m_resCtx;
         AbstractECConnection* m_ecConnection;

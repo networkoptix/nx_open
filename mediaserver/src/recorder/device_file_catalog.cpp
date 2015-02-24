@@ -93,10 +93,10 @@ QString getDirName(const QString& prefix, int currentParts[4], int i)
     return result;
 }
 
-bool DeviceFileCatalog::fileExists(const Chunk& chunk, bool checkDirOnly)
+bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, bool checkDirOnly)
 {
     //fileSize = 0;
-    QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
+    QnStorageResourcePtr storage = qnStorageMan->findStorageByOldIndex(chunk.storageIndex);
     if (!storage)
         return false;
 
@@ -797,7 +797,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         if (qAbs(last.startTimeMs + last.durationMs - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
             last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
         else {
-            if (last.durationMs < detailLevel)
+            if (last.durationMs < detailLevel && result.size() > 1)
                 result.pop_back();
             result << QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs);
         }
@@ -843,11 +843,11 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
         int duration = fields[3+timeZoneExist].trimmed().toInt()/coeff;
         Chunk chunk(startTime, fields[1+timeZoneExist].toInt(), fields[2+timeZoneExist].toInt(), duration, timeZone);
 
-        QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
+        QnStorageResourcePtr storage = qnStorageMan->findStorageByOldIndex(chunk.storageIndex);
         if (fields[3+timeZoneExist].trimmed().isEmpty()) 
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
-            if (qnStorageMan->isStorageAvailable(chunk.storageIndex))
+            if (qnStorageMan->isStorageAvailable(storage))
             {
                 needRewriteCatalog = true;
                 //chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
@@ -860,11 +860,11 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
         }
 
         //qint64 chunkFileSize = 0;
-        if (!qnStorageMan->isStorageAvailable(chunk.storageIndex)) 
+        if (!qnStorageMan->isStorageAvailable(storage)) 
         {
              needRewriteCatalog |= addChunk(chunk);
         }
-        else if (fileExists(chunk, checkDirOnly))
+        else if (csvMigrationCheckFile(chunk, checkDirOnly))
         {
             //chunk.setFileSize(chunkFileSize);
 

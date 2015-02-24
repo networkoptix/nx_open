@@ -64,7 +64,9 @@ int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const
 }
 
 int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password) {
-    return proxy->apiConnection()->mergeSystemAsync(url, user, password, QString(), true, true, true, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+    QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
+    Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
+    return proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, true, true, true, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {

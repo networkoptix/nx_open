@@ -65,6 +65,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(m_resetDefaultsButton, &QPushButton::clicked, this, &QnBusinessRulesDialog::at_resetDefaultsButton_clicked);
 
     setHelpTopic(this, Qn::EventsActions_Help);
+    setHelpTopic(ui->eventLogButton, Qn::EventLog_Help);
 
     m_currentDetailsWidget = ui->detailsWidget;
 
@@ -458,6 +459,7 @@ void QnBusinessRulesDialog::setAdvancedMode(bool value) {
 bool QnBusinessRulesDialog::tryClose(bool force) {
     if (force || isHidden()) {
         m_rulesViewModel->reset();
+        setAdvancedMode(false);
         hide();
         return true;
     }
@@ -480,9 +482,11 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
     case QMessageBox::Yes:
         if (!saveAll())
             return false;   // Cancel was pressed in the confirmation dialog
+        setAdvancedMode(false);
         break;
     case QMessageBox::No:
         m_rulesViewModel->reset();
+        setAdvancedMode(false);
         break;
     default:
         return false;   // Cancel was pressed

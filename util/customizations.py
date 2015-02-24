@@ -152,6 +152,7 @@ class Customization():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--color', action='store_true', help="colorized output")
+    parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
     parser.add_argument('-p', '--project', default='client', help="target project, default is client")
     args = parser.parse_args()
     if args.color:
