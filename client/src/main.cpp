@@ -629,11 +629,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
 
-    if(screen != -1) {
+    if (screen != -1) {
         QDesktopWidget *desktop = qApp->desktop();
-        if(screen >= 0 && screen < desktop->screenCount()) {
+        if (screen >= 0 && screen < desktop->screenCount()) {
             QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-
             mainWindow->move(desktop->screenGeometry(screen).topLeft() + screenDelta);
         }
     }
