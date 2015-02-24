@@ -3,7 +3,10 @@
 
 #include <QtCore/QSharedPointer>
 
+#include <common/common_globals.h>
+
 #include "abstract_media_context.h"
+
 
 class QnAbstractStreamDataProvider;
 
