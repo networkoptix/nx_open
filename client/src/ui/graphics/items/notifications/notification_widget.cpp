@@ -309,7 +309,7 @@ void QnNotificationWidget::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     painter->setPen(QPen(frameBrush(), frameWidth(), frameStyle()));
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
-    painter->drawRect(QnGeometry::aligned(colorSignSize, rect(), Qt::AlignLeft | Qt::AlignVCenter));
+    painter->drawRect(QnGeometry::aligned(colorSignSize, rect(), Qt::AlignLeft | Qt::AlignVCenter).adjusted(1, 0, 1, 0));
 
     //TODO: #GDM #Business draw corresponding image
 }
