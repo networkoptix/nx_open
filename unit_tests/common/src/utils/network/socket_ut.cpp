@@ -175,8 +175,8 @@ TEST_F( SocketAsyncModeTest, HostNameResolve2 )
 {
     std::condition_variable cond;
     std::mutex mutex;
-    std::atomic<int> startedConnectionsCount = 0;
-    std::atomic<int> completedConnectionsCount = 0;
+    std::atomic<int> startedConnectionsCount( 0 );
+    std::atomic<int> completedConnectionsCount( 0 );
     std::deque<std::unique_ptr<AbstractStreamSocket>> connections;
     HostAddress resolvedAddress;
 

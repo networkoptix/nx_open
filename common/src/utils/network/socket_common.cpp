@@ -19,7 +19,7 @@ HostAddress::HostAddress()
     memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
 }
 
-HostAddress::HostAddress( struct in_addr& sinAddr )
+HostAddress::HostAddress( const struct in_addr& sinAddr )
 :
     m_sinAddr(sinAddr),
     m_addressResolved(true)
