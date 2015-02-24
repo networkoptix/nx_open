@@ -42,6 +42,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AxaxhdwitnessLib">
+      <HintPath>..\..\build_environment\target\x86\bin\debug\AxaxhdwitnessLib.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>References\log4net.dll</HintPath>
@@ -87,7 +90,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -103,9 +106,9 @@
       <ReferenceAssemblies>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5</ReferenceAssemblies>
       <ILMergePath>C:\develop\netoptix_vms\ACS\Paxton\packages\ilmerge.2.14.1208\tools\ILMerge.exe</ILMergePath>
     </PropertyGroup>
-    <Exec Command="&quot;$(ILMergePath)&quot; /keyfile:C:\develop\netoptix_vms\ACS\Paxton\Sign.snk /target:library /out:NetworkOptix.OemDvrMiniDriver.Merged.dll NetworkOptix.OemDvrMiniDriver.dll Newtonsoft.Json.dll" WorkingDirectory="C:\Program Files (x86)\Paxton Access\Access Control\DvrMiniDrivers"/>
+    <Exec Command="&quot;$(ILMergePath)&quot; /keyfile:C:\develop\netoptix_vms\ACS\Paxton\Sign.snk /target:library /out:NetworkOptix.OemDvrMiniDriver.Merged.dll NetworkOptix.OemDvrMiniDriver.dll Newtonsoft.Json.dll AxaxhdwitnessLib.dll axhdwitnessLib.dll" WorkingDirectory="C:\Program Files (x86)\Paxton Access\Access Control\DvrMiniDrivers" />
     <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
-    <Delete Files="C:\Program Files (x86)\Paxton Access\Access Control\DvrMiniDrivers\NetworkOptix.OemDvrMiniDriver.dll"/>
-    <Delete Files="C:\Program Files (x86)\Paxton Access\Access Control\DvrMiniDrivers\NetworkOptix.OemDvrMiniDriver.pdb"/>
+    <Delete Files="C:\Program Files (x86)\Paxton Access\Access Control\DvrMiniDrivers\NetworkOptix.OemDvrMiniDriver.dll" />
+    <Delete Files="C:\Program Files (x86)\Paxton Access\Access Control\DvrMiniDrivers\NetworkOptix.OemDvrMiniDriver.pdb" />
   </Target>
 </Project>

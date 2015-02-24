@@ -12,6 +12,7 @@
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
 #include "nx_ec/ec_api.h"
+#include "api/abstract_connection.h"
 
 class QnLongRunnablePool;
 class QnSyncTime;
@@ -60,7 +61,8 @@ public slots:
     qint64 currentTime();
     void setCurrentTime(qint64 time);
 
-    void addToCurrentLayout(const QString &uniqueId);
+    void addResourceToLayout(const QString &uniqueId, qint64 timestamp);
+    void addResourcesToLayout(const QString &uniqueIds, qint64 timestamp);
     void removeFromCurrentLayout(const QString &uniqueId);
 
     void reconnect(const QString &url);
@@ -72,6 +74,13 @@ public slots:
 
     QString resourceListXml();
 
+signals:
+    void connectedProcessed();
+
+private slots:
+    void at_connectProcessed();
+    void at_initialResourcesReceived(const QnUserResourcePtr &);
+
 protected:
     virtual bool event(QEvent *event) override;
 
@@ -81,6 +90,10 @@ private:
     void createMainWindow();
 
 private:
+    QUrl m_url;
+    QnEc2ConnectionRequestResult m_result;
+    int m_connectingHandle;
+
     bool m_isInitialized;
 
 	QScopedPointer<ec2::AbstractECConnectionFactory> m_ec2ConnectionFactory;

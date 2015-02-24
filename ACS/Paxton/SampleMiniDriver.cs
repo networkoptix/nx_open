@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Drawing;
 using Newtonsoft.Json;
+using AxaxhdwitnessLib;
 
 namespace Company.Product.OemDvrMiniDriver {
     namespace Api {
@@ -21,7 +22,10 @@ namespace Company.Product.OemDvrMiniDriver {
 
     public class SampleMiniDriver : IOemDvrMiniDriver {
         private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        // private axhdwitnessLib.AxHDWitness _axhdwitness;
+        private AxAxHDWitness axAxHDWitness1;
+        private OemDvrCamera[] _cameras;
+
+        private long _tick;
 
         #region Implementation of IDvrMiniDriver
 
@@ -54,32 +58,11 @@ namespace Company.Product.OemDvrMiniDriver {
             return OemDvrStatus.InsufficientPriviledges;
         }
 
-        List<string> ParseString(string str) {
-            List<string> elements = new List<string>();
-            int beginPos = 0;
-            int endPos = 0;
-            for (int j = 0; j < str.Length; j++) {
-                if ((str[j] == ',') && (j == 0 || str[j - 1] != '\\')) {
-                    endPos = j;
-                    if (beginPos < endPos) {
-                        elements.Add(str.Substring(beginPos, endPos - beginPos));
-                    } else elements.Add("");
-                    beginPos = endPos + 1;
-                }
-            };
-            if (beginPos != 0) {
-                if (beginPos < str.Length) {
-                    elements.Add(str.Substring(beginPos, str.Length - beginPos));
-                } else elements.Add("");
-            }
-            return elements;
-        }
-
         public OemDvrStatus GetListOfCameras(OemDvrConnection connectionInfo, List<OemDvrCamera> cameras) {
             WebResponse response = null;
 
             try {
-                MessageBox.Show("Vagina");
+//                MessageBox.Show("Vagina");
 
                 Uri url = new Uri(connectionInfo.HostName);
                 int port = (int)connectionInfo.Port;
@@ -93,7 +76,6 @@ namespace Company.Product.OemDvrMiniDriver {
                 response = request.GetResponse();
 
                 StreamReader reader = new StreamReader(response.GetResponseStream());
-                cameras.Add(new OemDvrCamera("fake", "name"));
                 List<Api.Camera> apiCameras = JsonConvert.DeserializeObject<List<Api.Camera>>(reader.ReadToEnd());
 
                 foreach(Api.Camera apiCamera in apiCameras) {
@@ -122,17 +104,12 @@ namespace Company.Product.OemDvrMiniDriver {
         /// <returns>The completion status of the request.</returns>
         public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
             try {
-
                 MessageBox.Show("Penis");
 
                 //DateTime dt = new DateTime( 2014 ,5, 21 , 19 ,30 , 30);
-                double tick = (pbInfo.StartTimeUtc.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds;
-
-
-
-                Uri url = new Uri(cnInfo.HostName);
-
-
+                _tick = (long)((pbInfo.StartTimeUtc.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds);
+                Uri hostUrl = new Uri(cnInfo.HostName);
+                Uri url = new Uri(String.Format("http://{0}:{1}@{2}:{3}", cnInfo.UserId, cnInfo.Password, hostUrl.Host, hostUrl.Port));
 
                 if ((pbInfo.DvrCameras == null) || (pbInfo.DvrCameras.Length <= 0)) {
                     _logger.Error("Playback request without cameras.");
@@ -143,7 +120,9 @@ namespace Company.Product.OemDvrMiniDriver {
                     return OemDvrStatus.NumberOfCamerasUnsupported;
                 }
 
-                Load();
+                Load(pbSurface, url);
+
+                _cameras = pbInfo.DvrCameras;
 
                 switch (pbInfo.PlaybackFunction) {
                     case OemDvrPlaybackFunction.Start: {
@@ -226,7 +205,60 @@ namespace Company.Product.OemDvrMiniDriver {
         }
         #endregion
 
-        private void Load() {
+        private void PbSurfaceResize(object sender, EventArgs e) {
+            var frame = sender as Panel;
+            if (frame == null) {
+                return;
+            }
+
+            short vidWidth = Convert.ToInt16(frame.Width);
+            short vidHeight = Convert.ToInt16(frame.Height);
+            this.axAxHDWitness1.SetBounds(0, 0, vidWidth, vidHeight);
+        }
+
+        private void Load(Panel pbSurface, Uri url) {
+            pbSurface.Resize += PbSurfaceResize;
+
+            // System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager();
+            this.axAxHDWitness1 = new AxAxHDWitness();
+            ((System.ComponentModel.ISupportInitialize)(this.axAxHDWitness1)).BeginInit();
+            pbSurface.SuspendLayout();
+            // 
+            // axAxHDWitness1
+            // 
+            this.axAxHDWitness1.Enabled = true;
+            this.axAxHDWitness1.Location = new System.Drawing.Point(10, 10);
+            this.axAxHDWitness1.Name = "axAxHDWitness1";
+            // this.axAxHDWitness1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axAxHDWitness1.OcxState")));
+            this.axAxHDWitness1.Size = new System.Drawing.Size(831, 509);
+            this.axAxHDWitness1.TabIndex = 0;
+            // 
+            // Form1
+            // 
+//            pbSurface.AutoSize = true;
+            //pbSurface.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+
+//            pbSurface.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+//            pbSurface.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            pbSurface.ClientSize = new System.Drawing.Size(1251, 829);
+            pbSurface.Controls.Add(this.axAxHDWitness1);
+            pbSurface.Name = "Form1";
+            pbSurface.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.axAxHDWitness1)).EndInit();
+            pbSurface.ResumeLayout(false);
+
+            this.axAxHDWitness1.connectedProcessed += axAxHDWitness1_connectedProcessed;
+
+            this.axAxHDWitness1.reconnect(url.ToString());
+        }
+
+        void axAxHDWitness1_connectedProcessed(object sender, EventArgs e) {
+            // MessageBox.Show("Connect Processed");
+
+            foreach (OemDvrCamera camera in _cameras) {
+                axAxHDWitness1.addResourcesToLayout(camera.CameraId, _tick);
+            }
+
         }
 
         private void Play() {
