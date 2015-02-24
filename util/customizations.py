@@ -34,6 +34,7 @@ class Formats:
     GIF = '.gif'
     IMAGES = [PNG, GIF]
     AI = '.ai'
+    SVG = '.svg'
 
     CPP = '.cpp'
     H   = '.h'
@@ -57,6 +58,8 @@ class Formats:
 verbose = False
 
 class Customization():
+    DEFAULT = 'default'
+
     def __init__(self, name, path, project):
         self.name = name
         self.path = path
@@ -188,13 +191,15 @@ class Customization():
             error = True
             err("File %s is missing" % entry)
 
-        for entry in self.total:
-            if not entry.endswith(Formats.PNG):
-                continue;
-            sourceFile = entry.replace(Formats.PNG, Formats.AI)
-            if not sourceFile in self.total:
-                warn('Source file %s is missing' % sourceFile)
-            
+        if self.name == Customization.DEFAULT:
+            for entry in self.total:
+                if not entry.endswith(Formats.PNG):
+                    continue;
+                sourceAi = entry.replace(Formats.PNG, Formats.AI)
+                sourceSvg = entry.replace(Formats.PNG, Formats.SVG)
+                if not sourceAi in self.total and not sourceSvg in self.total:
+                    warn('Source file for %s is missing' % entry)
+                
         if clean:
             green('Success')
         if error:
@@ -210,7 +215,10 @@ class Customization():
             if self.project == Project.CLIENT:
                 if entry in Project.INTRO:
                     continue
-                
+            
+            if entry.endswith(Formats.AI) or entry.endswith(Formats.SVG):
+                continue
+            
             if not entry in other.total:
                 clean = False
                 err('File ' + self.relativePath(self.basePath, entry) + ' missing in ' + other.name)
@@ -381,7 +389,7 @@ def checkProject(rootDir, project):
         invalidCross += c2.validateCross(c1)
     info('Validation finished')
 
-    targetFiles = customizations['default'].total
+    targetFiles = customizations[Customization.DEFAULT].total
 
     printCustomizations(project, customizationDir, targetFiles, customizations, roots, children)
     
