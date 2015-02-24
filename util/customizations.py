@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 #/bin/python
 
 import sys
 import argparse
 import os
 from itertools import combinations
+from common_module import init_color,info,green,warn,err,separator
 
 class Project:
     COMMON = 'common'
@@ -52,33 +54,7 @@ class Formats:
                 return True
         return False
 
-class ColorDummy():
-    class Empty(object):
-        def __getattribute__(self, name):
-            return ''
-    
-    Style = Empty()
-    Fore = Empty()
-
-colorer = ColorDummy()
 verbose = False
-separator = '------------------------------------------------'
-
-def info(message):
-    if not verbose:
-        return
-    print colorer.Style.BRIGHT + message
-    
-def green(message):
-    if not verbose:
-        return
-    print colorer.Style.BRIGHT + colorer.Fore.GREEN + message
-        
-def warn(message):
-    print colorer.Style.BRIGHT + colorer.Fore.YELLOW + message
-        
-def err(message):
-    print colorer.Style.BRIGHT + colorer.Fore.RED + message
 
 class Customization():
     def __init__(self, name, path, project):
@@ -370,10 +346,9 @@ td.light { background-color: #D0D0D0; }
     file.close()
 
 def checkProject(rootDir, project):
-    global separator
-    info(separator)
+    separator()
     info('Checking project ' + project)
-    info(separator)
+    separator()
     customizations = {}
     roots = []
     children = []
@@ -422,10 +397,7 @@ def main():
     parser.add_argument('-p', '--project', default='', help="target project")
     args = parser.parse_args()
     if args.color:
-        from colorama import Fore, Back, Style, init
-        init(autoreset=True) # use Colorama to make Termcolor work on Windows too
-        global colorer
-        import colorama as colorer
+        init_color()
     
     global verbose
     verbose = args.verbose
