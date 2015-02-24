@@ -3,6 +3,7 @@
 
 #include <QtCore/QSharedMemory>
 #include <QtCore/QRect>
+#include <QtCore/QTimer>
 
 class QnScreenManager : public QObject {
     Q_OBJECT
@@ -21,10 +22,14 @@ private:
 
 private slots:
     void at_timer_timeout();
+    void at_refreshTimer_timeout();
 
 private:
     mutable QSharedMemory m_sharedMemory;
     int m_index;
+
+    QTimer *m_refreshDelayTimer;
+    QRect m_geometry;
 };
 
 #endif // QNSCREENMANAGER_H

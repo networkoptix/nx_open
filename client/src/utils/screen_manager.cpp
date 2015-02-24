@@ -1,7 +1,6 @@
 #include "screen_manager.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QTimer>
 #include <QtWidgets/QDesktopWidget>
 
 #include "utils/common/app_info.h"
@@ -13,6 +12,7 @@ namespace {
     const QString key = QnAppInfo::customizationName() + lit("/QnScreenManager/") + QString::number(dataVersion);
     const int maxClients = 64;
     const int checkDeadsInterval = 60 * 1000;
+    const int refreshDelay = 1000;
 
     struct ScreenUsageData {
         quint64 pid;
@@ -39,7 +39,8 @@ namespace {
 QnScreenManager::QnScreenManager(QObject *parent) :
     QObject(parent),
     m_sharedMemory(key),
-    m_index(-1)
+    m_index(-1),
+    m_refreshDelayTimer(new QTimer(this))
 {
     bool success = m_sharedMemory.create(maxClients * sizeof(ScreenUsageData));
     if (success) {
@@ -56,6 +57,10 @@ QnScreenManager::QnScreenManager(QObject *parent) :
         connect(timer, &QTimer::timeout, this, &QnScreenManager::at_timer_timeout);
         timer->start(checkDeadsInterval);
     }
+
+    m_refreshDelayTimer->setSingleShot(true);
+    m_refreshDelayTimer->setInterval(refreshDelay);
+    connect(m_refreshDelayTimer, &QTimer::timeout, this, &QnScreenManager::at_refreshTimer_timeout);
 }
 
 QnScreenManager::~QnScreenManager() {
@@ -74,8 +79,8 @@ QnScreenManager::~QnScreenManager() {
 }
 
 void QnScreenManager::updateCurrentScreens(const QWidget *widget) {
-    // TODO: #dklychkov detect cases when the window occupies more than one screen
-    setCurrentScreens(QSet<int>() << qApp->desktop()->screenNumber(widget));
+    m_geometry = widget->geometry();
+    m_refreshDelayTimer->start();
 }
 
 QSet<int> QnScreenManager::usedScreens() const {
@@ -161,4 +166,22 @@ void QnScreenManager::at_timer_timeout() {
     }
 
     m_sharedMemory.unlock();
+}
+
+void QnScreenManager::at_refreshTimer_timeout() {
+    QSet<int> used;
+
+    QDesktopWidget *desktop = qApp->desktop();
+
+    int screenCount = desktop->screenCount();
+    used.insert(desktop->screenNumber(m_geometry.center()));
+
+    for (int i = 0; i < screenCount; i++) {
+        QRect screenGeometry = desktop->screenGeometry(i);
+        QRect intersected = screenGeometry.intersected(m_geometry);
+        if (intersected.width() > screenGeometry.width() / 2 && intersected.height() > screenGeometry.height() / 2)
+            used.insert(i);
+    }
+
+    setCurrentScreens(used);
 }
