@@ -504,8 +504,7 @@ void QnMainWindow::skipDoubleClick() {
 }
 
 void QnMainWindow::updateScreenInfo() {
-    int screen = qApp->desktop()->screenNumber(this);
-    context()->instance<QnScreenManager>()->setCurrentScreens(QSet<int>() << screen);
+    context()->instance<QnScreenManager>()->updateCurrentScreens(this);
 }
 
 void QnMainWindow::updateHelpTopic() {

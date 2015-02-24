@@ -2,6 +2,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
+#include <QtWidgets/QDesktopWidget>
 
 #include "utils/common/app_info.h"
 #include "utils/common/process.h"
@@ -52,7 +53,7 @@ QnScreenManager::QnScreenManager(QObject *parent) :
 
     if (success) {
         QTimer *timer = new QTimer(this);
-        connnect(timer, &QTimer::timeout, this &QnScreenManager::at_timer_timeout);
+        connect(timer, &QTimer::timeout, this, &QnScreenManager::at_timer_timeout);
         timer->start(checkDeadsInterval);
     }
 }
@@ -72,7 +73,12 @@ QnScreenManager::~QnScreenManager() {
     m_sharedMemory.unlock();
 }
 
-QSet<int> QnScreenManager::usedScreens() {
+void QnScreenManager::updateCurrentScreens(const QWidget *widget) {
+    // TODO: #dklychkov detect cases when the window occupies more than one screen
+    setCurrentScreens(QSet<int>() << qApp->desktop()->screenNumber(widget));
+}
+
+QSet<int> QnScreenManager::usedScreens() const {
     QSet<int> result;
 
     if (!m_sharedMemory.lock())
@@ -81,6 +87,20 @@ QSet<int> QnScreenManager::usedScreens() {
     ScreenUsageData *data = reinterpret_cast<ScreenUsageData*>(m_sharedMemory.data());
     for (int i = 0; i < maxClients && data[i].pid != 0; i++)
         result += data[i].getScreens();
+
+    m_sharedMemory.unlock();
+
+    return result;
+}
+
+QSet<int> QnScreenManager::instanceUsedScreens() const {
+    QSet<int> result;
+
+    if (!m_sharedMemory.lock())
+        return result;
+
+    ScreenUsageData *data = reinterpret_cast<ScreenUsageData*>(m_sharedMemory.data());
+    result = data[m_index].getScreens();
 
     m_sharedMemory.unlock();
 
@@ -106,6 +126,23 @@ void QnScreenManager::setCurrentScreens(const QSet<int> &screens) {
         data[m_index].setScreens(screens);
 
     m_sharedMemory.unlock();
+}
+
+int QnScreenManager::nextFreeScreen() const {
+    QSet<int> used = instanceUsedScreens();
+    int screen = used.isEmpty() ? 0 : *std::min_element(used.begin(), used.end());
+    used = usedScreens();
+
+    int screenCount = qApp->desktop()->screenCount();
+    screen = (screen + 1) % screenCount;
+
+    for (int i = 0; i < screenCount; i++) {
+        int n = (screen + i) % screenCount;
+        if (!used.contains(n))
+            return n;
+    }
+
+    return screen;
 }
 
 void QnScreenManager::at_timer_timeout() {

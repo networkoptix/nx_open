@@ -130,6 +130,7 @@
 #include <utils/common/url.h>
 #include <utils/math/math.h>
 #include <utils/aspect_ratio.h>
+#include <utils/screen_manager.h>
 
 
 #ifdef Q_OS_MACX
@@ -444,13 +445,9 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QString::fromUtf8(QnAppServerConnectionFactory::url().toEncoded());
     }
 
-    /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
     if(mainWindow()) {
-        int screen = qApp->desktop()->screenNumber(mainWindow());
-        screen = (screen + 1) % qApp->desktop()->screenCount();
-
-        arguments << QLatin1String("--screen");
-        arguments << QString::number(screen);
+        int screen = context()->instance<QnScreenManager>()->nextFreeScreen();
+        arguments << QLatin1String("--screen") << QString::number(screen);
     }
 
     if (qnSettings->isDevMode())
