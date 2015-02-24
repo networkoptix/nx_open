@@ -85,6 +85,10 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 {
 }
 
+void QnLicenseManagerWidget::updateFromSettings() {
+    updateLicenses();
+}
+
 void QnLicenseManagerWidget::updateLicenses() {
     // do not re-read licenses if we are activating one now
     if (!m_handleKeyMap.isEmpty())

@@ -151,6 +151,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
     setHelpTopic(ui->rebuildGroupBox,                                         Qn::ServerSettings_ArchiveRestoring_Help);
+    setHelpTopic(ui->failoverGroupBox,                                        Qn::ServerSettings_Failover_Help);
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
@@ -177,6 +178,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     connect(webPageButton, &QPushButton::clicked, webPageAction, &QAction::trigger);
 
     ui->buttonBox->addButton(webPageButton, QDialogButtonBox::HelpRole);
+    setHelpTopic(webPageButton, Qn::ServerSettings_WebClient_Help);
 
     updateFromResources();
 }

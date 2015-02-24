@@ -30,6 +30,13 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
+    QnTimeManager<QueryProcessorType>::~QnTimeManager()
+    {
+        //safely disconnecting from TimeSynchronizationManager
+        TimeSynchronizationManager::instance()->disconnectAndJoin( this );
+    }
+
+    template<class QueryProcessorType>
     QnPeerTimeInfoList QnTimeManager<QueryProcessorType>::getPeerTimeInfoList() const
     {
         return TimeSynchronizationManager::instance()->getPeerTimeInfoList();

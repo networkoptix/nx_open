@@ -43,7 +43,7 @@ bool QnDbHelper::QnDbTransaction::commit()
     if (rez)
         m_mutex.unlock();
     else
-        qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
+        qWarning() << m_database.databaseName()<< ". Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
     return rez;
 }
 

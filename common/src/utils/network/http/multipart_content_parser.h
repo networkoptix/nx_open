@@ -29,13 +29,21 @@ namespace nx_http
         void setBoundary( const StringType& boundary );
 
     private:
-        // TODO: #Elric #enum
         enum ParsingState
         {
             waitingBoundary,
             readingHeaders,
             readingTextData,
-            readingBinaryData
+            //!reading data with Content-Length known
+            readingSizedBinaryData,
+            //!reading data with Content-Length not known: searching for boundary
+            readingUnsizedBinaryData
+        };
+
+        enum ChunkParseState
+        {
+            waitingEndOfLine,
+            checkingForBoundaryAfterEndOfLine
         };
 
         ParsingState m_state;
@@ -44,7 +52,15 @@ namespace nx_http
         StringType m_boundary;
         StringType m_startBoundaryLine;
         StringType m_endBoundaryLine;
+        StringType m_boundaryForUnsizedBinaryParsing;
         unsigned int m_contentLength;
+        ChunkParseState m_chunkParseState;
+        nx::Buffer m_supposedBoundary;
+        nx_http::HttpHeaders m_currentFrameHeaders;
+
+        void readUnsizedBinaryData(
+            const QnByteArrayConstRef& data,
+            size_t* const offset );
     };
 }
 

@@ -11,6 +11,7 @@
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
 #include <utils/common/delete_later.h>
+#include <utils/common/log.h>
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
@@ -69,6 +70,7 @@ void QnInstallUpdatesPeerTask::doStart() {
     m_protoProblemDetected = false;
     qnClientMessageProcessor->setHoldConnection(true);
 
+    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Start installing update [%1].").arg(m_updateId), cl_logDEBUG1);
     connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingPeers,
                                                       this, [this](int, ec2::ErrorCode){});
     m_checkTimer->start(checkTimeout);
@@ -127,10 +129,15 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
         m_pendingPeers.remove(peerId);
         m_stoppingPeers.remove(peerId);
         m_restartingPeers.remove(peerId);
+
+        NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Installation finished [%1, %2].")
+               .arg(server->getName()).arg(server->getId().toString()), cl_logDEBUG1);
+
         emit peerFinished(peerId);
     }
 
     if (m_pendingPeers.isEmpty()) {
+        NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Finished."), cl_logDEBUG1);
         finish(NoError);
         return;
     }
@@ -151,10 +158,16 @@ void QnInstallUpdatesPeerTask::at_checkTimer_timeout() {
         }
     }
 
-    finish(m_pendingPeers.isEmpty() ? NoError : InstallationFailed);
+    int result = m_pendingPeers.isEmpty() ? NoError : InstallationFailed;
+
+    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Finished on timeout [%1].").arg(result), cl_logDEBUG1);
+
+    finish(result);
 }
 
 void QnInstallUpdatesPeerTask::at_pingTimer_timeout() {
+    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Ping EC."), cl_logDEBUG2);
+
     m_pingTimer->setInterval(pingInterval);
 
     if (!m_ecConnection)

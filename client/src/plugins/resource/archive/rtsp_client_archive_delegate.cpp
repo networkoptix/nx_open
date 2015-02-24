@@ -236,8 +236,12 @@ bool QnRtspClientArchiveDelegate::openInternal() {
    
     if (!m_fixedServer) {
         m_server = getServerOnTime(m_position); // try to update server
-        if (m_server == 0 || m_server->getStatus() == Qn::Offline)
+        if (m_server == 0 || m_server->getStatus() == Qn::Offline) 
+        {
+            if (m_isMultiserverAllowed && m_globalMinArchiveTime == AV_NOPTS_VALUE)
+                checkMinTimeFromOtherServer(m_camera);
             return false;
+        }
     }
 
     setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);

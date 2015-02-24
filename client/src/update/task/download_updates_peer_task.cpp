@@ -6,6 +6,7 @@
 #include <QtNetwork/QNetworkRequest>
 
 #include <utils/update/update_utils.h>
+#include <utils/common/log.h>
 
 namespace {
 
@@ -60,6 +61,8 @@ void QnDownloadUpdatesPeerTask::doCancel() {
 }
 
 void QnDownloadUpdatesPeerTask::doStart() {
+    NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Starting download %1 file(s).").arg(m_targets.size()), cl_logDEBUG1);
+
     m_resultingFiles.clear();
     m_pendingDownloads = m_targets.keys();
     downloadNextUpdate();
@@ -67,6 +70,7 @@ void QnDownloadUpdatesPeerTask::doStart() {
 
 void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     if (m_pendingDownloads.isEmpty()) {
+        NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Download finished."), cl_logDEBUG1);
         finish(NoError);
         return;
     }
@@ -77,8 +81,11 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     QString fileName = updateFilePath(m_targets[url]);
     m_resultingFiles.insert(url, fileName);
 
+    NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Starting download [%1 -> %2].").arg(url.toString()).arg(fileName), cl_logDEBUG1);
+
     m_file.reset(new QFile(fileName));
     if (!m_file->open(QFile::WriteOnly | QFile::Truncate)) {
+        NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Could not open file %1.").arg(fileName), cl_logERROR);
         finish(FileError);
         return;
     }
@@ -101,6 +108,7 @@ void QnDownloadUpdatesPeerTask::continueDownload() {
 
     QNetworkRequest request(url);
     request.setRawHeader("Range", QString(lit("bytes=%1-")).arg(pos).toLatin1());
+    NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Continue download at %1.").arg(pos), cl_logDEBUG2);
     QNetworkReply *reply = m_networkAccessManager->get(request);
     connect(reply,  &QNetworkReply::readyRead,          this,   &QnDownloadUpdatesPeerTask::at_downloadReply_readyRead);
     connect(reply,  &QNetworkReply::finished,           this,   &QnDownloadUpdatesPeerTask::at_downloadReply_finished);
@@ -138,12 +146,14 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
 
         m_file->remove();
         m_file.reset();
+        NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Network error."), cl_logERROR);
         finish(DownloadError);
         return;
     }
 
     if (!readAllData(reply, m_file.data())) {
         doCancel();
+        NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: No free space."), cl_logERROR);
         finish(NoFreeSpaceError);
         return;
     }
@@ -155,12 +165,15 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
     m_file.reset();
 
     if (md5 != m_hashByUrl[m_pendingDownloads.first()]) {
+        NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Checksum check is failed."), cl_logERROR);
         finish(DownloadError);
         return;
     }
 
     foreach (const QnUuid &peerId, m_currentPeers)
         emit peerFinished(peerId);
+
+    NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Download finished [%1].").arg(m_pendingDownloads.first().toString()), cl_logDEBUG1);
 
     m_pendingDownloads.removeFirst();
     downloadNextUpdate();
@@ -190,6 +203,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
         m_file->close();
         m_file->remove();
         doCancel();
+        NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Wrong file size."), cl_logERROR);
         finish(DownloadError);
         return;
     }
@@ -218,6 +232,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {
 
     if (!readAllData(reply, m_file.data())) {
         doCancel();
+        NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: No free space."), cl_logERROR);
         finish(NoFreeSpaceError);
     }
 }

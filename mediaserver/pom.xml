@@ -74,18 +74,29 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.10</version>
                 <executions>
                     <execution>
                         <id>copy-platform-libs</id>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>nx_sdk</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>archive</classifier>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
+                                    <destFileName>sdk.zip</destFileName>
+                                </artifactItem>
+                            </artifactItems>
                             <stripVersion>true</stripVersion>
-                        </configuration>                        
+                        </configuration>                          
                     </execution>                            
                 </executions>
             </plugin>         

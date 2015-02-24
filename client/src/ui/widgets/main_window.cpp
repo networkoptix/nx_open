@@ -22,6 +22,7 @@
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/videowall_resource.h>
 
 #include <api/session_manager.h>
 
@@ -53,6 +54,7 @@
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/watchers/workbench_system_name_watcher.h>
 #include <ui/workbench/watchers/workbench_server_address_watcher.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
@@ -62,6 +64,7 @@
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -188,6 +191,21 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_scene.reset(new QnGraphicsScene(this));
     setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
+    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, [this]() {
+        if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
+            if (QnLayoutResourcePtr resource = layout->resource())
+                disconnect(resource.data(), NULL, this, NULL);
+        }
+    });
+
+    connect(workbench(), &QnWorkbench::currentLayoutChanged, this, [this]() {
+        if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
+            if (QnLayoutResourcePtr resource = layout->resource())
+                connect(resource.data(), &QnLayoutResource::backgroundImageChanged, this, &QnMainWindow::updateHelpTopic);
+        }
+        updateHelpTopic();
+    });
+
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
 
@@ -296,17 +314,23 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Tab bar layout. To snap tab bar to graphics view. */
-    QVBoxLayout *tabBarLayout = new QVBoxLayout();
+    QWidget *tabBarWidget = new QWidget(this);
+    setHelpTopic(tabBarWidget, Qn::MainWindow_TitleBar_Tabs_Help);
+
+    QBoxLayout *tabBarLayout = new QHBoxLayout(tabBarWidget);
     tabBarLayout->setContentsMargins(0, 0, 0, 0);
     tabBarLayout->setSpacing(0);
-    tabBarLayout->addStretch(0x1000);
     tabBarLayout->addWidget(m_tabBar);
+    tabBarLayout->addSpacing(6);
+    tabBarLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
+    tabBarLayout->addSpacing(6);
+    tabBarLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
+    tabBarLayout->addStretch(0x1000);
 
     /* Layout for window buttons that can be removed from the title bar. */
     m_windowButtonsLayout = new QHBoxLayout();
-    m_windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
-    m_windowButtonsLayout->setSpacing(2);
-    m_windowButtonsLayout->addSpacing(6);
+    m_windowButtonsLayout->setContentsMargins(4, 0, 2, 0);
+    m_windowButtonsLayout->setSpacing(4);
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction), false, 1.0, Qn::MainWindow_ContextHelp_Help));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
@@ -321,10 +345,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
-    m_titleLayout->addLayout(tabBarLayout);
-    m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
-    m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
-    m_titleLayout->addStretch(0x1000);
+    m_titleLayout->addWidget(tabBarWidget, 0x1000, Qt::AlignBottom);
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
@@ -476,6 +497,30 @@ void QnMainWindow::showNormal() {
 
 void QnMainWindow::skipDoubleClick() {
     m_skipDoubleClick = true;
+}
+
+void QnMainWindow::updateHelpTopic() {
+    if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
+        if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+            setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);
+            return;
+        }
+        if (layout->data().contains(Qn::LayoutSearchStateRole)) {
+            setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help);
+            return;
+        }
+        if (QnLayoutResourcePtr resource = layout->resource()) {
+            if (context()->snapshotManager()->isFile(resource.dynamicCast<QnLayoutResource>())) {
+                setHelpTopic(m_scene.data(), Qn::MainWindow_Tree_MultiVideo_Help);
+                return;
+            }
+            if (!resource->backgroundImageFilename().isEmpty()) {
+                setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_EMapping_Help);
+                return;
+            }
+        }
+    }
+    setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 }
 
 void QnMainWindow::minimize() {
