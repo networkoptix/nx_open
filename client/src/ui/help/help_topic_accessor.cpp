@@ -78,7 +78,7 @@ int QnHelpTopicAccessor::helpTopicAt(QWidget *widget, const QPoint &pos, bool bu
         if(!bubbleUp)
             break;
 
-        if(widget->parentWidget()) {
+        if(!widget->isWindow() && widget->parentWidget()) {
             widgetPos = widget->mapToParent(widgetPos);
             widget = widget->parentWidget();
         } else {
