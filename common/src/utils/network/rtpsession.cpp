@@ -1748,6 +1748,9 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readS
             return bufSizeBak;
 
 #ifdef __arm__
+        //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
+            //Possibly, it is workaround of some other bug somewhere else
+            //This code works only on Raspberry and NX1
         QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
 #endif
 
