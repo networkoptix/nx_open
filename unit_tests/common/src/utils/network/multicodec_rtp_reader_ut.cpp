@@ -3,10 +3,14 @@
 * a.kolesnikov
 ***********************************************************/
 
+#if 0
+
 #include <fcntl.h>
+#ifdef __linux__
 #include <poll.h>
 #include <unistd.h>
 #include <sys/uio.h>
+#endif
 
 #include <condition_variable>
 #include <iostream>
@@ -24,8 +28,6 @@
 #include <utils/network/rtpsession.h>
 #include <utils/network/http/httpclient.h>
 
-
-#if 0
 
 static const size_t MAX_BYTES_TO_READ = 25*1024*1024;
 
@@ -219,7 +221,9 @@ TEST( QnMulticodecRtpReader, streamFetchingOverHTTP2 )
 }
 
 
+#ifdef __linux__
 #define USE_SPLICE
+#endif
 
 TEST( QnMulticodecRtpReader, streamFetchingOverRTSP5 )
 {
@@ -501,6 +505,36 @@ TEST( QnMulticodecRtpReader, streamFetchingOverRTSP8 )
     }
 
     std::cout<<"totalBytesRead "<<totalBytesRead<<", average read size "<<(totalBytesRead/readsCount)<<" bytes"<<std::endl;
+}
+
+TEST( QnMulticodecRtpReader, rtpParsingPerformance )
+{
+    QnResourcePropertyDictionary resPropertyDictionary;
+    QnSyncTime syncTimeInstance;
+
+    QnNetworkResourcePtr resource( new QnNetworkResource() );
+    resource->setId( QUuid::createUuid().toString() );
+    resource->setName( "DummyRes" );
+    QAuthenticator auth;
+    auth.setUser( "root" );
+    auth.setPassword( "ptth" );
+    resource->setAuth( auth );
+
+    std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader( new QnMulticodecRtpReader( resource ) );
+    rtspStreamReader->setRequest( rtspUrl );
+    ASSERT_TRUE( rtspStreamReader->openStream() );
+
+    QElapsedTimer t;
+    t.restart();
+    for( ;; )
+    {
+        auto frame = rtspStreamReader->getNextData();
+        if( !frame )
+        {
+            std::cerr<<"Failed to get frame from "<<rtspUrl.toStdString()<<std::endl;
+            continue;
+        }
+    }
 }
 
 #endif
