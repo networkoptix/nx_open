@@ -315,7 +315,7 @@ void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, qint64 timestam
         QnResourcePtr resource = m_context->resourcePool()->getResourceByUniqId(uniqueId);
         if(resource)
             resources << resource;
-    }
+    } 
 
     if (resources.isEmpty())
         return;
@@ -324,15 +324,13 @@ void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, qint64 timestam
 
     parameters.setArgument(Qn::ItemTimeRole, timestamp);
     parameters.setResources(resources);
-    m_context->menu()->trigger(Qn::DropResourcesAction, parameters);
+    m_context->menu()->trigger(Qn::OpenInNewLayoutAction, parameters);
 }
 
 void AxHDWitness::removeFromCurrentLayout(const QString &uniqueId) {
-    //QSet<QnWorkbenchItem *> items = m_context->workbench()->currentLayout()->items(uniqueId);
 	auto layout = m_context->workbench()->currentLayout()->resource();
 	if (layout)
 		layout->removeItem(layout->getItem(uniqueId));
-    //qDeleteAll(items);
 }
 
 QString AxHDWitness::resourceListXml() {
@@ -347,9 +345,12 @@ QString AxHDWitness::resourceListXml() {
         if(!mediaResource)
             continue;
 
+        if (resource->hasFlags(Qn::desktop_camera))
+            continue;
+
         writer.writeStartElement(QLatin1String("resource"));
         writer.writeAttribute(QLatin1String("uniqueId"), resource->getUniqueId());
-        writer.writeAttribute(QLatin1String("isCamera"), QString::number((resource->flags() & Qn::live_cam) == Qn::live_cam));
+        writer.writeAttribute(QLatin1String("isCamera"), QString::number(resource->hasFlags(Qn::live_cam)));
         writer.writeAttribute(QLatin1String("name"), resource->getName());
         if(QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>())
             writer.writeAttribute(QLatin1String("ipAddress"), networkResource->getHostAddress());
@@ -362,32 +363,7 @@ QString AxHDWitness::resourceListXml() {
 }
 
 void AxHDWitness::reconnect(const QString &url) {
-    m_url = url;
-    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(url, &m_result, &QnEc2ConnectionRequestResult::processEc2Reply);
-
-	// m_context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
-}
-
-void AxHDWitness::at_connectProcessed() {
-    QnConnectionInfo connectionInfo = m_result.reply<QnConnectionInfo>();
-    QnAppServerConnectionFactory::setUrl(connectionInfo.ecUrl);
-    QnAppServerConnectionFactory::setEc2Connection(m_result.connection());
-    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
-
-    qnClientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
-    connect(m_context.data(), &QnWorkbenchContext::userChanged, this, &AxHDWitness::at_initialResourcesReceived, Qt::QueuedConnection);
-
-    QnSessionManager::instance()->start();
-    QnResource::startCommandProc();
-
-    m_context->setUserName(m_url.userName());
-
-    QnGlobalModuleFinder::instance()->setConnection(m_result.connection());
-    QnRouter::instance()->setEnforcedConnection(QnRoutePoint(connectionInfo.ecsGuid, connectionInfo.ecUrl.host(), connectionInfo.ecUrl.port()));
-}
-
-void AxHDWitness::at_initialResourcesReceived(const QnUserResourcePtr &user) {
-    emit connectedProcessed();
+    m_context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url) );
 }
 
 void AxHDWitness::maximizeItem(const QString &uniqueId) {
@@ -413,16 +389,6 @@ void AxHDWitness::slidePanelsOut() {
 // int counter = 0;
 bool AxHDWitness::doInitialize()
 {
-/*	counter++;
-
-            
-	if (counter != 3)
-		return true; */
-
-	// DebugBreak();
-
-    connect(&m_result, SIGNAL(replyProcessed()), this, SLOT(at_connectProcessed()));
-
 	AllowSetForegroundWindow(ASFW_ANY);
 
 	int argc = 0;
@@ -453,6 +419,7 @@ bool AxHDWitness::doInitialize()
 	m_serverCameraFactory.reset(new QnServerCameraFactory());
 
     qnSettings->setLightMode(Qn::LightModeFlags(Qn::LightModeFull & ~Qn::LightModeSingleItem));
+    qnSettings->setActiveXMode(true);
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
@@ -473,13 +440,9 @@ bool AxHDWitness::doInitialize()
 	m_ec2ConnectionFactory->setContext( resCtx );
 	QnAppServerConnectionFactory::setEC2ConnectionFactory( m_ec2ConnectionFactory.data() );
 
-//x    application->setWindowIcon(qnSkin->icon("logo_tray.png"));
-
     /* Initialize connections. */
     // initAppServerConnection();
     // qnSettings->save();
-//x    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
-
 
     /* Initialize application instance. */
     QApplication::setStartDragDistance(20);
@@ -557,18 +520,13 @@ bool AxHDWitness::doInitialize()
 
 	qApp->processEvents();
 
+    connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, &AxHDWitness::connectedProcessed, Qt::QueuedConnection);
+
     return true;
 }
 
 void AxHDWitness::doFinalize()
 {
-/*	counter++;
-
-	return; */
-
-	//if (counter != 4)
-	//	return;
-
 	qApp->processEvents();
 
     if (m_mainWindow) {

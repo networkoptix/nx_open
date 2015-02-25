@@ -179,6 +179,13 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     if (url.isValid()) {
+        /* ActiveX plugin */
+        if (qnSettings->isActiveXMode()) {
+            if (connectToServer(url, true) != ec2::ErrorCode::ok) {
+                QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
+                connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ExitAction), &QAction::trigger);
+            }
+        } else
         /* Videowall item */
         if (qnSettings->isVideoWallMode()) {
             //TODO: #GDM #High videowall should try indefinitely

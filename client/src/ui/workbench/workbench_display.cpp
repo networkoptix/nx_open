@@ -613,7 +613,7 @@ QRectF QnWorkbenchDisplay::raisedGeometry(QnResourceWidget *widget) const {
     QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
 
     qreal magicConst = maxExpandedSize;
-    if (qnSettings->isVideoWallMode())
+    if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
         magicConst = 0.8;   //TODO: #Elric magic const
     else
     if (
@@ -1281,6 +1281,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
 
     /* Do not add additional spacing in following cases: */
     bool noAdjust = qnSettings->isVideoWallMode()                           /*< Videowall client. */
+        || qnSettings->isActiveXMode()                                      /*< ActiveX Plugin */
         || !backgroundBoundingRect.isNull();                                /*< There is a layout background. */
 
     if (noAdjust)

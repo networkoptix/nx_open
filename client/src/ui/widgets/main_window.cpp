@@ -196,7 +196,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     display()->setLightMode(qnSettings->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
-    if (qnSettings->isVideoWallMode())
+    if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
         display()->setNormalMarginFlags(0);
     else
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
@@ -531,9 +531,9 @@ void QnMainWindow::updateDecorationsState() {
     bool uiTitleUsed = fullScreen || maximized;
 #endif
 
-    bool windowTitleUsed = !uiTitleUsed && !qnSettings->isVideoWallMode();
+    bool windowTitleUsed = !uiTitleUsed && !qnSettings->isVideoWallMode() && !qnSettings->isActiveXMode();
     setTitleVisible(windowTitleUsed);
-    m_ui->setTitleUsed(uiTitleUsed && !qnSettings->isVideoWallMode());
+    m_ui->setTitleUsed(uiTitleUsed && !qnSettings->isVideoWallMode() && !qnSettings->isActiveXMode());
     m_view->setLineWidth(windowTitleUsed ? 0 : 1);
 
     updateDwmState();

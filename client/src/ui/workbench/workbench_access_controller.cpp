@@ -57,9 +57,9 @@ bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, 
 }
 
 Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {
-    if (qnSettings->isVideoWallMode())
+    if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
         return Qn::GlobalViewerPermissions;
-
+    
     return globalPermissions(m_user);
 }
 

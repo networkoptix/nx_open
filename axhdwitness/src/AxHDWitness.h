@@ -77,10 +77,6 @@ public slots:
 signals:
     void connectedProcessed();
 
-private slots:
-    void at_connectProcessed();
-    void at_initialResourcesReceived(const QnUserResourcePtr &);
-
 protected:
     virtual bool event(QEvent *event) override;
 
@@ -90,10 +86,6 @@ private:
     void createMainWindow();
 
 private:
-    QUrl m_url;
-    QnEc2ConnectionRequestResult m_result;
-    int m_connectingHandle;
-
     bool m_isInitialized;
 
 	QScopedPointer<ec2::AbstractECConnectionFactory> m_ec2ConnectionFactory;

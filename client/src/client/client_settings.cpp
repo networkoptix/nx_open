@@ -181,6 +181,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
     case DEBUG_COUNTER:
     case DEV_MODE:
     case VIDEO_WALL_MODE:
+    case ACTIVE_X_MODE:
         return defaultValue; /* Not to be read from settings. */
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
@@ -189,7 +190,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
 }
 
 void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
-    if (isVideoWallMode())
+    if (isVideoWallMode() || isActiveXMode())
         return;
 
     switch(id) {
@@ -238,6 +239,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case LIGHT_MODE_OVERRIDE:
     case PTZ_PRESET_IN_USE_WARNING_DISABLED:
     case VIDEO_WALL_MODE:
+    case ACTIVE_X_MODE:
     case SOFTWARE_YUV:
     case NO_CLIENT_UPDATE:
         break; /* Not to be saved to settings. */
