@@ -463,7 +463,9 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
 
             QnThirdPartyCompressedVideoData* videoPacket = new QnThirdPartyCompressedVideoData( srcVideoPacket );
             packetAp.release();
-            videoPacket->pts = packet->timestamp();
+
+            // leave PTS unchanged
+            //videoPacket->pts = packet->timestamp();
 
             nxcip::Picture* srcMotionData = srcVideoPacket->getMotionData();
             if( srcMotionData )

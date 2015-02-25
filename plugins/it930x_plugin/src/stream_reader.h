@@ -5,7 +5,6 @@
 #include <plugins/plugin_tools.h>
 
 #include "ref_counter.h"
-#include "timer.h"
 
 namespace ite
 {
@@ -32,7 +31,6 @@ namespace ite
         CameraManager * m_cameraManager;
         int m_encoderNumber;
         bool m_interrupted;
-        PtsTime m_ptsTime;
 
         std::shared_ptr<ContentPacket> nextPacket();
     };

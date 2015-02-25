@@ -170,22 +170,37 @@ namespace ite
         if (!q)
             return ContentPacketPtr();
 
+        PtsTime& ptsTime = m_times[pid];
         ContentPacketPtr pkt = std::make_shared<ContentPacket>();
 
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        bool gotPES = false;
-        while (q->size())
         {
-            if (q->front().packet().isPES())
-            {
-                if (gotPES)
-                    break;
-                gotPES = true;
-            }
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-            pkt->append(q->front());
-            q->pop_front();
+            bool gotPES = false;
+            while (q->size())
+            {
+                if (q->front().packet().isPES())
+                {
+                    if (gotPES)
+                        break;
+
+                    gotPES = true;
+                    pkt->append(q->front());
+
+                    // TODO: in fact it's a time of the next PES, cause we dump TS queue then.
+                    pkt->setTimestamp( ptsTime.pts2usec(pkt->pts()) );
+                }
+                else
+                    pkt->append(q->front());
+
+                q->pop_front();
+            }
+        }
+
+        if (pkt->errors())
+        {
+            printf("TS errors: %d\n", pkt->errors());
+            return ContentPacketPtr();
         }
 
         return pkt;

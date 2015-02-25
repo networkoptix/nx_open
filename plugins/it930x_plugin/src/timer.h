@@ -138,6 +138,9 @@ namespace ite
             // - fix frozen PTS
             if (pts <= m_prevPTS || (pts - m_prevPTS) > PtsTime::MAX_PTS_DRIFT())
             {
+#if 0
+                printf("Timestamp drift\n");
+#endif
                 m_baseUsec = Timer::usecNow();
                 m_basePTS = pts;
             }

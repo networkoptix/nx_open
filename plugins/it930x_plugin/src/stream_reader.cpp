@@ -167,13 +167,12 @@ namespace ite
         }
 
         bool key = isKey(pkt);
-        uint64_t timestamp = m_ptsTime.pts2usec(pkt->pts());
 #if 0
         if (key && !m_encoderNumber)
-            printf("pts: %u; time: %lu; stamp: %lu\n", pkt->pts(), time(NULL), timestamp / 1000 / 1000);
+            printf("pts: %u; time: %lu; stamp: %lu\n", pkt->pts(), time(NULL), pkt->timestamp() / 1000 / 1000);
 #endif
 
-        VideoPacket * packet = new VideoPacket(pkt->data(), pkt->size(), timestamp);
+        VideoPacket * packet = new VideoPacket(pkt->data(), pkt->size(), pkt->timestamp());
         if (!packet)
         {
             *lpPacket = nullptr;
@@ -222,13 +221,7 @@ namespace ite
                 break;
 
             if (pkt)
-            {
-#if 1
-                if (pkt->errors())
-                    printf("TS errors: %d\n", pkt->errors());
-#endif
                 return pkt;
-            }
         }
 
         m_interrupted = false;

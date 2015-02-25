@@ -10,6 +10,7 @@
 
 #include "object_counter.h"
 
+#include "timer.h"
 #include "mpeg_ts_packet.h"
 
 namespace ite
@@ -146,23 +147,21 @@ namespace ite
         void append(const TsBuffer& ts)
         {
             MpegTsPacket pkt = ts.packet();
-            if (!m_gotPES && !pkt.isPES())
+
+            if (pkt.checkbit())
             {
-                //printf("TS lost: waiting for PES\n");
+                ++m_tsErrors;
                 return;
             }
 
+            if (!m_gotPES && !pkt.isPES())
+                return;
+
             if (pkt.isPES())
             {
+                m_tsErrors = 0;
                 ++m_gotPES;
-#if 0
-                if (pkt.isPES())
-                    pkt.print();
-#endif
-#if 0
-                if (m_gotPES > 1)
-                    printf("PES already have one!\n");
-#endif
+
                 MpegTsPacket::PesFlags flags = pkt.pesFlags();
 
                 if (flags.hasPTS())
@@ -180,8 +179,6 @@ namespace ite
             if (!m_adaptOPCR)
                 m_adaptOPCR = pkt.adaptOPCR();
 #endif
-            if (pkt.checkbit())
-                ++m_tsErrors;
 
             // memory limit
             if (size() >= MAX_PACKET_SIZE())
@@ -199,6 +196,9 @@ namespace ite
         uint32_t pts() const { return m_pesPTS; }
         unsigned& flags() { return m_flags; }
 
+        void setTimestamp(uint64_t ts) { m_timestamp = ts; }
+        uint64_t timestamp() const { return m_timestamp; }
+
         unsigned errors() const { return m_tsErrors; }
 
     private:
@@ -208,6 +208,7 @@ namespace ite
         unsigned m_tsErrors;
         uint32_t m_pesPTS;
         uint32_t m_pesDTS;
+        uint64_t m_timestamp;
 #if 0
         uint64_t m_adaptPCR;
         uint64_t m_adaptOPCR;
@@ -240,6 +241,7 @@ namespace ite
         void addPid(uint16_t pid)
         {
             m_queues[pid] = TsQueue();
+            m_times[pid] = PtsTime();
         }
 
         void push(const TsBuffer& ts);
@@ -250,6 +252,7 @@ namespace ite
     private:
         mutable std::mutex m_mutex;
         std::map<uint16_t, TsQueue> m_queues;   // {PID, TS queue}
+        std::map<uint16_t, PtsTime> m_times;    // {PID, PTS-time link}
 
         TsQueue * queue(uint16_t pid)
         {
