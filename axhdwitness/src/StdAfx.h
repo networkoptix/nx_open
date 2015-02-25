@@ -1,4 +1,6 @@
-#define QT_NO_CAST_FROM_ASCII
+#undef QT_NO_CAST_FROM_ASCII
+
+#define BLIB_EXPORT
 
 #include <common/config.h>
 #ifdef __cplusplus

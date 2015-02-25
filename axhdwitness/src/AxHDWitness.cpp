@@ -79,6 +79,8 @@
 #include "ui/workaround/fglrx_full_screen.h"
 #include <QtCore/private/qthread_p.h>
 
+#include <bespin.h>
+
 #include <QXmlStreamWriter>
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -386,7 +388,6 @@ void AxHDWitness::slidePanelsOut() {
     m_context->menu()->trigger(Qn::MaximizeAction);
 }
 
-// int counter = 0;
 bool AxHDWitness::doInitialize()
 {
 	AllowSetForegroundWindow(ASFW_ANY);
@@ -420,6 +421,7 @@ bool AxHDWitness::doInitialize()
 
     qnSettings->setLightMode(Qn::LightModeFlags(Qn::LightModeFull & ~Qn::LightModeSingleItem));
     qnSettings->setActiveXMode(true);
+
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
@@ -468,11 +470,6 @@ bool AxHDWitness::doInitialize()
     cl_log.log(lit(QN_APPLICATION_NAME), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QnAppInfo::applicationVersion(), cl_logALWAYS);
 
-
-#if 0 // AXFIXME
-    cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
-#endif
-
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
 	QnSessionManager::instance()->start();
@@ -497,27 +494,12 @@ bool AxHDWitness::doInitialize()
     //===========================================================================
 
 //    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
-    
-    //============================
-    //QnResourceDirectoryBrowser
-/*    QnResourceDirectoryBrowser::instance().setLocal(true);
-    QStringList dirs;
-    dirs << qnSettings->mediaFolder();
-    dirs << qnSettings->extraMediaFolders();
-    QnResourceDirectoryBrowser::instance().setPathCheckList(dirs); */
-
-    /************************************************************************/
-    /* Initializing resource searchers                                      */
-    /************************************************************************/
-/*    QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
-    m_clientResourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
-	QnResourceDiscoveryManager::instance()->setResourceProcessor(&m_clientResourceProcessor);
-
-    QnResourceDiscoveryManager::instance()->setReady(true);
-    QnResourceDiscoveryManager::instance()->start(); */
 
 //	qApp->setStyle(qnSkin->newStyle());
 
+    QStyle *baseStyle = new Bespin::Style();
+    QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
+    qApp->setStyle(style);
 	qApp->processEvents();
 
     connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, &AxHDWitness::connectedProcessed, Qt::QueuedConnection);
