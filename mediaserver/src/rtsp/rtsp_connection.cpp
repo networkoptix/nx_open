@@ -949,7 +949,7 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged()
     Q_D(QnRtspConnectionProcessor);
 
     SCOPED_MUTEX_LOCK( lock, &d->mutex);
-    if (d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
+    if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
         m_needStop = true;
         d->socket->close();
     }
@@ -999,11 +999,13 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
-
-                d->liveDpHi->addDataProcessor(d->dataProcessor);
-                d->liveDpHi->startIfNotRunning();
             }
         }
+        if (d->liveDpHi) {
+            d->liveDpHi->addDataProcessor(d->dataProcessor);
+            d->liveDpHi->startIfNotRunning();
+        }
+
         if (!d->liveDpLow && d->liveDpHi)
         {
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
@@ -1012,13 +1014,11 @@ void QnRtspConnectionProcessor::createDataProvider()
             bool canRunSecondStream = cameraRes && liveHiProvider && (cameraRes->streamFpsSharingMethod() != Qn::BasicFpsSharing || cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS);
 
             if (canRunSecondStream)
-            {
                 d->liveDpLow = camera->getLiveReader(QnServer::LowQualityCatalog);
-                if (d->liveDpLow) {
-                    d->liveDpLow->addDataProcessor(d->dataProcessor);
-                    d->liveDpLow->startIfNotRunning();
-                }
-            }
+        }
+        if (d->liveDpLow) {
+            d->liveDpLow->addDataProcessor(d->dataProcessor);
+            d->liveDpLow->startIfNotRunning();
         }
     }
     if (!d->archiveDP) {
@@ -1265,9 +1265,9 @@ int QnRtspConnectionProcessor::composePlay()
 int QnRtspConnectionProcessor::composeTeardown()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->mediaRes = QnMediaResourcePtr(0);
 
     d->deleteDP();
+    d->mediaRes = QnMediaResourcePtr(0);
 
     d->rtspScale = 1.0;
     d->startTime = d->endTime = 0;

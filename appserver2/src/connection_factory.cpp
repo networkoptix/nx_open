@@ -495,7 +495,9 @@ namespace ec2
         connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
+#ifdef __arm__
         connectionInfo->box = QnAppInfo::armBox();
+#endif
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
         return ErrorCode::ok;

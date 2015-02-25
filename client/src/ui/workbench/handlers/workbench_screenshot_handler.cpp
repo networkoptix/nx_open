@@ -34,6 +34,9 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include <utils/common/string.h>
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
@@ -393,6 +396,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
     dialog->addWidget(tr("Timestamp:"), comboBox);
+    setHelpTopic(dialog.data(), Qn::MainWindow_MediaItem_Screenshot_Help);
 
     QString fileName;
 

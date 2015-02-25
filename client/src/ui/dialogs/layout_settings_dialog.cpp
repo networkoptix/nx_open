@@ -141,8 +141,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setHelpTopic(ui->imageLabel,        Qn::LayoutSettings_EMapping_Help);
-    setHelpTopic(ui->lockedCheckBox,    Qn::LayoutSettings_Locking_Help);
+    setHelpTopic(ui->lockedCheckBox,        Qn::LayoutSettings_Locking_Help);
+    setHelpTopic(ui->backgroundGroupBox,    Qn::LayoutSettings_EMapping_Help);
 
     installEventFilter(this);
     ui->imageLabel->installEventFilter(this);

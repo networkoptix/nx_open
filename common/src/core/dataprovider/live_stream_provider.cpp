@@ -387,6 +387,7 @@ void QnLiveStreamProvider::startIfNotRunning()
     SCOPED_MUTEX_LOCK( mtx, &m_mutex);
     if (!isRunning())    
     {
+        m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
         start();
     }
 }

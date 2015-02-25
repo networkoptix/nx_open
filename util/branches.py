@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #/bin/python
 
 import subprocess
@@ -5,17 +6,15 @@ import sys
 import argparse
 from datetime import datetime
 from datetime import timedelta
+from common_module import init_color,info,green,warn,err,separator
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-a', '--all', action='store_true', help="show all branches (including valid)")
-    args = parser.parse_args()
-    all_branches = args.all
-           
+tooOld = timedelta(days = 30)
+all_branches = False
+
+def check_branches():
     output = subprocess.check_output("hg branches", shell=True)
     result = []
     curDate = datetime.now()
-    tooOld = timedelta(days = 30)
 
     for row in output.split('\n'):
         if ':' in row:
@@ -45,28 +44,41 @@ def main():
                 age = curDate - date
                 branch['date'] = date
                 branch['age'] = age
-        branch['valid'] = (branch['inactive'] == False) and (branch['age'] <= tooOld)
 
     result.sort(key=lambda branch: (branch['user'], branch['inactive']))
+    return result
 
+def print_branches(branches):
     prevUser = ''
 
-    for branch in result:
-        if (all_branches == False) and (branch['valid']):
-            continue
-            
+    for branch in branches:           
         if prevUser != branch['user']:
             if prevUser != '':
-                print '-------------------------------------------------------------------------------'
+                separator()
             prevUser = branch['user']
-            print prevUser
-        output = str(branch['name']).ljust(40)
+            info(prevUser)
+            separator()
+        branch_name = str(branch['name']).ljust(40)
         if branch['inactive']:
-            output += '(INACTIVE)'
+            err(branch_name + '(INACTIVE)')
+        elif branch['age'] > tooOld:
+            warn(branch_name + '(TOO OLD: ' + str(branch['age'].days) + ' days)')
+        elif all_branches == True:
+            info(branch_name)
+    
+def main(): 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--all', action='store_true', help="show all branches (including valid)")
+    parser.add_argument('-c', '--color', action='store_true', help="colorized output")
+    args = parser.parse_args()
+    global all_branches
+    all_branches = args.all
 
-        if branch['age'] > tooOld:
-            output += '(TOO OLD: ' + str(branch['age'].days) + ' days)'
-        print output
+    if args.color:
+        init_color()    
+           
+    branches = check_branches()
+    print_branches(branches)
 
 if __name__ == "__main__":
     main()

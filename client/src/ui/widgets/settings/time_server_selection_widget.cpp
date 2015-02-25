@@ -9,6 +9,8 @@
 #include <nx_ec/data/api_runtime_data.h>
 
 #include <ui/models/time_server_selection_model.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <utils/common/synctime.h>
 
@@ -44,6 +46,8 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /*= NUL
     m_model(new QnTimeServerSelectionModel(this))
 {
     ui->setupUi(this);
+    setHelpTopic(this, Qn::Administration_TimeSynchronization_Help);
+
     ui->timeSourceLabel->setVisible(false);
     if (true) {
         ui->timeSourceLabel->setText(tr("Time is taken from the Internet."));

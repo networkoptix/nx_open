@@ -22,6 +22,9 @@
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
 
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include <update/media_server_update_tool.h>
 
 #include <utils/applauncher_utils.h>
@@ -51,6 +54,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_lastAutoUpdateCheck(0)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::Administration_Update_Help);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);

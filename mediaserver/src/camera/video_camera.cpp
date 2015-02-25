@@ -49,6 +49,9 @@ public:
     QnConstCompressedAudioDataPtr getLastAudioFrame() const;
     void updateCameraActivity();
     virtual bool needConfigureProvider() const override { return false; }
+
+    void clearVideoData();
+
 private:
     mutable QnMutex m_queueMtx;
     int m_lastKeyFrameChannel;
@@ -120,7 +123,8 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames[ch].empty() || m_lastKeyFrames[ch].back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));
-            while (!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold)
+            while (!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold || 
+                    m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames[ch].pop_front();
         }
 
@@ -232,6 +236,17 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
     
 }
 
+void QnVideoCameraGopKeeper::clearVideoData()
+{
+    QMutexLocker lock(&m_queueMtx);
+
+    for( QnConstCompressedVideoDataPtr& frame: m_lastKeyFrame )
+        frame.clear();
+    for( auto& lastKeyFramesForChannel: m_lastKeyFrames )
+        lastKeyFramesForChannel.clear();
+    m_nextMinTryTime = 0;
+}
+
 // --------------- QnVideoCamera ----------------------------
 
 QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
@@ -304,6 +319,15 @@ void QnVideoCamera::at_camera_resourceChanged()
 				m_secondaryReader->pleaseStop();
 		}
 	}
+
+    if( cameraResource->flags() & Qn::foreigner )
+    {
+        //clearing saved key frames
+        if (m_primaryGopKeeper)
+            m_primaryGopKeeper->clearVideoData();
+        if (m_secondaryGopKeeper)
+            m_secondaryGopKeeper->clearVideoData();
+    }
 }
 
 void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)

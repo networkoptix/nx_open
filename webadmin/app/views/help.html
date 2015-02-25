@@ -7,10 +7,10 @@
             {{link.description}}
         </p>
 
-        <a ng-if="link.url" class="btn btn-default pull-right" ng-href="link.url" target="{{link.target=='new'?'_blank':'_top'}}">{{link.button}}</a>
+        <a ng-if="link.url" class="btn btn-default pull-right" ng-href="{{link.url}}" target="{{link.target=='new'?'_blank':'_top'}}">{{link.button}}</a>
         <a ng-repeat="(key1, url) in link.urls"
            class="btn btn-default pull-right"
-           ng-href="url.url"
+           ng-href="{{url.url}}"
            ng-class="url.class"
            target="{{link.target=='new'?'_blank':'_top'}}">{{url.button}}</a>
 

@@ -156,13 +156,6 @@ namespace {
         return button;
     }
 
-    QGraphicsWidget *newSpacerWidget(qreal w, qreal h) {
-        GraphicsWidget *result = new GraphicsWidget();
-        result->setMinimumSize(QSizeF(w, h));
-        result->setMaximumSize(result->minimumSize());
-        return result;
-    }
-
     class QnResizerWidget: public GraphicsWidget {
         typedef GraphicsWidget base_type;
 
@@ -1352,10 +1345,27 @@ void QnWorkbenchUi::createTitleWidget() {
 
     m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
 
+    QGraphicsLinearLayout *tabBarLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    tabBarLayout->setContentsMargins(0, 0, 0, 0);
+    tabBarLayout->setSpacing(0);
+    tabBarLayout->addItem(m_tabBarItem);
+    tabBarLayout->setItemSpacing(tabBarLayout->count() - 1, 6);
+    GraphicsWidget *newTabButton = newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help);
+    tabBarLayout->addItem(newTabButton);
+    tabBarLayout->setAlignment(newTabButton, Qt::AlignVCenter);
+    tabBarLayout->setItemSpacing(tabBarLayout->count() - 1, 6);
+    GraphicsWidget *layoutMenuButton = newActionButton(action(Qn::OpenCurrentUserLayoutMenu));
+    tabBarLayout->addItem(layoutMenuButton);
+    tabBarLayout->setAlignment(layoutMenuButton, Qt::AlignVCenter);
+    tabBarLayout->addStretch(0x1000);
+
+    QGraphicsWidget *tabBarWidget = new GraphicsWidget();
+    setHelpTopic(tabBarWidget, Qn::MainWindow_TitleBar_Tabs_Help);
+    tabBarWidget->setLayout(tabBarLayout);
+
     QGraphicsLinearLayout * windowButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
-    windowButtonsLayout->setSpacing(2);
-    windowButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
+    windowButtonsLayout->setContentsMargins(0, 0, 2, 0);
+    windowButtonsLayout->setSpacing(4);
     windowButtonsLayout->addItem(newActionButton(action(Qn::WhatsThisAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction)
@@ -1366,28 +1376,23 @@ void QnWorkbenchUi::createTitleWidget() {
     m_windowButtonsWidget->setLayout(windowButtonsLayout);
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->setSpacing(2);
-    titleLayout->setContentsMargins(4, 0, 4, 0);
-    QGraphicsLinearLayout *titleLeftButtonsLayout = new QGraphicsLinearLayout();
-    titleLeftButtonsLayout->setSpacing(2);
-    titleLeftButtonsLayout->setContentsMargins(0, 0, 0, 0);
-    titleLeftButtonsLayout->addItem(m_mainMenuButton);
-    titleLayout->addItem(titleLeftButtonsLayout);
-    titleLayout->addItem(m_tabBarItem);
-    titleLayout->setAlignment(m_tabBarItem, Qt::AlignBottom);
+    titleLayout->addItem(m_mainMenuButton);
+    titleLayout->addItem(tabBarWidget);
+    titleLayout->setAlignment(tabBarWidget, Qt::AlignBottom);
+    titleLayout->setStretchFactor(tabBarWidget, 0x1000);
     m_titleRightButtonsLayout = new QGraphicsLinearLayout();
-    m_titleRightButtonsLayout->setSpacing(2);
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)
         , kDefaultSizeMultiplier, Qn::MainWindow_TitleBar_NewLayout_Help));
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
-    m_titleRightButtonsLayout->addStretch(0x1000);
     if (QnScreenRecorder::isSupported())
     {
         m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)
         , kDefaultSizeMultiplier, Qn::MainWindow_ScreenRecording_Help));
     }
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenLoginDialogAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenLoginDialogAction)
+        , kDefaultSizeMultiplier, Qn::Login_Help));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);
     m_titleItem->setLayout(titleLayout);

@@ -131,6 +131,7 @@
 #include <utils/common/url.h>
 #include <utils/math/math.h>
 #include <utils/aspect_ratio.h>
+#include <utils/screen_manager.h>
 
 
 #ifdef Q_OS_MACX
@@ -292,7 +293,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
-    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()));
+    /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
+    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -444,13 +446,9 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QString::fromUtf8(QnAppServerConnectionFactory::url().toEncoded());
     }
 
-    /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
     if(mainWindow()) {
-        int screen = qApp->desktop()->screenNumber(mainWindow());
-        screen = (screen + 1) % qApp->desktop()->screenCount();
-
-        arguments << QLatin1String("--screen");
-        arguments << QString::number(screen);
+        int screen = context()->instance<QnScreenManager>()->nextFreeScreen();
+        arguments << QLatin1String("--screen") << QString::number(screen);
     }
 
     if (qnSettings->isDevMode())
@@ -1871,9 +1869,23 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if (moreResourceToDelete.isEmpty())
         return;
     
+    int helpId = -1;
+    for (const QnResourcePtr &resource: resources) {
+        if (resource->hasFlags(Qn::live_cam)) {
+            helpId = Qn::DeletingCamera_Help;
+            break;
+        }
+        if (resource->hasFlags(Qn::layout)) {
+            helpId = Qn::DeletingLayout_Help;
+            /* We don't break here because camera could be in the list,
+             * and camera has a preference. */
+        }
+    }
+
     QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
         mainWindow(),
         resources,
+        helpId,
         tr("Delete Resources"),
         question,
         QDialogButtonBox::Yes | QDialogButtonBox::No
@@ -2411,13 +2423,13 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please update all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
-    QScopedPointer<QnWorkbenchStateDependentDialog<QMessageBox> > messageBox(
-        new QnWorkbenchStateDependentDialog<QMessageBox>(mainWindow()));
+    QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
+        new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
     messageBox->setIcon(QMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);
     messageBox->setStandardButtons(QMessageBox::Cancel);
-    setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
+    setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Update..."), QMessageBox::HelpRole);
     connect(updateButton, &QPushButton::clicked, this, [this] {

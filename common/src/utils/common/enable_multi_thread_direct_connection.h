@@ -6,8 +6,10 @@
 #ifndef ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
 #define ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
 
-#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
+
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 
 //!QObject's successors which allow using Qt::DirectConnection to connect object living in different thread should inherit this class
@@ -15,9 +17,28 @@ template<class Derived>
 class EnableMultiThreadDirectConnection
 {
 public:
+    class WhileExecutingDirectCall
+    {
+    public:
+        WhileExecutingDirectCall( EnableMultiThreadDirectConnection* const caller )
+        :
+            m_caller( caller )
+        {
+            m_caller->beforeDirectCall();
+        }
+
+        ~WhileExecutingDirectCall()
+        {
+            m_caller->afterDirectCall();
+        }
+
+    private:
+        EnableMultiThreadDirectConnection* const m_caller;
+    };
+
     EnableMultiThreadDirectConnection()
     :
-        m_signalEmitMutex( QnMutex::Recursive )
+        m_ongoingCalls( 0 )
     {
     }
 
@@ -30,12 +51,29 @@ public:
     void disconnectAndJoin( QObject* receiver )
     {
         QObject::disconnect( static_cast<Derived*>(this), nullptr, receiver, nullptr );
-        SCOPED_MUTEX_LOCK( lk,  &m_signalEmitMutex );  //waiting for signals to be emitted in other threads to be processed
+        //waiting for signals to be emitted in other threads to be processed
+        SCOPED_MUTEX_LOCK( lk, &m_signalEmitMutex );
+        while( m_ongoingCalls > 0 )
+            m_cond.wait( lk.mutex() );
     }
 
-protected:
-    //!Successors have to lock this mutex for emiting signal which allows to be connected to directly
-    QnMutex m_signalEmitMutex;
+private:
+    mutable QMutex m_signalEmitMutex;
+    QnWaitCondition m_cond;
+    mutable size_t m_ongoingCalls;
+
+    void beforeDirectCall()
+    {
+        SCOPED_MUTEX_LOCK( lk, &m_signalEmitMutex );
+        ++m_ongoingCalls;
+    }
+
+    void afterDirectCall()
+    {
+        SCOPED_MUTEX_LOCK( lk, &m_signalEmitMutex );
+        --m_ongoingCalls;
+        m_cond.wakeAll();
+    }
 };
 
 #endif  //ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
