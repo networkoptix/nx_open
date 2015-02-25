@@ -326,7 +326,8 @@ void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, qint64 timestam
 
     parameters.setArgument(Qn::ItemTimeRole, timestamp);
     parameters.setResources(resources);
-    m_context->menu()->trigger(Qn::OpenInNewLayoutAction, parameters);
+    m_context->menu()->trigger(Qn::OpenNewTabAction);
+    m_context->menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
 }
 
 void AxHDWitness::removeFromCurrentLayout(const QString &uniqueId) {
@@ -495,7 +496,12 @@ bool AxHDWitness::doInitialize()
 
 //    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
-//	qApp->setStyle(qnSkin->newStyle());
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
+    runtimeData.peer.peerType = Qn::PT_DesktopClient;
+    runtimeData.brand = QnAppInfo::productNameShort();
+    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     QStyle *baseStyle = new Bespin::Style();
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
@@ -601,6 +607,7 @@ void AxHDWitness::createMainWindow() {
     m_mainWindow->setOptions(m_mainWindow->options() & ~(QnMainWindow::TitleBarDraggable | QnMainWindow::WindowButtonsVisible));
 
     m_mainWindow->setMinimumSize(320, 240);
+    m_context->setMainWindow(m_mainWindow);
 
 #ifdef _DEBUG
     /* Show FPS in debug. */

@@ -269,7 +269,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         timer->start(1000 * 60); /* Update icon button every minute. */
 
         connect(statusOverlayWidget(), &QnStatusOverlayWidget::diagnosticsRequested,    this,   &QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested);
-        statusOverlayWidget()->setDiagnosticsVisible(true);
+
+        bool diagnosticsAllowed = menu()->canTrigger(Qn::CameraDiagnosticsAction, m_camera);
+        statusOverlayWidget()->setDiagnosticsVisible(diagnosticsAllowed);
     }
 
     connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM #Common get rid of resourceChanged

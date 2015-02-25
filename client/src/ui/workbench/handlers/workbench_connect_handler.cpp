@@ -172,7 +172,8 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     // ask user if he wants to save changes
-    if (connected() && !disconnectFromServer(false))
+    bool force = qnSettings->isActiveXMode();
+    if (connected() && !disconnectFromServer(force))
         return; 
 
     QnActionParameters parameters = menu()->currentParameters(sender());

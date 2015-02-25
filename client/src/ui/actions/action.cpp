@@ -32,6 +32,7 @@ QnAction::QnAction(Qn::ActionId id, QObject *parent):
     QnWorkbenchContextAware(parent),
     m_id(id),
     m_flags(0),
+    m_mode(QnActionTypes::AnyMode),
     m_toolTipMarker(lit("<b></b>"))
 {
     setToolTip(m_toolTipMarker);
@@ -62,6 +63,10 @@ void QnAction::setForbiddenPermissions(Qn::Permissions forbiddenPermissions) {
 
 void QnAction::setFlags(Qn::ActionFlags flags) {
     m_flags = flags;
+}
+
+void QnAction::setMode(QnActionTypes::ClientModes mode) {
+    m_mode = mode;
 }
 
 void QnAction::setNormalText(const QString &normalText) {
@@ -137,6 +142,18 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
         return Qn::InvisibleAction;
 
     if((m_flags & Qn::DevMode) && !qnSettings->isDevMode())
+        return Qn::InvisibleAction;
+
+    auto hasMode = [this](QnActionTypes::ClientMode mode) {
+        return (m_mode & mode) == mode;
+    };
+
+    if (qnSettings->isVideoWallMode() && 
+        !hasMode(QnActionTypes::VideoWallMode) )
+        return Qn::InvisibleAction;
+
+    if (qnSettings->isActiveXMode() && 
+        !hasMode(QnActionTypes::ActiveXMode) )
         return Qn::InvisibleAction;
 
     int size = parameters.size();
