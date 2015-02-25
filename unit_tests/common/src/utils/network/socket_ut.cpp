@@ -3,13 +3,15 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include <chrono>
 #include <condition_variable>
 #include <deque>
 #include <mutex>
 #include <thread>
 
 #include <gtest/gtest.h>
+
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QThread>
 
 #include <utils/network/host_address_resolver.h>
 #include <utils/network/http/httpclient.h>
@@ -58,7 +60,7 @@ TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
             BYTES_TO_SEND_THROUGH_CONNECTION );
         ASSERT_TRUE( connectionsGenerator.start() );
 
-        std::this_thread::sleep_for( std::chrono::seconds( TEST_DURATION_SECONDS ) );
+        QThread::sleep( TEST_DURATION_SECONDS );
 
         connectionsGenerator.pleaseStop();
         connectionsGenerator.join();
@@ -68,7 +70,7 @@ TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
     }
 
     //waiting for some calls to deleted objects
-    std::this_thread::sleep_for( std::chrono::seconds( SECONDS_TO_WAIT_AFTER_TEST ) );
+    QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
 }
 
 TEST_F( SocketAsyncModeTest, ServerSocketAsyncCancellation )
@@ -86,7 +88,7 @@ TEST_F( SocketAsyncModeTest, ServerSocketAsyncCancellation )
     }
 
     //waiting for some calls to deleted objects
-    std::this_thread::sleep_for( std::chrono::seconds( SECONDS_TO_WAIT_AFTER_TEST ) );
+    QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
 }
 
 TEST_F( SocketAsyncModeTest, HostNameResolve1 )
@@ -211,7 +213,7 @@ TEST_F( SocketAsyncModeTest, HostNameResolve2 )
             connectionToCancel.reset();
             ++cancelledConnectionsCount;
         }
-        std::this_thread::sleep_for( std::chrono::milliseconds(1) );
+        QThread::msleep( 1 );
         lk.lock();
     }
 
