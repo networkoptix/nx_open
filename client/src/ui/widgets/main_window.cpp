@@ -191,7 +191,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up scene & view. */
     m_scene.reset(new QnGraphicsScene(this));
-    setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
     connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, [this]() {
         if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
@@ -199,7 +198,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
                 disconnect(resource.data(), NULL, this, NULL);
         }
     });
-
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this, [this]() {
         if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
             if (QnLayoutResourcePtr resource = layout->resource())
@@ -207,6 +205,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         }
         updateHelpTopic();
     });
+    connect(action(Qn::ToggleTourModeAction), &QAction::toggled, this, &QnMainWindow::updateHelpTopic);
+    updateHelpTopic();
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
@@ -508,6 +508,11 @@ void QnMainWindow::updateScreenInfo() {
 }
 
 void QnMainWindow::updateHelpTopic() {
+    if (action(Qn::ToggleTourModeAction)->isChecked()) {
+        setHelpTopic(m_scene.data(), Qn::MinaWindow_Scene_TourInProgress_Help);
+        return;
+    }
+
     if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
         if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
             setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);

@@ -39,6 +39,7 @@ QN_HELP_TOPIC(MainWindow_Tree_Camera_Help,                      "configuring_cam
 QN_HELP_TOPIC(MainWindow_Scene_Help,                            "hd_witness_user_interface_overview.htm")
 QN_HELP_TOPIC(MainWindow_Scene_EMapping_Help,                   "e-mapping.htm") // TODO
 QN_HELP_TOPIC(MainWindow_Scene_PreviewSearch_Help,              "thumbnail_search.htm") // TODO
+QN_HELP_TOPIC(MinaWindow_Scene_TourInProgress_Help,             "tours.htm")
 QN_HELP_TOPIC(MainWindow_Playback_Help,                         "playback_panel.htm")
 QN_HELP_TOPIC(MainWindow_Navigation_Help,                       "navigating_through_archive_and.htm")
 QN_HELP_TOPIC(MainWindow_Sync_Help,                             "navigating_through_several_cameras_synchronously.htm")
@@ -169,7 +170,6 @@ QN_HELP_TOPIC(LayoutSettings_EMapping_Help,						"e-mapping.htm")
 QN_HELP_TOPIC(PtzPresets_Help,                                  "saving_and_restoring_ptz_posit.htm")
 QN_HELP_TOPIC(PtzManagement_Tour_Help,                          "setting_up_ptz_tours.htm")
 QN_HELP_TOPIC(PtzManagement_HomePosition_Help,                  "home_positions_and_tours_for_p.htm")
-QN_HELP_TOPIC(Ptz_TourInProgress_Help,                          "tours.htm")
 
 QN_HELP_TOPIC(EventLog_Help,									"viewing_events_log.htm")
 
