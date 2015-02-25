@@ -985,7 +985,7 @@ Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resource
 Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList &resources) {
     bool found = false;
     foreach (const QnResourcePtr &resource, resources) {
-        if (resource->getStatus() != m_status) {
+        if (!m_statuses.contains(resource->getStatus())) {
             if (m_all)
                 return Qn::InvisibleAction;
         } else {

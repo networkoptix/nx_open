@@ -196,6 +196,7 @@ namespace ec2
         void updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* transport);
         void proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader);
         void removeTTSequenceForPeer(const QnUuid& id);
+        bool isSyncInProgress() const;
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

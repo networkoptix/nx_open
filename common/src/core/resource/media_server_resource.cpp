@@ -258,21 +258,6 @@ private:
 };
 */
 
-void QnMediaServerResource::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
-{
-    QMutexLocker lock(&m_mutex);
-    if( client->response() &&   //respnose has been received and parsed (no transport error)
-        client->response()->statusLine.statusCode == nx_http::StatusCode::ok )
-    {
-        const nx_http::BufferType& msgBodyBuf = client->fetchMessageBodyBuffer();
-        QnPingReply reply;
-        QnJsonRestResult result;
-        if( QJson::deserialize(msgBodyBuf, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
-            setPrimaryIF(client->url().host()); // server OK
-    }
-    m_runningIfRequests.erase(std::remove(m_runningIfRequests.begin(), m_runningIfRequests.end(), client), m_runningIfRequests.end());
-}
-
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
 {
     QUrl origApiUrl = getApiUrl();
@@ -331,30 +316,6 @@ void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
     m_serverFlags = flags;
 }
 
-
-void QnMediaServerResource::determineOptimalNetIF()
-{
-    QMutexLocker lock(&m_mutex);
-    
-    //using proxy before we able to establish direct connection
-    setPrimaryIF( QnMediaServerResource::USE_PROXY );
-
-    m_prevNetAddrList = m_netAddrList;
-    m_primaryIFSelected = false;
-
-    for (int i = 0; i < m_netAddrList.size(); ++i)
-    {
-        QUrl url(m_apiUrl);
-        url.setHost(m_netAddrList[i].toString());
-        url.setPath(lit("/api/ping"));
-
-        nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-        connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnMediaServerResource::at_httpClientDone, Qt::DirectConnection );
-        if (httpClient->doGet(url))
-            m_runningIfRequests.push_back(httpClient);
-    }
-}
-
 QnAbstractStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
 {
    for(const QnAbstractStorageResourcePtr& storage: getStorages()) {
@@ -403,7 +364,6 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
         if (m_restConnection)
             m_restConnection->setUrl(m_apiUrl);
-        determineOptimalNetIF();
     } else {
         m_url = oldUrl; //rollback changed value to autodetected
     }
