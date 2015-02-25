@@ -790,6 +790,11 @@ bool RTPSession::sendRequestInternal(nx_http::Request&& request)
     return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
 }
 
+AbstractStreamSocket* RTPSession::tcpSock()
+{
+    return m_tcpSock.get();
+}
+
 bool RTPSession::sendDescribe()
 {
     return sendRequestInternal(createDescribeRequest());
@@ -1710,6 +1715,14 @@ QString RTPSession::getVideoLayout() const
     return m_videoLayout;
 }
 
+static const size_t MAX_BITRATE_BITS_PER_SECOND = 50*1024*1024;
+static const size_t MAX_BITRATE_BYTES_PER_SECOND = MAX_BITRATE_BITS_PER_SECOND / CHAR_BIT;
+static_assert(
+    MAX_BITRATE_BYTES_PER_SECOND > ADDITIONAL_READ_BUFFER_CAPACITY * 10,
+    "MAX_BITRATE_BYTES_PER_SECOND MUST be 10 times greater than ADDITIONAL_READ_BUFFER_CAPACITY" );
+
+static const size_t MS_PER_SEC = 1000;
+
 int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome )
 {
     const size_t bufSizeBak = bufSize;
@@ -1733,6 +1746,10 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readS
             return bufSizeBak - bufSize;
         if( bufSize == 0 )
             return bufSizeBak;
+
+#ifdef __arm__
+        QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
+#endif
 
         m_additionalReadBufferSize = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
         m_additionalReadBufferPos = 0;

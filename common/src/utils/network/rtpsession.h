@@ -286,6 +286,8 @@ public:
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
 
+    AbstractStreamSocket* tcpSock();
+
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -319,6 +321,7 @@ private:
     nx_http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
     bool sendRequestInternal(nx_http::Request&& request);
+
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
