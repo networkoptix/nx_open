@@ -7,6 +7,8 @@
 
 #include "mutex_lock_analyzer.h"
 
+#include <iostream>
+
 #include <QtGlobal>
 #include <QtCore/QMutexLocker>
 

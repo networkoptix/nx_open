@@ -238,7 +238,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
 
 void QnVideoCameraGopKeeper::clearVideoData()
 {
-    QMutexLocker lock(&m_queueMtx);
+    SCOPED_MUTEX_LOCK( lock, &m_queueMtx );
 
     for( QnConstCompressedVideoDataPtr& frame: m_lastKeyFrame )
         frame.clear();

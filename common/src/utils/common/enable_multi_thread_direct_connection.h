@@ -58,7 +58,7 @@ public:
     }
 
 private:
-    mutable QMutex m_signalEmitMutex;
+    mutable QnMutex m_signalEmitMutex;
     QnWaitCondition m_cond;
     mutable size_t m_ongoingCalls;
 

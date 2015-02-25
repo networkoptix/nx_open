@@ -7,8 +7,10 @@
 #include <QtCore/QSet>
 #include <QtCore/QStringList>
 
+#include <utils/thread/mutex.h>
+
+
 class QSettings;
-class QnMutex;
 class QTextStream;
 
 class QnPropertyStorageLocker;
