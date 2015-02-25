@@ -144,18 +144,18 @@ namespace ite
             m_data.reserve(SIZE_RESERVE);
         }
 
-        void append(const TsBuffer& ts)
+        bool append(const TsBuffer& ts)
         {
             MpegTsPacket pkt = ts.packet();
 
             if (pkt.checkbit())
             {
                 ++m_tsErrors;
-                return;
+                return false;
             }
 
             if (!m_gotPES && !pkt.isPES())
-                return;
+                return false;
 
             if (pkt.isPES())
             {
@@ -186,7 +186,10 @@ namespace ite
                 printf("Elementary stream packet is too big. Something goes wrong.\n");
                 m_gotPES = 0;
                 m_data.clear();
+                return false;
             }
+
+            return true;
         }
 
         const uint8_t * data() const { return &m_data[0]; }

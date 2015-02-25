@@ -183,12 +183,13 @@ namespace ite
                 {
                     if (gotPES)
                         break;
-
                     gotPES = true;
-                    pkt->append(q->front());
 
-                    // TODO: in fact it's a time of the next PES, cause we dump TS queue then.
-                    pkt->setTimestamp( ptsTime.pts2usec(pkt->pts()) );
+                    if (pkt->append(q->front()))
+                    {
+                        // TODO: in fact it's a time of the next PES, cause we dump TS queue then.
+                        pkt->setTimestamp( ptsTime.pts2usec(pkt->pts()) );
+                    }
                 }
                 else
                     pkt->append(q->front());
