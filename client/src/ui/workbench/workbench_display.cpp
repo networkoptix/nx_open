@@ -481,6 +481,7 @@ void QnWorkbenchDisplay::initSceneView() {
 
     /* Run handlers. */
     at_workbench_currentLayoutChanged();
+    at_mapper_spacingChanged();
 }
 
 void QnWorkbenchDisplay::initBoundingInstrument() {
@@ -1270,7 +1271,6 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
 
     /* Do not add additional spacing in following cases: */
     bool noAdjust = qnSettings->isVideoWallMode()                           /*< Videowall client. */
-        || qnSettings->isActiveXMode()                                      /*< ActiveX Plugin */
         || !backgroundBoundingRect.isNull();                                /*< There is a layout background. */
 
     if (noAdjust)

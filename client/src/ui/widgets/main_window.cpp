@@ -214,7 +214,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     display()->setLightMode(qnSettings->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
-    if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
+    if (qnSettings->isVideoWallMode())
         display()->setNormalMarginFlags(0);
     else
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);

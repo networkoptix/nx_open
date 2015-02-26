@@ -172,7 +172,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     // ask user if he wants to save changes
-    bool force = qnSettings->isActiveXMode();
+    bool force = qnSettings->isActiveXMode() || qnSettings->isVideoWallMode();
     if (connected() && !disconnectFromServer(force))
         return; 
 

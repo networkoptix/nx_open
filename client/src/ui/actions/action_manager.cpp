@@ -546,6 +546,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::MainMenuAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space"), QnActionBuilder::Mac, true).
         autoRepeat(false).

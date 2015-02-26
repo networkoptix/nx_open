@@ -300,15 +300,7 @@ void AxHDWitness::clear()
 }
 
 void AxHDWitness::addResourceToLayout(const QString &uniqueId, qint64 timestamp) {
-    QnResourcePtr resource = m_context->resourcePool()->getResourceByUniqId(uniqueId);
-    if(!resource)
-        return;
-
-    QnActionParameters parameters;
-
-    parameters.setArgument(Qn::ItemTimeRole, timestamp);
-    parameters.setResources(QnResourceList() << resource);
-    m_context->menu()->trigger(Qn::DropResourcesAction, parameters);
+    addResourcesToLayout(uniqueId, timestamp);
 }
 
 void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, qint64 timestamp) {
