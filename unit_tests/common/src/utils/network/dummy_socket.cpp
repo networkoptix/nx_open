@@ -186,3 +186,46 @@ bool DummySocket::registerTimerImpl( unsigned int timeoutMs, std::function<void(
 {
     return false;
 }
+
+
+
+////////////////////////////////////////////////////////////
+//// parse utils
+////////////////////////////////////////////////////////////
+
+BufferSocket::BufferSocket( const std::basic_string<uint8_t>& data )
+:
+    m_data( data )
+{
+}
+
+void BufferSocket::close()
+{
+}
+
+bool BufferSocket::isClosed() const
+{
+    return true;
+}
+
+bool BufferSocket::connect(
+    const SocketAddress& remoteSocketAddress,
+    unsigned int timeoutMillis )
+{
+    return false;
+}
+
+int BufferSocket::recv( void* buffer, unsigned int bufferLen, int flags )
+{
+    return -1;
+}
+
+int BufferSocket::send( const void* buffer, unsigned int bufferLen )
+{
+    return -1;
+}
+
+bool BufferSocket::isConnected() const
+{
+    return false;
+}

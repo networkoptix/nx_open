@@ -63,4 +63,26 @@ private:
     SocketAddress m_remotePeerAddress;
 };
 
+//!Reads data from buffer. Sent data is ignored
+class BufferSocket
+:
+    public DummySocket
+{
+public:
+    BufferSocket( const std::basic_string<uint8_t>& data );
+
+    virtual void close() override;
+    virtual bool isClosed() const override;
+
+    virtual bool connect(
+        const SocketAddress& remoteSocketAddress,
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
+    virtual int send( const void* buffer, unsigned int bufferLen ) override;
+    virtual bool isConnected() const override;
+
+private:
+    const std::basic_string<uint8_t>& m_data;
+};
+
 #endif  //DUMMY_SOCKET_H

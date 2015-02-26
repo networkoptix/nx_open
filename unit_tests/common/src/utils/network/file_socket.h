@@ -11,6 +11,7 @@
 #include "dummy_socket.h"
 
 
+//!Reads data from file. Sent data is just ignored
 class FileSocket
 :
     public DummySocket
