@@ -355,6 +355,11 @@ QString AxHDWitness::resourceListXml() {
 }
 
 void AxHDWitness::reconnect(const QString &url) {
+
+    connect(m_context->action(Qn::ExitAction), &QAction::triggered, this, [this] {
+        emit connectionProcessed(1, lit("error"));
+    }, Qt::QueuedConnection);
+
     m_context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url) );
 }
 
@@ -497,7 +502,9 @@ bool AxHDWitness::doInitialize()
     qApp->setStyle(style);
 	qApp->processEvents();
 
-    connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, &AxHDWitness::connectedProcessed, Qt::QueuedConnection);
+    connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
+        emit connectionProcessed(0, QString());
+    }, Qt::QueuedConnection);
 
     return true;
 }

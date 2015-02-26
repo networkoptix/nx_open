@@ -183,8 +183,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         /* ActiveX plugin */
         if (qnSettings->isActiveXMode()) {
             if (connectToServer(url, true) != ec2::ErrorCode::ok) {
-                QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
-                connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ExitAction), &QAction::trigger);
+                QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
+                menu()->trigger(Qn::ExitAction);
             }
         } else
         /* Videowall item */

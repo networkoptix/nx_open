@@ -205,19 +205,18 @@ namespace Company.Product.OemDvrMiniDriver {
         #endregion
 
         private void PbSurfaceResize(object sender, EventArgs e) {
-            var frame = sender as Panel;
-            if (frame == null) {
-                return;
-            }
+            updateControlSize();
+        }
 
-            short vidWidth = Convert.ToInt16(frame.Width);
-            short vidHeight = Convert.ToInt16(frame.Height);
+        private void updateControlSize() {
+            short vidWidth = Convert.ToInt16(m_surface.Width);
+            short vidHeight = Convert.ToInt16(m_surface.Height);
             this.axAxHDWitness1.SetBounds(0, 0, vidWidth, vidHeight);
         }
 
         private void Load(Panel pbSurface, Uri url) {
             m_surface = pbSurface;
-            pbSurface.Resize += PbSurfaceResize;
+            pbSurface.SizeChanged += PbSurfaceResize;
 
             // System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager();
             this.axAxHDWitness1 = new AxAxHDWitness();
@@ -247,21 +246,22 @@ namespace Company.Product.OemDvrMiniDriver {
             ((System.ComponentModel.ISupportInitialize)(this.axAxHDWitness1)).EndInit();
             pbSurface.ResumeLayout(false);
 
-            this.axAxHDWitness1.connectedProcessed += axAxHDWitness1_connectedProcessed;
+            this.axAxHDWitness1.connectionProcessed += axAxHDWitness1_connectedProcessed;
 
             this.axAxHDWitness1.reconnect(url.ToString());
         }
 
-        void axAxHDWitness1_connectedProcessed(object sender, EventArgs e) {
+        void axAxHDWitness1_connectedProcessed(object sender, IAxHDWitnessEvents_connectionProcessedEvent e) {
+            updateControlSize();
+
+            if (e.p_status != 0)
+                return;
+
             var cameraIds = new List<string>();
             foreach (OemDvrCamera camera in _cameras) {
                 cameraIds.Add(camera.CameraId);
             }
             axAxHDWitness1.addResourcesToLayout(String.Join("|", cameraIds), _tick);
-
-            short vidWidth = Convert.ToInt16(m_surface.Width);
-            short vidHeight = Convert.ToInt16(m_surface.Height);
-            this.axAxHDWitness1.SetBounds(0, 0, vidWidth, vidHeight);
         }
 
         private void Play() {

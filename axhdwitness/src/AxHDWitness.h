@@ -75,7 +75,7 @@ public slots:
     QString resourceListXml();
 
 signals:
-    void connectedProcessed();
+    void connectionProcessed(int status, const QString &message);
 
 protected:
     virtual bool event(QEvent *event) override;
