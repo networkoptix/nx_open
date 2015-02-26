@@ -179,9 +179,14 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
 
 void QnStorageManager::initDone()
 {
+    m_catalogLoaded = true;
+    m_rebuildProgress = 1.0;
+
     m_initInProgress = false;
-    for(const QnStorageResourcePtr& storage: getStorages())
-        addDataFromDatabase(storage);
+    for(const QnStorageResourcePtr& storage: getStorages()) {
+        if (storage->getStatus() == Qn::Online)
+            addDataFromDatabase(storage);
+    }
     disconnect(qnResPool);
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
@@ -276,8 +281,10 @@ void QnStorageManager::rebuildCatalogIndexInternal()
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     }
 
-    for (const QnStorageResourcePtr& storage: m_storageRoots.values())
-        loadFullFileCatalog(storage, true, 1.0 / m_storageRoots.size());
+    for (const QnStorageResourcePtr& storage: m_storageRoots.values()) {
+        if (storage->getStatus() == Qn::Online)
+            loadFullFileCatalog(storage, true, 1.0 / m_storageRoots.size());
+    }
 
     m_rebuildState = RebuildState_None;
     m_catalogLoaded = true;
@@ -502,18 +509,21 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         m_storageRoots.insert(storageIndex, storage);
         if (storage->isStorageAvailable())
             storage->setStatus(Qn::Online);
+        else
+            storage->setStatus(Qn::Offline);
 
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), 
                 this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
     }
-#if 0
-    if (m_catalogLoaded) 
-    {
-        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
-            doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i));
+#if 1
+    if (m_catalogLoaded && storage->getStatus() == Qn::Online) {
+        doMigrateCSVCatalog();
+        addDataFromDatabase(storage);
     }
+#else
+    if (storage->getStatus() == Qn::Online)
+        loadFullFileCatalog(storage);
 #endif
-    loadFullFileCatalog(storage);
     updateStorageStatistics();
 }
 
@@ -979,11 +989,17 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
-    QMutexLocker lock(&m_mutexStorages);
+    //QMutexLocker lock(&m_mutexStorages);
+    if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
+        // add data before storage goes to the writable state
+        doMigrateCSVCatalog(fileStorage);
+        addDataFromDatabase(fileStorage);
+    }
+
     fileStorage->setStatus(status);
-    m_storagesStatisticsReady = false;
     if (status == Qn::Offline)
         emit storageFailure(fileStorage, QnBusiness::StorageIoErrorReason);
+    m_storagesStatisticsReady = false;
 }
 
 void QnStorageManager::testOfflineStorages()
@@ -1301,15 +1317,14 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
 
 // data migration from previous versions
 
-void QnStorageManager::doMigrateCSVCatalog() {
+void QnStorageManager::doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage) {
     for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
-        doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i));
-    m_catalogLoaded = true;
-    m_rebuildProgress = 1.0;
+        doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i), extraAllowedStorage);
 }
 
 QnStorageResourcePtr QnStorageManager::findStorageByOldIndex(int oldIndex)
 {
+    QMutexLocker lock(&m_mutexCatalog);
     for(auto itr = m_oldStorageIndexes.begin(); itr != m_oldStorageIndexes.end(); ++itr)
     {
         for(int idx: itr.value())
@@ -1354,8 +1369,10 @@ void QnStorageManager::backupFolderRecursive(const QString& srcDir, const QStrin
     }
 }
 
-void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType)
+void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, QnStorageResourcePtr extraAllowedStorage)
 {
+    QMutexLocker lock(&m_csvMigrationMutex);
+
     QString base = closeDirPath(getDataDirectory());
     QString separator = getPathSeparator(base);
     backupFolderRecursive(base + lit("record_catalog"), base + lit("record_catalog_backup"));
@@ -1367,11 +1384,13 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType)
         DeviceFileCatalogPtr catalogFile(new DeviceFileCatalog(mac, catalogType));
         QString catalogName = closeDirPath(fi.absoluteFilePath()) + lit("title.csv");
         QVector<DeviceFileCatalog::Chunk> notMigratedChunks;
-        if (catalogFile->fromCSVFile(catalogName)) 
+        if (catalogFile->fromCSVFile(catalogName))
         {
             for(const DeviceFileCatalog::Chunk& chunk: catalogFile->m_chunks) 
             {
                 QnStorageResourcePtr storage = findStorageByOldIndex(chunk.storageIndex);
+                if (storage && storage != extraAllowedStorage && storage->getStatus() != Qn::Online)
+                    storage.clear();
                 QnStorageDbPtr sdb = storage ? getSDB(storage) : QnStorageDbPtr();
                 if (sdb)
                     sdb->addRecord(mac, catalogType, chunk);
