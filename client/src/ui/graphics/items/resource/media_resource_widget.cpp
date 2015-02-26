@@ -823,6 +823,7 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
+    QnPtzObject activeObject;
 
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;

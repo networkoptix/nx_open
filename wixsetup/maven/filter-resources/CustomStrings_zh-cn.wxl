@@ -141,7 +141,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">发现已安装版本</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">安装方式</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">系统将开始更新！</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">您的数据库被破坏，无法恢复。新的数据库已经安装。要访问该系统请使用登录名“admin”和密码“admin”。请在首次登录后更改凭据。</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">您的数据库被破坏，无法恢复。新的数据库已经安装。要访问该系统请使用登录名“admin”和密码“123”。请在首次登录后更改凭据。</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">不能连接到windows防火墙。  ([2]   [3]   [4]   [5])</String>    

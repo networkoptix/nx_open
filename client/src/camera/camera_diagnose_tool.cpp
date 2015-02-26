@@ -96,8 +96,19 @@ namespace CameraDiagnostics
         emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
 
         emit diagnosticsStepStarted( static_cast<Step::Value>(m_step+1) );
-        m_serverConnection->doCameraDiagnosticsStepAsync( m_cameraID, static_cast<Step::Value>(m_step+1),
-            this, SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) );
+        if( m_serverConnection->doCameraDiagnosticsStepAsync(
+                m_cameraID,
+                static_cast<Step::Value>(m_step+1),
+                this,
+                SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) ) == -1 )
+        {
+            m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
+
+            m_result = false;
+            emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
+            m_state = sDone;
+            emit diagnosticsDone( m_step, m_result, m_errorMessage );
+        }
     }
 
     void DiagnoseTool::onCameraDiagnosticsStepResponse( int status, QnCameraDiagnosticsReply reply, int /*handle*/ )
@@ -145,26 +156,37 @@ namespace CameraDiagnostics
         }
 
         m_step = nextStep;
-
-        m_serverConnection->doCameraDiagnosticsStepAsync( m_cameraID, m_step,
-            this, SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) );
         emit diagnosticsStepStarted( m_step );
+
+        if( m_serverConnection->doCameraDiagnosticsStepAsync(
+                m_cameraID,
+                m_step,
+                this,
+                SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) ) == -1 )
+        {
+            m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
+
+            m_result = false;
+            emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
+            m_state = sDone;
+            emit diagnosticsDone( m_step, m_result, m_errorMessage );
+        }
     }
 
     void DiagnoseTool::doMediaServerAvailabilityStep()
     {
         emit diagnosticsStepStarted( m_step );
 
-        if( !m_serverConnection )
+        if( !m_serverConnection ||
+            m_serverConnection->getSystemNameAsync(
+                this,
+                SLOT(onGetServerSystemNameResponse(int, QString, int)) ) == -1 )
         {
             m_errorMessage = tr("No connection to Server %1.").arg(m_serverHostAddress);
             m_result = false;
             emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
             m_state = sDone;
             emit diagnosticsDone( m_step, m_result, m_errorMessage );
-            return;
         }
-
-        m_serverConnection->getSystemNameAsync( this, SLOT(onGetServerSystemNameResponse(int, QString, int)) );
     }
 }

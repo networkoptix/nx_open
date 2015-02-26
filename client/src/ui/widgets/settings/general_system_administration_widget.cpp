@@ -10,6 +10,8 @@
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget *parent /*= NULL*/):
     base_type(parent),
@@ -17,6 +19,11 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     ui(new Ui::GeneralSystemAdministrationWidget)
 {
     ui->setupUi(this);
+
+    setHelpTopic(ui->businessRulesButton,   Qn::EventsActions_Help);
+    setHelpTopic(ui->cameraListButton,      Qn::Administration_General_CamerasList_Help);
+    setHelpTopic(ui->eventLogButton,        Qn::EventLog_Help);
+    setHelpTopic(ui->healthMonitorButton,   Qn::Administration_General_HealthMonitoring_Help);
 
     connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
     connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );

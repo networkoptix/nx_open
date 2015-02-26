@@ -12,6 +12,8 @@
 #include <ui/widgets/settings/general_system_administration_widget.h>
 #include <ui/widgets/server_updates_widget.h>
 #include <ui/widgets/routing_management_widget.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -23,6 +25,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnSystemAdministrationDialog>(this))
 {
     ui->setupUi(this);
+    setHelpTopic(this, Qn::Administration_Help);
 
     m_updatesWidget = new QnServerUpdatesWidget(this);
 

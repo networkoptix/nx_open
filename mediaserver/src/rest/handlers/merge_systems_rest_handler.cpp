@@ -171,12 +171,14 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     authenticator.setUser(user);
     authenticator.setPassword(password);
 
+    QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
+
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     /* Change system name of the selected server */
     if (oneServer) {
         CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
         CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&sysIdTime=%2&tranLogTime=%3")
-            .arg(qnCommon->localSystemName())
+            .arg(systemName)
             .arg(qnCommon->systemIdentityTime())
             .arg(ec2Connection->getTransactionLogTime()));
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
@@ -202,7 +204,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
         authenticator.setPassword(currentPassword);
         CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
         CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true&sysIdTime=%2&tranLogTime=%3")
-            .arg(qnCommon->localSystemName())
+            .arg(systemName)
             .arg(qnCommon->systemIdentityTime())
             .arg(ec2Connection->getTransactionLogTime()));
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)

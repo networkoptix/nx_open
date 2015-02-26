@@ -132,10 +132,7 @@ void QnWeekTimeScheduleDialog::updateGridParams(bool fromUserInput)
 
 void QnWeekTimeScheduleDialog::updateColors() {
     ui->valueOnButton->setColor(ui->gridWidget->colors().recordAlways);
-    ui->valueOnButton->setCheckedColor(ui->gridWidget->colors().recordAlways.lighter());
-
     ui->valueOffButton->setColor(ui->gridWidget->colors().recordNever);
-    ui->valueOffButton->setCheckedColor(ui->gridWidget->colors().recordNever.lighter());
 }
 
 // -------------------------------------------------------------------------- //

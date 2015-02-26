@@ -36,6 +36,7 @@
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "restype_xml_parser.h"
+#include "business/business_event_rule.h"
 
 using std::nullptr_t;
 
@@ -241,7 +242,7 @@ bool QnDbManager::QnDbTransactionExt::commit()
         m_mutex.unlock();
     }
     else {
-        qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
+        qWarning() << "Commit failed to database" << m_database.databaseName() << "error:"  << m_database.lastError(); // do not unlock mutex. Rollback is expected
     }
     return rez;
 }
@@ -303,6 +304,36 @@ bool QnDbManager::migrateServerGUID(const QString& table, const QString& field)
     return true;
 }
 
+static std::array<QString, 3> DB_POSTFIX_LIST = 
+{
+    QLatin1String(""),
+    QLatin1String("-shm"),
+    QLatin1String("-wal")
+};
+
+bool removeDbFile(const QString& dbFileName)
+{
+    for(const QString& postfix: DB_POSTFIX_LIST) {
+        if (!removeFile(dbFileName + postfix))
+            return false;
+    }
+    return true;
+}
+
+bool createCorruptedDbBackup(const QString& dbFileName)
+{
+    QString newFileName = dbFileName.left(dbFileName.lastIndexOf(L'.') + 1) + lit("corrupted.sqlite");
+    if (!removeDbFile(newFileName))
+        return false;
+    for(const QString& postfix: DB_POSTFIX_LIST)
+    {
+        if (QFile::exists(dbFileName + postfix) && !QFile::copy(dbFileName + postfix, newFileName + postfix))
+            return false;
+    }
+
+    return true;
+}
+
 bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 {
     m_resourceFactory = factory;
@@ -317,11 +348,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");
     if (QFile::exists(backupDbFileName) || needCleanup) 
     {
-        if (!removeFile(dbFileName))
-            return false;
-        if (!removeFile(dbFileName + lit("-shm")))
-            return false;
-        if (!removeFile(dbFileName + lit("-wal")))
+        if (!removeDbFile(dbFileName))
             return false;
         if (QFile::exists(backupDbFileName)) 
         {
@@ -373,8 +400,18 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     }
 
     //tuning DB
-    if( !tuneDBAfterOpen() )
+    if( !tuneDBAfterOpen() ) 
+    {
+        m_sdb.close();
+        qWarning() << "Corrupted database file " << m_sdb.databaseName() << "!";
+        if (!createCorruptedDbBackup(dbFileName)) {
+            qWarning() << "Can't create database backup before removing file";
+            return false;
+        }
+        if (!removeDbFile(dbFileName))
+            qWarning() << "Can't delete corrupted database file " << m_sdb.databaseName();
         return false;
+    }
 
     if( !createDatabase() )
     {
@@ -1148,6 +1185,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/31_move_group_name_to_user_attrs.sql")) {
         m_needResyncCameraUserAttributes = true;
+    }
+    else if (updateName == lit(":/updates/32_default_business_rules.sql")) {
+        for(const auto& bRule: QnBusinessEventRule::getSystemRules())
+        {
+            ApiBusinessRuleData bRuleData;
+            fromResourceToApi(bRule, bRuleData);
+            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+                return false;
+        }
     }
 
     return true;

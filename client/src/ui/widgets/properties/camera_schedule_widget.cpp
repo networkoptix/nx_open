@@ -160,6 +160,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHighest), Qn::QualityHighest);
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
 
+    setHelpTopic(ui->archiveGroupBox, Qn::CameraSettings_Recording_ArchiveLength_Help);
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     // init buttons
@@ -759,17 +760,10 @@ void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled) {
 
 void QnCameraScheduleWidget::updateColors() {
     ui->recordAlwaysButton->setColor(ui->gridWidget->colors().recordAlways);
-    ui->recordAlwaysButton->setCheckedColor(ui->gridWidget->colors().recordAlways.lighter());
-
     ui->recordMotionButton->setColor(ui->gridWidget->colors().recordMotion);
-    ui->recordMotionButton->setCheckedColor(ui->gridWidget->colors().recordMotion.lighter());
-
     ui->recordMotionPlusLQButton->setColor(ui->gridWidget->colors().recordMotion);
-    ui->recordMotionPlusLQButton->setCheckedColor(ui->gridWidget->colors().recordMotion.lighter());
     ui->recordMotionPlusLQButton->setInsideColor(ui->gridWidget->colors().recordAlways);
-
     ui->noRecordButton->setColor(ui->gridWidget->colors().recordNever);
-    ui->noRecordButton->setCheckedColor(ui->gridWidget->colors().recordNever.lighter());
 }
 
 // -------------------------------------------------------------------------- //

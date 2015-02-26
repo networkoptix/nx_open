@@ -103,6 +103,7 @@ void QnPlWatchDogResource::enableOnvifSecondStream()
     // camera rebooting ....
 }
 
+/*
 int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
@@ -122,6 +123,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
 
     return qMax(1024,result);
 }
+*/
 
 QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() 
 {

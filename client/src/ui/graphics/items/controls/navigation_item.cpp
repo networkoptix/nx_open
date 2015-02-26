@@ -116,7 +116,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_timeScrollBar = new QnTimeScrollBar(this);
 
-
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
     navigator()->setTimeScrollBar(m_timeScrollBar);
@@ -274,11 +273,15 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     /* Set help topics. */
     setHelpTopic(this,                  Qn::MainWindow_Playback_Help);
-    setHelpTopic(m_timeSlider,          Qn::MainWindow_Slider_Timeline_Help);
     setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
     setHelpTopic(m_volumeSlider,        Qn::MainWindow_Slider_Volume_Help);
     setHelpTopic(m_muteButton,          Qn::MainWindow_Slider_Volume_Help);
     setHelpTopic(m_liveButton,          Qn::MainWindow_Navigation_Help);
+    setHelpTopic(m_playButton,          Qn::MainWindow_Navigation_Help);
+    setHelpTopic(m_stepBackwardButton,  Qn::MainWindow_Navigation_Help);
+    setHelpTopic(m_stepForwardButton,   Qn::MainWindow_Navigation_Help);
+    setHelpTopic(m_jumpBackwardButton,  Qn::MainWindow_Navigation_Help);
+    setHelpTopic(m_jumpForwardButton,   Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_syncButton,          Qn::MainWindow_Sync_Help);
     setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
     setHelpTopic(m_calendarButton,      Qn::MainWindow_Calendar_Help);

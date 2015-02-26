@@ -252,9 +252,13 @@ bool QnArchiveStreamReader::init()
     }
 
     if (!m_delegate->open(m_resource)) {
-        if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
-            emit jumpOccured(requiredJumpTime); 
-        m_requiredJumpTime = AV_NOPTS_VALUE;
+        if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) {
+            emit jumpOccured(requiredJumpTime);
+            m_jumpMtx.lock();
+            if (m_requiredJumpTime == requiredJumpTime)
+                m_requiredJumpTime = AV_NOPTS_VALUE;
+            m_jumpMtx.unlock();
+        }
         return false;
     }
     m_delegate->setAudioChannel(m_selectedAudioChannel);

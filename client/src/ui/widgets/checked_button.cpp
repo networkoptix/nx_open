@@ -4,46 +4,54 @@
 #include <QtGui/QPainter>
 
 #include "utils/math/color_transformations.h"
-#include <utils/math/linear_combination.h>
+#include "utils/math/linear_combination.h"
+#include "ui/common/geometry.h"
+
+namespace {
+    int lineWidth = 4;
+}
 
 QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked, bool enabled)
 {
     QPixmap result(size, size);
-    result.fill(QColor(Qt::gray));
+    result.fill(Qt::transparent);
 
     QPainter painter(&result);
-    painter.setPen(QColor(Qt::black));
-    
-    QColor brushClr(hovered ? color.lighter() : color);
-    if (!isEnabled())
-        brushClr = toGrayscale(linearCombine(0.5, brushClr, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
-        //brushClr = shiftColor(brushClr, -64, -64, -64);
-    painter.setBrush(brushClr);
-    int offset = checked && enabled ? 4 : 0;
-    painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
+    painter.setRenderHint(QPainter::Antialiasing);
 
-    if (insideColor.toRgb() != color.toRgb()) 
-    {
-        brushClr = QColor(hovered ? insideColor.lighter() : insideColor);
-        if (!isEnabled())
-            brushClr = toGrayscale(linearCombine(0.5, brushClr, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
-            //brushClr = shiftColor(brushClr, -64, -64, -64);
-        painter.setBrush(brushClr);
-        //offset = result.width()/3;
-        //painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
-        QPointF points[6];
+    if (checked || hovered) {
+        QColor penColor = palette().color(isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::Highlight);
+        painter.setPen(QPen(penColor, lineWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        painter.drawRect(QnGeometry::eroded(QRectF(result.rect()), lineWidth / 2.0));
+    }
+    
+    QColor brushColor(color);
+    if (!enabled)
+        brushColor = toGrayscale(linearCombine(0.5, brushColor, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
+
+    painter.fillRect(QnGeometry::eroded(result.rect(), lineWidth * 3 / 2), brushColor);
+
+    if (insideColor.toRgb() != color.toRgb())  {
+        brushColor = insideColor;
+        if (!enabled)
+            brushColor = toGrayscale(linearCombine(0.5, brushColor, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
+        painter.setBrush(brushColor);
+        painter.setPen(QPen(Qt::black, 1));
+
         qreal cellSize = result.width();
-        qreal trOffset = cellSize/6;
-        qreal trSize = cellSize/10;
+        qreal trOffset = cellSize / 6.4 + 0.5;
+        qreal trSize = cellSize / 64.0 * 6.0 - 0.5;
+
+        QPointF points[6];
         points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
         points[1] = QPointF(cellSize - trOffset, trOffset);
-        points[2] = QPointF(cellSize-trOffset, trOffset + trSize);
+        points[2] = QPointF(cellSize - trOffset, trOffset + trSize);
         points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
         points[4] = QPointF(trOffset, cellSize - trOffset);
         points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
+
         painter.drawPolygon(points, 6);
     }
-
 
     painter.end();
 
@@ -51,23 +59,22 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
 }
 
 QnCheckedButton::QnCheckedButton(QWidget* parent): 
-    QToolButton(parent),
-    m_insideColorDefined(false)
+    QToolButton(parent)
 {
     updateIcon();
 }
 
 void QnCheckedButton::updateIcon() {
-    QIcon icon;
-
     const int size = 64;
-    QPixmap normal          = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, false,  false, true);
-    QPixmap normalDisabled  = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, false,  false, false);
-    QPixmap normalHovered   = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, true,   false, true);
+    QColor insideColor = m_insideColor.isValid() ? m_insideColor : m_color;
 
-    QPixmap checked         = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, false,  true, true);
-    QPixmap checkedDisabled = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, false,  true, false);
-    QPixmap checkedHovered  = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, true,   true, true);
+    QPixmap normal          = generatePixmap(size, m_color, insideColor, false,  false, true);
+    QPixmap normalDisabled  = generatePixmap(size, m_color, insideColor, false,  false, false);
+    QPixmap normalHovered   = generatePixmap(size, m_color, insideColor, true,   false, true);
+    QPixmap checked         = normalHovered;
+    QPixmap checkedDisabled = generatePixmap(size, m_color, insideColor, false,  true, false);
+
+    QIcon icon;
 
     icon.addPixmap(normal, QIcon::Normal, QIcon::Off);
     icon.addPixmap(normalDisabled, QIcon::Disabled, QIcon::Off);
@@ -76,7 +83,6 @@ void QnCheckedButton::updateIcon() {
 
     icon.addPixmap(checked, QIcon::Normal, QIcon::On);
     icon.addPixmap(checkedDisabled, QIcon::Disabled, QIcon::On);
-    icon.addPixmap(checkedHovered, QIcon::Active, QIcon::On);
     icon.addPixmap(checked, QIcon::Selected, QIcon::On);
 
     setIcon(icon);
@@ -103,22 +109,6 @@ void QnCheckedButton::setInsideColor(const QColor& color)
         return;
 
     m_insideColor = color;
-    m_insideColorDefined = true;
-
-    updateIcon();
-}
-
-QColor QnCheckedButton::checkedColor() const
-{
-    return m_checkedColor;
-}
-
-void QnCheckedButton::setCheckedColor(const QColor& color)
-{
-    if(m_checkedColor == color)
-        return;
-
-    m_checkedColor = color;
 
     updateIcon();
 }

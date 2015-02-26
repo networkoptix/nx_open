@@ -409,6 +409,7 @@ namespace ec2
                                 0 );
                         }
                         lk.unlock();
+                        WhileExecutingDirectCall callGuard( this );
                         emit timeChanged( curSyncTime );
                     }
                 }
@@ -438,6 +439,7 @@ namespace ec2
         peerSystemTimeReceivedNonSafe( tran.params );
 
         lk.unlock();
+        WhileExecutingDirectCall callGuard( this );
         emit peerTimeChanged( tran.params.peerID, getSyncTime(), tran.params.peerSysTime );
     }
 
@@ -449,6 +451,7 @@ namespace ec2
                 QMutexLocker lk( &m_mutex );
                 peerSystemTimeReceivedNonSafe( data );
             }
+            WhileExecutingDirectCall callGuard( this );
             emit peerTimeChanged( data.peerID, getSyncTime(), data.peerSysTime );
         }
     }
@@ -569,7 +572,10 @@ namespace ec2
             }
         }
         lock->unlock();
-        emit timeChanged( curSyncTime );
+        {
+            WhileExecutingDirectCall callGuard( this );
+            emit timeChanged( curSyncTime );
+        }
         lock->relock();
     }
 
@@ -700,6 +706,7 @@ namespace ec2
             ((peersByTimePriorityFlags.cbegin()->first & peerTimeSynchronizedWithInternetServer) == 0) )    //those servers do not have internet access
 #endif
         {
+            WhileExecutingDirectCall callGuard( this );
             //multiple peers have same priority, user selection is required
             emit primaryTimeServerSelectionRequired();
         }

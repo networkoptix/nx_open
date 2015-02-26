@@ -70,13 +70,13 @@ namespace {
 
 struct LicenseTypeInfo
 {
-    LicenseTypeInfo(): licenseType(Qn::LC_Count), allowedForEdge(0) {}
-    LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& className, bool allowedForEdge):
-        licenseType(licenseType), className(className), allowedForEdge(allowedForEdge) {}
+    LicenseTypeInfo(): licenseType(Qn::LC_Count), allowedForARM(0) {}
+    LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& className, bool allowedForARM):
+        licenseType(licenseType), className(className), allowedForARM(allowedForARM) {}
 
     Qn::LicenseType licenseType;
     QnLatin1Array className;
-    bool allowedForEdge;
+    bool allowedForARM;
 };
 
 static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
@@ -270,20 +270,9 @@ bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
     return errorCode == NoError;
 }
 
-bool checkForEdgeBox(const QString& value)
+bool checkForARMBox(const QString& value)
 {
-    const char* EDGE_BOXES[] = {
-        "isd",
-        "isd_s2",
-        "rpi"
-    };
-    QByteArray box = value.toUtf8().toLower().trimmed();
-    for (size_t i = 0; i < sizeof(EDGE_BOXES) / sizeof(char*); ++i)
-    {
-        if (box == EDGE_BOXES[i])
-            return true;
-    }
-    return false;
+    return !value.isEmpty();
 }
 
 /* 
@@ -306,9 +295,9 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
         return gotError(errCode, Expired);
     
-    bool isEdgeBox = checkForEdgeBox(info.data.box);
-    if (isEdgeBox && !licenseTypeInfo[type()].allowedForEdge)
-        return gotError(errCode, InvalidType); // strict allowed license type for EDGE devices
+    bool isArmBox = checkForARMBox(info.data.box);
+    if (isArmBox && !licenseTypeInfo[type()].allowedForARM)
+        return gotError(errCode, InvalidType); // strict allowed license type for ARM devices
 #if 0
     if (isEdgeBox && type() == Qn::LC_Edge) 
     {

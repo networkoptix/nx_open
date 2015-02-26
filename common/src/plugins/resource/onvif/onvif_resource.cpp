@@ -1528,9 +1528,14 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         renewSubsciptionTimeoutSec = *response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime;
     else
         renewSubsciptionTimeoutSec = DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
-    using namespace std::placeholders;
+
+    if( m_renewSubscriptionTimerID )
+    {
+        TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
+        m_renewSubscriptionTimerID = 0;
+    }
     m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
+        std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, std::placeholders::_1),
         (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
             : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
@@ -2431,6 +2436,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
         return;
     if( timerID != m_renewSubscriptionTimerID )
         return;
+    m_renewSubscriptionTimerID = 0;
 
     const QAuthenticator& auth = getAuth();
     SubscriptionManagerSoapWrapper soapWrapper(
@@ -2840,6 +2846,12 @@ bool QnPlOnvifResource::createPullPointSubscription()
     {
         //NOTE: renewing session does not work on vista
         using namespace std::placeholders;
+        if( m_renewSubscriptionTimerID )
+        {
+            TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
+            m_renewSubscriptionTimerID = 0;
+        }
+
         m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
             (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
@@ -2994,6 +3006,12 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
 {
+    auto SCOPED_GUARD_FUNC = [this]( QnPlOnvifResource* ){
+        m_asyncPullMessagesCallWrapper.clear();
+    };
+    std::unique_ptr<QnPlOnvifResource, decltype(SCOPED_GUARD_FUNC)>
+        SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+
     if( resultCode != SOAP_OK && resultCode != SOAP_MUSTUNDERSTAND )
     {
         NX_LOG( lit("Failed to pull messages in NotificationProducer. endpoint %1, result code %2").
@@ -3006,10 +3024,19 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         if( !m_inputMonitored )
             return;
 
+        if( m_renewSubscriptionTimerID )
+        {
+            TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
+            m_renewSubscriptionTimerID = 0;
+        }
+
         m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
-            [this]( qint64 /*timerID*/ )
+            [this]( qint64 timerID )
             {
                 QMutexLocker lk(&m_ioPortMutex);
+                if( timerID != m_renewSubscriptionTimerID )
+                    return;
+                m_renewSubscriptionTimerID = 0;
                 if( !m_inputMonitored )
                     return;
                 lk.unlock();
@@ -3017,7 +3044,6 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
                 removePullPointSubscription();
                 createPullPointSubscription();
                 lk.relock();
-                m_renewSubscriptionTimerID = 0;
             },
             0 );
         return;
@@ -3036,8 +3062,6 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
-
-    m_asyncPullMessagesCallWrapper.clear();
 }
 
 void QnPlOnvifResource::onPullMessagesResponseReceived(

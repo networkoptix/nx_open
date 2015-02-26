@@ -291,7 +291,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
-    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()));
+    /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
+    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -1152,15 +1153,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     url.setPassword(QString());
     url.setScheme(lit("http"));
     url.setPath(lit("/static/index.html"));
-
-    const QNetworkProxy &proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);
-    if (proxy.type() == QNetworkProxy::HttpProxy) {
-        QUrlQuery query(url.query());
-        query.addQueryItem(lit("proxy"), server->getId().toString());
-        url.setQuery(query);
-        url.setHost(proxy.hostName());
-        url.setPort(proxy.port());
-    }
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
     QDesktopServices::openUrl(url);
 }
 
@@ -1525,9 +1518,6 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
     QUrl url = server->getApiUrl();
     url.setScheme(lit("http"));
-    //url.setPath(lit("/static/index.html"));
-    //url.setFragment(lit("/log")); // add hashtag postfix. It's required for our web page java script
-    //url.setQuery(lit("lines=1000"));
     url.setPath(lit("/api/showLog"));
 
     QString login = QnAppServerConnectionFactory::url().userName();
@@ -1536,13 +1526,8 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     urlQuery.addQueryItem(lit("auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(login, password)));
     urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
     url.setQuery(urlQuery);
-    
-    
-    //setting credentials for access to resource
-    //url.setUserName(QnAppServerConnectionFactory::url().userName());
-    //url.setPassword(QnAppServerConnectionFactory::url().password());
-
-    QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server);
+    QDesktopServices::openUrl(url);
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
@@ -1888,9 +1873,23 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if (moreResourceToDelete.isEmpty())
         return;
     
+    int helpId = -1;
+    for (const QnResourcePtr &resource: resources) {
+        if (resource->hasFlags(Qn::live_cam)) {
+            helpId = Qn::DeletingCamera_Help;
+            break;
+        }
+        if (resource->hasFlags(Qn::layout)) {
+            helpId = Qn::DeletingLayout_Help;
+            /* We don't break here because camera could be in the list,
+             * and camera has a preference. */
+        }
+    }
+
     QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
         mainWindow(),
         resources,
+        helpId,
         tr("Delete Resources"),
         question,
         QDialogButtonBox::Yes | QDialogButtonBox::No
@@ -2428,13 +2427,13 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please update all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
-    QScopedPointer<QnWorkbenchStateDependentDialog<QMessageBox> > messageBox(
-        new QnWorkbenchStateDependentDialog<QMessageBox>(mainWindow()));
+    QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
+        new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
     messageBox->setIcon(QMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);
     messageBox->setStandardButtons(QMessageBox::Cancel);
-    setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
+    setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Update..."), QMessageBox::HelpRole);
     connect(updateButton, &QPushButton::clicked, this, [this] {
