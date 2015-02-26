@@ -18,6 +18,8 @@
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
 
+#include <platform/monitoring/global_monitor.h>
+#include <platform/platform_abstraction.h>
 #include <plugins/resource/server_archive/dualquality_helper.h>
 
 #include "plugins/storage/file_storage/file_storage_resource.h"
@@ -27,6 +29,7 @@
 #include "utils/common/synctime.h"
 #include "motion/motion_helper.h"
 #include "common/common_module.h"
+
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -386,6 +389,35 @@ int QnStorageManager::detectStorageIndex(const QString& p)
     }
 }
 
+static QString getDBPath( const QnStorageResourcePtr& storage )
+{
+#ifdef _WIN32
+    return storage->getPath();
+#else
+    //On linux, sqlite db cannot be safely placed on a network partition due to lock problem
+        //So, for such storages creating DB in data dir
+
+    QString storagePath = storage->getPath();
+
+    QList<QnPlatformMonitor::PartitionSpace> partitions = 
+        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
+            QnPlatformMonitor::NetworkPartition );
+
+    for( const QnPlatformMonitor::PartitionSpace& partition: partitions )
+    {
+        if( !storagePath.startsWith( partition.path ) )
+            continue;
+
+        storagePath = QDir(getDataDirectory() + "/storage_db/" +
+            QCryptographicHash::hash(storagePath.toLatin1(), QCryptographicHash::Md5).toHex()).absolutePath();
+        QDir().mkpath( storagePath );
+        return storagePath;
+    }
+
+    return storagePath;
+#endif
+}
+
 QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 {
     QMutexLocker lock(&m_sdbMutex);
@@ -395,8 +427,9 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
         QString simplifiedGUID = qnCommon->moduleGUID().toString();
         simplifiedGUID = simplifiedGUID.replace("{", "");
         simplifiedGUID = simplifiedGUID.replace("}", "");
-        QString fileName = closeDirPath(storage->getPath()) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
-        QString oldFileName = closeDirPath(storage->getPath()) + QString::fromLatin1("media.sqlite");
+        const QString& dbPath = getDBPath(storage);
+        QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+        QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
         if (QFile::exists(oldFileName) && !QFile::exists(fileName))
             QFile::rename(oldFileName, fileName);
 
