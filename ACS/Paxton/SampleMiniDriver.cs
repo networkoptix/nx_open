@@ -23,6 +23,7 @@ namespace Company.Product.OemDvrMiniDriver {
     public class SampleMiniDriver : IOemDvrMiniDriver {
         private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private AxAxHDWitness axAxHDWitness1;
+        private Panel m_surface;
         private OemDvrCamera[] _cameras;
 
         private long _tick;
@@ -215,6 +216,7 @@ namespace Company.Product.OemDvrMiniDriver {
         }
 
         private void Load(Panel pbSurface, Uri url) {
+            m_surface = pbSurface;
             pbSurface.Resize += PbSurfaceResize;
 
             // System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager();
@@ -251,12 +253,15 @@ namespace Company.Product.OemDvrMiniDriver {
         }
 
         void axAxHDWitness1_connectedProcessed(object sender, EventArgs e) {
-            // MessageBox.Show("Connect Processed");
-
+            var cameraIds = new List<string>();
             foreach (OemDvrCamera camera in _cameras) {
-                axAxHDWitness1.addResourcesToLayout(camera.CameraId, _tick);
+                cameraIds.Add(camera.CameraId);
             }
+            axAxHDWitness1.addResourcesToLayout(String.Join("|", cameraIds), _tick);
 
+            short vidWidth = Convert.ToInt16(m_surface.Width);
+            short vidHeight = Convert.ToInt16(m_surface.Height);
+            this.axAxHDWitness1.SetBounds(0, 0, vidWidth, vidHeight);
         }
 
         private void Play() {

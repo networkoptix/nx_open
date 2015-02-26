@@ -179,7 +179,7 @@ bool AxHDWitness::event(QEvent *event) {
             mainLayout->addWidget(m_mainWindow);
             setLayout(mainLayout);
 
-            QMetaObject::invokeMethod(m_mainWindow, "showFullScreen", Qt::QueuedConnection);
+            QTimer::singleShot(1, m_mainWindow, SLOT(showFullScreen()));
         }
         break;
     }
@@ -595,7 +595,7 @@ void AxHDWitness::createMainWindow() {
     m_mainWindow = new QnMainWindow(m_context.data());
     m_mainWindow->setOptions(m_mainWindow->options() & ~(QnMainWindow::TitleBarDraggable | QnMainWindow::WindowButtonsVisible));
 
-    m_mainWindow->setMinimumSize(320, 240);
+    m_mainWindow->resize(100, 100);
     m_context->setMainWindow(m_mainWindow);
 
 #ifdef _DEBUG
