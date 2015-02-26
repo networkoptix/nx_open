@@ -1324,7 +1324,6 @@ void QnStorageManager::doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStor
 
 QnStorageResourcePtr QnStorageManager::findStorageByOldIndex(int oldIndex)
 {
-    QMutexLocker lock(&m_mutexCatalog);
     for(auto itr = m_oldStorageIndexes.begin(); itr != m_oldStorageIndexes.end(); ++itr)
     {
         for(int idx: itr.value())
