@@ -1347,11 +1347,26 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                 QnStorageResourcePtr storage = findStorageByOldIndex(chunk.storageIndex);
                 if (storage && storage != extraAllowedStorage && storage->getStatus() != Qn::Online)
                     storage.clear();
+
                 QnStorageDbPtr sdb = storage ? getSDB(storage) : QnStorageDbPtr();
-                if (sdb)
-                    sdb->addRecord(mac, catalogType, chunk);
-                else
+                if (sdb) 
+                {
+                    if (catalogFile->csvMigrationCheckFile(chunk, storage)) 
+                    {
+                        if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
+                        {
+                            const QString fileName = catalogFile->fullFileName(chunk);
+                            qWarning() << "File " << fileName << "has invalid duration " << chunk.durationMs/1000.0 << "s and corrupted. Delete file from catalog";
+                            storage->removeFile(fileName);
+                        }
+                        else {
+                            sdb->addRecord(mac, catalogType, chunk);
+                        }
+                    }
+                }
+                else {
                     notMigratedChunks << chunk;
+                }
             }
             {
                 QMutexLocker lock(&m_sdbMutex);
