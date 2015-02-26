@@ -314,12 +314,9 @@ void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, qint64 timestam
     if (resources.isEmpty())
         return;
 
-    QnActionParameters parameters;
-
-    parameters.setArgument(Qn::ItemTimeRole, timestamp);
-    parameters.setResources(resources);
     m_context->menu()->trigger(Qn::OpenNewTabAction);
-    m_context->menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
+    m_context->menu()->trigger(Qn::SetCurrentLayoutItemSpacing0Action);
+    m_context->menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resources).withArgument(Qn::ItemTimeRole, timestamp));
 }
 
 void AxHDWitness::removeFromCurrentLayout(const QString &uniqueId) {
@@ -335,7 +332,7 @@ QString AxHDWitness::resourceListXml() {
     writer.writeStartDocument();
     writer.writeStartElement(QLatin1String("resources"));
 
-    foreach(const QnResourcePtr &resource, m_context->resourcePool()->getResources()) {
+    for(const QnResourcePtr &resource: m_context->resourcePool()->getResources()) {
         QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
         if(!mediaResource)
             continue;
