@@ -104,8 +104,6 @@ namespace Company.Product.OemDvrMiniDriver {
         /// <returns>The completion status of the request.</returns>
         public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
             try {
-                MessageBox.Show("Penis");
-
                 //DateTime dt = new DateTime( 2014 ,5, 21 , 19 ,30 , 30);
                 _tick = (long)((pbInfo.StartTimeUtc.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds);
                 Uri hostUrl = new Uri(cnInfo.HostName);
