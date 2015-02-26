@@ -30,8 +30,12 @@ static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
 
 static RtpTransport::Value defaultTransportToUse( RtpTransport::_auto );
 
-QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
+QnMulticodecRtpReader::QnMulticodecRtpReader(
+    const QnResourcePtr& res,
+    std::unique_ptr<AbstractStreamSocket> tcpSock )
+:
     QnResourceConsumer(res),
+    m_RtpSession(std::move(tcpSock)),
     m_timeHelper(res->getUniqueId()),
     m_pleaseStop(false),
     m_gotSomeFrame(false),

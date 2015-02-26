@@ -1,6 +1,7 @@
 #ifndef rtp_session_h_1935_h
 #define rtp_session_h_1935_h
 
+#include <fstream>
 #include <memory>
 #include <vector>
 
@@ -21,6 +22,7 @@ extern "C"
 #include <network/authenticate_helper.h>
 
 //#define DEBUG_TIMINGS
+//#define _DUMP_STREAM
 
 class RTPSession;
 
@@ -183,7 +185,7 @@ public:
     //typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
     typedef QVector<QSharedPointer<SDPTrackInfo> > TrackMap;
 
-    RTPSession();
+    RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
     ~RTPSession();
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
@@ -381,6 +383,11 @@ private:
     int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
     mutable QMutex m_sockMutex;
+
+#ifdef _DUMP_STREAM
+    std::ofstream m_inStreamFile;
+    std::ofstream m_outStreamFile;
+#endif
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

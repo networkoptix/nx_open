@@ -3,6 +3,8 @@
 #  include <winsock2.h>
 #endif
 
+#include <atomic>
+
 #include "rtpsession.h"
 #include "rtp_stream_parser.h"
 
@@ -363,8 +365,12 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
 
 static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64*1024;
 
+
+static std::atomic<int> RTPSessionInstanceCounter(0);
+
 // ================================================== RTPSession ==========================================
-RTPSession::RTPSession():
+RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
+:
     m_csec(2),
     //m_rtpIo(*this),
     m_transport(TRANSPORT_UDP),
@@ -380,6 +386,7 @@ RTPSession::RTPSession():
     m_useDigestAuth(false),
     m_numOfPredefinedChannels(0),
     m_TimeOut(0),
+    m_tcpSock(std::move(tcpSock)),
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 )
@@ -387,7 +394,8 @@ RTPSession::RTPSession():
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
 
-    m_tcpSock.reset( SocketFactory::createStreamSocket() );
+    if( !m_tcpSock )
+        m_tcpSock.reset( SocketFactory::createStreamSocket() );
 
     m_additionalReadBuffer = new char[ADDITIONAL_READ_BUFFER_CAPACITY];
 
@@ -589,6 +597,18 @@ void RTPSession::updateResponseStatus(const QByteArray& response)
 
 CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
 {
+#ifdef _DUMP_STREAM
+    const int fileIndex = ++RTPSessionInstanceCounter;
+    std::ostringstream ss;
+    ss<<"C:\\tmp\\12\\in."<<fileIndex;
+    m_inStreamFile.open( ss.str(), std::ios_base::binary );
+    ss.str(std::string());
+    ss<<"C:\\tmp\\12\\out."<<fileIndex;
+    m_outStreamFile.open( ss.str(), std::ios_base::binary );
+#endif
+
+
+
     if ((quint64)startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
     m_SessionId.clear();
@@ -787,6 +807,9 @@ bool RTPSession::sendRequestInternal(nx_http::Request&& request)
     addAdditionAttrs(&request);
     QByteArray requestBuf;
     request.serialize( &requestBuf );
+#ifdef _DUMP_STREAM
+    m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
+#endif
     return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
 }
 
@@ -1328,6 +1351,9 @@ bool RTPSession::sendKeepAlive()
 void RTPSession::sendBynaryResponse(quint8* buffer, int size)
 {
     m_tcpSock->send(buffer, size);
+#ifdef _DUMP_STREAM
+    m_outStreamFile.write( (const char*)buffer, size );
+#endif
 }
 
 
@@ -1755,6 +1781,9 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readS
 #endif
 
         m_additionalReadBufferSize = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
+#ifdef _DUMP_STREAM
+        m_inStreamFile.write( m_additionalReadBuffer, m_additionalReadBufferSize );
+#endif
         m_additionalReadBufferPos = 0;
         if( m_additionalReadBufferSize <= 0 )
             return bufSize == bufSizeBak
@@ -1776,6 +1805,9 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
         request.serialize( &requestBuf );
         if( m_tcpSock->send(requestBuf.constData(), requestBuf.size()) <= 0 )
             return false;
+#ifdef _DUMP_STREAM
+        m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
+#endif
 
         if( !readTextResponce(responseBuf) )
             return false;

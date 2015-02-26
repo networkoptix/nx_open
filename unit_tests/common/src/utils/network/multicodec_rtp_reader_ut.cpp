@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#if 0
+#if 1
 
 #include <fcntl.h>
 #ifdef __linux__
@@ -27,6 +27,8 @@
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/rtpsession.h>
 #include <utils/network/http/httpclient.h>
+
+#include "file_socket.h"
 
 
 static const size_t MAX_BYTES_TO_READ = 25*1024*1024;
@@ -520,20 +522,27 @@ TEST( QnMulticodecRtpReader, rtpParsingPerformance )
     auth.setPassword( "ptth" );
     resource->setAuth( auth );
 
-    std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader( new QnMulticodecRtpReader( resource ) );
-    rtspStreamReader->setRequest( rtspUrl );
-    ASSERT_TRUE( rtspStreamReader->openStream() );
-
-    QElapsedTimer t;
-    t.restart();
     for( ;; )
     {
-        auto frame = rtspStreamReader->getNextData();
-        if( !frame )
+        std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader(
+            new QnMulticodecRtpReader(
+                resource,
+                std::unique_ptr<FileSocket>(new FileSocket("D:\\develop\\problems\\bpi_optimization\\in.1" ))) );
+        rtspStreamReader->setRequest( rtspUrl );
+        ASSERT_TRUE( rtspStreamReader->openStream() );
+
+        QElapsedTimer t;
+        t.restart();
+        for( ;; )
         {
-            std::cerr<<"Failed to get frame from "<<rtspUrl.toStdString()<<std::endl;
-            continue;
+            auto frame = rtspStreamReader->getNextData();
+            if( !frame )
+                break;
         }
+
+        int x = t.elapsed();
+        std::cout<<"Done in "<<x<<"ms"<<std::endl;
+        continue;
     }
 }
 
