@@ -193,9 +193,9 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     
     /* Set up new layout. 
      * 
-     * The fact that new layout is NULL means that we're in destructor, so no
+     * The fact that new layout is m_dummyLayout means that we're in destructor, so no
      * signals should be emitted. */
-    if(m_currentLayout != NULL) {
+    if(m_currentLayout != m_dummyLayout) {
         emit currentLayoutChanged();
 
         connect(m_currentLayout,    SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));

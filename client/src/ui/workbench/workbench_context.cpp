@@ -66,7 +66,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
 
-	if (!(qnSettings->lightMode() & Qn::LightModeNoPopups))
+	if (!qnSettings->isActiveXMode())
 		instance<QnWorkbenchLicenseNotifier>(); // TODO: #Elric belongs here?
 }
 

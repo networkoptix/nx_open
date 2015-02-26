@@ -420,7 +420,7 @@ bool AxHDWitness::doInitialize()
     m_runtimeInfoManager.reset(new QnRuntimeInfoManager());
 	m_serverCameraFactory.reset(new QnServerCameraFactory());
 
-    qnSettings->setLightMode(Qn::LightModeFlags(Qn::LightModeFull & ~Qn::LightModeSingleItem));
+    qnSettings->setLightMode(Qn::LightModeActiveX);
     qnSettings->setActiveXMode(true);
 
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");

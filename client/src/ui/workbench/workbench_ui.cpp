@@ -338,12 +338,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Fps counter. */
     createFpsWidget();
 
-	if (!(qnSettings->lightMode() & Qn::LightModeNoTree)) {
+	if (!qnSettings->isActiveXMode()) {
 		/* Tree panel. */
 		createTreeWidget();
 	}
 
-	if (!(qnSettings->lightMode() & Qn::LightModeNoTitle)) {
+	if (!qnSettings->isActiveXMode()) {
 		/* Title bar. */
 		createTitleWidget();
 	}
@@ -1307,6 +1307,9 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
 }
 
 void QnWorkbenchUi::updateTitleOpacity(bool animate) {
+    if (!m_titleItem)
+        return;
+
     if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
         qreal opacity = m_titleVisible ? opaque : hidden;
         setTitleOpacity(opacity, opacity, false);

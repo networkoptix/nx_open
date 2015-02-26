@@ -563,7 +563,7 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-	if (!(qnSettings->lightMode() & Qn::LightModeNoPopups)) {
+	if (!qnSettings->isActiveXMode()) {
 		if (!user) {
 	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 			return;
