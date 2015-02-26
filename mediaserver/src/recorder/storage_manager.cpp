@@ -1397,10 +1397,12 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                 else
                     notMigratedChunks << chunk;
             }
-            QMutexLocker lock(&m_sdbMutex);
-            for(const QnStorageDbPtr& sdb: m_chunksDB.values()) {
-                if (sdb)
-                    sdb->flushRecords();
+            {
+                QMutexLocker lock(&m_sdbMutex);
+                for(const QnStorageDbPtr& sdb: m_chunksDB.values()) {
+                    if (sdb)
+                        sdb->flushRecords();
+                }
             }
             QFile::remove(catalogName);
             if (!notMigratedChunks.isEmpty())
