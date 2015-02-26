@@ -2,6 +2,9 @@
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
 #endif
+#ifdef __arm__
+#include <sys/ioctl.h>
+#endif
 
 #include <atomic>
 
@@ -1774,10 +1777,20 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readS
             return bufSizeBak;
 
 #ifdef __arm__
-        //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
-            //Possibly, it is workaround of some other bug somewhere else
-            //This code works only on Raspberry and NX1
-        QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
+        {
+            //TODO #ak Better to find other solution and remove this code.
+                //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
+                //(with nat traversal introduced, not every socket will have handle)
+            int bytesAv = 0;
+            if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) != 0) ||  //socket read buffer size is unknown to us
+                (bytesAv == 0) )    //socket read buffer is empty
+            {
+                //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
+                    //Possibly, it is workaround of some other bug somewhere else
+                    //This code works only on Raspberry and NX1
+                QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
+            }
+        }
 #endif
 
         m_additionalReadBufferSize = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
