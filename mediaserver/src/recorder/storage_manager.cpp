@@ -396,12 +396,20 @@ int QnStorageManager::detectStorageIndex(const QString& p)
     }
 }
 
-static const QString dbRefFileName( QLatin1String("db_ref.guid") );
+static QString getLocalGuid()
+{
+    QString simplifiedGUID = qnCommon->moduleGUID().toString();
+    simplifiedGUID = simplifiedGUID.replace("{", "");
+    simplifiedGUID = simplifiedGUID.replace("}", "");
+    return simplifiedGUID;
+}
+
+static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
 static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
 {
     QString storagePath = storage->getPath();
-    const QString dbRefFilePath = storagePath+"/"+dbRefFileName;
+    const QString dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
 
     QByteArray dbRefGuidStr;
     //checking for file db_ref.guid existence
@@ -469,9 +477,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
     QnStorageDbPtr sdb = m_chunksDB[storage->getPath()];
     if (!sdb) 
     {
-        QString simplifiedGUID = qnCommon->moduleGUID().toString();
-        simplifiedGUID = simplifiedGUID.replace("{", "");
-        simplifiedGUID = simplifiedGUID.replace("}", "");
+        QString simplifiedGUID = getLocalGuid();
         QString dbPath;
         if( !getDBPath(storage, &dbPath) )
         {
