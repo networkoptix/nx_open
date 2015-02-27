@@ -195,7 +195,7 @@ static std::uintptr_t lockedThread = 0;
 
 void MutexLockAnalyzer::beforeMutexDestruction( QnMutex* const mutex )
 {
-    QMutexLocker lk( &m_mutex );
+    QWriteLocker lk( &m_mutex );
 
     lockedThread = QnLongRunnable::currentThreadSystemId();
 
@@ -204,12 +204,23 @@ void MutexLockAnalyzer::beforeMutexDestruction( QnMutex* const mutex )
 
 void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition )
 {
-    QMutexLocker lk( &m_mutex );
-
+    QReadLocker readLock( &m_mutex );
     lockedThread = QnLongRunnable::currentThreadSystemId();
 
     const std::uintptr_t curThreadID = QnLongRunnable::currentThreadSystemId();
-    ThreadContext& threadContext = m_threadContext[curThreadID];
+    auto iter = m_threadContext.lower_bound( curThreadID );
+    if( (iter == m_threadContext.end()) || (iter->first != curThreadID) )
+    {
+        //inserting new record
+        readLock.unlock();
+        {
+            QWriteLocker writeLock( &m_mutex );
+            iter = m_threadContext.emplace_hint( iter, curThreadID, ThreadContext() );
+        }
+        readLock.relock();
+    }
+
+    ThreadContext& threadContext = iter->second;
     
     if( threadContext.currentLockPath.empty() )
     {
@@ -232,7 +243,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
             "    %1\n").
             arg(pathToString(threadContext.currentLockPath.crbegin(), threadContext.currentLockPath.crend()));
 
-        lk.unlock();
+        readLock.unlock();
 
         NX_LOG( deadLockMsg, cl_logALWAYS );
         std::cerr<<deadLockMsg.toStdString()<<std::endl;
@@ -293,7 +304,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
                 arg(pathToString(edgesTravelled)).
                 arg(pathToString(threadContext.currentLockPath.crbegin(), threadContext.currentLockPath.crend()));
 
-            lk.unlock();
+            readLock.unlock();
 
             NX_LOG( deadLockMsg, cl_logALWAYS );
             std::cerr<<deadLockMsg.toStdString()<<std::endl;
@@ -301,6 +312,10 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
         }
         
     }
+
+    //upgrading lock
+    readLock.unlock();
+    QWriteLocker writeLock( &m_mutex );
 
     //OK to add edge
     std::pair<LockGraphEdgeData*, bool> p = m_lockDigraph.addEdge(
@@ -310,7 +325,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
 void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPosition )
 {
-    QMutexLocker lk( &m_mutex );
+    QWriteLocker lk( &m_mutex );
 
     lockedThread = QnLongRunnable::currentThreadSystemId();
 

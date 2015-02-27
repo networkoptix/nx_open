@@ -12,7 +12,7 @@
 #include <deque>
 #include <map>
 
-#include <QtCore/QMutex>
+#include <QtCore/QReadWriteLock>
 #include <QtCore/QString>
 
 #include <utils/math/digraph.h>
@@ -176,7 +176,7 @@ private:
 
     typedef Digraph<QnMutex*, LockGraphEdgeData> MutexLockDigraph;
 
-    mutable QMutex m_mutex;
+    mutable QReadWriteLock m_mutex;
     MutexLockDigraph m_lockDigraph;
     //!map<threadId, stack<mutex lock position>>
     std::map<std::uintptr_t, ThreadContext> m_threadContext;
