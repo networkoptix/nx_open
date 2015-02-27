@@ -24,6 +24,7 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/media_resource.h"
 #include "core/resource/network_resource.h"
+#include <core/resource/user_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
 
@@ -76,6 +77,8 @@
 
 #include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench_display.h"
+#include <ui/graphics/items/controls/time_slider.h>
+
 #include "ui/workaround/fglrx_full_screen.h"
 #include <QtCore/private/qthread_p.h>
 
@@ -304,6 +307,9 @@ void AxHDWitness::addResourceToLayout(const QString &uniqueId, qint64 timestamp)
 }
 
 void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, qint64 timestamp) {
+    if (!m_context->user())
+        return;
+
     QnResourceList resources;
     foreach(QString uniqueId, uniqueIds.split(QLatin1Char('|'))) {
         QnResourcePtr resource = m_context->resourcePool()->getResourceByUniqId(uniqueId);
@@ -313,10 +319,21 @@ void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, qint64 timestam
 
     if (resources.isEmpty())
         return;
+    
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    layout->setId(QnUuid::createUuid());
+    layout->setParentId(m_context->user()->getId());
+    layout->setCellSpacing(0, 0);
+    qnResPool->addResource(layout);  
 
-    m_context->menu()->trigger(Qn::OpenNewTabAction);
-    m_context->menu()->trigger(Qn::SetCurrentLayoutItemSpacing0Action);
-    m_context->menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resources).withArgument(Qn::ItemTimeRole, timestamp));
+    QnWorkbenchLayout *wlayout = new QnWorkbenchLayout(layout, this);
+    m_context->workbench()->addLayout(wlayout);
+    m_context->workbench()->setCurrentLayout(wlayout);
+
+     m_context->menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resources).withArgument(Qn::ItemTimeRole, timestamp));
+
+     QnTimePeriod period(timestamp - 10*1000, 20*1000);
+     m_context->navigator()->timeSlider()->setWindow(period.startTimeMs, period.endTimeMs(), false);
 }
 
 void AxHDWitness::removeFromCurrentLayout(const QString &uniqueId) {
