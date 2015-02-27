@@ -42,6 +42,10 @@ QnWorkbenchAccessController::~QnWorkbenchAccessController() {
 }
 
 Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &resource) const {
+    if (resource == m_user)
+        if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
+            return Qn::GlobalViewerPermissions;
+
     if (!m_dataByResource.contains(resource)) {
         Q_ASSERT(resource);
         if (resource && !resource->resourcePool())         /* Calculated permissions should always exist for all resources in the pool. */
@@ -56,14 +60,14 @@ bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, 
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
 
-Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {
-    if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
-        return Qn::GlobalViewerPermissions;
-    
+Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {  
     return globalPermissions(m_user);
 }
 
 Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResourcePtr &user) const {
+    if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
+        return Qn::GlobalViewerPermissions;
+
     Qn::Permissions result(0);
 
     if(!user)

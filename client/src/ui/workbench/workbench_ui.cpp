@@ -279,6 +279,30 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderZoomingOut(false),
     m_lastThumbnailsHeight(48.0),
 
+    m_treeWidget(NULL),
+    m_treeResizerWidget(NULL),
+    m_treeItem(NULL),
+    m_treeBackgroundItem(NULL),
+    m_treeShowButton(NULL),
+    m_treePinButton(NULL),
+    m_treeHidingProcessor(NULL),
+    m_treeShowingProcessor(NULL),
+    m_treeOpacityProcessor(NULL),
+    m_treeOpacityAnimatorGroup(NULL),
+    m_treeXAnimator(NULL),    
+
+    m_titleItem(NULL),
+    m_titleShowButton(NULL),
+    m_mainMenuButton(NULL),
+    m_tabBarWidget(NULL),
+    m_tabBarItem(NULL),
+    m_titleOpacityAnimatorGroup(NULL),
+    m_titleBackgroundItem(NULL),
+    m_titleYAnimator(NULL),
+    m_titleOpacityProcessor(NULL),
+    m_titleRightButtonsLayout(NULL),
+    m_windowButtonsWidget(NULL),
+
     m_notificationsBackgroundItem(NULL),
     m_notificationsItem(NULL),
     m_notificationsPinButton(NULL),
@@ -289,17 +313,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsXAnimator(NULL),
     m_notificationsOpacityAnimatorGroup(NULL),
 
-	m_treeXAnimator(NULL),
-	m_treePinButton(NULL),
-	m_treeItem(NULL),
 
-    m_titleRightButtonsLayout(NULL),
-    m_windowButtonsWidget(NULL),
-
-	m_titleShowButton(NULL),
-	m_titleYAnimator(NULL),
-	m_titleItem(NULL),
-	m_titleBackgroundItem(NULL),
 
     m_inCalendarGeometryUpdate(false),
     m_inDayTimeGeometryUpdate(false),
@@ -438,9 +452,13 @@ QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const
     /* Get items. */
     switch(scope) {
     case Qn::TitleBarScope:
-        return m_tabBarWidget->currentParameters(scope);
+        if (m_tabBarWidget)
+            return m_tabBarWidget->currentParameters(scope);
+        return QnActionParameters();
     case Qn::TreeScope:
-        return m_treeWidget->currentParameters(scope);
+        if (m_treeWidget)
+            return m_treeWidget->currentParameters(scope);
+        return QnActionParameters();
     default:
         return QnActionParameters(currentTarget(scope));
     }

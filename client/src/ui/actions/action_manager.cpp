@@ -428,12 +428,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::NextLayoutAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Next Layout")).
         shortcut(tr("Ctrl+Tab")).
         autoRepeat(false);
 
     factory(Qn::PreviousLayoutAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Previous Layout")).
         shortcut(tr("Ctrl+Shift+Tab")).
         autoRepeat(false);
@@ -471,6 +473,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::FreespaceAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Go to Freespace Mode")).
         shortcut(tr("F11")).
         autoRepeat(false);
@@ -554,6 +557,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenLoginDialogAction).
         flags(Qn::Main | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Connect to Server...")).
         shortcut(tr("Ctrl+Shift+C")).
         icon(qnSkin->icon("titlebar/disconnected.png")).
@@ -571,6 +575,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::TogglePanicModeAction).
         flags(Qn::GlobalHotkey| Qn::DevMode).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Start Panic Recording")).
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
@@ -596,6 +601,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::OpenNewTabAction).
             flags(Qn::Main | Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::GlobalHotkey).
+            mode(QnActionTypes::DesktopMode).
             text(tr("Tab")).
             pulledText(tr("New Tab")).
             shortcut(tr("Ctrl+T")).
@@ -604,6 +610,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::OpenNewWindowAction).
             flags(Qn::Main | Qn::GlobalHotkey).
+            mode(QnActionTypes::DesktopMode).
             text(tr("Window")).
             pulledText(tr("New Window")).
             shortcut(tr("Ctrl+N")).
@@ -684,6 +691,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SaveCurrentVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Save Video Wall View")). //TODO: #VW #TR
         shortcut(tr("Ctrl+S")).
         autoRepeat(false).
@@ -700,6 +708,7 @@ QnActionManager::QnActionManager(QObject *parent):
     if (QnScreenRecorder::isSupported()) {
         factory(Qn::ToggleScreenRecordingAction).
             flags(Qn::Main | Qn::GlobalHotkey).
+            mode(QnActionTypes::DesktopMode).
             text(tr("Start Screen Recording")).
             toggledText(tr("Stop Screen Recording")).
             shortcut(tr("Alt+R")).
@@ -716,6 +725,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::EscapeHotkeyAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         autoRepeat(false).
         shortcut(tr("Esc")).
         text(tr("Stop current action"));
@@ -742,6 +752,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::FullscreenMaximizeHotkeyAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         autoRepeat(false).
         shortcut(tr("Alt+Enter")).
         shortcut(tr("Alt+Return")).
@@ -755,18 +766,22 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::VersionMismatchMessageAction).
         flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Show Version Mismatch Message"));
 
     factory(Qn::BetaVersionMessageAction).
         flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Show Beta Version Warning Message"));
 
     factory(Qn::BrowseUrlAction).
         flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Open in Browser..."));
 
     factory(Qn::SystemAdministrationAction).
         flags(Qn::Main | Qn::Tree | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("System Administration...")).
         shortcut(tr("Ctrl+Alt+A")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
@@ -797,6 +812,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::BusinessEventsAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules...")).
         icon(qnSkin->icon("events/settings.png")).
@@ -805,6 +821,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::BusinessEventsLogAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Event Log...")).
         icon(qnSkin->icon("events/log.png")).
@@ -813,6 +830,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CameraListAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Camera List...")).
         shortcut(tr("Ctrl+M")).
@@ -835,6 +853,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("About...")).
         shortcut(tr("F1")).
         shortcutContext(Qt::ApplicationShortcut).
@@ -1478,12 +1497,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CloseLayoutAction).
         flags(Qn::TitleBar | Qn::ScopelessHotkey | Qn::SingleTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Close")).
         shortcut(tr("Ctrl+W")).
         autoRepeat(false);
 
     factory(Qn::CloseAllButThisLayoutAction).
         flags(Qn::TitleBar | Qn::SingleTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Close All But This")).
         condition(new QnLayoutCountActionCondition(2, this));
 
@@ -1545,9 +1566,9 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::Scene | Qn::SingleTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Preview Search...")).
         condition(new QnPreviewActionCondition(this));
-
 
 
     factory(Qn::DebugIncrementCounterAction).
@@ -1696,6 +1717,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ToggleBackgroundAnimationAction).
         flags(Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         shortcut(tr("Ctrl+Alt+T")).
         text(tr("Disable Background Animation")).
         toggledText(tr("Enable Background Animation")).
