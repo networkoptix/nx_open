@@ -64,8 +64,6 @@ namespace Company.Product.OemDvrMiniDriver {
             WebResponse response = null;
 
             try {
-//                MessageBox.Show("Vagina");
-
                 Uri url = new Uri(connectionInfo.HostName);
                 int port = (int)connectionInfo.Port;
                 if (port == 0)
@@ -265,18 +263,20 @@ namespace Company.Product.OemDvrMiniDriver {
                 cameraIds.Add(camera.CameraId);
             }
 
-            axAxHDWitness1.addResourcesToLayout(String.Join("|", cameraIds), _tick);
+            string timestamp = _tick.ToString();
+            axAxHDWitness1.addResourcesToLayout(String.Join("|", cameraIds), timestamp);
         }
 
         private void Play() {
-            int a = 1;
+            axAxHDWitness1.play();
         }
 
         private void Stop() {
-            int b = 2;
+            axAxHDWitness1.pause();
         }
 
         private void Pause() {
+            axAxHDWitness1.pause();
         }
 /*
         static void Main(string[] args) {

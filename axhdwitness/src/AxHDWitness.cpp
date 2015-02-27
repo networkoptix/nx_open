@@ -15,6 +15,7 @@
 #include "ui/workbench/workbench_context.h"
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_layout.h"
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <QAxAggregated>
 #include <QAxFactory>
@@ -302,11 +303,11 @@ void AxHDWitness::clear()
     m_context->workbench()->currentLayout()->clear();
 }
 
-void AxHDWitness::addResourceToLayout(const QString &uniqueId, qint64 timestamp) {
+void AxHDWitness::addResourceToLayout(const QString &uniqueId, const QString &timestamp) {
     addResourcesToLayout(uniqueId, timestamp);
 }
 
-void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, qint64 timestamp) {
+void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, const QString &timestamp) {
     if (!m_context->user())
         return;
 
@@ -319,21 +320,30 @@ void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, qint64 timestam
 
     if (resources.isEmpty())
         return;
-    
+
+    qint64 timeStampMs = timestamp.toLongLong();
+    const qint64 window = 20*1000; //20 seconds
+    QnTimePeriod period(timeStampMs - window/2, window);
+
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QnUuid::createUuid());
     layout->setParentId(m_context->user()->getId());
     layout->setCellSpacing(0, 0);
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, timeStampMs, 1.0)));
+    layout->setLocalRange(period);
     qnResPool->addResource(layout);  
 
     QnWorkbenchLayout *wlayout = new QnWorkbenchLayout(layout, this);
     m_context->workbench()->addLayout(wlayout);
     m_context->workbench()->setCurrentLayout(wlayout);
+    
+    m_context->menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resources).withArgument(Qn::ItemTimeRole, timeStampMs));
+    //m_context->navigator()->setPlaying(false);
 
-     m_context->menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resources).withArgument(Qn::ItemTimeRole, timestamp));
+    for (QnWorkbenchItem *item: wlayout->items())
+        item->setData(Qn::ItemSliderWindowRole, qVariantFromValue(period));
 
-     QnTimePeriod period(timestamp - 10*1000, 20*1000);
-     m_context->navigator()->timeSlider()->setWindow(period.startTimeMs, period.endTimeMs(), false);
+    m_context->navigator()->timeSlider()->setWindow(period.startTimeMs, period.endTimeMs(), false);
 }
 
 void AxHDWitness::removeFromCurrentLayout(const QString &uniqueId) {

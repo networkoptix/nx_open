@@ -61,8 +61,8 @@ public slots:
     qint64 currentTime();
     void setCurrentTime(qint64 time);
 
-    void addResourceToLayout(const QString &uniqueId, qint64 timestamp);
-    void addResourcesToLayout(const QString &uniqueIds, qint64 timestamp);
+    void addResourceToLayout(const QString &uniqueId, const QString &timestamp);
+    void addResourcesToLayout(const QString &uniqueIds, const QString &timestamp);
     void removeFromCurrentLayout(const QString &uniqueId);
 
     void reconnect(const QString &url);
