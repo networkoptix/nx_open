@@ -716,6 +716,7 @@ void QnStorageManager::clearSpace()
     if (!m_catalogLoaded)
         return;
 
+    testOfflineStorages();
     {
         QMutexLocker lock(&m_sdbMutex);
         for(const QnStorageDbPtr& sdb: m_chunksDB) {
