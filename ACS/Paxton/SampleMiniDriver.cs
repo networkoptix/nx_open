@@ -17,6 +17,7 @@ namespace Company.Product.OemDvrMiniDriver {
         class Camera {
             public string physicalId { get; set; }
             public string name { get; set; }
+            public string model { get; set; }
         }
     }
 
@@ -80,7 +81,9 @@ namespace Company.Product.OemDvrMiniDriver {
                 List<Api.Camera> apiCameras = JsonConvert.DeserializeObject<List<Api.Camera>>(reader.ReadToEnd());
 
                 foreach(Api.Camera apiCamera in apiCameras) {
-                    cameras.Add(new OemDvrCamera(apiCamera.physicalId.ToUpper(), apiCamera.name));
+                    if (apiCamera.model.Contains("virtual desktop camera"))
+                        continue;
+                    cameras.Add(new OemDvrCamera(apiCamera.physicalId, apiCamera.name));
                 }
                 
                 _logger.InfoFormat("Found {0} cameras.", cameras.Count);
@@ -261,6 +264,7 @@ namespace Company.Product.OemDvrMiniDriver {
             foreach (OemDvrCamera camera in _cameras) {
                 cameraIds.Add(camera.CameraId);
             }
+
             axAxHDWitness1.addResourcesToLayout(String.Join("|", cameraIds), _tick);
         }
 
