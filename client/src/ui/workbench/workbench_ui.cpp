@@ -91,7 +91,7 @@ namespace {
     const QSize showHideButtonSize(15, 45);
     const QMargins showHideButtonMargins(0, 10, 0, 10);
 
-    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, int helpTopicId = -1, QGraphicsItem *parent = NULL) {
+    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, int helpTopicId = Qn::Empty_Help, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
         qreal height = baseSize * sizeMultiplier;
@@ -113,7 +113,7 @@ namespace {
         button->setDefaultAction(action);
         button->setCached(true);
 
-        if(helpTopicId != -1)
+        if(helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);
 
         return button;

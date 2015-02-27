@@ -97,7 +97,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
 
     bool success = true;
     QString detail;
-    int helpTopicId = -1;
+    int helpTopicId = Qn::Empty_Help;
 
     bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
             || connectionInfo.brand == QnAppInfo::productNameShort();
@@ -158,7 +158,7 @@ void QnConnectionTestingDialog::updateUi(bool success, const QString &details, i
     ui->descriptionLabel->setText(details);
     ui->descriptionLabel->setVisible(!details.isEmpty());
 
-    if (helpTopicId >= 0)
+    if (helpTopicId != Qn::Empty_Help)
         setHelpTopic(this, helpTopicId);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(true);

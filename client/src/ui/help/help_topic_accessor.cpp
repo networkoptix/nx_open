@@ -15,63 +15,80 @@
 #include <client/client_globals.h>
 #include <common/common_globals.h>
 
+#include "help_topics.h"
+
 namespace {
     const char *qn_helpTopicPropertyName = "_qn_contextHelpId";
+
+    int topic(int id) {
+        if (id == Qn::Empty_Help || id == Qn::Forced_Empty_Help)
+            return Qn::Empty_Help;
+        return qAbs(id);
+    }
 }
 
 int QnHelpTopicAccessor::helpTopic(QObject *object) {
     if(!object) {
         qnNullWarning(object);
-        return -1;
+        return Qn::Empty_Help;
     }
 
-    return qvariant_cast<int>(object->property(qn_helpTopicPropertyName), -1);
+    return qAbs(qvariant_cast<int>(object->property(qn_helpTopicPropertyName), Qn::Empty_Help));
 }
 
-void QnHelpTopicAccessor::setHelpTopic(QObject *object, int helpTopic) {
+void QnHelpTopicAccessor::setHelpTopic(QObject *object, int helpTopic, bool enforceForChildren) {
     if(!object) {
         qnNullWarning(object);
         return;
     }
 
-    object->setProperty(qn_helpTopicPropertyName, helpTopic);
+    if (helpTopic == Qn::Forced_Empty_Help)
+        enforceForChildren = false;
+
+    object->setProperty(qn_helpTopicPropertyName, enforceForChildren ? -helpTopic : helpTopic);
 }
 
 int QnHelpTopicAccessor::helpTopicAt(QWidget *widget, const QPoint &pos, bool bubbleUp) {
     QPoint widgetPos = pos;
 
     while(true) {
-        int topicId = qvariant_cast<int>(widget->property(qn_helpTopicPropertyName), -1);
-        if(topicId != -1)
-            return topicId;
+        int topicId = qvariant_cast<int>(widget->property(qn_helpTopicPropertyName), Qn::Empty_Help);
+
+        if(topicId != Qn::Empty_Help)
+            return topic(topicId);
 
         if(HelpTopicQueryable *queryable = dynamic_cast<HelpTopicQueryable *>(widget)) {
             topicId = queryable->helpTopicAt(widgetPos);
-            if(topicId != -1)
-                return topicId;
+            if(topicId != Qn::Empty_Help)
+                return topic(topicId);
         }
 
         if(QGraphicsView *view = dynamic_cast<QGraphicsView *>(widget)) {
+            if(view->scene()) {
+                topicId = qvariant_cast<int>(view->scene()->property(qn_helpTopicPropertyName), Qn::Empty_Help);
+                if(topicId < 0)
+                    return -topicId;
+                if(topicId == Qn::Forced_Empty_Help)
+                    return Qn::Empty_Help;
+            }
+
             QPointF scenePos = view->mapToScene(widgetPos);
             foreach(QGraphicsItem *item, view->items(widgetPos)) {
                 int topicId = helpTopicAt(item, item->mapFromScene(scenePos));
-                if(topicId != -1)
-                    return topicId;
+                if(topicId != Qn::Empty_Help)
+                    return topic(topicId);
             }
 
-            if(view->scene()) {
-                topicId = qvariant_cast<int>(view->scene()->property(qn_helpTopicPropertyName), -1);
-                if(topicId != -1)
-                    return topicId;
-            }
+            if(topicId >= 0)
+                return topic(topicId);
         }
 
         if(QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(widget)) {
             if(QAbstractItemModel *model = view->model()) {
                 QPoint viewportPos = view->viewport()->mapFrom(view, widgetPos);
-                topicId = qvariant_cast<int>(model->data(view->indexAt(viewportPos), Qn::HelpTopicIdRole), -1);
-                if(topicId != -1)
-                    return topicId;
+                topicId = qvariant_cast<int>(model->data(view->indexAt(viewportPos), Qn::HelpTopicIdRole), Qn::Empty_Help);
+                if(topicId != Qn::Empty_Help)
+                    return topic(topicId);
             }
         }
 
@@ -86,25 +103,25 @@ int QnHelpTopicAccessor::helpTopicAt(QWidget *widget, const QPoint &pos, bool bu
         }
     }
 
-    return -1;
+    return Qn::Empty_Help;
 }
 
 int QnHelpTopicAccessor::helpTopicAt(QGraphicsItem *item, const QPointF &pos, bool bubbleUp) {
     QPointF itemPos = pos;
 
     while(true) {
-        int topicId = -1;
+        int topicId = Qn::Empty_Help;
 
         if(QGraphicsObject *object = item->toGraphicsObject()) {
-            topicId = qvariant_cast<int>(object->property(qn_helpTopicPropertyName), -1);
-            if(topicId != -1)
-                return topicId;
+            topicId = qvariant_cast<int>(object->property(qn_helpTopicPropertyName), Qn::Empty_Help);
+            if(topicId != Qn::Empty_Help)
+                return topic(topicId);
         }
 
         if(HelpTopicQueryable *queryable = dynamic_cast<HelpTopicQueryable *>(item)) {
             topicId = queryable->helpTopicAt(itemPos);
-            if(topicId != -1)
-                return topicId;
+            if(topicId != Qn::Empty_Help)
+                return topic(topicId);
         }
 
         if(QGraphicsProxyWidget *proxy = dynamic_cast<QGraphicsProxyWidget *>(item)) {
@@ -115,8 +132,8 @@ int QnHelpTopicAccessor::helpTopicAt(QGraphicsItem *item, const QPointF &pos, bo
                     child = proxy->widget();
 
                 topicId = helpTopicAt(child, child->mapFrom(proxy->widget(), widgetPos), true);
-                if(topicId != -1)
-                    return topicId;
+                if(topicId != Qn::Empty_Help)
+                    return topic(topicId);
             }
         }
 
@@ -131,5 +148,5 @@ int QnHelpTopicAccessor::helpTopicAt(QGraphicsItem *item, const QPointF &pos, bo
         }
     }
 
-    return -1;
+    return Qn::Empty_Help;
 }

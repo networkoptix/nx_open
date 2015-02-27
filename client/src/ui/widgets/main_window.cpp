@@ -86,7 +86,7 @@
 
 namespace {
 
-    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = -1) {
+    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = Qn::Empty_Help) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
@@ -108,7 +108,7 @@ namespace {
             QObject::connect(button,    SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
         }
 
-        if(helpTopicId != -1)
+        if(helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);
 
         return button;
@@ -509,7 +509,7 @@ void QnMainWindow::updateScreenInfo() {
 
 void QnMainWindow::updateHelpTopic() {
     if (action(Qn::ToggleTourModeAction)->isChecked()) {
-        setHelpTopic(m_scene.data(), Qn::MinaWindow_Scene_TourInProgress_Help);
+        setHelpTopic(m_scene.data(), Qn::MinaWindow_Scene_TourInProgress_Help, true);
         return;
     }
 
@@ -519,12 +519,12 @@ void QnMainWindow::updateHelpTopic() {
             return;
         }
         if (layout->data().contains(Qn::LayoutSearchStateRole)) {
-            setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help);
+            setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help, true);
             return;
         }
         if (QnLayoutResourcePtr resource = layout->resource()) {
             if (context()->snapshotManager()->isFile(resource.dynamicCast<QnLayoutResource>())) {
-                setHelpTopic(m_scene.data(), Qn::MainWindow_Tree_MultiVideo_Help);
+                setHelpTopic(m_scene.data(), Qn::MainWindow_Tree_MultiVideo_Help, true);
                 return;
             }
             if (!resource->backgroundImageFilename().isEmpty()) {

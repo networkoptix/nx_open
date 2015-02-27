@@ -8,6 +8,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/ec_api.h>
 #include <ui/dialogs/button_box_dialog.h>
+#include <ui/help/help_topics.h>
 
 
 class QDataWidgetMapper;
@@ -37,7 +38,7 @@ private slots:
     /**
      * Updates ui elements depending of the test result
      */
-    void updateUi(bool success, const QString &details = QString(), int helpTopicId = -1);
+    void updateUi(bool success, const QString &details = QString(), int helpTopicId = Qn::Empty_Help);
 
 private:
     Q_DISABLE_COPY(QnConnectionTestingDialog)

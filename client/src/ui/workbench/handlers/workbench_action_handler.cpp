@@ -1868,7 +1868,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if (moreResourceToDelete.isEmpty())
         return;
     
-    int helpId = -1;
+    int helpId = Qn::Empty_Help;
     for (const QnResourcePtr &resource: resources) {
         if (resource->hasFlags(Qn::live_cam)) {
             helpId = Qn::DeletingCamera_Help;
