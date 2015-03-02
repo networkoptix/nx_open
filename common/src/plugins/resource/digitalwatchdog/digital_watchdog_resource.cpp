@@ -166,6 +166,8 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     QMutexLocker lock(&m_physicalParamsMutex);
 
+    m_additionalSettings.clear();
+
     //Put base model in list
     m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
         getHostAddress(), 80, getNetworkTimeout(), getAuth(), baseIdStr)));
