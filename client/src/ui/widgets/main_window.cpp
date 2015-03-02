@@ -509,7 +509,7 @@ void QnMainWindow::updateScreenInfo() {
 
 void QnMainWindow::updateHelpTopic() {
     if (action(Qn::ToggleTourModeAction)->isChecked()) {
-        setHelpTopic(m_scene.data(), Qn::MinaWindow_Scene_TourInProgress_Help, true);
+        setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_TourInProgress_Help, true);
         return;
     }
 
