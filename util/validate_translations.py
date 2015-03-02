@@ -9,7 +9,8 @@ import xml.etree.ElementTree as ET
 projects = ['common', 'client', 'traytool']
 
 critical = ['\t', '%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', 'href']
-warned = ['%n', '\n']
+warned = ['\n']
+numerus = ['%n']
 
 class ColorDummy():
     class Empty(object):
@@ -46,30 +47,39 @@ def symbolText(symbol):
         return '\\n'
     return symbol
 
-def checkText(source, target, location, result, verbose):
-
-    filename = location.get('filename') if location is not None else 'unknown'
-    line = location.get('line') if location is not None else 'unknown'
+def checkText(source, target, context, result, verbose, index):
 
     for symbol in critical:
         occurences = source.count(symbol)
         if target.count(symbol) != occurences:
-            err(u'Invalid translation string, error on {0} count:\nLocation: {1} line {2}\nSource: {3}\nTarget: {4}'
+            err(u'Invalid translation string, error on {0} count:\nContext: {1}\nSource: {2}\nTarget: {3}'
                 .format(
                     symbolText(symbol),
-                    filename, line,
+                    context,
                     source, target))
             result.error += 1
             break
-
+    
+    if (index != 1):
+        for symbol in numerus:
+            occurences = source.count(symbol)
+            if target.count(symbol) != occurences:
+                err(u'Invalid translation string, error on {0} count:\nContext: {1}\nSource: {2}\nTarget: {3}'
+                    .format(
+                        symbolText(symbol),
+                        context,
+                        source, target))
+                result.error += 1
+                break
+    
     if verbose:
         for symbol in warned:
             occurences = source.count(symbol)
             if target.count(symbol) != occurences:
-                warn(u'Invalid translation string, error on {0} count:\nLocation: {1} line {2}\nSource: {3}\nTarget: {4}'
+                warn(u'Invalid translation string, error on {0} count:\nContext: {1}\nSource: {2}\nTarget: {3}'
                     .format(
                         symbolText(symbol),
-                        filename, line,
+                        context,
                         source, target))
                 result.warned += 1
                 break
@@ -80,11 +90,11 @@ def validateXml(root, verbose):
     result = ValidationResult()
 
     for context in root:
+        contextName = context.find('name').text
         for message in context.iter('message'):
             result.total += 1
             source = message.find('source')
             translation = message.find('translation')
-            location = message.find('location')
             if translation.get('type') == 'unfinished':
                 result.unfinished += 1
                 continue
@@ -94,14 +104,17 @@ def validateXml(root, verbose):
                 continue
 
             hasNumerusForm = False
+            index = 0
             for numerusform in translation.iter('numerusform'):
                 hasNumerusForm = True
+                index = index + 1
                 if not numerusform.text:
                     continue;
-                result = checkText(source.text, numerusform.text, location, result, verbose)
+                result = checkText(source.text, numerusform.text, contextName, result, verbose, index)
+                
 
             if not hasNumerusForm:
-                result = checkText(source.text, translation.text, location, result, verbose)
+                result = checkText(source.text, translation.text, contextName, result, verbose, index)
 
     return result
 

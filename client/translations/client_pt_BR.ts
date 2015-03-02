@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pt_BR" sourcelanguage="en">
+<TS version="2.1" language="pt_BR" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -333,7 +333,7 @@
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Atenção! Baixa qualidade pode resultar em imagem de baixa resolução..&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
-    <message utf8="true">
+    <message>
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2946,8 +2946,8 @@ Esta ação NÃO PODE ser desfeita!</translation>
     <message numerus="yes">
         <source>Error while adding camera(s).</source>
         <translation>
-            <numerusform>Erro de adição de câmera.%n</numerusform>
-            <numerusform>Erro de adição de câmeras.%n</numerusform>
+            <numerusform>Erro de adição de câmera.</numerusform>
+            <numerusform>Erro de adição de câmeras.</numerusform>
         </translation>
     </message>
     <message>
@@ -2977,8 +2977,8 @@ Esta ação NÃO PODE ser desfeita!</translation>
     <message numerus="yes">
         <source>Scanning hosts... (%1)</source>
         <translation>
-            <numerusform>%nEscaneando host... (%1)</numerusform>
-            <numerusform>%nEscaneando hosts... (%1)</numerusform>
+            <numerusform>Escaneando host... (%1)</numerusform>
+            <numerusform>Escaneando hosts... (%1)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -3188,8 +3188,8 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>%1 have no input ports</source>
         <translation>
-            <numerusform>%1 não tem porta de entrada%n</numerusform>
-            <numerusform>%1 não tem portas de entrada%n</numerusform>
+            <numerusform>%1 não tem porta de entrada</numerusform>
+            <numerusform>%1 não tem portas de entrada</numerusform>
         </translation>
     </message>
 </context>
@@ -3284,9 +3284,9 @@ This can take a lot of time.</source>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
-        <translation>
-            <numerusform>%nDetecção de movimento ou de Gravação está desabilitada para %1</numerusform>
-            <numerusform>%nDetecção de movimento ou de Gravação está desabilitada para %1</numerusform>
+        <translation type="unfinished">
+            <numerusform>Detecção de movimento ou de Gravação está desabilitada para %1</numerusform>
+            <numerusform>Detecção de movimento ou de Gravação está desabilitada para %1</numerusform>
         </translation>
     </message>
 </context>
@@ -3302,8 +3302,8 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>%1 have no output relays</source>
         <translation>
-            <numerusform>%1 não tem porta de relê%n</numerusform>
-            <numerusform>%1 não tem portas de relês%n</numerusform>
+            <numerusform>%1 não tem porta de relê</numerusform>
+            <numerusform>%1 não tem portas de relês</numerusform>
         </translation>
     </message>
 </context>
@@ -3312,8 +3312,8 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>Recording is disabled for %1</source>
         <translation>
-            <numerusform>%nGravação desabilitada para %1</numerusform>
-            <numerusform>%nGravações desabilitadas para %1</numerusform>
+            <numerusform>Gravação desabilitada para %1</numerusform>
+            <numerusform>Gravações desabilitadas para %1</numerusform>
         </translation>
     </message>
 </context>
