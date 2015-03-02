@@ -12,6 +12,9 @@ critical = ['\t', '%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', 'href']
 warned = ['\n']
 numerus = ['%n']
 
+verbose = False
+noTarget = False
+
 class ColorDummy():
     class Empty(object):
         def __getattribute__(self, name):
@@ -47,46 +50,46 @@ def symbolText(symbol):
         return '\\n'
     return symbol
 
-def checkText(source, target, context, result, verbose, index):
-
-    for symbol in critical:
-        occurences = source.count(symbol)
-        if target.count(symbol) != occurences:
-            err(u'Invalid translation string, error on {0} count:\nContext: {1}\nSource: {2}\nTarget: {3}'
-                .format(
+def checkSymbol(symbol, source, target, context, out):
+    occurences = source.count(symbol)
+    invalid = target.count(symbol) != occurences
+    if invalid and noTarget:
+        out(u'Invalid translation string, error on {0} count:\nContext: {1}\nSource: {2}'
+            .format(
                     symbolText(symbol),
                     context,
-                    source, target))
+                    source))
+    elif invalid:
+        out(u'Invalid translation string, error on {0} count:\nContext: {1}\nSource: {2}\nTarget: {3}'
+            .format(
+                    symbolText(symbol),
+                    context,
+                    source, target))    
+        
+    return invalid
+    
+def checkText(source, target, context, result, index):
+
+    for symbol in critical:
+        if checkSymbol(symbol, source, target, context, err):
             result.error += 1
             break
     
     if (index != 1):
         for symbol in numerus:
-            occurences = source.count(symbol)
-            if target.count(symbol) != occurences:
-                err(u'Invalid translation string, error on {0} count:\nContext: {1}\nSource: {2}\nTarget: {3}'
-                    .format(
-                        symbolText(symbol),
-                        context,
-                        source, target))
+            if checkSymbol(symbol, source, target, context, err):
                 result.error += 1
                 break
     
     if verbose:
         for symbol in warned:
-            occurences = source.count(symbol)
-            if target.count(symbol) != occurences:
-                warn(u'Invalid translation string, error on {0} count:\nContext: {1}\nSource: {2}\nTarget: {3}'
-                    .format(
-                        symbolText(symbol),
-                        context,
-                        source, target))
+            if checkSymbol(symbol, source, target, context, warn):
                 result.warned += 1
                 break
 
     return result;
 
-def validateXml(root, verbose):
+def validateXml(root):
     result = ValidationResult()
 
     for context in root:
@@ -110,21 +113,21 @@ def validateXml(root, verbose):
                 index = index + 1
                 if not numerusform.text:
                     continue;
-                result = checkText(source.text, numerusform.text, contextName, result, verbose, index)
+                result = checkText(source.text, numerusform.text, contextName, result, index)
                 
 
             if not hasNumerusForm:
-                result = checkText(source.text, translation.text, contextName, result, verbose, index)
+                result = checkText(source.text, translation.text, contextName, result, index)
 
     return result
 
-def validate(path, verbose):
+def validate(path):
     name = os.path.basename(path)
     if verbose:
         info('Validating {0}...'.format(name))
     tree = ET.parse(path)
     root = tree.getroot()
-    result = validateXml(root, verbose)
+    result = validateXml(root)
 
     if result.error > 0:
         err('{0}: {1} errors found'.format(name, result.error))
@@ -134,7 +137,7 @@ def validate(path, verbose):
     elif verbose:
         green('{0}: ok'.format(name))
 
-def validateProject(project, translationDir, verbose):
+def validateProject(project, translationDir):
     entries = []
 
     for entry in os.listdir(translationDir):
@@ -153,13 +156,22 @@ def validateProject(project, translationDir, verbose):
             
     count = 0
     for path in entries:
-        validate(path, verbose)
+        validate(path)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--color', action='store_true', help="colorized output")
     parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
+    parser.add_argument('-t', '--no-target', action='store_true', help="skip target field")
     args = parser.parse_args()
+    print args
+    
+    global verbose
+    verbose = args.verbose
+    
+    global noTarget
+    noTarget = args.no_target
+    
     if args.color:
         from colorama import Fore, Back, Style, init
         init(autoreset=True) # use Colorama to make Termcolor work on Windows too
@@ -172,7 +184,7 @@ def main():
     for project in projects:
         projectDir = os.path.join(rootDir, project)
         translationDir = os.path.join(projectDir, 'translations')
-        validateProject(project, translationDir, args.verbose)
+        validateProject(project, translationDir)
        
     info("Validation finished.")
     
