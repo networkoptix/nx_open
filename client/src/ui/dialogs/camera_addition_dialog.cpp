@@ -118,6 +118,17 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
+    QString examples = 
+        lit(
+        "<html><head/><body><p>%1</p>\
+        <p><span style=\"font-weight:600;\">62.82.122.156</span></p>\
+        <p><span style=\"font-weight:600;\">www.example.com:8080</span></p>\
+        <p><span style=\"font-weight:600;\">rtsp://example.com:554/video</span></p>\
+        </body></html>")
+        .arg(tr("Examples:"));
+
+    ui->singleCameraLineEdit->setToolTip(examples);
+
     setHelpTopic(this, Qn::ManualCameraAddition_Help);
 
     m_header = new QnCheckBoxedHeaderView(this);

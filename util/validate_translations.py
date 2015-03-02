@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 
 projects = ['common', 'client', 'traytool']
 
-critical = ['\t', '%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', 'href']
+critical = ['\t', '%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', 'href', '<html']
 warned = ['\n']
 numerus = ['%n']
 
@@ -101,6 +101,9 @@ def validateXml(root):
             if translation.get('type') == 'unfinished':
                 result.unfinished += 1
                 continue
+            
+            if translation.get('type') == 'obsolete':
+                continue
 
             #Using source text
             if not translation.text:
@@ -164,7 +167,6 @@ def main():
     parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
     parser.add_argument('-t', '--no-target', action='store_true', help="skip target field")
     args = parser.parse_args()
-    print args
     
     global verbose
     verbose = args.verbose
