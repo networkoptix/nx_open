@@ -156,7 +156,7 @@ bool QnGenericTabbedDialog::tryClose(bool force) {
 
     QMessageBox::StandardButton btn =  QMessageBox::question(this,
         tr("Confirm exit"),
-        tr("Unsaved changes will be lost. Save the following pages?\n") + details.join(L'\n'),
+        tr("Unsaved changes will be lost. Save the following pages?") + L'\n' + details.join(L'\n'),
         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
         QMessageBox::Cancel);
 

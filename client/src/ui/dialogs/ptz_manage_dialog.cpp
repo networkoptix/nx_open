@@ -490,7 +490,7 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
                 QDialogButtonBox::StandardButton button = QnCheckableMessageBox::warning(
                     this,
                     tr("Remove preset"),
-                    tr("This preset is used in some tours.\nThese tours will become invalid if you remove it."),
+                    tr("This preset is used in some tours.") + L'\n' + tr("These tours will become invalid if you remove it."),
                     tr("Do not show again."),
                     &ignorePresetIsInUse,
                     QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
