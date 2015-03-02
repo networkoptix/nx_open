@@ -252,10 +252,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
     context->instance<QnWorkbenchSystemNameWatcher>();
-
-    QnWorkbenchServerAddressWatcher *serverAddressWatcher = context->instance<QnWorkbenchServerAddressWatcher>();
-    serverAddressWatcher->setDirectModuleFinder(QnModuleFinder::instance()->directModuleFinder());
-    serverAddressWatcher->setDirectModuleFinderHelper(QnModuleFinder::instance()->directModuleFinderHelper());
+    context->instance<QnWorkbenchServerAddressWatcher>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);

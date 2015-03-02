@@ -1,19 +1,19 @@
 #ifndef NETWORKOPTIXMODULEFINDER_H
 #define NETWORKOPTIXMODULEFINDER_H
 
-#include <memory>
-
 #include <QtCore/QHash>
+#include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 
-#include <core/resource/resource_fwd.h>
 #include <utils/common/singleton.h>
 #include <utils/network/module_information.h>
-#include <utils/network/network_address.h>
+#include <core/resource/resource_fwd.h>
 
 class QnMulticastModuleFinder;
 class QnDirectModuleFinder;
-class QnModuleFinderHelper;
+class QnDirectModuleFinderHelper;
+class QTimer;
+struct QnModuleInformation;
 
 class QnModuleFinder : public QObject, public Singleton<QnModuleFinder> {
     Q_OBJECT
@@ -31,15 +31,13 @@ public:
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
-    QnModuleFinderHelper *directModuleFinderHelper() const;
 
-    //! \param peerList Discovery peer if and only if peer exist in peerList
-    void setAllowedPeers(const QList<QnUuid> &peerList);
+    int pingTimeout() const;
 
 public slots:
     void start();
-    void stop();
     void pleaseStop();
+
 signals:
     void moduleChanged(const QnModuleInformation &moduleInformation);
     void moduleLost(const QnModuleInformation &moduleInformation);
@@ -47,20 +45,25 @@ signals:
     void moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private slots:
-    void at_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
-    void at_moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
-    void at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void at_moduleChanged(const QnModuleInformation &moduleInformation);
+    void at_responseRecieved(QnModuleInformation moduleInformation, QUrl url);
+    void at_timer_timeout();
 
 private:
-    std::unique_ptr<QnMulticastModuleFinder> m_multicastModuleFinder;
+    QSet<QString> moduleAddresses(const QnUuid &id) const;
+    void removeUrl(const QUrl &url);
+
+private:
+    QElapsedTimer m_elapsedTimer;
+    QTimer *m_timer;
+
+    QScopedPointer<QnMulticastModuleFinder> m_multicastModuleFinder;
     QnDirectModuleFinder *m_directModuleFinder;
-    QnModuleFinderHelper *m_directModuleFinderHelper;
+    QnDirectModuleFinderHelper *m_helper;
 
     QHash<QnUuid, QnModuleInformation> m_foundModules;
-    QMultiHash<QnUuid, QUrl> m_multicastFoundUrls;
-    QMultiHash<QnUuid, QUrl> m_directFoundUrls;
+    QMultiHash<QnUuid, QUrl> m_urlById;
+    QHash<QUrl, QnUuid> m_idByUrl;
+    QHash<QUrl, qint64> m_lastResponse;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H
