@@ -16,7 +16,9 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/common/geometry.h>
+
 #include <utils/common/app_info.h>
+#include <utils/common/string.h>
 
 namespace {
     const int updatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
@@ -75,11 +77,11 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
 
     if (majorVersionChange) {
         title = tr("Newer version is available");
-        message = tr("New version <b>%1</b> is available.").arg(updateVersion.toString());
+        message = tr("New version %1 is available.").arg(htmlBold(updateVersion.toString()));
         message += lit("<br/>");
     } else {
         title = tr("Update is recommended");
-        message = tr("New version <b>%1</b> is available.").arg(updateVersion.toString());
+        message = tr("New version <b>%1</b> is available.").arg(htmlBold(updateVersion.toString()));
         message += lit("<br/>");
         message += tr("Major issues have been fixed.");
         message += lit("<br/><span style=\"color:%1;\">").arg(qnGlobals->errorTextColor().name());

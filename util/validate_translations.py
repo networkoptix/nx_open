@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 
 projects = ['common', 'client', 'traytool']
 
-critical = ['\t', '%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', 'href', '<html', '<b>']
+critical = ['\t', '%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', 'href', '<html', '<b>', '<br>']
 warned = ['\n']
 numerus = ['%n']
 

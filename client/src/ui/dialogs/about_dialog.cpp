@@ -28,6 +28,7 @@
 #include <ui/style/globals.h>
 
 #include <utils/common/email.h>
+#include <utils/common/string.h>
 
 #include "openal/qtvaudiodevice.h"
 #include <utils/common/app_info.h>
@@ -99,7 +100,7 @@ QString QnAboutDialog::connectedServers() const {
         if(!resource) 
             continue;
                       
-        QString server = tr("Server at %2: v%1<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+        QString server = tr("Server at %2: v%1").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host()) + lit("<br/>");
 
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
@@ -121,22 +122,22 @@ void QnAboutDialog::retranslateUi()
 
     m_copyButton->setText(tr("Copy to Clipboard"));
 
-    QString version = 
-        tr(
-            "<b>%1</b> version %2 (%3).<br/>\n"
-            "Built for %5-%6 with %7.<br/>\n"
-        ).
-        arg(qApp->applicationDisplayName()).
-        arg(QApplication::applicationVersion()).
-        arg(QnAppInfo::applicationRevision()).
-        arg(QnAppInfo::applicationPlatform()).
-        arg(QnAppInfo::applicationArch()).
-        arg(QnAppInfo::applicationCompiler());
+    QStringList version;
+    version <<
+        tr("%1 version %2 (%3).")
+        .arg(htmlBold(qApp->applicationDisplayName()))
+        .arg(QApplication::applicationVersion())
+        .arg(QnAppInfo::applicationRevision());
+    version <<
+        tr("Built for %1-%2 with %3.")
+        .arg(QnAppInfo::applicationPlatform())
+        .arg(QnAppInfo::applicationArch())
+        .arg(QnAppInfo::applicationCompiler());
 
 //    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
     QString servers = connectedServers();
     if (servers.isEmpty())
-        servers = tr("<b>Client</b> is not connected to <b>Server</b>.<br>");
+        servers = tr("Client is not connected to any server");
     
     QString appName = lit("<b>%1%2 %3</b>")
         .arg(QnAppInfo::organizationName())
@@ -163,9 +164,11 @@ void QnAboutDialog::retranslateUi()
     gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL vendor")).arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VENDOR))));
     gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL max texture size")).arg(maxTextureSize);
     
-    ui->versionLabel->setText(version);
-    ui->creditsLabel->setText(credits.join(lit("<br>\n")));
-    ui->gpuLabel->setText(gpu.join(lit("<br>\n")));
+    const QString lineSeparator = lit("<br>\n");
+
+    ui->versionLabel->setText(version.join(lineSeparator));
+    ui->creditsLabel->setText(credits.join(lineSeparator));
+    ui->gpuLabel->setText(gpu.join(lineSeparator));
     ui->serversLabel->setText(servers);
 
     QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
