@@ -175,11 +175,9 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return false;
     }
 
-    if (response.seed == qnCommon->moduleGUID().toString())
-        return true; // ignore requests to himself
-
     if (response.type != nxMediaServerId && response.type != nxECId)
         return true;
+
 
     if (!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower()) {
         NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
@@ -191,6 +189,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     QUrl url;
     url.setHost(remoteAddress);
     url.setPort(moduleInformation.port);
+
     emit responseRecieved(moduleInformation, url);
 
     return true;

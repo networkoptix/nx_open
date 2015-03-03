@@ -103,6 +103,8 @@ int QnModuleFinder::pingTimeout() const {
 }
 
 void QnModuleFinder::start() {
+    m_lastSelfConflict = 0;
+    m_selfConflictCount = 0;
     m_multicastModuleFinder->start();
     m_directModuleFinder->start();
     m_elapsedTimer.start();
@@ -118,6 +120,11 @@ void QnModuleFinder::pleaseStop() {
 void QnModuleFinder::at_responseRecieved(QnModuleInformationEx moduleInformation, QUrl url) {
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
+
+    if (moduleInformation.id == qnCommon->moduleGUID()) {
+        handleSelfResponse(moduleInformation, url);
+        return;
+    }
 
     url = trimmedUrl(url);
 
@@ -266,4 +273,21 @@ void QnModuleFinder::removeUrl(const QUrl &url) {
         NX_LOG(lit("QnModuleFinder: Module %1 is changed.").arg(it->id.toString()), cl_logDEBUG1);
         emit moduleChanged(*it);
     }
+}
+
+void QnModuleFinder::handleSelfResponse(const QnModuleInformationEx &moduleInformation, const QUrl &url) {
+    QnModuleInformationEx current = qnCommon->moduleInformation();
+    if (current == moduleInformation)
+        return;
+
+    qint64 currentTime = m_elapsedTimer.elapsed();
+    if (currentTime - m_lastSelfConflict > pingTimeout()) {
+        m_selfConflictCount = 1;
+        return;
+    }
+    m_lastSelfConflict = currentTime;
+    ++m_selfConflictCount;
+
+    if (m_selfConflictCount >= noticeableConflictCount && m_selfConflictCount % noticeableConflictCount == 0)
+        emit moduleConflict(moduleInformation, url);
 }

@@ -42,6 +42,7 @@ signals:
     void moduleLost(const QnModuleInformation &moduleInformation);
     void moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
     void moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void moduleConflict(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private slots:
     void at_responseRecieved(QnModuleInformationEx moduleInformation, QUrl url);
@@ -50,6 +51,7 @@ private slots:
 private:
     QSet<QString> moduleAddresses(const QnUuid &id) const;
     void removeUrl(const QUrl &url);
+    void handleSelfResponse(const QnModuleInformationEx &moduleInformation, const QUrl &url);
 
 private:
     QElapsedTimer m_elapsedTimer;
@@ -66,6 +68,9 @@ private:
     QHash<QnUuid, qint64> m_lastResponseById;
     QHash<QnUuid, qint64> m_lastConflictResponseById;
     QHash<QnUuid, int> m_conflictResponseCountById;
+
+    qint64 m_lastSelfConflict;
+    int m_selfConflictCount;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H
