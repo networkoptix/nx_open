@@ -167,32 +167,44 @@ namespace ite
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-            bool gotPES = false;
             while (q->size())
             {
-                if (q->front().packet().isPES())
+                if (pkt->append(q->front().packet()))
                 {
-                    if (gotPES)
-                        break;
-                    gotPES = true;
+                    bool isPES = q->front().packet().isPES();
 
-                    if (pkt->append(q->front()))
-                    {
-                        // TODO: in fact it's a time of the next PES, cause we dump TS queue then.
+                    // In fact it's a time of the next PES, cause we dump TS queue then.
+                    if (isPES)
                         pkt->setTimestamp( ptsTime.pts2usec(pkt->pts()) );
-                    }
                 }
                 else
-                    pkt->append(q->front());
+                {
+                    if (pkt->done())
+                        break;
+
+                    if (pkt->gotPES())
+                    {
+#if 0
+                        printf("Skip packet (PID: 0x%x)\n", pid);
+#endif
+                        while (q->size() && ! q->front().packet().isPES())
+                            q->pop_front();
+
+                        pkt.reset();
+                        break;
+                    }
+                }
 
                 q->pop_front();
             }
         }
 
-        if (pkt->errors())
+        if (pkt && (pkt->tsErrors() || pkt->seqErrors()))
         {
-            printf("TS errors: %d\n", pkt->errors());
-            return ContentPacketPtr();
+#if 1
+            printf("Skip packet (PID: 0x%x). TS errors: %d; sequence errors: %d\n", pid, pkt->tsErrors(), pkt->seqErrors());
+#endif
+            pkt.reset();
         }
 
         return pkt;

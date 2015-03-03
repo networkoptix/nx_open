@@ -133,9 +133,12 @@ namespace ite
         };
 
         ContentPacket()
-        :   m_gotPES(0),
-            m_flags(0),
+        :   m_gotPES(false),
+            m_done(false),
+            m_sequence(0),
+            m_seqErrors(0),
             m_tsErrors(0),
+            m_flags(0),
             m_pesPTS(0),
             m_pesDTS(0)
             //m_adaptPCR(0),
@@ -146,23 +149,30 @@ namespace ite
             m_data.reserve(SIZE_RESERVE);
         }
 
-        bool append(const TsBuffer& ts)
+        bool append(const MpegTsPacket& pkt)
         {
-            MpegTsPacket pkt = ts.packet();
-
             if (pkt.checkbit())
             {
+                if (pkt.hasPayload())
+                    ++m_sequence;
+
                 ++m_tsErrors;
                 return false;
             }
 
-            if (!m_gotPES && !pkt.isPES())
+            if (m_done || (!m_gotPES && !pkt.isPES()))
                 return false;
 
             if (pkt.isPES())
             {
-                m_tsErrors = 0;
-                ++m_gotPES;
+                if (m_gotPES)
+                {
+                    m_done = true;
+                    return false;
+                }
+
+                m_sequence = pkt.counter() + 1;
+                m_gotPES = true;
 
                 MpegTsPacket::PesFlags flags = pkt.pesFlags();
 
@@ -174,7 +184,19 @@ namespace ite
                 append(pkt.pesPayload(), pkt.pesPayloadLen());
             }
             else
+            {
+                if ((m_sequence & 0x0F) != pkt.counter())
+                {
+                    m_sequence = pkt.counter();
+                    ++m_seqErrors;
+                }
+
+                if (pkt.hasPayload())
+                    ++m_sequence;
+
                 append(pkt.tsPayload(), pkt.tsPayloadLen());
+            }
+
 #if 0
             if (!m_adaptPCR)
                 m_adaptPCR = pkt.adaptPCR();
@@ -186,8 +208,6 @@ namespace ite
             if (size() >= MAX_PACKET_SIZE())
             {
                 printf("Elementary stream packet is too big. Something goes wrong.\n");
-                m_gotPES = 0;
-                m_data.clear();
                 return false;
             }
 
@@ -204,13 +224,19 @@ namespace ite
         void setTimestamp(uint64_t ts) { m_timestamp = ts; }
         uint64_t timestamp() const { return m_timestamp; }
 
-        unsigned errors() const { return m_tsErrors; }
+        bool gotPES() const { return m_gotPES; }
+        bool done() const { return m_done; }
+        unsigned tsErrors() const { return m_tsErrors; }
+        unsigned seqErrors() const { return m_seqErrors; }
 
     private:
         std::vector<uint8_t> m_data;
-        unsigned m_gotPES;
+        bool m_gotPES;
+        bool m_done;
+        uint8_t m_sequence;
+        uint16_t m_seqErrors;
+        uint16_t m_tsErrors;
         unsigned m_flags;
-        unsigned m_tsErrors;
         uint32_t m_pesPTS;
         uint32_t m_pesDTS;
         uint64_t m_timestamp;
