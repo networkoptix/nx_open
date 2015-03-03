@@ -193,39 +193,52 @@ bool DummySocket::registerTimerImpl( unsigned int timeoutMs, std::function<void(
 //// parse utils
 ////////////////////////////////////////////////////////////
 
-BufferSocket::BufferSocket( const std::basic_string<uint8_t>& data )
+BufferSocket::BufferSocket( const std::string& data )
 :
-    m_data( data )
+    m_data( data ),
+    m_isOpened( false ),
+    m_curPos( 0 )
 {
 }
 
 void BufferSocket::close()
 {
+    m_isOpened = false;
 }
 
 bool BufferSocket::isClosed() const
 {
-    return true;
+    return !m_isOpened;
 }
 
 bool BufferSocket::connect(
     const SocketAddress& remoteSocketAddress,
     unsigned int timeoutMillis )
 {
-    return false;
+    if( !DummySocket::connect( remoteSocketAddress, timeoutMillis ) )
+        return false;
+
+    m_isOpened = true;
+    m_curPos = 0;
+    return true;
 }
 
 int BufferSocket::recv( void* buffer, unsigned int bufferLen, int flags )
 {
-    return -1;
+    const size_t bytesToCopy = std::min<size_t>( bufferLen, m_data.size() - m_curPos );
+    memcpy( buffer, m_data.data() + m_curPos, bytesToCopy );
+    m_curPos += bytesToCopy;
+    return bytesToCopy;
 }
 
 int BufferSocket::send( const void* buffer, unsigned int bufferLen )
 {
-    return -1;
+    if( !m_isOpened )
+        return -1;
+    return bufferLen;
 }
 
 bool BufferSocket::isConnected() const
 {
-    return false;
+    return m_isOpened;
 }

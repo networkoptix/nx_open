@@ -69,7 +69,7 @@ class BufferSocket
     public DummySocket
 {
 public:
-    BufferSocket( const std::basic_string<uint8_t>& data );
+    BufferSocket( const std::string& data );
 
     virtual void close() override;
     virtual bool isClosed() const override;
@@ -82,7 +82,9 @@ public:
     virtual bool isConnected() const override;
 
 private:
-    const std::basic_string<uint8_t>& m_data;
+    const std::string& m_data;
+    bool m_isOpened;
+    size_t m_curPos;
 };
 
 #endif  //DUMMY_SOCKET_H

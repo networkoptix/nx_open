@@ -511,8 +511,22 @@ TEST( QnMulticodecRtpReader, streamFetchingOverRTSP8 )
 
 TEST( QnMulticodecRtpReader, rtpParsingPerformance )
 {
+    //creating necessary single-tones
     QnResourcePropertyDictionary resPropertyDictionary;
     QnSyncTime syncTimeInstance;
+
+    //preparing test data
+    static const char* testDataFilePath = "D:\\develop\\problems\\bpi_optimization\\in.1";
+    std::ifstream testFile;
+    testFile.open( testDataFilePath, std::ifstream::binary );
+    std::string testData;
+    struct stat st;
+    memset( &st, 0, sizeof(st) );
+    ASSERT_EQ( stat( testDataFilePath, &st ), 0 );
+    testData.resize( st.st_size );
+    testFile.read( const_cast<char*>(testData.data()), st.st_size );
+    ASSERT_EQ( testFile.gcount(), st.st_size );
+    testFile.close();
 
     QnNetworkResourcePtr resource( new QnNetworkResource() );
     resource->setId( QUuid::createUuid().toString() );
@@ -522,28 +536,27 @@ TEST( QnMulticodecRtpReader, rtpParsingPerformance )
     auth.setPassword( "ptth" );
     resource->setAuth( auth );
 
-    for( ;; )
+    QElapsedTimer t;
+    t.restart();
+    for( int i = 0; i < 50; ++i )
     {
         std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader(
             new QnMulticodecRtpReader(
                 resource,
-                std::unique_ptr<FileSocket>(new FileSocket("D:\\develop\\problems\\bpi_optimization\\in.1" ))) );
+                std::unique_ptr<BufferSocket>(new BufferSocket(testData))) );
         rtspStreamReader->setRequest( rtspUrl );
         ASSERT_TRUE( rtspStreamReader->openStream() );
 
-        QElapsedTimer t;
-        t.restart();
         for( ;; )
         {
             auto frame = rtspStreamReader->getNextData();
             if( !frame )
                 break;
         }
-
-        int x = t.elapsed();
-        std::cout<<"Done in "<<x<<"ms"<<std::endl;
-        continue;
     }
+
+    int x = t.elapsed();
+    std::cout<<"Done in "<<x<<"ms"<<std::endl;
 }
 
 #endif
