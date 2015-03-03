@@ -27,7 +27,7 @@ namespace ite
 
         void push(T elem)
         {
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+            //std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             if (m_pool.size() < MAX_ELEMENTS)
             {
@@ -39,7 +39,7 @@ namespace ite
 
         T pop()
         {
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+            //std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             if (m_pool.empty())
                 return T();
@@ -50,7 +50,7 @@ namespace ite
         }
 
     private:
-        std::mutex m_mutex;
+        //std::mutex m_mutex; // faster without
         std::vector<T> m_pool;
     };
 
@@ -67,9 +67,11 @@ namespace ite
         typedef std::shared_ptr<ContT> BufT;
         typedef Pool<BufT, MAX_ELEMENTS> PoolT;
 
-        TsBuffer()
+        TsBuffer(bool alloc = false)
         :   m_pool(nullptr)
         {
+            if (alloc)
+                m_buf = std::make_shared<ContT>(MpegTsPacket::PACKET_SIZE());
         }
 
         TsBuffer(PoolT& pool)
@@ -82,7 +84,7 @@ namespace ite
 
         ~TsBuffer()
         {
-            if (m_buf.unique())
+            if (m_pool && m_buf.unique())
                 m_pool->push(m_buf);
         }
 
@@ -94,7 +96,7 @@ namespace ite
 
         TsBuffer& operator = (const TsBuffer& ts)
         {
-            if (m_buf && m_buf.unique())
+            if (m_pool && m_buf && m_buf.unique())
                 m_pool->push(m_buf);
 
             m_buf = ts.m_buf;

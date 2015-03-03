@@ -125,17 +125,8 @@ namespace ite
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         if (q->size() >= MAX_TS_QUEUE_SIZE())
-        {
             q->pop_front();
-#if 0
-            printf("lost TS\n");
-#endif
-        }
 
-#if 0
-        if (ts.packet().checkbit())
-            printf("TS error bit\n");
-#endif
 #if 0
         if (q->size())
         {
@@ -143,7 +134,7 @@ namespace ite
                 printf("TS wrong count: %d -> %d\n", q->back().packet().counter(), ts.packet().counter());
         }
 #endif
-        q->push_back(ts);
+        q->push_back(std::move(ts));
     }
 
     TsBuffer Demux::pop(uint16_t pid)
@@ -318,7 +309,7 @@ namespace ite
             if (pkt.isPES())
                 dumpPacket(pkt.pid());
 
-            m_demux.push(ts);
+            m_demux.push(std::move(ts));
             return true;
         }
 
@@ -392,7 +383,7 @@ namespace ite
         sync();
 
         Timer t(true);
-        TsBuffer ts(m_poolTs);
+        TsBuffer ts(true); // not from Pool
 
         while (t.elapsedUS() < WAIT_TIME_MS)
         {
