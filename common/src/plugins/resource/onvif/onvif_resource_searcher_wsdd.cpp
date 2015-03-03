@@ -572,6 +572,10 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
     else if (lowerName == lit("digital watchdog")) {
         qSwap(name, manufacturer);
     }
+    else if (manufacturer.toLower().startsWith(lit("dwc-"))) {
+        name = manufacturer;
+        manufacturer = lit("Digital Watchdog");
+    }
     else if (lowerName == lit("sony")) {
         qSwap(name, manufacturer);
     }

@@ -4,10 +4,13 @@
 namespace Qn {
 
     enum HelpTopic {
+        Empty_Help = 0,
+        Forced_Empty_Help,
+
 #define QN_HELP_TOPIC(ID, URL) ID,
 #include "help_topics.i"
 
-        Empty_Help = -1
+        HelpTopicCount
     };
 
 } // namespace Qn

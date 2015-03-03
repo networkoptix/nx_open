@@ -22,6 +22,16 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     m_mergeTool(new QnMergeSystemsTool(this))
 {
     ui->setupUi(this);
+
+    QStringList successMessage;
+    successMessage 
+        << tr("Success!") 
+        << QString() 
+        << QString() 
+        << tr("The system was configured successfully.") 
+        << tr("The servers from the remote system should appear in your system soon.");
+    ui->successLabel->setText(successMessage.join(L'\n'));
+
     ui->urlComboBox->lineEdit()->setPlaceholderText(tr("http(s)://host:port"));
     m_mergeButton = ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
     setWarningStyle(ui->errorLabel);

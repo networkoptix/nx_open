@@ -1375,10 +1375,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::Any, this),
-            new QnDisjunctionActionCondition(
-                      new QnResourceStatusActionCondition(Qn::Incompatible, false, this),
-                      new QnResourceStatusActionCondition(Qn::Unauthorized, false, this),
-                      this),
+            new QnResourceStatusActionCondition(QSet<Qn::ResourceStatus>() << Qn::Incompatible << Qn::Unauthorized, true, this),
             this));
 
     factory().

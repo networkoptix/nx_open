@@ -373,7 +373,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     }
     
     if (result)
-        connect(result, SIGNAL(packetLostDetected(quint32, quint32)), this, SLOT(at_packetLost(quint32, quint32)));
+        connect(result, &QnRtpStreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost, Qt::DirectConnection);
     return result;
 }
 

@@ -118,7 +118,7 @@ namespace {
         button->setDefaultAction(action);
         button->setCached(true);
 
-        if(helpTopicId != -1)
+        if(helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);
 
         return button;

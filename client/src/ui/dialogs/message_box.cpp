@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 static QMessageBox::StandardButton showNewMessageBox(QWidget *parent, QMessageBox::Icon icon, int helpTopicId, const QString& title, const QString& text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton) {
     QnMessageBox msgBox(icon, helpTopicId, title, text, QMessageBox::NoButton, parent);
@@ -37,7 +38,7 @@ QnMessageBox::QnMessageBox(QWidget *parent):
 {}
 
 QnMessageBox::QnMessageBox(Icon icon, int helpTopicId, const QString &title, const QString &text, StandardButtons buttons, QWidget *parent, Qt::WindowFlags flags):
-    base_type(icon, title, text, buttons, parent, helpTopicId == -1 ? flags : flags | Qt::WindowContextHelpButtonHint)
+    base_type(icon, title, text, buttons, parent, helpTopicId == Qn::Empty_Help ? flags : flags | Qt::WindowContextHelpButtonHint)
 {
     setHelpTopic(this, helpTopicId);
 }
@@ -89,7 +90,7 @@ QPushButton* QnMessageBox::addCustomButton(const QString &text, QMessageBox::But
 
 int QnMessageBox::exec() {
     Qt::WindowFlags flags = windowFlags();
-    if (helpTopic(this) != -1)
+    if (helpTopic(this) != Qn::Empty_Help)
         flags |= Qt::WindowContextHelpButtonHint;
     else
         flags &= ~Qt::WindowContextHelpButtonHint;

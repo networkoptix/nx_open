@@ -586,9 +586,9 @@ SystemError::ErrorCode readPartitionsAndSizes( QList<QnPlatformMonitor::Partitio
 
     for( auto deviceAndPath: deviceToPath )
     {
-        struct statvfs vfsInfo;
+        struct statvfs64 vfsInfo;
         memset( &vfsInfo, 0, sizeof(vfsInfo) );
-        if( statvfs( deviceAndPath.second.first.toUtf8().constData(), &vfsInfo ) == -1 )
+        if( statvfs64( deviceAndPath.second.first.toUtf8().constData(), &vfsInfo ) == -1 )
             continue;
 
         QnPlatformMonitor::PartitionSpace partitionInfo;

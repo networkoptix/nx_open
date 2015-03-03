@@ -28,6 +28,7 @@
 #include <ui/style/globals.h>
 
 #include <utils/common/email.h>
+#include <utils/common/string.h>
 
 #include "openal/qtvaudiodevice.h"
 #include <utils/common/app_info.h>
@@ -99,7 +100,7 @@ QString QnAboutDialog::connectedServers() const {
         if(!resource) 
             continue;
                       
-        QString server = tr("Server at %2: v%1<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+        QString server = tr("Server at %2: v%1").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host()) + lit("<br/>");
 
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
@@ -121,65 +122,53 @@ void QnAboutDialog::retranslateUi()
 
     m_copyButton->setText(tr("Copy to Clipboard"));
 
-    QString version = 
-        tr(
-            "<b>%1</b> version %2 (%3).<br/>\n"
-            "Built for %5-%6 with %7.<br/>\n"
-        ).
-        arg(qApp->applicationDisplayName()).
-        arg(QApplication::applicationVersion()).
-        arg(QnAppInfo::applicationRevision()).
-        arg(QnAppInfo::applicationPlatform()).
-        arg(QnAppInfo::applicationArch()).
-        arg(QnAppInfo::applicationCompiler());
+    QStringList version;
+    version <<
+        tr("%1 version %2 (%3).")
+        .arg(htmlBold(qApp->applicationDisplayName()))
+        .arg(QApplication::applicationVersion())
+        .arg(QnAppInfo::applicationRevision());
+    version <<
+        tr("Built for %1-%2 with %3.")
+        .arg(QnAppInfo::applicationPlatform())
+        .arg(QnAppInfo::applicationArch())
+        .arg(QnAppInfo::applicationCompiler());
 
 //    QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
     QString servers = connectedServers();
     if (servers.isEmpty())
-        servers = tr("<b>Client</b> is not connected to <b>Server</b>.<br>");
+        servers = tr("Client is not connected to any server");
     
-    QString credits = 
-        tr(
-            "<b>%1 %2</b> uses the following external libraries:<br/>\n"
-            "<br />\n"
-            "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br/>\n"
-            "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 FFmpeg developers.<br/>\n"
-            "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.<br/>\n"
-            "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6.<br/>\n"
-            "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
-            "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br/>\n"
-        ).
-        arg(QnAppInfo::organizationName() + lit("(tm)")).
-        arg(qApp->applicationDisplayName()).
-        arg(QLatin1String(QT_VERSION_STR)).
-        arg(versionString(QnAppInfo::ffmpegVersion())).
-        arg(QtvAudioDevice::instance()->versionString()).
-        arg(QtvAudioDevice::instance()->company()).
-        arg(versionString(QnAppInfo::sigarVersion())).
-        arg(versionString(QnAppInfo::boostVersion()));
+    QString appName = lit("<b>%1%2 %3</b>")
+        .arg(QnAppInfo::organizationName())
+        .arg(lit("(tm)"))
+        .arg(qApp->applicationDisplayName());
 
-#ifndef Q_OS_DARWIN
-    credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br/>");
-#endif
+    QStringList credits;
+    credits << tr("%1 uses the following external libraries:").arg(appName);
+    credits << QString();
+    credits << lit("<b>Qt v.%1</b> - Copyright (c) 2012 Nokia Corporation.").arg(QLatin1String(QT_VERSION_STR));
+    credits << lit("<b>FFMpeg %1</b> - Copyright (c) 2000-2012 FFmpeg developers.").arg(versionString(QnAppInfo::ffmpegVersion()));
+    credits << lit("<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.");
+    credits << lit("<b>OpenAL %1</b> - Copyright (c) 2000-2006 %2.").arg(QtvAudioDevice::instance()->versionString()).arg(QtvAudioDevice::instance()->company());
+    credits << lit("<b>SIGAR %1</b> - Copyright (c) 2004-2011 VMware Inc.").arg(versionString(QnAppInfo::sigarVersion()));
+    credits << lit("<b>Boost %1</b> - Copyright (c) 2000-2012 Boost developers.").arg(versionString(QnAppInfo::boostVersion()));
+    credits << lit("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.");
 
     int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
 
-    QString gpu = 
-        tr(
-            "<b>OpenGL version</b>: %1.<br/>\n"
-            "<b>OpenGL renderer</b>: %2.<br/>\n"
-            "<b>OpenGL vendor</b>: %3.<br/>\n"
-            "<b>OpenGL max texture size</b>: %4.<br/>\n"
-        ).
-        arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VERSION)))).
-        arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))). // TODO: #Elric same shit, OpenGL calls.
-        arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VENDOR)))).
-        arg(maxTextureSize);
-
+    QStringList gpu;
+     // TODO: #Elric same shit, OpenGL calls.
+    gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL version")).arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VERSION))));
+    gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL renderer")).arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER))));
+    gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL vendor")).arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VENDOR))));
+    gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL max texture size")).arg(maxTextureSize);
     
-    ui->versionLabel->setText(version);
-    ui->creditsLabel->setText(credits);
-    ui->gpuLabel->setText(gpu);
+    const QString lineSeparator = lit("<br>\n");
+
+    ui->versionLabel->setText(version.join(lineSeparator));
+    ui->creditsLabel->setText(credits.join(lineSeparator));
+    ui->gpuLabel->setText(gpu.join(lineSeparator));
     ui->serversLabel->setText(servers);
 
     QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
@@ -188,7 +177,7 @@ void QnAboutDialog::retranslateUi()
         supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportAddress);
     else if (!supportAddress.isEmpty())
         supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);
-    ui->supportEmailLabel->setText(tr("<b>Support</b>: %1").arg(supportLink));
+    ui->supportEmailLabel->setText(lit("<b>%1</b>: %2").arg(tr("Support")).arg(supportLink));
 }
 
 // -------------------------------------------------------------------------- //

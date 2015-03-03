@@ -13,6 +13,7 @@
 #include <QtWidgets/QSpacerItem>
 
 #include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 class QnCheckableMessageBoxPrivate {
 public:
@@ -202,7 +203,7 @@ QnCheckableMessageBox::question(QWidget *parent, int helpTopicId, const QString 
 QDialogButtonBox::StandardButton
 QnCheckableMessageBox::question(QWidget *parent, const QString &title, const QString &question, const QString &checkBoxText, bool *checkBoxSetting, 
         QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton, QDialogButtonBox::StandardButton cancelButton) {
-    return QnCheckableMessageBox::question(parent, -1, title, question, checkBoxText, checkBoxSetting, buttons, defaultButton, cancelButton);
+    return QnCheckableMessageBox::question(parent, Qn::Empty_Help, title, question, checkBoxText, checkBoxSetting, buttons, defaultButton, cancelButton);
 }
 
 QDialogButtonBox::StandardButton
@@ -226,5 +227,5 @@ QnCheckableMessageBox::warning(QWidget *parent, int helpTopicId, const QString &
 QDialogButtonBox::StandardButton
 QnCheckableMessageBox::warning(QWidget *parent, const QString &title, const QString &warning, const QString &checkBoxText, bool *checkBoxSetting, 
         QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton, QDialogButtonBox::StandardButton cancelButton) {
-    return QnCheckableMessageBox::warning(parent, -1, title, warning, checkBoxText, checkBoxSetting, buttons, defaultButton, cancelButton);
+    return QnCheckableMessageBox::warning(parent, Qn::Empty_Help, title, warning, checkBoxText, checkBoxSetting, buttons, defaultButton, cancelButton);
 }

@@ -160,7 +160,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         button->setDefaultAction(action(actionId));
         button->setFixedSize(buttonSize);
         button->setCached(true);
-        if (helpTopicId >= 0)
+        if (helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);
         connect(this->context(), &QnWorkbenchContext::userChanged, this, [this, button, actionId] {
             button->setVisible(this->menu()->canTrigger(actionId));

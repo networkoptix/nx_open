@@ -8,10 +8,12 @@
         <translation>System Tray</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>Es gibt keinen  System Tray auf diesem System.
-Die Applikation beendet sich jetzt.</translation>
+        <source>There is no system tray on this system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -42,12 +44,6 @@ Die Applikation beendet sich jetzt.</translation>
     <message>
         <source>Could not access installed services</source>
         <translation>Kein Zugriff auf installierten Dienst</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>Folgender Fehler trat beim Zugriff auf den installierten Dienst auf:
- %1</translation>
     </message>
     <message>
         <source>No %1 services installed</source>
@@ -115,6 +111,10 @@ Die Applikation beendet sich jetzt.</translation>
     <message>
         <source>Media Server Web Page</source>
         <translation>Media-Server Webseite</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
