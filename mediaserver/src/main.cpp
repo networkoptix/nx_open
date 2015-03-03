@@ -680,6 +680,8 @@ int serverMain(int argc, char *argv[])
 
 
     const QString& dataLocation = getDataDirectory();
+    const QString& logDir = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
+
     QDir::setCurrent(qApp->applicationDirPath());
 
     if (cmdLineArguments.rebuildArchive.isEmpty()) {
@@ -696,7 +698,7 @@ int serverMain(int argc, char *argv[])
 
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
-            dataLocation + QLatin1String("/log/http_log"),
+            logDir + QLatin1String("/http_log"),
             DEFAULT_MAX_LOG_FILE_SIZE,
             DEFAULT_MSG_LOG_ARCHIVE_SIZE,
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
@@ -710,7 +712,7 @@ int serverMain(int argc, char *argv[])
     if( cmdLineArguments.ec2TranLogLevel != lit("none") )
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            dataLocation + QLatin1String("/log/ec2_tran"),
+            logDir + QLatin1String("/ec2_tran"),
             DEFAULT_MAX_LOG_FILE_SIZE,
             DEFAULT_MSG_LOG_ARCHIVE_SIZE,
             QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );

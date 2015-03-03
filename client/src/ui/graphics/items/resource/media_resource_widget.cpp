@@ -821,7 +821,7 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     if (action(Qn::ToggleTourModeAction)->isChecked())
-        return Qn::MinaWindow_Scene_TourInProgress_Help;
+        return Qn::MainWindow_Scene_TourInProgress_Help;
 
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
 

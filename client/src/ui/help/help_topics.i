@@ -39,7 +39,7 @@ QN_HELP_TOPIC(MainWindow_Tree_Camera_Help,                      "configuring_cam
 QN_HELP_TOPIC(MainWindow_Scene_Help,                            "hd_witness_user_interface_overview.htm")
 QN_HELP_TOPIC(MainWindow_Scene_EMapping_Help,                   "e-mapping.htm") // TODO
 QN_HELP_TOPIC(MainWindow_Scene_PreviewSearch_Help,              "thumbnail_search.htm") // TODO
-QN_HELP_TOPIC(MinaWindow_Scene_TourInProgress_Help,             "tours.htm")
+QN_HELP_TOPIC(MainWindow_Scene_TourInProgress_Help,             "tours.htm")
 QN_HELP_TOPIC(MainWindow_Playback_Help,                         "playback_panel.htm")
 QN_HELP_TOPIC(MainWindow_Navigation_Help,                       "navigating_through_archive_and.htm")
 QN_HELP_TOPIC(MainWindow_Sync_Help,                             "navigating_through_several_cameras_synchronously.htm")
