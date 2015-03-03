@@ -40,6 +40,7 @@ extern "C"
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
@@ -244,6 +245,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(selectionPressed()),                         this,   SLOT(at_timeSlider_selectionPressed()));
     connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
     connect(m_timeSlider,                       SIGNAL(thumbnailClicked()),                         this,   SLOT(at_timeSlider_thumbnailClicked()));
+    connect(m_timeSlider, &QnTimeSlider::bookmarksUnderCursorUpdated, this, &QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated);
     m_timeSlider->setLineCount(SliderLineCount);
     m_timeSlider->setLineStretch(CurrentLine, 1.5);
     m_timeSlider->setLineStretch(SyncedLine, 1.0);
@@ -1285,6 +1287,29 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
 
     return base_type::eventFilter(watched, event);
 }
+
+void QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated(const QPointF& pos)
+{
+    if (qnSettings->isVideoWallMode())
+    {    
+        m_timeSlider->bookmarksViewer()->updateBookmarks(QnCameraBookmarkList(), QnActionParameters());
+        return;
+    }
+
+    const qint64 position = m_timeSlider->valueFromPosition(pos);
+    const QnActionParameters params(currentTarget(Qn::SliderScope));
+    QnCameraBookmarkList bookmarks;
+    if (m_currentMediaWidget && m_timeSlider->timePeriods(QnWorkbenchNavigator::CurrentLine, Qn::BookmarksContent).containTime(position))
+    {
+        if (QnCachingCameraDataLoader * const loader = loaderByWidget(m_currentMediaWidget))
+        {
+            bookmarks = loader->allBookmarksByTime(position);
+        }
+    }
+
+    m_timeSlider->bookmarksViewer()->updateBookmarks(bookmarks, params);
+}
+
 
 void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos) {
     if(!context() || !context()->menu()) {

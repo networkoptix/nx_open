@@ -264,6 +264,11 @@ void QnCachingCameraDataLoader::removeBookmark(const QnCameraBookmark & bookmark
     emit bookmarksChanged();
 }
 
+QnCameraBookmarkList QnCachingCameraDataLoader::allBookmarksByTime(qint64 position) const
+{
+    return m_bookmarkCameraData.findAll(position);
+}
+
 QnCameraBookmark QnCachingCameraDataLoader::bookmarkByTime(qint64 position) const {
     return m_bookmarkCameraData.find(position);
 }

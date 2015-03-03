@@ -19,6 +19,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <camera/resource_display.h>
 
@@ -51,6 +52,7 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
 #include <ui/common/palette.h>
 #include <ui/processors/hover_processor.h>
@@ -2353,6 +2355,21 @@ void QnWorkbenchUi::createSliderWidget()
     connect(action(Qn::ToggleTourModeAction),   &QAction::toggled,                  this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(action(Qn::ToggleThumbnailsAction), &QAction::toggled,                  this,           [this](bool checked){ setThumbnailsVisible(checked); });
     connect(action(Qn::ToggleSliderAction),     &QAction::toggled,                  this,           [this](bool checked){ if (!m_ignoreClickEvent) setSliderOpened(checked);});
+
+    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::editBookmarkClicked, this
+        , [this](const QnCameraBookmark &bookmark, QnActionParameters params)
+    {
+        params.setArgument(Qn::CameraBookmarkRole, bookmark);
+        menu()->triggerIfPossible(Qn::EditCameraBookmarkAction, params);
+    });
+
+    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::removeBookmarkClicked, this
+        , [this](const QnCameraBookmark &bookmark, QnActionParameters params)
+    {
+        params.setArgument(Qn::CameraBookmarkRole, bookmark);
+        menu()->triggerIfPossible(Qn::RemoveCameraBookmarkAction, params);
+    });
+    
 }
 
 #pragma endregion Slider methods

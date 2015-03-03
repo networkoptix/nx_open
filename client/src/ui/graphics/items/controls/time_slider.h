@@ -27,6 +27,7 @@ class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 class QnTimePeriodList;
+class QnBookmarksViewer;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
@@ -179,7 +180,10 @@ public:
     void setLastMinuteIndicatorVisible(int line, bool visible);
     bool isLastMinuteIndicatorVisible(int line) const;
 
+    QnBookmarksViewer *bookmarksViewer();
+
 signals:
+    void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
@@ -187,6 +191,8 @@ signals:
     void selectionReleased();
     void thumbnailsVisibilityChanged();
     void thumbnailClicked();
+
+    void bookmarksUnderCursorUpdated(const QPointF &position);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -400,6 +406,11 @@ private:
     qint64 m_localOffset;
 
     QLocale m_locale;
+
+    QPointF m_lastLineBarMousePos;
+    qreal m_lastLineBarValue;
+
+    QnBookmarksViewer *m_bookmarksViewer;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);
