@@ -56,12 +56,12 @@ namespace ec2
             saveCamera                  = 301,  /*< ApiCameraData */
             saveCameras                 = 302,  /*< ApiCameraDataList */
             removeCamera                = 303,  /*< ApiIdData */
-            getCameraHistoryItems       = 304,  /*< ApiCameraServerItemDataList */
-            addCameraHistoryItem        = 305,  /*< ApiCameraServerItemData */
+            getCameraHistoryItems       = 304,  /*< ApiCameraHistoryDataList */
+            addCameraHistoryItem        = 305,  /*< ApiCameraHistoryData */
             addCameraBookmarkTags       = 306,  /*< ApiCameraBookmarkTagDataList */
             getCameraBookmarkTags       = 307,  /*< ApiCameraBookmarkTagDataList */
             removeCameraBookmarkTags    = 308,
-            removeCameraHistoryItem     = 309,  /*< ApiCameraServerItemData */
+            removeCameraHistoryItem     = 309,  /*< ApiCameraHistoryData */
             saveCameraUserAttributes    = 310,  /*< ApiCameraAttributesData */
             saveCameraUserAttributesList= 311,  /*< ApiCameraAttributesDataList */
             getCameraUserAttributes     = 312,  /*< ApiCameraAttributesDataList */

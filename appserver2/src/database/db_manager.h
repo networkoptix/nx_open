@@ -151,7 +151,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataExList& cameraList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraHistoryDataList& historyList);
 
         //getCameraBookmarkTags
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
@@ -236,7 +236,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraHistoryData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
@@ -470,10 +470,6 @@ namespace ec2
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
-    protected: 
-        virtual bool beforeInstallUpdate(const QString& updateName) override;
-        virtual bool afterInstallUpdate(const QString& updateName) override;
-
     private:
         class QnDbTransactionExt: public QnDbTransaction
         {
@@ -500,14 +496,17 @@ namespace ec2
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
 
-        ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
-        ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
+        bool beforeInstallUpdate(const QString& updateName);
+        bool afterInstallUpdate(const QString& updateName);
+
+        ErrorCode addCameraHistory(const ApiCameraHistoryData& params);
+        ErrorCode removeCameraHistory(const QnUuid& serverId);
         ErrorCode getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool tuneDBAfterOpen();
-        bool updateCameraHistoryGuids();
+        bool removeOldCameraHistory();
         bool migrateServerGUID(const QString& table, const QString& field);
     private:
         QnResourceFactory* m_resourceFactory;

@@ -117,7 +117,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
                 QnCameraBookmarkList bookmarks;
                 if (qnStorageMan->getBookmarks(physicalId.toUtf8(), bookmarksFilter, bookmarks)) {
                     for (const QnCameraBookmark &bookmark: bookmarks)
-                        periods << QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);                    
+                        periods.push_back(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs));
                 }
             } else {
             //TODO: #GDM #Bookmarks use tags to filter periods?

@@ -18,6 +18,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include "core/resource/camera_history.h"
 
 
 namespace {
@@ -472,12 +473,9 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
     quint64 ts = params.eventTimestamp;
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
-    if (history) {
-        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, false);
-        if (newServer)
-            mserverRes = newServer;
-    }
+    QnMediaServerResourcePtr newServer = qnHistoryPool->getMediaServerOnTime(res, ts/1000);
+    if (newServer)
+        mserverRes = newServer;
 
     if (resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
         QUrl mserverUrl = mserverRes->getUrl();

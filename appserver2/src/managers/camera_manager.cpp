@@ -11,6 +11,7 @@
 #include "server_query_processor.h"
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
+#include "nx_ec/data/api_camera_server_item_data.h"
 
 namespace ec2
 {
@@ -45,22 +46,14 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::setCamerasWithArchive( const QnUuid& serverGuid, const std::vector<QnUuid>& cameras, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         ApiCommand::Value command = ApiCommand::addCameraHistoryItem;
-        auto tran = prepareTransaction( command, cameraHistoryItem );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
-        return reqID;
-    }
 
-    template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::removeCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-        ApiCommand::Value command = ApiCommand::removeCameraHistoryItem;
-        auto tran = prepareTransaction( command, cameraHistoryItem );
+        QnTransaction<ApiCameraHistoryData> tran(command);
+        tran.params.serverGuid = serverGuid;
+        tran.params.archivedCameras = cameras;
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
         return reqID;
@@ -83,17 +76,17 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::getCamerasWithArchiveList( impl::GetCamerasHistoryHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemDataList& cameraHistory) {
-            QnCameraHistoryList outData;
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraHistoryDataList& cameraHistory) {
+            ApiCameraHistoryDataList outData;
             if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(cameraHistory, outData);
+                outData = cameraHistory;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraHistoryDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryItems, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -228,16 +221,6 @@ namespace ec2
     {
         QnTransaction<ApiCameraAttributesDataList> tran(command);
         fromResourceListToApi(cameraAttributesList, tran.params);
-        return tran;
-    }
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiCameraServerItemData> QnCameraManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value command,
-        const QnCameraHistoryItem& historyItem )
-    {
-        QnTransaction<ApiCameraServerItemData> tran(command);
-        fromResourceToApi(historyItem, tran.params);
         return tran;
     }
 

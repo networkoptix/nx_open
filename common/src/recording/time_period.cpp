@@ -3,15 +3,19 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDateTime>
 
+#include <utils/common/model_functions.h>
+
 #include <utils/math/math.h>
 #include <utils/common/util.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
+#include "time_period_list.h"
 
 QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((QnTimePeriod), (ubjson)(xml)(csv_record))
 
 namespace detail {
-    QN_FUSION_DEFINE_FUNCTIONS(QnTimePeriod, (json), static)
+    QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((QnTimePeriod), (json))
 }
 
 

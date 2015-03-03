@@ -2,22 +2,28 @@
 
 #include <utils/common/util.h>
 #include <utils/math/math.h>
+#include <utils/common/model_functions.h>
+#include <utils/serialization/compressed_time_functions.h>
+
+QN_FUSION_ADAPT_STRUCT(MultiServerPeriodData, (guid)(periods))
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((MultiServerPeriodData), (json)(ubjson)(xml)(csv_record)(compressed_time))
 
 namespace {
     static const qint64 InvalidValue = INT64_MAX;
 }
 
 QnTimePeriodList::QnTimePeriodList(const QnTimePeriod &singlePeriod): 
-    QVector<QnTimePeriod>() {
-        append(singlePeriod);
+    std::vector<QnTimePeriod>() 
+{
+    push_back(singlePeriod);
 }
 
 QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 timeMs, bool searchForward) const {
-    if (isEmpty())
+    if (empty())
         return end();
 
-    const_iterator itr = qUpperBound(constBegin(), constEnd(), timeMs);
-    if (itr != begin())
+    const_iterator itr = qUpperBound(cbegin(), cend(), timeMs);
+    if (itr != cbegin())
         --itr;
 
     /* Note that there is no need to check for itr != end() here as
@@ -32,7 +38,7 @@ qint64 QnTimePeriodList::roundTimeToPeriodUSec(qint64 timeUsec, bool searchForwa
 {
     qint64 timeMs = timeUsec/1000;
     const_iterator period = findNearestPeriod(timeMs, searchForward);
-    if (period != constEnd()) {
+    if (period != cend()) {
         if (period->contains(timeMs))
             return timeUsec;
         else if (searchForward)
@@ -69,8 +75,8 @@ bool QnTimePeriodList::containTime(qint64 timeMs) const
 }
 
 bool QnTimePeriodList::containPeriod(const QnTimePeriod &period) const {
-    auto found = std::find_if(constBegin(), constEnd(), [period](const QnTimePeriod &p){return p.contains(period);});
-    return found != constEnd();
+    auto found = std::find_if(cbegin(), cend(), [period](const QnTimePeriod &p){return p.contains(period);});
+    return found != cend();
 }
 
 QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const {
@@ -92,7 +98,7 @@ QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const
 }
 
 qint64 QnTimePeriodList::duration() const {
-    if(isEmpty())
+    if(empty())
         return 0;
 
     if(back().durationMs == -1)
@@ -144,9 +150,9 @@ void serializeField(QByteArray &stream, qint64 field, bool intersected)
 
 bool QnTimePeriodList::encode(QByteArray &stream, bool intersected)
 {
-    if (isEmpty())
+    if (empty())
         return true;
-    qint64 timePos = first().startTimeMs;
+    qint64 timePos = at(0).startTimeMs;
 
     qint64 val = htonll(timePos << 16);
     stream.append(((const char*) &val), 6);
@@ -242,13 +248,13 @@ bool QnTimePeriodList::decode(QByteArray &stream, bool intersected)
 QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &periods, int detailLevelMs)
 {
     QnTimePeriodList result;
-    if (periods.isEmpty())
+    if (periods.empty())
         return result;
-    result << periods[0];
+    result.push_back(periods[0]);
 
     for (int i = 1; i < periods.size(); ++i)
     {
-        QnTimePeriod& last = result.last();
+        QnTimePeriod& last = *(result.end()-1);
         if(last.durationMs == -1)
             break;
 
@@ -259,19 +265,19 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &
                 last.durationMs = qMax(last.durationMs, periods[i].startTimeMs + periods[i].durationMs - last.startTimeMs);
             }
         } else {
-            result << periods[i];
+            result.push_back(periods[i]);
         }
     }
 
     return result;
 }
 
-QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periods)
+QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeriodList>& periods)
 {
     if(periods.size() == 1)
         return periods[0];
 
-    QVector<int> minIndexes;
+    std::vector<int> minIndexes;
     minIndexes.resize(periods.size());
     QnTimePeriodList result;
     int minIndex = 0;
@@ -292,17 +298,17 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
         {
             int& startIdx = minIndexes[minIndex];
             // add chunk to merged data
-            if (result.isEmpty()) {
-                result << periods[minIndex][startIdx];
+            if (result.empty()) {
+                result.push_back(periods[minIndex][startIdx]);
             }
             else {
-                QnTimePeriod& last = result.last();
+                QnTimePeriod& last = *(result.end()-1);
                 if (periods[minIndex][startIdx].durationMs == -1) 
                 {
                     if (last.durationMs == -1)
                         last.startTimeMs = qMin(last.startTimeMs, periods[minIndex][startIdx].startTimeMs);
                     else if (periods[minIndex][startIdx].startTimeMs > last.startTimeMs+last.durationMs)
-                        result << periods[minIndex][startIdx];
+                        result.push_back(periods[minIndex][startIdx]);
                     else 
                         last.durationMs = -1;
                     break;
@@ -310,7 +316,7 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
                 else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime)
                     last.durationMs = qMax(last.durationMs, minStartTime + periods[minIndex][startIdx].durationMs - last.startTimeMs);
                 else {
-                    result << periods[minIndex][startIdx];
+                    result.push_back(periods[minIndex][startIdx]);
                 }
             } 
             startIdx++;

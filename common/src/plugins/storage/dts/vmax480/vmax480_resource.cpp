@@ -251,8 +251,8 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
 QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
 {
     Q_UNUSED(detailLevel)
-    if (!m_chunks.isEmpty())
-        startTimeMs = qMin(startTimeMs, m_chunks.last().startTimeMs);
+    if (!m_chunks.empty())
+        startTimeMs = qMin(startTimeMs, m_chunks.rbegin()->startTimeMs);
 
     QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
     

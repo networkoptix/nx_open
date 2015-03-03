@@ -18,8 +18,8 @@ namespace ec2 {
     struct ApiCameraData;
     struct ApiCameraAttributesData;
     struct ApiCameraDataEx;
-    struct ApiCameraServerItemDataOld;
-    struct ApiCameraServerItemData;
+    struct ApiCameraHistoryData;
+    struct ApiCameraHistoryMoveData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
 	struct ApiFullInfoData;
@@ -92,8 +92,8 @@ namespace ec2 {
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraAttributesData> ApiCameraAttributesDataList;
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
-    typedef std::vector<ApiCameraServerItemDataOld> ApiCameraServerItemDataOldList;
-    typedef std::vector<ApiCameraServerItemData> ApiCameraServerItemDataList;
+    typedef std::vector<ApiCameraHistoryData> ApiCameraHistoryDataList;
+    typedef std::vector<ApiCameraHistoryMoveData> ApiCameraHistoryMoveDataList;
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
@@ -119,10 +119,9 @@ namespace ec2 {
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\
     (ApiCameraData)\
+    (ApiCameraHistoryData)\
     (ApiCameraAttributesData)\
     (ApiCameraDataEx)\
-    (ApiCameraServerItemDataOld)\
-    (ApiCameraServerItemData)\
     (ApiEmailData)\
     (ApiEmailSettingsData)\
     (ApiFullInfoData)\

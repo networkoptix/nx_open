@@ -8,6 +8,7 @@
 
 namespace ec2
 {
+    /*
     struct ApiCameraServerItemDataOld: ApiData {
         ApiCameraServerItemDataOld(): timestamp(0) {}
 
@@ -23,8 +24,29 @@ namespace ec2
         QnUuid serverGuid;
         qint64   timestamp;
     };
-#define ApiCameraServerItemDataOld_Fields (cameraUniqueId)(serverId)(timestamp)
-#define ApiCameraServerItemData_Fields (cameraUniqueId)(serverGuid)(timestamp)
+    */
+
+    struct ApiCameraHistoryData: ApiData
+    {
+        QnUuid serverGuid;
+        std::vector<QnUuid> archivedCameras;
+    };
+
+    struct ApiCameraHistoryMoveData: ApiData
+    {
+        ApiCameraHistoryMoveData(): timestamp(0) {}
+        QnUuid serverGuid;
+        qint64 timestamp;
+    };
+
+    struct ApiCameraHistoryDetailData {
+        QnUuid cameraId;
+        std::vector<ApiCameraHistoryMoveData> moveHistory;
+    };
+
+#define ApiCameraHistoryData_Fields (serverGuid)(archivedCameras)
+#define ApiCameraHistoryMoveData_Fields (serverGuid)(timestamp)
+#define ApiCameraHistoryDetailData_Fields (cameraId)(moveHistory)
 
 }
 

@@ -337,48 +337,6 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
 //// QnCameraHistoryItem
 ////////////////////////////////////////////////////////////
 
-void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst) {
-    dst.cameraUniqueId = src.cameraUniqueId;
-    dst.serverGuid = src.mediaServerGuid;
-    dst.timestamp = src.timestamp;
-}
-
-void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
-    dst.cameraUniqueId = src.cameraUniqueId;
-    dst.mediaServerGuid = src.serverGuid;
-    dst.timestamp = src.timestamp;
-}
-
-void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
-{
-    /* CameraUniqueId -> (Timestamp -> ServerGuid). */
-    QMap<QString, QMap<qint64, QnUuid> > history;
-
-    /* Fill temporary history map. */
-    for (auto pos = src.begin(); pos != src.end(); ++pos)
-        history[pos->cameraUniqueId][pos->timestamp] = pos->serverGuid;
-
-    for(auto pos = history.begin(); pos != history.end(); ++pos) {
-        QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
-
-        if (pos.value().isEmpty())
-            continue;
-
-        QMapIterator<qint64, QnUuid> camit(pos.value());
-        camit.toFront();
-
-        cameraHistory->setCameraUniqueId(pos.key());
-        while (camit.hasNext())
-        {
-            camit.next();
-            cameraHistory->addTimePeriod(camit.key(), camit.value());
-        }
-
-        dst.append(cameraHistory);
-    }
-}
-
-
 void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst) {
     dst.host = src.server;
     dst.port = src.port;
@@ -412,7 +370,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.videowalls, dst.resources);
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
-    fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
+    //fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
     dst.allProperties = src.allProperties;
     fromApiToResourceList(src.storages, dst.resources, ctx);
     dst.resStatusList = src.resStatusList;

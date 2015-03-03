@@ -161,7 +161,7 @@ namespace ec2
         QnUuid transactionHash(const ApiVideowallData& params) const              { return params.id; }
         QnUuid transactionHash(const ApiBusinessRuleData& params) const           { return params.id; }
         QnUuid transactionHash(const ApiIdData& params) const                     { return params.id; }
-        QnUuid transactionHash(const ApiCameraServerItemData& params) const       { return makeHash(params.cameraUniqueId.toUtf8(), QByteArray::number(params.timestamp)); }
+        QnUuid transactionHash(const ApiCameraHistoryData& params) const       { return makeHash(params.serverGuid.toRfc4122(), "history"); }
         QnUuid transactionHash(const ApiResourceStatusData& params) const      { return makeHash(params.id.toRfc4122(), "status"); }
         QnUuid transactionHash(const ApiResourceParamWithRefData& param) const;
         QnUuid transactionHash(const ApiStoredFileData& params) const             { return makeHash(params.path.toUtf8()); }

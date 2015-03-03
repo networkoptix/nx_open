@@ -14,7 +14,6 @@
 #include <api/model/connection_info.h>
 #include <api/model/kvpair.h>
 #include <business/business_fwd.h>
-#include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_type.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -172,7 +171,7 @@ namespace ec2
             void emitAddUserDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onAddUserDone( reqID, p1, p2 ); }
             void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
             void emitGetCameraUserAttributesDone( int reqID, const ErrorCode p1, const QnCameraUserAttributesList& p2 ) { emit onGetCameraUserAttributesDone( reqID, p1, p2 ); }
-            void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
+            void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const ApiCameraHistoryDataList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
             void emitGetCameraBookmarkTagsDone( int reqID, const ErrorCode p1, const QnCameraBookmarkTags& p2 ) { emit onGetCameraBookmarkTagsDone( reqID, p1, p2 ); }
             void emitGetUsersDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
             void emitGetBusinessRulesDone( int reqID, const ErrorCode p1, const QnBusinessEventRuleList& p2 ) { emit onGetBusinessRulesDone( reqID, p1, p2 ); }
@@ -208,7 +207,7 @@ namespace ec2
             void onAddUserDone( int reqID, const ErrorCode, const QnUserResourceList& );
             void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCameraUserAttributesDone( int reqID, const ErrorCode, const QnCameraUserAttributesList& );
-            void onGetCamerasHistoryDone( int reqID, const ErrorCode, const QnCameraHistoryList& );
+            void onGetCamerasHistoryDone( int reqID, const ErrorCode, const ApiCameraHistoryDataList& );
             void onGetCameraBookmarkTagsDone(int reqID, const ErrorCode, const QnCameraBookmarkTags& );
             void onGetUsersDone( int reqID, const ErrorCode, const QnUserResourceList& );
             void onGetBusinessRulesDone( int reqID, const ErrorCode, const QnBusinessEventRuleList& );
@@ -262,7 +261,7 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCameraUserAttributes, ErrorCode, QnCameraUserAttributesList )
-        DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryList )
+        DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, ApiCameraHistoryDataList )
         DEFINE_TWO_ARG_HANDLER( GetCameraBookmarkTags, ErrorCode, QnCameraBookmarkTags )
 
 
