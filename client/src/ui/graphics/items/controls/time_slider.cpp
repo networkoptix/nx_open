@@ -1250,7 +1250,7 @@ int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
 
     bool hasMotion = false;
     for (int i = 0; i < m_lineCount; i++) {
-        if (!timePeriods(i, Qn::MotionContent).isEmpty()) {
+        if (!timePeriods(i, Qn::MotionContent).empty()) {
             hasMotion = true;
             break;
         }

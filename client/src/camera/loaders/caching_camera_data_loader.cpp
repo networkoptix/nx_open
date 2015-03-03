@@ -407,7 +407,11 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::CameraDataType dataType) {
         return;
 
     QnTimePeriod requestedPeriod = addLoadingMargins(m_targetPeriod[dataType], m_boundingPeriod, minTimePeriodLoadingMargin);
-    requestedPeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << requestedPeriods << QnTimePeriodList(requestedPeriod));
+    std::vector<QnTimePeriodList> valueToMerge;
+    for(const auto& p: requestedPeriods)
+        valueToMerge.push_back(p);
+    valueToMerge.push_back(QnTimePeriodList(requestedPeriod));
+    requestedPeriods = QnTimePeriodList::mergeTimePeriods(valueToMerge);
     load(dataType, requestedPeriod);
 }
 
@@ -420,7 +424,10 @@ void QnCachingCameraDataLoader::updateBookmarks() {
     QnTimePeriod requestedPeriod = addLoadingMargins(m_targetPeriod[Qn::BookmarkData], m_boundingPeriod, resolutionMs * 2);
     if (!periods(Qn::BookmarksContent).intersects(requestedPeriod)) // check that there are any bookmarks in this time period
         return;
-
-    requestedPeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << requestedPeriods << QnTimePeriodList(requestedPeriod));
+    std::vector <QnTimePeriodList> valueToMerge;
+    for (const auto& p: requestedPeriods)
+        valueToMerge.push_back(p);
+    valueToMerge.push_back(QnTimePeriodList(requestedPeriod));
+    requestedPeriods = QnTimePeriodList::mergeTimePeriods(valueToMerge);
     load(Qn::BookmarkData, requestedPeriod, resolutionMs);
 }

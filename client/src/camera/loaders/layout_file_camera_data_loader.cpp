@@ -75,13 +75,13 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const Q
     QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
     if (!aviRes)
         return -1;
-    QVector<QnTimePeriodList> periods;
+    std::vector<QnTimePeriodList> periods;
     for (int channel = 0; channel < motionRegions.size(); ++channel)
     {
         const QnMetaDataLightVector& m_motionData = aviRes->getMotionBuffer(channel);
         if (!m_motionData.empty())
         {
-            periods << QnTimePeriodList();
+            periods.push_back(QnTimePeriodList());
             QnMetaDataLightVector::const_iterator itrStart = qUpperBound(m_motionData.begin(), m_motionData.end(), period.startTimeMs);
             QnMetaDataLightVector::const_iterator itrEnd = qUpperBound(itrStart, m_motionData.end(), period.endTimeMs());
 
@@ -91,7 +91,7 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const Q
             for (QnMetaDataLightVector::const_iterator itr = itrStart; itr != itrEnd; ++itr)
             {
                 if (itr->channel <= motionRegions.size() && QnMetaDataV1::matchImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
-                    periods.last() << QnTimePeriod(itr->startTimeMs, itr->durationMs);
+                    periods.rbegin()->push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
             }
         }
     }

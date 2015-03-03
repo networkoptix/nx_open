@@ -79,7 +79,7 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
 
     /* Try to reduce duration of the period to load. */
     QnTimePeriod periodToLoad = timePeriod;
-    if (!loadedPeriodList.isEmpty())
+    if (!loadedPeriodList.empty())
     {
         QnTimePeriodList::const_iterator itr = qUpperBound(loadedPeriodList.cbegin(), loadedPeriodList.cend(), periodToLoad.startTimeMs);
         if (itr != loadedPeriodList.cbegin())
@@ -185,27 +185,29 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
 
     // limit the loaded period to the right edge of the loaded data
     if(!loadedData->isEmpty())
-        newPeriod.durationMs = qMin(newPeriod.durationMs, loadedData->dataSource().last().endTimeMs() - newPeriod.startTimeMs);
+        newPeriod.durationMs = qMin(newPeriod.durationMs, loadedData->dataSource().rbegin()->endTimeMs() - newPeriod.startTimeMs);
 
     // union loaded time range info 
     if(newPeriod.durationMs > 0) {
         QnTimePeriodList newPeriods;
         newPeriods.push_back(newPeriod);
 
-        QVector<QnTimePeriodList> allLoadedPeriods;
-        allLoadedPeriods << loadedPeriods << newPeriods;
+        std::vector<QnTimePeriodList> allLoadedPeriods;
+        for (const auto& p: loadedPeriods)
+            allLoadedPeriods.push_back(p);
+        allLoadedPeriods.push_back(newPeriods);
 
         loadedPeriods = QnTimePeriodList::mergeTimePeriods(allLoadedPeriods); 
     }
 
     // reduce right edge of loaded period info if last period under writing now
-    if (!loadedPeriods.isEmpty() && !loadedData->isEmpty() && loadedData->dataSource().last().durationMs == -1)
+    if (!loadedPeriods.empty() && !loadedData->isEmpty() && loadedData->dataSource().rbegin()->durationMs == -1)
     {
-        qint64 lastDataTime = loadedData->dataSource().last().startTimeMs;
-        while (!loadedPeriods.isEmpty() && loadedPeriods.last().startTimeMs > lastDataTime)
+        qint64 lastDataTime = loadedData->dataSource().rbegin()->startTimeMs;
+        while (!loadedPeriods.empty() && loadedPeriods.rbegin()->startTimeMs > lastDataTime)
             loadedPeriods.pop_back();
-        if (!loadedPeriods.isEmpty()) {
-            QnTimePeriod& lastPeriod = loadedPeriods.last();
+        if (!loadedPeriods.empty()) {
+            QnTimePeriod& lastPeriod = *loadedPeriods.rbegin();
             lastPeriod.durationMs = qMin(lastPeriod.durationMs, lastDataTime - lastPeriod.startTimeMs);
         }
     }
