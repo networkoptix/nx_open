@@ -10,6 +10,7 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/product_features.h>
 
+#include "api/runtime_info_manager.h"
 #include "socket.h"
 #include "system_socket.h"
 #include "common/common_module.h"
@@ -138,6 +139,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
     //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
     RevealResponse response(qnCommon->moduleInformation());
+    response.runtimeId = QnRuntimeInfoManager::instance()->localInfo().uuid;
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
@@ -145,7 +147,6 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
         NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Can't send response to address (%1:%2)").
             arg(remoteAddressStr).arg(remotePort), cl_logDEBUG1);
         return false;
-
     };
 
     return true;
@@ -186,10 +187,10 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return false;
     }
 
-    QnModuleInformation moduleInformation = response.toModuleInformation();
+    QnModuleInformationEx moduleInformation = response.toModuleInformation();
     QUrl url;
     url.setHost(remoteAddress);
-    url.setPort(remotePort);
+    url.setPort(moduleInformation.port);
     emit responseRecieved(moduleInformation, url);
 
     return true;

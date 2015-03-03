@@ -13,7 +13,6 @@ class QnMulticastModuleFinder;
 class QnDirectModuleFinder;
 class QnDirectModuleFinderHelper;
 class QTimer;
-struct QnModuleInformation;
 
 class QnModuleFinder : public QObject, public Singleton<QnModuleFinder> {
     Q_OBJECT
@@ -45,7 +44,7 @@ signals:
     void moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private slots:
-    void at_responseRecieved(QnModuleInformation moduleInformation, QUrl url);
+    void at_responseRecieved(QnModuleInformationEx moduleInformation, QUrl url);
     void at_timer_timeout();
 
 private:
@@ -60,10 +59,13 @@ private:
     QnDirectModuleFinder *m_directModuleFinder;
     QnDirectModuleFinderHelper *m_helper;
 
-    QHash<QnUuid, QnModuleInformation> m_foundModules;
+    QHash<QnUuid, QnModuleInformationEx> m_foundModules;
     QMultiHash<QnUuid, QUrl> m_urlById;
     QHash<QUrl, QnUuid> m_idByUrl;
     QHash<QUrl, qint64> m_lastResponse;
+    QHash<QnUuid, qint64> m_lastResponseById;
+    QHash<QnUuid, qint64> m_lastConflictResponseById;
+    QHash<QnUuid, int> m_conflictResponseCountById;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

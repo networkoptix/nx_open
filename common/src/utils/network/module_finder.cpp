@@ -1,5 +1,7 @@
 #include "module_finder.h"
 
+#include <QtCore/QCryptographicHash>
+
 #include "utils/common/log.h"
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
@@ -7,10 +9,12 @@
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource_management/resource_pool.h"
+#include "utils/common/app_info.h"
 
 namespace {
     const int pingTimeout = 15 * 1000;
     const int checkInterval = 3000;
+    const int noticeableConflictCount = 5;
 
     QUrl trimmedUrl(const QUrl &url) {
         QUrl newUrl;
@@ -19,9 +23,37 @@ namespace {
         newUrl.setPort(url.port());
         return newUrl;
     }
+
+    QUrl makeUrl(const QString &host, int port) {
+        QUrl url;
+        url.setScheme(lit("http"));
+        url.setHost(host);
+        url.setPort(port);
+        return url;
+    }
+
+    QnUuid generateRuntimeId(const QnModuleInformation &moduleInformation) {
+        const int bytesNeeded = 16;
+
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        md5.addData(moduleInformation.id.toRfc4122());
+        md5.addData(moduleInformation.customization.toLatin1());
+        md5.addData(moduleInformation.systemName.toLatin1());
+        md5.addData(QByteArray::number(moduleInformation.port));
+        for (const QString &address: moduleInformation.remoteAddresses)
+            md5.addData(address.toLatin1());
+
+        QByteArray hash = md5.result();
+        while (hash.size() < bytesNeeded)
+            hash += hash;
+        hash.resize(16);
+
+        return QnUuid::fromRfc4122(hash);
+    }
 }
 
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
+    m_elapsedTimer(),
     m_timer(new QTimer(this)),
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
@@ -48,7 +80,10 @@ bool QnModuleFinder::isCompatibilityMode() const {
 }
 
 QList<QnModuleInformation> QnModuleFinder::foundModules() const {
-    return m_foundModules.values();
+    QList<QnModuleInformation> result;
+    for (const QnModuleInformation &moduleInformation: m_foundModules)
+        result.append(moduleInformation);
+    return result;
 }
 
 QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const {
@@ -80,7 +115,7 @@ void QnModuleFinder::pleaseStop() {
     m_directModuleFinder->pleaseStop();
 }
 
-void QnModuleFinder::at_responseRecieved(QnModuleInformation moduleInformation, QUrl url) {
+void QnModuleFinder::at_responseRecieved(QnModuleInformationEx moduleInformation, QUrl url) {
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
@@ -90,20 +125,84 @@ void QnModuleFinder::at_responseRecieved(QnModuleInformation moduleInformation, 
     if (!oldId.isNull() && oldId != moduleInformation.id)
         removeUrl(url);
 
-    m_lastResponse[url] = m_elapsedTimer.elapsed();
+    qint64 currentTime = m_elapsedTimer.elapsed();
+
+    m_lastResponse[url] = currentTime;
     m_idByUrl[url] = moduleInformation.id;
     if (!m_urlById.contains(moduleInformation.id, url))
         m_urlById.insert(moduleInformation.id, url);
 
-    QnModuleInformation &oldInformation = m_foundModules[moduleInformation.id];
+    QSet<QString> repliedAddresses = moduleInformation.remoteAddresses;
+    repliedAddresses.insert(url.host());
+
+    QnModuleInformationEx &oldInformation = m_foundModules[moduleInformation.id];
     moduleInformation.remoteAddresses = moduleAddresses(moduleInformation.id);
 
-    if (oldInformation != moduleInformation) {
-        QSet<QString> oldAddresses = oldInformation.remoteAddresses;
-        oldInformation = moduleInformation;
+    if (moduleInformation.runtimeId.isNull())
+        moduleInformation.runtimeId = generateRuntimeId(moduleInformation);
 
+    /* Handle conflicting servers */
+    if (!oldInformation.id.isNull() && oldInformation.runtimeId != moduleInformation.runtimeId) {
+        bool oldModuleIsValid = oldInformation.systemName == qnCommon->localSystemName();
+        bool newModuleIsValid = moduleInformation.systemName == qnCommon->localSystemName();
+
+        if (oldModuleIsValid & newModuleIsValid) {
+            oldModuleIsValid = oldInformation.customization == QnAppInfo::customizationName();
+            newModuleIsValid = moduleInformation.customization == QnAppInfo::customizationName();
+        }
+
+        if (newModuleIsValid && !oldModuleIsValid) {
+            QSet<QString> oldAddresses = oldInformation.remoteAddresses;
+            for (const QString &address: oldAddresses)
+                removeUrl(makeUrl(address, oldInformation.port));
+
+            moduleInformation.remoteAddresses.clear();
+            moduleInformation.remoteAddresses.insert(url.host());
+            m_foundModules.insert(moduleInformation.id, moduleInformation);
+            NX_LOG(lit("QnModuleFinder. Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+            emit moduleChanged(moduleInformation);
+            NX_LOG(lit("QnModuleFinder: New module URL: %1 %2:%3")
+                   .arg(moduleInformation.id.toString()).arg(url.host()).arg(moduleInformation.port), cl_logDEBUG1);
+            emit moduleUrlFound(moduleInformation, url);
+            return;
+        }
+
+        qint64 &lastConflictResponse = m_lastConflictResponseById[oldInformation.id];
+        qint64 lastResponse = m_lastResponseById[oldInformation.id];
+        int &conflictCount = m_conflictResponseCountById[oldInformation.id];
+
+        if (currentTime - lastConflictResponse < pingTimeout()) {
+            if (lastResponse >= lastConflictResponse)
+                ++conflictCount;
+        } else {
+            conflictCount = 0;
+        }
+        lastConflictResponse = currentTime;
+
+        if (conflictCount >= noticeableConflictCount && conflictCount % noticeableConflictCount == 0) {
+            NX_LOG(lit("QnModuleFinder: Server %1 conflict: %2:%3")
+                   .arg(moduleInformation.id.toString()).arg(url.host()).arg(moduleInformation.port), cl_logWARNING);
+        }
+
+        return;
+    }
+
+    if (oldInformation != moduleInformation) {
         NX_LOG(lit("QnModuleFinder. Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
         emit moduleChanged(moduleInformation);
+
+        QSet<QString> oldAddresses = oldInformation.remoteAddresses;
+        if (oldInformation.port != moduleInformation.port) {
+            for (const QString &address: oldAddresses)
+                removeUrl(makeUrl(address, oldInformation.port));
+
+            oldAddresses.clear();
+            moduleInformation.remoteAddresses.clear();
+            moduleInformation.remoteAddresses.insert(url.host());
+            m_foundModules.insert(moduleInformation.id, moduleInformation);
+        } else {
+            oldInformation = moduleInformation;
+        }
 
         for (const QString &address: moduleInformation.remoteAddresses - oldAddresses) {
             NX_LOG(lit("QnModuleFinder: New module URL: %1 %2:%3")
@@ -116,6 +215,8 @@ void QnModuleFinder::at_responseRecieved(QnModuleInformation moduleInformation, 
             emit moduleUrlFound(moduleInformation, url);
         }
     }
+
+    m_lastResponseById[moduleInformation.id] = currentTime;
 }
 
 void QnModuleFinder::at_timer_timeout() {
@@ -124,7 +225,7 @@ void QnModuleFinder::at_timer_timeout() {
     /* Copy it because we could remove urls from the hash during the check */
     QHash<QUrl, qint64> lastResponse = m_lastResponse;
     for (auto it = lastResponse.begin(); it != lastResponse.end(); ++it) {
-        if (currentTime - it.value() < ::pingTimeout)
+        if (currentTime - it.value() < pingTimeout())
             continue;
         removeUrl(it.key());
     }
@@ -157,7 +258,7 @@ void QnModuleFinder::removeUrl(const QUrl &url) {
     }
 
     if (it->remoteAddresses.isEmpty()) {
-        NX_LOG(lit("QnModuleFinder: Module %1 lost.").arg(it->id.toString()), cl_logDEBUG1);
+        NX_LOG(lit("QnModuleFinder: Module %1 is lost.").arg(it->id.toString()), cl_logDEBUG1);
         QnModuleInformation moduleInformation = *it;
         m_foundModules.erase(it);
         emit moduleLost(moduleInformation);
