@@ -300,62 +300,8 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.
- Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="obsolete">Não foi possivel abrir a url %1. Falha em conectar a porta média %2.
- Confira se a porta %2 esta acessível (ex. encaminhada). Por favor tente rebootar a câmera, e restaure-a aos padrões de fábrica na página web.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="obsolete">Não foi possivel abrir a url %1. Conexão à porta %2 foi fechada inesperadamente.
- Confira se a câmera está conectada à rede. Por favor tente rebootar a câmera.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">Câmera não respondeu. Url %1, nome requisitado %2.
-Por favor tente reiniciar a câmera, depois restaure-a aos padrões de fábrica pela página web. Finalmente, tente atualizar a firmware. Se o problema persistir, entre em contato com o suporte tecnico.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">Mídia não suportada em url %1.
-Por favor tente reiniciar a câmera, e a restaure aos padrões da fábrica pela página web. Finalmente, tente atualizar a firmware. Se o problema persistir, por favor contate o suporte técnico.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>Não autorizado. Url %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.
- Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">Não foi possivel abrir a mídia url %1. Protocolo de mídia não suportado %2.
-Restaure aos padrões da fábrica pela página web. Finalmente, tente atualizar a firmware. Se o problema persistir, por favor contate o suporte técnico.</translation>
-    </message>
-    <message>
-        <source>Failed to configure parameter %1.
- First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="obsolete">Falha em configurar o parâmetro %1.
-Tente ligar a gravação (caso esteja desligada) e diminua o FPS nos ajustes da câmera. Senão, restaure aos padrões da fábrica pela página web. Se o problema persistir, por favor contate o suporte técnico.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">Requisição da câmera &quot;%1&quot; falha com erro &quot;%2&quot;.
-Por favor tente reiniciar a câmera, e a restaure aos padrões da fábrica pela página web. Finalmente, tente atualizar a firmware. Se o problema persistir, por favor contate o suporte técnico.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.
- Please contact support.</source>
-        <translation type="obsolete">Erro desconhecido na câmera.
-Por favor contate o suporte técnico.</translation>
-    </message>
-    <message>
-        <source>An input/output error has occurred. OS message: &quot;%1&quot;.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="obsolete">Um erro de entrada/saída ocorreu. Mensagem do SO: &quot;%1&quot;.
-Confira se a câmera está conectada à rede. Por favor tente reiniciar a câmera.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -374,14 +320,6 @@ Confira se a câmera está conectada à rede. Por favor tente reiniciar a câmer
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>
-
-Parameters: </source>
-        <translation type="obsolete">
-
-Parâmetros: </translation>
-    </message>
-    <message>
         <source>Server has been stopped.</source>
         <translation>O servidor parou.</translation>
     </message>
@@ -392,12 +330,6 @@ Parâmetros: </translation>
     <message>
         <source>Unknown error. Please contact support.</source>
         <translation>Erro desconhecido. Por favor, contate o suporte.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to http port %1.
- Make sure the camera is plugged into the network.</source>
-        <translation type="obsolete">Não foi possivel conectar à porta http %1.
-Confira se a câmera esta ligada na rede.</translation>
     </message>
     <message>
         <source>Server %1 is not available.</source>
@@ -857,10 +789,6 @@ Confira se a câmera esta ligada na rede.</translation>
 <context>
     <name>QnSystemHealthStringsHelper</name>
     <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation type="obsolete">Reconstrução do índice de arquivos completada.</translation>
-    </message>
-    <message>
         <source>Storages are not configured</source>
         <translation>Storages nao foram configurados</translation>
     </message>
@@ -895,12 +823,6 @@ Confira se a câmera esta ligada na rede.</translation>
     <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You have no licenses.
-You cannot record video from cameras.</source>
-        <translation type="obsolete">Não há licença válida.
-Não é possivel gravar imagens das câmeras.</translation>
     </message>
     <message>
         <source>Storages are full</source>

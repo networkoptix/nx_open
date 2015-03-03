@@ -297,74 +297,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server %1 is not available.
- Check that Server is up and running.</source>
-        <translation type="obsolete">%1 서버가 유효하지 않습니다.
-서버를 실행하여 확인하십시오.</translation>
-    </message>
-    <message>
-        <source>Received bad response from Server %1: &quot;%2&quot;.
- Check if Server is up and has the proper version.</source>
-        <translation type="obsolete">%1 서버로 부터 잘못된 응답이 전달됨: &quot;%2&quot;.
-서버를 실행하시어 올바른 버젼인지 확인하십시오.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.
- Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="obsolete">%1 url media를 열 수 없습니다. %2 media 포트에 연결하지 못했습니다.
-%2 포트에 반드시 접근할 수 있어야 합니다.(기타 전달된). 다음 웹페이지에서 공장초기값으로 복원한 후 카메라를 다시 부팅하십시오.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="obsolete">%1 url 미디어 서버를 열 수 없습니다. %2 포트의 연결이 예기치 않게 끊어졌습니다.
-카메라 네트워크 환경을 다시 확인하십시오. 카메라를 재부팅합니다.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">카메라 응답을 분석할 수 없습니다. Url %1, 요청명 %2.
-카메라를 재부팅 하시고 , 웹페이지를 통해 공장 초기화로 복원하여 주세요. 마지막으로, 펌웨어 업데이트를 시도하여 주시고 만약 문제가 지속되면 지원 센터에 문의하여 주세요.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">%1 url의 미디어 트랙을 지원하지 않습니다.
-카메라를 재부팅하신 후에, 웹페이지를 통해 공장 초기값으로 복원하십시오. 마지막으로 펌웨어 업데이트를 시도합니다. 만약 문제가 지속되면 관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>%1. Url에 대한 권한이 없습니다.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.
- Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">%1 url 미디어를 열수 없습니다. %2 미디어 프로토콜은 지원하지 않습니다.
-웹페이지를 통해 공장 초기값으로 복원하십시오. 마지막으로 펌웨어 업데이트를 시도합니다. 만약 문제가 지속되면 관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
-        <source>Failed to configure parameter %1.
- First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="obsolete">%1 변수 설정에 실패하였습니다.
-먼저 저장설정은 켜신 후에(만약 끔상태이면) 카메라 설정의 프레임을 낮춰주세요. 만약 실패하면 웹페이지를 통해 공장 초기값으로 복원하십시오. 만약 문제가 지속되면 관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">%2 오류와 함께 %1 카메라 요청이 실패하였습니다.
-카메라를 재부팅하신 후에, 웹페이지를 통해 공장 초기값으로 복원하십시오. 마지막으로 펌웨어 업데이트를 시도합니다. 만약 문제가 지속되면 관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.
- Please contact support.</source>
-        <translation type="obsolete">알수없는 카메라 이슈가 발생하였습니다.
-관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
-        <source>An input/output error has occurred. OS message: &quot;%1&quot;.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="obsolete">입/출력에서 문제가 발생했습니다. OS 메세지 : &quot;%1&quot;.
-카메라가 네트워크에 정상적으로 연결되어있는지 확인하십시오. 그리고 카메라를 재 시작하세요.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -381,20 +315,6 @@
     <message>
         <source>Camera initialization process in progress</source>
         <translation>카메라 초기화 진행 중</translation>
-    </message>
-    <message>
-        <source>
-
-Parameters: </source>
-        <translation type="obsolete">
-
-매개 변수:</translation>
-    </message>
-    <message>
-        <source>Cannot connect to http port %1.
- Make sure the camera is plugged into the network.</source>
-        <translation type="obsolete">%1 http 포트를 연결할 수 없습니다.
-카메라가 네트워크에 연결 되어있는지 확인하십시오.</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -882,10 +802,6 @@ Parameters: </source>
         <translation>서버 연결 실패</translation>
     </message>
     <message>
-        <source>Select server for others to synchronise time with</source>
-        <translation type="obsolete">다른 서버에서 시간 동기화로 선택됨</translation>
-    </message>
-    <message>
         <source>Error while sending email</source>
         <translation>이메일을 보내는 동안 오류 발생</translation>
     </message>
@@ -898,55 +814,12 @@ Parameters: </source>
         <translation>저장기 구성이 되어있지 않음</translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation type="obsolete">인덱스 저장소의 재정비가 완료 되었습니다.</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>%1 사용자에 대한 이메일 주소가 설정되지 않음</translation>
     </message>
     <message>
-        <source>Email address is not set.
-You cannot receive system notifications via email.</source>
-        <translation type="obsolete">이메일 주소가 설정되지 않았습니다. 이메일을 통한 알람 정보를 받을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.
-You cannot receive system notifications via email.</source>
-        <translation type="obsolete">이메일 서버가 설정되지 않았습니다. 이메일을 통한 알람 정보를 받을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.
-They cannot receive system notifications via email.</source>
-        <translation type="obsolete">일부 사용자가 이메일 주소를 설정하지 않았습니다. 그들은 이메일을 통해 알람을 받을 수 없습니다.</translation>
-    </message>
-    <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
         <translation>여러 서버는 각각 다른 시간을 가지고 있어 올바른 시간을 자동으로 감지 될 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:
-%1.</source>
-        <translation type="obsolete">서버의 저장기 용량이 꽉참 :
-%1.</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:
-%1.</source>
-        <translation type="obsolete">서버의 저장기 구성이 되어있지 않음:
-%1.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:
-%1.</source>
-        <translation type="obsolete">서버의 인덱스 저장소 재정비가 완료 됨:
-%1.</translation>
-    </message>
-    <message>
-        <source>You have no licenses.
-You cannot record video from cameras.</source>
-        <translation type="obsolete">인증키가 존재하지 않습니다.
-카메라의 비디오를 저장할 수 없습니다.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>

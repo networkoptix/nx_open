@@ -297,80 +297,8 @@
         <translation>ตกลง</translation>
     </message>
     <message>
-        <source>Server %1 is not available.
- Check that Server is up and running.</source>
-        <translation type="obsolete">เซิร์ฟเวอร์ %1 จะไม่สามารถใช้ได้
- ตรวจสอบสถานะของเซิร์ฟเวอร์และการทำงาน.</translation>
-    </message>
-    <message>
-        <source>Received bad response from Server %1: &quot;%2&quot;.
- Check if Server is up and has the proper version.</source>
-        <translation type="obsolete">ที่ได้รับการตอบสนองที่ไม่ดีจากเซิร์ฟเวอร์ %1: &quot;%2&quot;.
-ตรวจสอบว่าสถานะของเซิร์ฟเวอร์และมีรุ่นที่เหมาะสม.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to http port %1.
- Make sure the camera is plugged into the network.</source>
-        <translation type="obsolete">ไม่สามารถเชื่อมต่อไปยัง http พอร์ต %1.
- ให้แน่ใจว่ากล้องต่อเข้ากับเครือข่าย.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.
- Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="obsolete">ไม่สามารถเปิด มีเดีย url %1.การเชื่อมต่อไปยังพอร์ตล้มเหลว %2.
-แน่ใจว่าพอร์ต %2 เข้ากันได้ (e.g. forwarded).โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="obsolete">ไม่สามารถเปิด มีเดีย url %1.การเชื่อมต่อไปยังพอร์ต %2 ล้มเหลว
-แน่ใจว่ากล้องได้ทำการเชื่อมต่อกับเครือข่ายแล้วหรือไม่ ทำการรีบุตกล้องใหม่.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">ไ่ม่สามารถได้รับการสนองของกล้องง. Url%1, ต้องการชื่อ %2.
-โปรดลองรีบูตกล้อง แล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ สุดท้ายพยายามที่จะปรับปรุงเฟิร์มแวร์ หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">ไม่มีการสนับสนุนแทร็คที่สื่อ url  %1.
-โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ สุดท้ายพยายามที่จะปรับปรุงเฟิร์มแวร์ หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>ไม่ได้รับอนุญาต. Url %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.
- Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">ไม่สามารถเปิดสื่อ url %1. ไม่รองรับมีเดียโปรโตคอล %2.
-โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ สุดท้ายพยายามที่จะปรับปรุงเฟิร์มแวร์ หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน.</translation>
-    </message>
-    <message>
-        <source>Failed to configure parameter %1.
- First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="obsolete">ล้มเหลวในการกำหนดค่าพารามิเตอร์ %1.
-สิ่งแรกที่พยายามที่จะเปิดการบันทึก (ถ้ามันปิดอยู่) และลดเฟรมต่อวินาทีในการตั้งค่ากล้อง ถ้ามันไม่ได้ช่วย ให้คืนค่าเริ่มต้นจากโรงงานในเว็บหน้ากล้อง หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">คำขอกล้องล้มเหลว &quot;%1&quot; ด้วยข้อผิดพลาด &quot;%2&quot;.
-โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ สุดท้ายพยายามที่จะปรับปรุงเฟิร์มแวร์ หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.
- Please contact support.</source>
-        <translation type="obsolete">กล้องที่ไม่รู้จัก.
-กรุณาติดต่อฝ่ายช่วยเหลือ.</translation>
-    </message>
-    <message>
-        <source>An input/output error has occurred. OS message: &quot;%1&quot;.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="obsolete">อินพุต/เอาต์พุต เกิดข้อผิดพลาดขึ้น ข้อความ OS: &quot;%1&quot;.
-ให้แน่ใจว่ากล้องจะเสียบเข้ากับเครือข่าย พยายามที่จะรีบูตกล้อง.</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -395,14 +323,6 @@
     <message>
         <source>Unknown error. Please contact support.</source>
         <translation>ข้อผิดพลาดที่ไม่รู้จัก กรุณาติดต่อฝ่ายสนับสนุน.</translation>
-    </message>
-    <message>
-        <source>
-
-Parameters: </source>
-        <translation type="obsolete">
-
-พารามิเตอร์: </translation>
     </message>
     <message>
         <source>(unknown)</source>
@@ -882,10 +802,6 @@ Parameters: </source>
         <translation>การเชื่อมต่อกับเซิร์ฟเวอร์ขาดหายไป</translation>
     </message>
     <message>
-        <source>Select server for others to synchronise time with</source>
-        <translation type="obsolete">เลือกเซิร์ฟเวอร์สำหรับเครื่องอื่น ๆ ที่จะปรับเวลาให้ตรงกับ</translation>
-    </message>
-    <message>
         <source>Error while sending email</source>
         <translation>เกิดข้อผิดพลาดในขณะที่การส่งอีเมล์</translation>
     </message>
@@ -898,58 +814,12 @@ Parameters: </source>
         <translation>หน่วยความจำไม่ได้กำหนดค่า</translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation type="obsolete">ดัชนีเก็บสร้างใหม่เป็นที่เรียบร้อยแล้ว.</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>ที่อยู่อีเมล์ไม่ได้ตั้งค่าสำหรับการใช้งาน %1</translation>
     </message>
     <message>
-        <source>Email address is not set.
-You cannot receive system notifications via email.</source>
-        <translation type="obsolete">ที่อยู่อีเมล์ไม่ได้ตั้งค่า.
-คุณไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล์.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.
-You cannot receive system notifications via email.</source>
-        <translation type="obsolete">เซิร์ฟเวอร์อีเมลไม่ได้ตั้งค่า.
-คุณไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล์.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.
-They cannot receive system notifications via email.</source>
-        <translation type="obsolete">ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมลของพวกเขา.
-พวกเขาไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล์.</translation>
-    </message>
-    <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
         <translation>เซิร์ฟเวอร์หลายเครื่องมีเวลาที่แตกต่างกันและเวลาที่ถูกต้องไม่สามารถตรวจพบโดยอัตโนมัติ.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:
-%1.</source>
-        <translation type="obsolete">หน่วยความจำเต็มบนเซิร์ฟเวอร์ต่อไปนี้:
-%1.</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:
-%1.</source>
-        <translation type="obsolete">หน่วยความจำไม่ได้กำหนดค่าบนเซิร์ฟเวอร์ดังต่อไปนี้:
-%1.</translation>
-    </message>
-    <message>
-        <source>You have no licenses.
-You cannot record video from cameras.</source>
-        <translation type="obsolete">คุณไม่มีใบอนุญาต.
-คุณไม่สามารถบันทึกวิดีโอจากกล้องได้.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:
-%1.</source>
-        <translation type="obsolete">ดัชนีเก็บสร้างใหม่เสร็จสมบูรณ์บนเซิร์ฟเวอร์ดังต่อไปนี้:
-%1.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>

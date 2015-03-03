@@ -8,10 +8,12 @@
         <translation>Bandeja del sistema</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>No hay ninguna bandeja de sistema en este sistema.
-Aplicación se cerrará.</translation>
+        <source>There is no system tray on this system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -42,12 +44,6 @@ Aplicación se cerrará.</translation>
     <message>
         <source>Could not access installed services</source>
         <translation>No se pudo acceder a los servicios instalados</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>Se ha producido un error al intentar acceder a los servicios instalados:
-.%1</translation>
     </message>
     <message>
         <source>No %1 services installed</source>
@@ -112,6 +108,10 @@ Aplicación se cerrará.</translation>
     <message>
         <source>Stop Media Server</source>
         <translation>Detener el servidor de medios</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

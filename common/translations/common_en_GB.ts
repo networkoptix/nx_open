@@ -300,12 +300,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>No supported media tracks at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">No supported media tracks at URL %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>Not authorized. URL %1.</translation>
     </message>
@@ -825,10 +819,6 @@
     <message>
         <source>Storages are not configured</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation type="obsolete">Rebuilding archive index is complete.</translation>
     </message>
     <message>
         <source>Email address is not set for user %1</source>

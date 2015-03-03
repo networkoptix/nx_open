@@ -297,80 +297,8 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Server %1 is not available.
- Check that Server is up and running.</source>
-        <translation type="obsolete">サーバー %1 は使用できません.
- サーバーが起動しているか確認してください.</translation>
-    </message>
-    <message>
-        <source>Received bad response from Server %1: &quot;%2&quot;.
- Check if Server is up and has the proper version.</source>
-        <translation type="obsolete">サーバー %1: &quot;%2&quot;.に不具合あり
- サーバーが適切なバージョンで起動しているか確認してください.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to http port %1.
- Make sure the camera is plugged into the network.</source>
-        <translation type="obsolete">http ポート %1・に接続出来ません.
- カメラがネットワークに接続されているか確認して下さい.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.
- Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="obsolete">メディア URL %1・を開けません. 又メディアポート %2・に接続出来ません .
- ポート %2 がアクセス可能か (フォワード等)確認して下さい. カメラのリブートを試し、その後カメラのWEBページから工場出荷時に戻して下さい.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="obsolete">メディアURL %1・開けません. Connection to ポート %2 との接続が予期しないで閉じられました.
- カメラがネットワークに接続されているか確認して下さい、カメラをリブートして下さい.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">URL%1 名前%2のカメラ応答を解析できませんでした
-カメラ再起動を行い初期設定に戻した後にファームウェアの更新を行ってください　解決しない場合はサポートに連絡してください.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">URL%1　サポートされないメディアトラック
-カメラの再起動後初期設定に戻しファームウェアの更新を行ってください　問題が解決しない場合はサポートに連絡してください.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>・URL・%1.は、承認されていません.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.
- Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">・メディアURL・%1を開けませんでした。・メディアプロトコル・%2・はサポートされていません
-・カメラを再起動してみてください、そしてカメラのウェブページ上から工場出荷時のデフォルト設定を復元し、最後に、ファームウェアをアップデートしてみてください。問題が解決しない場合は、サポートにお問い合わせ下さい.</translation>
-    </message>
-    <message>
-        <source>Failed to configure parameter %1.
- First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="obsolete">パラメータ・%1・を構成出来ません
-・（記録が停止している場合は）始めに記録を開始してみて下さい。そしてカメラ設定画面からFPS（記録コマ数/秒）を減らして下さい。それでも駄目な場合は、カメラのウェブページ上から工場出荷時のデフォルト設定を復元してみてください。問題が解決しない場合は、サポートにお問い合わせ下さい.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="obsolete">カメラは&quot;%1”・をリクエストしましたがエラー・&quot;%2&quot;・にて失敗しました
-カメラを再起動してみてください、そしてカメラのウェブページ上から工場出荷時のデフォルト設定を復元し、最後に、ファームウェアをアップデートしてみてください。問題が解決しない場合は、サポートにお問い合わせ下さい.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.
- Please contact support.</source>
-        <translation type="obsolete">不明なカメラトラブル
-サポートにお問い合わせ下さい.</translation>
-    </message>
-    <message>
-        <source>An input/output error has occurred. OS message: &quot;%1&quot;.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="obsolete">I/Oエラー・OSメッセージ:・&quot;%1&quot;.
-カメラがネットワークに接続されているか確認して下さい、カメラを再起動してみてください.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -387,12 +315,6 @@
     <message>
         <source>Camera initialization process in progress</source>
         <translation>カメライニシャライズ中</translation>
-    </message>
-    <message>
-        <source>
-
-Parameters: </source>
-        <translation type="obsolete">・パラメーター:</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -880,10 +802,6 @@ Parameters: </source>
         <translation>サーバーとの通信切断</translation>
     </message>
     <message>
-        <source>Select server for others to synchronise time with</source>
-        <translation type="obsolete">時刻同期サーバー選択</translation>
-    </message>
-    <message>
         <source>Error while sending email</source>
         <translation>メール送信中にエラーが発生しました</translation>
     </message>
@@ -896,58 +814,12 @@ Parameters: </source>
         <translation>ストレージが構成されていません</translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation type="obsolete">アーカイブインデックスのリビルド終了.</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>ユーザー %1 にEmailアドレスが設定されていません</translation>
     </message>
     <message>
-        <source>Email address is not set.
-You cannot receive system notifications via email.</source>
-        <translation type="obsolete">Emaiアドレスが設定されていません.
-Emailで通知を受信できません.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.
-You cannot receive system notifications via email.</source>
-        <translation type="obsolete">Emaiサーバーが設定されていません.
-Emailで通知を受信できません.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.
-They cannot receive system notifications via email.</source>
-        <translation type="obsolete">Emailアドレスが設定されていないユーザーがいます.
-Emailでの通知を受信できません.</translation>
-    </message>
-    <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
         <translation>複数のサーバー時刻が異なっており正確な時刻が検出できませんでした.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:
-%1.</source>
-        <translation type="obsolete">次のサーバーのストレージに空き容量がありません:
-%1.</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:
-%1.</source>
-        <translation type="obsolete">次のサーバーにストレージが構成されていません:
-%1.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:
-%1.</source>
-        <translation type="obsolete">次のサーバーのリビルドアーカイブインデックス終了:
-%1.</translation>
-    </message>
-    <message>
-        <source>You have no licenses.
-You cannot record video from cameras.</source>
-        <translation type="obsolete">ライセンスが有りません！
-カメラからのビデオを記録出来ません.</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
