@@ -178,6 +178,14 @@ qint64 getDiskTotalSpace(const QString& root)
 };
 
 #else 
+
+//TODO #ak introduce single function for getting partition info 
+    //and place platform-specific code in a single pace
+
+#ifdef __APPLE__
+#define statvfs64 statvfs
+#endif
+
 qint64 getDiskFreeSpace(const QString& root) {
     struct statvfs64 buf;
     if (statvfs64(root.toUtf8().data(), &buf) == 0)
