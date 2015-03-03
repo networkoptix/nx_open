@@ -33,7 +33,7 @@ signals:
 private slots:
     void tick();
 
-    void at_ecConnection_result(int reqID, ec2::ErrorCode errorCode, QnConnectionInfo connectionInfo);
+    void at_ecConnection_result(int reqID, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo);
 
     /**
      * Updates ui elements depending of the test result
