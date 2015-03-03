@@ -372,8 +372,8 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\n"
-            "Please wait for the camera to go online.").arg(m_resource->getName())
+            tr("An error has occurred while trying to get current position from camera %1.").arg(m_resource->getName()) + L'\n' 
+          + tr("Please wait for the camera to go online.")
             );
         return;
     }
@@ -394,8 +394,8 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera"),
-            tr("An error has occurred while trying to set current position for camera %1.\n\n"\
-            "Please wait for the camera to go online.").arg(m_resource->getName())
+            tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
+          + tr("Please wait for the camera to go online.")
             );
         return;
     }
@@ -435,8 +435,8 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera"),
-            tr("An error has occurred while trying to set current position for camera %1.\n\n"\
-            "Please wait for the camera to go online.").arg(m_resource->getName())
+            tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
+          + tr("Please wait for the camera to go online.")
             );
         return;
     }
@@ -490,7 +490,8 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
                 QDialogButtonBox::StandardButton button = QnCheckableMessageBox::warning(
                     this,
                     tr("Remove preset"),
-                    tr("This preset is used in some tours.") + L'\n' + tr("These tours will become invalid if you remove it."),
+                    tr("This preset is used in some tours.") + L'\n' 
+                  + tr("These tours will become invalid if you remove it."),
                     tr("Do not show again."),
                     &ignorePresetIsInUse,
                     QDialogButtonBox::Ok | QDialogButtonBox::Cancel,

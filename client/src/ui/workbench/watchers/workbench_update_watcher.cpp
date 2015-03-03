@@ -81,7 +81,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
         message += lit("<br/>");
     } else {
         title = tr("Update is recommended");
-        message = tr("New version <b>%1</b> is available.").arg(htmlBold(updateVersion.toString()));
+        message = tr("New version %1 is available.").arg(htmlBold(updateVersion.toString()));
         message += lit("<br/>");
         message += tr("Major issues have been fixed.");
         message += lit("<br/><span style=\"color:%1;\">").arg(qnGlobals->errorTextColor().name());
