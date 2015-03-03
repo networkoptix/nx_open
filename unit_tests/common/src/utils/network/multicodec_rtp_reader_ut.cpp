@@ -516,7 +516,8 @@ TEST( QnMulticodecRtpReader, rtpParsingPerformance )
     QnSyncTime syncTimeInstance;
 
     //preparing test data
-    static const char* testDataFilePath = "D:\\develop\\problems\\bpi_optimization\\in.1";
+    //static const char* testDataFilePath = "D:\\develop\\problems\\bpi_optimization\\in.1";
+    static const char* testDataFilePath = "/home/pi/in.1";
     std::ifstream testFile;
     testFile.open( testDataFilePath, std::ifstream::binary );
     std::string testData;
@@ -524,8 +525,8 @@ TEST( QnMulticodecRtpReader, rtpParsingPerformance )
     memset( &st, 0, sizeof(st) );
     ASSERT_EQ( stat( testDataFilePath, &st ), 0 );
     testData.resize( st.st_size );
-    testFile.read( const_cast<char*>(testData.data()), st.st_size );
-    ASSERT_EQ( testFile.gcount(), st.st_size );
+    testFile.read( const_cast<char*>(testData.data()), testData.size() );
+    ASSERT_EQ( testFile.gcount(), testData.size() );
     testFile.close();
 
     QnNetworkResourcePtr resource( new QnNetworkResource() );
@@ -538,7 +539,7 @@ TEST( QnMulticodecRtpReader, rtpParsingPerformance )
 
     QElapsedTimer t;
     t.restart();
-    for( int i = 0; i < 50; ++i )
+    for( int i = 0; i < 1; ++i )
     {
         std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader(
             new QnMulticodecRtpReader(

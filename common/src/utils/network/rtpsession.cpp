@@ -1754,6 +1754,27 @@ static const size_t MS_PER_SEC = 1000;
 
 int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome )
 {
+#if 1
+#ifdef __arm__
+    {
+        //TODO #ak Better to find other solution and remove this code.
+            //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
+            //(with nat traversal introduced, not every socket will have handle)
+        int bytesAv = 0;
+        if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) != 0) ||  //socket read buffer size is unknown to us
+            (bytesAv == 0) )    //socket read buffer is empty
+        {
+            //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
+                //Possibly, it is workaround of some other bug somewhere else
+                //This code works only on Raspberry and NX1
+            QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
+        }
+    }
+#endif
+
+    int bytesRead = m_tcpSock->recv( buf, bufSize, readSome ? 0 : MSG_WAITALL );
+    return bytesRead < 0 ? 0 : bytesRead;
+#else
     const size_t bufSizeBak = bufSize;
 
     //this method introduced to minimize m_tcpSock->recv calls (on isd edge m_tcpSock->recv call is rather heavy)
@@ -1803,6 +1824,7 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readS
                 ? m_additionalReadBufferSize    //if could not read anything returning error
                 : bufSizeBak - bufSize;
     }
+#endif
 }
 
 bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responseBuf )
