@@ -374,7 +374,7 @@ private:
     static QByteArray m_guid; // client guid. used in proprietary extension
     static QMutex m_guidMutex;
 
-    QVector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
+    std::vector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
     QString m_reasonPhrase;
     QString m_videoLayout;
 
