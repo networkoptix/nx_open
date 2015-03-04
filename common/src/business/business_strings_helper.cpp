@@ -209,20 +209,24 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case ServerConflictEvent: {
-        QnCameraConflictList conflicts;
-        conflicts.sourceServer = params.getSource();
-        conflicts.decode(params.getConflicts());
-        int n = 0;
-        for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
-            const QString &server = itr.key();
-            result += delimiter;
-            result += tr("Conflicting Server #%1: %2").arg(++n).arg(server);
-            int m = 0;
-            for (const QString &camera: conflicts.camerasByServer[server]) {
+        if (!params.getConflicts().isEmpty()) {
+            QnCameraConflictList conflicts;
+            conflicts.sourceServer = params.getSource();
+            conflicts.decode(params.getConflicts());
+            int n = 0;
+            for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
+                const QString &server = itr.key();
                 result += delimiter;
-                result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
-            }
+                result += tr("Conflicting Server #%1: %2").arg(++n).arg(server);
+                int m = 0;
+                for (const QString &camera: conflicts.camerasByServer[server]) {
+                    result += delimiter;
+                    result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
+                }
 
+            }
+        } else {
+            result += tr("Conflicting Server: %1").arg(params.getSource());
         }
         break;
     }
