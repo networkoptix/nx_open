@@ -10,6 +10,7 @@
 #include "core/resource/media_server_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/app_info.h"
+#include "api/runtime_info_manager.h"
 
 namespace {
     const int pingTimeout = 15 * 1000;
@@ -147,9 +148,18 @@ void QnModuleFinder::at_responseRecieved(QnModuleInformationEx moduleInformation
         bool oldModuleIsValid = oldInformation.systemName == qnCommon->localSystemName();
         bool newModuleIsValid = moduleInformation.systemName == qnCommon->localSystemName();
 
-        if (oldModuleIsValid & newModuleIsValid) {
+        if (oldModuleIsValid == newModuleIsValid) {
             oldModuleIsValid = oldInformation.customization == QnAppInfo::customizationName();
             newModuleIsValid = moduleInformation.customization == QnAppInfo::customizationName();
+        }
+
+        if (oldModuleIsValid == newModuleIsValid) {
+            QnUuid remoteId = qnCommon->remoteGUID();
+            if (!remoteId.isNull() && remoteId == moduleInformation.id) {
+                QnUuid correctRuntimeId = QnRuntimeInfoManager::instance()->item(remoteId).uuid;
+                oldModuleIsValid = oldInformation.runtimeId == correctRuntimeId;
+                newModuleIsValid = moduleInformation.runtimeId == correctRuntimeId;
+            }
         }
 
         if (newModuleIsValid && !oldModuleIsValid) {
