@@ -137,7 +137,7 @@
         <item>
          <widget class="QLabel" name="downmixWarningLabel">
           <property name="text">
-           <string>Restart required.</string>
+           <string>Restart required</string>
           </property>
          </widget>
         </item>
@@ -252,7 +252,7 @@
         <item>
          <widget class="QLabel" name="doubleBufferRestartLabel">
           <property name="text">
-           <string>Restart required.</string>
+           <string>Restart required</string>
           </property>
          </widget>
         </item>
@@ -272,11 +272,7 @@
        </spacer>
       </item>
       <item row="4" column="1">
-       <widget class="QLabel" name="doubleBufferWarningLabel">
-        <property name="text">
-         <string>Disable only if the client takes too much CPU.</string>
-        </property>
-       </widget>
+       <widget class="QnWordWrappedLabel" name="doubleBufferWarningLabel" native="true"/>
       </item>
      </layout>
     </widget>
@@ -314,6 +310,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>browseMainMediaFolderButton</tabstop>
   <tabstop>extraMediaFoldersList</tabstop>

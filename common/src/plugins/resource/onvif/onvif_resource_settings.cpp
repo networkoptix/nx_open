@@ -28,16 +28,6 @@ OnvifCameraSettingsResp::OnvifCameraSettingsResp(const std::string& deviceUrl, c
 
 OnvifCameraSettingsResp::~OnvifCameraSettingsResp()
 {
-    delete m_valsResponse;
-    m_valsResponse = NULL;
-    delete m_rangesResponse;
-    m_rangesResponse = NULL;
-    delete m_valsSoapWrapper;
-    m_valsSoapWrapper = NULL;
-    delete m_rangesSoapWrapper;
-    m_rangesSoapWrapper = NULL;
-    delete m_deviceSoapWrapper;
-    m_deviceSoapWrapper = NULL;
 }
 
 bool OnvifCameraSettingsResp::isEmpty() const
@@ -148,7 +138,7 @@ QString OnvifCameraSettingsResp::getUniqueId() const
 
 DeviceSoapWrapper* OnvifCameraSettingsResp::getDeviceSoapWrapper()
 {
-    return m_deviceSoapWrapper;
+    return m_deviceSoapWrapper.get();
 }
 
 //

@@ -59,7 +59,6 @@ public:
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
     /*!
         \return If there is route to mediaserver, ip address of mediaserver. If there is no route, string \a USE_PROXY
@@ -105,7 +104,6 @@ public:
     */
     QPair<int, int> saveUpdatedStorages();
 private slots:
-    void at_httpClientDone( const nx_http::AsyncHttpClientPtr& client );
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
 private:

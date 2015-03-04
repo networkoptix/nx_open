@@ -820,8 +820,10 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
 // Handlers
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
+    if (action(Qn::ToggleTourModeAction)->isChecked())
+        return Qn::MainWindow_Scene_TourInProgress_Help;
+
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
-    QnPtzObject activeObject;
 
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;

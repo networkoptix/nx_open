@@ -80,4 +80,29 @@ namespace nx
             : SystemError::fileNotFound;    //TODO #ak get proper error code
     #endif
     }
+
+#ifdef _WIN32
+
+    bool checkProcessExists(qint64 pid) {
+        bool exists = false;
+
+        HANDLE handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+        if (handle != NULL) {
+            DWORD exitCode = 9999;
+            if (GetExitCodeProcess(handle, &exitCode))
+                exists = exitCode == STILL_ACTIVE;
+            CloseHandle(handle);
+        }
+
+        return exists;
+    }
+
+#else
+
+    bool checkProcessExists(qint64 pid) {
+        return kill(pid, 0) == 0;
+    }
+
+#endif
 }
+

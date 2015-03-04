@@ -332,7 +332,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             setControlMode(false);
             QMessageBox::warning(mainWindow(),
                 tr("Control session is already running"),
-                tr("Could not start control session.\nAnother user is already controlling this screen."));
+                tr("Could not start control session.") + L'\n' + tr("Another user is already controlling this screen."));
         }
         
     });
@@ -924,7 +924,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
 
         QMessageBox::warning(mainWindow(),
             tr("Control session is already running"),
-            tr("Could not start control session.\nAnother user is already controlling this screen."));
+            tr("Could not start control session.") + L'\n' + tr("Another user is already controlling this screen."));
 
         return false;
     }
@@ -1368,8 +1368,8 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
 
     if (QMessageBox::warning(mainWindow(),
         tr("Confirm Video Wall stop"),
-        tr("Are you sure you want to stop the Video Wall?\n"\
-        "You'll have to start it manually."),
+        tr("Are you sure you want to stop the Video Wall?") + L'\n' 
+      + tr("You'll have to start it manually."),
         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
         QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
