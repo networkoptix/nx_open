@@ -9,7 +9,7 @@ from datetime import timedelta
 from common_module import init_color,info,green,warn,err,separator
 
 tooOld = timedelta(days = 30)
-all_branches = False
+verbose = False
 
 def check_branches():
     output = subprocess.check_output("hg branches", shell=True)
@@ -63,16 +63,16 @@ def print_branches(branches):
             err(branch_name + '(INACTIVE)')
         elif branch['age'] > tooOld:
             warn(branch_name + '(TOO OLD: ' + str(branch['age'].days) + ' days)')
-        elif all_branches == True:
+        elif verbose == True:
             info(branch_name)
     
 def main(): 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-a', '--all', action='store_true', help="show all branches (including valid)")
+    parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
     parser.add_argument('-c', '--color', action='store_true', help="colorized output")
     args = parser.parse_args()
-    global all_branches
-    all_branches = args.all
+    global verbose
+    verbose = args.verbose
 
     if args.color:
         init_color()    
