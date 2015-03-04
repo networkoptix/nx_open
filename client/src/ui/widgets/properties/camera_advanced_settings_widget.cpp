@@ -48,7 +48,7 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
 
     initWebView();
 
-    ui->manualLoadingWidget->setText(tr("Please wait while settings are being loaded.\nThis can take a lot of time."));
+    ui->manualLoadingWidget->setText(tr("Please wait while settings are being loaded.") + L'\n' + tr("This can take a lot of time."));
     setWarningStyle(ui->manualWarningLabel);
     updateApplyingParamsLabel();
 }

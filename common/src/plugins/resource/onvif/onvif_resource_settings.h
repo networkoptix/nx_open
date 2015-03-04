@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <memory>
+
 #include "../camera_settings/camera_settings.h"
 #include "soap_wrapper.h"
 
@@ -18,11 +20,11 @@ typedef QHash<QString, OnvifCameraSetting> CameraSettings;
 
 class OnvifCameraSettingsResp
 {
-    DeviceSoapWrapper* m_deviceSoapWrapper;
-    ImagingSoapWrapper* m_rangesSoapWrapper;
-    ImagingSoapWrapper* m_valsSoapWrapper;
-    ImagingOptionsResp* m_rangesResponse;
-    ImagingSettingsResp* m_valsResponse;
+    std::unique_ptr<DeviceSoapWrapper> m_deviceSoapWrapper;
+    std::unique_ptr<ImagingSoapWrapper> m_rangesSoapWrapper;
+    std::unique_ptr<ImagingSoapWrapper> m_valsSoapWrapper;
+    std::unique_ptr<ImagingOptionsResp> m_rangesResponse;
+    std::unique_ptr<ImagingSettingsResp> m_valsResponse;
     const std::string m_videoSrcToken;
     const QString m_uniqId;
     CameraSettings m_cameraSettings;
@@ -49,8 +51,6 @@ public:
 
 private:
     OnvifCameraSettingsResp();
-    OnvifCameraSettingsResp( const OnvifCameraSettingsResp& );
-    OnvifCameraSettingsResp& operator=( const OnvifCameraSettingsResp& );
 };
 
 //

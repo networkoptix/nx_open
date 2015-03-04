@@ -210,8 +210,8 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
 
     if (QMessageBox::warning(this,
                              tr("Confirm rules reset"),
-                             tr("Are you sure you want to reset rules to the defaults?\n"\
-                                "This action CANNOT be undone!"),
+                             tr("Are you sure you want to reset rules to the defaults?") + L'\n' +
+                                tr("This action CANNOT be undone!"),
                              QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;

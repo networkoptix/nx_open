@@ -1043,7 +1043,7 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
         getLastDecodedFrame(m_decoder.begin().value(), &outFrame);
     else
         CLVideoDecoderOutput::copy(m_lastDisplayedFrame.data(), outFrame.data());
-
+    outFrame->channel = m_lastDisplayedFrame->channel;
     return outFrame;
 }
 

@@ -33,6 +33,8 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->doubleBufferWarningLabel->setText(tr("Disable only if the client takes too much CPU"));
+
     if(!this->context()->instance<QnWorkbenchAutoStarter>()->isSupported()) {
         ui->autoStartCheckBox->hide();
         ui->autoStartLabel->hide();

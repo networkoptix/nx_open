@@ -350,3 +350,7 @@ void trimInPlace( QString* const str, const QString& symbols )
 
     *str = str->mid( startPos, endPos > startPos ? (endPos - startPos) : 0 );
 }
+
+QString htmlBold(const QString &source) {
+    return lit("<b>%1</b>").arg(source);
+}

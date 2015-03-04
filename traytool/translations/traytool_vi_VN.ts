@@ -8,9 +8,12 @@
         <translation>Hệ thống Toolbar</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>Hệ thống này không có hệ thống thanh công cụ, phần mềm sẽ nhảy.</translation>
+        <source>There is no system tray on this system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -41,11 +44,6 @@ Application will now quit.</source>
     <message>
         <source>Could not access installed services</source>
         <translation>Không thể truy cập các dịch vụ cài đặt</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>Đã xảy ra lỗi khi cố gắng truy cập vào các dịch vụ cài đặt：%1</translation>
     </message>
     <message>
         <source>No %1 services installed</source>
@@ -110,6 +108,10 @@ Application will now quit.</source>
     <message>
         <source>Stop Media Server</source>
         <translation>dừng lại Media Servers</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

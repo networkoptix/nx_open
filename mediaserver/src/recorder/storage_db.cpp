@@ -7,7 +7,7 @@
 #include <utils/serialization/sql.h>
 #include "utils/common/util.h"
 
-static const int COMMIT_INTERVAL = 1000 * 60 * 5;
+static const int COMMIT_INTERVAL = 1000 * 60 * 1;
 
 QnStorageDb::QnStorageDb(int storageIndex):
     QnDbHelper(),
