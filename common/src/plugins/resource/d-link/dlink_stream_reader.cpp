@@ -177,7 +177,7 @@ bool PlDlinkStreamReader::isStreamOpened() const
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 {
     if (!isStreamOpened())
-        return QnAbstractMediaDataPtr(0);
+        return QnAbstractMediaDataPtr();
 
     if (needMetaData())
         return getMetaData();

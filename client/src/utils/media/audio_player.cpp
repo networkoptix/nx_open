@@ -259,7 +259,7 @@ void AudioPlayer::run()
                     continue;
                 }
 
-                QnCompressedAudioDataPtr audioData = dataPacket.dynamicCast<QnCompressedAudioData>();
+                QnCompressedAudioDataPtr audioData = std::dynamic_pointer_cast<QnCompressedAudioData>(dataPacket);
                 if( !audioData )
                     continue;
 

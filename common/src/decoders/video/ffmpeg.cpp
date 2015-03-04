@@ -540,7 +540,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             m_motionMap.remove(motionIndex);
         }
         else
-            outFrame->metadata.clear();
+            outFrame->metadata.reset();
 
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height || 

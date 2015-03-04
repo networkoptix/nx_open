@@ -329,9 +329,9 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
     if (!m_initialized)
     {
         if (media->dataType == QnAbstractMediaData::VIDEO)
-            m_delayedVideoQueue << qSharedPointerDynamicCast<const QnCompressedVideoData> (media);
+            m_delayedVideoQueue << std::dynamic_pointer_cast<const QnCompressedVideoData> (media);
         else
-            m_delayedAudioQueue << qSharedPointerDynamicCast<const QnCompressedAudioData> (media);
+            m_delayedAudioQueue << std::dynamic_pointer_cast<const QnCompressedAudioData> (media);
         doTranscoding = false;
         if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty())
             return 0; // not ready to init

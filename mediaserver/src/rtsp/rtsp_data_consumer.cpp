@@ -117,7 +117,7 @@ qint64 QnRtspDataConsumer::getExternalTime() const
 
 bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
 {
-    return !(qSharedPointerDynamicCast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
+    return !(std::dynamic_pointer_cast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
 }
 
 bool QnRtspDataConsumer::isMediaTimingsSlow() const
@@ -136,7 +136,7 @@ void QnRtspDataConsumer::getEdgePackets(qint64& firstVTime, qint64& lastVTime, b
 {
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
-        const QnConstCompressedVideoDataPtr& video = m_dataQueue.atUnsafe(i).dynamicCast<const QnCompressedVideoData>();
+        const QnConstCompressedVideoDataPtr& video = std::dynamic_pointer_cast<const QnCompressedVideoData>(m_dataQueue.atUnsafe(i));
         if (video && video->isLQ() == checkLQ) {
             firstVTime = video->timestamp;
             break;
@@ -145,7 +145,7 @@ void QnRtspDataConsumer::getEdgePackets(qint64& firstVTime, qint64& lastVTime, b
 
     for (int i = m_dataQueue.size()-1; i >=0; --i)
     {
-        const QnConstCompressedVideoDataPtr& video = m_dataQueue.atUnsafe(i).dynamicCast<const QnCompressedVideoData>();
+        const QnConstCompressedVideoDataPtr& video = std::dynamic_pointer_cast<const QnCompressedVideoData>(m_dataQueue.atUnsafe(i));
         if (video && video->isLQ() == checkLQ) {
             lastVTime = video->timestamp;
             break;
@@ -200,7 +200,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         bool somethingDeleted = false;
         for (int i = m_dataQueue.size()-1; i >=0; --i)
         {
-            const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).data() );
+            const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).get() );
             if (media->flags & AV_PKT_FLAG_KEY) 
             {
                 bool isHiQ = !(media->flags & QnAbstractMediaData::MediaFlags_LowQuality);
@@ -218,7 +218,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         {
             for (int i = m_dataQueue.size()-1; i >=0; --i)
             {
-                const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).data() );
+                const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).get() );
                 if (media->flags & AV_PKT_FLAG_KEY)
                 {
                     m_dataQueue.removeFirst(i);
@@ -230,7 +230,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         if (somethingDeleted) 
         {
             // clone packet. Put to queue new copy because data is modified
-            QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(m_dataQueue.front().dynamicCast<const QnAbstractMediaData>()->clone());
+            QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(std::dynamic_pointer_cast<const QnAbstractMediaData>(m_dataQueue.front())->clone());
             media->flags |= QnAbstractMediaData::MediaFlags_AfterDrop;
             m_dataQueue.setAt(media, 0);
             m_someDataIsDropped = true;
@@ -449,7 +449,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     //msleep(500);
 
-    QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
+    QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
     if (!media)
         return true;
 
@@ -459,11 +459,11 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
             //Introduce safe solution
         if( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) )
-            (static_cast<QnAbstractMediaData*>(nonConstData.data()))->timestamp /= m_streamingSpeed;
+            (static_cast<QnAbstractMediaData*>(nonConstData.get()))->timestamp /= m_streamingSpeed;
     }
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(data.data());
+    const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(data.get());
     if (metadata == 0)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
@@ -660,7 +660,7 @@ qint64 QnRtspDataConsumer::lastQueuedTime()
     if (m_dataQueue.size() == 0)
         return m_lastMediaTime;
     else {
-        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.last().data() );
+        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.last().get() );
         if (media)
             return media->timestamp;
         else

@@ -194,7 +194,7 @@ QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
         rez = m_rtpStreamParser.getNextData();
         if (rez) 
         {
-            QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
+            //QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(rez);
             //ToDo: if (videoData)
             //    parseMotionInfo(videoData);
 

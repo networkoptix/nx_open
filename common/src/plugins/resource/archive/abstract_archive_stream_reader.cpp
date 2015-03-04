@@ -126,7 +126,7 @@ void QnAbstractArchiveReader::run()
 
         checkTime(data);
 
-        QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 
         if (videoData && videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
         {

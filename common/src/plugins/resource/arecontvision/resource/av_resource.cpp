@@ -8,6 +8,8 @@
 #  include <arpa/inet.h>
 #endif
 
+#include <memory>
+
 #include <utils/common/concurrent.h>
 #include <utils/common/log.h>
 #include <utils/network/http/httpclient.h>
@@ -113,7 +115,7 @@ private:
     int m_val;
 };
 
-typedef QSharedPointer<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
+typedef std::shared_ptr<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
 
 CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int val)
 {

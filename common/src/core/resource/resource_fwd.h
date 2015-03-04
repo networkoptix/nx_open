@@ -1,6 +1,8 @@
 #ifndef QN_RESOURCE_FWD_H
 #define QN_RESOURCE_FWD_H
 
+#include <memory>
+
 #include "shared_resource_pointer.h"
 #include "shared_resource_pointer_list.h"
 
@@ -34,7 +36,7 @@ class QnVideoWallControlMessage;
 class QnLayoutItemData;
 
 class QnResourceCommand;
-typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
+typedef std::shared_ptr<QnResourceCommand> QnResourceCommandPtr;
 
 // -->
 
