@@ -125,7 +125,6 @@ private:
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
     //QnAbstractStorageResourceList m_storages;
-    bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;

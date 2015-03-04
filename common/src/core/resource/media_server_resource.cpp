@@ -32,7 +32,6 @@ private:
 };
 
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
-    m_primaryIFSelected(false),
     m_serverFlags(Qn::SF_None)
 {
     setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
@@ -42,7 +41,6 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
     QnResource::setName(tr("Server"));
 
-    m_primaryIFSelected = false;
     m_statusTimer.restart();
 
     QnResourceList resList = qnResPool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
@@ -263,9 +261,6 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
     QUrl origApiUrl = getApiUrl();
     {
         QMutexLocker lock(&m_mutex);
-        if (m_primaryIFSelected)
-            return;
-        m_primaryIFSelected = true;
     
         if (primaryIF != USE_PROXY)
         {

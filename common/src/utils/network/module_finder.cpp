@@ -136,14 +136,8 @@ void QnModuleFinder::at_responseRecieved(QnModuleInformationEx moduleInformation
 
     m_lastResponse[url] = currentTime;
     m_idByUrl[url] = moduleInformation.id;
-    if (!m_urlById.contains(moduleInformation.id, url))
-        m_urlById.insert(moduleInformation.id, url);
-
-    QSet<QString> repliedAddresses = moduleInformation.remoteAddresses;
-    repliedAddresses.insert(url.host());
 
     QnModuleInformationEx &oldInformation = m_foundModules[moduleInformation.id];
-    moduleInformation.remoteAddresses = moduleAddresses(moduleInformation.id);
 
     if (moduleInformation.runtimeId.isNull())
         moduleInformation.runtimeId = generateRuntimeId(moduleInformation);
@@ -162,6 +156,9 @@ void QnModuleFinder::at_responseRecieved(QnModuleInformationEx moduleInformation
             QSet<QString> oldAddresses = oldInformation.remoteAddresses;
             for (const QString &address: oldAddresses)
                 removeUrl(makeUrl(address, oldInformation.port));
+
+            if (!m_urlById.contains(moduleInformation.id, url))
+                m_urlById.insert(moduleInformation.id, url);
 
             moduleInformation.remoteAddresses.clear();
             moduleInformation.remoteAddresses.insert(url.host());
@@ -193,6 +190,11 @@ void QnModuleFinder::at_responseRecieved(QnModuleInformationEx moduleInformation
 
         return;
     }
+
+    if (!m_urlById.contains(moduleInformation.id, url))
+        m_urlById.insert(moduleInformation.id, url);
+
+    moduleInformation.remoteAddresses = moduleAddresses(moduleInformation.id);
 
     if (oldInformation != moduleInformation) {
         NX_LOG(lit("QnModuleFinder. Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
@@ -277,7 +279,7 @@ void QnModuleFinder::removeUrl(const QUrl &url) {
 
 void QnModuleFinder::handleSelfResponse(const QnModuleInformationEx &moduleInformation, const QUrl &url) {
     QnModuleInformationEx current = qnCommon->moduleInformation();
-    if (current == moduleInformation)
+    if (current.runtimeId == moduleInformation.runtimeId)
         return;
 
     qint64 currentTime = m_elapsedTimer.elapsed();
