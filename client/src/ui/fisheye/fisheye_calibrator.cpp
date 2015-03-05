@@ -169,14 +169,17 @@ qreal QnFisheyeCalibrator::findElipse(qreal& newRadius)
     {
         QVector<Distance> distances;
         qreal offset = (i==0) ? height*0.33 : height*0.66;
-        int x1 = findPixel(center.y() + offset, m_width-1, -1);
-        int x2 = findPixel(center.y() + offset, 0, 1);
-        int x3 = findPixel(center.y() - offset, m_width-1, -1);
-        int x4 = findPixel(center.y() - offset, 0, 1);
-        distances << Distance(qAbs(center.x() - x1), QPointF(x1, center.y() + offset), RightBottom);
-        distances << Distance(qAbs(center.x() - x2), QPointF(x2, center.y() + offset), LeftBottom);
-        distances << Distance(qAbs(center.x() - x3), QPointF(x3, center.y() - offset), RightTop);
-        distances << Distance(qAbs(center.x() - x4), QPointF(x4, center.y() - offset), LeftTop);
+        int yMax = qMin(center.y() + offset, m_height - 1);
+        int yMin = qMax(center.y() - offset, 0);
+
+        int x1 = findPixel(yMax, m_width-1, -1);
+        int x2 = findPixel(yMax, 0, 1);
+        int x3 = findPixel(yMin, m_width-1, -1);
+        int x4 = findPixel(yMin, 0, 1);
+        distances << Distance(qAbs(center.x() - x1), QPointF(x1, yMax), RightBottom);
+        distances << Distance(qAbs(center.x() - x2), QPointF(x2, yMax), LeftBottom);
+        distances << Distance(qAbs(center.x() - x3), QPointF(x3, yMin), RightTop);
+        distances << Distance(qAbs(center.x() - x4), QPointF(x4, yMin), LeftTop);
         qSort(distances);
         if (i == 0)
             p1 = QPointF(distances[3].pos);
