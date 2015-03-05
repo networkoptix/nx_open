@@ -21,8 +21,6 @@
 #include "nx_ec/ec_proto_version.h"
 
 
-const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
-
 class QnMediaServerResourceGuard: public QObject {
 public:
     QnMediaServerResourceGuard(const QnMediaServerResourcePtr &resource): m_resource(resource) {}
@@ -262,27 +260,15 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
     {
         QMutexLocker lock(&m_mutex);
     
-        if (primaryIF != USE_PROXY)
-        {
-            QUrl apiUrl(getApiUrl());
-            apiUrl.setHost(primaryIF);
-            setApiUrl(apiUrl.toString());
+        QUrl apiUrl(getApiUrl());
+        apiUrl.setHost(primaryIF);
+        setApiUrl(apiUrl.toString());
 
-            QUrl url(getUrl());
-            url.setHost(primaryIF);
-            setUrl(url.toString());
-        }
-
-        m_primaryIf = primaryIF;
+        QUrl url(getUrl());
+        url.setHost(primaryIF);
+        setUrl(url.toString());
     }
     emit serverIfFound(::toSharedPointer(this), primaryIF, origApiUrl.toString());
-}
-
-QString QnMediaServerResource::getPrimaryIF() const 
-{
-    QMutexLocker lock(&m_mutex);
-
-    return m_primaryIf;
 }
 
 Qn::PanicMode QnMediaServerResource::getPanicMode() const 
