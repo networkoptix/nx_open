@@ -10,6 +10,8 @@
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget *parent /*= NULL*/):
     base_type(parent),
@@ -17,6 +19,24 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     ui(new Ui::GeneralSystemAdministrationWidget)
 {
     ui->setupUi(this);
+
+    auto shortcutString = [this](const Qn::ActionId actionId, const QString &baseString) -> QString {
+        auto shortcut = action(actionId)->shortcut();
+        if (shortcut.isEmpty())
+            return baseString;
+        return lit("<html><head/><body><p>%1 (<span style=\"font-weight:600;\">%2</span>)</p></body></html>")
+            .arg(baseString)
+            .arg(shortcut.toString(QKeySequence::NativeText));
+    };
+
+    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
+    ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log")));
+    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open Camera List")));
+
+    setHelpTopic(ui->businessRulesButton,   Qn::EventsActions_Help);
+    setHelpTopic(ui->cameraListButton,      Qn::Administration_General_CamerasList_Help);
+    setHelpTopic(ui->eventLogButton,        Qn::EventLog_Help);
+    setHelpTopic(ui->healthMonitorButton,   Qn::Administration_General_HealthMonitoring_Help);
 
     connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
     connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );

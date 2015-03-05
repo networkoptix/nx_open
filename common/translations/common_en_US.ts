@@ -300,76 +300,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server %1 is not available.
- Check that Server is up and running.</source>
-        <translation>Server %1 is not available.
- Confirm server is online and running.</translation>
-    </message>
-    <message>
-        <source>Received bad response from Server %1: &quot;%2&quot;.
- Check if Server is up and has the proper version.</source>
-        <translation>Received bad response from server %1: &quot;%2&quot;.
-Confirm server is online and has the proper version installed.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to http port %1.
- Make sure the camera is plugged into the network.</source>
-        <translation>Cannot connect to http port %1.
-Make sure the camera is available on your network.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.
- Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Could not parse camera response. Url %1, request name %2.
-Please try to reboot the camera, restore factory defaults, or update firmware. If the problem persists, please contact support.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>No supported media tracks at url %1.
-Please try to reboot the camera, restore factory defaults on the camdera, or update the camera&apos;s firmware. If the problem persists, please contact support.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>Not authorised. Url %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.
- Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Cannot open media url %1. Unsupported media protocol %2.
-Please try to restore factory defaults on the device and/or updating the device&apos;s firmware. If the problem persists, please contact support.</translation>
-    </message>
-    <message>
-        <source>Failed to configure parameter %1.
- First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>Failed to configure parameter %1.
-Try activating recording (if it&apos;s off) and decreasing FPS in camera settings. If still unsuccessful, try restoring factory defaults on the camera web-page. If the problem persists, please contact support.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
-Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.
- Please contact support.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>An input/output error has occurred. OS message: &quot;%1&quot;.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation></translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -396,14 +328,100 @@ Please try to reboot the camera, then restore factory defaults on the web-page. 
         <translation></translation>
     </message>
     <message>
-        <source>
-
-Parameters: </source>
+        <source>(unknown)</source>
         <translation></translation>
     </message>
     <message>
-        <source>(unknown)</source>
-        <translation></translation>
+        <source>Server %1 is not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check that Server is up and running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Received bad response from Server %1: &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check if Server is up and has the proper version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to http port %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the camera is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at url %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to configure parameter %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Camera Issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parameters:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -791,10 +809,6 @@ Parameters: </source>
         <translation></translation>
     </message>
     <message>
-        <source>Select server for others to synchronise time with</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Error while sending email</source>
         <translation></translation>
     </message>
@@ -807,58 +821,60 @@ Parameters: </source>
         <translation>Storage is not configured</translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Email address is not set.
-You cannot receive system notifications via email.</source>
-        <translation>Email address is not set.
-Unable to receive system notifications via email.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.
-You cannot receive system notifications via email.</source>
-        <translation>Email server is not set.
-Unable to receive system notifications via email.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.
-They cannot receive system notifications via email.</source>
-        <translation>Some users have not set their email addresses
-and will not receive system notifications via email.</translation>
     </message>
     <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
         <translation>Server times are not synchronised and a common time could not be detected automatically.</translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:
-%1.</source>
-        <translation>Storage is full on the following server:
-%1.</translation>
+        <source>Select server for others to synchronize time with</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storages are not configured on the following Server:
-%1.</source>
-        <translation>Storage is not configured on the following server:
-%1.</translation>
+        <source>Rebuilding archive index is completed</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You have no licenses.
-You cannot record video from cameras.</source>
-        <translation>No valid license detected.
-Unable to record video from cameras.</translation>
+        <source>Email address is not set.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed on the following Server:
-%1.</source>
-        <translation>Rebulding archive index is complete on the following server:
-%1.</translation>
+        <source>You cannot receive system notifications via email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email server is not set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some users have not set their email addresses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications via email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storages are full on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storages are not configured on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You have no licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You cannot record video from cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding archive index is completed on the following Server:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

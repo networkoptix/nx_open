@@ -78,7 +78,7 @@ public:
 
     QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs);
 
-    void doMigrateCSVCatalog();
+    void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
     bool loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild = false, qreal progressCoeff = 1.0);
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
@@ -150,7 +150,7 @@ private:
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff);
     void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
-    void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog);
+    void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
     QMap<QString, QSet<int>> deserializeStorageFile();
     void clearUnusedMotion();
     //void clearCameraHistory();
@@ -178,7 +178,7 @@ private:
     bool m_catalogLoaded;
     bool m_warnSended;
     bool m_isWritableStorageAvail;
-    QTime m_lastTestTime;
+    QElapsedTimer m_lastTestTime;
     QElapsedTimer m_storageWarnTimer;
     static TestStorageThread* m_testStorageThread;
     QMap<QnUuid, bool> m_diskFullWarned;
@@ -196,6 +196,7 @@ private:
     bool m_initInProgress;
     mutable QMutex m_sdbMutex;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
+    mutable QMutex m_csvMigrationMutex;
 };
 
 #define qnStorageMan QnStorageManager::instance()

@@ -8,9 +8,12 @@
         <translation>系統工具列</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>此系統無系統工具列，程式即將關閉。</translation>
+        <source>There is no system tray on this system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -41,11 +44,6 @@ Application will now quit.</source>
     <message>
         <source>Could not access installed services</source>
         <translation>無法存取已安裝的服務</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>當嘗試存取已安裝的服務時發生錯誤：%1</translation>
     </message>
     <message>
         <source>No %1 services installed</source>
@@ -110,6 +108,10 @@ Application will now quit.</source>
     <message>
         <source>Stop Media Server</source>
         <translation>停止媒體伺服器</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

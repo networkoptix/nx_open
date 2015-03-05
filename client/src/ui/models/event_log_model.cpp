@@ -506,6 +506,10 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
     const QnBusinessActionData &action = m_index->at(index.row());
 
     switch(role) {
+    case Qt::ToolTipRole:
+        if (index.column() != DescriptionColumn)
+            return QVariant();
+        // else go to Qt::DisplayRole
     case Qt::DisplayRole:
         return QVariant(textData(column, action));
     case Qt::DecorationRole:

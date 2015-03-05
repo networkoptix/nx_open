@@ -75,6 +75,7 @@ public:
 
     static TimerManager* instance();
 
+    void stop();
 protected:
     virtual void run();
 

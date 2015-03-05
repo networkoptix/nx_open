@@ -826,6 +826,9 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
 // Handlers
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
+    if (action(Qn::ToggleTourModeAction)->isChecked())
+        return Qn::MainWindow_Scene_TourInProgress_Help;
+
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
 
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
@@ -1000,11 +1003,16 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         && item()->layout() 
         && snapshotManager()->isFile(item()->layout()->resource());
 
+    bool isPreviewSearchLayout = item() 
+        && item()->layout() 
+        && item()->layout()->data().contains(Qn::LayoutSearchStateRole);
+
     if(m_camera
         && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
         && !m_camera->hasPtzCapabilities(Qn::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
         && !isExportedLayout
+        && !isPreviewSearchLayout
     ) {
         result |= PtzButton;
     }

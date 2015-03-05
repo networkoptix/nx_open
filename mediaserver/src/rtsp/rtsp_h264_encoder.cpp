@@ -12,7 +12,7 @@ QnRtspH264Encoder::QnRtspH264Encoder():
 
 }
 
-QByteArray QnRtspH264Encoder::getAdditionSDP()
+QByteArray QnRtspH264Encoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
 {
     if (!m_sdpMediaPacket) 
         return QByteArray();

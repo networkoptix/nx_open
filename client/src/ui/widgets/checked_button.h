@@ -16,9 +16,6 @@ public:
 
     void setInsideColor(const QColor& color);
 
-    QColor checkedColor() const;
-    void setCheckedColor(const QColor& color);
-
 protected:
     virtual bool event(QEvent *event) override;
 
@@ -28,8 +25,6 @@ protected:
 private:
     QColor m_color;
     QColor m_insideColor;
-    QColor m_checkedColor;
-    bool m_insideColorDefined;
 };
 
 #endif // QN_CHECKED_BUTTON_H

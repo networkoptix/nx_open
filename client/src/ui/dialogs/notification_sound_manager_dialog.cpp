@@ -11,6 +11,8 @@
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/media/audio_player.h>
@@ -20,6 +22,8 @@ QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *pare
     ui(new Ui::QnNotificationSoundManagerDialog)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::EventsActions_PlaySound_Help);
 
     ui->listView->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
 

@@ -728,6 +728,15 @@ Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &
     return qnSettings->isShowcaseEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnPtzActionCondition::check(const QnActionParameters &parameters) {
+    bool isPreviewSearchMode = 
+        parameters.scope() == Qn::SceneScope &&
+        context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+    if (isPreviewSearchMode)
+        return Qn::InvisibleAction;
+    return QnActionCondition::check(parameters);
+}
+
 Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources)
         if(!check(qnPtzPool->controller(resource)))
@@ -965,7 +974,7 @@ Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resource
 Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList &resources) {
     bool found = false;
     foreach (const QnResourcePtr &resource, resources) {
-        if (resource->getStatus() != m_status) {
+        if (!m_statuses.contains(resource->getStatus())) {
             if (m_all)
                 return Qn::InvisibleAction;
         } else {

@@ -131,6 +131,7 @@
 #include <utils/common/url.h>
 #include <utils/math/math.h>
 #include <utils/aspect_ratio.h>
+#include <utils/screen_manager.h>
 
 
 #ifdef Q_OS_MACX
@@ -146,6 +147,7 @@
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
+#include "network/authenticate_helper.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -291,7 +293,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
-    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()));
+    /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
+    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -443,13 +446,9 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QString::fromUtf8(QnAppServerConnectionFactory::url().toEncoded());
     }
 
-    /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
     if(mainWindow()) {
-        int screen = qApp->desktop()->screenNumber(mainWindow());
-        screen = (screen + 1) % qApp->desktop()->screenCount();
-
-        arguments << QLatin1String("--screen");
-        arguments << QString::number(screen);
+        int screen = context()->instance<QnScreenManager>()->nextFreeScreen();
+        arguments << QLatin1String("--screen") << QString::number(screen);
     }
 
     if (qnSettings->isDevMode())
@@ -1150,7 +1149,8 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     url.setPassword(QString());
     url.setScheme(lit("http"));
     url.setPath(lit("/static/index.html"));
-    QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+    QDesktopServices::openUrl(url);
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1333,20 +1333,17 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     qreal desiredItemAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
     QnResourceWidget *widget = parameters.widget();
     if (widget && widget->hasAspectRatio())
-        desiredItemAspectRatio = widget->aspectRatio();
+        desiredItemAspectRatio = widget->visualAspectRatio();
 
     /* Calculate best size for layout cells. */
     qreal desiredCellAspectRatio = desiredItemAspectRatio;
-    /* If the item is rotated, use its enclosing geometry to get best tiling. */
-    if (!qFuzzyIsNull(widget->item()->rotation())) {
-        QTransform rotationTransform;
-        rotationTransform.rotate(widget->item()->rotation());
-        QRectF rotated = rotationTransform.mapRect(widget->rect());
-        desiredCellAspectRatio = QnGeometry::aspectRatio(rotated);
-    }
 
     /* Aspect ratio of the screen free space. */
-    qreal displayAspectRatio = QnGeometry::aspectRatio(display()->layoutBoundingGeometry());
+    QRectF viewportGeometry = display()->boundedViewportGeometry();
+
+    qreal displayAspectRatio = viewportGeometry.isNull()
+        ? desiredItemAspectRatio
+        : QnGeometry::aspectRatio(viewportGeometry);
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 
@@ -1517,15 +1514,16 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
     QUrl url = server->getApiUrl();
     url.setScheme(lit("http"));
-    url.setPath(lit("/static/index.html"));
-    url.setQuery(lit("lines=1000"));
-    url.setFragment(lit("/log")); // add hashtag postfix. It's required for our web page java script
-    
-    //setting credentials for access to resource
-    url.setUserName(QnAppServerConnectionFactory::url().userName());
-    url.setPassword(QnAppServerConnectionFactory::url().password());
+    url.setPath(lit("/api/showLog"));
 
-    QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
+    QString login = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
+    QUrlQuery urlQuery(url);
+    urlQuery.addQueryItem(lit("auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(login, password)));
+    urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
+    url.setQuery(urlQuery);
+    url = QnNetworkProxyFactory::instance()->urlToResource(url, server);
+    QDesktopServices::openUrl(url);
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
@@ -1851,29 +1849,46 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     QString question;
     /* First version of the dialog if all cameras are auto-discovered. */
-    if (resources.size() == onlineAutoDiscoveredCameras.size()) 
-        question = tr("These %n cameras are auto-discovered.\n"\
-            "They may be auto-discovered again after removing.\n"\
-            "Are you sure you want to delete them?",
-            "", resources.size());
+    if (resources.size() == onlineAutoDiscoveredCameras.size()) {
+        question =
+            tr("These %n cameras are auto-discovered.", "", resources.size()) + L'\n' 
+          + tr("They may be auto-discovered again after removing.") + L'\n' 
+          + tr("Are you sure you want to delete them?");
+    }
     else 
     /* Second version - some cameras are auto-discovered, some not. */
-    if (!onlineAutoDiscoveredCameras.isEmpty())
-        question = tr("%n of these %1 cameras are auto-discovered.\n"\
-            "They may be auto-discovered again after removing.\n"\
-            "Are you sure you want to delete them?",
-            "", onlineAutoDiscoveredCameras.size()).arg(resources.size());
-     else
+    if (!onlineAutoDiscoveredCameras.isEmpty()) {
+        question = 
+            tr("%n of these %1 cameras are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(resources.size()) + L'\n' 
+          + tr("They may be auto-discovered again after removing.") + L'\n' 
+          + tr("Are you sure you want to delete them?");
+    }
+    else {
     /* Third version - no auto-discovered cameras in the list. */
-        question = tr("Do you really want to delete the following %n item(s)?",
-            "", resources.size());
+        question =
+            tr("Do you really want to delete the following %n item(s)?", "", resources.size());
+    }
     
     if (moreResourceToDelete.isEmpty())
         return;
     
+    int helpId = Qn::Empty_Help;
+    for (const QnResourcePtr &resource: resources) {
+        if (resource->hasFlags(Qn::live_cam)) {
+            helpId = Qn::DeletingCamera_Help;
+            break;
+        }
+        if (resource->hasFlags(Qn::layout)) {
+            helpId = Qn::DeletingLayout_Help;
+            /* We don't break here because camera could be in the list,
+             * and camera has a preference. */
+        }
+    }
+
     QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
         mainWindow(),
         resources,
+        helpId,
         tr("Delete Resources"),
         question,
         QDialogButtonBox::Yes | QDialogButtonBox::No
@@ -2215,7 +2230,10 @@ void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode e
     if( errorCode == ec2::ErrorCode::ok )
         return;
 
-    QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Server. \n\nError description: '%2'").arg(ec2::toString(errorCode)));
+    QMessageBox::critical(mainWindow(), 
+        tr("Could not delete resource"),
+        tr("An error has occurred while trying to delete a resource from Server. ") + L'\n'
+      + tr("Error description: '%1'").arg(ec2::toString(errorCode)));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources) {
@@ -2411,13 +2429,13 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please update all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
-    QScopedPointer<QnWorkbenchStateDependentDialog<QMessageBox> > messageBox(
-        new QnWorkbenchStateDependentDialog<QMessageBox>(mainWindow()));
+    QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
+        new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
     messageBox->setIcon(QMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);
     messageBox->setStandardButtons(QMessageBox::Cancel);
-    setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
+    setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Update..."), QMessageBox::HelpRole);
     connect(updateButton, &QPushButton::clicked, this, [this] {
@@ -2456,8 +2474,8 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
         QMessageBox::critical(
                     mainWindow(),
                     tr("Launcher process is not found"),
-                    tr("Cannot restart the client.\n"
-                       "Please close the application and start it again using the shortcut in the start menu.")
+                    tr("Cannot restart the client.") + L'\n' 
+                  + tr("Please close the application and start it again using the shortcut in the start menu.")
                     );
         return;
     }

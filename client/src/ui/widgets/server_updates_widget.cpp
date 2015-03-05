@@ -22,6 +22,9 @@
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
 
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include <update/media_server_update_tool.h>
 
 #include <utils/applauncher_utils.h>
@@ -51,6 +54,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_lastAutoUpdateCheck(0)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::Administration_Update_Help);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);
@@ -283,7 +288,7 @@ bool QnServerUpdatesWidget::confirm() {
 
 bool QnServerUpdatesWidget::discard() {
     if(!cancelUpdate()) {
-        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.\nPlease wait until update is finished"));
+        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.") + L'\n' + tr("Please wait until update is finished"));
         return false;
     }
 
@@ -323,8 +328,8 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                         unholdConnection = true;
                         QMessageBox::critical(this,
                             tr("Launcher process is not found"),
-                            tr("Cannot restart the client.\n"
-                            "Please close the application and start it again using the shortcut in the start menu."));
+                            tr("Cannot restart the client.") + L'\n' 
+                          + tr("Please close the application and start it again using the shortcut in the start menu."));
                     } else {
                         qApp->exit(0);
                         applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);

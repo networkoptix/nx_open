@@ -88,6 +88,10 @@ QnScheduleGridColors::QnScheduleGridColors() {
     weekendLabel =  QColor(255, 128, 128, 255);
     selectedLabel = QColor(64,  128, 192, 255);
     disabledLabel = QColor(183, 183, 183, 255);
+
+    recordNever =   QColor(64,  64,  64);
+    recordAlways =  QColor(0,   100, 0);
+    recordMotion =  QColor(100, 0,   0);
 }
 
 QnGridColors::QnGridColors() {

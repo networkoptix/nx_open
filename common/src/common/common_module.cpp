@@ -116,6 +116,7 @@ QnModuleInformation QnCommonModule::moduleInformation() const
                     moduleInformationCopy.remoteAddresses.insert(url.host());
             }
             moduleInformationCopy.port = server->getPort();
+            moduleInformationCopy.name = server->getName();
         }
 
         QnUserResourcePtr admin = qnResPool->getAdministrator();

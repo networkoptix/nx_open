@@ -391,7 +391,9 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         {
             // check current persistent state
             if (!m_runtimeTransactionLog->contains(aliveData.runtimeState)) {
-                qWarning() << "DETECT runtime transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
+                NX_LOG( QnLog::EC2_TRAN_LOG, lit("DETECT runtime transaction GAP via update message. Resync with peer %1").
+                    arg(transport->remotePeer().id.toString()), cl_logDEBUG1 );
+
                 needResync = true;
             }
         }
@@ -487,6 +489,7 @@ void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTranspor
 void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData> &tran) {
     Q_UNUSED(tran)
     sender->setSyncDone(true);
+    sender->setSyncInProgress(false);
     // propagate new data to other peers. Aka send current state, other peers should request update if need
     handlePeerAliveChanged(m_localPeer, true, true); 
     m_aliveSendTimer.restart();
@@ -810,11 +813,32 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     }
 }      
 
+bool QnTransactionMessageBus::isSyncInProgress() const
+{
+    for (QnConnectionMap::const_iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
+    {
+        QnTransactionTransport* transport = *itr;
+        if (transport->isSyncInProgress())
+            return true;
+    }
+    return false;
+}
+
 void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport)
 {
     // send sync request
+    Q_ASSERT(!transport->isSyncInProgress());
     transport->setReadSync(false);
     transport->setSyncDone(false);
+
+    if (isSyncInProgress()) {
+        transport->setNeedResync(true);
+        return;
+    }
+    
+    transport->setSyncInProgress(true);
+    transport->setNeedResync(false);
+
     QnTransaction<ApiSyncRequestData> requestTran(ApiCommand::tranSyncRequest);
     requestTran.params.persistentState = transactionLog->getTransactionsState();
     requestTran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
@@ -1126,6 +1150,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
                     qWarning() << "Transaction Transport HTTP keep-alive timeout for connection" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);
                 }
+                else if (transport->isNeedResync())
+                    queueSyncRequest(transport);
             }
         }
     }

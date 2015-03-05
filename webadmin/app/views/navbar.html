@@ -10,25 +10,22 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" title="Server name: {{settings.name}}&#10;Version: {{settings.version}} {{settings.systemInformation.platform}} {{settings.systemInformation.arch}}&#10;IP: {{settings.remoteAddresses}}" data-toggle="tooltip" data-placement="bottom" >
-                <img src="customization/hdw_logo.png" height="48"/>
-                {{settings.name}}
+                <img src="customization/webadmin_logo.png" height="40" style="margin-top:5px"/>
             </a>
         </div>
         <nav ng-if="!noPanel" class="collapse navbar-collapse bs-navbar-collapse" id="bs-example-navbar-collapse" role="navigation">
 
             <ul class="nav navbar-nav navbar-right">
-
-                <!-- <li class="active"><a ng-href="#">Home</a></li> -->
                 <li ng-hide="!user.isAdmin" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Settings</a></li>
                 <li ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Information</a></li>
                 <li ng-class="{active:isActive('/webclient')}"><a ng-href="#/webclient/">Web client</a></li>
                 <li ng-class="{active:isActive('/developers')}"><a ng-href="#/developers/">For Developers</a></li>
                 <li ng-class="{active:isActive('/help')}"><a ng-href="#/help/">Help</a></li>
-
                 <li><a ng-click="logout()" title="Logout"><span class="glyphicon glyphicon-off"></span></a></li>
-
-
             </ul>
         </nav>
     </div>
 </header>
+<div class="container">
+    <alert ng-if="alertVisible" type="info" close="closeAlert()">You are currently connected to the system '{{settings.systemName}}' through '{{settings.name}}' server</alert>
+</div>

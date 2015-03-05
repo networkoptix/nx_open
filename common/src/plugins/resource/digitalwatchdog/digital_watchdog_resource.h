@@ -5,6 +5,8 @@
 
 #include <core/datapacket/media_data_packet.h>
 #include <core/resource/camera_resource.h>
+#include <memory>
+
 #include <core/resource/security_cam_resource.h>
 
 #include <plugins/resource/onvif/onvif_resource.h>
@@ -12,9 +14,6 @@
 #include <utils/network/simple_http_client.h>
 
 #include "dw_resource_settings.h"
-
-class QnPlWatchDogResourceAdditionalSettings;
-typedef QSharedPointer<QnPlWatchDogResourceAdditionalSettings> QnPlWatchDogResourceAdditionalSettingsPtr;
 
 class QnDigitalWatchdogResource : public QnPlOnvifResource
 {
@@ -26,7 +25,7 @@ public:
     QnDigitalWatchdogResource();
     ~QnDigitalWatchdogResource();
 
-    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
+    //virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 protected:
@@ -45,8 +44,8 @@ private:
 
 private:
     bool m_hasZoom;
-    QScopedPointer<DWCameraProxy> m_cameraProxy;
 
+    QScopedPointer<DWCameraProxy> m_cameraProxy;
 };
 
 #endif //ENABLE_ONVIF

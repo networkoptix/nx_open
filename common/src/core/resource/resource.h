@@ -360,7 +360,6 @@ private:
     bool m_initialized;    
     QMutex m_initAsyncMutex;
 
-    static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
     CameraDiagnostics::Result m_prevInitializationResult;
     CameraDiagnostics::Result m_lastMediaIssue;

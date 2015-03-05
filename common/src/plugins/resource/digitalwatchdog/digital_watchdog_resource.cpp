@@ -1,6 +1,7 @@
 #ifdef ENABLE_ONVIF
 
 #include "digital_watchdog_resource.h"
+
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"
@@ -99,6 +100,7 @@ void QnDigitalWatchdogResource::enableOnvifSecondStream()
     // camera rebooting ....
 }
 
+/*
 int QnDigitalWatchdogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
@@ -118,6 +120,7 @@ int QnDigitalWatchdogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize res
 
     return qMax(1024,result);
 }
+*/
 
 QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal() 
 {

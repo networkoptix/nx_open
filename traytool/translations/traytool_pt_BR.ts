@@ -8,10 +8,12 @@
         <translation>Barra do sistema</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>Não há barra do sistema nesse sistema.
-A aplicação será terminada.</translation>
+        <source>There is no system tray on this system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -68,12 +70,6 @@ A aplicação será terminada.</translation>
         <translation>Não foi possivel acessar os serviços instalados</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>Um erro ocorreu na tentativa de acesso aos serviços instalados:
- %1</translation>
-    </message>
-    <message>
         <source>Show &amp;Media Server Log</source>
         <translation>Mostrar relatório do Servido de &amp;Mídia</translation>
     </message>
@@ -112,6 +108,10 @@ A aplicação será terminada.</translation>
     <message>
         <source> (stopped)</source>
         <translation> (parado)</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

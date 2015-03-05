@@ -30,6 +30,8 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 
+#include <ui/help/help_topics.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
@@ -1276,13 +1278,31 @@ QnBookmarksViewer *QnTimeSlider::bookmarksViewer()
     return m_bookmarksViewer;
 }
 
+int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
+    if (thumbnailsRect().contains(pos))
+        return Qn::MainWindow_Thumbnails_Help;
+    bool hasMotion = false;
+    for (int i = 0; i < m_lineCount; i++) {
+        if (!timePeriods(i, Qn::MotionContent).isEmpty()) {
+            hasMotion = true;
+            break;
+        }
+    }
+
+    if (hasMotion)
+        return Qn::MainWindow_MediaItem_SmartSearch_Help;
+
+    return Qn::MainWindow_Slider_Timeline_Help;
+}
+
+
 // -------------------------------------------------------------------------- //
 // Updating
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::updatePixmapCache() {
     m_pixmapCache->setFont(font());
     m_pixmapCache->setColor(palette().color(QPalette::WindowText));
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16); 
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16); 
 
     updateLineCommentPixmaps();
     updateTickmarkTextSteps();

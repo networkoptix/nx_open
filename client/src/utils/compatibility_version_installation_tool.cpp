@@ -36,8 +36,6 @@ void QnCompatibilityVersionInstallationTool::run() {
     timer->start(checkInterval);
 
     exec();
-
-    qDebug() << "stopped";
 }
 
 void QnCompatibilityVersionInstallationTool::cancel() {

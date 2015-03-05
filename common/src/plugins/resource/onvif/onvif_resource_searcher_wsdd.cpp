@@ -572,6 +572,10 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
     else if (lowerName == lit("digital watchdog")) {
         qSwap(name, manufacturer);
     }
+    else if (manufacturer.toLower().startsWith(lit("dwc-"))) {
+        name = manufacturer;
+        manufacturer = lit("Digital Watchdog");
+    }
     else if (lowerName == lit("sony")) {
         qSwap(name, manufacturer);
     }
@@ -585,6 +589,10 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
     else if (lowerName == lit("networkcamera") && manufacturer.toLower().startsWith(lit("dcs-"))) {
         name = manufacturer;
         manufacturer = lit("DLink");
+    }
+    else if (lowerName == lit("networkcamera") && manufacturer.toLower().startsWith(lit("sd8363"))) {
+        name = manufacturer;
+        manufacturer = lit("VIVOTEK");
     }
     else if( (lowerName.startsWith(lit("vista_")) || lowerName.startsWith(lit("norbain_"))) && manufacturer.toLower().startsWith(lit("vk2-"))) {
         name = manufacturer;

@@ -8,11 +8,12 @@
         <translation>시스템 트레이</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>해당 시스템에는 시스템 트레이가 없습니다.
-응용 프로그램이 종료 됩니다.
-</translation>
+        <source>There is no system tray on this system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -43,12 +44,6 @@ Application will now quit.</source>
     <message>
         <source>Could not access installed services</source>
         <translation>설치된 서비스에 접근할 수 없음</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>설치된 서비스에 접근을 시도하는 동안 오류가 발생 함:
- %1</translation>
     </message>
     <message>
         <source>No %1 services installed</source>
@@ -113,6 +108,10 @@ Application will now quit.</source>
     <message>
         <source>Stop Media Server</source>
         <translation>저장서버 정지</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
