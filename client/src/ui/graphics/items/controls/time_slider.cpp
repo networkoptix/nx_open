@@ -2486,7 +2486,7 @@ void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     if (!rulerRect().contains(pos) && isGrabbing)
     {
         ungrabMouse();
-        m_bookmarksViewer->leaveTimeLine();
+        m_bookmarksViewer->hideDelayed();
     }
     else
     {
@@ -2501,7 +2501,7 @@ void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         }
         else if (isGrabbing)
         {
-            m_bookmarksViewer->leaveTimeLine();
+            m_bookmarksViewer->hideDelayed();
         }
     }
     event->accept();
