@@ -3,7 +3,7 @@
 
 #include <QNetworkAccessManager>
 #include <QHostAddress>
-#include "utils/network/http\async_http_client_reply.h"
+#include "utils/network/http/async_http_client_reply.h"
 
 class QnPublicIPDiscovery: public QObject
 {
