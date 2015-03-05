@@ -104,6 +104,14 @@
         <source>Comments:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>When</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BusinessRulesDialog</name>
@@ -1461,17 +1469,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnAction</name>
-    <message>
-        <source>%n</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnActionManager</name>
     <message>
         <source>Show FPS</source>
@@ -2771,14 +2768,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>at</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>When</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Do</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnBusinessRulesDialog</name>
@@ -3801,11 +3790,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Motion video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>
-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7869,10 +7853,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Secure connection using TLS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7910,6 +7890,10 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
