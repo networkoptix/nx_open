@@ -297,6 +297,11 @@ void QnDirectModuleFinder::at_discoveryCheckTimer_timeout() {
 }
 
 void QnDirectModuleFinder::at_aliveCheckTimer_timeout() {
-    for (const QUrl &url: m_lastPingByUrl.keys())
-        enqueRequest(url);
+    for( QHash<QUrl, qint64>::const_iterator
+        it = m_lastPingByUrl.cbegin();
+        it != m_lastPingByUrl.cend();
+        ++it )
+    {
+        enqueRequest(it.key());
+    }
 }

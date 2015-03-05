@@ -1141,8 +1141,12 @@ void QnTransactionMessageBus::doPeriodicTasks()
     // send HTTP level keep alive (empty chunk) for server <---> server connections
     if (!m_localPeer.isClient()) 
     {
-        for(QnTransactionTransport* transport: m_connections.values()) 
+        for( QnConnectionMap::iterator
+            itr = m_connections.begin();
+            itr != m_connections.end();
+            ++itr )
         {
+            QnTransactionTransport* transport = itr.value();
             if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
             {
                 if (transport->isHttpKeepAliveTimeout()) {

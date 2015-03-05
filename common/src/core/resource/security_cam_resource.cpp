@@ -47,13 +47,34 @@ QnSecurityCamResource::QnSecurityCamResource():
         &m_mutex ),
     m_cachedSupportedMotionType(
         std::bind( &QnSecurityCamResource::calculateSupportedMotionType, this ),
+        &m_mutex ),
+    m_cachedCameraCapabilities(
+        [this]()->Qn::CameraCapabilities {
+            return static_cast<Qn::CameraCapabilities>(
+                getProperty(Qn::CAMERA_CAPABILITIES_PARAM_NAME).toInt()); },
+        &m_mutex ),
+    m_cachedIsDtsBased(
+        [this]()->bool{ return getProperty(Qn::DTS_PARAM_NAME).toInt() > 0; },
+        &m_mutex ),
+    m_motionType(
+        std::bind( &QnSecurityCamResource::calculateMotionType, this ),
         &m_mutex )
+
 {
     addFlags(Qn::live_cam);
 
-    connect(this, &QnResource::initializedChanged, this, &QnSecurityCamResource::at_initializedChanged, Qt::DirectConnection);
-    connect(this, &QnResource::resourceChanged, this, &QnSecurityCamResource::atResourceChanged, Qt::DirectConnection);
-    connect(this, &QnSecurityCamResource::motionRegionChanged, this, &QnSecurityCamResource::at_motionRegionChanged, Qt::DirectConnection);
+    connect(
+        this, &QnResource::initializedChanged,
+        this, &QnSecurityCamResource::at_initializedChanged,
+        Qt::DirectConnection);
+    connect(
+        this, &QnResource::resourceChanged,
+        this, &QnSecurityCamResource::atResourceChanged,
+        Qt::DirectConnection);
+    connect(
+        this, &QnSecurityCamResource::motionRegionChanged,
+        this, &QnSecurityCamResource::at_motionRegionChanged,
+        Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
 }
@@ -262,8 +283,7 @@ bool QnSecurityCamResource::hasDualStreaming() const {
 }
 
 bool QnSecurityCamResource::isDtsBased() const {
-    QString val = getProperty(Qn::DTS_PARAM_NAME);
-    return val.toInt() > 0;
+    return m_cachedIsDtsBased.get();
 }
 
 bool QnSecurityCamResource::isAnalog() const {
@@ -447,6 +467,10 @@ bool QnSecurityCamResource::hasMotion() const {
 }
 
 Qn::MotionType QnSecurityCamResource::getMotionType() const {
+    return m_motionType.get();
+}
+
+Qn::MotionType QnSecurityCamResource::calculateMotionType() const {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     Qn::MotionType value = (*userAttributesLock)->motionType;
     if (value == Qn::MT_NoMotion)
@@ -463,8 +487,7 @@ void QnSecurityCamResource::setMotionType(Qn::MotionType value) {
 }
 
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
-    QString val = getProperty(Qn::CAMERA_CAPABILITIES_PARAM_NAME);
-    return static_cast<Qn::CameraCapabilities>(val.toInt());
+    return m_cachedCameraCapabilities.get();
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const {
@@ -804,4 +827,6 @@ void QnSecurityCamResource::atResourceChanged()
     //resetting cached values
     m_cachedHasDualStreaming2.update();
     m_cachedSupportedMotionType.update();
+    m_cachedCameraCapabilities.update();
+    m_cachedIsDtsBased.update();
 }

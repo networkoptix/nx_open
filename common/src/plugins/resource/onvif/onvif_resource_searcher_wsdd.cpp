@@ -35,11 +35,9 @@ const char OnvifResourceSearcherWsdd::WSDD_ACTION[] = "http://schemas.xmlsoap.or
 
 const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp://239.255.255.250:3702";
 
-int WSDD_MULTICAST_PORT = 3702;
-const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
-
-#define WSDD_GROUP_ADDRESS QHostAddress(QLatin1String(WSDD_MULTICAST_ADDRESS))
-
+static const int WSDD_MULTICAST_PORT = 3702;
+static const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
+static const SocketAddress WSDD_MULTICAST_ENDPOINT( WSDD_MULTICAST_ADDRESS, WSDD_MULTICAST_PORT );
 
 
 namespace
@@ -59,7 +57,7 @@ namespace
     int gsoapFsend(struct soap *soap, const char *s, size_t n)
     {
         AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-        qSocket->sendTo(s, n, QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+        qSocket->sendTo(s, n, WSDD_MULTICAST_ENDPOINT);
         return SOAP_OK;
     }
 
@@ -111,7 +109,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
         guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
         QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLatin1();
 
-        qSocket->sendTo(data.data(), data.size(), QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+        qSocket->sendTo(data.data(), data.size(), WSDD_MULTICAST_ENDPOINT);
         return SOAP_OK;
     }
 
@@ -133,7 +131,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 
         //socket.connectToHost(QHostAddress(QString::fromLatin1(soap->host)), WSDD_MULTICAST_PORT);
         //socket.write(data);
-        socket->sendTo(data.data(), data.size(), QString::fromLatin1(soap->host), WSDD_MULTICAST_PORT);
+        socket->sendTo(data.data(), data.size(), SocketAddress( soap->host, WSDD_MULTICAST_PORT ) );
         return SOAP_OK;
     }
 }
