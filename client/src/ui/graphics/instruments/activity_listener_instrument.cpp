@@ -3,7 +3,7 @@
 
 ActivityListenerInstrument::ActivityListenerInstrument(bool focusedOnly, int activityTimeoutMSec, QObject *parent):
     Instrument(
-        makeSet(QEvent::Wheel, QEvent::MouseButtonPress, QEvent::MouseButtonDblClick, QEvent::MouseMove, QEvent::MouseButtonRelease), 
+        makeSet(QEvent::Wheel, QEvent::MouseButtonPress, QEvent::MouseButtonDblClick, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::ShortcutOverride),
         makeSet(QEvent::KeyPress, QEvent::KeyRelease) | (focusedOnly ? makeSet(QEvent::FocusIn, QEvent::FocusOut) : makeSet()), 
         makeSet(), 
         makeSet(), 
