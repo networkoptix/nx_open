@@ -712,6 +712,7 @@ void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
 
     node->setResource(resource);
     node->setParent(parentNode);
+    node->update();
 }
 
 void QnResourcePoolModel::at_layout_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {

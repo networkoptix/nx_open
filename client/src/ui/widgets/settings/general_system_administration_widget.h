@@ -24,6 +24,9 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private:
+    bool isDatabaseBackupAvailable() const;
+
+private:
     QScopedPointer<Ui::GeneralSystemAdministrationWidget> ui;
 };
 

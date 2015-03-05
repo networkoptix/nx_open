@@ -40,9 +40,9 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
         setWarningStyle(ui->readOnlyWarningLabel);
         ui->readOnlyWarningLabel->setText(
 #ifdef Q_OS_LINUX
-            tr("Settings file is read-only. Please contact your system administrator.\nAll changes will be lost after program exit.")
+            tr("Settings file is read-only. Please contact your system administrator.") + L'\n' + tr("All changes will be lost after program exit.")
 #else
-            tr("Settings cannot be saved. Please contact your system administrator.\nAll changes will be lost after program exit.")
+            tr("Settings cannot be saved. Please contact your system administrator.") + L'\n' + tr("All changes will be lost after program exit.")
 #endif
         );
     }

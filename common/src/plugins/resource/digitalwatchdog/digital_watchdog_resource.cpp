@@ -1,6 +1,7 @@
 #ifdef ENABLE_ONVIF
 
 #include "digital_watchdog_resource.h"
+
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"
@@ -24,9 +25,7 @@ QString getIdSuffixByModel(const QString& cameraModel)
 }
 
 QnPlWatchDogResource::QnPlWatchDogResource():
-    QnPlOnvifResource(),
-    m_hasZoom(false),
-    m_additionalSettings()
+    m_hasZoom(false)
 {
     setVendor(lit("Digital Watchdog"));
 }
@@ -167,6 +166,8 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     QMutexLocker lock(&m_physicalParamsMutex);
 
+    m_additionalSettings.clear();
+
     //Put base model in list
     m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
         getHostAddress(), 80, getNetworkTimeout(), getAuth(), baseIdStr)));
@@ -271,7 +272,6 @@ QnPlWatchDogResourceAdditionalSettings::QnPlWatchDogResourceAdditionalSettings(c
 
 QnPlWatchDogResourceAdditionalSettings::~QnPlWatchDogResourceAdditionalSettings()
 {
-    delete m_cameraProxy;
 }
 
 bool QnPlWatchDogResourceAdditionalSettings::refreshValsFromCamera()

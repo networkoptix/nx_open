@@ -488,7 +488,7 @@ void QnLoginDialog::at_deleteButton_clicked() {
         return;
 
     if (QMessageBox::warning(this, tr("Delete connections"),
-                                   tr("Are you sure you want to delete the connection\n%1?").arg(name),
+                                   tr("Are you sure you want to delete this connection: %1?").arg(L'\n' + name),
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 

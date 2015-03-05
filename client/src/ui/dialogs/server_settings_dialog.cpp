@@ -500,12 +500,13 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
         int button = QMessageBox::warning(
             this,
             tr("Warning"),
-            tr("You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! "
-            "Depending on the total size of archive it can take several hours. "
-            "This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?"),
-            QMessageBox::Yes | QMessageBox::No
+            tr("You are about to launch the archive re-synchronization routine.") + L'\n' 
+          + tr("ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.") + L'\n' 
+          + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.") + L'\n' 
+          + tr("Are you sure you want to continue?"),
+            QMessageBox::Ok | QMessageBox::Cancel
             );
-        if(button == QMessageBox::No)
+        if(button != QMessageBox::Ok)
             return;
     }
 
