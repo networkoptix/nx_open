@@ -121,9 +121,9 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     QString examples = 
         lit(
         "<html><head/><body><p>%1</p>\
-        <p><span style=\"font-weight:600;\">62.82.122.156</span></p>\
-        <p><span style=\"font-weight:600;\">www.example.com:8080</span></p>\
-        <p><span style=\"font-weight:600;\">rtsp://example.com:554/video</span></p>\
+        <p><b>192.168.1.15</b></p>\
+        <p><b>www.example.com:8080</b></p>\
+        <p><b>rtsp://example.com:554/video</b></p>\
         </body></html>")
         .arg(tr("Examples:"));
 

@@ -24,7 +24,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         auto shortcut = action(actionId)->shortcut();
         if (shortcut.isEmpty())
             return baseString;
-        return lit("<html><head/><body><p>%1 (<span style=\"font-weight:600;\">%2</span>)</p></body></html>")
+        return lit("%1 (<b>%2</b>)")
             .arg(baseString)
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
