@@ -30,7 +30,7 @@ public:
 protected:
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const QString& host,
+        const HostAddress& host,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         const QAuthenticator &auth,

@@ -124,14 +124,13 @@ void RTPIODevice::processRtcpData()
     quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
     while( m_rtcpSocket->hasData() )
     {
-        QString lastReceivedAddr;
-        unsigned short lastReceivedPort = 0;
-        int readed = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), lastReceivedAddr, lastReceivedPort);
+        SocketAddress senderEndpoint;
+        int readed = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), &senderEndpoint);
         if (readed > 0)
         {
             if (!m_rtcpSocket->isConnected())
             {
-                if (!m_rtcpSocket->setDestAddr(lastReceivedAddr, lastReceivedPort))
+                if (!m_rtcpSocket->setDestAddr(senderEndpoint))
                 {
                     qWarning() << "RTPIODevice::processRtcpData(): setDestAddr() failed: " << SystemError::getLastOSErrorText();
                 }

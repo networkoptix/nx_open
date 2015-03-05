@@ -254,12 +254,10 @@ QnResourceList QnPlIqResourceSearcher::findResources()
         QByteArray datagram;
         datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-        QString sender;
-        quint16 senderPort;
+        SocketAddress senderEndpoint;
+        int readed = receiveSock->recvFrom(datagram.data(), datagram.size(), &senderEndpoint);
 
-        int readed = receiveSock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
-
-        if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
+        if (senderEndpoint.port == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
             processNativePacket(result, datagram.left(readed));
     }
 

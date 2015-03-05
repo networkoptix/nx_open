@@ -49,16 +49,15 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
             QByteArray reply;
             reply.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-            QString sender;
-            quint16 senderPort;
-            int readed = socket->recvFrom(reply.data(), reply.size(), sender, senderPort);
+            SocketAddress senderEndpoint;
+            int readed = socket->recvFrom(reply.data(), reply.size(), &senderEndpoint);
             if (readed < 1)
                 continue;
                         
             WSResult res = parseReply(reply.left(readed));
             if (!res.mac.isEmpty())
             {
-                res.ip = sender;
+                res.ip = senderEndpoint.address.toString();
                 res.disc_ip = iface.address.toString();
                 result[res.mac] = res;
             }

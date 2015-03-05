@@ -256,9 +256,8 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())
     {
-        QString remoteAddress;
-        quint16 remotePort;
-        int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), remoteAddress, remotePort);
+        SocketAddress remoteEndpoint;
+        int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), &remoteEndpoint);
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
