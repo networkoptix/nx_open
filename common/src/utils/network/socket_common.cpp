@@ -10,7 +10,7 @@
 
 
 const HostAddress HostAddress::localhost( QLatin1String("127.0.0.1") );
-const HostAddress HostAddress::anyHost( INADDR_ANY );
+const HostAddress HostAddress::anyHost( (uint32_t)INADDR_ANY );
 
 HostAddress::HostAddress()
 :
@@ -50,6 +50,26 @@ HostAddress::HostAddress( const QString& addrStr )
     }
 
     m_sinAddr.s_addr = inet_addr( addrStr.toLatin1().constData() );
+    if( m_sinAddr.s_addr != INADDR_NONE )
+        m_addressResolved = true;   //addrStr contains valid ip address
+}
+
+HostAddress::HostAddress( const char* addrStr )
+:
+    m_addrStr( QLatin1String(addrStr) ),
+    m_addressResolved(false)
+{
+    memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
+    //if addrStr is an ip address
+
+    if( strcmp( addrStr, "255.255.255.255" ) == 0 )
+    {
+        m_sinAddr.s_addr = 0xffffffffU;
+        m_addressResolved = true;
+        return;
+    }
+
+    m_sinAddr.s_addr = inet_addr( addrStr );
     if( m_sinAddr.s_addr != INADDR_NONE )
         m_addressResolved = true;   //addrStr contains valid ip address
 }

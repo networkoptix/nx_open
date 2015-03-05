@@ -249,7 +249,8 @@ namespace nx_http
 
         bool operator==( const MimeProtoVersion& right ) const
         {
-            return protocol == right.protocol && version == right.version;
+            return protocol == right.protocol
+                && version == right.version;
         }
     };
 

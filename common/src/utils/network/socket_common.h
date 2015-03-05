@@ -36,6 +36,7 @@ public:
     */
     HostAddress( uint32_t _ipv4 );
     HostAddress( const QString& addrStr );
+    HostAddress( const char* addrStr );
 
     //!Returns ip in local byte order
     uint32_t ipv4() const;
