@@ -243,7 +243,6 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);
     }
-
 }
 
 bool QnRtspDataConsumer::canAcceptData() const
@@ -416,7 +415,7 @@ void QnRtspDataConsumer::doRealtimeDelay(QnConstAbstractMediaDataPtr media)
 
 void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
 {
-    RtspServerTrackInfoPtr metadataTrack = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
+    RtspServerTrackInfo* metadataTrack = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
     if (metadataTrack && metadataTrack->clientPort != -1)
     {
         m_sendBuffer.resize(16);
@@ -493,11 +492,11 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     int trackNum = media->channelNumber;
     if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
         trackNum = 0; // multichannel video is going to be transcoded to a single track
-    RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(trackNum);
+    RtspServerTrackInfo* trackInfo = m_owner->getTrackInfo(trackNum);
 
-    if (trackInfo == 0 || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
+    if (trackInfo == nullptr || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
-    QnRtspEncoderPtr codecEncoder = trackInfo->encoder;
+    const QnRtspEncoderPtr& codecEncoder = trackInfo->encoder;
     {
         QMutexLocker lock(&m_mutex);
         int cseq = media->opaque;
@@ -597,7 +596,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     }
     m_sendBuffer.clear();
 
-    QByteArray newRange = m_owner->getRangeHeaderIfChanged().toUtf8();
+    const QByteArray& newRange = m_owner->getRangeHeaderIfChanged();
     if (!newRange.isEmpty())
         sendMetadata(newRange);
 
