@@ -41,11 +41,18 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_recActionCnt(0),
     m_statusFlags(Qn::CSF_NoFlags),
     m_advancedWorking(false),
-    m_manuallyAdded(false)
+    m_manuallyAdded(false),
+    m_cachedHasDualStreaming2(
+        [this]()->bool{ return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse; },
+        &m_mutex ),
+    m_cachedSupportedMotionType(
+        std::bind( &QnSecurityCamResource::calculateSupportedMotionType, this ),
+        &m_mutex )
 {
     addFlags(Qn::live_cam);
 
     connect(this, &QnResource::initializedChanged, this, &QnSecurityCamResource::at_initializedChanged, Qt::DirectConnection);
+    connect(this, &QnResource::resourceChanged, this, &QnSecurityCamResource::atResourceChanged, Qt::DirectConnection);
     connect(this, &QnSecurityCamResource::motionRegionChanged, this, &QnSecurityCamResource::at_motionRegionChanged, Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
@@ -246,7 +253,7 @@ QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const {
 }
 
 bool QnSecurityCamResource::hasDualStreaming2() const {
-    return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse;
+    return m_cachedHasDualStreaming2.get();
 }
 
 bool QnSecurityCamResource::hasDualStreaming() const {
@@ -427,25 +434,9 @@ Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const
 }
 
 Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
-    QString val = getProperty(Qn::SUPPORTED_MOTION_PARAM_NAME);
-    if (val.isEmpty())
-        return Qn::MT_NoMotion;
-
-    Qn::MotionTypes result = Qn::MT_Default;
-    for(const QString& str: val.split(L',')) {
-        QString s1 = str.toLower().trimmed();
-        if (s1 == lit("hardwaregrid"))
-            result |= Qn::MT_HardwareGrid;
-        else if (s1 == lit("softwaregrid"))
-            result |= Qn::MT_SoftwareGrid;
-        else if (s1 == lit("motionwindow"))
-            result |= Qn::MT_MotionWindow;
-    }
-    //if ((!hasDualStreaming() || secondaryStreamQuality() == Qn::SSQualityDontUse) && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
-    //    result &= ~Qn::MT_SoftwareGrid;
-
-    return result;
+    return m_cachedSupportedMotionType.get();
 }
+
 
 bool QnSecurityCamResource::hasMotion() const {
     Qn::MotionType motionType = getDefaultMotionType();
@@ -786,3 +777,31 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
 //{
 //    return m_motionMaskList[channel];
 //}
+
+Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const {
+    QString val = getProperty(Qn::SUPPORTED_MOTION_PARAM_NAME);
+    if (val.isEmpty())
+        return Qn::MT_NoMotion;
+
+    Qn::MotionTypes result = Qn::MT_Default;
+    for(const QString& str: val.split(L',')) {
+        QString s1 = str.toLower().trimmed();
+        if (s1 == lit("hardwaregrid"))
+            result |= Qn::MT_HardwareGrid;
+        else if (s1 == lit("softwaregrid"))
+            result |= Qn::MT_SoftwareGrid;
+        else if (s1 == lit("motionwindow"))
+            result |= Qn::MT_MotionWindow;
+    }
+    //if ((!hasDualStreaming() || secondaryStreamQuality() == Qn::SSQualityDontUse) && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
+    //    result &= ~Qn::MT_SoftwareGrid;
+
+    return result;
+}
+
+void QnSecurityCamResource::atResourceChanged()
+{
+    //resetting cached values
+    m_cachedHasDualStreaming2.update();
+    m_cachedSupportedMotionType.update();
+}

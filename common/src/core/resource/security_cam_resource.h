@@ -4,6 +4,8 @@
 #include <QtGui/QRegion>
 #include <QtCore/QMutex>
 
+#include <utils/common/value_cache.h>
+
 #include "media_resource.h"
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
@@ -11,11 +13,13 @@
 #include "common/common_globals.h"
 #include "business/business_fwd.h"
 
+
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
 
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
+
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     typedef QnNetworkResource base_type;
@@ -305,8 +309,14 @@ private:
     //int m_minDays;
     //int m_maxDays;
     //QnUuid m_preferedServerId;
+    CachedValue<bool> m_cachedHasDualStreaming2;
+    CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
 
     //QnMotionRegion getMotionRegionNonSafe(int channel) const;
+    Qn::MotionTypes calculateSupportedMotionType() const;
+
+private slots:
+    void atResourceChanged();
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
