@@ -108,3 +108,16 @@ void QnEmulatedFrameWidget::updateCursor(const QPoint &mousePos) {
     m_lastMousePos = mousePos;
 }
 
+void QnEmulatedFrameWidget::showFullScreen() {
+    m_dragProcessor->reset();
+    m_dragProcessor->setHandler(NULL);
+    base_type::showFullScreen();
+}
+
+void QnEmulatedFrameWidget::showNormal() {
+    base_type::showNormal();
+    m_dragProcessor->setHandler(this);
+}
+
+
+
