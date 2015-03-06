@@ -719,6 +719,12 @@ namespace ec2
             return getLayouts( std::static_pointer_cast<impl::GetLayoutsHandler>(
                 std::make_shared<impl::CustomGetLayoutsHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode getLayoutsSync(QnLayoutResourceList* const layoutsList ) {
+            int(AbstractLayoutManager::*fn)(impl::GetLayoutsHandlerPtr) = &AbstractLayoutManager::getLayouts;
+            return impl::doSyncCall<impl::GetLayoutsHandler>( std::bind(fn, this, std::placeholders::_1), layoutsList );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */

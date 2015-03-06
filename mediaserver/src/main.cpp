@@ -42,6 +42,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -1122,6 +1123,21 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 
         for(const QnVideoWallResourcePtr &videowall: videowalls)
             messageProcessor->updateResource(videowall);
+    }
+
+    {
+        //loading layouts
+        QnLayoutResourceList layouts;
+        while(( rez = ec2Connection->getLayoutManager()->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+
+        for(const auto &layout: layouts)
+            messageProcessor->updateResource(layout);
     }
 
     {
