@@ -7,14 +7,19 @@
 #include <api/app_server_connection.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/layout_resource.h>
 
 namespace {
-    const int timeout = 60*1000;    //check once a minute
+    const int timeout = 1*1000;    //check once a minute
 }
 
 QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent) {
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this] {
+
+        QnLayoutResourceList layouts = qnResPool->getResources<QnLayoutResource>();
+        for (const auto &layout: layouts)
+            qDebug() << layout->getName();
 
         // remove resources that have been offline for more than one iteration
         for (const QnResourcePtr &resource: m_queuedToDelete) {
