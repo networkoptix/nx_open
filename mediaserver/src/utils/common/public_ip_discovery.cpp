@@ -8,9 +8,10 @@
 #include <media_server/settings.h>
 
 #include <utils/common/sleep.h>
+#include <utils/network/http/httpclient.h>
 
 namespace {
-    const QString primaryUrlsList("http://checkrealip.com;http://checkip.eurodyndns.org");
+    const QString primaryUrlsList("http://www.mypublicip.com;http://checkip.eurodyndns.org");
     const QString secondaryUrlsList("http://networkoptix.com/myip");
     const int requestTimeoutMs = 4*1000;
     const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
@@ -43,7 +44,6 @@ QnPublicIPDiscovery::QnPublicIPDiscovery():
     m_stage(Stage::Idle),
     m_replyInProgress(0)
 {
-    connect(&m_networkManager, &QNetworkAccessManager::finished,   this,   &QnPublicIPDiscovery::at_reply_finished);
     m_primaryUrls = MSSettings::roSettings()->value(nx_ms_conf::PUBLIC_IP_SERVERS, primaryUrlsList).toString().split(";", QString::SkipEmptyParts);
     m_secondaryUrls = secondaryUrlsList.split(";", QString::SkipEmptyParts);
 
@@ -90,27 +90,14 @@ void QnPublicIPDiscovery::waitForFinished() {
     }
 }
 
-void QnPublicIPDiscovery::at_reply_finished(QNetworkReply * reply) {
-    handleReply(reply);
-    reply->deleteLater();
-    m_replyInProgress--;
-    if (m_replyInProgress == 0)
-        nextStage();
-
-    /* If no public ip found, clean existing. */
-    if (m_stage == Stage::Idle && !m_publicIP.isNull()) {
-        m_publicIP.clear();
-        emit found(m_publicIP);
-    }
-}
-
-void QnPublicIPDiscovery::handleReply(QNetworkReply* reply) {
+void QnPublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpClient) {
     /* Check if reply finished successfully. */
-    if (reply->error() != QNetworkReply::NoError)
+
+    if( (httpClient->failed()) || (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok) )
         return;
 
     /* Check if reply contents contain any ip address. */
-    QByteArray response = QByteArray(" ") + reply->readAll() + QByteArray(" ");
+    QByteArray response = QByteArray(" ") + httpClient->fetchMessageBodyBuffer() + QByteArray(" ");
     int ipPos = iPRegExpr.indexIn(response);
     if (ipPos < 0)
         return;
@@ -130,10 +117,35 @@ void QnPublicIPDiscovery::handleReply(QNetworkReply* reply) {
     }
 }
 
-void QnPublicIPDiscovery::sendRequest(const QString &url) {
+void QnPublicIPDiscovery::sendRequest(const QString &url) 
+{
+    nx_http::AsyncHttpClientPtr httpRequest = std::make_shared<nx_http::AsyncHttpClient>();
+
+    auto at_reply_finished = [this, httpRequest] ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
+    {
+        handleReply(httpClient);
+        httpRequest->disconnect();
+        httpRequest.reset();
+        m_replyInProgress--;
+        if (m_replyInProgress == 0)
+            nextStage();
+
+        /* If no public ip found, clean existing. */
+        if (m_stage == Stage::Idle && !m_publicIP.isNull()) {
+            m_publicIP.clear();
+            emit found(m_publicIP);
+        }
+    };
+
     PRINT_DEBUG("Sending request to: " + url);
     m_replyInProgress++;
-    m_networkManager.get(QNetworkRequest(url.trimmed()));
+
+    httpRequest->setResponseReadTimeoutMs(requestTimeoutMs);
+    connect( httpRequest.get(), &nx_http::AsyncHttpClient::done, this, at_reply_finished, Qt::DirectConnection );
+    if( !httpRequest->doGet( url ) ) {
+        httpRequest->disconnect();
+        m_replyInProgress--;
+    }
 }
 
 void QnPublicIPDiscovery::nextStage() {

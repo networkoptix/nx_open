@@ -1254,6 +1254,11 @@ void QnMain::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
+void QnMain::at_serverModuleConflict(const QnModuleInformationEx &moduleInformation, const QUrl &url)
+{
+    qnBusinessRuleConnector->at_mediaServerConflict(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch(), moduleInformation, url);
+}
+
 void QnMain::at_timer()
 {
     if (isStopping())
@@ -1815,6 +1820,8 @@ void QnMain::run()
         }
         qnCommon->setAllowedPeers(allowedPeers);
     }
+
+    connect(m_moduleFinder, &QnModuleFinder::moduleConflict, this, &QnMain::at_serverModuleConflict);
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
 

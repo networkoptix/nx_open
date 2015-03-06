@@ -8,6 +8,8 @@
 
 #include <business/business_fwd.h>
 
+struct QnModuleInformation;
+
 /*
 * This class listening various logic events, covert these events to business events and send it to businessRuleProcessor
 */
@@ -61,6 +63,8 @@ public slots:
     void at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QStringList& macAddrList, qint64 timeStamp);
 
     void at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QnCameraConflictList& conflicts);
+
+    void at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QnModuleInformation& conflictModule, const QUrl &url);
 
     void at_NoStorages(const QnResourcePtr& resource);
 

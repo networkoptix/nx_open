@@ -3,9 +3,7 @@
 
 #include <QNetworkAccessManager>
 #include <QHostAddress>
-
-class QNetworkAccessManager;
-class QNetworkReply;
+#include "utils/network/http/async_http_client_reply.h"
 
 class QnPublicIPDiscovery: public QObject
 {
@@ -18,11 +16,8 @@ public slots:
     void update();
 signals:
     void found(const QHostAddress& address);
-private slots:
-    void at_reply_finished(QNetworkReply* reply);
-
 private:
-    void handleReply(QNetworkReply* reply);
+    void handleReply(const nx_http::AsyncHttpClientPtr& httpClient);
     void sendRequest(const QString &url);
     void nextStage();
 private:
@@ -33,7 +28,6 @@ private:
         PublicIpFound
     };
 
-    QNetworkAccessManager m_networkManager;
     QHostAddress m_publicIP;
     Stage m_stage;
     int m_replyInProgress;
