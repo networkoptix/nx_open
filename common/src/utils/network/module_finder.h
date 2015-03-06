@@ -45,7 +45,7 @@ signals:
     void moduleConflict(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private slots:
-    void at_responseRecieved(QnModuleInformationEx moduleInformation, QUrl url);
+    void at_responseReceived(QnModuleInformationEx moduleInformation, QUrl url);
     void at_timer_timeout();
 
 private:

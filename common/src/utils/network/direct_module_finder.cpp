@@ -168,7 +168,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 
     m_lastPingByUrl[url] = m_elapsedTimer.elapsed();
 
-    emit responseRecieved(moduleInformation, url);
+    emit responseReceived(moduleInformation, url);
 }
 
 void QnDirectModuleFinder::at_checkTimer_timeout() {

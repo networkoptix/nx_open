@@ -28,7 +28,7 @@ public:
     void pleaseStop();
 
 signals:
-    void responseRecieved(const QnModuleInformationEx &moduleInformation, const QUrl &url);
+    void responseReceived(const QnModuleInformationEx &moduleInformation, const QUrl &url);
 
 private:
     void enqueRequest(const QUrl &url);

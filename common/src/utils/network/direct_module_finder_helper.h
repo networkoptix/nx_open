@@ -27,7 +27,7 @@ private slots:
     void at_resourceRemoved(const QnResourcePtr &resource);
     void at_resourceChanged(const QnResourcePtr &resource);
     void at_resourceAuxUrlsChanged(const QnResourcePtr &resource);
-    void at_responseRecieved(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_responseReceived(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_timer_timeout();
 
 private:

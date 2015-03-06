@@ -60,8 +60,8 @@ QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_helper(new QnDirectModuleFinderHelper(this))
 {
-    connect(m_multicastModuleFinder.data(), &QnMulticastModuleFinder::responseRecieved,     this, &QnModuleFinder::at_responseRecieved);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::responseRecieved,        this, &QnModuleFinder::at_responseRecieved);
+    connect(m_multicastModuleFinder.data(), &QnMulticastModuleFinder::responseReceived,     this, &QnModuleFinder::at_responseReceived);
+    connect(m_directModuleFinder,           &QnDirectModuleFinder::responseReceived,        this, &QnModuleFinder::at_responseReceived);
 
     m_timer->setInterval(checkInterval);
     connect(m_timer, &QTimer::timeout, this, &QnModuleFinder::at_timer_timeout);
@@ -118,7 +118,7 @@ void QnModuleFinder::pleaseStop() {
     m_directModuleFinder->pleaseStop();
 }
 
-void QnModuleFinder::at_responseRecieved(QnModuleInformationEx moduleInformation, QUrl url) {
+void QnModuleFinder::at_responseReceived(QnModuleInformationEx moduleInformation, QUrl url) {
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 

@@ -190,7 +190,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     url.setHost(remoteAddress);
     url.setPort(moduleInformation.port);
 
-    emit responseRecieved(moduleInformation, url);
+    emit responseReceived(moduleInformation, url);
 
     return true;
 }

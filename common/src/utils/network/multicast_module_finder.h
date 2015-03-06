@@ -55,7 +55,7 @@ public slots:
     virtual void pleaseStop() override;
 
 signals:
-    void responseRecieved(const QnModuleInformationEx &moduleInformation, const QUrl &url);
+    void responseReceived(const QnModuleInformationEx &moduleInformation, const QUrl &url);
 
 protected:
     virtual void run() override;

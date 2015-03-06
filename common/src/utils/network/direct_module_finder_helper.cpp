@@ -44,7 +44,7 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnDirectModuleFinderHelper::at_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnDirectModuleFinderHelper::at_resourceRemoved);
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnDirectModuleFinderHelper::at_resourceChanged);
-    connect(moduleFinder->multicastModuleFinder(), &QnMulticastModuleFinder::responseRecieved, this, &QnDirectModuleFinderHelper::at_responseRecieved);
+    connect(moduleFinder->multicastModuleFinder(), &QnMulticastModuleFinder::responseReceived, this, &QnDirectModuleFinderHelper::at_responseReceived);
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &QnDirectModuleFinderHelper::at_timer_timeout);
@@ -125,7 +125,7 @@ void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &
     at_resourceAdded(resource);
 }
 
-void QnDirectModuleFinderHelper::at_responseRecieved(const QnModuleInformation &moduleInformation, const QUrl &url) {
+void QnDirectModuleFinderHelper::at_responseReceived(const QnModuleInformation &moduleInformation, const QUrl &url) {
     Q_UNUSED(moduleInformation)
     m_multicastedUrlLastPing[url] = m_elapsedTimer.elapsed();
 }
