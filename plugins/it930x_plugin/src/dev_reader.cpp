@@ -110,7 +110,15 @@ namespace ite
         }
 
         if (dev)
-            readDevice();
+        {
+            static const unsigned READ_COUNT = 4;
+
+            for (unsigned i = 0; i < READ_COUNT; ++i)
+            {
+                clear();
+                readDevice();
+            }
+        }
     }
 
     // Demux
@@ -153,6 +161,17 @@ namespace ite
         }
 
         return TsBuffer();
+    }
+
+    void Demux::clear(uint16_t pid)
+    {
+        TsQueue * q = queue(pid);
+        if (!q)
+            return;
+
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        q->clear();
     }
 
     ContentPacketPtr Demux::dumpPacket(uint16_t pid)
@@ -246,6 +265,11 @@ namespace ite
             case Pacidal::PID_VIDEO_SD:
             case Pacidal::PID_VIDEO_CIF:
                 m_packetQueues[pid] = PacketsQueue();
+                m_demux.clear(pid);
+                return true;
+
+            case It930x::PID_RETURN_CHANNEL:
+                m_demux.clear(pid);
                 return true;
         }
 
@@ -262,19 +286,23 @@ namespace ite
             case Pacidal::PID_VIDEO_HD:
             case Pacidal::PID_VIDEO_SD:
             case Pacidal::PID_VIDEO_CIF:
-                //m_packetQueues.erase(pid);
                 m_packetQueues[pid] = PacketsQueue();
+                m_demux.clear(pid);
+                break;
+
+            case It930x::PID_RETURN_CHANNEL:
+                m_demux.clear(pid);
                 break;
         }
     }
 
-    void DevReader::start(It930x * dev)
+    void DevReader::start(It930x * dev, bool rcOnly)
     {
         m_buf.setDevice(dev);
 
         try
         {
-            m_readThread = std::thread( DevReadThread(this) );
+            m_readThread = std::thread( DevReadThread(this, rcOnly) );
             m_hasThread = true;
         }
         catch (std::system_error& )
@@ -304,12 +332,23 @@ namespace ite
         catch (const std::exception& e)
         {
             std::string s = e.what();
+            printf("%s\n", s.c_str());
         }
 
         m_buf.setDevice(nullptr);
+        m_buf.clear(); // flush buffer!
     }
 
-    bool DevReader::readStep()
+    void DevReader::wait()
+    {
+        if (m_hasThread)
+        {
+            m_readThread.join();
+            m_hasThread = false;
+        }
+    }
+
+    bool DevReader::readStep(bool rcOnly)
     {
         TsBuffer ts(m_poolTs);
         if (! m_buf.readTSPacket(ts))
@@ -318,10 +357,19 @@ namespace ite
         MpegTsPacket pkt = ts.packet();
         if (pkt.syncOK())
         {
-            if (pkt.isPES())
-                dumpPacket(pkt.pid());
+            if (pkt.pid() == It930x::PID_RETURN_CHANNEL)
+            {
+                TsBuffer tsCopy = ts.copy();
+                m_demux.push(tsCopy);
+            }
+            else if (! rcOnly)
+            {
+                if (pkt.isPES())
+                    dumpPacket(pkt.pid());
 
-            m_demux.push(std::move(ts));
+                m_demux.push(std::move(ts));
+            }
+
             return true;
         }
 
@@ -357,7 +405,7 @@ namespace ite
             }
 
             q->push_back(pkt);
-            m_cond.notify_all();
+            m_cond.notify_all(); // NOTIFY
         }
     }
 
@@ -373,7 +421,7 @@ namespace ite
             PacketsQueue& q = it->second;
 
             if (q.empty())
-                m_cond.wait_until(lock, system_clock::now() + timeout);
+                m_cond.wait_until(lock, system_clock::now() + timeout); // WAIT
 
             // could be unsubscribed here
             if (! q.empty())
@@ -387,6 +435,7 @@ namespace ite
         return ContentPacketPtr();
     }
 
+#if 0
     bool DevReader::readRetChanCmd(RCCommand& cmd)
     {
         static const unsigned WAIT_TIME_MS = 1000;
@@ -423,15 +472,13 @@ namespace ite
 
         return false;
     }
+#endif
 
     bool DevReader::getRetChanCmd(RCCommand& cmd)
     {
         TsBuffer ts = m_demux.pop(It930x::PID_RETURN_CHANNEL);
         if (ts)
         {
-#if 1
-            printf("getting RC cmd (from RC queue)\n");
-#endif
             MpegTsPacket pkt = ts.packet();
             cmd.add(pkt.tsPayload(), pkt.tsPayloadLen());
             return true;

@@ -28,8 +28,8 @@ namespace ite
     RxDevice::RxDevice(unsigned id)
     :   m_devReader( new DevReader() ),
         m_rxID(id),
-        m_txID(0),
-        m_frequency(0),
+        m_channel(NOT_A_CHANNEL),
+        m_txs(TxDevice::CHANNELS_NUM),
         m_signalQuality(0),
         m_signalStrength(0),
         m_signalPresent(false)
@@ -55,41 +55,58 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::lockCamera(unsigned short txID, unsigned freq)
+    bool RxDevice::lockCamera(uint16_t txID)
     {
-        typedef std::chrono::steady_clock Clock;
+        using std::chrono::system_clock;
 
-        // TODO: class Timer
-        static const unsigned DURATION_MS = TxDevice::SEND_WAIT_TIME_MS * 2;
-        static const unsigned DELAY_MS = 20;
+        static const unsigned TIMEOUT_MS = 5000;
+        static const std::chrono::milliseconds timeout(TIMEOUT_MS);
 
-        std::chrono::milliseconds duration(DURATION_MS);
-        std::chrono::milliseconds delay(DELAY_MS);
+        unsigned chan = chan4Tx(txID);
 
-        // could be locked by Discovery, waiting
-        std::chrono::time_point<Clock> timeFinish = Clock::now() + duration;
-        while (Clock::now() < timeFinish)
+        // lock only one camera
+        bool expected = false;
+        if (m_sync.usedByCamera.compare_exchange_strong(expected, true))
         {
-            if (m_txDev) // locked by another camera
-                return false;
-
-            if (tryLockF(freq))
+            for (unsigned i = 0; i < 2; ++i)
             {
-                m_txID = txID;
-                updateTxParams();
-                if (good())
-                    m_devReader->start(m_device.get());
-                return true;
+
+                if (tryLockC(chan))
+                {
+                    updateTxParams();
+                    if (good())
+                        m_devReader->start(m_device.get());
+                    return true;
+                }
+
+                if (i)
+                {
+                    m_sync.usedByCamera = false;
+                    break;
+                }
+
+                std::unique_lock<std::mutex> cvLock( m_sync.mutex ); // LOCK
+
+                m_sync.waiting = true;
+                m_sync.cond.wait_until(cvLock, system_clock::now() + timeout); // WAIT
+
+                // usedByCamera is false here (unset on channel unlock)
+
+                m_sync.usedByCamera = true;
+                m_sync.waiting = false;
             }
-
-            std::this_thread::sleep_for(delay);
         }
-
+#if 1
+        printf("-- Can't lock channel for camera Tx: %d; Rx: %d (used: %d)\n", txID, m_rxID, m_sync.usedByCamera.load());
+#endif
         return false;
     }
 
-    bool RxDevice::tryLockF(unsigned freq)
+    bool RxDevice::tryLockC(unsigned channel)
     {
+        if (channel >= RxDevice::NOT_A_CHANNEL)
+            return false;
+
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         // prevent double locking at all (even with the same frequency)
@@ -101,12 +118,12 @@ namespace ite
 
         try
         {
-            m_device->lockChannel(freq);
-            m_frequency = freq;
+            m_device->lockFrequency( TxDevice::freq4chan(channel) );
+            m_channel = channel;
             stats();
 
-            if (good())
-                m_devReader->setDevice(m_device.get());
+            //if (good())
+            //    m_devReader->setDevice(m_device.get());
             return true;
         }
         catch (const char * msg)
@@ -118,7 +135,7 @@ namespace ite
         return false;
     }
 
-    void RxDevice::unlockF()
+    void RxDevice::unlockC()
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
@@ -129,8 +146,10 @@ namespace ite
             m_device->closeStream();
 
         m_txDev.reset();
-        m_frequency = 0;
-        m_txID = 0;
+        m_channel = NOT_A_CHANNEL;
+
+        m_sync.usedByCamera = false;
+        m_sync.cond.notify_all(); // NOTIFY
     }
 
     bool RxDevice::isLocked() const
@@ -163,49 +182,71 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::findTx(unsigned freq, uint16_t& outTxID)
+    bool RxDevice::startSearchTx(unsigned channel)
     {
-        typedef std::chrono::steady_clock Clock;
+        bool cantSearch = false;
+        {
+            std::unique_lock<std::mutex> cvLock( m_sync.mutex ); // LOCK
 
-        // TODO: class Timer
-        static const unsigned RET_CHAN_SEARCH_MS = 1000;
-        std::chrono::milliseconds duration(RET_CHAN_SEARCH_MS);
+            if (m_sync.waiting)
+                cantSearch = true;
+        }
 
-        bool retVal = false;
-        outTxID = 0;
+        if (cantSearch || m_sync.usedByCamera)
+        {
+            printf("cant't search, used. Rx: %d; frequency: %d\n", rxID(), TxDevice::freq4chan(channel));
+            return false;
+        }
 
-        if (tryLockF(freq))
+        if (tryLockC(channel))
         {
 #if 1
-            printf("searching TxIDs - rxID: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
-                   rxID(), freq, quality(), strength(), present());
+            printf("searching Tx. Rx: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
+                   rxID(), TxDevice::freq4chan(channel), quality(), strength(), present());
 #endif
             if (good())
             {
-                std::chrono::time_point<Clock> timeFinish = Clock::now() + duration;
-
-                while (Clock::now() < timeFinish)
-                {
-                    RCCommand cmd;
-                    if (m_devReader->readRetChanCmd(cmd))
-                    {
-                        if (cmd.isOK())
-                        {
-                            retVal = true;
-                            outTxID = cmd.txID();
-                            break;
-                        }
-                    }
-                }
+                m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
+                m_devReader->start(m_device.get(), true);
             }
 
-            unlockF();
+            return true;
         }
 
-#if 1
-        if (retVal)
-            printf("Rx: %d; Tx: %x (%d)\n", rxID(), outTxID, outTxID);
-#endif
+        return false;
+    }
+
+    bool RxDevice::stopSearchTx(uint16_t& outTxID)
+    {
+        bool retVal = false;
+        outTxID = 0;
+
+        if (isLocked())
+        {
+            if (good())
+            {
+                m_devReader->wait();
+
+                RCCommand cmd;
+                if (m_devReader->getRetChanCmd(cmd) && cmd.isOK())
+                {
+                    retVal = true;
+                    outTxID = cmd.txID();
+                    setTx(m_channel, outTxID);
+
+                    while (m_devReader->getRetChanCmd(cmd))
+                    {
+                        if (cmd.isOK() && cmd.txID() != outTxID)
+                            printf("-- Different TxIDs from one channel: %d vs %d\n", outTxID, cmd.txID());
+                    }
+                }
+
+                m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
+            }
+
+            unlockC();
+        }
+
         return retVal;
     }
 
@@ -223,7 +264,7 @@ namespace ite
     }
 
     // TODO
-    bool RxDevice::setChannel(unsigned short txID, unsigned chan)
+    bool RxDevice::changeChannel(unsigned short txID, unsigned chan)
     {
 #if 0
         if (isLocked())

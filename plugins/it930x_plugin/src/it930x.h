@@ -143,7 +143,7 @@ namespace ite
         bool pidFilterReset() { return 0 == DTV_ResetPIDTable(m_handle); }
 
         // both in KHz
-        void lockChannel(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
+        void lockFrequency(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
         {
             closeStream();
 

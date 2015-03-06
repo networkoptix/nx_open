@@ -20,15 +20,17 @@ namespace ite
     class DevReadThread
     {
     public:
-        DevReadThread(DevReader * reader = nullptr)
+        DevReadThread(DevReader * reader = nullptr, bool rcOnly = false)
         :   m_stopMe(false),
-            m_devReader(reader)
+            m_devReader(reader),
+            m_rcOnly(rcOnly)
         {
         }
 
         DevReadThread(DevReadThread&& obj)
         :   m_stopMe(false),
-            m_devReader(obj.m_devReader)
+            m_devReader(obj.m_devReader),
+            m_rcOnly(obj.m_rcOnly)
         {
         }
 
@@ -39,10 +41,24 @@ namespace ite
 
             m_devReader->sync();
 
-            while (!m_stopMe)
+            if (m_rcOnly)
             {
-                if (! m_devReader->readStep()) // blocking
-                    break;
+                static const unsigned SEARCH_TIME_MS = 4000;
+                Timer t(true);
+
+                while (!m_stopMe && t.elapsedMS() < SEARCH_TIME_MS)
+                {
+                    if (! m_devReader->readStep(true)) // blocking
+                        break;
+                }
+            }
+            else
+            {
+                while (!m_stopMe)
+                {
+                    if (! m_devReader->readStep(false)) // blocking
+                        break;
+                }
             }
 
 #if 1
@@ -57,6 +73,7 @@ namespace ite
     private:
         std::atomic_bool m_stopMe;
         DevReader * m_devReader;
+        bool m_rcOnly;
 
         DevReadThread(const DevReadThread&);
         DevReadThread& operator = (const DevReadThread&);

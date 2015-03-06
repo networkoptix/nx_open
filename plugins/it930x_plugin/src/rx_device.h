@@ -20,6 +20,11 @@ namespace ite
     public:
         constexpr static const char * DEVICE_PATTERN = "usb-it930x";
 
+        enum
+        {
+            NOT_A_CHANNEL = TxDevice::CHANNELS_NUM
+        };
+
         static constexpr unsigned streamsCount() { return 2; }
 
         static uint16_t stream2pid(unsigned stream)
@@ -78,7 +83,12 @@ namespace ite
         RxDevice(unsigned id);
 
         unsigned short rxID() const { return m_rxID; }
-        unsigned short txID() const { return m_txID; }
+        unsigned short txID() const
+        {
+            if (m_channel <= NOT_A_CHANNEL)
+                return m_txs[m_channel].present;
+            return 0;
+        }
 
         DevReader * reader() { return m_devReader.get(); }
         bool isReading() const { return m_devReader->hasThread(); }
@@ -86,17 +96,20 @@ namespace ite
         bool subscribe(unsigned stream) { return m_devReader->subscribe(stream2pid(stream)); }
         void unsubscribe(unsigned stream) { m_devReader->unsubscribe(stream2pid(stream)); }
 
-        bool lockCamera(unsigned short txID, unsigned frequency);
-        bool tryLockF(unsigned freq);
+        bool lockCamera(uint16_t txID);
+        bool tryLockC(unsigned freq);
         bool isLocked() const;
-        void unlockF();
-        bool findTx(unsigned freq, uint16_t& outTxID);
+        void unlockC();
+
+        bool startSearchTx(unsigned channel);
+        bool stopSearchTx(uint16_t& outTxID);
 
         const IteDriverInfo rxDriverInfo() const { return m_rxInfo; }
         const TxManufactureInfo txDriverInfo() const { return m_txDev->txDeviceInfo(); }
         const TxVideoEncConfig txVideoEncConfig(uint8_t encNo) const { return m_txDev->txVideoEncConfig(encNo); }
 
-        unsigned frequency() const { return m_frequency; }
+        //unsigned frequency() const { return TxDevice::freq4chan(m_channel); }
+        unsigned channel() { return m_channel; }
         uint8_t strength() const { return m_signalStrength; }
         uint8_t quality() const { return m_signalQuality; }
         bool present() const { return m_signalPresent; }
@@ -112,15 +125,100 @@ namespace ite
 
         static std::string id2str(unsigned id);
 
-        bool setChannel(unsigned short txID, unsigned chan);
+        // TX stuff
+
+        void setTx(unsigned channel, uint16_t txID = 0)
+        {
+#if 1
+            printf("Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
+#endif
+            if (channel >= m_txs.size())
+                return;
+
+            if (txID)
+                m_txs[channel].set(txID);
+            else
+                m_txs[channel].lose();
+        }
+
+        uint16_t getTx(unsigned channel, bool lost = false) const
+        {
+            if (channel >= m_txs.size())
+                return 0;
+
+            if (lost)
+                return m_txs[channel].lost;
+            return m_txs[channel].present;
+        }
+
+        unsigned chan4Tx(uint16_t txID) const
+        {
+            for (size_t i = 0; i < m_txs.size(); ++i)
+                if (m_txs[i].present == txID)
+                    return i;
+            return NOT_A_CHANNEL;
+        }
+
+        void setChannel(unsigned channel)
+        {
+            if (channel >= m_txs.size())
+                return;
+
+            if (m_txs[channel].present)
+            {
+                m_channel = channel;
+
+                for (size_t i = 0; i < m_txs.size(); ++i)
+                    m_txs[i].lose();
+            }
+        }
+
+        bool changeChannel(uint16_t txID, unsigned channel);
 
     private:
+        struct TX
+        {
+            uint16_t present;
+            uint16_t lost;
+
+            TX()
+            :   present(0), lost(0)
+            {}
+
+            void set(uint16_t txID)
+            {
+                present = txID;
+                lost = 0;
+            }
+
+            void lose()
+            {
+                if (present)
+                    lost = present;
+                present = 0;
+            }
+        };
+
+        struct Sync
+        {
+            std::mutex mutex;
+            std::condition_variable cond;
+            std::atomic_bool usedByCamera;
+            bool waiting;
+
+            Sync()
+            :   usedByCamera(false),
+                waiting(false)
+            {}
+        };
+
         mutable std::mutex m_mutex;
         std::unique_ptr<It930x> m_device;
         std::unique_ptr<DevReader> m_devReader;
-        unsigned short m_rxID;
-        unsigned short m_txID; // captured camera txID or 0
-        unsigned m_frequency;
+        const uint16_t m_rxID;
+        unsigned m_channel;
+        Sync m_sync;
+        std::vector<TX> m_txs;
 
         // info from DTV receiver
         uint8_t m_signalQuality;

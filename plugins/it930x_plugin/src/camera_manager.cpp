@@ -440,9 +440,9 @@ namespace ite
 
     void CameraManager::getParamStr_Channel(std::string& s) const
     {
-        if (m_rxDevice && m_rxDevice->frequency())
+        if (m_rxDevice && m_rxDevice->channel() != RxDevice::NOT_A_CHANNEL)
         {
-            unsigned chan = TxDevice::freqChannel(m_rxDevice->frequency());
+            unsigned chan = m_rxDevice->channel();
             if (chan < TxDevice::CHANNELS_NUM)
                 s = PARAM_CHANNELS[chan];
         }
@@ -489,14 +489,14 @@ namespace ite
             //std::lock_guard<std::mutex> lock( m_rxDevice->mutex() ); // LOCK device
 
             RxDevicePtr dev = m_rxDevice;
-            unsigned curFreq = m_rxDevice->frequency();
+            unsigned curChan = m_rxDevice->channel();
 
             /// @warning locks m_reloadMutex inside (possible deadlock if we lock device)
             if (! stopStreams(true))
                 return false;
 
-            if (curFreq && dev->tryLockF(curFreq))
-                return dev->setChannel(m_txID, chan);
+            if (dev->tryLockC(curChan))
+                return dev->changeChannel(m_txID, chan);
         }
 
         return false;
@@ -530,13 +530,11 @@ namespace ite
 
     int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
     {
-        tryLoad();
-
-        State state = checkState();
+        State state = tryLoad();
         switch (state)
         {
             case STATE_NO_CAMERA:
-            case STATE_NO_FREQUENCY:
+            case STATE_NO_CHANNEL:
             case STATE_NO_RECEIVER:
             case STATE_DEVICE_READY:
             case STATE_STREAM_LOADING:
@@ -634,8 +632,8 @@ namespace ite
         if (! m_rxDevice)
             return STATE_NO_RECEIVER;
 
-        if (! m_rxDevice->frequency())
-            return STATE_NO_FREQUENCY;
+        if (m_rxDevice->channel() == RxDevice::NOT_A_CHANNEL)
+            return STATE_NO_CHANNEL;
 
         if (m_rxDevice && ! m_rxDevice->isLocked())
             return STATE_DEVICE_READY;
@@ -652,7 +650,7 @@ namespace ite
         return STATE_STREAM_READING;
     }
 
-    void CameraManager::tryLoad()
+    CameraManager::State CameraManager::tryLoad()
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
@@ -660,8 +658,8 @@ namespace ite
         switch (state)
         {
             case STATE_NO_CAMERA:
-            case STATE_NO_FREQUENCY:
-                return; // can do nothing
+            case STATE_NO_CHANNEL:
+                return state; // can do nothing
 
             case STATE_NO_RECEIVER:
             {
@@ -683,6 +681,8 @@ namespace ite
             case STATE_STREAM_READING:
                 break;
         }
+
+        return checkState();
     }
 
     void CameraManager::reloadMedia()
@@ -740,10 +740,6 @@ namespace ite
     {
         RxDevicePtr best;
 
-        unsigned freq = m_devMapper->getFreq4Tx(m_txID);
-        if (freq == 0)
-            return best;
-
         std::vector<RxDevicePtr> supportedRxDevices;
         m_devMapper->getRx4Tx(m_txID, supportedRxDevices);
 
@@ -752,7 +748,7 @@ namespace ite
             RxDevicePtr dev = supportedRxDevices[i];
 
             bool isGood = true;
-            if (dev->lockCamera(m_txID, freq)) // delay inside
+            if (dev->lockCamera(m_txID)) // delay inside
             {
                 isGood = dev->good();
                 if (isGood)
@@ -763,9 +759,20 @@ namespace ite
 
                 // unlock all but best
                 if (dev)
-                    dev->unlockF();
+                    dev->unlockC();
+            }
+#if 1
+            else
+            {
+                printf("-- Can't lock camera for Tx: %d\n", m_txID);
             }
         }
+
+        if (supportedRxDevices.empty())
+            printf("-- No devices for Tx: %d\n", m_txID);
+#else
+        }
+#endif
 
         return best;
     }
@@ -774,7 +781,7 @@ namespace ite
     {
         if (m_rxDevice)
         {
-            m_rxDevice->unlockF();
+            m_rxDevice->unlockC();
             m_rxDevice.reset();
         }
         m_stopTimer.stop();

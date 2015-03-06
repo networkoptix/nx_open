@@ -113,6 +113,13 @@ namespace ite
 
         static unsigned size() { return MpegTsPacket::PACKET_SIZE(); }
 
+        TsBuffer copy()
+        {
+            TsBuffer ts(true);
+            memcpy(ts.data(), data(), size());
+            return ts;
+        }
+
     private:
         BufT m_buf;
         PoolT * m_pool;
@@ -277,6 +284,7 @@ namespace ite
 
         void push(const TsBuffer& ts);
         TsBuffer pop(uint16_t pid);
+        void clear(uint16_t pid);
 
         ContentPacketPtr dumpPacket(uint16_t pid);
 
@@ -341,6 +349,12 @@ namespace ite
 
         bool sync();
 
+        void clear()
+        {
+            m_buf.clear();
+            m_pos = 0;
+        }
+
         bool readTSPacket(TsBuffer& buf)
         {
             return read(buf.data(), buf.size()) == (int)buf.size();
@@ -356,12 +370,6 @@ namespace ite
 
         const uint8_t * data() const { return &m_buf[m_pos]; }
         int size() const { return m_buf.size() - m_pos; }
-
-        void clear()
-        {
-            m_buf.clear();
-            m_pos = 0;
-        }
 
         int read(uint8_t * buf, int bufSize);
         int readDevice();
@@ -379,9 +387,9 @@ namespace ite
         bool subscribe(uint16_t pid);
         void unsubscribe(uint16_t pid);
 
-        void setDevice(It930x * dev) { m_buf.setDevice(dev); }
-        void start(It930x * dev);
+        void start(It930x * dev, bool rcOnly = false);
         void stop();
+        void wait();
 
         void setThreadObj(DevReadThread * ptr) { m_threadObject = ptr; }
         bool hasThread() const { return m_threadObject; }
@@ -393,12 +401,12 @@ namespace ite
             return true;
         }
 
-        bool readStep();
-        bool readRetChanCmd(RCCommand& cmd);
+        bool readStep(bool rcOnly = false);
+
         bool getRetChanCmd(RCCommand& cmd);
 
         ContentPacketPtr getPacket(uint16_t pid, const std::chrono::milliseconds& timeout);
-        void interrupt() const { m_cond.notify_all(); }
+        void interrupt() const { m_cond.notify_all(); } // NOTIFY
 
     private:
         typedef std::deque<ContentPacketPtr> PacketsQueue;

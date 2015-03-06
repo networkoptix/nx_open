@@ -94,14 +94,13 @@ namespace ite
         void stopEncoders();
 
         void reloadMedia();
-        void tryLoad();
 
         bool stopStreams(bool force = false);
 
         typedef enum
         {
             STATE_NO_CAMERA,        // no Tx
-            STATE_NO_FREQUENCY,     // frequency not set
+            STATE_NO_CHANNEL,       // channel not set
             STATE_NO_RECEIVER,      // no Rx for Tx
             STATE_DEVICE_READY,     // got Rx for Tx
             STATE_STREAM_LOADING,   // loading data streams
@@ -111,6 +110,7 @@ namespace ite
         } State;
 
         State checkState() const;
+        State tryLoad();
 
         //
 

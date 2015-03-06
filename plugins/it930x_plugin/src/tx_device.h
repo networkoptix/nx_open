@@ -55,7 +55,10 @@ namespace ite
     public:
         static const unsigned SLEEP_TIME_MS = 200;
         static const unsigned SEND_WAIT_TIME_MS = 1000;
-        static const unsigned CHANNELS_NUM = 16;
+        enum
+        {
+            CHANNELS_NUM = 16
+        };
 
         typedef enum
         {
@@ -78,7 +81,7 @@ namespace ite
             FREQ_CH15 = 473000
         } Frequency;
 
-        static Frequency chanFrequency(unsigned channel)
+        static Frequency freq4chan(unsigned channel)
         {
             switch (channel)
             {
@@ -104,7 +107,7 @@ namespace ite
             return FREQ_X;
         }
 
-        static unsigned freqChannel(unsigned freq)
+        static unsigned chan4freq(unsigned freq)
         {
             switch (freq)
             {

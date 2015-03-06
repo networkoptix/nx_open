@@ -16,6 +16,7 @@ namespace ite
     static RC_DiscoveryThread * updateThreadObj = nullptr;
     static std::thread updateThread;
 
+    ///
     class RC_DiscoveryThread
     {
     public:
@@ -42,19 +43,9 @@ namespace ite
             {
                 m_devMapper->updateRxDevices();
 
-                for (size_t ch = 0; ch < TxDevice::CHANNELS_NUM; ++ch)
-                {
-                    // check restored devices
-                    {
-                        std::vector<DeviceMapper::DevLink> restored;
-                        m_devMapper->getRestored(restored);
+                // TODO: restored
 
-                        for (size_t i = 0; i < restored.size(); ++i)
-                            m_devMapper->checkLink(restored[i]);
-                    }
-
-                    m_devMapper->updateTxDevices(ch);
-                }
+                m_devMapper->updateTxDevices();
             }
 
             updateThreadObj = nullptr;
@@ -94,15 +85,11 @@ namespace ite
 
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-        auto range = m_devLinks.equal_range(txID);
-        for (auto itTx = range.first; itTx != range.second; ++itTx)
+        for (auto it = m_rxDevs.begin(); it != m_rxDevs.end(); ++it)
         {
-            auto itRx = m_rxDevs.find(itTx->second.rxID);
-            if (itRx != m_rxDevs.end())
-            {
-                RxDevicePtr dev = itRx->second;
-                devs.push_back(dev);
-            }
+            unsigned chan = it->second->chan4Tx(txID);
+            if (chan < TxDevice::CHANNELS_NUM)
+                devs.push_back(it->second);
         }
     }
 
@@ -154,7 +141,7 @@ namespace ite
 #endif
     }
 
-    void DeviceMapper::updateTxDevices(unsigned chan)
+    void DeviceMapper::updateTxDevices()
     {
         std::vector<RxDevicePtr> scanDevs;
 
@@ -168,88 +155,61 @@ namespace ite
             }
         }
 
-        // TODO: parallelize
-        unsigned freq = TxDevice::chanFrequency(chan);
-        for (size_t i = 0; i < scanDevs.size(); ++i)
+        for (unsigned chan = 0; chan < TxDevice::CHANNELS_NUM; ++chan)
         {
-            DevLink link;
-            link.rxID = scanDevs[i]->rxID();
-            link.frequency = freq;
-            checkLink(scanDevs[i], link);
+            std::vector<bool> toStop(scanDevs.size(), true);
+
+            for (size_t i = 0; i < scanDevs.size(); ++i)
+            {
+                if (! scanDevs[i]->startSearchTx(chan))
+                    toStop[i] = false;
+            }
+
+            for (size_t i = 0; i < scanDevs.size(); ++i)
+            {
+                DevLink link;
+                if (toStop[i] && scanDevs[i]->stopSearchTx(link.txID))
+                {
+                    link.rxID = scanDevs[i]->rxID();
+                    link.channel = chan;
+                    addTxDevice(link);
+                }
+            }
         }
 
 #if 1
         size_t numTx = 0;
-        size_t numLinks = 0;
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             numTx = m_txDevs.size();
-            numLinks = m_devLinks.size();
         }
         printf("got TX devices: %ld\n", numTx);
-        printf("got TX-RX links: %ld\n", numLinks);
 #endif
     }
 
-    // THINK: could check TxID changes here
-    void DeviceMapper::checkLink(RxDevicePtr dev, DevLink& link)
+    RxDevicePtr DeviceMapper::getRx(uint16_t rxID)
     {
-        if (dev->findTx(link.frequency, link.txID))
-        {
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-            addTxDevice(link);
-            addDevLink(link);
-        }
-    }
+        auto it = m_rxDevs.find(rxID);
+        if (it != m_rxDevs.end())
+            return it->second;
 
-    void DeviceMapper::checkLink(DevLink& link)
-    {
-        if (link.frequency == 0)
-            return;
-
-        RxDevicePtr dev;
-
-        {
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            auto it = m_rxDevs.find(link.rxID);
-            if (it != m_rxDevs.end())
-                dev = it->second;
-        }
-
-        if (dev)
-            checkLink(dev, link);
+        return RxDevicePtr();
     }
 
     void DeviceMapper::addTxDevice(const DevLink& link)
     {
-        // under lock
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        unsigned freq = TxDevice::freq4chan(link.channel);
 
         auto it = m_txDevs.find(link.txID);
         if (it == m_txDevs.end())
-            m_txDevs[link.txID] = std::make_shared<TxDevice>(link.txID, link.frequency);
+            m_txDevs[link.txID] = std::make_shared<TxDevice>(link.txID, freq);
         else
-            it->second->setFrequency(link.frequency);
-    }
-
-    void DeviceMapper::addDevLink(const DevLink& link)
-    {
-        // under lock
-
-        auto itNew = m_devLinks.end();
-        auto range = m_devLinks.equal_range(link.txID);
-        for (auto it = range.first; it != range.second; ++it)
-        {
-            if (it->second.rxID == link.rxID)
-                itNew = it;
-            else
-                it->second.frequency = link.frequency;
-        }
-
-        if (itNew == m_devLinks.end())
-            m_devLinks.insert( std::make_pair(link.txID, link) );
+            it->second->setFrequency(freq);
     }
 
     void DeviceMapper::txDevs(std::vector<TxDevicePtr>& txDevs) const
@@ -263,7 +223,7 @@ namespace ite
             txDevs.push_back(it->second);
     }
 
-    unsigned DeviceMapper::getFreq4Tx(unsigned short txID) const
+    unsigned DeviceMapper::freq4Tx(unsigned short txID) const
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
@@ -278,7 +238,9 @@ namespace ite
         DevLink link;
 
         std::vector<unsigned short> rxIDs;
-        DeviceMapper::parseInfo(info, link.txID, link.frequency, rxIDs);
+        unsigned freq;
+        DeviceMapper::parseInfo(info, link.txID, freq, rxIDs);
+        link.channel = TxDevice::chan4freq(freq);
 
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
@@ -287,15 +249,6 @@ namespace ite
             link.rxID = *it;
             m_restore.push_back(link);
         }
-    }
-
-    void DeviceMapper::getRestored(std::vector<DevLink>& links)
-    {
-        links.clear();
-
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        links.swap(m_restore);
     }
 
     // CameraInfo stuff
@@ -309,7 +262,7 @@ namespace ite
         for (auto it = rxDevs.begin(); it != rxDevs.end(); ++it)
             rxIDs.push_back((*it)->rxID());
 
-        unsigned freq = getFreq4Tx(txID);
+        unsigned freq = freq4Tx(txID);
         makeInfo(info, txID, freq, rxIDs);
     }
 
