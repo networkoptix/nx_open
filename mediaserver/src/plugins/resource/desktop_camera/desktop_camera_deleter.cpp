@@ -10,34 +10,43 @@
 #include <core/resource/layout_resource.h>
 
 namespace {
-    const int timeout = 1*1000;    //check once a minute
+    const int timeout = 60*1000;    //check once a minute
 }
 
 QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent) {
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this] {
-
-        QnLayoutResourceList layouts = qnResPool->getResources<QnLayoutResource>();
-        for (const auto &layout: layouts)
-            qDebug() << layout->getName();
-
-        // remove resources that have been offline for more than one iteration
-        for (const QnResourcePtr &resource: m_queuedToDelete) {
-            if (resource->getStatus() != Qn::Offline)
-                continue;
-            QnAppServerConnectionFactory::getConnection2()->getCameraManager()->remove(resource->getId(), this, []{});
-            qnResPool->removeResource(resource);
-        }
-        m_queuedToDelete.clear();
-
-        // queue to removing all resources that went offline since the last check
-        QnResourceList desktopCameras = qnResPool->getResourcesWithFlag(Qn::desktop_camera);
-        for(const QnResourcePtr &resource: desktopCameras) {
-            if (resource->getStatus() == Qn::Offline)
-                m_queuedToDelete << resource;
-        }
+        deleteQueuedResources();
+        updateQueue();
     });
     timer->start(timeout);   
 }
+
+void QnDesktopCameraDeleter::deleteQueuedResources() {
+    for (const QnResourcePtr &resource: m_queuedToDelete) {
+        if (resource->getStatus() != Qn::Offline)
+            continue;
+
+        /* If the camera is placed on the layout, also remove the layout. */
+        for (const QnLayoutResourcePtr &layout: qnResPool->getLayoutsWithResource(resource->getId())) {
+            QnAppServerConnectionFactory::getConnection2()->getLayoutManager()->remove(layout->getId(), this, []{});
+            qnResPool->removeResource(layout);
+        }
+
+        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->remove(resource->getId(), this, []{});
+        qnResPool->removeResource(resource);
+    }
+    m_queuedToDelete.clear();
+}
+
+void QnDesktopCameraDeleter::updateQueue() {
+    
+    QnResourceList desktopCameras = qnResPool->getResourcesWithFlag(Qn::desktop_camera);
+    for(const QnResourcePtr &resource: desktopCameras) {
+        if (resource->getStatus() == Qn::Offline)
+            m_queuedToDelete << resource;
+    }
+}
+
 
 #endif
