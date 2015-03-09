@@ -289,6 +289,10 @@
         <source>Recording on %n camera(s) is disabled: </source>
         <translation>การบันทึกบน %n กล้อง(s) ปิดการทำงาน: </translation>
     </message>
+    <message>
+        <source>Conflicting Server: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

@@ -492,7 +492,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
 
     if (!isCameraControlRequired()) {
         // TODO: #Elric need to untangle this evil.
-        m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
+        m_onvifRes->setPtzProfileToken(info.profileToken);
 
         return CameraDiagnostics::NoErrorResult();
     } else {

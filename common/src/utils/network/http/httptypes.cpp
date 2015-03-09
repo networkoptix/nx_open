@@ -328,7 +328,8 @@ namespace nx_http
     {
         *dstBuffer += method;
         *dstBuffer += " ";
-        *dstBuffer += url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        QByteArray path = url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        *dstBuffer += path.isEmpty() ? "/" : path;
         *dstBuffer += urlPostfix;
         *dstBuffer += " ";
         version.serialize( dstBuffer );

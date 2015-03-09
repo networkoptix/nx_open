@@ -1166,15 +1166,21 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QnUuid::createUuid());
-    if (filtered.size() == 1)
-        layout->setName(generateUniqueLayoutName(context()->user(),
-                                                 filtered.first()->getName(),
-                                                 tr("%1 (%2)")
-                                                 .arg(filtered.first()->getName())
-                                                 .arg(lit("%1"))
-                                                 ));
-    else
+    if (filtered.size() == 1) {
+        QnResourcePtr resource = filtered.first();
+        if (resource->hasFlags(Qn::desktop_camera))
+            layout->setName(resource->getName());
+        else
+            layout->setName(generateUniqueLayoutName(context()->user(),
+                                                     resource->getName(),
+                                                     tr("%1 (%2)")
+                                                     .arg(resource->getName())
+                                                     .arg(lit("%1"))
+                                                     ));
+    }
+    else {
         layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
+    }
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 

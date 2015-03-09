@@ -38,7 +38,7 @@ bool RevealRequest::deserialize(const quint8 **bufStart, const quint8 *bufEnd) {
 
 RevealResponse::RevealResponse() : port(0), sslAllowed(false), protoVersion(0) {}
 
-RevealResponse::RevealResponse(const QnModuleInformation &moduleInformation) {
+RevealResponse::RevealResponse(const QnModuleInformationEx &moduleInformation) {
     type = moduleInformation.type;
     version = moduleInformation.version.toString();
     systemInformation = moduleInformation.systemInformation.toString();
@@ -51,10 +51,11 @@ RevealResponse::RevealResponse(const QnModuleInformation &moduleInformation) {
     remoteAddresses = moduleInformation.remoteAddresses.toList();
     authHash = moduleInformation.authHash;
     protoVersion = moduleInformation.protoVersion;
+    runtimeId = moduleInformation.runtimeId;
 }
 
-QnModuleInformation RevealResponse::toModuleInformation() const {
-    QnModuleInformation moduleInformation;
+QnModuleInformationEx RevealResponse::toModuleInformation() const {
+    QnModuleInformationEx moduleInformation;
     moduleInformation.type = type;
     moduleInformation.customization = customization;
     moduleInformation.version = QnSoftwareVersion(version);
@@ -67,6 +68,7 @@ QnModuleInformation RevealResponse::toModuleInformation() const {
     moduleInformation.sslAllowed = sslAllowed;
     moduleInformation.authHash = authHash;
     moduleInformation.protoVersion = protoVersion;
+    moduleInformation.runtimeId = runtimeId;
     return moduleInformation;
 }
 
@@ -84,6 +86,7 @@ bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
     map[lit("remoteAddresses")] = remoteAddresses;
     map[lit("authHash")] = authHash.toBase64();
     map[lit("protoVersion")] = protoVersion;
+    map[lit("runtimeId")] = runtimeId.toString();
 
     QByteArray data = QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
     if (data.size() > bufEnd - *bufStart)
@@ -112,6 +115,7 @@ bool RevealResponse::deserialize(const quint8 **bufStart, const quint8 *bufEnd) 
     remoteAddresses = map.value(lit("remoteAddresses")).toStringList();
     authHash = QByteArray::fromBase64(map.value(lit("authHash")).toByteArray());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
+    runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
 
     return !type.isEmpty() && !version.isEmpty();
 }

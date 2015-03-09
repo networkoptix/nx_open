@@ -104,6 +104,14 @@
         <source>Comments:</source>
         <translation></translation>
     </message>
+    <message>
+        <source>When</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BusinessRulesDialog</name>
@@ -1461,17 +1469,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnAction</name>
-    <message>
-        <source>%n</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnActionManager</name>
     <message>
         <source>Show FPS</source>
@@ -2771,14 +2768,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>at</source>
         <translation></translation>
     </message>
-    <message>
-        <source>When</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Do</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>QnBusinessRulesDialog</name>
@@ -3804,11 +3793,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>
-</source>
-        <translation></translation>
-    </message>
-    <message>
         <source> (%1 times)</source>
         <translation></translation>
     </message>
@@ -4036,6 +4020,14 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Pictures %1</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutTabBar</name>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7869,10 +7861,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation>Unsecure Connection</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Secure connection using TLS</source>
         <translation>Secure connection using TLS.</translation>
     </message>
@@ -7911,6 +7899,10 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <source>Cancel</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

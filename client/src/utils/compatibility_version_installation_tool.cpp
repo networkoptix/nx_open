@@ -7,7 +7,7 @@ using namespace applauncher;
 
 namespace {
 
-    const int checkInterval = 500;
+    const int timerIntervalMs = 500;
 
 } // anonymous namespace
 
@@ -33,7 +33,7 @@ void QnCompatibilityVersionInstallationTool::run() {
 
     QScopedPointer<QTimer> timer(new QTimer());
     connect(timer.data(), &QTimer::timeout, this, &QnCompatibilityVersionInstallationTool::at_timer_timeout);
-    timer->start(checkInterval);
+    timer->start(timerIntervalMs);
 
     exec();
 }

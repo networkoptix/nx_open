@@ -1,6 +1,7 @@
 #include "mserver_conflict_business_event.h"
 
 #include "core/resource/resource.h"
+#include "utils/network/module_information.h"
 
 QStringList QnCameraConflictList::encode() const {
     QStringList result;
@@ -58,4 +59,17 @@ QnMServerConflictBusinessEvent::QnMServerConflictBusinessEvent(
 
     m_source = m_cameraConflicts.sourceServer;
     m_conflicts = m_cameraConflicts.encode();
+}
+
+QnMServerConflictBusinessEvent::QnMServerConflictBusinessEvent(
+        const QnResourcePtr &mServerRes,
+        qint64 timeStamp,
+        const QnModuleInformation &conflictModule,
+        const QUrl &conflictUrl):
+    base_type(QnBusiness::ServerConflictEvent,
+              mServerRes,
+              timeStamp)
+{
+    Q_UNUSED(conflictModule)
+    m_source = lit("%1:%2").arg(conflictUrl.host()).arg(conflictUrl.port());
 }
