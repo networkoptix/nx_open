@@ -23,6 +23,10 @@ struct QnPeerRuntimeInfo {
         return uuid == other.uuid &&
             data == other.data;
     }
+
+    bool isNull() const {
+        return uuid.isNull();
+    }
 };
 
 

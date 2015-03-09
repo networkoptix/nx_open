@@ -186,6 +186,9 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
     if (!server)
         return;
 
+    if (server->getSystemName() != qnCommon->localSystemName())
+        return;
+
     int row = m_items.size();
     beginInsertRows(QModelIndex(), row, row);
     m_items.append(new Item(server));
@@ -197,17 +200,12 @@ void QnServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource) {
     if (!server)
         return;
 
-    int row;
-    for (row = 0; row < m_items.size(); row++) {
-        if (m_items[row]->server() == server)
-            break;
-    }
-
-    if (row == m_items.size())
+    QModelIndex idx = index(server->getId());
+    if (!idx.isValid())
         return;
 
-    beginRemoveRows(QModelIndex(), row, row);
-    m_items.removeAt(row);
+    beginRemoveRows(QModelIndex(), idx.row(), idx.row());
+    m_items.removeAt(idx.row());
     endRemoveRows();
 }
 
@@ -217,10 +215,18 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
         return;
 
     QModelIndex idx = index(server);
-    if (!idx.isValid())
-        return;
+    bool exists = idx.isValid();
+    bool isOurServer = (server->getSystemName() == qnCommon->localSystemName());
 
-    emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
+    if (exists == isOurServer) {
+        emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
+        return;
+    }
+
+    if (isOurServer)
+        at_resourceAdded(resource);
+    else
+        at_resourceRemoved(resource);
 }
 
 QnSoftwareVersion QnServerUpdatesModel::latestVersion() const {

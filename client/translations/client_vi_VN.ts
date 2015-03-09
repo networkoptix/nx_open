@@ -110,6 +110,14 @@
         <translatorcomment>lời nói:</translatorcomment>
         <translation>lời nói:</translation>
     </message>
+    <message>
+        <source>When</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BusinessRulesDialog</name>
@@ -1466,17 +1474,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnAction</name>
-    <message>
-        <source>%n</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnActionManager</name>
     <message>
         <source>Show FPS</source>
@@ -2767,14 +2764,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>to</source>
         <translation>đến</translation>
     </message>
-    <message>
-        <source>When</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Do</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnBusinessRulesDialog</name>
@@ -3775,11 +3764,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Motion video</source>
         <translation>chuyển động video</translation>
-    </message>
-    <message>
-        <source>
-</source>
-        <translation></translation>
     </message>
     <message>
         <source> (%1 times)</source>
@@ -7817,10 +7801,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation>Dây không an toàn</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(đề nghị)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>Secure connection using TLS</source>
         <translation>dùng TLS kết nối an toàn</translation>
     </message>
@@ -7859,6 +7839,10 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <source>Cancel</source>
         <translation>hủy bỏ</translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
