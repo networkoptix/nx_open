@@ -289,6 +289,10 @@
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
         <translation>%1 HDD/SSD 디스크 꽉참. VMS에 관리되지 않는 과도한 데이터가 포함되어 있음.</translation>
     </message>
+    <message>
+        <source>Conflicting Server: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
