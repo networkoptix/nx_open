@@ -46,8 +46,8 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget(this);
     closeButton->setCached(true);
-    closeButton->setToolTip(tr("Close (<b>Right Click</b>)"));
-    closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #Elric
+    closeButton->setToolTip(lit("%1 (<b>%2</b>)").arg(tr("Close")).arg(tr("Right Click")));
+    closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #dklychkov
     closeButton->setFixedSize(closeButtonSize, closeButtonSize);
     connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
 
@@ -309,7 +309,7 @@ void QnNotificationWidget::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     painter->setPen(QPen(frameBrush(), frameWidth(), frameStyle()));
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
-    painter->drawRect(QnGeometry::aligned(colorSignSize, rect(), Qt::AlignLeft | Qt::AlignVCenter));
+    painter->drawRect(QnGeometry::aligned(colorSignSize, rect(), Qt::AlignLeft | Qt::AlignVCenter).adjusted(1, 0, 1, 0));
 
     //TODO: #GDM #Business draw corresponding image
 }

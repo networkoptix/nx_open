@@ -8,6 +8,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QDesktopWidget>
 #include <QtGui/QFileOpenEvent>
 #include <QtNetwork/QNetworkReply>
 
@@ -77,6 +78,7 @@
 #include <client/client_settings.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/screen_manager.h>
 
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
@@ -84,7 +86,7 @@
 
 namespace {
 
-    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = -1) {
+    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = Qn::Empty_Help) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
@@ -106,7 +108,7 @@ namespace {
             QObject::connect(button,    SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
         }
 
-        if(helpTopicId != -1)
+        if(helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);
 
         return button;
@@ -189,7 +191,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up scene & view. */
     m_scene.reset(new QnGraphicsScene(this));
-    setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
     connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, [this]() {
         if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
@@ -197,7 +198,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
                 disconnect(resource.data(), NULL, this, NULL);
         }
     });
-
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this, [this]() {
         if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
             if (QnLayoutResourcePtr resource = layout->resource())
@@ -205,6 +205,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         }
         updateHelpTopic();
     });
+    connect(action(Qn::ToggleTourModeAction), &QAction::toggled, this, &QnMainWindow::updateHelpTopic);
+    updateHelpTopic();
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
@@ -250,10 +252,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
     context->instance<QnWorkbenchSystemNameWatcher>();
-
-    QnWorkbenchServerAddressWatcher *serverAddressWatcher = context->instance<QnWorkbenchServerAddressWatcher>();
-    serverAddressWatcher->setDirectModuleFinder(QnModuleFinder::instance()->directModuleFinder());
-    serverAddressWatcher->setDirectModuleFinderHelper(QnModuleFinder::instance()->directModuleFinderHelper());
+    context->instance<QnWorkbenchServerAddressWatcher>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
@@ -501,19 +500,28 @@ void QnMainWindow::skipDoubleClick() {
     m_skipDoubleClick = true;
 }
 
+void QnMainWindow::updateScreenInfo() {
+    context()->instance<QnScreenManager>()->updateCurrentScreens(this);
+}
+
 void QnMainWindow::updateHelpTopic() {
+    if (action(Qn::ToggleTourModeAction)->isChecked()) {
+        setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_TourInProgress_Help, true);
+        return;
+    }
+
     if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
         if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
             setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);
             return;
         }
         if (layout->data().contains(Qn::LayoutSearchStateRole)) {
-            setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help);
+            setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help, true);
             return;
         }
         if (QnLayoutResourcePtr resource = layout->resource()) {
             if (context()->snapshotManager()->isFile(resource.dynamicCast<QnLayoutResource>())) {
-                setHelpTopic(m_scene.data(), Qn::MainWindow_Tree_MultiVideo_Help);
+                setHelpTopic(m_scene.data(), Qn::MainWindow_Tree_MultiVideo_Help, true);
                 return;
             }
             if (!resource->backgroundImageFilename().isEmpty()) {
@@ -802,6 +810,12 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
 
 void QnMainWindow::resizeEvent(QResizeEvent *event) {
     base_type::resizeEvent(event);
+    updateScreenInfo();
+}
+
+void QnMainWindow::moveEvent(QMoveEvent *event) {
+    base_type::moveEvent(event);
+    updateScreenInfo();
 }
 
 bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {

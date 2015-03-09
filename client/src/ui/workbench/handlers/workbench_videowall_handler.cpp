@@ -332,7 +332,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             setControlMode(false);
             QMessageBox::warning(mainWindow(),
                 tr("Control session is already running"),
-                tr("Could not start control session.\nAnother user is already controlling this screen."));
+                tr("Could not start control session.") + L'\n' + tr("Another user is already controlling this screen."));
         }
         
     });
@@ -924,7 +924,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
 
         QMessageBox::warning(mainWindow(),
             tr("Control session is already running"),
-            tr("Could not start control session.\nAnother user is already controlling this screen."));
+            tr("Could not start control session.") + L'\n' + tr("Another user is already controlling this screen."));
 
         return false;
     }
@@ -1166,15 +1166,21 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QnUuid::createUuid());
-    if (filtered.size() == 1)
-        layout->setName(generateUniqueLayoutName(context()->user(),
-                                                 filtered.first()->getName(),
-                                                 tr("%1 (%2)")
-                                                 .arg(filtered.first()->getName())
-                                                 .arg(lit("%1"))
-                                                 ));
-    else
+    if (filtered.size() == 1) {
+        QnResourcePtr resource = filtered.first();
+        if (resource->hasFlags(Qn::desktop_camera))
+            layout->setName(resource->getName());
+        else
+            layout->setName(generateUniqueLayoutName(context()->user(),
+                                                     resource->getName(),
+                                                     tr("%1 (%2)")
+                                                     .arg(resource->getName())
+                                                     .arg(lit("%1"))
+                                                     ));
+    }
+    else {
         layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
+    }
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 
@@ -1368,8 +1374,8 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
 
     if (QMessageBox::warning(mainWindow(),
         tr("Confirm Video Wall stop"),
-        tr("Are you sure you want to stop the Video Wall?\n"\
-        "You'll have to start it manually."),
+        tr("Are you sure you want to stop the Video Wall?") + L'\n' 
+      + tr("You'll have to start it manually."),
         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
         QMessageBox::Cancel) == QMessageBox::Cancel)
         return;

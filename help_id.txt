@@ -2,7 +2,7 @@ Login Dialog, Saved Connections - connecting_to_enterprise_contr.htm
 Click on compatibility warning (Client/Server version mismatch  or connection test warning) - launching_product_name_in_comp.htm
 Main Menu - main_menu.htm
 Side Panels (buttons that show/hide panels) - showing_and_hiding_side_panels.htm
-Tab - tabs.htm
+Tab (and tab panel, except top right buttons) - tabs.htm
 Items on Scene - viewing_camera_stream_information.htm
 Resource Tree (Empty Space) - working_with_a_resource_tree.htm
 Resource Tree - Search (Empty Space) - search.htm
@@ -46,16 +46,17 @@ IP Camera Properties (Recording tab, min/max section) - configuring_maximum_and_
 IP Camera Properties (Motion Detection tab) - setting_up_motion_mask_and_motion_sensitivity_(adm.htm
 IP Camera Properties (Advanced tab) - configuring_proprietary_camera_parameters.htm
 Expert tab in camera settings (Empty space) - adjusting_second_stream_qualit.htm
-Sysadmin - Enable Camera Discovery - disabling_recording_of_primary.htm
 Expert tab, Keep Camera streams and profile settings checkbox - preventing_product_name_from_c.htm
 Expert tab, Do not archive primary stream - disabling_recording_of_primary.htm
+Expert tab, Do not archive secondary stream - disabling_recording_of_primary.htm
+Expert tab, RTP Transport - Setting_Up_Camera_Transport_Pr.htm
 Swapping warning (when drop cameras between servers) - swapping_cameras_between_media_servers_(admin_only.htm
 Delete Camera Warning - deleting_a_camera_(admin_only).htm
-Server Settings, Failover checkbox - configuring_failover.htm
-Media Server Settings, Camera Capacity - configuring_failover.htm
+Server Settings, Failover section - configuring_failover.htm
 Event/Action Form - configuring_events_and_actions.htm
 System Administration - General - Alarm/Event Rules - configuring_events_and_actions.htm
 Events Schedule - setting_up_schedule_for_tracki.htm
+   
    - Events: 
      - Motion - motion_on_camera.htm
      - Camera Disconnected - camera_disconnection_malfuncti.htm
@@ -67,6 +68,7 @@ Events Schedule - setting_up_schedule_for_tracki.htm
      - Media Servers Conflict - media_servers_conflict.htm
    - Actions: 
      - Show Notification - notifications.htm
+     - License Issue - License_Issue.htm
 - Notification Settings,Notification panel - notifications.htm
      - Camera Recording - start_recording_on_camera.htm
      - Panic Recording - start_panic_recording.htm
@@ -81,6 +83,7 @@ System Administration - EMail - configuring_mail_server_for_e-.htm
      - Repeat Sound Action in E&A form and its adv. settings part - repeat_sound.htm
 System Administration - General - Event Log - viewing_events_log.htm
 Event Log Form - viewing_events_log.htm
+Event/Rules, Event Log button - viewing_events_log.htm 
 Create User - creating_a_new_user_(admin_only).htm
 User in Tree - users_management.htm
 Modifying User - changing_user_settings.htm

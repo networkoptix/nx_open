@@ -110,7 +110,7 @@
     </message>
     <message>
         <source>Camera IP Conflict</source>
-        <translation>IP-Konflikt bei Kamera</translation>
+        <translation>IP Konflikt bei Kamera</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -118,7 +118,7 @@
     </message>
     <message>
         <source>Server Conflict</source>
-        <translation>Serverkonflikt</translation>
+        <translation>Server Konflikt</translation>
     </message>
     <message>
         <source>Server Started</source>
@@ -263,11 +263,11 @@
     </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation></translation>
+        <translation>RTP-Paket-Verlust identifiziert, vorherige Sequ. = %1 nächste Sequ. = %2.</translation>
     </message>
     <message>
         <source>RTP packet loss detected.</source>
-        <translation></translation>
+        <translation>RTP-Paket-Verlust identifiziert.</translation>
     </message>
     <message>
         <source>Server terminated.</source>
@@ -279,11 +279,11 @@
     </message>
     <message>
         <source>I/O error has occurred at %1.</source>
-        <translation></translation>
+        <translation>I/O Fehler aufgetreten auf %1.</translation>
     </message>
     <message>
         <source>Not enough HDD/SSD speed for recording to %1.</source>
-        <translation>HDD/SSD Zugriffsgeschwindigkeit zur gering für Aufnahme auf %1.</translation>
+        <translation>HDD/SSD Zugriffsgeschwindigkeit zu gering für Aufnahme auf %1.</translation>
     </message>
     <message>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
@@ -291,7 +291,11 @@
     </message>
     <message>
         <source>Recording on %n camera(s) is disabled: </source>
-        <translation>Aufnahme ist bei %n Kameras deaktiviert: </translation>
+        <translation>Aufnahme ist bei %n Kamera(s) deaktiviert: </translation>
+    </message>
+    <message>
+        <source>Conflicting Server: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -301,81 +305,8 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Server %1 is not available.
- Check that Server is up and running.</source>
-        <translation>Server %1 ist nicht verfügbar.
-Stellen Sie sicher, dass der Server läuft und mit den Netzwerk verbunden ist.</translation>
-    </message>
-    <message>
-        <source>Received bad response from Server %1: &quot;%2&quot;.
- Check if Server is up and has the proper version.</source>
-        <translation>Ungültige Antwort von Server %1: &quot;%2&quot;.
- Überprüfen Sie, dass der Server läuft und die korrekte Softwareversion gestartet wurde.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to http port %1.
- Make sure the camera is plugged into the network.</source>
-        <translation>Verbindung zu HTTP Port %1 gescheitert.
-Bitte stellen Sie sicher, dass die Kamera über das Netzwerk erreichbar ist.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.
- Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>Media URL %1 kann nicht geöffnet werden. Verbindung zu Media-Port %2 gescheitert.
-Stellen Sie sicher, dass der Port %2 erreichbar ist, also z.B. vom Router geforwarded wird. Starten Sie die Kamera ggf. neu und setzen Sie die Kamerakonfiguration mittels der Weboberfläche zurück.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>Media URL %1 kann nicht geöffnet werden. Verbindung zu Port %2 wurde unerwartet beendet.
- Bitte stellen Sie sicher, dass die Kamera über das Netzwerk erreichbar ist. Starten Sie die Kamera ggf. neu.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Antwort der Kamera konnte nicht verarbeitet werden (pharse failed). Url %1, angeforderter Name %2.
- Starten Sie die Kamera ggf. neu und setzen Sie die Kamerakonfiguration mittels der Weboberfläche zurück. Versuchen Sie die Firmware upzudaten. Bleibt das Problem bestehen, kontaktieren Sie bitten den Support.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Keine unterstützten Media Tracks auf URL %1.
- Starten Sie die Kamera ggf. neu und setzen Sie die Kamerakonfiguration mittels der Weboberfläche zurück. Versuchen Sie die Firmware upzudaten. Bleibt das Problem bestehen, kontaktieren Sie bitten den Support.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>Nicht authentifiziert. URL %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.
- Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Kann Media-URL %1 nicht öffnen. Media Protokoll %2 nicht unterstützt.
- Starten Sie die Kamera ggf. neu und setzen Sie die Kamerakonfiguration mittels der Weboberfläche zurück. Versuchen Sie die Firmware upzudaten. Bleibt das Problem bestehen, kontaktieren Sie bitten den Support.</translation>
-    </message>
-    <message>
-        <source>Failed to configure parameter %1.
- First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>Parameter %1 konnte nicht konfiguriert werden.
- Versuchen Sie zuerst Aufnahme zur aktivieren, falls diese nicht läuft, und reduzieren Sie den FPS wert in der Kameraeinstellung.
-Falls das nicht hilft, setzen Sie die Kamerakonfiguration mittels der Weboberfläche zurück. Bleibt das Problem bestehen, kontaktieren Sie bitten den Support.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Kamera anfrage &quot;%1&quot; mit Fehler &quot;%2&quot; gescheitert.
- Starten Sie die Kamera ggf. neu und setzen Sie die Kamerakonfiguration mittels der Weboberfläche zurück. Versuchen Sie anschliessend die Firmware upzudaten. Bleibt das Problem bestehen, kontaktieren Sie bitten den Support.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.
- Please contact support.</source>
-        <translation>Unbekanntes Kameramodell.
-Bitte kontaktieren Sie den Support.</translation>
-    </message>
-    <message>
-        <source>An input/output error has occurred. OS message: &quot;%1&quot;.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>Eine Input/Output Fehler hat sich ereignet. OS Meldung: &quot;%1&quot;.
- Stellen Sie sicher, dass die Kamera mit dem Netzwerk verbunden ist. Starten Sie die Kamera ggf. neu.</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
@@ -395,23 +326,107 @@ Bitte kontaktieren Sie den Support.</translation>
     </message>
     <message>
         <source>Camera initialization process in progress</source>
-        <translation>Initalisierungsprozess der Kamera läuft</translation>
+        <translation>Initialisierungsprozess der Kamera läuft</translation>
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
         <translation>Unbekannter Fehler. Bitte kontaktieren Sie den Support.</translation>
     </message>
     <message>
-        <source>
-
-Parameters: </source>
-        <translation>
-
-Parameter: </translation>
-    </message>
-    <message>
         <source>(unknown)</source>
         <translation>(unbekannt)</translation>
+    </message>
+    <message>
+        <source>Server %1 is not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check that Server is up and running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Received bad response from Server %1: &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check if Server is up and has the proper version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to http port %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the camera is plugged into the network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at url %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to configure parameter %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Camera Issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parameters:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -423,7 +438,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>Ungültiger Wert für den &apos;%1&apos; Parameter - erwartet %2, geliefert &apos;%3&apos;.</translation>
+        <translation>Ungültiger Wert für den &apos;%1&apos; Parameter - erwartet %2, vorausgesetzt &apos;%3&apos;.</translation>
     </message>
 </context>
 <context>
@@ -434,7 +449,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>Konnte explorer.exe innerhalb des Suchpfads nicht finden um Windows Explorer zu starten.</translation>
+        <translation>Konnte explorer.exe innerhalb des Suchpfades nicht finden, um Windows Explorer zu starten.</translation>
     </message>
 </context>
 <context>
@@ -445,7 +460,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Could not find encoder for codec %1.</source>
-        <translation>Encoder für codec %1 konnte nicht gefunden werden.</translation>
+        <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
@@ -460,7 +475,7 @@ Parameter: </translation>
     <name>QnFfmpegTranscoder</name>
     <message>
         <source>Container %1 was not found in FFMPEG library.</source>
-        <translation>Container %1 wurde in FFMPEG library nicht gefunden.</translation>
+        <translation>Container %1 wurde in der FFMPEG Library nicht gefunden.</translation>
     </message>
     <message>
         <source>Could not create output context for format %1.</source>
@@ -472,7 +487,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Could not perform direct stream copy because frame size is undefined.</source>
-        <translation>Direct Stream Copy kann nicht aufgeführt werden, da die Frame Size nicht definiert wurde.</translation>
+        <translation>Direct Stream Copy kann nicht ausgeführt werden, da die Frame Size nicht definiert wurde.</translation>
     </message>
     <message>
         <source>Could not find codec %1.</source>
@@ -480,14 +495,14 @@ Parameter: </translation>
     </message>
     <message>
         <source>Video or audio codec is incompatible with container %1.</source>
-        <translation>Video- oder Audio-Codec ist mit container %1 nicht kompatibel.</translation>
+        <translation>Video- oder Audio-Codec ist mit Container %1 nicht kompatibel.</translation>
     </message>
 </context>
 <context>
     <name>QnFfmpegVideoTranscoder</name>
     <message>
         <source>Could not find encoder for codec %1.</source>
-        <translation>Encoder für codec %1 konnte nicht gefunden werden.</translation>
+        <translation>Encoder für Codec %1 konnte nicht gefunden werden.</translation>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
@@ -527,31 +542,31 @@ Parameter: </translation>
     </message>
     <message>
         <source>Trial licenses</source>
-        <translation>Trial Lizenzen</translation>
+        <translation>Trial Lizenz(en)</translation>
     </message>
     <message>
         <source>Analog licenses</source>
-        <translation>Analog Lizenzen</translation>
+        <translation>Analog Lizenz(en)</translation>
     </message>
     <message>
         <source>Professional licenses</source>
-        <translation>Professional Lizenzen</translation>
+        <translation>Professional Lizenz(en)</translation>
     </message>
     <message>
         <source>Edge licenses</source>
-        <translation>Edge Lizenzen</translation>
+        <translation>Edge Lizenz(en)</translation>
     </message>
     <message>
         <source>Vmax licenses</source>
-        <translation>Vmax Lizenzen</translation>
+        <translation>Vmax Lizenz(en)</translation>
     </message>
     <message>
         <source>Analog encoder licenses</source>
-        <translation>Analog Encoder Lizenzen</translation>
+        <translation>Analog Encoder Lizenz(en)</translation>
     </message>
     <message>
         <source>Video Wall licenses</source>
-        <translation>Video-Wand Lizenzen</translation>
+        <translation>Video-Wand Lizenz(en)</translation>
     </message>
     <message>
         <source>Invalid signature</source>
@@ -563,7 +578,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation></translation>
+        <translation>Ungültige Anpassung</translation>
     </message>
     <message>
         <source>Expired</source>
@@ -601,15 +616,15 @@ Parameter: </translation>
     <message numerus="yes">
         <source>Activate %n more %2. </source>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Aktiviere %n %2.</numerusform>
+            <numerusform>Aktiviere %n %2.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %2 will be used. </source>
         <translation>
-            <numerusform>%n %2 mehr wird verwendet.</numerusform>
-            <numerusform>%n %2 mehr werden verwendet.</numerusform>
+            <numerusform>%n %2 wird verwendet.</numerusform>
+            <numerusform>%n %2 werden verwendet.</numerusform>
         </translation>
     </message>
     <message>
@@ -622,7 +637,7 @@ Parameter: </translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation>Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support Team,falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten, bzw. ihren Lizenzschlüssel zu prüfen.</translation>
+        <translation>Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support Team,falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. ihren Lizenzschlüssel zu prüfen.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
@@ -651,7 +666,7 @@ Parameter: </translation>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>Ungültiger Wert für den &apos;%1&apos; Parameter - erwartet %2, geliefert &apos;%3&apos;.</translation>
+        <translation>Ungültiger Wert für den &apos;%1&apos; Parameter - erwartet %2, vorausgesetzt &apos;%3&apos;.</translation>
     </message>
 </context>
 <context>
@@ -794,19 +809,15 @@ Parameter: </translation>
     </message>
     <message>
         <source>Some users have not set their email addresses</source>
-        <translation>Einige Benutzer haben keine Email Adressen gesetzt</translation>
+        <translation>Einige Benutzer haben keine Emailadressen gesetzt</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
         <translation>Verbindung zu Server verloren</translation>
     </message>
     <message>
-        <source>Select server for others to synchronise time with</source>
-        <translation>Wählen Sie den Server mit dem andere ihre Zeit syncronisieren</translation>
-    </message>
-    <message>
         <source>Error while sending email</source>
-        <translation>Fehler beim Email Versand</translation>
+        <translation>Fehler beim Emailversand</translation>
     </message>
     <message>
         <source>Storages are full</source>
@@ -817,58 +828,60 @@ Parameter: </translation>
         <translation>Speichermedien sind nicht konfiguriert</translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation>Neuaufbau des Archivindex ist abgeschlossen.</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>Email Adresse für Benutzer %1 wurde nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>Email address is not set.
-You cannot receive system notifications via email.</source>
-        <translation>Email Adresse wurde nicht gesetzt.
-Sie können keine Systembenachrichtigungen via Email erhalten.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.
-You cannot receive system notifications via email.</source>
-        <translation>Email Server wurde nicht gesetzt.
-Sie können keine Systembenachrichtigungen via Email erhalten.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.
-They cannot receive system notifications via email.</source>
-        <translation>Email Adresse wurden bei einigen Benutzern nicht gesetzt.
-Diese Benutzer können keine Systembenachrichtigungen via Email erhalten.</translation>
     </message>
     <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
         <translation>Die Zeiteinstellung zwischen einigen Servern weicht ab und die korrekte Zeit konnte nicht automatisch bestimmt werden.</translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:
-%1.</source>
-        <translation>Speichermedien sind voll auf den folgenden Servern:
-%1.</translation>
+        <source>Select server for others to synchronize time with</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storages are not configured on the following Server:
-%1.</source>
-        <translation>Speichermedien sind nicht konfiguriert auf den folgenden Servern:
-%1.</translation>
+        <source>Rebuilding archive index is completed</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You have no licenses.
-You cannot record video from cameras.</source>
-        <translation>Sie haben keine Lizenzen.
-Sie können keine Videos mit Ihren Kameras aufnehmen.</translation>
+        <source>Email address is not set.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed on the following Server:
-%1.</source>
-        <translation>Neuaufbau des Archivindex ist abgeschlossen auf folgenden Servern:
-%1.</translation>
+        <source>You cannot receive system notifications via email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email server is not set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some users have not set their email addresses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications via email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storages are full on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storages are not configured on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You have no licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You cannot record video from cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding archive index is completed on the following Server:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -887,7 +900,7 @@ Sie können keine Videos mit Ihren Kameras aufnehmen.</translation>
     </message>
     <message>
         <source>Unsupported Transport</source>
-        <translation>Transport nicht unterstützt</translation>
+        <translation>Transport wird nicht unterstützt</translation>
     </message>
     <message>
         <source>Internal Server Error</source>

@@ -52,11 +52,12 @@ public:
     QStringList remoteAddresses;
     QByteArray authHash;
     int protoVersion;
+    QnUuid runtimeId;
 
     RevealResponse();
-    RevealResponse(const QnModuleInformation &moduleInformation);
+    RevealResponse(const QnModuleInformationEx &moduleInformation);
 
-    QnModuleInformation toModuleInformation() const;
+    QnModuleInformationEx toModuleInformation() const;
 
     bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);
     bool deserialize(const quint8 **bufStart, const quint8 *bufEnd);

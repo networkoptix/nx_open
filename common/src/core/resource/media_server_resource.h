@@ -21,8 +21,6 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
 public:
-    static const QString USE_PROXY;
-
     QnMediaServerResource(const QnResourceTypePool* resTypePool);
     virtual ~QnMediaServerResource();
 
@@ -59,12 +57,7 @@ public:
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
-    /*!
-        \return If there is route to mediaserver, ip address of mediaserver. If there is no route, string \a USE_PROXY
-    */
-    QString getPrimaryIF() const;
 
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
@@ -105,7 +98,6 @@ public:
     */
     QPair<int, int> saveUpdatedStorages();
 private slots:
-    void at_httpClientDone( const nx_http::AsyncHttpClientPtr& client );
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
 private:
@@ -121,13 +113,11 @@ signals:
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
-    QString m_primaryIf;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
     //QnAbstractStorageResourceList m_storages;
-    bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;

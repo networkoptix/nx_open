@@ -178,7 +178,11 @@ namespace ec2
                     val == runtimeInfoChanged ||
                     val == peerAliveInfo ||
                     val == broadcastPeerSystemTime ||
-                    val == tranSyncDone;
+                    val == tranSyncDone ||
+                    val == uploadUpdate ||
+                    val == uploadUpdateResponce ||
+                    val == installUpdate;
+
         }
 
         bool isPersistent( Value val )

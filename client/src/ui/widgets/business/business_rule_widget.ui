@@ -47,8 +47,14 @@
               <height>0</height>
              </size>
             </property>
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>When</string>
             </property>
            </widget>
           </item>
@@ -155,7 +161,7 @@
            <string>Schedule...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../../../x64/build/client.qrc">
+           <iconset>
             <normaloff>:/skin/tree/servers.png</normaloff>:/skin/tree/servers.png</iconset>
           </property>
          </widget>
@@ -198,8 +204,14 @@
               <height>0</height>
              </size>
             </property>
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>Do</string>
             </property>
            </widget>
           </item>

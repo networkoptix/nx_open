@@ -21,8 +21,6 @@
 #include "nx_ec/ec_proto_version.h"
 
 
-const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
-
 class QnMediaServerResourceGuard: public QObject {
 public:
     QnMediaServerResourceGuard(const QnMediaServerResourcePtr &resource): m_resource(resource) {}
@@ -32,7 +30,6 @@ private:
 };
 
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
-    m_primaryIFSelected(false),
     m_serverFlags(Qn::SF_None)
 {
     setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
@@ -42,7 +39,6 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
     QnResource::setName(tr("Server"));
 
-    m_primaryIFSelected = false;
     m_statusTimer.restart();
 
     QnResourceList resList = qnResPool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
@@ -258,51 +254,21 @@ private:
 };
 */
 
-void QnMediaServerResource::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
-{
-    QMutexLocker lock(&m_mutex);
-    if( client->response() &&   //respnose has been received and parsed (no transport error)
-        client->response()->statusLine.statusCode == nx_http::StatusCode::ok )
-    {
-        const nx_http::BufferType& msgBodyBuf = client->fetchMessageBodyBuffer();
-        QnPingReply reply;
-        QnJsonRestResult result;
-        if( QJson::deserialize(msgBodyBuf, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
-            setPrimaryIF(client->url().host()); // server OK
-    }
-    m_runningIfRequests.erase(std::remove(m_runningIfRequests.begin(), m_runningIfRequests.end(), client), m_runningIfRequests.end());
-}
-
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
 {
     QUrl origApiUrl = getApiUrl();
     {
         QMutexLocker lock(&m_mutex);
-        if (m_primaryIFSelected)
-            return;
-        m_primaryIFSelected = true;
     
-        if (primaryIF != USE_PROXY)
-        {
-            QUrl apiUrl(getApiUrl());
-            apiUrl.setHost(primaryIF);
-            setApiUrl(apiUrl.toString());
+        QUrl apiUrl(getApiUrl());
+        apiUrl.setHost(primaryIF);
+        setApiUrl(apiUrl.toString());
 
-            QUrl url(getUrl());
-            url.setHost(primaryIF);
-            setUrl(url.toString());
-        }
-
-        m_primaryIf = primaryIF;
+        QUrl url(getUrl());
+        url.setHost(primaryIF);
+        setUrl(url.toString());
     }
     emit serverIfFound(::toSharedPointer(this), primaryIF, origApiUrl.toString());
-}
-
-QString QnMediaServerResource::getPrimaryIF() const 
-{
-    QMutexLocker lock(&m_mutex);
-
-    return m_primaryIf;
 }
 
 Qn::PanicMode QnMediaServerResource::getPanicMode() const 
@@ -329,30 +295,6 @@ Qn::ServerFlags QnMediaServerResource::getServerFlags() const
 void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
 {
     m_serverFlags = flags;
-}
-
-
-void QnMediaServerResource::determineOptimalNetIF()
-{
-    QMutexLocker lock(&m_mutex);
-    
-    //using proxy before we able to establish direct connection
-    setPrimaryIF( QnMediaServerResource::USE_PROXY );
-
-    m_prevNetAddrList = m_netAddrList;
-    m_primaryIFSelected = false;
-
-    for (int i = 0; i < m_netAddrList.size(); ++i)
-    {
-        QUrl url(m_apiUrl);
-        url.setHost(m_netAddrList[i].toString());
-        url.setPath(lit("/api/ping"));
-
-        nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-        connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnMediaServerResource::at_httpClientDone, Qt::DirectConnection );
-        if (httpClient->doGet(url))
-            m_runningIfRequests.push_back(httpClient);
-    }
 }
 
 QnAbstractStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
@@ -403,7 +345,6 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
         if (m_restConnection)
             m_restConnection->setUrl(m_apiUrl);
-        determineOptimalNetIF();
     } else {
         m_url = oldUrl; //rollback changed value to autodetected
     }
