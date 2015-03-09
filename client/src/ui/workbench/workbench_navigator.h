@@ -31,6 +31,7 @@ class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 class QnSearchLineEdit;
+class QnSearchQueryStrategy;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -185,6 +186,7 @@ protected slots:
     void at_timeSlider_selectionPressed();
     void at_timeSlider_selectionReleased();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
+    void at_timeSlider_bookmarksUnderCursorUpdated(const QPointF& pos);
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_thumbnailClicked();
 
@@ -206,6 +208,7 @@ private:
     QnCalendarWidget *m_calendar;
     QnDayTimeWidget *m_dayTimeWidget;
     QnSearchLineEdit *m_bookmarksSearchWidget;
+    QnSearchQueryStrategy *m_searchQueryStrategy;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;

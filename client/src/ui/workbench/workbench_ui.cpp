@@ -19,6 +19,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <camera/resource_display.h>
 
@@ -51,6 +52,7 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
 #include <ui/common/palette.h>
 #include <ui/processors/hover_processor.h>
@@ -1882,7 +1884,7 @@ void QnWorkbenchUi::updateCalendarGeometry() {
     m_calendarItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
-    m_calendarItem->setPos(geometry.topLeft());
+    m_calendarItem->setPos(geometry.topLeft() - QPointF(0, m_searchWidget->paintSize().height()));
 }
 
 QRectF QnWorkbenchUi::updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry) {
@@ -2358,6 +2360,21 @@ void QnWorkbenchUi::createSliderWidget()
     connect(action(Qn::ToggleTourModeAction),   &QAction::toggled,                  this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(action(Qn::ToggleThumbnailsAction), &QAction::toggled,                  this,           [this](bool checked){ setThumbnailsVisible(checked); });
     connect(action(Qn::ToggleSliderAction),     &QAction::toggled,                  this,           [this](bool checked){ if (!m_ignoreClickEvent) setSliderOpened(checked);});
+
+    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::editBookmarkClicked, this
+        , [this](const QnCameraBookmark &bookmark, QnActionParameters params)
+    {
+        params.setArgument(Qn::CameraBookmarkRole, bookmark);
+        menu()->triggerIfPossible(Qn::EditCameraBookmarkAction, params);
+    });
+
+    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::removeBookmarkClicked, this
+        , [this](const QnCameraBookmark &bookmark, QnActionParameters params)
+    {
+        params.setArgument(Qn::CameraBookmarkRole, bookmark);
+        menu()->triggerIfPossible(Qn::RemoveCameraBookmarkAction, params);
+    });
+    
 }
 
 #pragma endregion Slider methods
@@ -2439,7 +2456,9 @@ void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
         m_searchSizeAnimator->stop();
         m_searchWidget->setPaintSize(newSize);
     }
-
+    
+    QnSearchLineEdit *searchWidget = navigator()->bookmarksSearchWidget();
+    searchWidget->setEnabled(opened);
     action(Qn::ToggleBookmarksSearchAction)->setChecked(opened);
 }
 
@@ -2492,6 +2511,7 @@ void QnWorkbenchUi::createSearchWidget() {
     QnSearchLineEdit *searchLine = new QnSearchLineEdit();
     searchLine->setAttribute(Qt::WA_TranslucentBackground);
     searchLine->resize(250, 21);
+    connect(searchLine, &QnSearchLineEdit::escKeyPressed, this, [this]() { setSearchOpened(false, true); } );
 
     navigator()->setBookmarksSearchWidget(searchLine);
 
@@ -2500,15 +2520,10 @@ void QnWorkbenchUi::createSearchWidget() {
     m_searchWidget->setProperty(Qn::NoHandScrollOver, true);
     connect(m_searchWidget,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
     connect(m_searchWidget,   &QGraphicsWidget::geometryChanged,          this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
+    connect(m_searchWidget,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
 
     // slider should be highlighted when search widget is hovered
     m_sliderOpacityProcessor->addTargetItem(m_searchWidget);
-
-    HoverFocusProcessor* searchHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    searchHidingProcessor->addTargetItem(m_searchWidget);
-    searchHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
-    searchHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
-    connect(searchHidingProcessor,  &HoverFocusProcessor::hoverFocusLeft, this, [this](){ setSearchOpened(false);});
 
     m_searchOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_searchOpacityProcessor->addTargetItem(m_searchWidget);
