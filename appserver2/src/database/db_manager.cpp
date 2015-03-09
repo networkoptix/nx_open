@@ -2227,6 +2227,10 @@ ErrorCode QnDbManager::removeCamera(const QnUuid& guid)
 {
     qint32 id = getResourceInternalId(guid);
 
+    // todo: #rvasilenko Do not delete references to the camera. All child object should be deleted with separated transactions
+    // It's not big issue now because we keep a lot of camera data after deleting camera object. So, it should be refactored in 1.4 after we introduce full data cleanup
+    // for removing camera
+    /*
     ErrorCode err = deleteTableRecord(guid, "vms_businessrule_action_resources", "resource_guid");
     if (err != ErrorCode::ok)
         return err;
@@ -2240,10 +2244,12 @@ ErrorCode QnDbManager::removeCamera(const QnUuid& guid)
         return err;
 
     err = deleteCameraServerItemTable(id);
+
     if (err != ErrorCode::ok)
         return err;
-
-    err = deleteTableRecord(id, "vms_camera", "resource_ptr_id");
+    */
+    
+    ErrorCode err = deleteTableRecord(id, "vms_camera", "resource_ptr_id");
     if (err != ErrorCode::ok)
         return err;
 

@@ -314,7 +314,9 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
 }
 
 // todo: ec2 relate logic. remove from this class
-void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
+void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) 
+{
+    /*
     for(const QnBusinessEventRulePtr& bRule: m_rules.values())
     {
         if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
@@ -324,6 +326,7 @@ void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
             emit businessRuleChanged(updatedRule);
         }
     }
+    */
 }
 
 

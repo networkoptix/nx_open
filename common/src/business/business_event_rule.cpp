@@ -42,17 +42,6 @@ QVector<QnUuid> QnBusinessEventRule::eventResources() const {
     return m_eventResources;
 }
 
-QnResourceList QnBusinessEventRule::eventResourceObjects() const 
-{
-    QnResourceList result;
-    for(const QnUuid& id: m_eventResources) {
-        QnResourcePtr res = qnResPool->getResourceById(id);
-        if (res)
-            result << res;
-    }
-    return result;
-}
-
 void QnBusinessEventRule::setEventResources(const QVector<QnUuid> &value) {
     m_eventResources = value;
 }
@@ -85,17 +74,6 @@ void QnBusinessEventRule::setActionType(QnBusiness::ActionType actionType) {
 
 QVector<QnUuid> QnBusinessEventRule::actionResources() const {
     return m_actionResources;
-}
-
-QnResourceList QnBusinessEventRule::actionResourceObjects() const 
-{
-    QnResourceList result;
-    for(const QnUuid& id: m_actionResources) {
-        QnResourcePtr res = qnResPool->getResourceById(id);
-        if (res)
-            result << res;
-    }
-    return result;
 }
 
 void QnBusinessEventRule::setActionResources(const QVector<QnUuid> &value) {
