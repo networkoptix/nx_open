@@ -293,6 +293,10 @@
         <source>Server started after crash.</source>
         <translation>服务器停止后启动.</translation>
     </message>
+    <message>
+        <source>Conflicting Server: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

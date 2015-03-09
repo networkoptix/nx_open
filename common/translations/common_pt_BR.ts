@@ -292,6 +292,10 @@
         <source>User Defined (%1)</source>
         <translation>Definido por usuário (%1)</translation>
     </message>
+    <message>
+        <source>Conflicting Server: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
