@@ -48,7 +48,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
     for (const DiscoveryInfo& info: m_sockList)
-        info.sock->sendTo(TestCamConst::TEST_CAMERA_FIND_MSG, strlen(TestCamConst::TEST_CAMERA_FIND_MSG), BROADCAST_ADDRESS, TestCamConst::DISCOVERY_PORT);
+        info.sock->sendTo(TestCamConst::TEST_CAMERA_FIND_MSG, static_cast<unsigned int>(strlen(TestCamConst::TEST_CAMERA_FIND_MSG)), BROADCAST_ADDRESS, TestCamConst::DISCOVERY_PORT);
 }
 
 QnResourceList QnTestCameraResourceSearcher::findResources(void)

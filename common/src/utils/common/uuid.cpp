@@ -12,7 +12,7 @@ QnUuid::QnUuid()
 
 QnUuid::QnUuid( const char* text )
 :
-    m_uuid( text ? QByteArray::fromRawData( text, strlen(text) ) : QByteArray() )
+    m_uuid( text ? QByteArray::fromRawData( text, static_cast<int>(strlen(text)) ) : QByteArray() )
 {
 }
 

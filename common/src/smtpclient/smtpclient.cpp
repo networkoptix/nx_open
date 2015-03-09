@@ -472,7 +472,7 @@ void SmtpClient::waitForResponse()
             continue;
         }
 
-        bufPos += bytesParsed;
+        bufPos += static_cast<int>(bytesParsed);
 
         // Save the server's response
         responseText = QLatin1String( lineBufferRef.toByteArrayWithRawData() );
