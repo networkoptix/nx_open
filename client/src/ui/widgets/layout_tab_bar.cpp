@@ -64,9 +64,9 @@ QnLayoutTabBar::~QnLayoutTabBar() {
     disconnect(workbench(), NULL, this, NULL);
     disconnect(snapshotManager(), NULL, this, NULL);
 
+    m_submit = m_update = false;
     while(count() > 0)
         removeTab(count() - 1);
-    m_submit = m_update = false;
 }
 
 void QnLayoutTabBar::checkInvariants() const {
