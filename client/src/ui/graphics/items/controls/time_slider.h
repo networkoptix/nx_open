@@ -156,6 +156,7 @@ public:
     Q_SLOT void finishAnimations();
     Q_SLOT void hurryKineticAnimations();
 
+    bool m_boomarksHovered;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;

@@ -2,6 +2,8 @@
 #include "bookmarks_viewer.h"
 
 #include <core/resource/camera_bookmark.h>
+
+#include <ui/common/palette.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
@@ -52,7 +54,7 @@ namespace
     const QString kDelimiter = lit(" ");
     const QString kLinkTemplate = lit("<a href = \"%1\">%2</a>");
 
-    class QnBookmarkTooltipActionResuourceStrings
+    class QnBookmarksViewerStrings
     {
         Q_DECLARE_TR_FUNCTIONS(QnBookmarkTooltipActionResuourceStrings)
     public:
@@ -103,9 +105,7 @@ namespace
             font.setItalic(params.italic);
             label->setFont(font);
 
-            QPalette &palette = label->palette();
-            palette.setColor(QPalette::Background, backgroundColor);
-            label->setPalette(palette);
+            setPaletteColor(label, QPalette::Background, backgroundColor);
 
             label->setWordWrap(true);
             label->setMaximumWidth(kBookmarkFrameWidth);
@@ -145,9 +145,7 @@ namespace
         label->setTextInteractionFlags(Qt::TextBrowserInteraction);
         QObject::connect(label, &QnProxyLabel::linkActivated, label, [handler](const QString &id) { handler(id); });
         
-        QPalette &palette = label->palette();
-        palette.setColor(QPalette::Background, backgroundColor);
-        label->setPalette(palette);
+        setPaletteColor(label, QPalette::Background, backgroundColor);
 
         return label;
     }
@@ -284,10 +282,10 @@ namespace
         const QColor backgroundColor = palette().color(QPalette::Background);
         QGraphicsLinearLayout *actionsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
         QnProxyLabel *editActionLabel =
-            createButtonLabel(QnBookmarkTooltipActionResuourceStrings::editCaption(), kEditActionAnchorName, this
+            createButtonLabel(QnBookmarksViewerStrings::editCaption(), kEditActionAnchorName, this
             , std::bind(&BookmarkToolTipFrame::onBookmarkAction, this, std::placeholders::_1), backgroundColor);
         QnProxyLabel *removeActionLabel =
-            createButtonLabel(QnBookmarkTooltipActionResuourceStrings::removeCaption(), kRemoveActoinAnchorName, this
+            createButtonLabel(QnBookmarksViewerStrings::removeCaption(), kRemoveActoinAnchorName, this
             , std::bind(&BookmarkToolTipFrame::onBookmarkAction, this, std::placeholders::_1), backgroundColor);
 
         actionsLayout->addItem(removeActionLabel);
