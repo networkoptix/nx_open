@@ -631,7 +631,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         const char* paramDescXMLStr = m_cameraManager3->getParametersDescriptionXML();
         if( paramDescXMLStr != nullptr )
         {
-            QByteArray paramDescXML = QByteArray::fromRawData( paramDescXMLStr, strlen(paramDescXMLStr) );
+            QByteArray paramDescXML = QByteArray::fromRawData( paramDescXMLStr, static_cast<int>(strlen(paramDescXMLStr)) );
             QBuffer dataSource(&paramDescXML);
 
             if( QnCameraAdvacedParamsXmlParser::validateXml(&dataSource)) {

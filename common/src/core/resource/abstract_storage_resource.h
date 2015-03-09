@@ -49,16 +49,6 @@ public:
      */
     virtual float getAvarageWritingUsage() const;
 
-
-    // TODO: #Elric move out?
-    struct ProtocolDescription {
-        QString protocol;
-        QString name;
-        QString urlTemplate;
-        QString urlPattern;
-    };
-
-    static ProtocolDescription protocolDescription(const QString &protocol);
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 signals:
     /*

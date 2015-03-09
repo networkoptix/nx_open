@@ -2082,7 +2082,7 @@ bool QnPlOnvifResource::detectVideoSourceCount()
         if (soapRes != SOAP_OK)
             return false;
         if ( (int)confResponse.Configurations.size() < m_maxChannels)
-            m_maxChannels = confResponse.Configurations.size();
+            m_maxChannels = static_cast<int>(confResponse.Configurations.size());
     }
 
     return true;
@@ -2143,7 +2143,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
 
         if ( (int)confResponse.Configurations.size() < m_maxChannels)
-            m_maxChannels = confResponse.Configurations.size();
+            m_maxChannels = static_cast<int>(confResponse.Configurations.size());
     }
 
     return CameraDiagnostics::NoErrorResult();

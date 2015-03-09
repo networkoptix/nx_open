@@ -313,9 +313,10 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
     execBusinessActionInternal(action);
 }
 
-// todo: ec2 relate logic. remove from this class
+//TODO: #rvasilenko ec2 relate logic. remove from this class
 void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) 
 {
+    Q_UNUSED(id)
     /*
     for(const QnBusinessEventRulePtr& bRule: m_rules.values())
     {
@@ -373,9 +374,11 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 }
 
 void QnCommonMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+    Q_UNUSED(data)
 }
 
 void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {  
+    Q_UNUSED(data)
 }
 
 
