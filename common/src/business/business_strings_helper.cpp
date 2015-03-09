@@ -209,7 +209,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case ServerConflictEvent: {
-        if (!params.cnflicts.isEmpty()) {
+        if (!params.conflicts.isEmpty()) {
             QnCameraConflictList conflicts;
             conflicts.sourceServer = params.source;
             conflicts.decode(params.conflicts);
@@ -226,7 +226,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
 
             }
         } else {
-            result += tr("Conflicting Server: %1").arg(params.getSource());
+            result += tr("Conflicting Server: %1").arg(params.source);
         }
         break;
     }
