@@ -6,7 +6,9 @@
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/bookmark_business_action.h>
 #include <business/actions/common_business_action.h>
-#include "core/resource/resource.h"
+
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
 
 QVector<QnUuid> toIdList(const QnResourceList& list)
 {
@@ -18,7 +20,7 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 }
 
 QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
-    QnResourceList resList = rule->actionResourceObjects<QnResource>();
+    QnResourceList resList = qnResPool->getResources<QnResource>(rule->actionResources());
     if (QnBusiness::requiresCameraResource(rule->actionType()) && resList.isEmpty())
         return QnAbstractBusinessActionPtr(); //camera does not exist anymore
     //TODO: #GDM #Business check resource type?

@@ -10,7 +10,6 @@
 #include <business/business_fwd.h>
 #include <business/business_action_parameters.h>
 #include <business/business_event_parameters.h>
-#include "core/resource_management/resource_pool.h"
 
 namespace QnBusiness
 {
@@ -45,7 +44,6 @@ public:
     void setResources(const QVector<QnUuid>& resources);
 
     const QVector<QnUuid>& getResources() const;
-    template <class T> QnSharedResourcePointerList<T> getResourceObjects() const { return qnResPool->getResources<T>(m_resources); }
 
     void setParams(const QnBusinessActionParameters& params);
     const QnBusinessActionParameters& getParams() const;
