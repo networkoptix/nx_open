@@ -222,7 +222,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnResourceList resList = action->getResourceObjects().filtered<QnNetworkResource>();
+    QnResourceList resList = action->getResourceObjects<QnNetworkResource>();
     if (resList.isEmpty()) {
         executeAction(action, QnResourcePtr());
     }
@@ -456,7 +456,9 @@ void QnBusinessRuleProcessor::at_timer()
 
 bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule)
 {
-    bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || rule->eventResources().contains(bEvent->getResource()->getId());
+    //bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || rule->eventResources().contains(bEvent->getResource()->getId());
+    auto resList = rule->eventResourceObjects<QnResource>();
+    bool resOK = !bEvent->getResource() || resList.isEmpty() || resList.contains(bEvent->getResource());
     if (!resOK)
         return false;
 
@@ -538,7 +540,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     }
 
     QStringList recipients;
-    for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
+    for (const QnUserResourcePtr &user: action->getResourceObjects<QnUserResource>()) {
         QString email = user->getEmail();
         if (!email.isEmpty() && QnEmailAddress::isValid(email))
             recipients << email;
@@ -587,7 +589,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
 
     QStringList log;
     QStringList recipients;
-    for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
+    for (const QnUserResourcePtr &user: action->getResourceObjects<QnUserResource>()) {
         QString email = user->getEmail();
         log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
         if (!email.isEmpty() && QnEmailAddress::isValid(email))
@@ -745,7 +747,7 @@ void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& res
 
         if( rule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnVirtualCameraResourceList resList = rule->eventResourceObjects().filtered<QnVirtualCameraResource>();
+            QnVirtualCameraResourceList resList = rule->eventResourceObjects<QnVirtualCameraResource>();
             if( resList.isEmpty() ||            //listening all cameras
                 resList.contains(resource.staticCast<QnVirtualCameraResource>()) )
             {
@@ -815,7 +817,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
     {
         if( businessRule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnVirtualCameraResourceList resList = businessRule->eventResourceObjects().filtered<QnVirtualCameraResource>();
+            QnVirtualCameraResourceList resList = businessRule->eventResourceObjects<QnVirtualCameraResource>();
             if (resList.isEmpty())
                 resList = qnResPool->getAllCameras(QnResourcePtr(), true);
 
@@ -831,7 +833,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
 
     //notifying resources about recording action
     {
-        QnVirtualCameraResourceList resList = businessRule->actionResourceObjects().filtered<QnVirtualCameraResource>();
+        QnVirtualCameraResourceList resList = businessRule->actionResourceObjects<QnVirtualCameraResource>();
         if( businessRule->actionType() == QnBusiness::CameraRecordingAction)
         {
             for(const QnVirtualCameraResourcePtr camera: resList)
