@@ -15,6 +15,8 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/media_resource.h>
+
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
