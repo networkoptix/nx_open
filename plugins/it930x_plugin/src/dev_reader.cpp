@@ -123,7 +123,19 @@ namespace ite
 
     // Demux
 
-    void Demux::push(const TsBuffer& ts)
+    Demux::Demux()
+    {
+        // alloc TS pool
+        {
+            std::vector<TsBuffer> vecTS;
+            vecTS.reserve(TsBuffer::MAX_ELEMENTS);
+
+            for (size_t i=0; i< TsBuffer::MAX_ELEMENTS; ++i)
+                vecTS.push_back(TsBuffer(m_poolTs));
+        }
+    }
+
+    void Demux::push(const TsBuffer& ts, unsigned maxCount)
     {
         uint16_t pid = ts.packet().pid();
         TsQueue * q = queue(pid);
@@ -132,16 +144,9 @@ namespace ite
 
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-        if (q->size() >= MAX_TS_QUEUE_SIZE())
+        if (q->size() >= maxCount)
             q->pop_front();
 
-#if 0
-        if (q->size())
-        {
-            if ((q->back().packet().counter() + 1) % 16 != ts.packet().counter())
-                printf("TS wrong count: %d -> %d\n", q->back().packet().counter(), ts.packet().counter());
-        }
-#endif
         q->push_back(std::move(ts));
     }
 
@@ -161,6 +166,22 @@ namespace ite
         }
 
         return TsBuffer();
+    }
+
+    void Demux::pushRC(const TsBuffer& ts)
+    {
+        push(std::move(ts), MAX_RC_QUEUE_SIZE());
+    }
+
+    TsBuffer Demux::popRC()
+    {
+        TsBuffer ts = pop(It930x::PID_RETURN_CHANNEL);
+
+        //std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        //if (ts)
+        //    return ts.copy(); // pool -> default alloc memory
+        return ts;
     }
 
     void Demux::clear(uint16_t pid)
@@ -243,15 +264,6 @@ namespace ite
         m_demux.addPid(Pacidal::PID_VIDEO_HD);
         m_demux.addPid(Pacidal::PID_VIDEO_SD);
         m_demux.addPid(Pacidal::PID_VIDEO_CIF);
-
-        // alloc TS pool
-        {
-            std::vector<TsBuffer> vecTS;
-            vecTS.reserve(TsBuffer::MAX_ELEMENTS);
-
-            for (size_t i=0; i< TsBuffer::MAX_ELEMENTS; ++i)
-                vecTS.push_back(TsBuffer(m_poolTs));
-        }
     }
 
     bool DevReader::subscribe(uint16_t pid)
@@ -350,7 +362,7 @@ namespace ite
 
     bool DevReader::readStep(bool rcOnly)
     {
-        TsBuffer ts(m_poolTs);
+        TsBuffer ts = m_demux.tsFromPool();
         if (! m_buf.readTSPacket(ts))
             return false;
 
@@ -359,8 +371,7 @@ namespace ite
         {
             if (pkt.pid() == It930x::PID_RETURN_CHANNEL)
             {
-                TsBuffer tsCopy = ts.copy();
-                m_demux.push(tsCopy);
+                m_demux.pushRC(std::move(ts));
             }
             else if (! rcOnly)
             {
@@ -435,48 +446,9 @@ namespace ite
         return ContentPacketPtr();
     }
 
-#if 0
-    bool DevReader::readRetChanCmd(RCCommand& cmd)
-    {
-        static const unsigned WAIT_TIME_MS = 1000;
-        static const unsigned READ_BLOCK = 1024;
-
-        sync();
-
-        Timer t(true);
-        TsBuffer ts(true); // not from Pool
-
-        while (t.elapsedUS() < WAIT_TIME_MS)
-        {
-            // check time time to time - sometimes
-            for (unsigned i = 0; i < READ_BLOCK; ++i)
-            {
-                if (m_buf.readTSPacket(ts))
-                {
-                    MpegTsPacket pkt = ts.packet();
-                    if (pkt.syncOK())
-                    {
-                        uint16_t pid = pkt.pid();
-                        if (pid == It930x::PID_RETURN_CHANNEL)
-                        {
-#if 1
-                            printf("got RC cmd (TX search)\n");
-#endif
-                            cmd.add(pkt.tsPayload(), pkt.tsPayloadLen());
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-#endif
-
     bool DevReader::getRetChanCmd(RCCommand& cmd)
     {
-        TsBuffer ts = m_demux.pop(It930x::PID_RETURN_CHANNEL);
+        TsBuffer ts = m_demux.popRC();
         if (ts)
         {
             MpegTsPacket pkt = ts.packet();

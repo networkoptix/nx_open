@@ -27,7 +27,7 @@ namespace ite
 
         void push(T elem)
         {
-            //std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             if (m_pool.size() < MAX_ELEMENTS)
             {
@@ -39,7 +39,7 @@ namespace ite
 
         T pop()
         {
-            //std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             if (m_pool.empty())
                 return T();
@@ -50,7 +50,7 @@ namespace ite
         }
 
     private:
-        //std::mutex m_mutex; // faster without
+        std::mutex m_mutex;
         std::vector<T> m_pool;
     };
 
@@ -60,21 +60,19 @@ namespace ite
     public:
         enum
         {
-            MAX_ELEMENTS = 4 * 1024
+            MAX_ELEMENTS = 2 * 1024
         };
 
         typedef std::vector<uint8_t> ContT;
         typedef std::shared_ptr<ContT> BufT;
         typedef Pool<BufT, MAX_ELEMENTS> PoolT;
 
-        TsBuffer(bool alloc = false)
+        TsBuffer()
         :   m_pool(nullptr)
         {
-            if (alloc)
-                m_buf = std::make_shared<ContT>(MpegTsPacket::PACKET_SIZE());
         }
 
-        TsBuffer(PoolT& pool)
+        explicit TsBuffer(PoolT& pool)
         :   m_buf(pool.pop()),
             m_pool(&pool)
         {
@@ -113,7 +111,7 @@ namespace ite
 
         static unsigned size() { return MpegTsPacket::PACKET_SIZE(); }
 
-        TsBuffer copy()
+        TsBuffer copy() const
         {
             TsBuffer ts(true);
             memcpy(ts.data(), data(), size());
@@ -123,6 +121,13 @@ namespace ite
     private:
         BufT m_buf;
         PoolT * m_pool;
+
+        explicit TsBuffer(bool alloc)
+        :   m_pool(nullptr)
+        {
+            if (alloc)
+                m_buf = std::make_shared<ContT>(MpegTsPacket::PACKET_SIZE());
+        }
     };
 
     typedef std::deque<TsBuffer> TsQueue;
@@ -274,7 +279,11 @@ namespace ite
     class Demux : public ObjectCounter<Demux>
     {
     public:
+        // 2k => ~ 60Mbps 30fps (TS payload ~128 byte)
         static constexpr unsigned MAX_TS_QUEUE_SIZE() { return TsBuffer::MAX_ELEMENTS; }
+        static constexpr unsigned MAX_RC_QUEUE_SIZE() { return 64; }
+
+        Demux();
 
         void addPid(uint16_t pid)
         {
@@ -282,14 +291,19 @@ namespace ite
             m_times[pid] = PtsTime();
         }
 
-        void push(const TsBuffer& ts);
-        TsBuffer pop(uint16_t pid);
+        TsBuffer tsFromPool() { return TsBuffer(m_poolTs); }
+
+        void push(const TsBuffer& ts, unsigned maxCount = MAX_TS_QUEUE_SIZE());
         void clear(uint16_t pid);
+
+        void pushRC(const TsBuffer& ts);
+        TsBuffer popRC();
 
         ContentPacketPtr dumpPacket(uint16_t pid);
 
     private:
         mutable std::mutex m_mutex;
+        TsBuffer::PoolT m_poolTs;
         std::map<uint16_t, TsQueue> m_queues;   // {PID, TS queue}
         std::map<uint16_t, PtsTime> m_times;    // {PID, PTS-time link}
 
@@ -308,6 +322,8 @@ namespace ite
                 return &it->second;
             return nullptr;
         }
+
+        TsBuffer pop(uint16_t pid);
     };
 
     class It930x;
@@ -416,7 +432,6 @@ namespace ite
 
         DeviceBuffer m_buf;
         Demux m_demux;
-        TsBuffer::PoolT m_poolTs;
         std::map<uint16_t, PacketsQueue> m_packetQueues;
 
         DevReadThread * m_threadObject;
