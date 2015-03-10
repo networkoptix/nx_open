@@ -24,6 +24,7 @@
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <update/media_server_update_tool.h>
 
@@ -72,14 +73,23 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionsClickable(false);
     setPaletteColor(ui->tableView, QPalette::Highlight, Qt::transparent);
 
-    connect(ui->cancelButton,           &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::cancelUpdate);
+    connect(ui->cancelButton,           &QPushButton::clicked,      this, [this] {
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+            return;
+        m_updateTool->cancelUpdate();
+    });
+
     connect(ui->internetUpdateButton,   &QPushButton::clicked,      this, [this] {
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+            return;
         m_updateTool->startUpdate(m_targetVersion, !m_targetVersion.isNull());
     });
     ui->internetUpdateButton->setEnabled(false);
     ui->internetDetailLabel->setVisible(false);
 
     connect(ui->localUpdateButton,      &QPushButton::clicked,      this, [this] {
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+            return;
         m_updateTool->startUpdate(ui->filenameLineEdit->text());
     });
     ui->localUpdateButton->setEnabled(false);
@@ -412,6 +422,9 @@ void QnServerUpdatesWidget::autoCheckForUpdatesInternet() {
 }
 
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoStart) {
+    if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+        return;
+
     if (m_checkingInternet || !m_updateTool->idle())
         return;
     m_checkingInternet = true;
@@ -501,6 +514,9 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
 }
 
 void QnServerUpdatesWidget::checkForUpdatesLocal() {
+    if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+        return;
+
     if (m_checkingLocal)
         return;
     m_checkingLocal = true;

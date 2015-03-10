@@ -509,6 +509,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SelectTimeServerAction).
         flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Select time server"));
 
     factory(Qn::PtzActivatePresetAction).
