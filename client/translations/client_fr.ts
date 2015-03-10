@@ -5979,6 +5979,22 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Provided storage path does not define a valid external storage.</source>
         <translation>Le chemin de stockage fourni ne définit pas un stockage externe valide.</translation>
     </message>
+    <message>
+        <source>Windows Network Shared Resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Coldstore Network Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>coldstore://&lt;Address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
