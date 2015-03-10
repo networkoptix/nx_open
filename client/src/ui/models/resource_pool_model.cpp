@@ -603,7 +603,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (server) {
         m_rootNodes[Qn::OtherSystemsNode]->update();
         for (const QnResourcePtr &resource: qnResPool->getResourcesByParentId(server->getId())) {
-            if (m_itemNodeByUuid.contains(resource->getId()))
+            if (m_resourceNodeByResource.contains(resource))
                 at_resource_parentIdChanged(resource);
         }
     }
