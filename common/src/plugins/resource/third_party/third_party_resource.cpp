@@ -648,7 +648,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         const char* paramDescXMLStr = m_cameraManager3->getParametersDescriptionXML();
         if( paramDescXMLStr != nullptr )
         {
-            QByteArray paramDescXML = QByteArray::fromRawData( paramDescXMLStr, strlen(paramDescXMLStr) );
+            QByteArray paramDescXML = QByteArray::fromRawData( paramDescXMLStr, static_cast<int>(strlen(paramDescXMLStr)) );
             QUrl schemaUrl( lit("qrc:/camera_settings/camera_settings.xsd") );
 
             //validating xml

@@ -1,7 +1,10 @@
 ----------------------------------------------2.3.0.xxxx-------------------------------------------
 Known Issues:
-#4452
-#4453
+
+Client cannot run on Windows 2003/XP x64.
+Server can’t be installed at some assemblies of windows Server 2008 and Windows Vista right from the box. It is necessary to download and install this package:
+ - http://www.microsoft.com/en-us/download/details.aspx?id=29 for x86 version
+ - http://www.microsoft.com/en-us/download/details.aspx?id=15336 for x64 version
 
 Features:
 

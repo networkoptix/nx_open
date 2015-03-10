@@ -69,6 +69,8 @@ unsigned int IPPH264Decoder::getDecoderCaps() const
 
 void IPPH264Decoder::setSpeed( float newValue )
 {
+    Q_UNUSED(newValue)
+    //TODO/IMPL
 }
 
 #endif

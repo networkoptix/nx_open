@@ -86,9 +86,9 @@ def checkText(source, target, context, result, index):
             if checkSymbol(symbol, source, target, context, warn):
                 result.warned += 1
                 break
-#            if checkSymbol(symbol, source, '', context, warn):
-#                result.warned += 1
-#                break
+            if checkSymbol(symbol, source, '', context, warn):
+                result.warned += 1
+                break             
             
 
     return result;

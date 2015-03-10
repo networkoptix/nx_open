@@ -196,7 +196,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     const QList<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
     const QList<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
 
-    if (!QnRuntimeInfoManager::instance()->items()->hasItem(qnCommon->remoteGUID())) {
+    if (QnRuntimeInfoManager::instance()->remoteInfo().isNull()) {
         emit showMessageLater(tr("License Activation"),
             tr("Network error has occurred during automatic license activation.") + L'\n' + tr("Try to activate your license manually."),
             true);
@@ -243,7 +243,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         hw++;
     }
 
-    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(qnCommon->remoteGUID()).data;
+    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->remoteInfo().data;
 
     params.addQueryItem(QLatin1String("box"), runtimeData.box);
     params.addQueryItem(QLatin1String("brand"), runtimeData.brand);

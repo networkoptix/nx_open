@@ -104,7 +104,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
         return false;
 
     const unsigned char* inbuf_ptr = (const unsigned char*) data->data();
-    int size = data->dataSize();
+    int size = static_cast<int>(data->dataSize());
     unsigned char* outbuf = (unsigned char*)result.data();
 
     int outbuf_len = 0;

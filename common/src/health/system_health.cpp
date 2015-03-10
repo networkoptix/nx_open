@@ -56,16 +56,16 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         messageParts << tr("Multiple servers have different time and correct time could not be detected automatically." );
         break;
     case QnSystemHealth::StoragesAreFull:
-        messageParts << tr("Storages are full on the following Server:") << lit("%1.").arg(resourceName);
+        messageParts << tr("Storages are full on the following Server:") << resourceName;
         break;
     case QnSystemHealth::StoragesNotConfigured:
-        messageParts << tr("Storages are not configured on the following Server:") << lit("%1.").arg(resourceName);
+        messageParts << tr("Storages are not configured on the following Server:") << resourceName;
         break;
     case QnSystemHealth::NoLicenses:
         messageParts << tr("You have no licenses.") << tr("You cannot record video from cameras.");
         break;
     case QnSystemHealth::ArchiveRebuildFinished:
-        messageParts << tr("Rebuilding archive index is completed on the following Server:") << lit("%1.").arg(resourceName);
+        messageParts << tr("Rebuilding archive index is completed on the following Server:") << resourceName;
         break;
     default:
         break;

@@ -276,6 +276,7 @@ QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manu
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& model, 
     const QString& mac, const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const
 {
+    Q_UNUSED(discoveryIp)
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
 
