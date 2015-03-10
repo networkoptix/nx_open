@@ -11,6 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <client/client_message_processor.h>
+#include <client/client_settings.h>
 
 #include <ui/common/palette.h>
 #include <ui/common/ui_resource_name.h>
@@ -284,7 +285,7 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
 }
 
 void QnServerUpdatesWidget::updateFromSettings() {
-    //do nothing
+    ui->updatesNotificationCheckbox->setChecked(qnSettings->isAutoCheckForUpdates());
 }
 
 bool QnServerUpdatesWidget::confirm() {
@@ -293,6 +294,7 @@ bool QnServerUpdatesWidget::confirm() {
         return false;
     }
 
+    qnSettings->setAutoCheckForUpdates(ui->updatesNotificationCheckbox->isChecked());
     return true;
 }
 
