@@ -513,15 +513,30 @@ void QnLayoutSettingsDialog::selectFile() {
     if(!dialog->exec())
         return;
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. */
-    if (!context()->user())
-        return;
-
     QString fileName = dialog->selectedFile();
     if (fileName.isEmpty())
         return;
 
     qnSettings->setBackgroundsFolder(QFileInfo(fileName).absolutePath());
+
+    QFileInfo fileInfo(fileName);
+    if (fileInfo.size() == 0) {
+        d->state = Error;
+        d->errorText = tr("<Image cannot be read>");
+        updateControls();
+        return;
+    }
+
+    if (fileInfo.size() > QnAppServerFileCache::maximumFileSize()) {
+        d->state = Error;
+        d->errorText = tr("<Image cannot be greater than %1 Mb>").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024));
+        updateControls();
+        return;
+    }
+
+    /* Check if we were disconnected (server shut down) while the dialog was open. */
+    if (!context()->user())
+        return;
 
     d->clear();
     d->imageSourcePath = fileName;
