@@ -18,8 +18,6 @@ QnCameraUserAttributes::QnCameraUserAttributes()
     minDays(0),
     maxDays(0)
 {
-	if (QnGlobalSettings::instance())
-		cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         motionRegions << QnMotionRegion();
 }
