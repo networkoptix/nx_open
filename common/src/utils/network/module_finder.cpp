@@ -136,7 +136,6 @@ void QnModuleFinder::at_responseReceived(QnModuleInformationEx moduleInformation
     qint64 currentTime = m_elapsedTimer.elapsed();
 
     m_lastResponse[url] = currentTime;
-    m_idByUrl[url] = moduleInformation.id;
 
     QnModuleInformationEx &oldInformation = m_foundModules[moduleInformation.id];
 
@@ -167,8 +166,7 @@ void QnModuleFinder::at_responseReceived(QnModuleInformationEx moduleInformation
             for (const QString &address: oldAddresses)
                 removeUrl(makeUrl(address, oldInformation.port));
 
-            if (!m_urlById.contains(moduleInformation.id, url))
-                m_urlById.insert(moduleInformation.id, url);
+            addUrl(url, moduleInformation.id);
 
             moduleInformation.remoteAddresses.clear();
             moduleInformation.remoteAddresses.insert(url.host());
@@ -201,9 +199,7 @@ void QnModuleFinder::at_responseReceived(QnModuleInformationEx moduleInformation
         return;
     }
 
-    if (!m_urlById.contains(moduleInformation.id, url))
-        m_urlById.insert(moduleInformation.id, url);
-
+    addUrl(url, moduleInformation.id);
     moduleInformation.remoteAddresses = moduleAddresses(moduleInformation.id);
 
     if (oldInformation != moduleInformation) {
@@ -227,10 +223,6 @@ void QnModuleFinder::at_responseReceived(QnModuleInformationEx moduleInformation
             NX_LOG(lit("QnModuleFinder: New module URL: %1 %2:%3")
                    .arg(moduleInformation.id.toString()).arg(address).arg(moduleInformation.port), cl_logDEBUG1);
 
-            QUrl url;
-            url.setScheme(lit("http"));
-            url.setHost(address);
-            url.setPort(moduleInformation.port);
             emit moduleUrlFound(moduleInformation, url);
         }
     }
@@ -269,6 +261,8 @@ void QnModuleFinder::removeUrl(const QUrl &url) {
 
     auto it = m_foundModules.find(id);
     Q_ASSERT_X(it != m_foundModules.end(), Q_FUNC_INFO, "Module information must exist here.");
+    if (it == m_foundModules.end())
+        return;
 
     if (it->remoteAddresses.remove(url.host())) {
         NX_LOG(lit("QnModuleFinder: Module URL lost: %1 %2:%3")
@@ -285,6 +279,12 @@ void QnModuleFinder::removeUrl(const QUrl &url) {
         NX_LOG(lit("QnModuleFinder: Module %1 is changed.").arg(it->id.toString()), cl_logDEBUG1);
         emit moduleChanged(*it);
     }
+}
+
+void QnModuleFinder::addUrl(const QUrl &url, const QnUuid &id) {
+    m_idByUrl[url] = id;
+    if (!m_urlById.contains(id, url))
+        m_urlById.insert(id, url);
 }
 
 void QnModuleFinder::handleSelfResponse(const QnModuleInformationEx &moduleInformation, const QUrl &url) {

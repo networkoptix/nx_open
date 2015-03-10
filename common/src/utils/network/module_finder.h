@@ -51,6 +51,7 @@ private slots:
 private:
     QSet<QString> moduleAddresses(const QnUuid &id) const;
     void removeUrl(const QUrl &url);
+    void addUrl(const QUrl &url, const QnUuid &id);
     void handleSelfResponse(const QnModuleInformationEx &moduleInformation, const QUrl &url);
 
 private:
