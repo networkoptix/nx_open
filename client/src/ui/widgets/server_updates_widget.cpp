@@ -285,7 +285,7 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
 }
 
 void QnServerUpdatesWidget::updateFromSettings() {
-    ui->updatesNotificationCheckbox->setChecked(qnSettings->isAutoCheckForUpdates());
+    ui->updatesNotificationCheckbox->setChecked(qnSettings->notifyAboutUpdates());
 }
 
 bool QnServerUpdatesWidget::confirm() {
@@ -294,7 +294,7 @@ bool QnServerUpdatesWidget::confirm() {
         return false;
     }
 
-    qnSettings->setAutoCheckForUpdates(ui->updatesNotificationCheckbox->isChecked());
+    qnSettings->setNotifyAboutUpdates(ui->updatesNotificationCheckbox->isChecked());
     return true;
 }
 
