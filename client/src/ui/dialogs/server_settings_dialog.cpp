@@ -142,6 +142,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
     connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
     connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString)), this, SLOT(at_updateRebuildInfo()));
+    for (const auto& storage: m_server->getStorages())
+        connect(storage.data(), &QnResource::statusChanged, this, &QnServerSettingsDialog::at_updateRebuildInfo);
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
@@ -547,7 +549,7 @@ void QnServerSettingsDialog::updateRebuildUi(const QnStorageScanData& reply) {
      ui->rebuildStartButton->setEnabled(reply.state == Qn::RebuildState_None);
      ui->rebuildStopButton->setEnabled(reply.state == Qn::RebuildState_FullScan);
 
-     if (oldState.state > Qn::RebuildState_None && reply.state == Qn::RebuildState_None) {
+     if (oldState.state == Qn::RebuildState_FullScan && reply.state == Qn::RebuildState_None) {
          emit rebuildArchiveDone();
          QMessageBox::information(this,
          tr("Finished"),

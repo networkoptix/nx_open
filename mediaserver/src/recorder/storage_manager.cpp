@@ -52,6 +52,8 @@ private:
     };
     QnStorageManager* m_owner;
     CLThreadQueue<ScanData> m_scanTasks;
+    QMutex m_mutex;
+    QWaitCondition m_waitCond;
     bool m_fullScanCanceled;
 public:
     ScanMediaFilesTask(QnStorageManager* owner): QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
@@ -63,7 +65,12 @@ public:
         ScanData scanData(storage, partialScan);
         if (m_scanTasks.contains(scanData))
             return;
+        if (m_scanTasks.isEmpty())
+            m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, QString(), 0.0));
+
+        QMutexLocker lock(&m_mutex);
         m_scanTasks.push(std::move(scanData));
+        m_waitCond.wakeAll();
     }
 
     bool hasFullScanTasks()
@@ -96,10 +103,13 @@ public:
                 m_fullScanCanceled = false;
             }
 
-            if (m_scanTasks.isEmpty()) {
-                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
-                msleep(100);
-                continue;
+            {
+                QMutexLocker lock(&m_mutex);
+                if (m_scanTasks.isEmpty()) {
+                    m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
+                    m_waitCond.wait(&m_mutex, 100);
+                    continue;
+                }
             }
 
             ScanData scanData = m_scanTasks.front();
@@ -129,13 +139,14 @@ public:
                         return;
                     ++currentStep;
                 }
+                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getPath(), 1.0));
             }
             else 
             {
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 0.0));
-                for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
-                    m_owner->loadFullFileCatalogFromMedia(scanData.storage, static_cast<QnServer::ChunksCatalog> (i), 1.0 / QnServer::ChunksCatalogCount);
-                }
+                m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::LowQualityCatalog, 0.5);
+                m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::HiQualityCatalog, 0.5);
+                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 1.0));
             }
             m_scanTasks.removeFirst(1);
         }
@@ -241,8 +252,10 @@ void QnStorageManager::initDone()
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
-    for(const QnStorageResourcePtr& storage: storages)
-        m_rebuildArchiveThread->addStorageToScan(storage, true);
+    for(const QnStorageResourcePtr& storage: storages) {
+        if (storage->getStatus() == Qn::Online)
+            m_rebuildArchiveThread->addStorageToScan(storage, true);
+    }
     m_rebuildArchiveThread->start();
 }
 
@@ -303,8 +316,10 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
     if (!m_rebuildArchiveThread->hasFullScanTasks()) 
     {
         m_rebuildCancelled = false;
-        for(const QnStorageResourcePtr& storage: getStorages())
-            m_rebuildArchiveThread->addStorageToScan(storage, false);
+        for(const QnStorageResourcePtr& storage: getStorages()) {
+            if (storage->getStatus() == Qn::Online)
+                m_rebuildArchiveThread->addStorageToScan(storage, false);
+        }
     }
     return result;
 }
@@ -1000,6 +1015,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         // add data before storage goes to the writable state
         doMigrateCSVCatalog(fileStorage);
         addDataFromDatabase(fileStorage);
+        m_rebuildArchiveThread->addStorageToScan(fileStorage, true);
     }
 
     fileStorage->setStatus(status);
@@ -1318,7 +1334,7 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
 // data migration from previous versions
 
 void QnStorageManager::doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage) {
-    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    for (int i = 0; i < QnServer::BookmarksCatalog; ++i)
         doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i), extraAllowedStorage);
 }
 
