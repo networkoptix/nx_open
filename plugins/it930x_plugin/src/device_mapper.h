@@ -16,18 +16,12 @@ namespace ite
     class DeviceMapper : public ObjectCounter<DeviceMapper>
     {
     public:
-        struct DevLink
-        {
-            uint16_t rxID;
-            uint16_t txID;
-            unsigned channel;
-        };
-
         DeviceMapper();
         ~DeviceMapper();
 
         void updateRxDevices();
         void updateTxDevices();
+        void restoreTxDevices();
 
         RxDevicePtr getRx(uint16_t rxID);
 
@@ -48,7 +42,6 @@ namespace ite
         mutable std::mutex m_mutex;
         std::map<unsigned short, RxDevicePtr> m_rxDevs;     // {RxID, RxDev}
         std::map<unsigned short, TxDevicePtr> m_txDevs;     // {TxID, TxDev}
-        std::vector<DevLink> m_restore;
 
         void addTxDevice(const DevLink& link);
 

@@ -55,6 +55,21 @@ namespace ite
         return false;
     }
 
+    bool RxDevice::wantedByCamera() const
+    {
+        {
+            std::unique_lock<std::mutex> cvLock( m_sync.mutex ); // LOCK
+
+            if (m_sync.waiting)
+                return true;
+        }
+
+        if (m_sync.usedByCamera)
+            return true;
+
+        return false;
+    }
+
     bool RxDevice::lockCamera(uint16_t txID)
     {
         using std::chrono::system_clock;
@@ -70,7 +85,6 @@ namespace ite
         {
             for (unsigned i = 0; i < 2; ++i)
             {
-
                 if (tryLockC(chan))
                 {
                     updateTxParams();
@@ -102,12 +116,18 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::tryLockC(unsigned channel)
+    bool RxDevice::tryLockC(unsigned channel, bool prio)
     {
         if (channel >= RxDevice::NOT_A_CHANNEL)
             return false;
 
+        if (! prio && wantedByCamera())
+            return false;
+
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        if (! prio && wantedByCamera())
+            return false;
 
         // prevent double locking at all (even with the same frequency)
         if (isLocked_u())
@@ -143,7 +163,7 @@ namespace ite
             m_devReader->stop();
 
         if (m_device)
-            m_device->closeStream();
+            m_device->unlockFrequency();
 
         m_txDev.reset();
         m_channel = NOT_A_CHANNEL;
@@ -182,23 +202,27 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::startSearchTx(unsigned channel)
+    void RxDevice::startSearchLost(unsigned lostNum)
     {
-        bool cantSearch = false;
+        unsigned num = 0;
+        for (size_t chan = 0; chan < m_txs.size(); ++chan)
         {
-            std::unique_lock<std::mutex> cvLock( m_sync.mutex ); // LOCK
+            if (m_txs[chan].lost)
+            {
+                if (num == lostNum)
+                {
+                    startSearchTx(chan);
+                    return;
+                }
 
-            if (m_sync.waiting)
-                cantSearch = true;
+                ++num;
+            }
         }
+    }
 
-        if (cantSearch || m_sync.usedByCamera)
-        {
-            printf("cant't search, used. Rx: %d; frequency: %d\n", rxID(), TxDevice::freq4chan(channel));
-            return false;
-        }
-
-        if (tryLockC(channel))
+    void RxDevice::startSearchTx(unsigned channel)
+    {
+        if (tryLockC(channel, false))
         {
 #if 1
             printf("searching Tx. Rx: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
@@ -210,18 +234,20 @@ namespace ite
                 m_devReader->start(m_device.get(), true);
             }
 
-            return true;
+            m_sync.searching.store(true);
         }
-
-        return false;
+        else
+        {
+            printf("cant't search, used. Rx: %d; frequency: %d\n", rxID(), TxDevice::freq4chan(channel));
+        }
     }
 
-    bool RxDevice::stopSearchTx(uint16_t& outTxID)
+    void RxDevice::stopSearchTx(DevLink& devLink)
     {
-        bool retVal = false;
-        outTxID = 0;
+        devLink.rxID = m_rxID;
+        devLink.txID = 0;
 
-        if (isLocked())
+        if (m_sync.searching && isLocked())
         {
             if (good())
             {
@@ -230,14 +256,20 @@ namespace ite
                 RCCommand cmd;
                 if (m_devReader->getRetChanCmd(cmd) && cmd.isOK())
                 {
-                    retVal = true;
-                    outTxID = cmd.txID();
-                    setTx(m_channel, outTxID);
+                    devLink.txID = cmd.txID();
+                    devLink.channel = m_channel;
+#if 1
+                    if (! devLink.txID)
+                        printf("txID == 0\n");
+#endif
+                    setTx(m_channel, devLink.txID);
 
                     while (m_devReader->getRetChanCmd(cmd))
                     {
-                        if (cmd.isOK() && cmd.txID() != outTxID)
-                            printf("-- Different TxIDs from one channel: %d vs %d\n", outTxID, cmd.txID());
+#if 1
+                        if (cmd.isOK() && cmd.txID() != devLink.txID)
+                            printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, cmd.txID());
+#endif
                     }
                 }
 
@@ -247,7 +279,7 @@ namespace ite
             unlockC();
         }
 
-        return retVal;
+        m_sync.searching.store(false);
     }
 
     // TODO

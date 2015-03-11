@@ -14,6 +14,17 @@ namespace ite
     unsigned str2num(std::string& s);
     std::string num2str(unsigned id);
 
+    struct DevLink
+    {
+        uint16_t rxID;
+        uint16_t txID;
+        unsigned channel;
+
+        DevLink()
+        :   rxID(0), txID(0), channel(0)
+        {}
+    };
+
     //!
     class RxDevice
     {
@@ -97,12 +108,13 @@ namespace ite
         void unsubscribe(unsigned stream) { m_devReader->unsubscribe(stream2pid(stream)); }
 
         bool lockCamera(uint16_t txID);
-        bool tryLockC(unsigned freq);
+        bool tryLockC(unsigned freq, bool prio = true);
         bool isLocked() const;
         void unlockC();
 
-        bool startSearchTx(unsigned channel);
-        bool stopSearchTx(uint16_t& outTxID);
+        void startSearchTx(unsigned channel);
+        void startSearchLost(unsigned lostNum);
+        void stopSearchTx(DevLink& outDevLink);
 
         const IteDriverInfo rxDriverInfo() const { return m_rxInfo; }
         const TxManufactureInfo txDriverInfo() const { return m_txDev->txDeviceInfo(); }
@@ -151,6 +163,17 @@ namespace ite
             return m_txs[channel].present;
         }
 
+        void checkTx(unsigned channel, uint16_t txID)
+        {
+#if 1
+            printf("restore Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
+#endif
+            if (channel >= m_txs.size())
+                return;
+
+            m_txs[channel].check(txID);
+        }
+
         unsigned chan4Tx(uint16_t txID) const
         {
             for (size_t i = 0; i < m_txs.size(); ++i)
@@ -182,33 +205,64 @@ namespace ite
             uint16_t lost;
 
             TX()
-            :   present(0), lost(0)
+            :   present(0), lost(0), m_lock(false)
             {}
 
             void set(uint16_t txID)
             {
+                bool expected = false;
+                while (! m_lock.compare_exchange_weak(expected, true))
+                    ;
+
                 present = txID;
                 lost = 0;
+
+                m_lock.store(false);
             }
 
             void lose()
             {
+                bool expected = false;
+                while (! m_lock.compare_exchange_weak(expected, true))
+                    ;
+
                 if (present)
+                {
                     lost = present;
-                present = 0;
+                    present = 0;
+                }
+
+                m_lock.store(false);
             }
+
+            void check(uint16_t txID)
+            {
+                bool expected = false;
+                while (! m_lock.compare_exchange_weak(expected, true))
+                    ;
+
+                if (present == 0)
+                    lost = txID;
+
+                m_lock.store(false);
+            }
+
+        private:
+            std::atomic_bool m_lock;
         };
 
         struct Sync
         {
-            std::mutex mutex;
+            mutable std::mutex mutex;
             std::condition_variable cond;
             std::atomic_bool usedByCamera;
             bool waiting;
+            std::atomic_bool searching;
 
             Sync()
             :   usedByCamera(false),
-                waiting(false)
+                waiting(false),
+                searching(false)
             {}
         };
 
@@ -230,6 +284,7 @@ namespace ite
         TxDevicePtr m_txDev;
 
         bool isLocked_u() const { return m_device.get() && m_device->hasStream(); }
+        bool wantedByCamera() const;
 
         bool open();
         bool stats();

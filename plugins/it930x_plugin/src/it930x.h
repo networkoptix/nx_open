@@ -145,7 +145,8 @@ namespace ite
         // both in KHz
         void lockFrequency(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
         {
-            closeStream();
+            if (m_devStream)
+                throw "It930x.lockFrequency() already locked";
 
             unsigned result = DTV_AcquireChannel(m_handle, frequency, bandwidth);
             if (result)
@@ -156,16 +157,21 @@ namespace ite
             if (result)
                 throw "DTV_IsLocked";
 
-            openStream();
+            m_devStream.reset( new It930Stream(this) );
         }
 
+        void unlockFrequency()
+        {
+            m_devStream.reset();
+        }
+#if 0
         bool isLocked() const
         {
             Bool locked = False;
             unsigned result = DTV_IsLocked(m_handle, &locked);
             return !result && (locked == True);
         }
-
+#endif
         void statistic(uint8_t& quality, uint8_t& strength, bool& presented, bool& locked) const
         {
             DTVStatistic statisic;
@@ -204,8 +210,6 @@ namespace ite
         }
 
         bool hasStream() const { return m_devStream.get(); }
-        void openStream() { m_devStream.reset( new It930Stream(this) ); }
-        void closeStream() { m_devStream.reset(); }
 
     private:
         int m_handle;

@@ -32,19 +32,16 @@ namespace ite
 
         void operator () ()
         {
-            //static std::chrono::seconds s1(1);
-            static std::chrono::seconds s10(10);
+            static const unsigned RESTORE_DELAY_S = 4;
+            static std::chrono::seconds delay(RESTORE_DELAY_S);
 
             updateThreadObj = this;
 
-            std::this_thread::sleep_for(s10);
+            std::this_thread::sleep_for(delay);
 
             while (!m_stopMe)
             {
                 m_devMapper->updateRxDevices();
-
-                // TODO: restored
-
                 m_devMapper->updateTxDevices();
             }
 
@@ -64,6 +61,8 @@ namespace ite
     {
         try
         {
+            updateRxDevices();
+
             updateThread = std::thread( RC_DiscoveryThread(this) );
         }
         catch (std::system_error& )
@@ -155,26 +154,44 @@ namespace ite
             }
         }
 
-        for (unsigned chan = 0; chan < TxDevice::CHANNELS_NUM; ++chan)
-        {
-            std::vector<bool> toStop(scanDevs.size(), true);
+        std::vector<DevLink> links;
 
+        // restore lost
+        for (unsigned lostN = 0; lostN < TxDevice::CHANNELS_NUM; ++lostN)
+        {
             for (size_t i = 0; i < scanDevs.size(); ++i)
-            {
-                if (! scanDevs[i]->startSearchTx(chan))
-                    toStop[i] = false;
-            }
+                scanDevs[i]->startSearchLost(lostN);
 
             for (size_t i = 0; i < scanDevs.size(); ++i)
             {
                 DevLink link;
-                if (toStop[i] && scanDevs[i]->stopSearchTx(link.txID))
-                {
-                    link.rxID = scanDevs[i]->rxID();
-                    link.channel = chan;
-                    addTxDevice(link);
-                }
+                scanDevs[i]->stopSearchTx(link);
+                if (link.txID)
+                    links.push_back(link);
             }
+
+            for (auto it = links.begin(); it != links.end(); ++it)
+                addTxDevice(*it);
+            links.clear();
+        }
+
+        // normal channel search
+        for (unsigned chan = 0; chan < TxDevice::CHANNELS_NUM; ++chan)
+        {
+            for (size_t i = 0; i < scanDevs.size(); ++i)
+                scanDevs[i]->startSearchTx(chan);
+
+            for (size_t i = 0; i < scanDevs.size(); ++i)
+            {
+                DevLink link;
+                scanDevs[i]->stopSearchTx(link);
+                if (link.txID)
+                    links.push_back(link);
+            }
+
+            for (auto it = links.begin(); it != links.end(); ++it)
+                addTxDevice(*it);
+            links.clear();
         }
 
 #if 1
@@ -186,6 +203,31 @@ namespace ite
         }
         printf("got TX devices: %ld\n", numTx);
 #endif
+    }
+
+    void DeviceMapper::restoreCamera(const nxcip::CameraInfo& info)
+    {
+        DevLink link;
+
+        std::vector<unsigned short> rxIDs;
+        unsigned freq;
+        DeviceMapper::parseInfo(info, link.txID, freq, rxIDs);
+        link.channel = TxDevice::chan4freq(freq);
+
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        for (auto it = rxIDs.begin(); it != rxIDs.end(); ++it)
+        {
+            link.rxID = *it;
+
+            auto itDev = m_rxDevs.find(link.rxID);
+            if (itDev != m_rxDevs.end())
+            {
+                RxDevicePtr dev = itDev->second;
+                if (dev)
+                    dev->checkTx(link.channel, link.txID);
+            }
+        }
     }
 
     RxDevicePtr DeviceMapper::getRx(uint16_t rxID)
@@ -201,6 +243,10 @@ namespace ite
 
     void DeviceMapper::addTxDevice(const DevLink& link)
     {
+#if 1
+        printf("device link Rx: %d; Tx: %d; channel: %d\n", link.rxID, link.txID, link.channel);
+#endif
+
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         unsigned freq = TxDevice::freq4chan(link.channel);
@@ -231,24 +277,6 @@ namespace ite
         if (it != m_txDevs.end())
             return it->second->frequency();
         return 0;
-    }
-
-    void DeviceMapper::restoreCamera(const nxcip::CameraInfo& info)
-    {
-        DevLink link;
-
-        std::vector<unsigned short> rxIDs;
-        unsigned freq;
-        DeviceMapper::parseInfo(info, link.txID, freq, rxIDs);
-        link.channel = TxDevice::chan4freq(freq);
-
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        for (auto it = rxIDs.begin(); it != rxIDs.end(); ++it)
-        {
-            link.rxID = *it;
-            m_restore.push_back(link);
-        }
     }
 
     // CameraInfo stuff
