@@ -68,10 +68,10 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
     if (m_latestVersion == updateVersion || qnSettings->ignoredUpdateVersion() >= updateVersion || qnCommon->engineVersion() >= updateVersion)
         return;
 
-    m_latestVersion = updateVersion;
-
     if (!qnSettings->isAutoCheckForUpdates())
         return;
+
+    m_latestVersion = updateVersion;
 
     QnSoftwareVersion current = qnCommon->engineVersion();
     bool majorVersionChange = updateVersion.major() > current.major() || updateVersion.minor() > current.minor();
