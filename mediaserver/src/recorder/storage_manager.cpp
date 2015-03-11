@@ -186,21 +186,23 @@ QnStorageManager::QnStorageManager():
     m_mutexStorages(QMutex::Recursive),
     m_mutexCatalog(QMutex::Recursive),
     m_storagesStatisticsReady(false),
-    m_catalogLoaded(false),
     m_warnSended(false),
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
-    m_rebuildArchiveThread(0),
-    m_initInProgress(true)
+    m_rebuildArchiveThread(0)
 {
-    m_lastTestTime.restart();
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
 
     assert( QnStorageManager_instance == nullptr );
     QnStorageManager_instance = this;
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::DirectConnection);
     m_oldStorageIndexes = deserializeStorageFile();
+
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
+
+    m_rebuildArchiveThread = new ScanMediaFilesTask(this);
+    m_rebuildArchiveThread->start();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -236,27 +238,9 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
     fileCatalog->addChunks(newChunks);
 }
 
-
 void QnStorageManager::initDone()
 {
-    m_catalogLoaded = true;
-
-    m_initInProgress = false;
-    auto storages = getStorages();
-    for(const QnStorageResourcePtr& storage: storages) {
-        if (storage->getStatus() == Qn::Online)
-            addDataFromDatabase(storage);
-    }
-    disconnect(qnResPool);
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
-
-    m_rebuildArchiveThread = new ScanMediaFilesTask(this);
-    for(const QnStorageResourcePtr& storage: storages) {
-        if (storage->getStatus() == Qn::Online)
-            m_rebuildArchiveThread->addStorageToScan(storage, true);
-    }
-    m_rebuildArchiveThread->start();
+    QTimer::singleShot(0, this, SLOT(testOfflineStorages()));
 }
 
 QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
@@ -342,11 +326,6 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
     QMutexLocker lock(&m_rebuildStateMtx);
     m_archiveRebuildInfo = data;
-}
-
-bool QnStorageManager::isCatalogLoaded() const
-{
-    return m_catalogLoaded;
 }
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff)
@@ -524,26 +503,11 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
         //if (oldStorage)
         //    storage->addWritedSpace(oldStorage->getWritedSpace());
+        storage->setStatus(Qn::Offline); // we will check status after
         m_storageRoots.insert(storageIndex, storage);
-        if (storage->isStorageAvailable())
-            storage->setStatus(Qn::Online);
-        else
-            storage->setStatus(Qn::Offline);
-
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), 
                 this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
     }
-#if 1
-    if (m_catalogLoaded && storage->getStatus() == Qn::Online) {
-        doMigrateCSVCatalog();
-        addDataFromDatabase(storage);
-
-        m_rebuildArchiveThread->addStorageToScan(storage, true);
-    }
-#else
-    if (storage->getStatus() == Qn::Online)
-        loadFullFileCatalog(storage);
-#endif
     updateStorageStatistics();
 }
 
@@ -564,20 +528,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     connect(resource.data(), &QnResource::resourceChanged, this, &QnStorageManager::at_storageChanged);
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == qnCommon->moduleGUID()) 
-    {
-#if 0
-        if (m_initInProgress) {
-            addStorage(storage);
-        }
-        else {
-            AddStorageTask *task = new AddStorageTask(storage);
-            task->setAutoDelete(true);
-            QThreadPool::globalInstance()->start(task);
-        }
-#else
         addStorage(storage);
-#endif
-    }
 }
 
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
@@ -727,9 +678,6 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
 
 void QnStorageManager::clearSpace()
 {
-    if (!m_catalogLoaded)
-        return;
-
     testOfflineStorages();
     {
         QMutexLocker lock(&m_sdbMutex);
@@ -1027,12 +975,8 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 void QnStorageManager::testOfflineStorages()
 {
     QMutexLocker lock(&m_mutexStorages);
-
-    if (m_lastTestTime.elapsed() < OFFLINE_STORAGES_TEST_INTERVAL || m_testStorageThread->isRunning())
-        return;
-
-    m_testStorageThread->start();
-    m_lastTestTime.restart();
+    if (!m_testStorageThread->isRunning())
+        m_testStorageThread->start();
 }
 
 void QnStorageManager::stopAsyncTasks()
@@ -1084,7 +1028,6 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     QnStorageResourcePtr result;
     float minBitrate = (float) INT_MAX;
 
-    testOfflineStorages();
     updateStorageStatistics();
 
     QVector<QPair<float, QnStorageResourcePtr> > bitrateInfo;
@@ -1192,15 +1135,11 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
 
 DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix)
 {
-    if (!m_catalogLoaded)
-        return DeviceFileCatalogPtr();
     return getFileCatalogInternal(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(catalogPrefix));
 }
 
 DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
-    if (!m_catalogLoaded)
-        return DeviceFileCatalogPtr();
     return getFileCatalogInternal(cameraUniqueId, catalog);
 }
 

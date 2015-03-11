@@ -120,6 +120,7 @@ public slots:
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
     void at_storageChanged(const QnResourcePtr &storage);
+    void testOfflineStorages();
 private:
     friend class TestStorageThread;
 
@@ -129,8 +130,6 @@ private:
     void getTimePeriodInternal(QVector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
-    void testOfflineStorages();
-    bool isCatalogLoaded() const;
 
     int getFileNumFromCache(const QString& base, const QString& folder);
     void putFileNumToCache(const QString& base, int fileNum);
@@ -168,10 +167,8 @@ private:
     typedef QMap<QString, QPair<QString, int > > FileNumCache;
     FileNumCache m_fileNumCache;
     QMutex m_cacheMutex;
-    bool m_catalogLoaded;
     bool m_warnSended;
     bool m_isWritableStorageAvail;
-    QElapsedTimer m_lastTestTime;
     QElapsedTimer m_storageWarnTimer;
     static TestStorageThread* m_testStorageThread;
     QMap<QnUuid, bool> m_diskFullWarned;
