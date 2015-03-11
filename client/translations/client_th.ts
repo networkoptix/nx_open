@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="th" sourcelanguage="en">
+<TS version="2.0" language="th" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -325,7 +325,7 @@
         <source>High quality</source>
         <translation>คุณภาพสูง</translation>
     </message>
-    <message>
+    <message utf8="true">
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation>คำเตือน! ที่มีคุณภาพสูงอาจส่งผลให้เกินพิกัดของ CPU เซิร์ฟเวอร์ข้อผิดพลาดการเชื่อมต่อเครือข่ายและปัญหาอื่น ๆ.</translation>
     </message>
@@ -4795,14 +4795,18 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnPerformance</name>
+    <name>QnPerformanceTest</name>
     <message>
-        <source>Warning</source>
-        <translation>คำเตือน</translation>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Performance of this computer allows running %1 in configuration mode only. For full-featured mode please use another computer.</source>
-        <translation>ประสิทธิภาพการทำงานของคอมพิวเตอร์เครื่องนี้ช่วยให้การทำงาน %1 ในโหมดการตั้งค่าเท่านั้น สำหรับโหมดเต็มรูปแบบกรุณาใช้คอมพิวเตอร์เครื่องอื่น.</translation>
+        <source>For full-featured mode please use another computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6025,7 +6029,7 @@ Short for &quot;seconds&quot;</extracomment>
         <source>auto</source>
         <comment>AM/PM usage based on user&apos;s system locale.</comment>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">อัตโนมัติ</translation>
     </message>
     <message>
         <source>ms</source>
