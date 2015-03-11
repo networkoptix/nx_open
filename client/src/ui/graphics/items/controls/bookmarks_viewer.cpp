@@ -78,8 +78,7 @@ namespace
         , QGraphicsItem *parent
         , QGraphicsLinearLayout *layout
         , int insertionIndex
-        , LabelParamIds labelParamsId
-        , const QColor &backgroundColor)
+        , LabelParamIds labelParamsId)
     {
         const QString trimmedText = text.trimmed();
 
@@ -105,7 +104,7 @@ namespace
             font.setItalic(params.italic);
             label->setFont(font);
 
-            setPaletteColor(label, QPalette::Background, backgroundColor);
+            setPaletteColor(label, QPalette::Background, Qt::transparent);
 
             label->setWordWrap(true);
             label->setMaximumWidth(kBookmarkFrameWidth);
@@ -137,15 +136,14 @@ namespace
     QnProxyLabel *createButtonLabel(const QString &caption
         , const QString &id
         , QGraphicsItem *parent
-        , const ButtonLabelHandlerType &handler
-        , const QColor &backgroundColor)
+        , const ButtonLabelHandlerType &handler)
     {
         QnProxyLabel *label = new QnProxyLabel(parent);
         label->setText(kLinkTemplate.arg(id, caption));
         label->setTextInteractionFlags(Qt::TextBrowserInteraction);
         QObject::connect(label, &QnProxyLabel::linkActivated, label, [handler](const QString &id) { handler(id); });
         
-        setPaletteColor(label, QPalette::Background, backgroundColor);
+        setPaletteColor(label, QPalette::Background, Qt::transparent);
 
         return label;
     }
@@ -279,14 +277,13 @@ namespace
 
         /// TODO #ynikitenkov : Add visibility constraints according to buisiness logic
 
-        const QColor backgroundColor = palette().color(QPalette::Background);
         QGraphicsLinearLayout *actionsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
         QnProxyLabel *editActionLabel =
             createButtonLabel(QnBookmarksViewerStrings::editCaption(), kEditActionAnchorName, this
-            , std::bind(&BookmarkToolTipFrame::onBookmarkAction, this, std::placeholders::_1), backgroundColor);
+            , std::bind(&BookmarkToolTipFrame::onBookmarkAction, this, std::placeholders::_1));
         QnProxyLabel *removeActionLabel =
             createButtonLabel(QnBookmarksViewerStrings::removeCaption(), kRemoveActoinAnchorName, this
-            , std::bind(&BookmarkToolTipFrame::onBookmarkAction, this, std::placeholders::_1), backgroundColor);
+            , std::bind(&BookmarkToolTipFrame::onBookmarkAction, this, std::placeholders::_1));
 
         actionsLayout->addItem(removeActionLabel);
         actionsLayout->addStretch();
@@ -386,10 +383,9 @@ namespace
         m_bookmark = bookmark;
 
         enum { kFirstPosition = 0 };
-        const QColor backgroundColor = palette().color(QPalette::Background);
-        int position = renewLabel(m_name, bookmark.name, this, m_layout, kFirstPosition, kNameLabelIndex, backgroundColor);
-        position = renewLabel(m_description, bookmark.description, this, m_layout, position, kDescriptionLabelIndex, backgroundColor);
-        position = renewLabel(m_tags, tagsToString(bookmark.tags), this, m_layout, position, kTagsLabelIndex, backgroundColor);
+        int position = renewLabel(m_name, bookmark.name, this, m_layout, kFirstPosition, kNameLabelIndex);
+        position = renewLabel(m_description, bookmark.description, this, m_layout, position, kDescriptionLabelIndex);
+        position = renewLabel(m_tags, tagsToString(bookmark.tags), this, m_layout, position, kTagsLabelIndex);
     }
 
     const QnCameraBookmark &BookmarkToolTipFrame::bookmark() const
