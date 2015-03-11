@@ -402,7 +402,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             {
                 if (m_decodeMode == DecodeMode_Fastest)
                     return false;
-                else if (m_frameTypeExtractor->getFrameType((quint8*) data->data(), data->dataSize()) == FrameTypeExtractor::B_Frame)
+                else if (m_frameTypeExtractor->getFrameType((quint8*) data->data(), static_cast<int>(data->dataSize())) == FrameTypeExtractor::B_Frame)
                     return false;
             }
         }
@@ -426,7 +426,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         AVPacket avpkt;
         av_init_packet(&avpkt);
         avpkt.data = (unsigned char*)data->data();
-        avpkt.size = data->dataSize();
+        avpkt.size = static_cast<int>(data->dataSize());
         avpkt.dts = avpkt.pts = data->timestamp;
         // HACK for CorePNG to decode as normal PNG by default
         avpkt.flags = AV_PKT_FLAG_KEY;

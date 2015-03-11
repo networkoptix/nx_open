@@ -84,19 +84,20 @@ int MotionDataPicture::planeCount() const
 //!Width (pixels)
 int MotionDataPicture::width() const
 {
-    return m_width;
+    //TODO: #ak why are the fields are declared as size_t and getters as int?
+    return static_cast<int>(m_width);
 }
 
 //!Hidth (pixels)
 int MotionDataPicture::height() const
 {
-    return m_height;
+    return static_cast<int>(m_height);
 }
 
 //!Length of horizontal line in bytes
 int MotionDataPicture::xStride( int /*planeNumber*/ ) const
 {
-    return m_stride;
+    return static_cast<int>(m_stride);
 }
 
 //!Returns pointer to horizontal line \a lineNumber (starting with 0)

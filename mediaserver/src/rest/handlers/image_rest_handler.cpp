@@ -17,6 +17,7 @@ extern "C"
 #include "utils/network/tcp_connection_priv.h"
 #include <utils/math/math.h>
 #include "core/resource/network_resource.h"
+#include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"

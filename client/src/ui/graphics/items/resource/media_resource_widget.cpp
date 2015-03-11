@@ -134,7 +134,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     , m_currentTime(kInvalidTime)
     , m_bookmarks()
-    , m_bookmarksBeginPosition(m_bookmarks.begin())
+    , m_bookmarksBeginPosition(m_bookmarks.cbegin())
     , m_dataLoader(context->instance<QnCameraDataManager>()->loader(m_resource->toResourcePtr()))
 {
     updateBookmarks();
@@ -142,7 +142,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_dataLoader, &QnCachingCameraDataLoader::loadingFailed, this, [this]()
     {
         m_bookmarks = QnCameraBookmarkList();
-        m_bookmarksBeginPosition = m_bookmarks.begin();
+        m_bookmarksBeginPosition = m_bookmarks.cbegin();
     });
     connect(m_dataLoader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type)
     {
@@ -1327,7 +1327,7 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
 void QnMediaResourceWidget::updateBookmarks()
 {
     m_bookmarks = m_dataLoader->bookmarks();
-    m_bookmarksBeginPosition = m_bookmarks.begin();
+    m_bookmarksBeginPosition = m_bookmarks.cbegin();
 
     if (m_currentTime != kInvalidTime)
         updateCurrentTime(m_currentTime);
@@ -1335,6 +1335,10 @@ void QnMediaResourceWidget::updateBookmarks()
 
 void QnMediaResourceWidget::updateCurrentTime(qreal timeMs)
 {
+    if (m_bookmarks.empty())
+    {
+        int i = 0;
+    }
     if (timeMs < m_currentTime)
         m_bookmarksBeginPosition = m_bookmarks.cbegin();
 
@@ -1349,16 +1353,12 @@ void QnMediaResourceWidget::updateCurrentTime(qreal timeMs)
     static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
 
     QString text;
-    std::find_if(m_bookmarksBeginPosition, m_bookmarks.cend()
-        , [&text, timeMs](const QnCameraBookmark &bookmark) -> bool 
+    auto itBookmark = m_bookmarksBeginPosition;
+    while((itBookmark != m_bookmarks.cend()) && (itBookmark->startTimeMs <= timeMs))
     {
-        if (bookmark.startTimeMs <= timeMs)
-        {
-            text += outputTemplate.arg(bookmark.name, bookmark.description);
-            return false;
-        }
-        return true;
-    });
+        text += outputTemplate.arg(itBookmark->name, itBookmark->description);
+        ++itBookmark;
+    }
 
     setBookmarksLabelText(text);
 }

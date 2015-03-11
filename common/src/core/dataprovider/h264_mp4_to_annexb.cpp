@@ -48,8 +48,8 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
         readH264SeqHeaderFromExtraData( videoPacket, &seqHeader );
         if( seqHeader.size() > 0 )
         {
-            QnByteArray mediaDataWithSeqHeader( FF_INPUT_BUFFER_PADDING_SIZE, seqHeader.size() + videoPacket->dataSize() );
-            mediaDataWithSeqHeader.resize( seqHeader.size() + videoPacket->dataSize() );
+            QnByteArray mediaDataWithSeqHeader( FF_INPUT_BUFFER_PADDING_SIZE, static_cast<unsigned int>(seqHeader.size() + videoPacket->dataSize()) );
+            mediaDataWithSeqHeader.resize( static_cast<unsigned int>(seqHeader.size() + videoPacket->dataSize()) );
             memcpy( mediaDataWithSeqHeader.data(), seqHeader.data(), seqHeader.size() );
             memcpy( mediaDataWithSeqHeader.data() + seqHeader.size(), videoPacket->data(), videoPacket->dataSize() );
             videoPacket->m_data = mediaDataWithSeqHeader;

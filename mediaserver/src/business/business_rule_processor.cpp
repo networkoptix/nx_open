@@ -821,7 +821,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
             if (resList.isEmpty())
                 resList = qnResPool->getAllCameras(QnResourcePtr(), true);
 
-            for(const QnVirtualCameraResourcePtr camera: resList)
+            for(const QnVirtualCameraResourcePtr &camera: resList)
             {
                 if( isRuleAdded )
                     camera->inputPortListenerAttached();
