@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="th" sourcelanguage="en">
+<TS version="2.1" language="th" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -325,7 +325,7 @@
         <source>High quality</source>
         <translation>คุณภาพสูง</translation>
     </message>
-    <message utf8="true">
+    <message>
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation>คำเตือน! ที่มีคุณภาพสูงอาจส่งผลให้เกินพิกัดของ CPU เซิร์ฟเวอร์ข้อผิดพลาดการเชื่อมต่อเครือข่ายและปัญหาอื่น ๆ.</translation>
     </message>
@@ -570,10 +570,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>ConnectionTestingDialog</name>
     <message>
         <source>Connection Test</source>
-        <translatorcomment>123</translatorcomment>
-        <translation>   &lt;String Id=&quot;DiskCostDlg_Title&quot;                                  Overridable=&quot;yes&quot;&gt;${company.name} ${product.name} Setup v.${release.version}&lt;/String&gt;
-    &lt;String Id=&quot;ErrorDlg_Title&quot;                                     Overridable=&quot;yes&quot;&gt;${company.name} ${product.name} Setup v.${release.version}&lt;/String&gt;
-    &lt;String Id=&quot;ExitDialog_Title&quot;                                   Overridable=&quot;yes&quot;&gt;${company.name} ${product.name} Setup v.${release.version}&lt;/String&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Testing connection...</source>
