@@ -7570,7 +7570,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>ResourceListDialog</name>
     <message>
         <source>Never suggest saving layouts</source>
-        <translation>never suggest saving layouts</translation>
+        <translation>Never suggest saving layouts</translation>
     </message>
 </context>
 <context>
