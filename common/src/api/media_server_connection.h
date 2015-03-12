@@ -195,7 +195,7 @@ public:
         QObject* target, const char* slot );
 
     /**
-        \param slot Slot MUST have signature (int, QnRebuildArchiveReply, int)
+        \param slot Slot MUST have signature (int, QnStorageScanData, int)
         \returns Request handle. -1 In case of failure to start async request
      */
     int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);

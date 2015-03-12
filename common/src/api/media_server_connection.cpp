@@ -258,10 +258,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished( this, response.status, QString::fromUtf8(response.data), handle );
         break;
     case RebuildArchiveObject: {
-        QnRebuildArchiveReply info;
-        if (response.status == 0)
-            info.deserialize(response.data);
-        emitFinished(this, response.status, info, handle);
+        processJsonReply<QnStorageScanData>(this, response, handle);
         break;
     }
     case BookmarkAddObject: 
@@ -693,7 +690,7 @@ int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, QObject
         params << QnRequestParam("action",  lit("start"));
     else if (action == RebuildAction_Cancel)
         params << QnRequestParam("action",  lit("stop"));
-    return sendAsyncGetRequest(RebuildArchiveObject, params, QN_STRINGIZE_TYPE(QnRebuildArchiveReply), target, slot);
+    return sendAsyncGetRequest(RebuildArchiveObject, params, QN_STRINGIZE_TYPE(QnStorageScanData), target, slot);
 }
 
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {

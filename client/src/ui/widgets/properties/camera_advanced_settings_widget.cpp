@@ -347,7 +347,7 @@ void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, 
         if (!it->second) {
             QString formattedParam(lit("Advanced->") + it->first.right(it->first.length() - 2));
             failedParams += lit("\n");
-            failedParams += formattedParam.replace(lit("%%"), lit("->")); // TODO: #Elric #TR
+            failedParams += formattedParam.replace(lit("%%"), lit("->"));
         }
     }
 

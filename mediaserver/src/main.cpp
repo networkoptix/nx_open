@@ -726,13 +726,6 @@ int serverMain(int argc, char *argv[])
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(argv[0])), cl_logALWAYS);
     }
 
-    if (cmdLineArguments.rebuildArchive == "all")
-        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
-    else if (cmdLineArguments.rebuildArchive == "hq")
-        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_HQ);
-    else if (cmdLineArguments.rebuildArchive == "lq")
-        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
-
     NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
     NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
     NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
@@ -1938,9 +1931,7 @@ void QnMain::run()
     for(const QnAbstractStorageResourcePtr &storage: modifiedStorages)
         messageProcessor->updateResource(storage);
 
-    qnStorageMan->doMigrateCSVCatalog();
     qnStorageMan->initDone();
-
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
     updateAllowCameraCHangesIfNeed();

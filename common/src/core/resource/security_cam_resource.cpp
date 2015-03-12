@@ -681,6 +681,8 @@ void QnSecurityCamResource::setCameraControlDisabled(bool value) {
 }
 
 bool QnSecurityCamResource::isCameraControlDisabled() const {
+    if (QnGlobalSettings::instance() && !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled())
+        return true;
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     return (*userAttributesLock)->cameraControlDisabled;
 }

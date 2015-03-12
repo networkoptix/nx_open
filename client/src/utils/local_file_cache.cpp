@@ -40,7 +40,7 @@ void QnLocalFileCache::storeImageData(const QString &fileName, const QImage &ima
     if (QFileInfo(fullPath).exists())
         return;
 
-    image.save(fullPath, "png");
+    image.save(fullPath);
 }
 
 void QnLocalFileCache::downloadFile(const QString &filename) {

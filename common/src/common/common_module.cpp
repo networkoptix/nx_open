@@ -13,7 +13,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <utils/common/product_features.h>
-#include <api/runtime_info_manager.h>
 
 
 QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
@@ -97,7 +96,7 @@ QnModuleInformationEx QnCommonModule::moduleInformation() const
         QMutexLocker lk(&m_mutex);
         moduleInformationCopy = m_moduleInformation;
         moduleInformationCopy.systemName = m_localSystemName;
-        moduleInformationCopy.runtimeId = QnRuntimeInfoManager::instance()->localInfo().uuid;
+        moduleInformationCopy.runtimeId = runningInstanceGUID();
     }
     //filling dynamic fields
     if (qnResPool) {

@@ -6,7 +6,6 @@
 #include <utils/network/module_information.h>
 #include <utils/common/model_functions.h>
 #include <common/common_module.h>
-#include <api/runtime_info_manager.h>
 
 int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
@@ -20,9 +19,7 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
             modules.append(server->getModuleInformation());
         result.setReply(modules);
     } else {
-        QnModuleInformationEx moduleInformation = qnCommon->moduleInformation();
-        moduleInformation.runtimeId = QnRuntimeInfoManager::instance()->localInfo().uuid;
-        result.setReply(moduleInformation);
+        result.setReply(qnCommon->moduleInformation());
     }
     return CODE_OK;
 }

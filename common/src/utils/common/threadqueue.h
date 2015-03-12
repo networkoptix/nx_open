@@ -38,7 +38,17 @@ public:
     {
         return m_bufferLen == 0;
     }
-    
+
+    bool contains(const T& val) const
+    { 
+        QMutexLocker mutex(&m_cs);
+        for (int i = 0; i < m_bufferLen; ++i) {
+            if (atUnsafe(i) == val)
+                return true;
+        }
+        return false;
+    }
+
     bool push(const T& val) 
     { 
         QMutexLocker mutex(&m_cs);
@@ -139,7 +149,7 @@ public:
     }
 
     template <class ConditionFunc>
-    void detachDataByCondition(const ConditionFunc& cond, QVariant opaque)
+    void detachDataByCondition(const ConditionFunc& cond, const QVariant& opaque = QVariant())
     {
         QMutexLocker mutex(&m_cs);
         int index = m_headIndex;

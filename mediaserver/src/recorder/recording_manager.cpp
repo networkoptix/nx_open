@@ -581,10 +581,6 @@ void QnRecordingManager::onTimer()
     }
 
     QnStorageManager* storageMan = QnStorageManager::instance();
-    if (!someRecordingIsPresent && storageMan->rebuildState() == QnStorageManager::RebuildState_WaitForRecordersStopped)
-    {
-        storageMan->setRebuildState(QnStorageManager::RebuildState_Started);
-    }
 
     QMap<QnSecurityCamResourcePtr, qint64> stopList = m_delayedStop;
     for (QMap<QnSecurityCamResourcePtr, qint64>::iterator itrDelayedStop = stopList.begin(); itrDelayedStop != stopList.end(); ++itrDelayedStop)

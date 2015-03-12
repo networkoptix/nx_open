@@ -177,7 +177,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
-    qRegisterMetaType<QnRebuildArchiveReply>();
+    qRegisterMetaType<QnStorageScanData>();
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
@@ -203,6 +203,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
+    qRegisterMetaType<Qn::RebuildState>();
 
     qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QnModuleInformationEx>();
