@@ -17,57 +17,58 @@
 
 struct QnMultiserverChunksRestHandler::InternalContext
 {
-    InternalContext(): requestsInProgress(0) {}
+    InternalContext(const QString& urlPath, const QnChunksRequestData& request): urlPath(urlPath), request(request), requestsInProgress(0) {}
 
-    QString urlPath;
+    const QString urlPath;
+    const QnChunksRequestData request;
     QMutex mutex;
     QWaitCondition waitCond;
     int requestsInProgress;
 };
 
-void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataList& outputData, QnMediaServerResourcePtr server, const QnChunksRequestData& request, InternalContext* ctx)
+void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataList& outputData, QnMediaServerResourcePtr server, InternalContext* ctx)
 {
 
-    auto requestCompletionFunc = [&] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
+    auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
     {
-        if( osErrorCode != SystemError::noError || statusCode != nx_http::StatusCode::ok )
-            return;
+        MultiServerPeriodDataList remoteData;
         bool success = false;
-        MultiServerPeriodDataList result = QnCompressedTime::deserialized(msgBody, MultiServerPeriodDataList(), &success);
+        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok )
+            remoteData = QnCompressedTime::deserialized(msgBody, MultiServerPeriodDataList(), &success);
+        
         QMutexLocker lock(&ctx->mutex);
-        if (success && !result.empty())
-            outputData.push_back(std::move(result.front()));
+        if (success && !remoteData.empty())
+            outputData.push_back(std::move(remoteData.front()));
         ctx->requestsInProgress--;
         ctx->waitCond.wakeAll();
     };
 
     QUrl apiUrl(server->getApiUrl());
     apiUrl.setPath(ctx->urlPath);
-    QUrlQuery query;
-    query.addQueryItem("format", QnLexical::serialized(Qn::CompressedTimePeriods));
-    query.addQueryItem("isLocal", QString());
-    apiUrl.setQuery(query);
+
+    QnChunksRequestData modifiedRequest = ctx->request;
+    modifiedRequest.format = Qn::CompressedPeriodsFormat;
+    modifiedRequest.isLocal = true;
+    apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
     nx_http::HttpHeaders headers;
-
     auto route = QnRouter::instance()->routeTo(server->getId());
     if (route.isValid()) {
         apiUrl.setHost(route.points.first().host);
         apiUrl.setPort(route.points.first().port);
         headers.emplace("x-server-guid", server->getId().toByteArray());
     }
-    {
-        QMutexLocker lock(&ctx->mutex);
+
+    QMutexLocker lock(&ctx->mutex);
+    if (nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers))
         ctx->requestsInProgress++;
-    }
-    nx_http::downloadFileAsync( route.points.first().url(), requestCompletionFunc, headers);
 }
 
-void QnMultiserverChunksRestHandler::loadLocalData(MultiServerPeriodDataList& outputData, const QnChunksRequestData& request, InternalContext* ctx)
+void QnMultiserverChunksRestHandler::loadLocalData(MultiServerPeriodDataList& outputData, InternalContext* ctx)
 {
     MultiServerPeriodData record;
     record.guid = qnCommon->moduleGUID();
-    record.periods = QnChunksRequestHelper::load(request);
+    record.periods = QnChunksRequestHelper::load(ctx->request);
     if (!record.periods.empty()) {
         QMutexLocker lock(&ctx->mutex);
         outputData.push_back(std::move(record));
@@ -83,37 +84,34 @@ void QnMultiserverChunksRestHandler::waitForDone(InternalContext* ctx)
 
 int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
-    InternalContext ctx;
-    ctx.urlPath = path;
-
-    QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+    InternalContext ctx(path, QnChunksRequestData::fromParams(params));
 
     MultiServerPeriodDataList outputData;
 
-    if (request.isLocal)
+    if (ctx.request.isLocal)
     {
-        loadLocalData(outputData, request, &ctx);
+        loadLocalData(outputData, &ctx);
     }
     else 
     {
         QSet<QnMediaServerResourcePtr> servers;
-        for (const auto& camera: request.resList)
+        for (const auto& camera: ctx.request.resList)
             servers += QnCameraHistoryPool::instance()->getServersByCamera(camera).toSet();
 
         for (const auto& server: servers) 
         {
             if (server->getId() == qnCommon->moduleGUID())
-                loadLocalData(outputData, request, &ctx);
+                loadLocalData(outputData, &ctx);
             else
-                loadRemoteDataAsync(outputData, server, request, &ctx);
+                loadRemoteDataAsync(outputData, server, &ctx);
         }
         waitForDone(&ctx);
     }
 
-    if (QnFusionRestHandlerDetail::formatFromParams(params) == Qn::CompressedTimePeriods)
+    if (ctx.request.format == Qn::CompressedPeriodsFormat)
     {
         result = QnCompressedTime::serialized(outputData, false);
-        contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedTimePeriods);
+        contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
     }
     else {
         QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);

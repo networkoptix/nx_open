@@ -21,6 +21,7 @@ QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& pa
         request.periodsType = static_cast<Qn::TimePeriodContent>(params.value("periodsType").toInt());
     request.filter = params.value("filter");
     request.isLocal = params.contains("local");
+    QnLexical::deserialize(params.value(lit("format")), &request.format);
 
     for (const auto& id: params.allValues("physicalId") + params.allValues("mac")) {
         QnVirtualCameraResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(id).dynamicCast<QnVirtualCameraResource>();
@@ -29,6 +30,31 @@ QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& pa
     }
 
     return request;
+}
+
+QnRequestParamList QnChunksRequestData::toParams() const
+{
+    QnRequestParamList result;
+
+    result.insert("startTime", QString::number(startTimeMs));
+    result.insert("endTime", QString::number(endTimeMs));
+    result.insert("detail", QString::number(detailLevel));
+    result.insert("periodsType", QString::number(periodsType));
+    if (!filter.isEmpty())
+        result.insert("filter", filter);
+    if (isLocal)
+        result.insert("local", QString());
+    result.insert("format", QnLexical::serialized(format));
+
+    return result;
+}
+
+QUrlQuery QnChunksRequestData::toUrlQuery() const
+{
+    QUrlQuery urlQuery;
+    for(const auto& param: toParams())
+        urlQuery.addQueryItem(param.first, param.second);
+    return urlQuery;
 }
 
 QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)

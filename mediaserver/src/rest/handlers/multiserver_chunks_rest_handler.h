@@ -19,8 +19,8 @@ private:
     struct InternalContext;
 
     void waitForDone(InternalContext* ctx);
-    void loadRemoteDataAsync(MultiServerPeriodDataList& outputData, QnMediaServerResourcePtr server, const QnChunksRequestData& request, InternalContext* ctx);
-    void loadLocalData(MultiServerPeriodDataList& outputData, const QnChunksRequestData& request, InternalContext* ctx);
+    void loadRemoteDataAsync(MultiServerPeriodDataList& outputData, QnMediaServerResourcePtr server, InternalContext* ctx);
+    void loadLocalData(MultiServerPeriodDataList& outputData, InternalContext* ctx);
 };
 
 
