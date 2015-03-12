@@ -348,9 +348,10 @@ void QnProxyConnectionProcessor::run()
     else {
         doRawProxy();
     }
-
-    d->dstSocket->close();
-    d->socket->close();
+    if (d->dstSocket)
+        d->dstSocket->close();
+    if (d->socket)
+        d->socket->close();
 }
 
 void QnProxyConnectionProcessor::doRawProxy()
