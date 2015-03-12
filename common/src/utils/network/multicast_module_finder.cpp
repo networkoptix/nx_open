@@ -10,7 +10,6 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/product_features.h>
 
-#include "api/runtime_info_manager.h"
 #include "socket.h"
 #include "system_socket.h"
 #include "common/common_module.h"
@@ -139,7 +138,6 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
     //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
     RevealResponse response(qnCommon->moduleInformation());
-    response.runtimeId = QnRuntimeInfoManager::instance()->localInfo().uuid;
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
