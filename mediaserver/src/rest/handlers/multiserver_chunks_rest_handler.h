@@ -14,13 +14,15 @@
 class QnMultiserverChunksRestHandler: public QnFusionRestHandler
 {
 public:
+    QnMultiserverChunksRestHandler(const QString& path);
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
+
+    static MultiServerPeriodDataList loadDataSync(const QnChunksRequestData& request);
 private:
     struct InternalContext;
-
-    void waitForDone(InternalContext* ctx);
-    void loadRemoteDataAsync(MultiServerPeriodDataList& outputData, QnMediaServerResourcePtr server, InternalContext* ctx);
-    void loadLocalData(MultiServerPeriodDataList& outputData, InternalContext* ctx);
+    static void waitForDone(InternalContext* ctx);
+    static void loadRemoteDataAsync(MultiServerPeriodDataList& outputData, QnMediaServerResourcePtr server, InternalContext* ctx);
+    static void loadLocalData(MultiServerPeriodDataList& outputData, InternalContext* ctx);
 };
 
 

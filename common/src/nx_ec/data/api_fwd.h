@@ -20,6 +20,7 @@ namespace ec2 {
     struct ApiCameraDataEx;
     struct ApiCameraHistoryData;
     struct ApiCameraHistoryMoveData;
+    struct ApiCameraHistoryDetailData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
 	struct ApiFullInfoData;
@@ -120,6 +121,8 @@ namespace ec2 {
     (ApiBusinessRuleData)\
     (ApiCameraData)\
     (ApiCameraHistoryData)\
+    (ApiCameraHistoryMoveData)\
+    (ApiCameraHistoryDetailData)\
     (ApiCameraAttributesData)\
     (ApiCameraDataEx)\
     (ApiEmailData)\

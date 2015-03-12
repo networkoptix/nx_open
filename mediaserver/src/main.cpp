@@ -178,6 +178,7 @@
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
 #include "rest/handlers/multiserver_chunks_rest_handler.h"
+#include "rest/handlers/camera_history_rest_handler.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1313,7 +1314,8 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
-    QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
+    QnRestProcessorPool::instance()->registerHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api

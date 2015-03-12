@@ -15,16 +15,24 @@
 #include "utils/network/router.h"
 #include "utils/network/http/asynchttpclient.h"
 
+namespace {
+    static QString urlPath;
+}
+
 struct QnMultiserverChunksRestHandler::InternalContext
 {
-    InternalContext(const QString& urlPath, const QnChunksRequestData& request): urlPath(urlPath), request(request), requestsInProgress(0) {}
+    InternalContext(const QnChunksRequestData& request): request(request), requestsInProgress(0) {}
 
-    const QString urlPath;
     const QnChunksRequestData request;
     QMutex mutex;
     QWaitCondition waitCond;
     int requestsInProgress;
 };
+
+QnMultiserverChunksRestHandler::QnMultiserverChunksRestHandler(const QString& path): QnFusionRestHandler()
+{
+    urlPath = path;
+}
 
 void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataList& outputData, QnMediaServerResourcePtr server, InternalContext* ctx)
 {
@@ -44,7 +52,7 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
     };
 
     QUrl apiUrl(server->getApiUrl());
-    apiUrl.setPath(ctx->urlPath);
+    apiUrl.setPath(urlPath);
 
     QnChunksRequestData modifiedRequest = ctx->request;
     modifiedRequest.format = Qn::CompressedPeriodsFormat;
@@ -77,13 +85,11 @@ void QnMultiserverChunksRestHandler::waitForDone(InternalContext* ctx)
         ctx->waitCond.wait(&ctx->mutex);
 }
 
-int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnChunksRequestData& request)
 {
-    InternalContext ctx(path, QnChunksRequestData::fromParams(params));
-
+    InternalContext ctx(request);
     MultiServerPeriodDataList outputData;
-
-    if (ctx.request.isLocal)
+    if (request.isLocal)
     {
         loadLocalData(outputData, &ctx);
     }
@@ -102,8 +108,15 @@ int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequ
         }
         waitForDone(&ctx);
     }
+    return outputData;
+}
 
-    if (ctx.request.format == Qn::CompressedPeriodsFormat)
+int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+{
+    QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+    MultiServerPeriodDataList outputData = loadDataSync(request);
+
+    if (request.format == Qn::CompressedPeriodsFormat)
     {
         result = QnCompressedTime::serialized(outputData, false);
         contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
