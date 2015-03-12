@@ -52,12 +52,7 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
     nx_http::HttpHeaders headers;
-    auto route = QnRouter::instance()->routeTo(server->getId());
-    if (route.isValid()) {
-        apiUrl.setHost(route.points.first().host);
-        apiUrl.setPort(route.points.first().port);
-        headers.emplace("x-server-guid", server->getId().toByteArray());
-    }
+	QnRouter::instance()->updateRequest(apiUrl, headers, server->getId());
 
     QMutexLocker lock(&ctx->mutex);
     if (nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers))

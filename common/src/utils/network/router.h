@@ -8,6 +8,7 @@
 #include <api/runtime_info_manager.h>
 #include <utils/common/singleton.h>
 #include <utils/network/route.h>
+#include "http/httptypes.h"
 
 class QnRouteBuilder;
 class QnModuleFinder;
@@ -34,6 +35,7 @@ public:
 
     QnRoute routeTo(const QnUuid &id, const QnUuid &via = QnUuid()) const;
     QnRoute routeTo(const QString &host, quint16 port) const;
+    void updateRequest(QUrl& url, nx_http::HttpHeaders& headers, const QnUuid &id);
 
     QnUuid whoIs(const QString &host, quint16 port) const;
 

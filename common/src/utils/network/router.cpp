@@ -71,6 +71,18 @@ QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
     return route;
 }
 
+void QnRouter::updateRequest(QUrl& url, nx_http::HttpHeaders& headers, const QnUuid &id)
+{
+    QnRoute route = routeTo(id);
+    if (route.isValid() && route.points.first().peerId != id) 
+    {
+        url.setHost(route.points.first().host);
+        url.setPort(route.points.first().port);
+        headers.emplace("x-server-guid", id.toByteArray());
+    }
+}
+
+
 QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
     QMutexLocker lk(&m_mutex);
 
