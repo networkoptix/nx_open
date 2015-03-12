@@ -117,7 +117,8 @@ void QnDirectModuleFinder::activateRequests() {
     while (m_activeRequests.size() < m_maxConnections && !m_requestQueue.isEmpty()) {
         QUrl url = m_requestQueue.dequeue();
 
-        m_lastCheckByUrl[trimmedUrl(url)] = m_elapsedTimer.elapsed();
+        qint64 time = m_elapsedTimer.elapsed();
+        m_lastCheckByUrl[trimmedUrl(url)] = time;
 
         nx_http::AsyncHttpClientPtr client = std::make_shared<nx_http::AsyncHttpClient>();
         std::unique_ptr<QnAsyncHttpClientReply> reply( new QnAsyncHttpClientReply(client, this) );
@@ -186,4 +187,5 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
         }
         enqueRequest(url);
     }
+    activateRequests();
 }

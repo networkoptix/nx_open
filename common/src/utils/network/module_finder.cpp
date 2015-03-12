@@ -99,6 +99,10 @@ QnDirectModuleFinder *QnModuleFinder::directModuleFinder() const {
     return m_directModuleFinder;
 }
 
+QnDirectModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
+    return m_helper;
+}
+
 int QnModuleFinder::pingTimeout() const {
     return ::pingTimeout;
 }

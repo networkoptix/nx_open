@@ -31,6 +31,8 @@ public:
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
 
+    QnDirectModuleFinderHelper *directModuleFinderHelper() const;
+
     int pingTimeout() const;
 
 public slots:

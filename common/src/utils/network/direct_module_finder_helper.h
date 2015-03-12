@@ -22,6 +22,8 @@ class QnDirectModuleFinderHelper : public Connective<QObject> {
 public:
     explicit QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder);
 
+    void setForcedUrls(const QSet<QUrl> &forcedUrls);
+
 private slots:
     void at_resourceAdded(const QnResourcePtr &resource);
     void at_resourceRemoved(const QnResourcePtr &resource);
@@ -39,6 +41,7 @@ private:
 
     QHash<QUrl, int> m_urls;
     QHash<QUrl, int> m_ignoredUrls;
+    QSet<QUrl> m_forcedUrls;
 
     QHash<QnUuid, QnUrlSet> m_serverUrlsById;
     QHash<QnUuid, QnUrlSet> m_additionalServerUrlsById;
