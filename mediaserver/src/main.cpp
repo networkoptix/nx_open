@@ -787,7 +787,7 @@ void initAppServerConnection(QSettings &settings)
         QString staticDBPath = settings.value("staticDataDir").toString();
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
-		}
+        }
         if (MSSettings::roSettings()->value(REMOVE_DB_PARAM_NAME).toBool())
             params.addQueryItem("cleanupDb", QString());
     }
@@ -1986,7 +1986,7 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     QnMServerResourceSearcher::instance()->start();
     m_universalTcpListener->start();
-	serverConnector->start();
+    serverConnector->start();
 #if 1
     if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
@@ -2247,14 +2247,17 @@ private:
         QString hwidGuid = hardwareIdAsGuid();
 
         if (guidIsHWID == YES) {
-            MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            if (serverGuid.isEmpty())
+                MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+			else
+				MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
             MSSettings::roSettings()->remove(SERVER_GUID2);
         } else if (guidIsHWID == NO) {
             if (serverGuid.isEmpty()) {
                 // serverGuid remove from settings manually?
                 MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
                 MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
-            }
+            }                                            
 
             MSSettings::roSettings()->remove(SERVER_GUID2);
         } else if (guidIsHWID.isEmpty()) {
