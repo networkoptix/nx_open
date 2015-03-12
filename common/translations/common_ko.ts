@@ -15,25 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnAbstractStorageResource</name>
-    <message>
-        <source>Windows Network Shared Resource</source>
-        <translation>윈도우 네트워크 공유 리소스</translation>
-    </message>
-    <message>
-        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>\\&lt;컴퓨터 이름&gt;\&lt;폴더&gt;</translation>
-    </message>
-    <message>
-        <source>Coldstore Network Storage</source>
-        <translation>방한 네트워크 저장 장치</translation>
-    </message>
-    <message>
-        <source>coldstore://&lt;Address&gt;</source>
-        <translation>방한://&lt;주소&gt;</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>User Defined (%1)</source>
@@ -288,6 +269,10 @@
     <message>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
         <translation>%1 HDD/SSD 디스크 꽉참. VMS에 관리되지 않는 과도한 데이터가 포함되어 있음.</translation>
+    </message>
+    <message>
+        <source>Conflicting Server: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

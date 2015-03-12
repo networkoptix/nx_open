@@ -1,14 +1,22 @@
 #include "module_finder.h"
 
+#include <QtCore/QCryptographicHash>
+
 #include "utils/common/log.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"
 #include "common/common_module.h"
+#include "core/resource/media_server_resource.h"
+#include "core/resource_management/resource_pool.h"
+#include "utils/common/app_info.h"
+#include "api/runtime_info_manager.h"
 
 namespace {
+    const int pingTimeout = 15 * 1000;
+    const int checkInterval = 3000;
+    const int noticeableConflictCount = 5;
+
     QUrl trimmedUrl(const QUrl &url) {
         QUrl newUrl;
         newUrl.setScheme(lit("http"));
@@ -16,23 +24,51 @@ namespace {
         newUrl.setPort(url.port());
         return newUrl;
     }
+
+    QUrl makeUrl(const QString &host, int port) {
+        QUrl url;
+        url.setScheme(lit("http"));
+        url.setHost(host);
+        url.setPort(port);
+        return url;
+    }
+
+    QnUuid generateRuntimeId(const QnModuleInformation &moduleInformation) {
+        const int bytesNeeded = 16;
+
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        md5.addData(moduleInformation.id.toRfc4122());
+        md5.addData(moduleInformation.customization.toLatin1());
+        md5.addData(moduleInformation.systemName.toLatin1());
+        md5.addData(QByteArray::number(moduleInformation.port));
+        for (const QString &address: moduleInformation.remoteAddresses)
+            md5.addData(address.toLatin1());
+
+        QByteArray hash = md5.result();
+        while (hash.size() < bytesNeeded)
+            hash += hash;
+        hash.resize(16);
+
+        return QnUuid::fromRfc4122(hash);
+    }
 }
 
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
+    m_elapsedTimer(),
+    m_timer(new QTimer(this)),
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
-    m_directModuleFinderHelper(new QnModuleFinderHelper(this))
+    m_helper(new QnDirectModuleFinderHelper(this))
 {
-    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
-    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
-    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleChanged,            this,       &QnModuleFinder::at_moduleChanged);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlFound,              this,       &QnModuleFinder::at_moduleUrlFound);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlLost,               this,       &QnModuleFinder::at_moduleUrlLost);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleChanged,               this,       &QnModuleFinder::at_moduleChanged);
+    connect(m_multicastModuleFinder.data(), &QnMulticastModuleFinder::responseReceived,     this, &QnModuleFinder::at_responseReceived);
+    connect(m_directModuleFinder,           &QnDirectModuleFinder::responseReceived,        this, &QnModuleFinder::at_responseReceived);
+
+    m_timer->setInterval(checkInterval);
+    connect(m_timer, &QTimer::timeout, this, &QnModuleFinder::at_timer_timeout);
 }
 
 QnModuleFinder::~QnModuleFinder() {
-    stop();
+    pleaseStop();
 }
 
 void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
@@ -40,13 +76,15 @@ void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_directModuleFinder->setCompatibilityMode(compatibilityMode);
 }
 
-bool QnModuleFinder::isCompatibilityMode() const
-{
-    return m_directModuleFinder->isCompatibilityMode();
+bool QnModuleFinder::isCompatibilityMode() const {
+    return m_multicastModuleFinder->isCompatibilityMode();
 }
 
 QList<QnModuleInformation> QnModuleFinder::foundModules() const {
-    return m_foundModules.values();
+    QList<QnModuleInformation> result;
+    for (const QnModuleInformation &moduleInformation: m_foundModules)
+        result.append(moduleInformation);
+    return result;
 }
 
 QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const {
@@ -54,139 +92,214 @@ QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) co
 }
 
 QnMulticastModuleFinder *QnModuleFinder::multicastModuleFinder() const {
-    return m_multicastModuleFinder.get();
+    return m_multicastModuleFinder.data();
 }
 
 QnDirectModuleFinder *QnModuleFinder::directModuleFinder() const {
     return m_directModuleFinder;
 }
 
-QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
-    return m_directModuleFinderHelper;
+int QnModuleFinder::pingTimeout() const {
+    return ::pingTimeout;
 }
 
 void QnModuleFinder::start() {
+    m_lastSelfConflict = 0;
+    m_selfConflictCount = 0;
     m_multicastModuleFinder->start();
     m_directModuleFinder->start();
+    m_elapsedTimer.start();
+    m_timer->start();
 }
 
 void QnModuleFinder::pleaseStop() {
+    m_timer->stop();
     m_multicastModuleFinder->pleaseStop();
     m_directModuleFinder->pleaseStop();
 }
 
-void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
+void QnModuleFinder::at_responseReceived(QnModuleInformationEx moduleInformation, QUrl url) {
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
-    QUrl url = address.toUrl();
-    m_directModuleFinder->addIgnoredUrl(url);
+    if (moduleInformation.id == qnCommon->moduleGUID()) {
+        handleSelfResponse(moduleInformation, url);
+        return;
+    }
 
-    if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
-        m_multicastFoundUrls.insert(moduleInformation.id, url);
+    url = trimmedUrl(url);
 
-        if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
-            NX_LOG(lit("QnModuleFinder: New URL from multicast finder: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            QnModuleInformation oldModuleInformation = m_foundModules.value(moduleInformation.id);
-            Q_ASSERT_X(!oldModuleInformation.id.isNull(), "Module information must exist here", Q_FUNC_INFO);
-            if (oldModuleInformation.id.isNull())
-                oldModuleInformation = moduleInformation;
-            emit moduleUrlFound(oldModuleInformation, url);
+    QnUuid oldId = m_idByUrl.value(url);
+    if (!oldId.isNull() && oldId != moduleInformation.id)
+        removeUrl(url);
+
+    qint64 currentTime = m_elapsedTimer.elapsed();
+
+    m_lastResponse[url] = currentTime;
+
+    QnModuleInformationEx &oldInformation = m_foundModules[moduleInformation.id];
+
+    if (moduleInformation.runtimeId.isNull())
+        moduleInformation.runtimeId = generateRuntimeId(moduleInformation);
+
+    /* Handle conflicting servers */
+    if (!oldInformation.id.isNull() && oldInformation.runtimeId != moduleInformation.runtimeId) {
+        bool oldModuleIsValid = oldInformation.systemName == qnCommon->localSystemName();
+        bool newModuleIsValid = moduleInformation.systemName == qnCommon->localSystemName();
+
+        if (oldModuleIsValid == newModuleIsValid) {
+            oldModuleIsValid = oldInformation.customization == QnAppInfo::customizationName();
+            newModuleIsValid = moduleInformation.customization == QnAppInfo::customizationName();
         }
+
+        if (oldModuleIsValid == newModuleIsValid) {
+            QnUuid remoteId = qnCommon->remoteGUID();
+            if (!remoteId.isNull() && remoteId == moduleInformation.id) {
+                QnUuid correctRuntimeId = QnRuntimeInfoManager::instance()->item(remoteId).uuid;
+                oldModuleIsValid = oldInformation.runtimeId == correctRuntimeId;
+                newModuleIsValid = moduleInformation.runtimeId == correctRuntimeId;
+            }
+        }
+
+        if (newModuleIsValid && !oldModuleIsValid) {
+            QSet<QString> oldAddresses = oldInformation.remoteAddresses;
+            for (const QString &address: oldAddresses)
+                removeUrl(makeUrl(address, oldInformation.port));
+
+            addUrl(url, moduleInformation.id);
+
+            moduleInformation.remoteAddresses.clear();
+            moduleInformation.remoteAddresses.insert(url.host());
+            m_foundModules.insert(moduleInformation.id, moduleInformation);
+            NX_LOG(lit("QnModuleFinder. Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+            emit moduleChanged(moduleInformation);
+            NX_LOG(lit("QnModuleFinder: New module URL: %1 %2:%3")
+                   .arg(moduleInformation.id.toString()).arg(url.host()).arg(moduleInformation.port), cl_logDEBUG1);
+            emit moduleUrlFound(moduleInformation, url);
+            return;
+        }
+
+        qint64 &lastConflictResponse = m_lastConflictResponseById[oldInformation.id];
+        qint64 lastResponse = m_lastResponseById[oldInformation.id];
+        int &conflictCount = m_conflictResponseCountById[oldInformation.id];
+
+        if (currentTime - lastConflictResponse < pingTimeout()) {
+            if (lastResponse >= lastConflictResponse)
+                ++conflictCount;
+        } else {
+            conflictCount = 0;
+        }
+        lastConflictResponse = currentTime;
+
+        if (conflictCount >= noticeableConflictCount && conflictCount % noticeableConflictCount == 0) {
+            NX_LOG(lit("QnModuleFinder: Server %1 conflict: %2:%3")
+                   .arg(moduleInformation.id.toString()).arg(url.host()).arg(moduleInformation.port), cl_logWARNING);
+        }
+
+        return;
+    }
+
+    addUrl(url, moduleInformation.id);
+    moduleInformation.remoteAddresses = moduleAddresses(moduleInformation.id);
+
+    if (oldInformation != moduleInformation) {
+        NX_LOG(lit("QnModuleFinder. Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+        emit moduleChanged(moduleInformation);
+
+        QSet<QString> oldAddresses = oldInformation.remoteAddresses;
+        if (oldInformation.port != moduleInformation.port) {
+            for (const QString &address: oldAddresses)
+                removeUrl(makeUrl(address, oldInformation.port));
+
+            oldAddresses.clear();
+            moduleInformation.remoteAddresses.clear();
+            moduleInformation.remoteAddresses.insert(url.host());
+            m_foundModules.insert(moduleInformation.id, moduleInformation);
+        } else {
+            oldInformation = moduleInformation;
+        }
+
+        for (const QString &address: moduleInformation.remoteAddresses - oldAddresses) {
+            NX_LOG(lit("QnModuleFinder: New module URL: %1 %2:%3")
+                   .arg(moduleInformation.id.toString()).arg(address).arg(moduleInformation.port), cl_logDEBUG1);
+
+            emit moduleUrlFound(moduleInformation, url);
+        }
+    }
+
+    m_lastResponseById[moduleInformation.id] = currentTime;
+}
+
+void QnModuleFinder::at_timer_timeout() {
+    qint64 currentTime = m_elapsedTimer.elapsed();
+
+    /* Copy it because we could remove urls from the hash during the check */
+    QHash<QUrl, qint64> lastResponse = m_lastResponse;
+    for (auto it = lastResponse.begin(); it != lastResponse.end(); ++it) {
+        if (currentTime - it.value() < pingTimeout())
+            continue;
+        removeUrl(it.key());
     }
 }
 
-void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
-    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
+QSet<QString> QnModuleFinder::moduleAddresses(const QnUuid &id) const {
+    QSet<QString> result;
+
+    for (const QUrl &url: m_urlById.values(id))
+        result.insert(url.host());
+
+    return result;
+}
+
+void QnModuleFinder::removeUrl(const QUrl &url) {
+    QnUuid id = m_idByUrl.take(url);
+    if (id.isNull())
         return;
 
-    QUrl url = address.toUrl();
+    m_urlById.remove(id, url);
+    m_lastResponse.remove(url);
 
-    m_directModuleFinder->removeIgnoredUrl(url);
-    if (m_multicastFoundUrls.remove(moduleInformation.id, url)) {
-        NX_LOG(lit("QnModuleFinder: URL from multicast finder is lost: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-        emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
+    auto it = m_foundModules.find(id);
+    Q_ASSERT_X(it != m_foundModules.end(), Q_FUNC_INFO, "Module information must exist here.");
+    if (it == m_foundModules.end())
+        return;
 
-        QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
-        if ((locModuleInformation.remoteAddresses - (QSet<QString>() << url.host())).isEmpty()) {
-            m_foundModules.remove(moduleInformation.id);
-            NX_LOG(lit("QnModuleFinder: Module %1 lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
-            emit moduleLost(locModuleInformation);
-        }
+    if (it->remoteAddresses.remove(url.host())) {
+        NX_LOG(lit("QnModuleFinder: Module URL lost: %1 %2:%3")
+               .arg(it->id.toString()).arg(url.host()).arg(it->port), cl_logDEBUG1);
+        emit moduleUrlLost(*it, url);
+    }
+
+    if (it->remoteAddresses.isEmpty()) {
+        NX_LOG(lit("QnModuleFinder: Module %1 is lost.").arg(it->id.toString()), cl_logDEBUG1);
+        QnModuleInformation moduleInformation = *it;
+        m_foundModules.erase(it);
+        emit moduleLost(moduleInformation);
+    } else {
+        NX_LOG(lit("QnModuleFinder: Module %1 is changed.").arg(it->id.toString()), cl_logDEBUG1);
+        emit moduleChanged(*it);
     }
 }
 
-void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
-    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
+void QnModuleFinder::addUrl(const QUrl &url, const QnUuid &id) {
+    m_idByUrl[url] = id;
+    if (!m_urlById.contains(id, url))
+        m_urlById.insert(id, url);
+}
+
+void QnModuleFinder::handleSelfResponse(const QnModuleInformationEx &moduleInformation, const QUrl &url) {
+    QnModuleInformationEx current = qnCommon->moduleInformation();
+    if (current.runtimeId == moduleInformation.runtimeId)
         return;
 
-    QUrl url = trimmedUrl(foundUrl);
-
-    if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
-        m_directFoundUrls.insert(moduleInformation.id, url);
-
-        if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
-            NX_LOG(lit("QnModuleFinder: New URL from direct finder: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            QnModuleInformation oldModuleInformation = m_foundModules.value(moduleInformation.id);
-            Q_ASSERT_X(!oldModuleInformation.id.isNull(), "Module information must exist here", Q_FUNC_INFO);
-            if (oldModuleInformation.id.isNull())
-                oldModuleInformation = moduleInformation;
-            emit moduleUrlFound(oldModuleInformation, url);
-        }
+    qint64 currentTime = m_elapsedTimer.elapsed();
+    if (currentTime - m_lastSelfConflict > pingTimeout()) {
+        m_selfConflictCount = 1;
+        return;
     }
+    m_lastSelfConflict = currentTime;
+    ++m_selfConflictCount;
+
+    if (m_selfConflictCount >= noticeableConflictCount && m_selfConflictCount % noticeableConflictCount == 0)
+        emit moduleConflict(moduleInformation, url);
 }
-
-void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
-    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
-        return;
-
-    QUrl url = trimmedUrl(foundUrl);
-
-    if (m_directFoundUrls.remove(moduleInformation.id, url)) {
-        NX_LOG(lit("QnModuleFinder: URL from direct finder is lost: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-        emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
-
-        QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
-        if ((locModuleInformation.remoteAddresses - (QSet<QString>() << url.host())).isEmpty()) {
-            m_foundModules.remove(moduleInformation.id);
-            NX_LOG(lit("QnModuleFinder: Module %1 lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
-            emit moduleLost(locModuleInformation);
-        }
-    }
-}
-
-void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation) {
-    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
-        return;
-
-    QnModuleInformation updatedModuleInformation = moduleInformation;
-
-    if (sender() == m_multicastModuleFinder.get())
-        updatedModuleInformation.remoteAddresses.unite(m_directModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
-    else if (sender() == m_directModuleFinder)
-        updatedModuleInformation.remoteAddresses.unite(m_multicastModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
-    else
-        Q_ASSERT_X(0, "Invalid sender in slot", Q_FUNC_INFO);
-
-    if (updatedModuleInformation.remoteAddresses.isEmpty())
-        return;
-
-    QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
-    if (oldModuleInformation != updatedModuleInformation) {
-        oldModuleInformation = updatedModuleInformation;
-
-        /* Don't emit when there is no more remote addresses. moduleLost() will be emited just after moduleUrlLost(). */
-        if (!updatedModuleInformation.remoteAddresses.isEmpty()) {
-            NX_LOG(lit("QnModuleFinder. Module %1 is changed, addresses = [%2]")
-                   .arg(updatedModuleInformation.id.toString())
-                   .arg(QStringList(QStringList::fromSet(updatedModuleInformation.remoteAddresses)).join(lit(", "))), cl_logDEBUG1);
-            emit moduleChanged(updatedModuleInformation);
-        }
-    }
-}
-
-void QnModuleFinder::stop() {
-    m_multicastModuleFinder->stop();
-    m_directModuleFinder->stop();
-}
-

@@ -28,10 +28,13 @@ QSize QnAppServerImageCache::getMaxImageSize() const {
 
 
 QString QnAppServerImageCache::cachedImageFilename(const QString &sourcePath) {
-    QString uuid = guidFromArbitraryData(sourcePath.toUtf8()).toString();
-    return uuid.mid(1, uuid.size() - 2) + lit(".png");
-}
+    QString ext = QFileInfo(sourcePath).suffix();
+    if (ext.isEmpty())
+        ext = lit("png");
 
+    QString uuid = guidFromArbitraryData(sourcePath.toUtf8()).toString();
+    return uuid.mid(1, uuid.size() - 2) + L'.' + ext;
+}
 
 void QnAppServerImageCache::storeImage(const QString &filePath, const qreal targetAspectRatio) {
     QString newFilename = cachedImageFilename(filePath);

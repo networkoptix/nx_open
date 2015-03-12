@@ -13,7 +13,7 @@
 #endif
 
 namespace {
-    const int checkInterval = 1000; // check user inactivity every second
+    const int timerIntervalMs = 1000; // check user inactivity every second
 }
 
 QnWorkbenchUserInactivityWatcher::QnWorkbenchUserInactivityWatcher(QObject *parent) :
@@ -107,7 +107,7 @@ void QnWorkbenchUserInactivityWatcher::setEnabled(bool enable) {
         return;
 
     if (enable) {
-        m_timerId = startTimer(checkInterval);
+        m_timerId = startTimer(timerIntervalMs);
     } else {
         killTimer(m_timerId);
         m_timerId = -1;

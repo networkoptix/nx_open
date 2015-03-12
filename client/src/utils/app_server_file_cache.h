@@ -41,6 +41,7 @@ public:
 
     static void clearLocalCache();
 
+    static qint64 maximumFileSize();
 protected:
     void ensureCacheFolder();
     QString folderName() const;

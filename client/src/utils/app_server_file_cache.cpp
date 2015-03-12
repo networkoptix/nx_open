@@ -14,6 +14,11 @@
 #include <utils/common/uuid.h>
 #include <utils/common/string.h>
 
+namespace {
+    /** Maximum allowed file size is 15 Mb, hard limit of Jaguar or S2 cameras. */
+    const qint64 maximumFileSize = 15*1024*1024;
+}
+
 QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *parent) :
     QObject(parent),
     m_folderName(folderName)
@@ -75,6 +80,11 @@ void QnAppServerFileCache::clearLocalCache() {
 bool QnAppServerFileCache::isConnectedToServer() const {
     return QnAppServerConnectionFactory::getConnection2() != NULL;
 }
+
+qint64 QnAppServerFileCache::maximumFileSize() {
+    return ::maximumFileSize;
+}
+
 
 // -------------- File List loading methods -----
 
@@ -167,6 +177,11 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
 
     QFile file(getFullPath(filename));
     if(!file.open(QIODevice::ReadOnly)) {
+        emit delayedFileUploaded(filename, false);
+        return;
+    }
+
+    if(file.size() > ::maximumFileSize) {
         emit delayedFileUploaded(filename, false);
         return;
     }

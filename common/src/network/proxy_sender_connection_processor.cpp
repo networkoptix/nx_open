@@ -41,11 +41,11 @@ QByteArray QnProxySenderConnection::readProxyResponse()
     size_t bufLen = 0;
     while (d->socket->isConnected() && !m_needStop && bufLen < sizeof(buffer))
     {
-        int readed = d->socket->recv(buffer + bufLen, sizeof(buffer) - bufLen);
+        int readed = d->socket->recv(buffer + bufLen, sizeof(buffer) - static_cast<unsigned int>(bufLen));
         if (readed < 1)
             return QByteArray();
         bufLen += readed;
-        QByteArray result = QByteArray::fromRawData((const char*)buffer, bufLen);
+        QByteArray result = QByteArray::fromRawData((const char*)buffer, static_cast<int>(bufLen));
         if (QnTCPConnectionProcessor::isFullMessage(result))
             return result;
     }

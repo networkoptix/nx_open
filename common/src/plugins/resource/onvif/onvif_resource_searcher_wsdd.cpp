@@ -57,7 +57,7 @@ namespace
     int gsoapFsend(struct soap *soap, const char *s, size_t n)
     {
         AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-        qSocket->sendTo(s, n, WSDD_MULTICAST_ENDPOINT);
+        qSocket->sendTo(s, static_cast<unsigned int>(n), WSDD_MULTICAST_ENDPOINT);
         return SOAP_OK;
     }
 
@@ -87,7 +87,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
     size_t gsoapFrecv(struct soap* soap, char* data, size_t maxSize)
     {
         AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-        int readed = qSocket->recv(data, maxSize, 0);
+        int readed = qSocket->recv(data, static_cast<unsigned int>(maxSize), 0);
         return (size_t) qMax(0, readed);
     }
 
@@ -96,12 +96,10 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
     int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
     {
         //avoiding sending numerous data
-        if (!QByteArray::fromRawData(s, n).startsWith("<?xml")) {
+        if (!QByteArray::fromRawData(s, static_cast<int>(n)).startsWith("<?xml")) {
             return SOAP_OK;
         }
 
-        Q_UNUSED(s)
-        Q_UNUSED(n)
         QString msgId;
         AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
 
@@ -116,12 +114,10 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
     int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
     {
         //avoiding sending numerous data
-        if (!QByteArray::fromRawData(s, n).startsWith("<?xml")) {
+        if (!QByteArray::fromRawData(s, static_cast<int>(n)).startsWith("<?xml")) {
             return SOAP_OK;
         }
 
-        Q_UNUSED(s)
-        Q_UNUSED(n)
         QString msgId;
         AbstractDatagramSocket* socket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
 

@@ -42,6 +42,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -725,13 +726,6 @@ int serverMain(int argc, char *argv[])
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(argv[0])), cl_logALWAYS);
     }
 
-    if (cmdLineArguments.rebuildArchive == "all")
-        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
-    else if (cmdLineArguments.rebuildArchive == "hq")
-        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_HQ);
-    else if (cmdLineArguments.rebuildArchive == "lq")
-        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
-
     NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
     NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
     NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
@@ -793,7 +787,7 @@ void initAppServerConnection(QSettings &settings)
         QString staticDBPath = settings.value("staticDataDir").toString();
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
-		}
+        }
         if (MSSettings::roSettings()->value(REMOVE_DB_PARAM_NAME).toBool())
             params.addQueryItem("cleanupDb", QString());
     }
@@ -1125,6 +1119,21 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     }
 
     {
+        //loading layouts
+        QnLayoutResourceList layouts;
+        while(( rez = ec2Connection->getLayoutManager()->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+
+        for(const auto &layout: layouts)
+            messageProcessor->updateResource(layout);
+    }
+
+    {
         //loading business rules
         QnBusinessEventRuleList rules;
         while( (rez = ec2Connection->getBusinessEventManager()->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
@@ -1236,6 +1245,11 @@ void QnMain::at_connectionOpened()
         m_startMessageSent = true;
     }
     m_firstRunningTime = 0;
+}
+
+void QnMain::at_serverModuleConflict(const QnModuleInformationEx &moduleInformation, const QUrl &url)
+{
+    qnBusinessRuleConnector->at_mediaServerConflict(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch(), moduleInformation, url);
 }
 
 void QnMain::at_timer()
@@ -1800,6 +1814,8 @@ void QnMain::run()
         qnCommon->setAllowedPeers(allowedPeers);
     }
 
+    connect(m_moduleFinder, &QnModuleFinder::moduleConflict, this, &QnMain::at_serverModuleConflict);
+
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
 
     // ------------------------------------------
@@ -1915,9 +1931,7 @@ void QnMain::run()
     for(const QnAbstractStorageResourcePtr &storage: modifiedStorages)
         messageProcessor->updateResource(storage);
 
-    qnStorageMan->doMigrateCSVCatalog();
     qnStorageMan->initDone();
-
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
     updateAllowCameraCHangesIfNeed();
@@ -1972,7 +1986,7 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     QnMServerResourceSearcher::instance()->start();
     m_universalTcpListener->start();
-	serverConnector->start();
+    serverConnector->start();
 #if 1
     if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
@@ -2233,14 +2247,17 @@ private:
         QString hwidGuid = hardwareIdAsGuid();
 
         if (guidIsHWID == YES) {
-            MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            if (serverGuid.isEmpty())
+                MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+			else
+				MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
             MSSettings::roSettings()->remove(SERVER_GUID2);
         } else if (guidIsHWID == NO) {
             if (serverGuid.isEmpty()) {
                 // serverGuid remove from settings manually?
                 MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
                 MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
-            }
+            }                                            
 
             MSSettings::roSettings()->remove(SERVER_GUID2);
         } else if (guidIsHWID.isEmpty()) {

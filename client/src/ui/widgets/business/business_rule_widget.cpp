@@ -70,9 +70,6 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 {
     ui->setupUi(this);
 
-    ui->eventDoLabel->setText(lit("<html><head/><body><p><span style=\"font-weight:600;\">%1</span></p></body></html>").arg(tr("When")));
-    ui->actionDoLabel->setText(lit("<html><head/><body><p><span style=\"font-weight:600;\">%1</span></p></body></html>").arg(tr("Do")));
-
     setHelpTopic(ui->scheduleButton, Qn::EventsActions_Schedule_Help);
 
     ui->eventDefinitionGroupBox->installEventFilter(this);

@@ -511,7 +511,7 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
     if (!canStartVideowall(videoWall)) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
-            tr("There are no offline videowall items attached to this pc.")); //TODO: #VW #TR
+            tr("There are no offline videowall items attached to this pc."));
         return;
     }
 
@@ -521,7 +521,7 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
             Qn::Videowall_VwModeWarning_Help,
             tr("Switch to Video Wall Mode..."),
             tr("Video Wall will be started now. Do you want to close this %1 Client instance?")
-                .arg(QnAppInfo::productNameLong()), //TODO: #VW #TR
+                .arg(QnAppInfo::productNameLong()),
             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
             QMessageBox::Yes
             );
@@ -1166,15 +1166,21 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QnUuid::createUuid());
-    if (filtered.size() == 1)
-        layout->setName(generateUniqueLayoutName(context()->user(),
-                                                 filtered.first()->getName(),
-                                                 tr("%1 (%2)")
-                                                 .arg(filtered.first()->getName())
-                                                 .arg(lit("%1"))
-                                                 ));
-    else
+    if (filtered.size() == 1) {
+        QnResourcePtr resource = filtered.first();
+        if (resource->hasFlags(Qn::desktop_camera))
+            layout->setName(resource->getName());
+        else
+            layout->setName(generateUniqueLayoutName(context()->user(),
+                                                     resource->getName(),
+                                                     tr("%1 (%2)")
+                                                     .arg(resource->getName())
+                                                     .arg(lit("%1"))
+                                                     ));
+    }
+    else {
         layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
+    }
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 
@@ -1221,7 +1227,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Video Wall..."));
-    dialog->setText(tr("Enter the name of the Video Wall to create:")); //TODO: #VW #TR
+    dialog->setText(tr("Enter the name of the Video Wall to create:"));
     dialog->setName(proposedName);
     dialog->setWindowModality(Qt::ApplicationModal);
 
@@ -1690,7 +1696,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered() {
     if (matrix.layoutByItem.isEmpty()) {
         QMessageBox::information(mainWindow(),
             tr("Invalid matrix"),
-            tr("You have no layouts on the screens. Matrix cannot be saved.")); //TODO: #VW #TR
+            tr("You have no layouts on the screens. Matrix cannot be saved."));
         return;
     }
 

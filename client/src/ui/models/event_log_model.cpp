@@ -410,13 +410,15 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
                 result = tr("Motion video");
         }
         else {
-            result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, tr("\n"));
+            result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, lit("\n"));
         }
 
         if (!QnBusiness::hasToggleState(eventType)) {
             int count = action.getAggregationCount();
-            if (count > 1)
-                result += tr(" (%1 times)").arg(count); // TODO: #Elric #TR this will probably look bad 
+            if (count > 1) {
+                QString countString = tr("%1 times").arg(count);
+                result += lit(" (%1)").arg(countString);
+            }
         }
         return result;
     }

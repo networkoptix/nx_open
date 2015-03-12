@@ -47,6 +47,8 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
                                                 const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
+    Q_UNUSED(discoveryAddr)
+
     QnMacAddress mac(devInfo.serialNumber);
     const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
     if( channelCountEndIndex == -1 )
@@ -132,6 +134,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
 
 QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
+    Q_UNUSED(params)
     QnNetworkResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);

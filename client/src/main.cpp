@@ -664,10 +664,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     addTestData();
 #endif
 
+#ifdef _DEBUG
     if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
         QObject::connect(&autoTester, SIGNAL(finished()), application, SLOT(quit()));
         autoTester.start();
     }
+#endif
 
     /* Process pending events before executing actions. */
     qApp->processEvents();
@@ -752,12 +754,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     result = application->exec();
 
+#ifdef _DEBUG
     if(autoTester.state() == QnAutoTester::Finished) {
         if(!autoTester.succeeded())
             result = 1;
 
         cl_log.log(autoTester.message(), cl_logALWAYS);
     }
+#endif
 
     QnSessionManager::instance()->stop();
 

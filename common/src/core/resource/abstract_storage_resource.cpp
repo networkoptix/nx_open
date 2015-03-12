@@ -96,27 +96,6 @@ float QnAbstractStorageResource::getAvarageWritingUsage() const
     return 0.0;
 }
 
-QnAbstractStorageResource::ProtocolDescription QnAbstractStorageResource::protocolDescription(const QString &protocol) {
-    ProtocolDescription result;
-
-    QString validIpPattern = lit("(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])");
-    QString validHostnamePattern = lit("(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])");
-
-    if(protocol == lit("smb")) {
-        result.protocol = protocol;
-        result.name = tr("Windows Network Shared Resource");
-        result.urlTemplate = tr("\\\\<Computer Name>\\<Folder>");
-        result.urlPattern = lit("\\\\\\\\%1\\\\.+").arg(validHostnamePattern);
-    } else if(protocol == lit("coldstore")) {
-        result.protocol = protocol;
-        result.name = tr("Coldstore Network Storage");
-        result.urlTemplate = tr("coldstore://<Address>");
-        result.urlPattern = lit("coldstore://%1/?").arg(validHostnamePattern);
-    }
-
-    return result;
-}
-
 void QnAbstractStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     Q_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());

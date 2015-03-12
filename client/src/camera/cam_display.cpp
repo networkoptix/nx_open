@@ -848,7 +848,8 @@ void QnCamDisplay::onReaderResumed()
 
 void QnCamDisplay::onPrevFrameOccured()
 {
-    m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
+    if (getDisplayedTime() != DATETIME_NOW)
+        m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
     QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->clearDeviceBuffer();
 }

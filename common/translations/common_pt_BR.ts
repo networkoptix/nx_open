@@ -15,25 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnAbstractStorageResource</name>
-    <message>
-        <source>coldstore://&lt;Address&gt;</source>
-        <translation>coldstore://&lt;Address&gt;</translation>
-    </message>
-    <message>
-        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
-    </message>
-    <message>
-        <source>Windows Network Shared Resource</source>
-        <translation>Windows Network Shared Resource</translation>
-    </message>
-    <message>
-        <source>Coldstore Network Storage</source>
-        <translation>Armazenamento de rede Coldstore</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Camera IP Conflict</source>
@@ -291,6 +272,10 @@
     <message>
         <source>User Defined (%1)</source>
         <translation>Definido por usuário (%1)</translation>
+    </message>
+    <message>
+        <source>Conflicting Server: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

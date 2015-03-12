@@ -1,5 +1,5 @@
 <Include>
-  <Property Id="ARPCOMMENTS" Value="${company.name} [ProductName]" />
+  <Property Id="ARPCOMMENTS" Value="${company.name} ${display.product.name}" />
   <Property Id="ARPCONTACT" Value="${company.url}" />
   <Property Id="ARPPRODUCTICON" Value="eve_logo.ico" />
   <Property Id="ARPHELPLINK" Value="${product.url}" />

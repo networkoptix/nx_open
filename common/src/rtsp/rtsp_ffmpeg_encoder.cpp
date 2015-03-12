@@ -149,7 +149,7 @@ quint32 QnRtspFfmpegEncoder::getSSRC()
 
 bool QnRtspFfmpegEncoder::getRtpMarker()
 {
-    int dataRest = m_media->data() + m_media->dataSize() - m_curDataBuffer;
+    int dataRest = m_media->data() + static_cast<int>(m_media->dataSize()) - m_curDataBuffer;
     return m_isLastDataContext || dataRest == 0;
 }
 

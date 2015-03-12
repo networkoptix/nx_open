@@ -24,6 +24,7 @@ static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
 static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
 static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10*1000;
 static const quint64 MSEC_PER_SEC = 1000;
+static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 
@@ -264,6 +265,7 @@ QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
 
     m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
+    m_lastActivityTimer.invalidate();
 }
 
 void QnVideoCamera::beforeStop()
@@ -440,12 +442,14 @@ void QnVideoCamera::inUse(void* user)
 {
     QMutexLocker lock(&m_getReaderMutex);
     m_cameraUsers << user;
+    m_lastActivityTimer.restart();
 }
 
 void QnVideoCamera::notInUse(void* user)
 {
     QMutexLocker lock(&m_getReaderMutex);
     m_cameraUsers.remove(user);
+    m_lastActivityTimer.restart();
 }
 
 bool QnVideoCamera::isSomeActivity() const
@@ -499,6 +503,8 @@ void QnVideoCamera::stopIfNoActivity()
     }
 
     if (isSomeActivity())
+        return;
+	else if (m_lastActivityTimer.isValid() && m_lastActivityTimer.elapsed() < CAMERA_PULLING_STOP_TIMEOUT)
         return;
 
     const bool needStopPrimary = m_primaryReader && m_primaryReader->isRunning();
