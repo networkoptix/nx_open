@@ -28,8 +28,10 @@ namespace QnFusionRestHandlerDetail
             break;
         case Qn::CsvFormat:
             result = QnCsv::serialized(outputData);
+            break;
         case Qn::XmlFormat:
             result = QnXml::serialized(outputData, lit("reply"));
+            break;
         default:
             assert(0);
         }

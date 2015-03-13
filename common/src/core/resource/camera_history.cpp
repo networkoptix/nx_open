@@ -58,7 +58,7 @@ QnMediaServerResourceList QnCameraHistoryPool::getServersByCamera(const QnNetwor
     auto itr2 = getMediaServerOnTimeInternal(moveData, timePeriod.startTimeMs);
     Q_ASSERT(itr2 != moveData.end());
     QSet<QnMediaServerResourcePtr> result;
-    while (itr2 != moveData.end() && itr2->timestamp < timePeriod.endTimeMs()) {
+    while (itr2 != moveData.end() && itr2->timestampMs < timePeriod.endTimeMs()) {
         QnMediaServerResourcePtr mServer = toMediaServer(itr2->serverGuid);
         if (mServer)
             result << mServer;
@@ -70,7 +70,7 @@ ec2::ApiCameraHistoryMoveDataList::const_iterator QnCameraHistoryPool::getMediaS
 {
     // todo: test me!!!
     return std::lower_bound(data.begin(), data.end(), timestamp, [](const ec2::ApiCameraHistoryMoveData& data, qint64 timestamp) { 
-        return timestamp < data.timestamp; // inverse compare
+        return timestamp < data.timestampMs; // inverse compare
     });
 }
 
@@ -105,9 +105,9 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnNetwo
         return QnMediaServerResourcePtr();
     QnMediaServerResourcePtr result = toMediaServer(detailItr->serverGuid);
     if (foundPeriod) {
-        foundPeriod->startTimeMs = detailItr->timestamp;
+        foundPeriod->startTimeMs = detailItr->timestampMs;
         ++detailItr;
-        foundPeriod->durationMs = (detailItr == detailData.end() ? QnTimePeriod::UnlimitedPeriod : detailItr->timestamp - foundPeriod->startTimeMs);
+        foundPeriod->durationMs = (detailItr == detailData.end() ? QnTimePeriod::UnlimitedPeriod : detailItr->timestampMs - foundPeriod->startTimeMs);
     }
     return result;
 }
@@ -124,22 +124,22 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
     auto detailItr = getMediaServerOnTimeInternal(detailData, timestamp);
     if (detailItr == detailData.end())
         return  QnMediaServerResourcePtr();
-    qint64 t1 = detailItr->timestamp;
+    qint64 t1 = detailItr->timestampMs;
 
     if (searchForward) {
         if (++detailItr == detailData.end())
             return  QnMediaServerResourcePtr();
-        foundPeriod->startTimeMs = detailItr->timestamp;
+        foundPeriod->startTimeMs = detailItr->timestampMs;
         if (++detailItr == detailData.end())
             return  QnMediaServerResourcePtr();
-        foundPeriod->durationMs = detailItr->timestamp - foundPeriod->startTimeMs;
+        foundPeriod->durationMs = detailItr->timestampMs - foundPeriod->startTimeMs;
     }
     else {
         if (detailItr == detailData.cbegin())
             return QnMediaServerResourcePtr();
         else {
             --detailItr;
-            foundPeriod->startTimeMs = detailItr->timestamp;
+            foundPeriod->startTimeMs = detailItr->timestampMs;
             foundPeriod->durationMs = t1 - foundPeriod->startTimeMs;
         }
     }
