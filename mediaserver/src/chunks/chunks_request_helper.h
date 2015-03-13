@@ -13,6 +13,7 @@ struct QnChunksRequestData
     static QnChunksRequestData fromParams(const QnRequestParamList& params);
     QnRequestParamList toParams() const;
     QUrlQuery toUrlQuery() const;
+    bool isValid() const;
 
     Qn::TimePeriodContent periodsType;
     QnVirtualCameraResourceList resList;

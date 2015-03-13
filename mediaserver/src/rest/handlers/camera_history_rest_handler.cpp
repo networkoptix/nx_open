@@ -2,19 +2,84 @@
 #include <QWaitCondition>
 
 #include "camera_history_rest_handler.h"
+#include "core/resource/camera_resource.h"
 
-ec2::ApiCameraHistoryDetailData QnCameraHistoryRestHandler::buildHistoryData(const MultiServerPeriodDataList& chunks)
+/*
+int findNextServerIdx(qint64 currentTime, const MultiServerPeriodDataList& chunks, std::vector<qint64>& scanPos) 
 {
-    // todo: implement me
-    ec2::ApiCameraHistoryDetailData result;
+    for (int i = 0; i < scanPos.size(); ++i) {
+
+    }
+}
+*/
+
+ec2::ApiCameraHistoryMoveDataList QnCameraHistoryRestHandler::buildHistoryData(const MultiServerPeriodDataList& chunks)
+{
+    ec2::ApiCameraHistoryMoveDataList result;
+    std::vector<int> scanPos;
+    scanPos.resize(chunks.size());
+    qint64 currentTime = 0;
+    int prevIndex = -1;    
+    while(1)
+    {
+        int index = -1;
+        qint64 minNextTime = INT64_MAX;
+        int nextIndex = -1;
+        for (int i = 0; i < scanPos.size(); ++i) 
+        {
+            int& pos = scanPos[i];
+            const QnTimePeriodList& periods = chunks[i].periods;
+            for (;pos < periods.size() && periods[pos].endTimeMs() <= currentTime; pos++);
+            if (pos < periods.size()) {
+                if (periods[pos].contains(currentTime)) {
+                    index = i; // exact match
+                    break;
+                }
+                else if (periods[pos].startTimeMs < minNextTime) {
+                    minNextTime = periods[pos].startTimeMs;
+                    nextIndex = i;
+                }
+            }
+        }
+        if (index == -1) {
+            index = nextIndex; // data hole. get next min time after hole
+            currentTime = minNextTime;
+        }
+        if (index == -1)
+            break; // end of data reached
+
+        const QnTimePeriod& curPeriod = chunks[index].periods[scanPos[index]];
+        scanPos[index]++;
+        if (index == prevIndex)
+            continue; // ignore same server (no changes)
+
+        result.push_back(ec2::ApiCameraHistoryMoveData(chunks[index].guid, currentTime));
+        currentTime = curPeriod.endTimeMs();
+        prevIndex = index;
+    }
+
     return result;
 }
 
 int QnCameraHistoryRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     QnChunksRequestData request = QnChunksRequestData::fromParams(params);
-    MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(request);
-    ec2::ApiCameraHistoryDetailData outputData = buildHistoryData(chunks);
+    if (!request.isValid())
+        return nx_http::StatusCode::badRequest;
+
+    ec2::ApiCameraHistoryDetailDataList outputData;
+    for (const auto& camera: request.resList)
+    {
+        QnChunksRequestData updatedRequest = request;
+        updatedRequest.resList.clear();
+        updatedRequest.resList.push_back(camera);
+        MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(request);
+        ec2::ApiCameraHistoryDetailData outputRecord;
+        outputRecord.cameraId = request.resList.first()->getId();
+        outputRecord.moveHistory = buildHistoryData(chunks);
+        outputData.push_back(std::move(outputRecord));
+    }
+
     QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);
     return nx_http::StatusCode::ok;
 }

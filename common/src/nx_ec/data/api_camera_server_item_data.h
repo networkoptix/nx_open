@@ -35,14 +35,17 @@ namespace ec2
     struct ApiCameraHistoryMoveData: ApiData
     {
         ApiCameraHistoryMoveData(): timestamp(0) {}
+        ApiCameraHistoryMoveData(const QnUuid& serverGuid, const qint64& timestamp): serverGuid(serverGuid), timestamp(timestamp) {}
         QnUuid serverGuid;
         qint64 timestamp;
     };
 
+    typedef std::vector<ApiCameraHistoryMoveData> ApiCameraHistoryMoveDataList;
     struct ApiCameraHistoryDetailData {
         QnUuid cameraId;
-        std::vector<ApiCameraHistoryMoveData> moveHistory;
+        ApiCameraHistoryMoveDataList moveHistory;
     };
+    typedef std::vector<ApiCameraHistoryDetailData> ApiCameraHistoryDetailDataList;
 
 #define ApiCameraHistoryData_Fields (serverGuid)(archivedCameras)
 #define ApiCameraHistoryMoveData_Fields (serverGuid)(timestamp)

@@ -114,6 +114,8 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnC
 int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+    if (!request.isValid())
+        return nx_http::StatusCode::badRequest;
     MultiServerPeriodDataList outputData = loadDataSync(request);
 
     if (request.format == Qn::CompressedPeriodsFormat)

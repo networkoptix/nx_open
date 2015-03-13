@@ -172,7 +172,6 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
 
 bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 {
-
     std::vector<QnUuid> archivedListNew = qnStorageMan->getCamerasWithArchive();
     std::vector<QnUuid> archivedListOld = qnHistoryPool->getCamerasWithArchive(qnCommon->moduleGUID());
     if (archivedListOld == archivedListNew) 
@@ -251,6 +250,8 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
 
 bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
+    updateCameraHistory(res);
+
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
     bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();
     if (!cameraRes->isInitialized() && needRecordCamera) {
@@ -306,8 +307,6 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
                 camera->updateActivity();
             }
         }
-        if (recorderHiRes || recorderLowRes)
-            updateCameraHistory(res);
     }
     else 
     {

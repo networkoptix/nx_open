@@ -2116,7 +2116,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
 ErrorCode QnDbManager::addCameraHistory(const ApiCameraHistoryData& params)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_archived_cameras (server_guid, cameras) VALUES(?, ?)");
+    query.prepare("INSERT OR REPLACE INTO vms_used_cameras (server_guid, cameras) VALUES(?, ?)");
     query.addBindValue(QnSql::serialized_field(params.serverGuid));
     query.addBindValue(QnUbjson::serialized(params.archivedCameras));
     if (!query.exec()) {

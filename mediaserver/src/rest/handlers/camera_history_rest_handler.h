@@ -15,7 +15,7 @@ class QnCameraHistoryRestHandler: public QnFusionRestHandler
 public:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
 private:
-    ec2::ApiCameraHistoryDetailData buildHistoryData(const MultiServerPeriodDataList& chunks);
+    ec2::ApiCameraHistoryMoveDataList buildHistoryData(const MultiServerPeriodDataList& chunks);
 };
 
 
