@@ -299,6 +299,7 @@ void QnModuleFinder::handleSelfResponse(const QnModuleInformationEx &moduleInfor
     qint64 currentTime = m_elapsedTimer.elapsed();
     if (currentTime - m_lastSelfConflict > pingTimeout()) {
         m_selfConflictCount = 1;
+        m_lastSelfConflict = currentTime;
         return;
     }
     m_lastSelfConflict = currentTime;
