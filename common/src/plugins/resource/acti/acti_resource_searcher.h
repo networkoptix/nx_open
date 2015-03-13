@@ -65,6 +65,8 @@ private:
 
 private slots:
     void at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply);
+private:
+    QnUuid m_resTypeId;
 };
 
 #endif // #ifdef ENABLE_ACTI

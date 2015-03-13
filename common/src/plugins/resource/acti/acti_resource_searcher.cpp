@@ -20,6 +20,7 @@ QnActiResourceSearcher::QnActiResourceSearcher():
     QObject(), QnUpnpResourceSearcher()
 {
     QnMdnsListener::instance()->registerConsumer((long) this);
+    m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
 }
 
 QnActiResourceSearcher::~QnActiResourceSearcher()
@@ -222,13 +223,12 @@ void QnActiResourceSearcher::createResource(
     const QAuthenticator& auth,
     QnResourceList& result )
 {
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
-    if (rt.isNull())
+    if (m_resTypeId.isNull())
         return;
 
     QnActiResourcePtr resource( new QnActiResource() );
 
-    resource->setTypeId(rt);
+    resource->setTypeId(m_resTypeId);
     resource->setName(QString(QLatin1String("ACTi-")) + devInfo.modelName);
     resource->setModel(devInfo.modelName);
     resource->setUrl(devInfo.presentationUrl);

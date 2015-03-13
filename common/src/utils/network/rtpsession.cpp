@@ -442,11 +442,11 @@ void RTPSession::usePredefinedTracks()
     int trackNum = 0;
     for (; trackNum < m_numOfPredefinedChannels; ++trackNum)
     {
-        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QLatin1String("video"), QString(QLatin1String("trackID=%1")).arg(trackNum), FFMPEG_CODE, trackNum, this, true));
+        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QByteArray("video"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, trackNum, this, true));
     }
 
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QLatin1String("audio"), QString(QLatin1String("trackID=%1")).arg(trackNum), FFMPEG_CODE, trackNum, this, true));
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(METADATA_STR, QLatin1String("metadata"), QLatin1String("trackID=7"), METADATA_CODE, METADATA_TRACK_NUM, this, true));
+    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QByteArray("audio"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, trackNum, this, true));
+    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(METADATA_STR, QByteArray("metadata"), QByteArray("trackID=7"), METADATA_CODE, METADATA_TRACK_NUM, this, true));
 }
 
 bool trackNumLess(const QSharedPointer<RTPSession::SDPTrackInfo>& track1, const QSharedPointer<RTPSession::SDPTrackInfo>& track2)
@@ -498,8 +498,8 @@ void RTPSession::parseSDP()
 
     int mapNum = -1;
     QString codecName;
-    QString codecType;
-    QString setupURL;
+    QByteArray codecType;
+    QByteArray setupURL;
 
     for(QByteArray line: lines)
     {
@@ -515,7 +515,7 @@ void RTPSession::parseSDP()
                 setupURL.clear();
             }
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
-            codecType = QLatin1String(trackParams[0]);
+            codecType = trackParams[0];
             codecName.clear();
             mapNum = 0;
             if (trackParams.size() >= 4) {
@@ -537,7 +537,7 @@ void RTPSession::parseSDP()
         //else if (lineLower.startsWith("a=control:track"))
         else if (lineLower.startsWith("a=control:"))
         {
-            setupURL = QLatin1String(line.mid(QByteArray("a=control:").length()));
+            setupURL = line.mid(QByteArray("a=control:").length());
         }
     }
     if (mapNum >= 0) {
@@ -974,16 +974,16 @@ bool RTPSession::sendSetup()
 
         nx_http::Request request;
         request.requestLine.method = "SETUP";
-        if( trackInfo->setupURL.startsWith(QLatin1String("rtsp://")) )
+        if( trackInfo->setupURL.startsWith("rtsp://") )
         {
             // full track url in a prefix
-            request.requestLine.url = trackInfo->setupURL;
+            request.requestLine.url = QString::fromLatin1(trackInfo->setupURL);
         }   
         else
         {
             request.requestLine.url = mUrl;
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
-            request.requestLine.urlPostfix = QString(lit("/")) + trackInfo->setupURL;
+            request.requestLine.urlPostfix = QByteArray("/") + trackInfo->setupURL;
         }
         request.requestLine.version = nx_rtsp::rtsp_1_0;
         request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );

@@ -143,19 +143,19 @@ public:
 
     struct SDPTrackInfo
     {
-        SDPTrackInfo(const QString& _codecName, QString trackTypeStr, const QString& _setupURL, int _mapNum, int _trackNum, RTPSession* owner, bool useTCP):
+        SDPTrackInfo(const QString& _codecName, const QByteArray& _trackTypeStr, const QByteArray& _setupURL, int _mapNum, int _trackNum, RTPSession* owner, bool useTCP):
             codecName(_codecName), setupURL(_setupURL), mapNum(_mapNum), trackNum(_trackNum)
         {
-            trackTypeStr = trackTypeStr.toLower();
-            if (trackTypeStr == QLatin1String("audio"))
+            QByteArray trackTypeStr = _trackTypeStr.toLower();
+            if (trackTypeStr == "audio")
                 trackType = TT_AUDIO;
-            else if (trackTypeStr == QLatin1String("audio-rtcp"))
+            else if (trackTypeStr == "audio-rtcp")
                 trackType = TT_AUDIO_RTCP;
-            else if (trackTypeStr == QLatin1String("video"))
+            else if (trackTypeStr == "video")
                 trackType = TT_VIDEO;
-            else if (trackTypeStr == QLatin1String("video-rtcp"))
+            else if (trackTypeStr == "video-rtcp")
                 trackType = TT_VIDEO_RTCP;
-            else if (trackTypeStr == QLatin1String("metadata"))
+            else if (trackTypeStr == "metadata")
                 trackType = TT_METADATA;
             else
                 trackType = TT_UNKNOWN;
@@ -172,7 +172,7 @@ public:
 
         QString codecName;
         TrackType trackType;
-        QString setupURL;
+        QByteArray setupURL;
         int mapNum;
         int trackNum;
         QPair<int,int> interleaved;
