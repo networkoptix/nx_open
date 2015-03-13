@@ -30,7 +30,10 @@ private:
 };
 
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
-    m_serverFlags(Qn::SF_None)
+    m_serverFlags(Qn::SF_None),
+    m_panicModeCache(
+        std::bind(&QnMediaServerResource::calculatePanicMode, this),
+        &m_mutex )
 {
     setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
     addFlags(Qn::server | Qn::remote);
@@ -47,6 +50,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
+    connect(this, &QnResource::resourceChanged, this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -69,6 +73,10 @@ void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
         m_firstCamera.clear();
 }
 
+void QnMediaServerResource::atResourceChanged()
+{
+    m_panicModeCache.update();
+}
 
 QString QnMediaServerResource::getUniqueId() const
 {
@@ -272,6 +280,11 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
 }
 
 Qn::PanicMode QnMediaServerResource::getPanicMode() const 
+{
+    return m_panicModeCache.get();
+}
+
+Qn::PanicMode QnMediaServerResource::calculatePanicMode() const 
 {
     QString strVal = getProperty(lit("panic_mode"));
     Qn::PanicMode result = Qn::PM_None;

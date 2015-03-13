@@ -8,6 +8,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <memory>
+
 #include "media_data_packet.h"
 
 
@@ -36,8 +38,8 @@ public:
     void assign(const QnCompressedVideoData* other);
 };
 
-typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
-typedef QSharedPointer<const QnCompressedVideoData> QnConstCompressedVideoDataPtr;
+typedef std::shared_ptr<QnCompressedVideoData> QnCompressedVideoDataPtr;
+typedef std::shared_ptr<const QnCompressedVideoData> QnConstCompressedVideoDataPtr;
 
 
 //!Stores video data buffer using \a QnByteArray
@@ -69,8 +71,8 @@ private:
     void assign(const QnWritableCompressedVideoData* other);
 };
 
-typedef QSharedPointer<QnWritableCompressedVideoData> QnWritableCompressedVideoDataPtr;
-typedef QSharedPointer<const QnWritableCompressedVideoData> QnConstWritableCompressedVideoDataPtr;
+typedef std::shared_ptr<QnWritableCompressedVideoData> QnWritableCompressedVideoDataPtr;
+typedef std::shared_ptr<const QnWritableCompressedVideoData> QnConstWritableCompressedVideoDataPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
 

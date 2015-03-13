@@ -45,7 +45,9 @@ private:
     enum {BLOCK_SIZE = 1460};
 
 public:
-    QnMulticodecRtpReader( const QnResourcePtr& res );
+    QnMulticodecRtpReader(
+        const QnResourcePtr& res,
+        std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
     virtual ~QnMulticodecRtpReader();
 
     //!Implementation of QnAbstractMediaStreamProvider::getNextData

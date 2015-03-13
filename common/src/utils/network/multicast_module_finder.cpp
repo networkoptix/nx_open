@@ -89,7 +89,7 @@ void QnMulticastModuleFinder::updateInterfaces() {
             std::unique_ptr<UDPSocket> sock( new UDPSocket() );
             sock->bind(SocketAddress(address.toString(), 0));
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
-            sock->setDestAddr(m_multicastGroupAddress.toString(), m_multicastGroupPort);
+            sock->setDestAddr(SocketAddress(m_multicastGroupAddress.toString(), m_multicastGroupPort));
             auto it = m_clientSockets.insert(address, sock.release());
             if (m_serverSocket)
                 m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString());
@@ -116,9 +116,8 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[READ_BUFFER_SIZE];
 
-    QString remoteAddressStr;
-    unsigned short remotePort = 0;
-    int bytesRead = udpSocket->recvFrom(readBuffer, READ_BUFFER_SIZE, remoteAddressStr, remotePort);
+    SocketAddress remoteEndpoint;
+    int bytesRead = udpSocket->recvFrom(readBuffer, READ_BUFFER_SIZE, &remoteEndpoint);
     if (bytesRead == -1) {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Failed to read socket on local address (%1). %2").
@@ -131,8 +130,8 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     const quint8 *requestBufStart = readBuffer;
     if (!request.deserialize(&requestBufStart, readBuffer + bytesRead)) {
         //invalid response
-        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1:%2) on local address %3").
-            arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1) on local address %2").
+            arg(remoteEndpoint.toString()).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
         return false;
     }
 
@@ -141,9 +140,9 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
-    if (!udpSocket->sendTo(readBuffer, responseBufStart - readBuffer, SocketAddress(remoteAddressStr, remotePort))) {
-        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Can't send response to address (%1:%2)").
-            arg(remoteAddressStr).arg(remotePort), cl_logDEBUG1);
+    if (!udpSocket->sendTo(readBuffer, responseBufStart - readBuffer, remoteEndpoint)) {
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Can't send response to address (%1)").
+            arg(remoteEndpoint.toString()), cl_logDEBUG1);
         return false;
     };
 
@@ -154,10 +153,8 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     const size_t readBufferSize = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[readBufferSize];
 
-    QString remoteAddress;
-    unsigned short remotePort = 0;
-
-    int bytesRead = udpSocket->recvFrom(readBuffer, readBufferSize, remoteAddress, remotePort);
+    SocketAddress remoteEndpoint;
+    int bytesRead = udpSocket->recvFrom(readBuffer, readBufferSize, &remoteEndpoint);
     if (bytesRead == -1) {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(lit("QnMulticastModuleFinder. Failed to read socket on local address (%1). %2")
@@ -168,24 +165,25 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     RevealResponse response;
     const quint8 *responseBufStart = readBuffer;
     if (!response.deserialize(&responseBufStart, readBuffer + bytesRead)) {
-        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1:%2) on local address %3")
-               .arg(remoteAddress).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
+        //invalid response
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1) on local address %2").
+            arg(remoteEndpoint.toString()).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
         return false;
     }
 
     if (response.type != nxMediaServerId && response.type != nxECId)
         return true;
 
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Ignoring %1 (%2) with different customization %3 on local address %4").
+            arg(response.type).arg(remoteEndpoint.toString()).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
 
     if (!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower()) {
-        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
-            arg(response.type).arg(remoteAddress).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
 
     QnModuleInformationEx moduleInformation = response.toModuleInformation();
     QUrl url;
-    url.setHost(remoteAddress);
+    url.setHost(remoteEndpoint.address.toString());
     url.setPort(moduleInformation.port);
 
     emit responseReceived(moduleInformation, url);

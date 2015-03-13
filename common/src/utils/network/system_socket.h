@@ -534,12 +534,12 @@ public:
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
     //!Implementation of AbstractDatagramSocket::setDestAddr
-    virtual bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort ) override;
+    virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) override;
     //!Implementation of AbstractDatagramSocket::sendTo
     virtual bool sendTo(
         const void* buffer,
         unsigned int bufferLen,
-        const SocketAddress& foreignAddress ) override;
+        const SocketAddress& foreignEndpoint ) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     /*!
         Actually calls \a UDPSocket::recvFrom and saves datagram source address/port
@@ -549,8 +549,7 @@ public:
     virtual int recvFrom(
         void* buffer,
         unsigned int bufferLen,
-        QString& sourceAddress,
-        unsigned short& sourcePort ) override;
+        SocketAddress* const sourceAddress ) override;
     //!Implementation of AbstractDatagramSocket::lastDatagramSourceAddress
     virtual SocketAddress lastDatagramSourceAddress() const override;
     //!Implementation of AbstractDatagramSocket::hasData

@@ -446,7 +446,7 @@ void QnThumbnailsLoader::process() {
 #endif
 
         qint64 time = period.startTimeMs;
-        QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
+        QnCompressedVideoDataPtr frame = std::dynamic_pointer_cast<QnCompressedVideoData>(client->getNextData());
         if (frame)
         {
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
@@ -489,7 +489,7 @@ void QnThumbnailsLoader::process() {
                     }
                 }
 
-                frame = qSharedPointerDynamicCast<QnCompressedVideoData>(client->getNextData());
+                frame = std::dynamic_pointer_cast<QnCompressedVideoData>(client->getNextData());
             }
 
             if(!invalidated && m_mode == Mode::Default) { // TODO: #Elric mode check may be wrong here.

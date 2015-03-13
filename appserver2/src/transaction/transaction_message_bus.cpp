@@ -1017,15 +1017,14 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
     return transaction;
 }
 
-//TODO #ak use SocketAddress instead of this function. It will reduce QString instanciations and make code more clear
-static QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
+static SocketAddress getUrlAddr(const QUrl& url) { return SocketAddress( url.host(), url.port() ); }
 
 bool QnTransactionMessageBus::isPeerUsing(const QUrl& url)
 {
-    QString addr1 = getUrlAddr(url);
+    const SocketAddress& addr1 = getUrlAddr(url);
     for (int i = 0; i < m_connectingConnections.size(); ++i)
     {
-        QString addr2 = getUrlAddr(m_connectingConnections[i]->remoteAddr());
+        const SocketAddress& addr2 = getUrlAddr(m_connectingConnections[i]->remoteAddr());
         if (addr2 == addr1)
             return true;
     }
@@ -1142,8 +1141,12 @@ void QnTransactionMessageBus::doPeriodicTasks()
     // send HTTP level keep alive (empty chunk) for server <---> server connections
     if (!m_localPeer.isClient()) 
     {
-        for(QnTransactionTransport* transport: m_connections.values()) 
+        for( QnConnectionMap::iterator
+            itr = m_connections.begin();
+            itr != m_connections.end();
+            ++itr )
         {
+            QnTransactionTransport* transport = itr.value();
             if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
             {
                 if (transport->isHttpKeepAliveTimeout()) {
@@ -1289,7 +1292,7 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
 
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.remove(url);
-    QString urlStr = getUrlAddr(url);
+    const SocketAddress& urlStr = getUrlAddr(url);
     for(QnTransactionTransport* transport: m_connections.values())
     {
         if (getUrlAddr(transport->remoteAddr()) == urlStr) {

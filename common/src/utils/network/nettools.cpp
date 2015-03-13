@@ -605,10 +605,14 @@ int strEqualAmount(const char* str1, const char* str2)
     return rez;
 }
 
-bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress)
+bool isNewDiscoveryAddressBetter(
+    const HostAddress& host,
+    const QHostAddress& newAddress,
+    const QHostAddress& oldAddress )
 {
-    int eq1 = strEqualAmount(host.toLatin1().constData(), newAddress.toLatin1().constData());
-    int eq2 = strEqualAmount(host.toLatin1().constData(), oldAddress.toLatin1().constData());
+    //TODO #ak compare binary values, not strings!
+    int eq1 = strEqualAmount(host.toString().toLatin1().constData(), newAddress.toString().toLatin1().constData());
+    int eq2 = strEqualAmount(host.toString().toLatin1().constData(), oldAddress.toString().toLatin1().constData());
     return eq1 > eq2;
 }
 

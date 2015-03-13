@@ -8,6 +8,8 @@ extern "C"
 #include "libavcodec/avcodec.h"
 }
 
+#include <memory>
+
 #include <QtCore/QVector>
 #include <QtCore/QRect>
 
@@ -125,8 +127,8 @@ protected:
 private:
     //QnAbstractMediaData(): data(0U, 1) {};
 };
-typedef QSharedPointer<QnAbstractMediaData> QnAbstractMediaDataPtr;
-typedef QSharedPointer<const QnAbstractMediaData> QnConstAbstractMediaDataPtr;
+typedef std::shared_ptr<QnAbstractMediaData> QnAbstractMediaDataPtr;
+typedef std::shared_ptr<const QnAbstractMediaData> QnConstAbstractMediaDataPtr;
 
 Q_STATIC_ASSERT(AV_PKT_FLAG_KEY == QnAbstractMediaData::MediaFlags_AVKey);
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnAbstractMediaData::MediaFlags)
@@ -153,12 +155,12 @@ struct QnEmptyMediaData : public QnAbstractMediaData
 
     QnByteArray m_data;
 };
-typedef QSharedPointer<QnEmptyMediaData> QnEmptyMediaDataPtr;
+typedef std::shared_ptr<QnEmptyMediaData> QnEmptyMediaDataPtr;
 
 struct QnMetaDataV1;
-typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
+typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
-typedef QSharedPointer<const QnMetaDataV1> QnConstMetaDataV1Ptr;
+typedef std::shared_ptr<const QnMetaDataV1> QnConstMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
 
 
