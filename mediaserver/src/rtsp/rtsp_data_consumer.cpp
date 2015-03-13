@@ -57,7 +57,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
     m_someDataIsDropped(false),
     m_previousRtpTimestamp(-1),
-    m_previousScaledRtpTimestamp(-1)
+    m_previousScaledRtpTimestamp(-1),
+    m_framesSinceRangeCheck(0)
 {
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
@@ -596,9 +597,14 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     }
     m_sendBuffer.clear();
 
-    QByteArray newRange = m_owner->getRangeHeaderIfChanged();
-    if (!newRange.isEmpty())
-        sendMetadata(newRange);
+    static const int FRAMES_BETWEEN_PLAY_RANGE_CHECK = 20;
+    if( (++m_framesSinceRangeCheck) > FRAMES_BETWEEN_PLAY_RANGE_CHECK )
+    {
+        m_framesSinceRangeCheck = 0;
+        const QByteArray& newRange = m_owner->getRangeHeaderIfChanged();
+        if (!newRange.isEmpty())
+            sendMetadata(newRange);
+    }
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
