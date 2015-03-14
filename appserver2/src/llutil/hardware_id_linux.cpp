@@ -8,6 +8,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
 #include <QtCore/QDebug>
+#include <QtCore/QDir>
 
 #ifdef __arm__
 #include <sys/types.h>
@@ -67,7 +68,7 @@ void getMemoryInfo(std::string& memoryInfo) {
     StrSet values[PARAMETER_COUNT];
 
     FILE *fp = popen("/usr/sbin/dmidecode -t17", "r");
-    
+
     if (fp == NULL)
         return;
 
@@ -98,7 +99,42 @@ namespace LLUtil {
 
 #if defined(__i686__) || defined(__x86_64__)
 
-void fillHardwareIds(QList<QByteArray>& hardwareIds)
+void findMacAddresses(DevicesList& devices) {
+    QStringList classes;
+    classes << "PCI" << "USB";
+
+    QDir interfacesDir("/sys/class/net");
+    QStringList interfaces = interfacesDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach (QString interface, interfaces) {
+        QFileInfo addressFileInfo(interfacesDir, interface + "/address");
+        if (!addressFileInfo.exists())
+            continue;
+
+        QFile addressFile(addressFileInfo.absoluteFilePath());
+        if (!addressFile.open(QFile::ReadOnly))
+            continue;
+
+        QString mac = QString(addressFile.readAll()).trimmed().toUpper();
+        if (mac.isEmpty())
+            continue;
+
+        QFileInfo subsystemFileInfo(interfacesDir, interface + "/device/subsystem");
+        QString xclass = QDir(subsystemFileInfo.symLinkTarget()).dirName().toUpper();
+
+        if (classes.contains(xclass)) {
+            devices.push_back(DeviceClassAndMac(xclass, mac));
+        }
+    }
+}
+
+void getMacAddress(QString &mac, QSettings *settings) {
+    DevicesList devices;
+
+    findMacAddresses(devices);
+    mac = getSaveMacAddress(devices, settings);
+}
+
+void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
 {
     std::string board_serial = read_file("/sys/class/dmi/id/board_serial");
     std::string board_vendor = read_file("/sys/class/dmi/id/board_vendor");
@@ -112,17 +148,22 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds)
     getMemoryInfo(memory_info);
     QByteArray memory_info_ba = fromString(memory_info);
 
+    QString mac;
+    getMacAddress(mac, settings);
+
     QByteArray hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
     hardwareIds[0] = hardwareId;
-	hardwareIds[1] = hardwareId;
+    hardwareIds[1] = hardwareId;
     hardwareIds[2] = (hardwareId + memory_info_ba);
-    
+    hardwareIds[3] = (hardwareId + memory_info_ba + mac.toLatin1());
+
     changeGuidByteOrder(product_uuid);
     hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
 
-    hardwareIds[3] = hardwareId;
-	hardwareIds[4] = hardwareId;
-    hardwareIds[5] = (hardwareId + memory_info_ba);
+    hardwareIds[4] = hardwareId;
+    hardwareIds[5] = hardwareId;
+    hardwareIds[6] = (hardwareId + memory_info_ba);
+    hardwareIds[7] = (hardwareId + memory_info_ba + mac.toLatin1());
 }
 
 #elif defined(__arm__)
@@ -154,7 +195,10 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds)
     mac_eth0( MAC_str, nullptr );
     QByteArray hardwareId = QByteArray( MAC_str, sizeof(MAC_str) );
     hardwareIds.clear();
-    hardwareIds << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId;
+
+    for (int ; i < 2 * LATEST_HWID_VERSION; i++) {
+        hardwareIds << hardwareId;
+    }
 }
 
 #endif
