@@ -2249,8 +2249,9 @@ private:
         if (guidIsHWID == YES) {
             if (serverGuid.isEmpty())
                 MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
-            else
+            else if (serverGuid != hwidGuid)
                 MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
+
             MSSettings::roSettings()->remove(SERVER_GUID2);
         } else if (guidIsHWID == NO) {
             if (serverGuid.isEmpty()) {
