@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_history.h>
 #include <utils/common/product_features.h>
 
 
@@ -28,6 +29,8 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
     loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"), false);
+
+    instance<QnCameraHistoryPool>();
 
     /* Init members. */
     m_sessionManager = new QnSessionManager(); //instance<QnSessionManager>();

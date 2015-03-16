@@ -12,16 +12,7 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     m_mutex(QMutex::Recursive)
 {}
 
-QnCameraHistoryPool::~QnCameraHistoryPool() {
-    return;
-}
-
-Q_GLOBAL_STATIC(QnCameraHistoryPool, QnCameraHistoryPool_instance);
-
-QnCameraHistoryPool* QnCameraHistoryPool::instance()
-{
-    return QnCameraHistoryPool_instance();
-}
+QnCameraHistoryPool::~QnCameraHistoryPool() {}
 
 QnMediaServerResourcePtr QnCameraHistoryPool::getCurrentServer(const QnNetworkResourcePtr &camera) const
 {

@@ -173,7 +173,7 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
 bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 {
     std::vector<QnUuid> archivedListNew = qnStorageMan->getCamerasWithArchive();
-    std::vector<QnUuid> archivedListOld = qnHistoryPool->getCamerasWithArchive(qnCommon->moduleGUID());
+    std::vector<QnUuid> archivedListOld = qnCameraHistoryPool->getCamerasWithArchive(qnCommon->moduleGUID());
     if (archivedListOld == archivedListNew) 
         return true;
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();

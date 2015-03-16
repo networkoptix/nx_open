@@ -10,15 +10,15 @@
 #include <set>
 #include "nx_ec/data/api_fwd.h"
 
-class QnCameraHistoryPool: public QObject {
-    Q_OBJECT;
+#include <utils/common/singleton.h>
+
+class QnCameraHistoryPool: public QObject, public Singleton<QnCameraHistoryPool> {
+    Q_OBJECT
+
 public:
-    typedef QMap<QnUuid, ec2::ApiCameraHistoryMoveDataList> DetailHistoryMap;
 
     QnCameraHistoryPool(QObject *parent = NULL);
     virtual ~QnCameraHistoryPool();
-
-    static QnCameraHistoryPool* instance();
 
     void setCamerasWithArchiveList(const ec2::ApiCameraHistoryDataList& cameraHistoryList);
     void setCamerasWithArchive(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
@@ -53,10 +53,12 @@ private:
 
     mutable QMutex m_mutex;
     QMap<QnUuid, std::vector<QnUuid>> m_archivedCameras; // archived cameras by server
+
+    typedef QMap<QnUuid, ec2::ApiCameraHistoryMoveDataList> DetailHistoryMap;
     DetailHistoryMap m_historyDetail; // camera move detail by camera
 };
 
 
-#define qnHistoryPool (QnCameraHistoryPool::instance())
+#define qnCameraHistoryPool (QnCameraHistoryPool::instance())
 
 #endif // QN_CAMERA_HISTORY_H

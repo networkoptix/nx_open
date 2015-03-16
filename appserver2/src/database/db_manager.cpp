@@ -3027,7 +3027,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
     return ErrorCode::ok;
 }
 
-//getCameraServerItems
+//getCameraHistoryItems
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraHistoryDataList& historyList)
 {
     QSqlQuery query(m_sdb);

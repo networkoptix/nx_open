@@ -473,7 +473,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
     quint64 ts = params.eventTimestamp;
 
-    QnMediaServerResourcePtr newServer = qnHistoryPool->getMediaServerOnTime(res, ts/1000);
+    QnMediaServerResourcePtr newServer = qnCameraHistoryPool->getMediaServerOnTime(res, ts/1000);
     if (newServer)
         mserverRes = newServer;
 

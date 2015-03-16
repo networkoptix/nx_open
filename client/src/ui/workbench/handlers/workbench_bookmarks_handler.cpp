@@ -76,7 +76,7 @@ QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const
     if (time == DATETIME_NOW)
         return currentServer;
 
-    QnMediaServerResourcePtr mediaServer = QnCameraHistoryPool::instance()->getMediaServerOnTime(camera, time);
+    QnMediaServerResourcePtr mediaServer = qnCameraHistoryPool->getMediaServerOnTime(camera, time);
     if (!mediaServer)
         return currentServer;
 

@@ -97,7 +97,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnC
     {
         QSet<QnMediaServerResourcePtr> servers;
         for (const auto& camera: ctx.request.resList)
-            servers += QnCameraHistoryPool::instance()->getServersByCamera(camera).toSet();
+            servers += qnCameraHistoryPool->getServersByCamera(camera).toSet();
 
         for (const auto& server: servers) 
         {

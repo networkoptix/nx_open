@@ -4,34 +4,18 @@
 #include "api_globals.h"
 #include "api_data.h"
 
-#include <utils/common/latin1_array.h>
-
 namespace ec2
 {
-    /*
-    struct ApiCameraServerItemDataOld: ApiData {
-        ApiCameraServerItemDataOld(): timestamp(0) {}
-
-        QString cameraUniqueId;
-        QnLatin1Array serverId;
-        qint64   timestamp;
-    };
-
-    struct ApiCameraServerItemData: ApiData {
-        ApiCameraServerItemData(): timestamp(0) {}
-
-        QString cameraUniqueId;
-        QnUuid serverGuid;
-        qint64   timestamp;
-    };
-    */
-
+    /** List of cameras that have footage on the given server. */
     struct ApiCameraHistoryData: ApiData
     {
         QnUuid serverGuid;
         std::vector<QnUuid> archivedCameras;
     };
+    #define ApiCameraHistoryData_Fields (serverGuid)(archivedCameras)
+    typedef std::vector<ApiCameraHistoryData> ApiCameraHistoryDataList;
 
+    /** History item of camera movement from server to server. Server and timestamp when the camera moved to it. */
     struct ApiCameraHistoryMoveData: ApiData
     {
         ApiCameraHistoryMoveData(): timestampMs(0) {}
@@ -39,18 +23,17 @@ namespace ec2
         QnUuid serverGuid;
         qint64 timestampMs;
     };
-
+    #define ApiCameraHistoryMoveData_Fields (serverGuid)(timestampMs)
     typedef std::vector<ApiCameraHistoryMoveData> ApiCameraHistoryMoveDataList;
+
+
+    /** Full history of the movement for the given camera. */
     struct ApiCameraHistoryDetailData {
         QnUuid cameraId;
         ApiCameraHistoryMoveDataList moveHistory;
     };
+    #define ApiCameraHistoryDetailData_Fields (cameraId)(moveHistory)
     typedef std::vector<ApiCameraHistoryDetailData> ApiCameraHistoryDetailDataList;
-
-#define ApiCameraHistoryData_Fields (serverGuid)(archivedCameras)
-#define ApiCameraHistoryMoveData_Fields (serverGuid)(timestampMs)
-#define ApiCameraHistoryDetailData_Fields (cameraId)(moveHistory)
-
 }
 
 #endif // __CAMERA_SERVER_ITEM_DATA_H__
