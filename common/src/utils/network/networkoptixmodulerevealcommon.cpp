@@ -127,6 +127,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     moduleInformation.authHash = authHash;
     moduleInformation.protoVersion = protoVersion;
     moduleInformation.runtimeId = runtimeId;
+    moduleInformation.fixRuntimeId(); // compatibility with previous version if field is absent
 
     return !type.isEmpty() && !version.isEmpty();
 }
