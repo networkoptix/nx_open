@@ -188,8 +188,9 @@ void mac_eth0(char  MAC_str[13], char** host)
 }
 
 
-void fillHardwareIds(QList<QByteArray>& hardwareIds)
+void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
 {
+    Q_UNUSED(settings)
     char MAC_str[13];
     memset(MAC_str, sizeof(MAC_str), 0);
     mac_eth0( MAC_str, nullptr );
