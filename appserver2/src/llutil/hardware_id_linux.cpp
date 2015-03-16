@@ -196,7 +196,7 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds)
     QByteArray hardwareId = QByteArray( MAC_str, sizeof(MAC_str) );
     hardwareIds.clear();
 
-    for (int ; i < 2 * LATEST_HWID_VERSION; i++) {
+    for (int i = 0; i < 2 * LATEST_HWID_VERSION; i++) {
         hardwareIds << hardwareId;
     }
 }
