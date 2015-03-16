@@ -45,14 +45,14 @@ void QnLocalFileCache::storeImageData(const QString &fileName, const QImage &ima
 
 void QnLocalFileCache::downloadFile(const QString &filename) {
     if (filename.isEmpty()) {
-        emit fileDownloaded(filename, false);
+        emit fileDownloaded(filename, OperationResult::invalidOperation);
         return;
     }
 
     QFileInfo info(getFullPath(filename));
-    emit fileDownloaded(filename, info.exists());
+    emit fileDownloaded(filename, info.exists() ? OperationResult::ok : OperationResult::fileSystemError);
 }
 
 void QnLocalFileCache::uploadFile(const QString &filename) {
-    emit fileUploaded(filename, true);
+    emit fileUploaded(filename, OperationResult::ok);
 }

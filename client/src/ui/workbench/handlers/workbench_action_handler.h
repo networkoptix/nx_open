@@ -253,7 +253,7 @@ protected slots:
     void at_createZoomWindowAction_triggered();
 
     void at_setAsBackgroundAction_triggered();
-    void at_backgroundImageStored(const QString &filename, bool success);
+    void setCurrentLayoutBackground(const QString &filename);
 
     void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources );
     void at_resources_properties_saved( int handle, ec2::ErrorCode errorCode );
