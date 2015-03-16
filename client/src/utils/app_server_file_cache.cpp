@@ -23,25 +23,37 @@ QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *p
     QObject(parent),
     m_folderName(folderName)
 {
-    connect(this, &QnAppServerFileCache::delayedFileDownloaded,     this,   [this](const QString &filename, bool ok) {
-        auto connection = QnAppServerConnectionFactory::getConnection2();
-        emit fileDownloaded(filename, ok && static_cast<bool>(connection));
+    connect(this, &QnAppServerFileCache::delayedFileDownloaded,     this,   [this](const QString &filename, OperationResult status) {
+        if (isConnectedToServer())
+            emit fileDownloaded(filename, status);
+        else
+            emit fileDownloaded(filename, OperationResult::disconnected);
     }, Qt::QueuedConnection);
-    connect(this, &QnAppServerFileCache::delayedFileUploaded,     this,   [this](const QString &filename, bool ok) {
-        auto connection = QnAppServerConnectionFactory::getConnection2();
-        emit fileUploaded(filename, ok && static_cast<bool>(connection));
+
+    connect(this, &QnAppServerFileCache::delayedFileUploaded,       this,   [this](const QString &filename, OperationResult status) {
+        if (isConnectedToServer())
+            emit fileUploaded(filename, status);
+        else
+            emit fileUploaded(filename, OperationResult::disconnected);
     }, Qt::QueuedConnection);
-    connect(this, &QnAppServerFileCache::delayedFileDeleted,     this,   [this](const QString &filename, bool ok) {
-        auto connection = QnAppServerConnectionFactory::getConnection2();
-        emit fileDeleted(filename, ok && static_cast<bool>(connection));
+
+    connect(this, &QnAppServerFileCache::delayedFileDeleted,        this,   [this](const QString &filename, OperationResult status) {
+        if (isConnectedToServer())
+            emit fileDeleted(filename, status);
+        else
+            emit fileDeleted(filename, OperationResult::disconnected);
     }, Qt::QueuedConnection);
-    connect(this, &QnAppServerFileCache::delayedFileListReceived,     this,   [this](const QStringList &files, bool ok) {
-        auto connection = QnAppServerConnectionFactory::getConnection2();
-        emit fileListReceived(files, ok && static_cast<bool>(connection));
+
+    connect(this, &QnAppServerFileCache::delayedFileListReceived,   this,   [this](const QStringList &files, OperationResult status) {
+        if (isConnectedToServer())
+            emit fileListReceived(files, status);
+        else
+            emit fileListReceived(files, OperationResult::disconnected);
     }, Qt::QueuedConnection);
 }
 
-QnAppServerFileCache::~QnAppServerFileCache(){}
+QnAppServerFileCache::~QnAppServerFileCache() {
+}
 
 // -------------- Utility methods ----------------
 
@@ -89,46 +101,47 @@ qint64 QnAppServerFileCache::maximumFileSize() {
 // -------------- File List loading methods -----
 
 void QnAppServerFileCache::getFileList() {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection) {
-        emit delayedFileListReceived(QStringList(), false);
+    if (!isConnectedToServer()) {
+        emit delayedFileListReceived(QStringList(), OperationResult::disconnected);
         return;
     }
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
     connection->getStoredFileManager()->listDirectory(m_folderName, this, [this](int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
         Q_UNUSED(handle);
-        emit fileListReceived(filenames, errorCode == ec2::ErrorCode::ok);
+        bool ok = errorCode == ec2::ErrorCode::ok;
+        emit fileListReceived(filenames, ok ? OperationResult::ok : OperationResult::serverError);
     } );
 }
 
 // -------------- Download File methods ----------
 
 void QnAppServerFileCache::downloadFile(const QString &filename) {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection) {
-        emit delayedFileDownloaded(filename, false);
+    if (!isConnectedToServer()) {
+        emit delayedFileDownloaded(filename, OperationResult::disconnected);
         return;
     }
 
     if (filename.isEmpty()) {
-        emit delayedFileDownloaded(filename, false);
+        emit delayedFileDownloaded(filename, OperationResult::invalidOperation);
         return;
     }
 
     if (m_deleting.values().contains(filename)) {
-        emit delayedFileDownloaded(filename, false);
+        emit delayedFileDownloaded(filename, OperationResult::invalidOperation);
         return;
     }
 
     QFileInfo info(getFullPath(filename));
     if (info.exists()) {
-        emit delayedFileDownloaded(filename, true);
+        emit delayedFileDownloaded(filename, OperationResult::ok);
         return;
     }
 
     if (m_loading.values().contains(filename))
       return;
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
     int handle = connection->getStoredFileManager()->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
                 this,
@@ -143,8 +156,13 @@ void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, 
     QString filename = m_loading[handle];
     m_loading.remove(handle);
 
-    if (errorCode != ec2::ErrorCode::ok || !isConnectedToServer()) {
-        emit fileDownloaded(filename, false);
+    if (!isConnectedToServer()) {
+        emit fileDownloaded(filename, OperationResult::disconnected);
+        return;
+    }
+
+    if (errorCode != ec2::ErrorCode::ok) {
+        emit fileDownloaded(filename, OperationResult::serverError);
         return;
     }
 
@@ -152,23 +170,22 @@ void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, 
     QString filePath = getFullPath(filename);
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        emit fileDownloaded(filename, false);
+        emit fileDownloaded(filename, OperationResult::fileSystemError);
         return;
     }
     QDataStream out(&file);
     out.writeRawData(data, data.size());
     file.close();
 
-    emit fileDownloaded(filename, true);
+    emit fileDownloaded(filename, OperationResult::ok);
 }
 
 // -------------- Uploading methods ----------------
 
 
 void QnAppServerFileCache::uploadFile(const QString &filename) {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection) {
-        emit delayedFileUploaded(filename, false);
+    if (!isConnectedToServer()) {
+        emit delayedFileUploaded(filename, OperationResult::disconnected);
         return;
     }
 
@@ -177,18 +194,19 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
 
     QFile file(getFullPath(filename));
     if(!file.open(QIODevice::ReadOnly)) {
-        emit delayedFileUploaded(filename, false);
+        emit delayedFileUploaded(filename, OperationResult::fileSystemError);
         return;
     }
 
     if(file.size() > ::maximumFileSize) {
-        emit delayedFileUploaded(filename, false);
+        emit delayedFileUploaded(filename, OperationResult::sizeLimitExceeded);
         return;
     }
 
     QByteArray data = file.readAll();
     file.close();
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
     int handle = connection->getStoredFileManager()->addStoredFile(
                 m_folderName + QLatin1Char('/') +filename,
                 data,
@@ -206,27 +224,26 @@ void QnAppServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode
     m_uploading.remove(handle);
 
     if (!isConnectedToServer()) {
-        emit fileUploaded(filename, false);
+        emit fileUploaded(filename, OperationResult::disconnected);
         return;
     }
 
     const bool ok = errorCode == ec2::ErrorCode::ok;
     if (!ok)
         QFile::remove(getFullPath(filename));
-    emit fileUploaded(filename, ok);
+    emit fileUploaded(filename, ok ? OperationResult::ok : OperationResult::serverError);
 }
 
 // -------------- Deleting methods ----------------
 
 void QnAppServerFileCache::deleteFile(const QString &filename) {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection) {
-        emit delayedFileDeleted(filename, false);
+    if (!isConnectedToServer()) {
+        emit delayedFileDeleted(filename, OperationResult::disconnected);
         return;
     }
 
     if (filename.isEmpty()) {
-        emit delayedFileDeleted(filename, false);
+        emit delayedFileDeleted(filename, OperationResult::invalidOperation);
         return;
     }
 
@@ -243,6 +260,7 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
     if (m_deleting.values().contains(filename))
       return;
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
     int handle = connection->getStoredFileManager()->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
                     this,
@@ -255,15 +273,18 @@ void QnAppServerFileCache::at_fileDeleted( int handle, ec2::ErrorCode errorCode 
     if (!m_deleting.contains(handle))
         return;
 
-    if (!isConnectedToServer())
-        return;
-
     QString filename = m_deleting[handle];
     m_deleting.remove(handle);
+
+    if (!isConnectedToServer()) {
+        emit fileDeleted(filename, OperationResult::disconnected);
+        return;
+    }
+    
     const bool ok = errorCode == ec2::ErrorCode::ok;
     if (ok)
         QFile::remove(getFullPath(filename));
-    emit fileDeleted(filename, ok);
+    emit fileDeleted(filename, ok ? OperationResult::ok : OperationResult::serverError);
 }
 
 void QnAppServerFileCache::clear() {

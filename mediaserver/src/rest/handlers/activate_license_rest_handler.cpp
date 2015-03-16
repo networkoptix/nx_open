@@ -51,6 +51,14 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
 
         hw++;
     }
+
+    hw = 1;
+    for(const QByteArray& hwid: compatibleHardwareIds) {
+        QString name = QString(QLatin1String("chwid%1")).arg(hw);
+        params.addQueryItem(name, QLatin1String(hwid));
+        hw++;
+    }
+
     if (infoMode)
         params.addQueryItem(lit("mode"), lit("info"));
 
