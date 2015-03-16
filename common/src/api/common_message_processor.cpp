@@ -478,9 +478,4 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
 }
 
 void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) {
-    if (resource->getId() == qnCommon->moduleGUID()) {
-        QnModuleInformation moduleInformation = qnCommon->moduleInformation();
-        moduleInformation.name = resource->getName();
-        qnCommon->setModuleInformation(moduleInformation);
-    }
 }
