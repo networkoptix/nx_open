@@ -240,5 +240,5 @@ void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInforma
     ++m_selfConflictCount;
 
     if (m_selfConflictCount >= noticeableConflictCount && m_selfConflictCount % noticeableConflictCount == 0)
-        emit moduleConflict(moduleInformation, address);
+        emit moduleConflict(moduleInformation, SocketAddress(address, moduleInformation.port));
 }

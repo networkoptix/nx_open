@@ -120,4 +120,6 @@ private:
     SocketGlobalRuntimeInternal* m_data;
 };
 
+Q_DECLARE_METATYPE(SocketAddress)
+
 #endif  //SOCKET_COMMON_H
