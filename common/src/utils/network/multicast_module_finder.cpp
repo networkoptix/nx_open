@@ -14,10 +14,13 @@
 #include "system_socket.h"
 #include "common/common_module.h"
 #include "module_information.h"
+#include "utils/common/cryptographic_hash.h"
+
+static const int MAX_CACHE_SIZE_BYTES = 1024 * 64;
 
 namespace {
-
-    const unsigned defaultPingTimeoutMs = 3000;
+    
+    const unsigned defaultPingTimeoutMs = 1000 * 5;
     const unsigned defaultKeepAliveMultiply = 5;
     const unsigned errorWaitTimeoutMs = 1000;
     const unsigned checkInterfacesTimeoutMs = 60 * 1000;
@@ -38,13 +41,15 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     m_lastInterfacesCheckMs(0),
     m_compatibilityMode(false),
     m_multicastGroupAddress(multicastGroupAddress),
-    m_multicastGroupPort(multicastGroupPort)
+    m_multicastGroupPort(multicastGroupPort),
+    m_cachedResponse(MAX_CACHE_SIZE_BYTES)
 {
     if (!clientOnly) {
         m_serverSocket = new UDPSocket();
         m_serverSocket->setReuseAddrFlag(true);
         m_serverSocket->bind(SocketAddress(HostAddress::anyHost, multicastGroupPort));
     }
+    connect(qnCommon, &QnCommonModule::moduleInformationChanged, this, &QnMulticastModuleFinder::at_moduleInformationChanged, Qt::DirectConnection);
 }
 
 QnMulticastModuleFinder::~QnMulticastModuleFinder() {
@@ -89,7 +94,7 @@ void QnMulticastModuleFinder::updateInterfaces() {
             std::unique_ptr<UDPSocket> sock( new UDPSocket() );
             sock->bind(SocketAddress(address.toString(), 0));
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
-            sock->setDestAddr(m_multicastGroupAddress.toString(), m_multicastGroupPort);
+            sock->setDestAddr(SocketAddress(m_multicastGroupAddress.toString(), m_multicastGroupPort));
             auto it = m_clientSockets.insert(address, sock.release());
             if (m_serverSocket)
                 m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString());
@@ -116,9 +121,8 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[READ_BUFFER_SIZE];
 
-    QString remoteAddressStr;
-    unsigned short remotePort = 0;
-    int bytesRead = udpSocket->recvFrom(readBuffer, READ_BUFFER_SIZE, remoteAddressStr, remotePort);
+    SocketAddress remoteEndpoint;
+    int bytesRead = udpSocket->recvFrom(readBuffer, READ_BUFFER_SIZE, &remoteEndpoint);
     if (bytesRead == -1) {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Failed to read socket on local address (%1). %2").
@@ -127,37 +131,57 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     }
 
     //parsing received request
-    RevealRequest request;
-    const quint8 *requestBufStart = readBuffer;
-    if (!request.deserialize(&requestBufStart, readBuffer + bytesRead)) {
+    if (!RevealRequest::isValid(readBuffer, readBuffer + bytesRead)) {
         //invalid response
-        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1:%2) on local address %3").
-            arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1) on local address %2").
+            arg(remoteEndpoint.toString()).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
         return false;
     }
 
     //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
-    RevealResponse response(qnCommon->moduleInformation());
-    quint8 *responseBufStart = readBuffer;
-    if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
-        return false;
-    if (!udpSocket->sendTo(readBuffer, responseBufStart - readBuffer, SocketAddress(remoteAddressStr, remotePort))) {
-        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Can't send response to address (%1:%2)").
-            arg(remoteAddressStr).arg(remotePort), cl_logDEBUG1);
+    {
+        QMutexLocker lock(&m_moduleInfoMutex);
+        if (m_serializedModuleInfo.isEmpty())
+            m_serializedModuleInfo = RevealResponse(qnCommon->moduleInformation()).serialize();
+    }
+    if (!udpSocket->sendTo(m_serializedModuleInfo.data(), m_serializedModuleInfo.size(), remoteEndpoint)) {
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Can't send response to address (%1)").
+            arg(remoteEndpoint.toString()), cl_logDEBUG1);
         return false;
     };
 
     return true;
 }
 
+void QnMulticastModuleFinder::at_moduleInformationChanged()
+{
+    QMutexLocker lock(&m_moduleInfoMutex);
+    m_serializedModuleInfo.clear(); // clear cached value
+}
+
+RevealResponse* QnMulticastModuleFinder::getCachedValue(const quint8* buffer, const quint8* bufferEnd)
+{
+    QnCryptographicHash m_mdctx(QnCryptographicHash::Md5);
+    m_mdctx.addData((const char*) buffer, bufferEnd - buffer);
+    QByteArray result = m_mdctx.result();
+    RevealResponse* response = m_cachedResponse[result];
+    if (!response) {
+        response = new RevealResponse();
+        if (!response->deserialize(buffer, bufferEnd)) {
+            delete response;
+            return 0;
+        }
+        m_cachedResponse.insert(result, response, bufferEnd - buffer);
+    }
+    return response;
+}
+
 bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     const size_t readBufferSize = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[readBufferSize];
 
-    QString remoteAddress;
-    unsigned short remotePort = 0;
-
-    int bytesRead = udpSocket->recvFrom(readBuffer, readBufferSize, remoteAddress, remotePort);
+    SocketAddress remoteEndpoint;
+    int bytesRead = udpSocket->recvFrom(readBuffer, readBufferSize, &remoteEndpoint);
     if (bytesRead == -1) {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(lit("QnMulticastModuleFinder. Failed to read socket on local address (%1). %2")
@@ -165,30 +189,34 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return false;
     }
 
+    /*
     RevealResponse response;
     const quint8 *responseBufStart = readBuffer;
     if (!response.deserialize(&responseBufStart, readBuffer + bytesRead)) {
-        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1:%2) on local address %3")
-               .arg(remoteAddress).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
+    */
+    RevealResponse* response = getCachedValue(readBuffer, readBuffer + bytesRead);
+    if (!response) {
+        //invalid response
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1) on local address %2").
+            arg(remoteEndpoint.toString()).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
         return false;
     }
 
-    if (response.type != nxMediaServerId && response.type != nxECId)
+    if (response->type != nxMediaServerId && response->type != nxECId)
         return true;
 
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Ignoring %1 (%2) with different customization %3 on local address %4").
+            arg(response->type).arg(remoteEndpoint.toString()).arg(response->customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
 
-    if (!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower()) {
-        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
-            arg(response.type).arg(remoteAddress).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
+    if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
         return false;
-    }
 
-    QnModuleInformationEx moduleInformation = response.toModuleInformation();
+    //const QnModuleInformationEx& moduleInformation = response->toModuleInformation();
     QUrl url;
-    url.setHost(remoteAddress);
-    url.setPort(moduleInformation.port);
+    url.setHost(remoteEndpoint.address.toString());
+    url.setPort(response->moduleInformation.port);
 
-    emit responseReceived(moduleInformation, url);
+    emit responseReceived(response->moduleInformation, url);
 
     return true;
 }

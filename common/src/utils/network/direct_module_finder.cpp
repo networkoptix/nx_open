@@ -166,7 +166,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 
     if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
         return;
-
+    moduleInformation.fixRuntimeId();
     m_lastPingByUrl[url] = m_elapsedTimer.elapsed();
 
     emit responseReceived(moduleInformation, url);

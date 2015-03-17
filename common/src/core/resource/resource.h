@@ -235,7 +235,7 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(const QSharedPointer<QnResourceCommand> &command);
+    static void addCommandToProc(const QnResourceCommandPtr &command);
     static int commandProcQueueSize();
 #endif
 

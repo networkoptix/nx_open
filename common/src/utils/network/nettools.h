@@ -5,6 +5,9 @@
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QNetworkAddressEntry>
 
+#include <utils/network/socket_common.h>
+
+
 static const int ping_timeout = 300;
 
 struct CLSubNetState;
@@ -56,7 +59,10 @@ QN_EXPORT bool isIpv4Address(const QString& addr);
 QN_EXPORT QHostAddress resolveAddress(const QString& addr);
 
 QN_EXPORT int strEqualAmount(const char* str1, const char* str2);
-QN_EXPORT bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
+QN_EXPORT bool isNewDiscoveryAddressBetter(
+    const HostAddress& host,
+    const QHostAddress& newAddress,
+    const QHostAddress& oldAddress );
 
 static const int MAC_ADDR_LEN = 18;
 /*!

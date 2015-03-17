@@ -91,7 +91,7 @@ QnAbstractMediaDataPtr ThirdPartyArchiveDelegate::getNextData()
         rez = ThirdPartyStreamReader::readStreamReader( m_streamReader );
         if( rez )
         {
-            QnCompressedVideoDataPtr videoData = rez.dynamicCast<QnCompressedVideoData>();
+            QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(rez);
             if( videoData && videoData->motion )
             {
                 rez = videoData->motion;

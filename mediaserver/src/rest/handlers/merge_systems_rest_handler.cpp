@@ -24,6 +24,7 @@
 #include "api/model/ping_reply.h"
 
 namespace {
+    const int requestTimeout = 60000;
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 }
 
@@ -176,7 +177,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     /* Change system name of the selected server */
     if (oneServer) {
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
         CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&sysIdTime=%2&tranLogTime=%3")
             .arg(systemName)
             .arg(qnCommon->systemIdentityTime())
@@ -186,7 +187,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     }
 
     {   /* Save current admin inside the remote system */
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
 
         ec2::ApiUserData userData;
         ec2::fromResourceToApi(admin, userData);
@@ -202,7 +203,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     /* Change system name of the remote system */
     if (!oneServer) {
         authenticator.setPassword(currentPassword);
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
         CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true&sysIdTime=%2&tranLogTime=%3")
             .arg(systemName)
             .arg(qnCommon->systemIdentityTime())
@@ -225,7 +226,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
 
         ec2::ApiUserDataList users;
         {
-            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
             CLHttpStatus status = client.doGET(lit("/ec2/getUsers"));
             if (status != CLHttpStatus::CL_HTTP_SUCCESS)
                 return false;
@@ -236,7 +237,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
             QJson::deserialize(data, &users);
         }
         {
-            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
             CLHttpStatus status = client.doGET(lit("/api/ping"));
             if (status != CLHttpStatus::CL_HTTP_SUCCESS)
                 return false;

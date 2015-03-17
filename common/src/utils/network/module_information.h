@@ -29,10 +29,14 @@ struct QnModuleInformation {
     bool hasCompatibleVersion() const;
     bool isLocal() const; //!< true if at least one address from \a remoteHostAddress is a local address
 };
-struct QnModuleInformationEx : QnModuleInformation {
+struct QnModuleInformationEx : QnModuleInformation 
+{
     QnUuid runtimeId;
+
     QnModuleInformationEx() {}
     QnModuleInformationEx(const QnModuleInformation &other) : QnModuleInformation(other) {}
+
+    void fixRuntimeId();
 };
 
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(remoteAddresses)(id)(sslAllowed)(authHash)(protoVersion)

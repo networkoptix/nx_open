@@ -83,7 +83,7 @@ public:
     QnSoftwareVersion engineVersion() const;
     void setEngineVersion(const QnSoftwareVersion &version);
 
-    void setModuleInformation(const QnModuleInformation &moduleInformation);
+    void setModuleInformation(const QnModuleInformationEx &moduleInformation);
     QnModuleInformationEx moduleInformation() const;
 
     bool isTranscodeDisabled() const { return m_transcodingDisabled; }
@@ -93,6 +93,7 @@ public:
     inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 signals:
     void systemNameChanged(const QString &systemName);
+    void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
 protected:
@@ -101,7 +102,6 @@ protected:
 private:
     QnSessionManager *m_sessionManager;
     QnResourceDataPool *m_dataPool;
-    QString m_localSystemName;
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;
@@ -110,7 +110,7 @@ private:
     QUrl m_url;
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
-    QnModuleInformation m_moduleInformation;
+    QnModuleInformationEx m_moduleInformation;
     mutable QMutex m_mutex;
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;

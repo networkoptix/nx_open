@@ -787,7 +787,7 @@ void initAppServerConnection(QSettings &settings)
         QString staticDBPath = settings.value("staticDataDir").toString();
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
-		}
+        }
         if (MSSettings::roSettings()->value(REMOVE_DB_PARAM_NAME).toBool())
             params.addQueryItem("cleanupDb", QString());
     }
@@ -1521,8 +1521,8 @@ void QnMain::run()
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
     int guidCompatibility = 0;
-    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
-    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
+    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings());
+    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings());
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     MediaServerStatusWatcher mediaServerStatusWatcher;
@@ -1784,7 +1784,7 @@ void QnMain::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation;
+    QnModuleInformationEx selfInformation;
     selfInformation.type = moduleName;
     if (!compatibilityMode)
         selfInformation.customization = QnAppInfo::customizationName();
@@ -1797,8 +1797,10 @@ void QnMain::run()
     selfInformation.id = serverGuid();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    selfInformation.runtimeId = qnCommon->runningInstanceGUID();
 
     qnCommon->setModuleInformation(selfInformation);
+    updateModuleInfo();
 
     m_moduleFinder = new QnModuleFinder( false );
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
@@ -1923,6 +1925,11 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+    connect(m_mediaServer.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnMain::updateModuleInfo);
+    connect(m_mediaServer.data(), &QnMediaServerResource::resourceChanged, this, &QnMain::updateModuleInfo);
+    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+    if (adminUser)
+        connect(adminUser.data(), &QnResource::resourceChanged, this, &QnMain::updateModuleInfo);
 
     QnAbstractStorageResourceList storages = m_mediaServer->getStorages();
     QnAbstractStorageResourceList modifiedStorages = createStorages(m_mediaServer);
@@ -1986,7 +1993,7 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     QnMServerResourceSearcher::instance()->start();
     m_universalTcpListener->start();
-	serverConnector->start();
+    serverConnector->start();
 #if 1
     if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
@@ -2148,6 +2155,41 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
     }
 }
 
+void QnMain::updateModuleInfo()
+{
+    QnModuleInformationEx moduleInformationCopy = qnCommon->moduleInformation();
+    if (qnResPool) {
+        moduleInformationCopy.remoteAddresses.clear();
+        const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        if (server) {
+            QSet<QString> ignoredHosts;
+            for (const QUrl &url: server->getIgnoredUrls())
+                ignoredHosts.insert(url.host());
+
+            for(const QHostAddress &address: server->getNetAddrList()) {
+                QString addressString = address.toString();
+                if (!ignoredHosts.contains(addressString))
+                    moduleInformationCopy.remoteAddresses.insert(addressString);
+            }
+            for(const QUrl &url: server->getAdditionalUrls()) {
+                if (!ignoredHosts.contains(url.host()))
+                    moduleInformationCopy.remoteAddresses.insert(url.host());
+            }
+            moduleInformationCopy.port = server->getPort();
+            moduleInformationCopy.name = server->getName();
+        }
+
+        QnUserResourcePtr admin = qnResPool->getAdministrator();
+        if (admin) {
+            QCryptographicHash md5(QCryptographicHash::Md5);
+            md5.addData(admin->getHash());
+            md5.addData(moduleInformationCopy.systemName.toUtf8());
+            moduleInformationCopy.authHash = md5.result();
+        }
+        qnCommon->setModuleInformation(moduleInformationCopy);
+    }
+}
+
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {
 public:
@@ -2233,7 +2275,7 @@ private:
     }
 
     QString hardwareIdAsGuid() {
-        QString hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+        QString hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false, MSSettings::roSettings())).toString();
         std::cout << "Got hwID \"" << hwID.toStdString() << "\"" << std::endl;
         return hwID;
     }
@@ -2247,14 +2289,18 @@ private:
         QString hwidGuid = hardwareIdAsGuid();
 
         if (guidIsHWID == YES) {
-            MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            if (serverGuid.isEmpty())
+                MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            else if (serverGuid != hwidGuid)
+                MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
+
             MSSettings::roSettings()->remove(SERVER_GUID2);
         } else if (guidIsHWID == NO) {
             if (serverGuid.isEmpty()) {
                 // serverGuid remove from settings manually?
                 MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
                 MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
-            }
+            }                                            
 
             MSSettings::roSettings()->remove(SERVER_GUID2);
         } else if (guidIsHWID.isEmpty()) {

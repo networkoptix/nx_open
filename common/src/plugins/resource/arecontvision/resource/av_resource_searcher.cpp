@@ -65,12 +65,10 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 QByteArray datagram;
                 datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-                QString sender;
-                quint16 senderPort;
+                SocketAddress remoteEndpoint;
+                int readed = sock->recvFrom(datagram.data(), datagram.size(), &remoteEndpoint);
 
-                int readed = sock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
-
-                if (senderPort!=69 || readed < 32) // minimum response size
+                if (remoteEndpoint.port!=69 || readed < 32) // minimum response size
                     continue;
 
                 const unsigned char* data = (unsigned char*)(datagram.data());
@@ -121,7 +119,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 if (resource==0)
                     continue;
 
-                resource->setHostAddress(sender);
+                resource->setHostAddress(remoteEndpoint.toString());
                 resource->setMAC(QnMacAddress(mac));
                 resource->setName(QLatin1String("ArecontVision_Abstract"));
 

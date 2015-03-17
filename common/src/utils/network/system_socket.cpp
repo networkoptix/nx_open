@@ -1393,18 +1393,18 @@ int UDPSocket::send( const void* buffer, unsigned int bufferLen )
 }
 
 //!Implementation of AbstractDatagramSocket::setDestAddr
-bool UDPSocket::setDestAddr( const QString& foreignAddress, unsigned short foreignPort )
+bool UDPSocket::setDestAddr( const SocketAddress& foreignEndpoint )
 {
-    return m_implDelegate.fillAddr( SocketAddress(foreignAddress, foreignPort), m_destAddr );
+    return m_implDelegate.fillAddr( foreignEndpoint, m_destAddr );
 }
 
 //!Implementation of AbstractDatagramSocket::sendTo
 bool UDPSocket::sendTo(
     const void* buffer,
     unsigned int bufferLen,
-    const SocketAddress& foreignAddress )
+    const SocketAddress& foreignEndpoint )
 {
-    setDestAddr( foreignAddress.address.toString(), foreignAddress.port );  //TODO #ak optimize, remove (to QString); (from QString) operations
+    setDestAddr( foreignEndpoint );  //TODO #ak optimize: pass SocketAddress to setDestAddr
     return sendTo( buffer, bufferLen );
 }
 
@@ -1417,8 +1417,7 @@ int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
 int UDPSocket::recvFrom(
     void *buffer,
     unsigned int bufferLen,
-    QString& sourceAddress,
-    unsigned short &sourcePort )
+    SocketAddress* const sourceAddress )
 {
     int rtn = recvFrom(
         buffer,
@@ -1426,10 +1425,8 @@ int UDPSocket::recvFrom(
         &m_prevDatagramAddress.address,
         &m_prevDatagramAddress.port );
 
-    if (rtn >= 0) {
-        sourceAddress = QLatin1String(inet_ntoa(m_prevDatagramAddress.address.inAddr()));
-        sourcePort = m_prevDatagramAddress.port;
-    }
+    if( rtn >= 0 && sourceAddress )
+        *sourceAddress = m_prevDatagramAddress;
     return rtn;
 }
 

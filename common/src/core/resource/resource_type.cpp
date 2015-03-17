@@ -61,7 +61,7 @@ bool QnResourceType::isCamera() const
     return m_isCamera;
 }
 
-void QnResourceType::addAdditionalParent(QnUuid parent)
+void QnResourceType::addAdditionalParent(const QnUuid& parent)
 {
     if (parent.isNull()) {
         qWarning() << "Adding NULL parentId";
@@ -182,7 +182,7 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
     {
         //NX_LOG(rt->getName(), cl_logALWAYS); //debug
 
-        if (rt->getName().compare(name, Qt::CaseInsensitive) == 0 && rt->getManufacture()==manufacture)
+        if (rt->getManufacture()==manufacture && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
             return rt->getId();
     }
 

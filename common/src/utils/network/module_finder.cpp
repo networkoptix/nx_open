@@ -32,25 +32,6 @@ namespace {
         url.setPort(port);
         return url;
     }
-
-    QnUuid generateRuntimeId(const QnModuleInformation &moduleInformation) {
-        const int bytesNeeded = 16;
-
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(moduleInformation.id.toRfc4122());
-        md5.addData(moduleInformation.customization.toLatin1());
-        md5.addData(moduleInformation.systemName.toLatin1());
-        md5.addData(QByteArray::number(moduleInformation.port));
-        for (const QString &address: moduleInformation.remoteAddresses)
-            md5.addData(address.toLatin1());
-
-        QByteArray hash = md5.result();
-        while (hash.size() < bytesNeeded)
-            hash += hash;
-        hash.resize(16);
-
-        return QnUuid::fromRfc4122(hash);
-    }
 }
 
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
@@ -142,9 +123,6 @@ void QnModuleFinder::at_responseReceived(QnModuleInformationEx moduleInformation
     m_lastResponse[url] = currentTime;
 
     QnModuleInformationEx &oldInformation = m_foundModules[moduleInformation.id];
-
-    if (moduleInformation.runtimeId.isNull())
-        moduleInformation.runtimeId = generateRuntimeId(moduleInformation);
 
     /* Handle conflicting servers */
     if (!oldInformation.id.isNull() && oldInformation.runtimeId != moduleInformation.runtimeId) {
@@ -299,6 +277,7 @@ void QnModuleFinder::handleSelfResponse(const QnModuleInformationEx &moduleInfor
     qint64 currentTime = m_elapsedTimer.elapsed();
     if (currentTime - m_lastSelfConflict > pingTimeout()) {
         m_selfConflictCount = 1;
+        m_lastSelfConflict = currentTime;
         return;
     }
     m_lastSelfConflict = currentTime;

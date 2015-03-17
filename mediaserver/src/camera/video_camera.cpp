@@ -109,7 +109,7 @@ static CyclicAllocator gopKeeperKeyFramesAllocator;
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QMutexLocker lock(&m_queueMtx);
-    if (QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(nonConstData))
+    if (QnConstCompressedVideoDataPtr video = std::dynamic_pointer_cast<const QnCompressedVideoData>(nonConstData))
     {
         if (video->flags & AV_PKT_FLAG_KEY)
         {
@@ -131,11 +131,11 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
 
         if (m_dataQueue.size() < m_dataQueue.maxSize()) {
             //TODO #ak MUST NOT modify video packet here! It can be used by other threads concurrently and flags value can be undefined in other threads
-            static_cast<QnAbstractMediaData*>(nonConstData.data())->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            static_cast<QnAbstractMediaData*>(nonConstData.get())->flags |= QnAbstractMediaData::MediaFlags_LIVE;
             QnAbstractDataConsumer::putData( nonConstData );
         }
     }
-    else if (QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(nonConstData))
+    else if (QnConstCompressedAudioDataPtr audio = std::dynamic_pointer_cast<const QnCompressedAudioData>(nonConstData))
     {
         m_lastAudioData = std::move(audio);
     }
@@ -153,7 +153,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, 
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
         const QnConstAbstractDataPacketPtr& data = m_dataQueue.atUnsafe(i);
-        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.data());
+        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.get());
         if (video)
         {
             QnCompressedVideoData* newData = video->clone();
@@ -163,7 +163,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, 
             dstQueue.push(QnAbstractMediaDataPtr(newData));
         }
         else { 
-            dstQueue.push(data.constCast<QnAbstractDataPacket>());    //TODO: #ak remove const_cast
+            dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data));    //TODO: #ak remove const_cast
         }
         rez++;
     }
@@ -242,7 +242,7 @@ void QnVideoCameraGopKeeper::clearVideoData()
     QMutexLocker lock(&m_queueMtx);
 
     for( QnConstCompressedVideoDataPtr& frame: m_lastKeyFrame )
-        frame.clear();
+        frame.reset();
     for( auto& lastKeyFramesForChannel: m_lastKeyFrames )
         lastKeyFramesForChannel.clear();
     m_nextMinTryTime = 0;

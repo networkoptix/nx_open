@@ -6,6 +6,7 @@
 
 #include <api/media_server_connection.h>
 
+#include <utils/common/value_cache.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 
@@ -100,6 +101,7 @@ public:
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
+    void atResourceChanged();
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
@@ -130,7 +132,11 @@ private:
     QnAbstractStorageResourceList m_storagesToUpdate;
     ec2::ApiIdDataList m_storagesToRemove;
 
+    CachedValue<Qn::PanicMode> m_panicModeCache;
+
     mutable QnResourcePtr m_firstCamera;
+
+    Qn::PanicMode calculatePanicMode() const;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

@@ -6,6 +6,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtGui/QDesktopServices>
 
+#include <api/global_settings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -68,7 +69,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
     if (m_latestVersion == updateVersion || qnSettings->ignoredUpdateVersion() >= updateVersion || qnCommon->engineVersion() >= updateVersion)
         return;
 
-    if (!qnSettings->notifyAboutUpdates())
+    if (!QnGlobalSettings::instance()->isUpdateNotificationsEnabled())
         return;
 
     m_latestVersion = updateVersion;

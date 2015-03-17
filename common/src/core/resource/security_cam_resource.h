@@ -4,6 +4,8 @@
 #include <QtGui/QRegion>
 #include <QtCore/QMutex>
 
+#include <utils/common/value_cache.h>
+
 #include "media_resource.h"
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
@@ -11,11 +13,13 @@
 #include "common/common_globals.h"
 #include "business/business_fwd.h"
 
+
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
 
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
+
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     typedef QnNetworkResource base_type;
@@ -285,28 +289,27 @@ protected:
     virtual bool isInputPortMonitored() const;
 
 private:
-    //QList<QnMotionRegion> m_motionMaskList;
     QnDataProviderFactory *m_dpFactory;
-    //QnScheduleTaskList m_scheduleTasks;
-    //mutable Qn::MotionType m_motionType;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
-    //Qn::SecondStreamQuality m_secondaryQuality;
-    //bool m_cameraControlDisabled;
     Qn::CameraStatusFlags m_statusFlags;
-    //bool m_scheduleDisabled;
-    //bool m_audioEnabled;
     bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    //int m_minDays;
-    //int m_maxDays;
-    //QnUuid m_preferedServerId;
+    CachedValue<bool> m_cachedHasDualStreaming2;
+    CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
+    CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
+    CachedValue<bool> m_cachedIsDtsBased;
+    CachedValue<Qn::MotionType> m_motionType;
 
-    //QnMotionRegion getMotionRegionNonSafe(int channel) const;
+    Qn::MotionTypes calculateSupportedMotionType() const;
+    Qn::MotionType calculateMotionType() const;
+
+private slots:
+    void atResourceChanged();
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

@@ -64,7 +64,7 @@ private:
     QString m_name;
 };
 
-typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
+typedef std::shared_ptr<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
 #endif // ENABLE_DATA_PROVIDERS
 
 // -------------------------------------------------------------------------- //
@@ -96,7 +96,7 @@ private:
     QString m_name;
     QVariant m_val;
 };
-typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+typedef std::shared_ptr<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 
 #endif // ENABLE_DATA_PROVIDERS

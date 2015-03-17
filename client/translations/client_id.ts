@@ -373,6 +373,10 @@
         <source>Warning! Low quality may result in low resolution image.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -3958,18 +3962,6 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
-        <source>&lt;No image&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be loaded&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be uploaded&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Select file...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3978,11 +3970,27 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Image cannot be read&gt;</source>
+        <source>&lt;No picture&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Image cannot be greater than %1 Mb&gt;</source>
+        <source>&lt;Error while loading picture&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Error while uploading picture&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be read&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be loaded&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5356,14 +5364,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rebuild archive index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Fast initial scan in progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5405,6 +5405,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6539,10 +6547,6 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Image cannot be uploaded</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Could not save the following %n items.</source>
         <translation type="unfinished">
@@ -6629,6 +6633,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while uploading picture.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

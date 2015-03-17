@@ -169,7 +169,7 @@ void CLServerPushStreamReader::run()
                 getResource()->setStatus(Qn::Online);
         }
 
-        QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 
         if (mFramesLost>0) // we are alive again
         {

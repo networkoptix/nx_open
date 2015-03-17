@@ -48,7 +48,7 @@ public:
     {}
 
     bool isEmpty() const {
-        return m_data.isNull() && m_image.isNull();
+        return !m_data && m_image.isNull();
     }
 
     const QnCompressedVideoDataPtr &data() const {

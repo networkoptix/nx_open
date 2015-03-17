@@ -114,7 +114,12 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(m_model,    &QnPtzManageModel::modelReset,      this,               &QnPtzManageDialog::at_model_modelReset);
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
-    connect(m_cache,    &QnLocalFileCache::fileDownloaded,  this,               &QnPtzManageDialog::at_cache_imageLoaded);
+    connect(m_cache,    &QnLocalFileCache::fileDownloaded,  this,  [this](const QString &filename, QnAppServerFileCache::OperationResult status) {
+        if (status != QnAppServerFileCache::OperationResult::ok)
+            return;
+        at_cache_imageLoaded(filename);
+    });
+
     connect(m_adaptor,  &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
 
     connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_savePositionButton_clicked);
@@ -551,16 +556,13 @@ void QnPtzManageDialog::at_tourSpotsChanged(const QnPtzTourSpotList &spots) {
     m_model->updateTourSpots(m_currentTourId, spots);
 }
 
-void QnPtzManageDialog::at_cache_imageLoaded(const QString &fileName, bool ok) {
-    if (!ok)
-        return;
-
+void QnPtzManageDialog::at_cache_imageLoaded(const QString &filename) {
     QnPtzManageModel::RowData rowData = m_model->rowData(ui->tableView->currentIndex().row());
-    if (rowData.id() != fileName)
+    if (rowData.id() != filename)
         return;
 
     QnThreadedImageLoader *loader = new QnThreadedImageLoader(this);
-    loader->setInput(m_cache->getFullPath(fileName));
+    loader->setInput(m_cache->getFullPath(filename));
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(ui->previewLabel->size());
     loader->setFlags(Qn::TouchSizeFromOutside);

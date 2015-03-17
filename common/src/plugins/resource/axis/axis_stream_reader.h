@@ -34,7 +34,7 @@ private:
 
     QStringList getRTPurls() const;
     int toAxisQuality(Qn::StreamQuality quality);
-    void parseMotionInfo(QnCompressedVideoDataPtr videoData);
+    void parseMotionInfo(QnCompressedVideoData* videoData);
     void processTriggerData(const quint8* payload, int len);
 
     void fillMotionInfo(const QRect& rect);

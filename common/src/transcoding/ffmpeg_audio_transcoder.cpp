@@ -142,7 +142,7 @@ bool QnFfmpegAudioTranscoder::existMoreData() const
 int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
-        result->clear();
+        result->reset();
 
     if (!m_lastErrMessage.isEmpty())
         return -3;
@@ -155,7 +155,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         }
 
         m_lastTimestamp = media->timestamp;
-        QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(media);
+        QnConstCompressedAudioDataPtr audio = std::dynamic_pointer_cast<const QnCompressedAudioData>(media);
         AVPacket avpkt;
         av_init_packet(&avpkt);
         avpkt.data = const_cast<quint8*>((const quint8*)media->data());
