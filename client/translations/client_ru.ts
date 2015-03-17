@@ -691,7 +691,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Double buffering:</source>
-        <translation>Двояная буферизация:</translation>
+        <translation>Двойная буферизация:</translation>
     </message>
     <message>
         <source>Browse logs</source>
