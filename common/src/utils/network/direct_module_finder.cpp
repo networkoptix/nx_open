@@ -166,11 +166,14 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 
     if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
         return;
+
+    if (moduleInformation.port != url.port())
+        return;
+
     moduleInformation.fixRuntimeId();
-    moduleInformation.remoteAddresses.clear();
     m_lastPingByUrl[url] = m_elapsedTimer.elapsed();
 
-    emit responseReceived(moduleInformation, url);
+    emit responseReceived(moduleInformation, url.host());
 }
 
 void QnDirectModuleFinder::at_checkTimer_timeout() {

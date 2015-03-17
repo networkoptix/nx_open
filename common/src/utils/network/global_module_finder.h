@@ -9,6 +9,14 @@
 #include <utils/common/singleton.h>
 
 class QnModuleFinder;
+struct QnGlobalModuleInformation : QnModuleInformation {
+    QSet<QString> remoteAddresses;
+
+    QnGlobalModuleInformation() {}
+    QnGlobalModuleInformation(const QnModuleInformation &other) :
+        QnModuleInformation(other)
+    {}
+};
 
 class QnGlobalModuleFinder : public QObject, public Singleton<QnGlobalModuleFinder> {
     Q_OBJECT
@@ -17,15 +25,12 @@ public:
 
     void setConnection(const ec2::AbstractECConnectionPtr &connection);
 
-    static void fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data);
-    static void fillFromApiModuleData(const ec2::ApiModuleData &data, QnModuleInformation *moduleInformation);
-
-    QList<QnModuleInformation> foundModules() const;
-    QnModuleInformation moduleInformation(const QnUuid &id) const;
+    QList<QnGlobalModuleInformation> foundModules() const;
+    QnGlobalModuleInformation moduleInformation(const QnUuid &id) const;
 
 signals:
-    void peerChanged(const QnModuleInformation &moduleInformation);
-    void peerLost(const QnModuleInformation &moduleInformation);
+    void peerChanged(const QnGlobalModuleInformation &moduleInformation);
+    void peerLost(const QnGlobalModuleInformation &moduleInformation);
 
 private slots:
     void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive);
@@ -45,7 +50,7 @@ private:
     mutable QMutex m_mutex;
     std::weak_ptr<ec2::AbstractECConnection> m_connection;  // just to know from where to disconnect
     const QPointer<QnModuleFinder> m_moduleFinder;
-    QHash<QnUuid, QnModuleInformation> m_moduleInformationById;
+    QHash<QnUuid, QnGlobalModuleInformation> m_moduleInformationById;
     QHash<QnUuid, QHash<QnUuid, QSet<QString>>> m_discoveredAddresses;
 };
 

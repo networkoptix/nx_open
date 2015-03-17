@@ -22,8 +22,8 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
     m_runtimeDataUpdateTimer(new QTimer(this)),
     m_runtimeDataElapsedTimer(new QElapsedTimer())
 {
-    connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
-    connect(moduleFinder,       &QnModuleFinder::moduleUrlLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
+    connect(moduleFinder,       &QnModuleFinder::moduleAddressFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
+    connect(moduleFinder,       &QnModuleFinder::moduleAddressLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
 
     QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnRouter::at_runtimeInfoManager_runtimeInfoAdded);
@@ -91,8 +91,8 @@ void QnRouter::setEnforcedConnection(const QnRoutePoint &enforcedConnection) {
     m_routeBuilder->setEnforcedConnection(enforcedConnection);
 }
 
-void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
-    Endpoint endpoint(moduleInformation.id, url.host(), url.port());
+void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+    Endpoint endpoint(moduleInformation.id, address.address.toString(), address.port);
 
     if (endpoint.id.isNull())
         return;
@@ -106,8 +106,8 @@ void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleI
     emit connectionAdded(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }
 
-void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url) {
-    Endpoint endpoint(moduleInformation.id, url.host(), url.port());
+void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+    Endpoint endpoint(moduleInformation.id, address.address.toString(), address.port);
 
     if (!removeConnection(qnCommon->moduleGUID(), endpoint))
         return;

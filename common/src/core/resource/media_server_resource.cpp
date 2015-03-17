@@ -457,8 +457,6 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.systemName = m_systemName;
     moduleInformation.name = getName();
     moduleInformation.port = QUrl(m_apiUrl).port();
-    for (const QHostAddress &address: m_netAddrList)
-        moduleInformation.remoteAddresses.insert(address.toString());
     moduleInformation.id = getId();
 
     return moduleInformation;
