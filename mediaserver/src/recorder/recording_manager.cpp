@@ -36,6 +36,7 @@
 #include "mutex/distributed_mutex_manager.h"
 
 static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 30;
+static const qint64 UPDATE_CAMERA_HISTORY_PERIOD_MSEC = 60 * 1000;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 class QnServerDataProviderFactory: public QnDataProviderFactory
@@ -68,6 +69,7 @@ void QnRecordingManager::start()
 {
     m_scheduleWatchingTimer.start(1000);
     m_licenseTimer.start(1000 * 60);
+    m_updateCameraHistoryTimer.restart();
     QThread::start();
 }
 
@@ -170,8 +172,12 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
     return  cameraRes && cameraRes->isScheduleDisabled();
 }
 
-bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
-{
+bool QnRecordingManager::updateCameraHistory() {
+    
+    if (!m_updateCameraHistoryTimer.hasExpired(UPDATE_CAMERA_HISTORY_PERIOD_MSEC))
+        return;
+    m_updateCameraHistoryTimer.restart();
+
     std::vector<QnUuid> archivedListNew = qnStorageMan->getCamerasWithArchive();
     std::vector<QnUuid> archivedListOld = qnCameraHistoryPool->getCamerasWithArchive(qnCommon->moduleGUID());
     if (archivedListOld == archivedListNew) 
@@ -250,7 +256,7 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
 
 bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
-    updateCameraHistory(res);
+    updateCameraHistory();
 
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
     bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();

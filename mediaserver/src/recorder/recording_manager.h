@@ -73,7 +73,7 @@ private:
     void beforeDeleteRecorder(const Recorders& recorders);
     void stopRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
-    bool updateCameraHistory(const QnResourcePtr& res);
+    bool updateCameraHistory();
 
     void at_licenseMutexLocked();
     void at_licenseMutexTimeout();
@@ -82,6 +82,7 @@ private:
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
     QTimer m_licenseTimer;
+    QElapsedTimer m_updateCameraHistoryTimer;
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
