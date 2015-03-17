@@ -700,8 +700,8 @@ int serverMain(int argc, char *argv[])
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
             logDir + QLatin1String("/http_log"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
 
     //preparing transaction log
@@ -714,8 +714,8 @@ int serverMain(int argc, char *argv[])
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
             logDir + QLatin1String("/ec2_tran"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
@@ -1525,8 +1525,8 @@ void QnMain::run()
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
     int guidCompatibility = 0;
-    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings());
-    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings());
+    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
+    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     MediaServerStatusWatcher mediaServerStatusWatcher;

@@ -60,10 +60,10 @@ namespace ec2
         quint64 serverTimePriority;
 
         /** A list of available connections to other peers. */
-        QList<ApiConnectionData> availableConnections;
+        QVector<ApiConnectionData> availableConnections;
 
-        QList<QByteArray> mainHardwareIds;
-        QList<QByteArray> compatibleHardwareIds;
+        QVector<QByteArray> mainHardwareIds;
+        QVector<QByteArray> compatibleHardwareIds;
 
         bool updateStarted;
     };

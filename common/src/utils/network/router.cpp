@@ -134,10 +134,7 @@ void QnRouter::at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo 
     QList<Endpoint> connections = m_connections.values(data.uuid);
     m_mutex.unlock();
 
-    QList<ec2::ApiConnectionData> newConnections = data.data.availableConnections;
-
-    while (!newConnections.isEmpty()) {
-        ec2::ApiConnectionData connection = newConnections.takeFirst();
+    for(const auto& connection: data.data.availableConnections) {
         Endpoint endpoint(connection.peerId, connection.host, connection.port);
         bool isNew = !connections.removeOne(endpoint);
         if (isNew)
@@ -202,7 +199,7 @@ void QnRouter::updateRuntimeData(bool force) {
 
     m_runtimeDataUpdateTimer->stop();
 
-    QList<ec2::ApiConnectionData> connections;
+    QVector<ec2::ApiConnectionData> connections;
     for (const Endpoint &endpoint: m_connections.values(qnCommon->moduleGUID())) {
         ec2::ApiConnectionData connection;
         connection.peerId = endpoint.id;

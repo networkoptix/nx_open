@@ -139,6 +139,28 @@ public:
         return true;
     }
 
+    template <class T, int N>
+    bool readBinaryData(std::array<T, N> *target) {
+        assert(target);
+        
+        if(!readArrayStart())
+            return false;
+
+        State &state = m_stateStack.back();
+        if(state.type != QnUbjson::UInt8Marker || state.count != N)
+            return false;
+
+        if(!m_stream.readBytes(N, target->data()))
+            return false;
+
+        state.status = AtArrayEnd;
+
+        if(!readArrayEnd())
+            return false;
+
+        return true;
+    }
+
     bool readArrayStart(int *size = NULL, QnUbjson::Marker *type = NULL) {
         return readContainerStartInternal<AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd>(QnUbjson::ArrayStartMarker, size, type);
     }
