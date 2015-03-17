@@ -268,7 +268,7 @@ template <class Input>
 bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target) 
 {
     std::array<char, 16> tmp;
-    if(!stream->readBinaryData(&tmp))
+    if(!stream->template readBinaryData(&tmp))
         return false;
     *target = QnUuid::fromRfc4122(QByteArray::fromRawData(tmp.data(), tmp.size()));
     return true;

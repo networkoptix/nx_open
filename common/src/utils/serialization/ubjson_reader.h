@@ -139,7 +139,7 @@ public:
         return true;
     }
 
-    template <class T, int N>
+    template <class T, std::size_t N>
     bool readBinaryData(std::array<T, N> *target) {
         assert(target);
         
