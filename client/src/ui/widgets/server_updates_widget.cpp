@@ -7,11 +7,11 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
 
+#include <api/global_settings.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <client/client_message_processor.h>
-#include <client/client_settings.h>
 
 #include <ui/common/palette.h>
 #include <ui/common/ui_resource_name.h>
@@ -285,7 +285,7 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
 }
 
 void QnServerUpdatesWidget::updateFromSettings() {
-    ui->updatesNotificationCheckbox->setChecked(qnSettings->notifyAboutUpdates());
+    ui->updatesNotificationCheckbox->setChecked(QnGlobalSettings::instance()->isUpdateNotificationsEnabled());
 }
 
 bool QnServerUpdatesWidget::confirm() {
@@ -294,7 +294,7 @@ bool QnServerUpdatesWidget::confirm() {
         return false;
     }
 
-    qnSettings->setNotifyAboutUpdates(ui->updatesNotificationCheckbox->isChecked());
+    QnGlobalSettings::instance()->setUpdateNotificationsEnabled(ui->updatesNotificationCheckbox->isChecked());
     return true;
 }
 
