@@ -700,8 +700,8 @@ int serverMain(int argc, char *argv[])
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
             logDir + QLatin1String("/http_log"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
 
     //preparing transaction log
@@ -714,8 +714,8 @@ int serverMain(int argc, char *argv[])
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
             logDir + QLatin1String("/ec2_tran"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
@@ -1784,7 +1784,7 @@ void QnMain::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation;
+    QnModuleInformationEx selfInformation;
     selfInformation.type = moduleName;
     if (!compatibilityMode)
         selfInformation.customization = QnAppInfo::customizationName();
@@ -1797,8 +1797,10 @@ void QnMain::run()
     selfInformation.id = serverGuid();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    selfInformation.runtimeId = qnCommon->runningInstanceGUID();
 
     qnCommon->setModuleInformation(selfInformation);
+    updateModuleInfo();
 
     m_moduleFinder = new QnModuleFinder( false );
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
@@ -1923,6 +1925,11 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+    connect(m_mediaServer.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnMain::updateModuleInfo);
+    connect(m_mediaServer.data(), &QnMediaServerResource::resourceChanged, this, &QnMain::updateModuleInfo);
+    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+    if (adminUser)
+        connect(adminUser.data(), &QnResource::resourceChanged, this, &QnMain::updateModuleInfo);
 
     QnAbstractStorageResourceList storages = m_mediaServer->getStorages();
     QnAbstractStorageResourceList modifiedStorages = createStorages(m_mediaServer);
@@ -2145,6 +2152,41 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
                 }
                 m_updateUserRequests.remove(user->getId());
             } );
+    }
+}
+
+void QnMain::updateModuleInfo()
+{
+    QnModuleInformationEx moduleInformationCopy = qnCommon->moduleInformation();
+    if (qnResPool) {
+        moduleInformationCopy.remoteAddresses.clear();
+        const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        if (server) {
+            QSet<QString> ignoredHosts;
+            for (const QUrl &url: server->getIgnoredUrls())
+                ignoredHosts.insert(url.host());
+
+            for(const QHostAddress &address: server->getNetAddrList()) {
+                QString addressString = address.toString();
+                if (!ignoredHosts.contains(addressString))
+                    moduleInformationCopy.remoteAddresses.insert(addressString);
+            }
+            for(const QUrl &url: server->getAdditionalUrls()) {
+                if (!ignoredHosts.contains(url.host()))
+                    moduleInformationCopy.remoteAddresses.insert(url.host());
+            }
+            moduleInformationCopy.port = server->getPort();
+            moduleInformationCopy.name = server->getName();
+        }
+
+        QnUserResourcePtr admin = qnResPool->getAdministrator();
+        if (admin) {
+            QCryptographicHash md5(QCryptographicHash::Md5);
+            md5.addData(admin->getHash());
+            md5.addData(moduleInformationCopy.systemName.toUtf8());
+            moduleInformationCopy.authHash = md5.result();
+        }
+        qnCommon->setModuleInformation(moduleInformationCopy);
     }
 }
 

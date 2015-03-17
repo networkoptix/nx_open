@@ -27,7 +27,7 @@ class RevealRequest
 {
 public:
     bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);
-    bool deserialize(const quint8 **bufStart, const quint8 *bufEnd);
+    static bool isValid(const quint8 *bufStart, const quint8 *bufEnd);
 };
 
 typedef QMap<QString, QString> TypeSpecificParamMap;
@@ -54,13 +54,15 @@ public:
     int protoVersion;
     QnUuid runtimeId;
 
+    QnModuleInformationEx moduleInformation;
+
     RevealResponse();
     RevealResponse(const QnModuleInformationEx &moduleInformation);
 
-    QnModuleInformationEx toModuleInformation() const;
+    //QnModuleInformationEx toModuleInformation() const;
 
-    bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);
-    bool deserialize(const quint8 **bufStart, const quint8 *bufEnd);
+    QByteArray serialize();
+    bool deserialize(const quint8 *bufStart, const quint8 *bufEnd);
 };
 
 #endif  //NETWORKOPTIXMODULEREVEALCOMMON_H

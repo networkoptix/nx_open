@@ -2,6 +2,7 @@
 #define MULTICAST_MODULE_FINDER_H
 
 #include <QtCore/QMutex>
+#include <QCache>
 
 #include <utils/common/long_runnable.h>
 #include "aio/pollset.h"
@@ -53,7 +54,8 @@ class QnMulticastModuleFinder : public QnLongRunnable {
 
 public slots:
     virtual void pleaseStop() override;
-
+private slots:
+    void at_moduleInformationChanged();
 signals:
     void responseReceived(const QnModuleInformationEx &moduleInformation, const QUrl &url);
 
@@ -64,7 +66,7 @@ private:
     bool processDiscoveryRequest(UDPSocket *udpSocket);
     bool processDiscoveryResponse(UDPSocket *udpSocket);
     void updateInterfaces();
-
+    RevealResponse* getCachedValue(const quint8* buffer, const quint8* bufferEnd);
 private:
     mutable QMutex m_mutex;
     aio::PollSet m_pollSet;
@@ -77,6 +79,9 @@ private:
     bool m_compatibilityMode;
     QHostAddress m_multicastGroupAddress;
     quint16 m_multicastGroupPort;
+    QCache<QByteArray, RevealResponse> m_cachedResponse;
+    QByteArray m_serializedModuleInfo;
+    mutable QMutex m_moduleInfoMutex;
 };
 
 #endif // MULTICAST_MODULE_FINDER_H

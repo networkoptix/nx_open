@@ -136,6 +136,7 @@ void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrLis
 {
     QMutexLocker lock(&m_mutex);
     m_netAddrList = netAddrList;
+    emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QHostAddress> QnMediaServerResource::getNetAddrList() const

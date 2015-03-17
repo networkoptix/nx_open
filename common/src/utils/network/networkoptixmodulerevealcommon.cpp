@@ -23,14 +23,13 @@ bool RevealRequest::serialize(quint8 ** const bufStart, const quint8 *bufEnd) {
     return true;
 }
 
-bool RevealRequest::deserialize(const quint8 **bufStart, const quint8 *bufEnd) {
-    if (bufEnd - *bufStart < revealRequestStr.size())
+bool RevealRequest::isValid(const quint8 *bufStart, const quint8 *bufEnd) {
+    if (bufEnd - bufStart < revealRequestStr.size())
         return false;
 
-    if (memcmp(*bufStart, revealRequestStr.data(), revealRequestStr.size()) != 0)
+    if (memcmp(bufStart, revealRequestStr.data(), revealRequestStr.size()) != 0)
         return false;
 
-    *bufStart += revealRequestStr.size();
     return true;
 }
 
@@ -54,6 +53,7 @@ RevealResponse::RevealResponse(const QnModuleInformationEx &moduleInformation) {
     runtimeId = moduleInformation.runtimeId;
 }
 
+/*
 QnModuleInformationEx RevealResponse::toModuleInformation() const {
     QnModuleInformationEx moduleInformation;
     moduleInformation.type = type;
@@ -71,8 +71,9 @@ QnModuleInformationEx RevealResponse::toModuleInformation() const {
     moduleInformation.runtimeId = runtimeId;
     return moduleInformation;
 }
+*/
 
-bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
+QByteArray RevealResponse::serialize() {
     QVariantMap map;
     map[lit("application")] = type;
     map[lit("version")] = version;
@@ -88,19 +89,14 @@ bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
     map[lit("protoVersion")] = protoVersion;
     map[lit("runtimeId")] = runtimeId.toString();
 
-    QByteArray data = QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
-    if (data.size() > bufEnd - *bufStart)
-        return false;
-    memcpy(*bufStart, data.data(), data.size());
-    *bufStart += data.size();
-    return true;
+    return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 
-bool RevealResponse::deserialize(const quint8 **bufStart, const quint8 *bufEnd) {
-    while (*bufStart < bufEnd && **bufStart != '{')
-        (*bufStart)++;
+bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
+    while (bufStart < bufEnd && *bufStart != '{')
+        bufStart++;
 
-    QByteArray data(reinterpret_cast<const char *>(*bufStart), bufEnd - *bufStart);
+    QByteArray data(reinterpret_cast<const char *>(bufStart), bufEnd - bufStart);
 
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
     type = map.value(lit("application")).toString();
@@ -116,6 +112,22 @@ bool RevealResponse::deserialize(const quint8 **bufStart, const quint8 *bufEnd) 
     authHash = QByteArray::fromBase64(map.value(lit("authHash")).toByteArray());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
+
+    // fill module information
+    moduleInformation.type = type;
+    moduleInformation.customization = customization;
+    moduleInformation.version = QnSoftwareVersion(version);
+    moduleInformation.systemInformation = QnSystemInformation(systemInformation);
+    moduleInformation.systemName = name;
+    moduleInformation.name = moduleName;
+    moduleInformation.id = seed;
+    moduleInformation.port = port;
+    moduleInformation.remoteAddresses = QSet<QString>::fromList(remoteAddresses);
+    moduleInformation.sslAllowed = sslAllowed;
+    moduleInformation.authHash = authHash;
+    moduleInformation.protoVersion = protoVersion;
+    moduleInformation.runtimeId = runtimeId;
+    moduleInformation.fixRuntimeId(); // compatibility with previous version if field is absent
 
     return !type.isEmpty() && !version.isEmpty();
 }
