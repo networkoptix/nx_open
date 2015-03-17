@@ -1247,7 +1247,7 @@ void QnMain::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
-void QnMain::at_serverModuleConflict(const QnModuleInformationEx &moduleInformation, const QUrl &url)
+void QnMain::at_serverModuleConflict(const QnModuleInformation &moduleInformation, const QUrl &url)
 {
     qnBusinessRuleConnector->at_mediaServerConflict(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch(), moduleInformation, url);
 }
@@ -1784,7 +1784,7 @@ void QnMain::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformationEx selfInformation;
+    QnModuleInformation selfInformation;
     selfInformation.type = moduleName;
     if (!compatibilityMode)
         selfInformation.customization = QnAppInfo::customizationName();
@@ -2157,7 +2157,7 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
 
 void QnMain::updateModuleInfo()
 {
-    QnModuleInformationEx moduleInformationCopy = qnCommon->moduleInformation();
+    QnModuleInformation moduleInformationCopy = qnCommon->moduleInformation();
     if (qnResPool) {
         moduleInformationCopy.remoteAddresses.clear();
         const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();

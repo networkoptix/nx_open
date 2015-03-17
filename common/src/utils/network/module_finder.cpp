@@ -103,7 +103,7 @@ void QnModuleFinder::pleaseStop() {
     m_directModuleFinder->pleaseStop();
 }
 
-void QnModuleFinder::at_responseReceived(QnModuleInformationEx moduleInformation, QUrl url) {
+void QnModuleFinder::at_responseReceived(QnModuleInformation moduleInformation, QUrl url) {
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
@@ -122,7 +122,7 @@ void QnModuleFinder::at_responseReceived(QnModuleInformationEx moduleInformation
 
     m_lastResponse[url] = currentTime;
 
-    QnModuleInformationEx &oldInformation = m_foundModules[moduleInformation.id];
+    QnModuleInformation &oldInformation = m_foundModules[moduleInformation.id];
 
     /* Handle conflicting servers */
     if (!oldInformation.id.isNull() && oldInformation.runtimeId != moduleInformation.runtimeId) {
@@ -269,8 +269,8 @@ void QnModuleFinder::addUrl(const QUrl &url, const QnUuid &id) {
         m_urlById.insert(id, url);
 }
 
-void QnModuleFinder::handleSelfResponse(const QnModuleInformationEx &moduleInformation, const QUrl &url) {
-    QnModuleInformationEx current = qnCommon->moduleInformation();
+void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInformation, const QUrl &url) {
+    QnModuleInformation current = qnCommon->moduleInformation();
     if (current.runtimeId == moduleInformation.runtimeId)
         return;
 

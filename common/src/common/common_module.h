@@ -83,8 +83,8 @@ public:
     QnSoftwareVersion engineVersion() const;
     void setEngineVersion(const QnSoftwareVersion &version);
 
-    void setModuleInformation(const QnModuleInformationEx &moduleInformation);
-    QnModuleInformationEx moduleInformation() const;
+    void setModuleInformation(const QnModuleInformation &moduleInformation);
+    QnModuleInformation moduleInformation() const;
 
     bool isTranscodeDisabled() const { return m_transcodingDisabled; }
     void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
@@ -110,7 +110,7 @@ private:
     QUrl m_url;
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
-    QnModuleInformationEx m_moduleInformation;
+    QnModuleInformation m_moduleInformation;
     mutable QMutex m_mutex;
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;

@@ -69,7 +69,7 @@ void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
 
 void QnCommonModule::setLocalSystemName(const QString& value)
 {
-    QnModuleInformationEx info = moduleInformation();
+    QnModuleInformation info = moduleInformation();
     info.systemName = value;
     setModuleInformation(info);
 }
@@ -79,7 +79,7 @@ QString QnCommonModule::localSystemName() const
     return moduleInformation().systemName;
 }
 
-void QnCommonModule::setModuleInformation(const QnModuleInformationEx &moduleInformation) 
+void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation)
 {
     bool isSystemNameChanged = false;
     {
@@ -95,16 +95,16 @@ void QnCommonModule::setModuleInformation(const QnModuleInformationEx &moduleInf
     emit moduleInformationChanged();
 }
 
-QnModuleInformationEx QnCommonModule::moduleInformation() const
+QnModuleInformation QnCommonModule::moduleInformation() const
 {
     QMutexLocker lk(&m_mutex);
     return m_moduleInformation;
 }
 
 /*
-QnModuleInformationEx QnCommonModule::moduleInformation() const
+QnModuleInformation QnCommonModule::moduleInformation() const
 {
-    QnModuleInformationEx moduleInformationCopy;
+    QnModuleInformation moduleInformationCopy;
     {
         QMutexLocker lk(&m_mutex);
         moduleInformationCopy = m_moduleInformation;

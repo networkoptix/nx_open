@@ -24,7 +24,7 @@ bool QnModuleInformation::isLocal() const {
     return false;
 }
 
-void QnModuleInformationEx::fixRuntimeId()
+void QnModuleInformation::fixRuntimeId()
 {
     if (!runtimeId.isNull())
         return;
@@ -46,6 +46,3 @@ void QnModuleInformationEx::fixRuntimeId()
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation,   (json)(eq), QnModuleInformation_Fields)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformationEx, (json)(eq), QnModuleInformationEx_Fields)
-

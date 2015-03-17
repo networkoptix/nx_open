@@ -153,7 +153,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 
     QnJsonRestResult result;
     QJson::deserialize(data, &result);
-    QnModuleInformationEx moduleInformation;
+    QnModuleInformation moduleInformation;
     QJson::deserialize(result.reply(), &moduleInformation);
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
@@ -167,6 +167,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
         return;
     moduleInformation.fixRuntimeId();
+    moduleInformation.remoteAddresses.clear();
     m_lastPingByUrl[url] = m_elapsedTimer.elapsed();
 
     emit responseReceived(moduleInformation, url);

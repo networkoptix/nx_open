@@ -35,10 +35,10 @@ typedef QMap<QString, QString> TypeSpecificParamMap;
 Q_DECLARE_METATYPE(TypeSpecificParamMap)
 
 //!Sent in response to RevealRequest by module which reveals itself
-struct RevealResponse : public QnModuleInformationEx {
+struct RevealResponse : public QnModuleInformation {
 public:
     RevealResponse() {}
-    RevealResponse(const QnModuleInformationEx &other);
+    RevealResponse(const QnModuleInformation &other);
     QByteArray serialize();
     bool deserialize(const quint8 *bufStart, const quint8 *bufEnd);
 };

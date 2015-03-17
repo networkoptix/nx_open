@@ -205,7 +205,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::RebuildState>();
 
     qRegisterMetaType<QnModuleInformation>();
-    qRegisterMetaType<QnModuleInformationEx>();
+    qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QList<QnModuleInformation>>();
 
     qRegisterMetaType<Qn::CameraDataType>();

@@ -57,7 +57,7 @@ public slots:
 private slots:
     void at_moduleInformationChanged();
 signals:
-    void responseReceived(const QnModuleInformationEx &moduleInformation, const QUrl &url);
+    void responseReceived(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 protected:
     virtual void run() override;

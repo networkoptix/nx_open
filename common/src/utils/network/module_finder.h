@@ -47,14 +47,14 @@ signals:
     void moduleConflict(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private slots:
-    void at_responseReceived(QnModuleInformationEx moduleInformation, QUrl url);
+    void at_responseReceived(QnModuleInformation moduleInformation, QUrl url);
     void at_timer_timeout();
 
 private:
     QSet<QString> moduleAddresses(const QnUuid &id) const;
     void removeUrl(const QUrl &url);
     void addUrl(const QUrl &url, const QnUuid &id);
-    void handleSelfResponse(const QnModuleInformationEx &moduleInformation, const QUrl &url);
+    void handleSelfResponse(const QnModuleInformation &moduleInformation, const QUrl &url);
 
 private:
     QElapsedTimer m_elapsedTimer;
@@ -64,7 +64,7 @@ private:
     QnDirectModuleFinder *m_directModuleFinder;
     QnDirectModuleFinderHelper *m_helper;
 
-    QHash<QnUuid, QnModuleInformationEx> m_foundModules;
+    QHash<QnUuid, QnModuleInformation> m_foundModules;
     QMultiHash<QnUuid, QUrl> m_urlById;
     QHash<QUrl, QnUuid> m_idByUrl;
     QHash<QUrl, qint64> m_lastResponse;

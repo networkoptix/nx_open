@@ -206,7 +206,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
         return false;
 
-    //const QnModuleInformationEx& moduleInformation = response->toModuleInformation();
+    //const QnModuleInformation& moduleInformation = response->toModuleInformation();
     QUrl url;
     url.setHost(remoteEndpoint.address.toString());
     url.setPort(response->port);
