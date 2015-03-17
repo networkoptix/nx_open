@@ -191,6 +191,7 @@ public:
     int desiredSecondStreamFps() const;
     Qn::StreamQuality getSecondaryStreamQuality() const;
 
+    //TODO: #2.4 #rvasilenko #High Move to runtime data
     Qn::CameraStatusFlags statusFlags() const;
     bool hasStatusFlags(Qn::CameraStatusFlag value) const;
     void setStatusFlags(Qn::CameraStatusFlags value);
@@ -244,6 +245,7 @@ signals:
     void groupIdChanged(const QnResourcePtr &resource);
     void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
+    void statusFlagsChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 

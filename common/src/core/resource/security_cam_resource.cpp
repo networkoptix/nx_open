@@ -148,6 +148,9 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         if (other_casted->m_groupName != m_groupName)
             modifiedFields << "groupNameChanged";
 
+        if (other_casted->m_statusFlags != m_statusFlags)
+            modifiedFields << "statusFlagsChanged";
+
         m_groupId = other_casted->m_groupId;
         m_groupName = other_casted->m_groupName;
         m_statusFlags = other_casted->m_statusFlags;
@@ -588,7 +591,7 @@ void QnSecurityCamResource::setFirmware(const QString &firmware) {
 }
 
 QString QnSecurityCamResource::getVendor() const {
-    SAFE(return m_vendor);
+    SAFE(return m_vendor)
 
     // This code is commented for a reason. We want to know if vendor is empty. --Elric
     //SAFE(if (!m_vendor.isEmpty()) return m_vendor)    //calculated on the server
@@ -723,24 +726,44 @@ Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const {
 }
 
 Qn::CameraStatusFlags QnSecurityCamResource::statusFlags() const {
-    return m_statusFlags;
+    SAFE(return m_statusFlags)
 }
 
 bool QnSecurityCamResource::hasStatusFlags(Qn::CameraStatusFlag value) const
 {
-    return m_statusFlags & value;
+    SAFE(return m_statusFlags & value)
 }
 
 void QnSecurityCamResource::setStatusFlags(Qn::CameraStatusFlags value) {
-    m_statusFlags = value;
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_statusFlags == value)
+            return;
+        m_statusFlags = value;
+    }
+    emit statusFlagsChanged(::toSharedPointer(this));
 }
 
-void QnSecurityCamResource::addStatusFlags(Qn::CameraStatusFlag value) {
-    m_statusFlags |= value;
+void QnSecurityCamResource::addStatusFlags(Qn::CameraStatusFlag flag) {
+    {
+        QMutexLocker locker(&m_mutex);
+        Qn::CameraStatusFlags value = m_statusFlags | flag;
+        if(m_statusFlags == value)
+            return;
+        m_statusFlags = value;
+    }
+    emit statusFlagsChanged(::toSharedPointer(this));
 }
 
-void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag value) {
-    m_statusFlags &= ~value;
+void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag flag) {
+    {
+        QMutexLocker locker(&m_mutex);
+        Qn::CameraStatusFlags value = m_statusFlags & ~flag;
+        if(m_statusFlags == value)
+            return;
+        m_statusFlags = value;
+    }
+    emit statusFlagsChanged(::toSharedPointer(this));
 }
 
 

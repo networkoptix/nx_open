@@ -1261,10 +1261,15 @@ void QnMain::at_timer()
     if (isStopping())
         return;
 
+    //TODO: #2.4 #GDM This timer make two totally different functions. Split it.
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    for(const QnVirtualCameraResourcePtr& camera: qnResPool->getAllCameras(mServer))
-        camera->noCameraIssues(); // decrease issue counter
+    if (!mServer)
+        return;
+
+    for(const auto& camera: qnResPool->getAllCameras(mServer, true))
+        camera->cleanCameraIssues();
 }
 
 void QnMain::at_storageManager_noStoragesAvailable() {
@@ -1978,13 +1983,12 @@ void QnMain::run()
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
-    at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    timer.start(QnVirtualCameraResource::issuesTimeoutMs());
+    at_timer();
+
     QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
-    timer.start(60 * 1000);
-
-
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
 
 

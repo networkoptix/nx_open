@@ -4,6 +4,7 @@
 #include <deque>
 
 #include <QtCore/QMetaType>
+#include <QtCore/QElapsedTimer>
 
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/model_functions_fwd.h>
@@ -37,16 +38,17 @@ public:
     void saveParams();
     void saveParamsAsync();
     int saveAsync();
-public slots:
+
+    static int issuesTimeoutMs();
+
     void issueOccured();
-    void noCameraIssues();
-private slots:
-    void at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
+    void cleanCameraIssues();
 protected:
 
 private:
     QnAbstractDTSFactory* m_dtsFactory;
-    std::deque<qint64> m_issueTimes;
+    int m_issueCounter;
+    QElapsedTimer m_lastIssueTimer;
 };
 
 
