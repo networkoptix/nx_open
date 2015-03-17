@@ -193,8 +193,8 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
 
 void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url) 
 {
-    const QList<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
-    const QList<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
+    const QVector<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
+    const QVector<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
 
     if (QnRuntimeInfoManager::instance()->remoteInfo().isNull()) {
         emit showMessageLater(tr("License Activation"),
