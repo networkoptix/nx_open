@@ -34,61 +34,26 @@ bool RevealRequest::isValid(const quint8 *bufStart, const quint8 *bufEnd) {
 }
 
 
-
-RevealResponse::RevealResponse() : port(0), sslAllowed(false), protoVersion(0) {}
-
-RevealResponse::RevealResponse(const QnModuleInformationEx &moduleInformation) {
-    type = moduleInformation.type;
-    version = moduleInformation.version.toString();
-    systemInformation = moduleInformation.systemInformation.toString();
-    customization = moduleInformation.customization;
-    name = moduleInformation.systemName;
-    moduleName = moduleInformation.name;
-    seed = moduleInformation.id;
-    port = moduleInformation.port;
-    sslAllowed = moduleInformation.sslAllowed;
-    remoteAddresses = moduleInformation.remoteAddresses.toList();
-    authHash = moduleInformation.authHash;
-    protoVersion = moduleInformation.protoVersion;
-    runtimeId = moduleInformation.runtimeId;
+RevealResponse::RevealResponse(const QnModuleInformationEx &other)
+    : QnModuleInformationEx(other)
+{
 }
-
-/*
-QnModuleInformationEx RevealResponse::toModuleInformation() const {
-    QnModuleInformationEx moduleInformation;
-    moduleInformation.type = type;
-    moduleInformation.customization = customization;
-    moduleInformation.version = QnSoftwareVersion(version);
-    moduleInformation.systemInformation = QnSystemInformation(systemInformation);
-    moduleInformation.systemName = name;
-    moduleInformation.name = moduleName;
-    moduleInformation.id = seed;
-    moduleInformation.port = port;
-    moduleInformation.remoteAddresses = QSet<QString>::fromList(remoteAddresses);
-    moduleInformation.sslAllowed = sslAllowed;
-    moduleInformation.authHash = authHash;
-    moduleInformation.protoVersion = protoVersion;
-    moduleInformation.runtimeId = runtimeId;
-    return moduleInformation;
-}
-*/
 
 QByteArray RevealResponse::serialize() {
     QVariantMap map;
     map[lit("application")] = type;
-    map[lit("version")] = version;
+    map[lit("version")] = version.toString();
     map[lit("customization")] = customization;
-    map[lit("seed")] = seed.toString();
-    map[lit("systemName")] = name;
-    map[lit("name")] = moduleName;
-    map[lit("systemInformation")] = systemInformation;
+    map[lit("seed")] = id.toString();
+    map[lit("systemName")] = systemName;
+    map[lit("name")] = name;
+    map[lit("systemInformation")] = systemInformation.toString();
     map[lit("sslAllowed")] = sslAllowed;
     map[lit("port")] = port;
-    map[lit("remoteAddresses")] = remoteAddresses;
+    map[lit("remoteAddresses")] = QStringList(remoteAddresses.toList());
     map[lit("authHash")] = authHash.toBase64();
     map[lit("protoVersion")] = protoVersion;
     map[lit("runtimeId")] = runtimeId.toString();
-
     return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 
@@ -100,34 +65,18 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
 
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
     type = map.value(lit("application")).toString();
-    version = map.value(lit("version")).toString();
+    version = QnSoftwareVersion(map.value(lit("version")).toString());
     systemInformation = map.value(lit("systemInformation")).toString();
     customization = map.value(lit("customization")).toString();
-    name = map.value(lit("systemName")).toString();
-    moduleName = map.value(lit("name")).toString();
-    seed = QnUuid(map.value(lit("seed")).toString());
+    systemName = map.value(lit("systemName")).toString();
+    name = map.value(lit("name")).toString();
+    id = QnUuid::fromStringSafe(map.value(lit("seed")).toString());
     sslAllowed = map.value(lit("sslAllowed")).toBool();
     port = static_cast<quint16>(map.value(lit("port")).toUInt());
-    remoteAddresses = map.value(lit("remoteAddresses")).toStringList();
+//    remoteAddresses = map.value(lit("remoteAddresses")).toStringList();
     authHash = QByteArray::fromBase64(map.value(lit("authHash")).toByteArray());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
 
-    // fill module information
-    moduleInformation.type = type;
-    moduleInformation.customization = customization;
-    moduleInformation.version = QnSoftwareVersion(version);
-    moduleInformation.systemInformation = QnSystemInformation(systemInformation);
-    moduleInformation.systemName = name;
-    moduleInformation.name = moduleName;
-    moduleInformation.id = seed;
-    moduleInformation.port = port;
-    moduleInformation.remoteAddresses = QSet<QString>::fromList(remoteAddresses);
-    moduleInformation.sslAllowed = sslAllowed;
-    moduleInformation.authHash = authHash;
-    moduleInformation.protoVersion = protoVersion;
-    moduleInformation.runtimeId = runtimeId;
-    moduleInformation.fixRuntimeId(); // compatibility with previous version if field is absent
-
-    return !type.isEmpty() && !version.isEmpty();
+    return !type.isEmpty() && !version.isNull();
 }
