@@ -11,6 +11,7 @@
 
 #include "ref_counter.h"
 #include "rx_device.h"
+#include "tx_device.h"
 #include "timer.h"
 
 namespace ite
@@ -25,7 +26,7 @@ namespace ite
         DEF_REF_COUNTER
 
     public:
-        CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper);
+        CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper, TxDevicePtr txDev);
         virtual ~CameraManager();
 
         // nxcip::BaseCameraManager
@@ -62,6 +63,12 @@ namespace ite
 
         // for DiscoveryManager
 
+        void updateTx(TxDevicePtr txDev)
+        {
+            if (! m_txDev)
+                m_txDev = txDev;
+        }
+
         void updateCameraInfo(const nxcip::CameraInfo& info);
         bool stopIfNeedIt();
 
@@ -69,13 +76,18 @@ namespace ite
 
         const char * url() const { return m_info.url; }
 
-        unsigned short txID() const { return m_txID; }
+        unsigned short txID() const
+        {
+            if (m_txDev)
+                return m_txDev->txID();
+            return 0;
+        }
 
     private:
         mutable std::mutex m_mutex;
 
         const DeviceMapper * m_devMapper;
-        unsigned short m_txID;
+        TxDevicePtr m_txDev;
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders; // FIXME: do not use smart ptr for ref-counted object
 
         std::set<unsigned> m_openedStreams;
@@ -134,11 +146,11 @@ namespace ite
             }
         }
 
-        void getParamStr_TxHwID(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().hardwareId; }
-        void getParamStr_TxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().companyName; }
-        void getParamStr_TxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().modelName; }
-        void getParamStr_TxSerial(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().serialNumber; }
-        void getParamStr_TxFwVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().firmwareVersion; }
+        void getParamStr_TxHwID(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().hardwareId; }
+        void getParamStr_TxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().companyName; }
+        void getParamStr_TxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().modelName; }
+        void getParamStr_TxSerial(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().serialNumber; }
+        void getParamStr_TxFwVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().firmwareVersion; }
 
         bool setParam_Channel(std::string& s);
     };

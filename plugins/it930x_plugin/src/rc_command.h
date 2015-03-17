@@ -2,9 +2,7 @@
 #define RETURN_CHANNEL_CMD_X_H
 
 #include <vector>
-#include <utility>
-
-#include "ret_chan/ret_chan_cmd.h"
+#include <cstdint>
 
 namespace ite
 {
@@ -12,74 +10,92 @@ namespace ite
     class RCCommand
     {
     public:
-        RCCommand()
-        :   frequency_(0)
+        enum
         {
-            buffer_.reserve(RcCmdMaxSize);
-        }
+            RC_MAX_SIZE = 169,  // if RC command is bigger it would be split
+            CMD_MAX_SIZE = 184, // leading ('#') + head (13 bytes) + [RC] + ending (0x0d)
+            TS_SIZE = 188       // + TS header: sync (0x47), TEI + PID, TS seq
+        };
 
-        static unsigned short input2outputID(unsigned short cmdID)
-        {
-            if (cmdID >= CMD_GetMetadataSettingsInput)
-                return cmdID | 0xF000;
-            return cmdID | 0x8000;
-        }
+        static constexpr uint8_t HEAD_SIZE() { return 13; }
+        static constexpr uint8_t leadingTag() { return '#'; }
+        static constexpr uint8_t endingTag() { return 0x0d; }
 
-        unsigned add(const Byte * data, unsigned len)
-        {
-            for (unsigned i = 0; buffer_.size() < RcCmdMaxSize && len > 0; ++i, --len)
-                buffer_.push_back(data[i]);
-            return len;
-        }
+        RCCommand(uint8_t * ptr, uint8_t size = CMD_MAX_SIZE)
+        :   m_data(ptr),
+            m_size(size)
+        {}
 
-        bool isFull() const { return buffer_.size() == RcCmdMaxSize; }
-        bool hasLeadingTag() const { return buffer_[0] == leadingTag(); }
-        bool hasEndingTag() const { return buffer_[183] == endingTag(); }
+        static uint16_t in2outID(uint16_t cmdID);
+
+        bool hasData() const { return m_data && m_size; }
+        bool hasLeadingTag() const { return m_data[0] == leadingTag(); }
+        bool hasEndingTag() const { return m_data[m_size-1] == endingTag(); }
         bool hasTags() const { return hasLeadingTag() && hasEndingTag(); }
-        bool isOK() const { return isFull() && hasTags() && checksum(); }
+        bool isOK() const { return hasData() && hasTags() && checksumOK(); }
 
-        void clear() { buffer_.clear(); frequency_ = 0; }
-        void swap(RCCommand& cmd)
-        {
-            buffer_.swap(cmd.buffer_);
-            std::swap(frequency_, cmd.frequency_);
-        }
+        // header bytes
+        uint16_t rxID() const           { return (m_data[1]<<8) | m_data[2]; }
+        uint16_t txID() const           { return (m_data[3]<<8) | m_data[4]; }
+        uint16_t totalPktNum() const    { return (m_data[5]<<8) | m_data[6]; }
+        uint16_t paketNum() const       { return (m_data[7]<<8) | m_data[8]; }
+        uint16_t sequenceNum() const    { return (m_data[9]<<8) | m_data[10]; }
+        uint16_t pktLength() const      { return (m_data[11]<<8) | m_data[12]; }
+        // cmd bytes
+        uint16_t commandID() const      { return (m_data[17]<<8) | m_data[18]; }
 
-        static unsigned short headSize() { return 13; }
-        static Byte leadingTag() { return '#'; }
-        static Byte endingTag() { return 0x0d; }
-        static unsigned short maxSize() { return RcCmdMaxSize; }
-
-        unsigned short rxID() const { return ((buffer_[1])<<8) | buffer_[2]; }
-        unsigned short txID() const { return (buffer_[3]<<8) | buffer_[4]; }
-        unsigned short commandID() const { return (buffer_[17]<<8) | buffer_[18]; }
-        unsigned short totalPktNum() const { return (buffer_[5]<<8) | buffer_[6]; }
-        unsigned short paketNum() const { return (buffer_[7]<<8) | buffer_[8]; }
-        unsigned short sequenceNum() const { return (buffer_[9]<<8) | buffer_[10]; }
-        unsigned short pktLength() const { return (buffer_[11]<<8) | buffer_[12]; }
-
-        Byte checkSumValue() const { return buffer_[headSize() + pktLength()]; }
-        bool checksum() const;
+        static uint8_t checksum(const uint8_t * buffer, unsigned length);
+        uint8_t calcChecksum() const;
+        uint8_t checksumValue() const { return m_data[HEAD_SIZE() + pktLength()]; }
+        bool checksumOK() const { return checksumValue() == calcChecksum(); }
 
         bool isBroadcast() const { return txID() == 0xFFFF; }
 
-        const Byte * head() const { return &buffer_[0]; }
-        const Byte * data() const { return &buffer_[headSize()]; }
+        const uint8_t * head() const { return m_data; }
+        const uint8_t * content() const { return &m_data[HEAD_SIZE()]; }
+
+        //
 
         unsigned headCheck() const;
 
         bool checkPacketCount();
 
         //
-        unsigned frequency() const { return frequency_; }
-        void setFrequency(unsigned freq) { frequency_ = freq; }
+
+        size_t rawSize() const { return m_size; }
+        uint8_t * rawData() { return m_data; }
+        const uint8_t * rawData() const { return m_data; }
 
     private:
-        std::vector<Byte> buffer_;
-        unsigned frequency_;
+        uint8_t * m_data;
+        uint8_t m_size;
+    };
 
-        RCCommand(const RCCommand& );
-        RCCommand& operator = (const RCCommand&);
+    ///
+    class RCCmdBuffer
+    {
+    public:
+        RCCmdBuffer()
+        {
+            m_buffer.reserve(RCCommand::CMD_MAX_SIZE);
+        }
+
+        unsigned append(const uint8_t * data, unsigned len)
+        {
+            for (unsigned i = 0; len > 0; ++i, --len)
+                m_buffer.push_back(data[i]);
+            return len;
+        }
+
+        RCCommand cmd()
+        {
+            if (m_buffer.size())
+                return RCCommand(&m_buffer[0], m_buffer.size());
+            return RCCommand(nullptr, 0);
+        }
+
+    private:
+        std::vector<uint8_t> m_buffer;
     };
 
     ///
@@ -95,7 +111,7 @@ namespace ite
 
         unsigned add(const RCCommand&);
 
-        const Byte * data() const { return &cmd_[0]; }
+        const uint8_t * data() const { return &cmd_[0]; }
         unsigned size() const { return cmd_.size(); }
         bool isOK() const { return cmd_.size() == expectedSize_; }
 
@@ -109,11 +125,11 @@ namespace ite
         bool isValid() const { return isValid_; }
         void setValid(bool value = true) { isValid_ = value; }
 
-        unsigned short commandID() const { return (cmd_[4]<<8) | cmd_[5]; }
-        Byte returnCode() const { return cmd_[6]; }
+        uint16_t commandID() const { return (cmd_[4]<<8) | cmd_[5]; }
+        uint8_t returnCode() const { return cmd_[6]; }
 
     private:
-        std::vector<Byte> cmd_;
+        std::vector<uint8_t> cmd_;
         unsigned expectedSize_;
         unsigned expectedPackets_;
         unsigned packets_;

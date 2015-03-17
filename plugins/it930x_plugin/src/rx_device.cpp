@@ -2,8 +2,9 @@
 #include <thread>
 
 #include "timer.h"
-#include "rx_device.h"
+#include "tx_device.h"
 #include "mpeg_ts_packet.h"
+#include "rx_device.h"
 
 namespace ite
 {
@@ -70,13 +71,17 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::lockCamera(uint16_t txID)
+    bool RxDevice::lockCamera(TxDevicePtr txDev)
     {
         using std::chrono::system_clock;
 
         static const unsigned TIMEOUT_MS = 5000;
         static const std::chrono::milliseconds timeout(TIMEOUT_MS);
 
+        if (! txDev)
+            return false;
+
+        uint16_t txID = txDev->txID();
         unsigned chan = chan4Tx(txID);
 
         // lock only one camera
@@ -90,6 +95,8 @@ namespace ite
                     updateTxParams();
                     if (good())
                         m_devReader->start(m_device.get());
+
+                    m_txDev = txDev;
                     return true;
                 }
 
@@ -253,24 +260,39 @@ namespace ite
             {
                 m_devReader->wait();
 
-                RCCommand cmd;
-                if (m_devReader->getRetChanCmd(cmd) && cmd.isOK())
+                bool first = true;
+                for (;;)
                 {
-                    devLink.txID = cmd.txID();
-                    devLink.channel = m_channel;
+                    RCCmdBuffer cmdBuf;
+                    if (! m_devReader->getRetChanCmd(cmdBuf))
+                        break;
+
+                    RCCommand cmd = cmdBuf.cmd();
+                    if (! cmd.isOK())
+                    {
 #if 1
+                        if (cmd.hasData())
+                            printf("wrong RC command. tags: %d; sum val: %d; sum calc: %d\n", cmd.hasTags(), cmd.checksumValue(), cmd.calcChecksum());
+                        else
+                            printf("wrong RC command. No data\n");
+#endif
+                        continue;
+                    }
+
+                    if (first)
+                    {
+                        first = false;
+                        devLink.txID = cmd.txID();
+                        devLink.channel = m_channel;
+
+                        setTx(m_channel, devLink.txID);
+                    }
+#if 1
+                    if (cmd.txID() != devLink.txID)
+                        printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, cmd.txID());
                     if (! devLink.txID)
                         printf("txID == 0\n");
 #endif
-                    setTx(m_channel, devLink.txID);
-
-                    while (m_devReader->getRetChanCmd(cmd))
-                    {
-#if 1
-                        if (cmd.isOK() && cmd.txID() != devLink.txID)
-                            printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, cmd.txID());
-#endif
-                    }
                 }
 
                 m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
@@ -286,22 +308,26 @@ namespace ite
     void RxDevice::updateTxParams()
     {
 #if 0
-        m_txDev = m_rcShell->device(m_rxID, m_txID);
+        // TODO: check device link first?
+
         if (m_txDev)
         {
-            /// @note async
-            m_rcShell->updateTxParams(m_txInfo);
+            m_txDev->getTransmissionParameterCapabilities();
+            m_txDev->getTransmissionParameters();
+            m_txDev->getDeviceInformation();
+            m_txDev->getVideoSources();
+            m_txDev->getVideoSourceConfigurations();
+            m_txDev->getVideoEncoderConfigurations();
+
+            m_txDev->wait();
         }
 #endif
     }
 
-    // TODO
-    bool RxDevice::changeChannel(unsigned short txID, unsigned chan)
+    bool RxDevice::changeChannel(unsigned chan)
     {
-#if 0
-        if (isLocked())
-            return m_rcShell->setChannel(rxID(), txID, chan);
-#endif
+        if (m_txDev && m_txDev->setChannel(chan))
+            return true;
         return false;
     }
 

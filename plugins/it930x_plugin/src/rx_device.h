@@ -7,13 +7,16 @@
 
 #include "it930x.h"
 #include "dev_reader.h"
-#include "tx_device.h"
 
 namespace ite
 {
     unsigned str2num(std::string& s);
     std::string num2str(unsigned id);
 
+    class TxDevice;
+    typedef std::shared_ptr<TxDevice> TxDevicePtr;
+
+    ///
     struct DevLink
     {
         uint16_t rxID;
@@ -25,7 +28,7 @@ namespace ite
         {}
     };
 
-    //!
+    ///
     class RxDevice
     {
     public:
@@ -33,7 +36,7 @@ namespace ite
 
         enum
         {
-            NOT_A_CHANNEL = TxDevice::CHANNELS_NUM
+            NOT_A_CHANNEL = 16 // TxDevice::CHANNELS_NUM
         };
 
         static constexpr unsigned streamsCount() { return 2; }
@@ -107,7 +110,7 @@ namespace ite
         bool subscribe(unsigned stream) { return m_devReader->subscribe(stream2pid(stream)); }
         void unsubscribe(unsigned stream) { m_devReader->unsubscribe(stream2pid(stream)); }
 
-        bool lockCamera(uint16_t txID);
+        bool lockCamera(TxDevicePtr txDev);
         bool tryLockC(unsigned freq, bool prio = true);
         bool isLocked() const;
         void unlockC();
@@ -117,10 +120,8 @@ namespace ite
         void stopSearchTx(DevLink& outDevLink);
 
         const IteDriverInfo rxDriverInfo() const { return m_rxInfo; }
-        const TxManufactureInfo txDriverInfo() const { return m_txDev->txDeviceInfo(); }
-        const TxVideoEncConfig txVideoEncConfig(uint8_t encNo) const { return m_txDev->txVideoEncConfig(encNo); }
+        TxDevicePtr txDevice() const { return m_txDev; }
 
-        //unsigned frequency() const { return TxDevice::freq4chan(m_channel); }
         unsigned channel() { return m_channel; }
         uint8_t strength() const { return m_signalStrength; }
         uint8_t quality() const { return m_signalQuality; }
@@ -196,15 +197,16 @@ namespace ite
             }
         }
 
-        bool changeChannel(uint16_t txID, unsigned channel);
+        bool changeChannel(unsigned channel);
 
     private:
-        struct TX
+        ///
+        struct TxPresence
         {
             uint16_t present;
             uint16_t lost;
 
-            TX()
+            TxPresence()
             :   present(0), lost(0), m_lock(false)
             {}
 
@@ -251,6 +253,7 @@ namespace ite
             std::atomic_bool m_lock;
         };
 
+        ///
         struct Sync
         {
             mutable std::mutex mutex;
@@ -269,10 +272,11 @@ namespace ite
         mutable std::mutex m_mutex;
         std::unique_ptr<It930x> m_device;
         std::unique_ptr<DevReader> m_devReader;
+        TxDevicePtr m_txDev;                    // locked Tx device (as camera)
         const uint16_t m_rxID;
         unsigned m_channel;
         Sync m_sync;
-        std::vector<TX> m_txs;
+        std::vector<TxPresence> m_txs;
 
         // info from DTV receiver
         uint8_t m_signalQuality;
@@ -280,8 +284,7 @@ namespace ite
         bool m_signalPresent;
         IteDriverInfo m_rxInfo;
 
-        // info from RC
-        TxDevicePtr m_txDev;
+        // locked Tx device
 
         bool isLocked_u() const { return m_device.get() && m_device->hasStream(); }
         bool wantedByCamera() const;

@@ -446,13 +446,14 @@ namespace ite
         return ContentPacketPtr();
     }
 
-    bool DevReader::getRetChanCmd(RCCommand& cmd)
+    // TODO: multipacket commands
+    bool DevReader::getRetChanCmd(RCCmdBuffer& cmd)
     {
         TsBuffer ts = m_demux.popRC();
         if (ts)
         {
             MpegTsPacket pkt = ts.packet();
-            cmd.add(pkt.tsPayload(), pkt.tsPayloadLen());
+            cmd.append(pkt.tsPayload(), pkt.tsPayloadLen());
             return true;
         }
 

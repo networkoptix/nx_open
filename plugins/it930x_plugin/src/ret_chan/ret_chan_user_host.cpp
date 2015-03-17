@@ -6,21 +6,12 @@
 #define Ref_BufferSize 64
 #define RC_USER_DEFINE_INIT_VALUE 0
 
+typedef TxRC RCHostInfo;
 
 //*******************User Define Init********************
-void User_init_DeviceID_Host(Word* TxID, Word* RxID)
-{
-#if	UART_TEST
-	(*TxID) = 0x0000;
-	(*RxID) = 0xFFFF;
-#endif
-}
 
 void User_Host_init(RCHostInfo* deviceInfo)
 {
-#if	UART_TEST
-	Byte i;
-	Byte j;
 	Rule_LineDetector* ptrRule_LineDetector = NULL;
 	Rule_FieldDetector* ptrRule_FieldDetector = NULL;
 	Rule_MotionDetector* ptrRule_MotionDetector = NULL;
@@ -115,7 +106,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->psiTable.ONID = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->psiTable.NID = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->psiTable.TSID = RC_USER_DEFINE_INIT_VALUE;
-	for(i = 0;i<32;i++)
+    for(Byte i = 0;i<32;i++)
 		deviceInfo->psiTable.networkName[i] = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->psiTable.extensionFlag = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->psiTable.privateDataSpecifier = RC_USER_DEFINE_INIT_VALUE;
@@ -153,7 +144,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->eitInfo.videoEncConfigToken);
 	deviceInfo->eitInfo.listSize = 2;
 	deviceInfo->eitInfo.eitInfoParam = (EITInfoParam*) User_memory_allocate( deviceInfo->eitInfo.listSize *sizeof(EITInfoParam));
-	for( i = 0; i < deviceInfo->eitInfo.listSize; i ++)
+    for (Byte i = 0; i < deviceInfo->eitInfo.listSize; ++i)
 	{
 		deviceInfo->eitInfo.eitInfoParam[i].enable = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->eitInfo.eitInfoParam[i].startDate = RC_USER_DEFINE_INIT_VALUE;
@@ -235,7 +226,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//----------------------init_DigitalInputs--------------------------
 	deviceInfo->digitalInputsInfo.listSize = 2;
 	deviceInfo->digitalInputsInfo.tokenList = (RCString*)User_memory_allocate( deviceInfo->digitalInputsInfo.listSize*sizeof(RCString));
-	for( i = 0; i < deviceInfo->digitalInputsInfo.listSize; i ++)
+    for (Byte i = 0; i < deviceInfo->digitalInputsInfo.listSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->digitalInputsInfo.tokenList[i]);
 	}
@@ -245,7 +236,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 
 	deviceInfo->relayOutputs.relayOutputsParam = (RelayOutputsParam*) User_memory_allocate( deviceInfo->relayOutputs.listSize * sizeof(RelayOutputsParam));
 
-	for( i = 0; i < deviceInfo->relayOutputs.listSize; i ++)
+    for (Byte i = 0; i < deviceInfo->relayOutputs.listSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->relayOutputs.relayOutputsParam[i].token);
 
@@ -399,7 +390,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->audioEncConfig.configListSize = 1;
 	deviceInfo->audioEncConfig.configList = (AudioEncConfigParam*) User_memory_allocate( deviceInfo->audioEncConfig.configListSize * sizeof(AudioEncConfigParam));
 
-	for( i = 0; i < deviceInfo->audioEncConfig.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->audioEncConfig.configListSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioEncConfig.configList[i].token);
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioEncConfig.configList[i].name);
@@ -413,7 +404,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//-------------------init_AudioSourceConfig---------------------
 	deviceInfo->audioSrcConfig.configListSize = 1;
 	deviceInfo->audioSrcConfig.audioSrcConfigList = (AudioSrcConfigParam*) User_memory_allocate( deviceInfo->audioSrcConfig.configListSize * sizeof(AudioSrcConfigParam));
-	for( i = 0; i < deviceInfo->audioSrcConfig.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->audioSrcConfig.configListSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioSrcConfig.audioSrcConfigList[i].name);
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioSrcConfig.audioSrcConfigList[i].token);
@@ -425,7 +416,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//----------------------init_AudioSources------------------------
 	deviceInfo->audioSources.audioSourcesListSize = 2;
 	deviceInfo->audioSources.audioSourcesList = (AudioSourcesParam*) User_memory_allocate( deviceInfo->audioSources.audioSourcesListSize * sizeof(AudioSourcesParam));
-	for( i = 0; i < deviceInfo->audioSources.audioSourcesListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->audioSources.audioSourcesListSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioSources.audioSourcesList[i].audioSourcesToken);
 		deviceInfo->audioSources.audioSourcesList[i].channels = RC_USER_DEFINE_INIT_VALUE;
@@ -444,7 +435,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->mediaProfiles.profilesListSize = 2;
 	deviceInfo->mediaProfiles.mediaProfilesParam = (MediaProfilesParam*) User_memory_allocate( deviceInfo->mediaProfiles.profilesListSize * sizeof(MediaProfilesParam));
 
-	for( i = 0; i < deviceInfo->mediaProfiles.profilesListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->mediaProfiles.profilesListSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->mediaProfiles.mediaProfilesParam[i].name);
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->mediaProfiles.mediaProfilesParam[i].token);
@@ -503,7 +494,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//--------------------init_VideoEncConfig------------------------
 	deviceInfo->videoEncConfig.configListSize = 1;
 	deviceInfo->videoEncConfig.configList = (VideoEncConfigParam*) User_memory_allocate( deviceInfo->videoEncConfig.configListSize * sizeof(VideoEncConfigParam));
-	for( i = 0; i < deviceInfo->videoEncConfig.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoEncConfig.configListSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoEncConfig.configList[i].name);
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoEncConfig.configList[i].token);
@@ -527,7 +518,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//--------------------init_VideoSrcConfig------------------------
 	deviceInfo->videoSrcConfig.configListSize = 1;
 	deviceInfo->videoSrcConfig.configList = (VideoSrcConfigParam*) User_memory_allocate( deviceInfo->videoSrcConfig.configListSize * sizeof(VideoSrcConfigParam));
-	for( i = 0; i < deviceInfo->videoSrcConfig.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoSrcConfig.configListSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfig.configList[i].name);
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfig.configList[i].token);
@@ -548,7 +539,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//------------------------init_VideoSrc---------------------------
 	deviceInfo->videoSrc.videoSrcListSize = 1;
 	deviceInfo->videoSrc.srcList = (VideoSrcParam*) User_memory_allocate( deviceInfo->videoSrc.videoSrcListSize * sizeof(VideoSrcParam));
-	for( i = 0; i < deviceInfo->videoSrc.videoSrcListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoSrc.videoSrcListSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrc.srcList[i].token);
 		deviceInfo->videoSrc.srcList[i].frameRate =RC_USER_DEFINE_INIT_VALUE;
@@ -570,7 +561,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->videoSrcConfigOptions.boundsRange_Heigh_Max = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize = 2;
 	deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList = (RCString*) User_memory_allocate( deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize * sizeof(RCString));
-	for( i = 0; i < deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize; ++i)
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList[i]);
 	deviceInfo->videoSrcConfigOptions.rotateModeOptions = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoSrcConfigOptions.rotateDegreeMinOption = RC_USER_DEFINE_INIT_VALUE;
@@ -584,10 +575,10 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->videoEncConfigOptions.encodingOption = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize = 2;
 	deviceInfo->videoEncConfigOptions.resolutionsAvailableList = ( ResolutionsAvailableList* ) User_memory_allocate( deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize * sizeof(ResolutionsAvailableList));
-	for( i = 0; i < deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize; ++i)
 	{
-		deviceInfo->videoEncConfigOptions.resolutionsAvailableList[i].width = RC_USER_DEFINE_INIT_VALUE + i;;
-		deviceInfo->videoEncConfigOptions.resolutionsAvailableList[i].height = RC_USER_DEFINE_INIT_VALUE + i;;
+        deviceInfo->videoEncConfigOptions.resolutionsAvailableList[i].width = RC_USER_DEFINE_INIT_VALUE + i;
+        deviceInfo->videoEncConfigOptions.resolutionsAvailableList[i].height = RC_USER_DEFINE_INIT_VALUE + i;
 	}
 	deviceInfo->videoEncConfigOptions.qualityMin = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoEncConfigOptions.qualityMax = RC_USER_DEFINE_INIT_VALUE;
@@ -605,7 +596,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->videoEncConfigOptions.targetBitrateRangeMax = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize = 2;
 	deviceInfo->videoEncConfigOptions.aspectRatioList = (Word*) User_memory_allocate( deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize * sizeof(Word));
-	for( i = 0; i < deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize; i ++ )
+    for (Byte i = 0; i < deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize; ++i)
 	{
 		deviceInfo->videoEncConfigOptions.aspectRatioList[i] = RC_USER_DEFINE_INIT_VALUE;
 	}
@@ -616,7 +607,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioSrcConfigOptions.profileToken);
 	deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize = 2;
 	deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList = (RCString*) User_memory_allocate(deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize * sizeof(RCString));
-	for( i = 0; i < deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize; ++i)
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList[i]);
 	//------------------------init_AudioSrcConfigOptions---------------------------
 	//------------------------init_AudioEncConfigOptions---------------------------
@@ -625,14 +616,14 @@ void User_Host_init(RCHostInfo* deviceInfo)
 
 	deviceInfo->audioEncConfigOptions.configListSize = 2;
 	deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam = ( AudioEncConfigOptionsParam* ) User_memory_allocate( deviceInfo->audioEncConfigOptions.configListSize * sizeof(AudioEncConfigOptionsParam));
-	for( i = 0; i < deviceInfo->audioEncConfigOptions.configListSize; i ++ )
+    for (Byte i = 0; i < deviceInfo->audioEncConfigOptions.configListSize; ++i)
 	{
 		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].encodingOption = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].bitrateRangeMin = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].bitrateRangeMax = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize = 2;
 		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList = (Word*) User_memory_allocate( deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize * sizeof(Word));
-		for( j = 0; j < deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize; j ++)
+        for (Byte j = 0; j < deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize; ++j)
 		{
 			deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList[j] = RC_USER_DEFINE_INIT_VALUE;
 		}
@@ -713,7 +704,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoPrivateArea.videoSrcToken);
 	deviceInfo->videoPrivateArea.polygonListSize = 2;
 	deviceInfo->videoPrivateArea.privateAreaPolygon = ( PrivateAreaPolygon* ) User_memory_allocate( deviceInfo->videoPrivateArea.polygonListSize * sizeof(PrivateAreaPolygon));
-	for( i = 0; i < deviceInfo->videoPrivateArea.polygonListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoPrivateArea.polygonListSize; ++i)
 	{
 		deviceInfo->videoPrivateArea.privateAreaPolygon[i].polygon_x = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->videoPrivateArea.privateAreaPolygon[i].polygon_y = RC_USER_DEFINE_INIT_VALUE;
@@ -730,7 +721,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//------------------------init_PTZConfig--------------------------
 	deviceInfo->ptzConfig.PTZConfigListSize = 2;
 	deviceInfo->ptzConfig.PTZConfigList = (PTZConfigParam*) User_memory_allocate( deviceInfo->ptzConfig.PTZConfigListSize * sizeof(PTZConfigParam));
-	for(i = 0; i < deviceInfo->ptzConfig.PTZConfigListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->ptzConfig.PTZConfigListSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzConfig.PTZConfigList[i].name);
 		deviceInfo->ptzConfig.PTZConfigList[i].useCount = RC_USER_DEFINE_INIT_VALUE;
@@ -770,7 +761,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsGet.token);
 	deviceInfo->ptzPresetsGet.configListSize = 1;
 	deviceInfo->ptzPresetsGet.configList = (PTZPresetsConfig*) User_memory_allocate( deviceInfo->ptzPresetsGet.configListSize * sizeof(PTZPresetsConfig));
-	for( i = 0; i < deviceInfo->ptzPresetsGet.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->ptzPresetsGet.configListSize; ++i)
 	{
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsGet.configList[i].presetName);
 		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsGet.configList[i].presetToken);
@@ -840,7 +831,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//----------------------init_SupportedRules-----------------------
 	deviceInfo->supportedRules.supportListSize = 5;
 	deviceInfo->supportedRules.ruleType = (Byte*) User_memory_allocate( deviceInfo->supportedRules.supportListSize * sizeof(Byte));
-	for( i = 0; i < deviceInfo->supportedRules.supportListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->supportedRules.supportListSize; ++i)
 		deviceInfo->supportedRules.ruleType[i] = i + 0x10;
 	//----------------------init_SupportedRules-----------------------
 	//------------------------init_DeleteRule--------------------------
@@ -857,7 +848,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->ruleList.maxListSize = 10;
 	deviceInfo->ruleList.ruleListSize = 5;
 	deviceInfo->ruleList.totalRuleList = (TotalRule* )User_memory_allocate(deviceInfo->ruleList.maxListSize * sizeof(TotalRule));
-	for( i = 0; i < deviceInfo->ruleList.maxListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->ruleList.maxListSize; ++i)
 	{
 
 		if( i < 5)
@@ -886,7 +877,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 			ptrRule_LineDetector->polygonListSize = 2;
 			ptrRule_LineDetector->detectPolygon = (DetectPolygon*) User_memory_allocate( ptrRule_LineDetector->polygonListSize * sizeof(DetectPolygon));
 
-			for(j = 0; j < ptrRule_LineDetector->polygonListSize; j ++)
+            for (Byte j = 0; j < ptrRule_LineDetector->polygonListSize; ++j)
 			{
 				ptrRule_LineDetector->detectPolygon[j].polygon_x = RC_USER_DEFINE_INIT_VALUE;
 				ptrRule_LineDetector->detectPolygon[j].polygon_y = RC_USER_DEFINE_INIT_VALUE;
@@ -900,7 +891,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 
 			ptrRule_FieldDetector->polygonListSize = 2;
 			ptrRule_FieldDetector->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_FieldDetector->polygonListSize * sizeof(DetectPolygon));
-			for(j = 0; j < ptrRule_FieldDetector->polygonListSize; j ++)
+            for (Byte j = 0; j < ptrRule_FieldDetector->polygonListSize; ++j)
 			{
 				ptrRule_FieldDetector->detectPolygon[j].polygon_x = RC_USER_DEFINE_INIT_VALUE;
 				ptrRule_FieldDetector->detectPolygon[j].polygon_y = RC_USER_DEFINE_INIT_VALUE;
@@ -916,7 +907,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 			ptrRule_MotionDetector->polygonListSize = 2 ;
 			ptrRule_MotionDetector->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_MotionDetector->polygonListSize * sizeof(DetectPolygon));
 
-			for( j = 0; j < ptrRule_MotionDetector->polygonListSize; j++ )
+            for (Byte j = 0; j < ptrRule_MotionDetector->polygonListSize; ++j)
 			{
 				ptrRule_MotionDetector->detectPolygon[j].polygon_x = RC_USER_DEFINE_INIT_VALUE;
 				ptrRule_MotionDetector->detectPolygon[j].polygon_y = RC_USER_DEFINE_INIT_VALUE;
@@ -936,7 +927,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 			ptrRule_Counting->polygonListSize = 2;
 			ptrRule_Counting->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_Counting->polygonListSize * sizeof(DetectPolygon));
 
-			for( j = 0; j < ptrRule_Counting->polygonListSize; j++ )
+            for (Byte j = 0; j < ptrRule_Counting->polygonListSize; ++j)
 			{
 				ptrRule_Counting->detectPolygon[j].polygon_x = RC_USER_DEFINE_INIT_VALUE;
 				ptrRule_Counting->detectPolygon[j].polygon_y = RC_USER_DEFINE_INIT_VALUE;
@@ -979,7 +970,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 
 	deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize = 1;
 	deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList = (Metadata_StreamParam*) User_memory_allocate( deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize * sizeof(Metadata_StreamParam));
-	for( i = 0; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; ++i)
 	{
 		deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoPID = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoEncodingType = RC_USER_DEFINE_INIT_VALUE;
@@ -1016,15 +1007,12 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->metadataSettings.motionDetectorEnable = 1;
 	deviceInfo->metadataSettings.motionDetectorPeriod = 1000;
 	//--------------------init_MetadataSettings----------------------
-#endif
 }
 //*******************User Define Init********************
 
 //*******************User Define UnInit********************
 void User_Host_uninit(RCHostInfo* deviceInfo)
 {
-#if	UART_TEST
-	Byte i = 0;
 	Rule_LineDetector* ptrRule_LineDetector = NULL;
 	Rule_FieldDetector* ptrRule_FieldDetector = NULL;
 	Rule_MotionDetector* ptrRule_MotionDetector = NULL;
@@ -1047,7 +1035,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
     //------------------init_CalibrationTable------------------------
 	//-----------------uninit_EITInfo-----------------
 	Cmd_StringClear(&deviceInfo->eitInfo.videoEncConfigToken);
-	for( i = 0; i < deviceInfo->eitInfo.listSize; i ++)
+    for (Byte i = 0; i < deviceInfo->eitInfo.listSize; ++i)
 	{
 		Cmd_StringClear(&deviceInfo->eitInfo.eitInfoParam[i].eventName);
 		Cmd_StringClear(&deviceInfo->eitInfo.eitInfoParam[i].eventText);
@@ -1080,7 +1068,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	Cmd_StringClear(&deviceInfo->systemFirmware.message);
 	//-----------------uninit_SystemFirmware--------------------
 	//-----------------uninit_DigitalInputs----------------
-	for( i = 0; i < deviceInfo->digitalInputsInfo.listSize; i ++)
+    for (Byte i = 0; i < deviceInfo->digitalInputsInfo.listSize; ++i)
 	{
 		Cmd_StringClear(&deviceInfo->digitalInputsInfo.tokenList[i]);
 	}
@@ -1089,7 +1077,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	deviceInfo->digitalInputsInfo.listSize = 0;
 	//-----------------uninit_DigitalInputs----------------
 	//-----------------uninit_RelayOutputs---------------
-	for( i = 0; i < deviceInfo->relayOutputs.listSize; i ++)
+    for (Byte i = 0; i < deviceInfo->relayOutputs.listSize; ++i)
 	{
 		Cmd_StringClear( &deviceInfo->relayOutputs.relayOutputsParam[i].token);
 	}
@@ -1124,7 +1112,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	Cmd_StringClear( &deviceInfo->userDefinedSettings.uerDefinedData);
 	//---------------------------uninit_UserDefinedSettings----------------------------
 	//--------------uninit_AudioEncConfig---------------
-	for( i = 0; i < deviceInfo->audioEncConfig.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->audioEncConfig.configListSize; ++i)
 	{
 		Cmd_StringClear( &deviceInfo->audioEncConfig.configList[i].token);
 		Cmd_StringClear( &deviceInfo->audioEncConfig.configList[i].name);
@@ -1134,7 +1122,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	deviceInfo->audioEncConfig.configListSize = 0;
 	//--------------uninit_AudioEncConfig---------------
 	//------------uninit_AudioSourceConfig--------------
-	for( i = 0; i < deviceInfo->audioSrcConfig.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->audioSrcConfig.configListSize; ++i)
 	{
 		Cmd_StringClear( &deviceInfo->audioSrcConfig.audioSrcConfigList[i].name);
 		Cmd_StringClear( &deviceInfo->audioSrcConfig.audioSrcConfigList[i].token);
@@ -1145,7 +1133,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	deviceInfo->audioSrcConfig.configListSize = 0;
 	//------------uninit_AudioSourceConfig--------------
 	//---------------uninit_AudioSources-----------------
-	for( i = 0; i < deviceInfo->audioSources.audioSourcesListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->audioSources.audioSourcesListSize; ++i)
 	{
 		Cmd_StringClear( &deviceInfo->audioSources.audioSourcesList[i].audioSourcesToken);
 	}
@@ -1157,7 +1145,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	Cmd_StringClear( &deviceInfo->guaranteedEncs.configurationToken);
 	//---------------uninit_GuaranteedEncs-----------------
 	//--------------------uninit_Profiles---------------------
-	for( i = 0; i < deviceInfo->mediaProfiles.profilesListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->mediaProfiles.profilesListSize; ++i)
 	{
 		Cmd_StringClear( &deviceInfo->mediaProfiles.mediaProfilesParam[i].name);
 		Cmd_StringClear( &deviceInfo->mediaProfiles.mediaProfilesParam[i].token);
@@ -1187,7 +1175,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	deviceInfo->mediaProfiles.profilesListSize = 0;
 	//--------------------uninit_Profiles---------------------
 	//---------------uninit_VideoEncConfig-----------------
-	for( i = 0; i < deviceInfo->videoEncConfig.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoEncConfig.configListSize; ++i)
 	{
 		Cmd_StringClear(  &deviceInfo->videoEncConfig.configList[i].name);
 		Cmd_StringClear(  &deviceInfo->videoEncConfig.configList[i].token);
@@ -1197,7 +1185,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	deviceInfo->videoEncConfig.configListSize = 0;
 	//---------------uninit_VideoEncConfig-----------------
 	//---------------uninit_VideoSrcConfig-----------------
-	for( i = 0; i < deviceInfo->videoSrcConfig.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoSrcConfig.configListSize; ++i)
 	{
 		Cmd_StringClear(  &deviceInfo->videoSrcConfig.configList[i].name);
 		Cmd_StringClear(  &deviceInfo->videoSrcConfig.configList[i].token);
@@ -1208,7 +1196,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	deviceInfo->videoSrcConfig.configListSize = 0;
 	//---------------uninit_VideoSrcConfig-----------------
 	//------------------uninit_VideoSrc---------------------
-	for( i = 0; i < deviceInfo->videoSrc.videoSrcListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoSrc.videoSrcListSize; ++i)
 	{
 		Cmd_StringClear(  &deviceInfo->videoSrc.srcList[i].token);
 	}
@@ -1219,7 +1207,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	//------------------------uninit_VideoSrcConfigOptions---------------------------
 	Cmd_StringClear(  &deviceInfo->videoSrcConfigOptions.videoSrcConfigToken);
 	Cmd_StringClear(  &deviceInfo->videoSrcConfigOptions.profileToken);
-	for( i = 0; i < deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize; ++i)
 		Cmd_StringClear( &deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList[i]);
 	User_memory_free(deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList);
 	deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList = NULL;
@@ -1238,7 +1226,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	//------------------------uninit_AudioSrcConfigOptions---------------------------
 	Cmd_StringClear(  &deviceInfo->audioSrcConfigOptions.audioSrcConfigToken);
 	Cmd_StringClear(  &deviceInfo->audioSrcConfigOptions.profileToken);
-    for( i = 0; i < deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize; ++i)
         Cmd_StringClear(&deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList[i]);
 	User_memory_free(deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList);
 	deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList = NULL;
@@ -1247,7 +1235,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	//------------------------uninit_AudioEncConfigOptions---------------------------
 	Cmd_StringClear(  &deviceInfo->audioEncConfigOptions.audioEncConfigToken);
 	Cmd_StringClear(  &deviceInfo->audioEncConfigOptions.profileToken);
-	for( i = 0; i < deviceInfo->audioEncConfigOptions.configListSize; i ++ )
+    for (Byte i = 0; i < deviceInfo->audioEncConfigOptions.configListSize; ++i)
 		User_memory_free(deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList);
 	User_memory_free(deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam);
 	deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam = NULL;
@@ -1288,7 +1276,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	Cmd_StringClear( &deviceInfo->videoSrcControl.videoSrcToken);
 	//------------------------uninit_VideoSrcControl--------------------------
 	//-------------------uninit_PTZConfig--------------------
-	for(i = 0; i < deviceInfo->ptzConfig.PTZConfigListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->ptzConfig.PTZConfigListSize; ++i)
 	{
 		Cmd_StringClear(&deviceInfo->ptzConfig.PTZConfigList[i].name);
 		Cmd_StringClear(&deviceInfo->ptzConfig.PTZConfigList[i].token);
@@ -1303,7 +1291,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	Cmd_StringClear( &deviceInfo->ptzStatus.error);
 	//-------------------uninit_PTZStatus---------------------
 	//------------------uninit_PTZPresetsGet---------------------
-	for( i = 0; i < deviceInfo->ptzPresetsGet.configListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->ptzPresetsGet.configListSize; ++i)
 	{
 		Cmd_StringClear( &deviceInfo->ptzPresetsGet.configList[i].presetName);
 		Cmd_StringClear( &deviceInfo->ptzPresetsGet.configList[i].presetToken);
@@ -1395,7 +1383,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	}
 	//--------------------uninit_totalRule----------------------
 	//---------------------uninit_ruleList-----------------------
-	for( i = 0; i < deviceInfo->ruleList.maxListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->ruleList.maxListSize; ++i)
 	{
 		if((deviceInfo->ruleList.totalRuleList[i].type >= 0x10) && (deviceInfo->ruleList.totalRuleList[i].type <= 0x14))
 		{
@@ -1462,38 +1450,36 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	Cmd_StringClear( &deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken);
 	//*************uninit_metadata_Event*************
 	Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Device.textInformation);
-	for( i = 0; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; i ++)
+    for (Byte i = 0; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; ++i)
 		Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken);
 	User_memory_free(deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList);
 	deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList = NULL;
 	deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize = 0;
 	//--------------uninit_MetaDataStream-----------------
-#endif
 }
+
 //*******************User Define UnInit********************
+
+void User_getSecurity(RCString /*userName*/, RCString /*password*/, Byte* valid)
+{
+    *valid = Valid;
+}
+
+#if USER_REPLY
 
 //*******************User Define Reply********************
 //--------------------------General-------------------------------
-void User_getSecurity(RCString /*userName*/, RCString /*password*/, Byte* valid)
-{
-#if	UART_TEST
-    *valid = Valid;
-#endif
-}
 
 void User_getGeneralReply(RCHostInfo* /*deviceInfo*/, Word command)
 {
-#if	UART_TEST
 	printf("=== Cmd=0x%04x: ===\n\n", command);
 	printf("\n >>>Set Command OK <<<!!!!\n\n");
 	printf("=== Cmd=0x%04x: ===\n\n", command);
-#endif
 }
 
 #if 0
 void User_getErrorReply(Device device, ReturnValue returnValue, Word command)
 {
-#if	UART_TEST
 	printf("=== Cmd=0x%04x: ===\n\n", command);
 
 	if(returnValue.returnCode != 0)
@@ -1755,7 +1741,6 @@ void User_getErrorReply(Device device, ReturnValue returnValue, Word command)
 	}
 	printf("Cmd=0x%04x, returnCode=0x%02x\n",command,returnValue.returnCode);
 	printf("=== Cmd=0x%04x: ===\n\n", command);
-#endif
 }
 #endif
 
@@ -1775,7 +1760,6 @@ void User_getDeviceAddressReply(RCHostInfo* deviceInfo, Word command)
 
 void User_getTransmissionParameterReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	TransmissionParameter* in_TransmissionParameter = &deviceInfo->transmissionParameter;
 
 	printf("=== Cmd=0x%04x: User_getTransmissionParameterReply ===\n\n", CMD_GetTransmissionParametersOutput);
@@ -1797,17 +1781,16 @@ void User_getTransmissionParameterReply(RCHostInfo* deviceInfo, Word /*command*/
 		printf("    segmentationMode		= %u\n",in_TransmissionParameter->segmentationMode);
 		printf("    oneSeg_Constellation	= 0x%x\n",in_TransmissionParameter->oneSeg_Constellation);
 		printf("    oneSeg_CodeRate		= 0x%x\n",in_TransmissionParameter->oneSeg_CodeRate);
-	}else
+    }
+    else
 	{
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_getTransmissionParameterReply ===\n\n", CMD_GetTransmissionParametersOutput);
-#endif
 }
 
 void User_getHwRegisterValuesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	HwRegisterInfo* in_HwRegisterInfo = &deviceInfo->hwRegisterInfo;
 	Byte i = 0;
 
@@ -1819,12 +1802,10 @@ void User_getHwRegisterValuesReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    %u : 0x%02x \n",i,in_HwRegisterInfo->registerValues[i]);
 	printf("\n");
 	printf("=== Cmd=0x%04x: User_getHwRegisterValuesReply ===\n\n", CMD_GetHwRegisterValuesOutput);
-#endif
 }
 
 void User_getAdvanceOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	AdvanceOptions* in_AdvanceOptions = &deviceInfo->advanceOptions;
 
 	printf("=== Cmd=0x%04x: User_getAdvanceOptionsReply ===\n\n", CMD_GetAdvanceOptionsOutput);
@@ -1843,17 +1824,16 @@ void User_getAdvanceOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    repeatPacketNum			= %u\n",in_AdvanceOptions->repeatPacketNum);
 		printf("    repeatPacketTimeInterval		= %u\n",in_AdvanceOptions->repeatPacketTimeInterval);
 		printf("    TS_TableDisable			= 0x%x\n",in_AdvanceOptions->TS_TableDisable);
-	}else
+    }
+    else
 	{
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_getAdvanceOptionsReply ===\n\n", CMD_GetAdvanceOptionsOutput);
-#endif
 }
 
 void User_getTPSInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	TPSInfo* in_TPSInfo = &deviceInfo->tpsInfo;
 
 	printf("=== Cmd=0x%04x: User_getTPSInfoReply ===\n\n", CMD_GetTPSInformationOutput);
@@ -1864,12 +1844,10 @@ void User_getTPSInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    Constellation	= 0x%x\n",in_TPSInfo->constellation);
 	printf("    Interval		= 0x%x\n",in_TPSInfo->interval);
 	printf("=== Cmd=0x%04x: User_getTPSInfoReply ===\n\n", CMD_GetTPSInformationOutput);
-#endif
 }
 
 void User_getSiPsiTableReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	PSITable* in_PSITable = &deviceInfo->psiTable;
 
 	printf("=== Cmd=0x%04x: User_getSiPsiTableReply ===\n\n", CMD_GetSiPsiTableOutput);
@@ -1884,17 +1862,16 @@ void User_getSiPsiTableReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    NITVersion			= 0x%02x\n",in_PSITable->NITVersion);
 		printf("    countryID			= %u\n",in_PSITable->countryID);
 		printf("    languageID			= %u\n",in_PSITable->languageID);
-	}else
+    }
+    else
 	{
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_getSiPsiTableReply ===\n\n", CMD_GetSiPsiTableOutput);
-#endif
 }
 
 void User_getNitLocationReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	NITLoacation* in_NITLoacation = &deviceInfo->nitLoacation;
 
 	printf("=== Cmd=0x%04x: User_getNitLocationReply ===\n\n", CMD_GetNitLocationOutput);
@@ -1903,12 +1880,10 @@ void User_getNitLocationReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    extentLatitude	= %u\n",in_NITLoacation->extentLatitude);
 	printf("    extentLongitude	= %u\n",in_NITLoacation->extentLongitude);
 	printf("=== Cmd=0x%04x: User_getNitLocationReply ===\n\n", CMD_GetNitLocationOutput);
-#endif
 }
 
 void User_getSdtServiceReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	ServiceConfig* in_ServiceConfig = &deviceInfo->serviceConfig;
 
 	printf("=== Cmd=0x%04x: User_getSdtServiceReply ===\n\n", CMD_GetSdtServiceOutput);
@@ -1930,17 +1905,16 @@ void User_getSdtServiceReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    ISDBT_ServiceIDDataType_1		= 0x%04x\n",in_ServiceConfig->ISDBT_ServiceIDDataType_1);
 		printf("    ISDBT_ServiceIDDataType_2		= 0x%04x\n",in_ServiceConfig->ISDBT_ServiceIDDataType_2);
 		printf("    ISDBT_ServiceIDPartialReception	= 0x%04x\n",in_ServiceConfig->ISDBT_ServiceIDPartialReception);
-	}else
+    }
+    else
 	{
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_getSdtServiceReply ===\n\n", CMD_GetSdtServiceOutput);
-#endif
 }
 
 void User_getEITInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	EITInfo* in_EITInfo = &deviceInfo->eitInfo;
 	Byte i;
 
@@ -1958,10 +1932,8 @@ void User_getEITInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    eventText stringLength	= %u\n",in_EITInfo->eitInfoParam[i].eventText.stringLength);
 		printf("    eventText stringData	= %s\n",in_EITInfo->eitInfoParam[i].eventText.stringData);
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
-
 	}
 	printf("=== Cmd=0x%04x: User_getEITInfoReply ===\n\n", CMD_GetEITInformationOutput);
-#endif
 }
 
 void User_getTransmissionParameterCapabilitiesReply(RCHostInfo* deviceInfo, Word /*command*/)
@@ -2003,18 +1975,15 @@ void User_getTransmissionParameterCapabilitiesReply(RCHostInfo* deviceInfo, Word
 //-----------------Device Management Service-------------------
 void User_getDeviceCapabilityReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	DeviceCapability* in_DeviceCapability = &deviceInfo->deviceCapability;
 
 	printf("=== Cmd=0x%04x: User_getDeviceCapabilityReply ===\n\n", CMD_GetCapabilitiesOutput);
 	printf("    supportedFeatures	= 0x%x\n",in_DeviceCapability->supportedFeatures);
 	printf("=== Cmd=0x%04x: User_getDeviceCapabilityReply ===\n\n", CMD_GetCapabilitiesOutput);
-#endif
 }
 
 void User_getDeviceInformationReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	ManufactureInfo* in_ManufactureInfo = &deviceInfo->manufactureInfo;
 
 	printf("=== Cmd=0x%04x: User_getDeviceInformationReply ===\n\n", CMD_GetDeviceInformationOutput);
@@ -2033,24 +2002,20 @@ void User_getDeviceInformationReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    hardwareId.stringLength		= %u\n",in_ManufactureInfo->hardwareId.stringLength);
 	printf("    hardwareId.stringData		= %s\n",in_ManufactureInfo->hardwareId.stringData);
 	printf("=== Cmd=0x%04x: User_getDeviceInformationReply ===\n\n", CMD_GetDeviceInformationOutput);
-#endif
 }
 
 void User_getHostnameReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	HostInfo* in_HostInfo = &deviceInfo->hostInfo;
 
 	printf("=== Cmd=0x%04x: User_getHostnameReply ===\n\n", CMD_GetHostnameOutput);
 	printf("    hostName.stringLength	= %u\n",in_HostInfo->hostName.stringLength);
 	printf("    hostName.stringData		= %s\n",in_HostInfo->hostName.stringData);
 	printf("=== Cmd=0x%04x: User_getHostnameReply ===\n\n", CMD_GetHostnameOutput);
-#endif
 }
 
 void User_getSystemDateAndTimeReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	SystemTime* in_SystemTime = &deviceInfo->systemTime;
 
 	printf("=== Cmd=0x%04x: User_getSystemDateAndTimeReply ===\n\n", CMD_GetSystemDateAndTimeOutput);
@@ -2077,24 +2042,20 @@ void User_getSystemDateAndTimeReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_getSystemDateAndTimeReply ===\n\n", CMD_GetSystemDateAndTimeOutput);
-#endif
 }
 
 void User_getSystemLogReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	SystemLog* in_SystemLog = &deviceInfo->systemLog;
 
 	printf("=== Cmd=0x%04x: User_getSystemLogReply ===\n\n", CMD_GetSystemLogOutput);
 	printf("    systemLog stringLength	= %u\n",in_SystemLog->logData.stringLength);
 	printf("    systemLog stringData	= %s\n",in_SystemLog->logData.stringData);
 	printf("=== Cmd=0x%04x: User_getSystemLogReply ===\n\n", CMD_GetSystemLogOutput);
-#endif
 }
 
 void User_getOSDInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	OSDInfo* in_OSDInfo = &deviceInfo->osdInfo;
 
 	printf("=== Cmd=0x%04x: User_getOSDInfoReply ===\n\n", CMD_GetOSDInformationOutput);
@@ -2116,31 +2077,26 @@ void User_getOSDInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    text stringLength	= %u\n",in_OSDInfo->text.stringLength);
 	printf("    text stringData	= %s\n",in_OSDInfo->text.stringData);
 	printf("=== Cmd=0x%04x: User_getOSDInfoReply ===\n\n", CMD_GetOSDInformationOutput);
-#endif
 }
 
 void User_systemRebootReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	SystemReboot* in_SystemReboot = &deviceInfo->systemReboot;
 
 	printf("=== Cmd=0x%04x: User_systemReboot ===\n\n", CMD_SystemRebootOutput);
 	printf("    rebootMessage stringLength	= %u\n",in_SystemReboot->responseMessage.stringLength);
 	printf("    rebootMessage stringData	= %s\n",in_SystemReboot->responseMessage.stringData);
 	printf("=== Cmd=0x%04x: User_systemReboot ===\n\n", CMD_SystemRebootOutput);
-#endif
 }
 
 void User_upgradeSystemFirmwareReply(RCHostInfo* deviceInfo, Word command)
 {
-#if	UART_TEST
 	SystemFirmware* in_SystemFirmware = &deviceInfo->systemFirmware;
 
 	printf("=== Cmd=0x%04x: User_upgradeSystemFirmwareReply ===\n\n", command);
 	printf("    message stringLength	= %u\n",in_SystemFirmware->message.stringLength);
 	printf("    message stringData		= %s\n",in_SystemFirmware->message.stringData);
 	printf("=== Cmd=0x%04x: User_upgradeSystemFirmwareReply ===\n\n", command);
-#endif
 }
 
 //-----------------Device Management Service-------------------
@@ -2148,7 +2104,6 @@ void User_upgradeSystemFirmwareReply(RCHostInfo* deviceInfo, Word command)
 //---------------------Device_IO Service------------------------
 void User_getDigitalInputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	DigitalInputsInfo* in_DigitalInputsInfo = &deviceInfo->digitalInputsInfo;
 	Byte i =0;
 
@@ -2163,12 +2118,10 @@ void User_getDigitalInputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
 	}
 	printf("=== Cmd=0x%04x: User_getDigitalInputsReply ===\n\n", CMD_GetDigitalInputsOutput);
-#endif
 }
 
 void User_getRelayOutputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	RelayOutputs* in_RelayOutputs = &deviceInfo->relayOutputs;
 	Byte i =0;
 
@@ -2187,7 +2140,6 @@ void User_getRelayOutputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
 	}
 	printf("=== Cmd=0x%04x: User_getRelayOutputsReply ===\n\n", CMD_GetRelayOutputsOutput);
-#endif
 }
 
 //---------------------Device_IO Service------------------------
@@ -2195,7 +2147,6 @@ void User_getRelayOutputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 //-----------------------Imaging Service-------------------------
 void User_getImagingSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	ImageConfig* in_ImageConfig = &deviceInfo->imageConfig;
 
 	printf("=== Cmd=0x%04x: User_getImagingSettingsReply ===\n\n", CMD_GetImagingSettingsOutput);
@@ -2247,12 +2198,10 @@ void User_getImagingSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 	}
 
 	printf("=== Cmd=0x%04x: User_getImagingSettingsReply ===\n\n", CMD_GetImagingSettingsOutput);
-#endif
 }
 
 void User_getStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	FocusStatusInfo* in_FocusStatusInfo = &deviceInfo->focusStatusInfo;
 
 	printf("=== Cmd=0x%04x: User_getStatusReply ===\n\n", CMD_IMG_GetStatusOutput);
@@ -2261,12 +2210,10 @@ void User_getStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    error stringLength	= %u\n",in_FocusStatusInfo->error.stringLength);
 	printf("    error stringData	= %s\n",in_FocusStatusInfo->error.stringData);
 	printf("=== Cmd=0x%04x: User_getStatusReply ===\n\n", CMD_IMG_GetStatusOutput);
-#endif
 }
 
 void User_getOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	ImageConfigOption* in_ImageConfigOption = &deviceInfo->imageConfigOption;
 
 	printf("=== Cmd=0x%04x: User_getOptionsReply ===\n\n", CMD_IMG_GetOptionsOutput);
@@ -2329,26 +2276,22 @@ void User_getOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    backLightControlStrengthMin		= %f\n",in_ImageConfigOption->backLightControlStrengthMin);
 	printf("    backLightControlStrengthMax		= %f\n",in_ImageConfigOption->backLightControlStrengthMax);
 	printf("=== Cmd=0x%04x: User_getOptionsReply ===\n\n", CMD_IMG_GetOptionsOutput);
-#endif
 }
 
 void User_getUserDefinedSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	UserDefinedSettings* in_UserDefinedSettings = &deviceInfo->userDefinedSettings;
 
 	printf("=== Cmd=0x%04x: User_getUserDefinedSettingsReply ===\n\n", CMD_GetUserDefinedSettingsInput);
 	printf("    uerDefinedData 	stringLength	= %u\n",in_UserDefinedSettings->uerDefinedData.stringLength);
 	printf("    uerDefinedData 	stringData	= %s\n",in_UserDefinedSettings->uerDefinedData.stringData);
 	printf("=== Cmd=0x%04x: User_getUserDefinedSettingsReply ===\n\n", CMD_GetUserDefinedSettingsInput);
-#endif
 }
 //-----------------------Imaging Service-------------------------
 
 //-------------------------Media Service-------------------------
 void User_getVideoPrivateAreaReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	VideoPrivateArea* in_VideoPrivateArea = &deviceInfo->videoPrivateArea;
 	Byte i = 0;
 
@@ -2363,12 +2306,10 @@ void User_getVideoPrivateAreaReply(RCHostInfo* deviceInfo, Word /*command*/)
 	}
 	printf("    privateAreaEnable	= %u\n",in_VideoPrivateArea->privateAreaEnable);
 	printf("=== Cmd=0x%04x: User_getVideoPrivateAreaReply ===\n\n", CMD_GetVideoPrivateAreaOutput);
-#endif
 }
 
 void User_getVideoOSDConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	VideoOSDConfig *in_VideoOSDConfig = &deviceInfo->videoOSDConfig;
 
 	printf("=== Cmd=0x%04x: User_getVideoOSDConfigReply ===\n\n", CMD_GetVideoOSDConfigurationOutput);
@@ -2389,12 +2330,10 @@ void User_getVideoOSDConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    text stringLength		= %u\n",in_VideoOSDConfig->text.stringLength);
 	printf("    text stringData		= %s\n",in_VideoOSDConfig->text.stringData);
 	printf("=== Cmd=0x%04x: User_getVideoOSDConfigReply ===\n\n", CMD_GetVideoOSDConfigurationOutput);
-#endif
 }
 
 void User_getAudioEncConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	AudioEncConfigOptions* in_AudioEncConfigOptions = &deviceInfo->audioEncConfigOptions;
 	Byte i = 0, j = 0;
 
@@ -2413,12 +2352,10 @@ void User_getAudioEncConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
 	}
 	printf("=== Cmd=0x%04x: User_getAudioEncConfigOptionsReply ===\n\n", CMD_GetAudioEncoderConfigurationOptionsOutput);
-#endif
 }
 
 void User_getAudioSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	AudioSrcConfigOptions* in_AudioSrcConfigOptions = &deviceInfo->audioSrcConfigOptions;
 	Byte i = 0;
 
@@ -2430,12 +2367,10 @@ void User_getAudioSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/
 		printf("    audioSrcTokensAvailableList[%u] stringData		= %s\n", i, in_AudioSrcConfigOptions->audioSrcTokensAvailableList[i].stringData);
 	}
 	printf("=== Cmd=0x%04x: User_getAudioSrcConfigOptionsReply ===\n\n", CMD_GetAudioSourceConfigurationOptionsOutput);
-#endif
 }
 
 void User_getVideoEncConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	VideoEncConfigOptions* in_VideoEncConfigOptions = &deviceInfo->videoEncConfigOptions;
 	Byte i;
 
@@ -2468,12 +2403,10 @@ void User_getVideoEncConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/
 	}
 
 	printf("=== Cmd=0x%04x: User_getVideoEncConfigOptionsReply ===\n\n", CMD_GetVideoEncoderConfigurationOptionsOutput);
-#endif
 }
 
 void User_getVideoSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	VideoSrcConfigOptions* in_VideoSrcConfigOptions = &deviceInfo->videoSrcConfigOptions;
 	Byte i;
 
@@ -2499,12 +2432,10 @@ void User_getVideoSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/
 	printf("    maxFrameRateMin					= %u\n",in_VideoSrcConfigOptions->maxFrameRateMin);
 	printf("    maxFrameRateMax					= %u\n",in_VideoSrcConfigOptions->maxFrameRateMax);
 	printf("=== Cmd=0x%04x: User_getVideoSrcConfigOptionsReply ===\n\n", CMD_GetVideoSourceConfigurationOptionsOutput);
-#endif
 }
 
 void User_getAudioEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	AudioEncConfig* in_AudioEncConfig = &deviceInfo->audioEncConfig;
 	Byte i;
 
@@ -2525,12 +2456,10 @@ void User_getAudioEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
 	}
 	printf("=== Cmd=0x%04x: User_getAudioEncConfigReply ===\n\n", CMD_GetAudioEncoderConfigurationsOutput);
-#endif
 }
 
 void User_getAudioSourceConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	AudioSrcConfig* in_AudioSrcConfig = &deviceInfo->audioSrcConfig;
 	Byte i;
 
@@ -2549,12 +2478,10 @@ void User_getAudioSourceConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("----------------------------- Index %u ----------------------------------\n",i);
 	}
 	printf("=== Cmd=0x%04x: User_getAudioSourceConfigReply ===\n\n", CMD_GetAudioSourceConfigurationsOutput);
-#endif
 }
 
 void User_getAudioSourcesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	AudioSources* in_AudioSources = &deviceInfo->audioSources;
 	Byte i;
 
@@ -2570,12 +2497,10 @@ void User_getAudioSourcesReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("----------------------------- Index %u ----------------------------------\n",i);
 	}
 	printf("=== Cmd=0x%04x: User_getAudioSourcesReply ===\n\n", CMD_GetAudioSourcesInput);
-#endif
 }
 
 void User_getGuaranteedEncsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	GuaranteedEncs* in_GuaranteedEncs = &deviceInfo->guaranteedEncs;
 
 	printf("=== Cmd=0x%04x: User_getGuaranteedEncsReply ===\n\n", CMD_GetGuaranteedNumberOfVideoEncoderInstancesOutput);
@@ -2585,12 +2510,10 @@ void User_getGuaranteedEncsReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    MPEG4Num	= %u\n", in_GuaranteedEncs->MPEG4Num);
 	printf("    MPEG2Num	= %u\n", in_GuaranteedEncs->MPEG2Num);
 	printf("=== Cmd=0x%04x: User_getGuaranteedEncsReply ===\n\n", CMD_GetGuaranteedNumberOfVideoEncoderInstancesOutput);
-#endif
 }
 
 void User_getProfilesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	MediaProfiles* in_MediaProfiles = &deviceInfo->mediaProfiles;
 	Byte i;
 
@@ -2679,12 +2602,10 @@ void User_getProfilesReply(RCHostInfo* deviceInfo, Word /*command*/)
 	}
 
 	printf("=== Cmd=0x%04x: User_getProfilesReply ===\n\n", CMD_GetProfilesOutput);
-#endif
 }
 
 void User_getVideoEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	VideoEncConfig* in_VideoEncConfig = &deviceInfo->videoEncConfig;
 	Byte i;
 
@@ -2721,12 +2642,10 @@ void User_getVideoEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 	}
 
 	printf("=== Cmd=0x%04x: User_getVideoEncConfigReply ===\n\n", CMD_GetVideoEncoderConfigurationsOutput);
-#endif
 }
 
 void User_getVideoSrcConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	VideoSrcConfig* in_VideoSrcConfig = &deviceInfo->videoSrcConfig;
 	Byte i;
 
@@ -2760,12 +2679,10 @@ void User_getVideoSrcConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("---------------------------------- Index %u -------------------------------------\n", i);
 	}
 	printf("=== Cmd=0x%04x: User_getVideoSrcConfigReply ===\n\n", CMD_GetVideoSourceConfigurationsOutput);
-#endif
 }
 
 void User_getVideoSrcReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	VideoSrc* in_VideoSrc = &deviceInfo->videoSrc;
 	Byte i;
 
@@ -2782,14 +2699,12 @@ void User_getVideoSrcReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("---------------------------------- Index %u -------------------------------------\n", i);
 	}
 	printf("=== Cmd=0x%04x: User_getVideoSrcReply ===\n\n", CMD_GetVideoSourcesOutput);
-#endif
 }
 //-------------------------Media Service-------------------------
 
 //--------------------Video Analytics Service--------------------
 void User_getSupportedRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	SupportedRules* in_SupportedRules = &deviceInfo->supportedRules;
 	Byte i;
 
@@ -2800,12 +2715,10 @@ void User_getSupportedRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    ruleType		= 0x%02x\n",in_SupportedRules->ruleType[i]);
 	}
 	printf("=== Cmd=0x%04x: User_getSupportedRulesReply ===\n\n", CMD_GetSupportedRulesOutput);
-#endif
 }
 
 void User_getRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	RuleList* in_RuleList = &deviceInfo->ruleList;
 	Byte i,j;
 	Rule_LineDetector* ptrRule_LineDetector = NULL;
@@ -2921,14 +2834,12 @@ void User_getRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
 	}
 
 	printf("=== Cmd=0x%04x: User_getRulesReply ===\n\n", CMD_GetRulesOutput);
-#endif
 }
 //--------------------Video Analytics Service--------------------
 
 //--------------------------PTZ Service--------------------------
 void User_getPTZConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	PTZConfig* in_PTZConfig = &deviceInfo->ptzConfig;
 	Byte i;
 
@@ -2967,12 +2878,10 @@ void User_getPTZConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("------------------------------------ Index %u --------------------------------------\n", i);
 	}
 	printf("=== Cmd=0x%04x: User_getPTZConfigReply ===\n\n", CMD_GetConfigurationsOutput);
-#endif
 }
 
 void User_getPTZStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	PTZStatus* in_PTZStatus = &deviceInfo->ptzStatus;
 
 	printf("=== Cmd=0x%04x: User_getPTZStatusReply ===\n\n", CMD_PTZ_GetStatusOutput);
@@ -2990,12 +2899,10 @@ void User_getPTZStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    UTCMonth		= %u\n",in_PTZStatus->UTCMonth);
 	printf("    UTCDay		= %u\n",in_PTZStatus->UTCDay);
 	printf("=== Cmd=0x%04x: User_getPTZStatusReply ===\n\n", CMD_PTZ_GetStatusOutput);
-#endif
 }
 
 void User_getPresetsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	PTZPresets* in_PTZPresets = &deviceInfo->ptzPresetsGet;
 	Byte i;
 
@@ -3015,19 +2922,16 @@ void User_getPresetsReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("------------------------------------ Index %u --------------------------------------\n", i);
 	}
 	printf("=== Cmd=0x%04x: User_getPresetsReply ===\n\n", CMD_GetPresetsOutput);
-#endif
 }
 
 void User_setPresetReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	PTZPresetsSet* in_PTZPresetsSet = &deviceInfo->ptzPresetsSet;
 
 	printf("=== Cmd=0x%04x: User_setPresetReply ===\n\n", CMD_SetPresetOutput);
 	printf("    presetToken stringLength	= %u\n",in_PTZPresetsSet->presetToken_set.stringLength);
 	printf("    presetToken stringData	= %s\n",in_PTZPresetsSet->presetToken_set.stringData);
 	printf("=== Cmd=0x%04x: User_setPresetReply ===\n\n", CMD_SetPresetOutput);
-#endif
 }
 //--------------------------PTZ Service--------------------------
 
@@ -3042,7 +2946,6 @@ void User_metadataStreamDeviceReply(RCHostInfo* /*deviceInfo*/, Word /*command*/
 
 void User_metadataStreamLineEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
 	Metadata_Event* in_Metadata_Line_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
@@ -3068,12 +2971,10 @@ void User_metadataStreamLineEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_metadataStreamLineEventReply ===\r\n", CMD_MetadataStreamOutput);
-#endif
 }
 
 void User_metadataStreamFieldEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
 	Metadata_Event* in_Metadata_Field_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
@@ -3100,12 +3001,10 @@ void User_metadataStreamFieldEventReply(RCHostInfo* deviceInfo, Word /*command*/
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_metadataStreamFieldEventReply ===\r\n", CMD_MetadataStreamOutput);
-#endif
 }
 
 void User_metadataStreamMotionEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
 	Metadata_Event* in_Metadata_Motion_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
@@ -3131,12 +3030,10 @@ void User_metadataStreamMotionEventReply(RCHostInfo* deviceInfo, Word /*command*
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_metadataStreamMotionEventReply ===\r\n", CMD_MetadataStreamOutput);
-#endif
 }
 
 void User_metadataStreamCountingEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
 	Metadata_Event* in_Metadata_Counting_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
@@ -3163,12 +3060,10 @@ void User_metadataStreamCountingEventReply(RCHostInfo* deviceInfo, Word /*comman
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_metadataStreamCountingEventReply ===\r\n", CMD_MetadataStreamOutput);
-#endif
 }
 
 void User_metadataStreamCellMotionEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	MetadataStreamInfo* in_MetadataStreamInfo = &deviceInfo->metadataStreamInfo;
 	Metadata_Event* in_Metadata_CellMotion_Event = &deviceInfo->metadataStreamInfo.metadata_Event;
 
@@ -3194,12 +3089,10 @@ void User_metadataStreamCellMotionEventReply(RCHostInfo* deviceInfo, Word /*comm
 		printf("    No Extension Parameter!\n");
 	}
 	printf("=== Cmd=0x%04x: User_metadataStreamCellMotionEventReply ===\r\n", CMD_MetadataStreamOutput);
-#endif
 }
 
 void User_getMetadataSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 {
-#if	UART_TEST
 	MetadataSettings* in_MetadataSettings = &deviceInfo->metadataSettings;
 
 	printf("=== Cmd=0x%04x: User_getMetadataSettingsReply ===\n\n", CMD_GetMetadataSettingsOutput);
@@ -3212,7 +3105,8 @@ void User_getMetadataSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("     motionDetectorPeriod	= %u\n",in_MetadataSettings->motionDetectorPeriod);
 
 	printf("=== Cmd=0x%04x: User_getMetadataSettingsReply ===\n\n", CMD_GetMetadataSettingsOutput);
-#endif
 }
 
 //*******************User Define Reply********************
+
+#endif

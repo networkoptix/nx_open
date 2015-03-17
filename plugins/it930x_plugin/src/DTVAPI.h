@@ -434,6 +434,9 @@ Dword DTV_GetDriverInformation(
 	IN	int handle,
 	OUT	PDemodDriverInfo pDriverInfo);
 
+//
+Dword DTV_SendCommand(IN int handle, IN const Byte * data, IN unsigned length);
+
 //-----------------------------------------------------------------------------
 //	PURPOSE:
 //		Get data from driver, for DVB-T/TDMB/FM mode.

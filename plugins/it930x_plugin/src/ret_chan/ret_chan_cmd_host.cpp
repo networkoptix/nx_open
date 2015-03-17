@@ -1,12 +1,15 @@
-#include <vector>
-
 #include "ret_chan_user.h"
 #include "ret_chan_user_host.h"
-#include "ret_chan_cmd_host.h"
 
-unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * Buffer, unsigned bufferLength)
+//#include "ret_chan_cmd_host.h"
+#include "../tx_device.h"
+
+using ite::TxDevice;
+
+///
+unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, unsigned bufferLength)
 {
-	unsigned error = ModulatorError_NO_ERROR;
+    unsigned error = ReturnChannelError::NO_ERROR;
     unsigned check;
 	Byte i = 0, j = 0;
 	unsigned index = 0;
@@ -19,12 +22,12 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 	Byte tmpByte = 0;
 
 	if (bufferLength < 8)
-		error = ReturnChannelError_Reply_WRONG_LENGTH;
+        error = ReturnChannelError::Reply_WRONG_LENGTH;
 
-    if (error == ModulatorError_NO_ERROR)
+    if (error == ReturnChannelError::NO_ERROR)
         Cmd_CheckByteIndexRead(Buffer, index, &checkByte);
 
-    if (error == ModulatorError_NO_ERROR)
+    if (error == ReturnChannelError::NO_ERROR)
     {
         index = 7;
 
@@ -38,9 +41,9 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
             switch (valid)
             {
                 case UserNameInvalid:
-                    return ReturnChannelError_USER_INVALID;
+                    return ReturnChannelError::USER_INVALID;
                 case PasswordInvalid:
-                    return ReturnChannelError_PASSWORD_INVALID;
+                    return ReturnChannelError::PASSWORD_INVALID;
                 default:
                     break;
             }
@@ -101,7 +104,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getGeneralReply( deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetTxDeviceAddressIDOutput :	//GetTxDeviceAddressID
@@ -111,7 +114,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					//User_getDeviceAddressReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetTransmissionParameterCapabilitiesOutput	:	//GetTransmissionParameterCapabilitiesReply
@@ -144,7 +147,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getTransmissionParameterCapabilitiesReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetTransmissionParametersOutput://get Transmission Parameter Reply
@@ -172,7 +175,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getTransmissionParameterReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetHwRegisterValuesOutput://GetHwRegisterValues Reply
@@ -188,7 +191,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getHwRegisterValuesReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetAdvanceOptionsOutput://getAdvanceOptions  Reply
@@ -213,7 +216,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getAdvanceOptionsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetTPSInformationOutput:
@@ -229,7 +232,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getTPSInfoReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetSiPsiTableOutput://GetSiPsiTable Reply
@@ -250,7 +253,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getSiPsiTableReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetNitLocationOutput://GetNitLocation Reply
@@ -264,7 +267,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getNitLocationReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetSdtServiceOutput://GetSdtService Reply
@@ -292,7 +295,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getSdtServiceReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetEITInformationOutput://GetEITInformation Reply
@@ -321,7 +324,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getEITInfoReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 				//------------------	ccHDtv Service -----------------------------
 
@@ -333,7 +336,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getDeviceCapabilityReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetDeviceInformationOutput:			//GetDeviceInformationReply
@@ -354,7 +357,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getDeviceInformationReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetHostnameOutput:			//GetHostnameReply
@@ -366,7 +369,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getHostnameReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetSystemDateAndTimeOutput:	//GetSystemDateAndTimeReply
@@ -395,7 +398,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getSystemDateAndTimeReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetSystemLogOutput:	//GetSystemLogReply
@@ -407,7 +410,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getSystemLogReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetOSDInformationOutput:	//GetOSDInformation Reply
@@ -434,7 +437,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getOSDInfoReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_SystemRebootOutput:	//SystemRebootReply
@@ -446,7 +449,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_systemRebootReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_UpgradeSystemFirmwareOutput:
@@ -458,7 +461,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_upgradeSystemFirmwareReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 				//-------------------Device_IO Service----------------------
@@ -483,7 +486,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getDigitalInputsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetRelayOutputsOutput:	//GetRelayOutputsReply
@@ -510,7 +513,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getRelayOutputsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 				//-------------------Device_IO Service----------------------
 
@@ -563,7 +566,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					}
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_IMG_GetStatusOutput:	//GetStatusReply
@@ -578,7 +581,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getStatusReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_IMG_GetOptionsOutput:	//GetOptions Reply
@@ -646,7 +649,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getOptionsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetUserDefinedSettingsOutput:
@@ -658,7 +661,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getUserDefinedSettingsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 				//-------------------Imaging Service-------------------------
 
@@ -783,7 +786,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getProfilesReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetVideoSourcesOutput:	//GetVideoSourcesReply
@@ -810,7 +813,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getVideoSrcReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetVideoSourceConfigurationsOutput:	//GetVideoSourceConfigurationsReply
@@ -884,7 +887,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getVideoSrcConfigReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetGuaranteedNumberOfVideoEncoderInstancesOutput:	//GetGuaranteedNumberOfVideoEncoderInstancesReply
@@ -899,7 +902,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getGuaranteedEncsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetVideoEncoderConfigurationsOutput:	//GetVideoEncoderConfigurationsReply
@@ -979,7 +982,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getVideoEncConfigReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetAudioSourcesOutput:	//GetAudioSources
@@ -1004,7 +1007,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getAudioSourcesReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetAudioSourceConfigurationsOutput:	//GetAudioSourceConfigurationsReply
@@ -1033,7 +1036,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getAudioSourceConfigReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetAudioEncoderConfigurationsOutput:	//GetAudioEncoderConfigurationsReply
@@ -1063,7 +1066,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getAudioEncConfigReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetVideoSourceConfigurationOptionsOutput:	//GetVideoSourceConfigurationOptionsReply
@@ -1100,7 +1103,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getVideoSrcConfigOptionsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetVideoEncoderConfigurationOptionsOutput:	//GetVideoEncoderConfigurationOptions Reply
@@ -1146,7 +1149,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 					User_getVideoEncConfigOptionsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetAudioSourceConfigurationOptionsOutput:	//GetAudioSourceConfigurationOptions Reply
@@ -1170,7 +1173,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getAudioSrcConfigOptionsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetAudioEncoderConfigurationOptionsOutput:	//GetAudioEncoderConfigurationOptions Reply
@@ -1200,7 +1203,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getAudioEncConfigOptionsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetVideoOSDConfigurationOutput:	//GetVideoOSDConfiguration Reply
@@ -1227,7 +1230,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getVideoOSDConfigReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetVideoPrivateAreaOutput:	//GetVideoPrivateArea Reply
@@ -1249,7 +1252,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getVideoPrivateAreaReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 				//-------------------Media Service--------------------------
 
@@ -1330,7 +1333,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getPTZConfigReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_PTZ_GetStatusOutput:	//GetStatus Reply
@@ -1354,7 +1357,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getPTZStatusReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetPresetsOutput:	//GetPresets Reply
@@ -1381,7 +1384,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getPresetsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_SetPresetOutput:	//SetPreset Reply
@@ -1393,7 +1396,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_setPresetReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 				//---------------------PTZ Service--------------------------
 
@@ -1414,7 +1417,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getSupportedRulesReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 
 			case CMD_GetRulesOutput:	//GetRules Reply
@@ -1621,7 +1624,7 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getRulesReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
 				//-----------------Video Analytics Service-------------------
 
@@ -1835,8 +1838,9 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						}
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
+
 			case CMD_GetMetadataSettingsOutput:	//GetMetadataSettings Reply
 				if(bufferLength >=14)
 				{
@@ -1850,11 +1854,12 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 						User_getMetadataSettingsReply(deviceInfo, command );
 				}
 				else
-					error = ReturnChannelError_Reply_WRONG_LENGTH;
+                    error = ReturnChannelError::Reply_WRONG_LENGTH;
 				break;
+
 				//--------------------Metadata Stream----------------------
 			default :
-				error = ReturnChannelError_CMD_NOT_SUPPORTED;
+                error = ReturnChannelError::CMD_NOT_SUPPORTED;
 				break;
 			}
 		}
@@ -1864,374 +1869,72 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
 
 //----------------------General-----------------------
 
-unsigned Cmd_Send(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_generalGet(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
-	switch (command)
-	{
-	case CMD_GetTxDeviceAddressIDInput:
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetTransmissionParameterCapabilitiesInput:				//GetTransmissionParameterCapabilities
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetTransmissionParametersInput:			//GetTransmissionParameters
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetHwRegisterValuesInput:			//GetHwRegisterValues
-		error = Cmd_getHwRegisterValues(deviceInfo, command);
-		break;
-	case CMD_GetAdvanceOptionsInput:				//GetAdvanceOptions
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetTPSInformationInput:
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetSiPsiTableInput:				//GetSiPsiTable
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetNitLocationInput:				//GetNitLocation
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetSdtServiceInput:				//GetSdtService
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetEITInformationInput:				//GetEITInformation
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->eitInfo.videoEncConfigToken ,command);
-		break;
-	case CMD_SetTxDeviceAddressIDInput:				//SetTxDeviceAddressID
-		error = Cmd_setTxDeviceAddressID(deviceInfo, command);
-		break;
-	case CMD_SetCalibrationTableInput:				//SetCalibrationTable
-		error = Cmd_setCalibrationTable(deviceInfo, command);
-		break;
-	case CMD_SetTransmissionParametersInput:				//SetTransmissionParameters
-		error = Cmd_setTransmissionParameters(deviceInfo, command);
-		break;
-	case CMD_SetHwRegisterValuesInput:				//SetHwRegisterValues
-		error = Cmd_setHwRegisterValues(deviceInfo, command);
-		break;
-	case CMD_SetAdvaneOptionsInput:				//SetAdvanceOptions
-		error = Cmd_setAdvanceOptions(deviceInfo, command);
-		break;
-	case CMD_SetTPSInformationInput:
-		error = Cmd_setTPSInfo(deviceInfo, command);
-		break;
-	case CMD_SetSiPsiTableInput:			//SetSiPsiTable
-		error = Cmd_setPSITable(deviceInfo, command);
-		break;
-	case CMD_SetNitLocationInput:			//SetNitLocation
-		error = Cmd_setNitLocation(deviceInfo, command);
-		break;
-	case CMD_SetSdtServiceInput:			//SetSdtServiceConfiguration
-		error = Cmd_setSdtServiceConfiguration(deviceInfo, command);
-		break;
-	case CMD_SetEITInformationInput:			//SetEITInformation
-		error = Cmd_setEITInformation(deviceInfo, command);
-		break;
-	case CMD_GetCapabilitiesInput:	//GetCapabilities
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetDeviceInformationInput:	//GetDeviceInformation
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetHostnameInput:	//GetHostname
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetSystemDateAndTimeInput:	//GetSystemDateAndTime
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetSystemLogInput:	//GetSystemLog
-		error = Cmd_getWithByte(deviceInfo,  deviceInfo->systemLog.logType, command);
-		break;
-	case CMD_GetOSDInformationInput:	//GetOSDInformation
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_SystemRebootInput:	//SystemReboot
-		error = Cmd_getWithByte(deviceInfo, deviceInfo->systemReboot.rebootType, command);
-		break;
-	case CMD_SetSystemFactoryDefaultInput:	//SetSystemFactoryDefault
-		error = Cmd_getWithByte(deviceInfo, deviceInfo->systemDefault.factoryDefault, command);
-		break;
-	case CMD_SetHostnameInput:	//SetHostname
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->hostInfo.hostName , command);
-		break;
-	case CMD_SetSystemDateAndTimeInput:	//SetSystemDateAndTime
-		error = Cmd_setSystemDateAndTime(deviceInfo, command);
-		break;
-	case CMD_SetOSDInformationInput:	//SetOSDInformation
-		error = Cmd_setOSDInformation(deviceInfo, command);
-		break;
-	case CMD_UpgradeSystemFirmwareInput:	//UpgradeSystemFirmware
-		error = Cmd_upgradeSystemFirmware(deviceInfo, command);
-		break;
-	case CMD_GetDigitalInputsInput:	//GetDigitalInputs
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetRelayOutputsInput:	//GetRelayOutputs
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_SetRelayOutputStateInput:	//SetRelayOutputState.
-		error = Cmd_setRelayOutputState(deviceInfo, command);
-		break;
-	case CMD_SetRelayOutputSettingsInput:	//SetRelayOutputSettings
-		error = Cmd_setRelayOutputSettings(deviceInfo, command);
-		break;
-	case CMD_GetImagingSettingsInput:	//GetImagingSettings
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->imageConfig.videoSourceToken , command);
-		break;
-	case CMD_IMG_GetStatusInput:	//GetStatus
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->focusStatusInfo.videoSourceToken , command);
-		break;
-	case CMD_IMG_GetOptionsInput:	//GetOptions
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->imageConfigOption.videoSourceToken , command);
-		break;
-	case CMD_GetUserDefinedSettingsInput:
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->userDefinedSettings.videoSourceToken , command);
-		break;
-	case CMD_SetImagingSettingsInput:	//SetImagingSettings
-		error = Cmd_setImagingSettings(deviceInfo, command);
-		break;
-	case CMD_IMG_MoveInput:	//Move
-		error = Cmd_move(deviceInfo, command);
-		break;
-	case CMD_IMG_StopInput:	//Stop
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->focusStopInfo.videoSourceToken , command);
-		break;
-	case CMD_SetUserDefinedSettingsInput:
-		error = Cmd_setUserDefinedSettings(deviceInfo, command);
-		break;
-	case CMD_GetProfilesInput:	//GetProfiles
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetVideoSourcesInput:	//GetVideoSources
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetVideoSourceConfigurationsInput:	//GetVideoSourceConfigurations
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetGuaranteedNumberOfVideoEncoderInstancesInput:	//GetGuaranteedNumberOfVideoEncoderInstances
-		error = Cmd_getWithString(deviceInfo, &deviceInfo->guaranteedEncs.configurationToken, command);
-		break;
-	case CMD_GetVideoEncoderConfigurationsInput:	//GetVideoEncoderConfigurations
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetAudioSourcesInput:	//GetAudioSources
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetAudioSourceConfigurationsInput:	//GetAudioSourceConfigurations
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetAudioEncoderConfigurationsInput:	//GetAudioEncoderConfigurations
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetVideoSourceConfigurationOptionsInput:	//GetVideoSourceConfigurationOptions
-		error = Cmd_getVideoSrcConfigOptions(deviceInfo, command);
-		break;
-	case CMD_GetVideoEncoderConfigurationOptionsInput:	//GetVideoEncoderConfigurationOptions
-		error = Cmd_getVideoEncConfigOptions(deviceInfo, command);
-		break;
-	case CMD_GetAudioSourceConfigurationOptionsInput:	//GetAudioSourceConfigurationOptions
-		error = Cmd_getAudioSrcConfigOptions(deviceInfo, command);
-		break;
-	case CMD_GetAudioEncoderConfigurationOptionsInput:	//GetAudioEncoderConfigurationOptions
-		error = Cmd_getAudioEncConfigOptions(deviceInfo, command);
-		break;
-	case CMD_GetVideoOSDConfigurationInput:	//GetVideoOSDConfiguration
-		error = Cmd_getVideoOSDConfig(deviceInfo, command);
-		break;
-	case CMD_GetVideoPrivateAreaInput:	//GetVideoPrivateArea
-		error = Cmd_getVideoPrivateArea(deviceInfo, command);
-		break;
-	case CMD_SetSynchronizationPointInput:	//SetSynchronizationPoint
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->syncPoint.profileToken ,command);
-		break;
-	case CMD_SetVideoSourceConfigurationInput:	//SetVideoSourceConfiguration
-		error = Cmd_setVideoSrcConfig(deviceInfo, command);
-		break;
-	case CMD_SetVideoEncoderConfigurationInput:	//SetVideoEncoderConfiguration
-		error = Cmd_setVideoEncConfig(deviceInfo, command);
-		break;
-	case CMD_SetAudioSourceConfigurationInput:	//SetAudioSourceConfiguration
-		error = Cmd_setAudioSrcConfig(deviceInfo, command);
-		break;
-	case CMD_SetAudioEncoderConfigurationInput:	//SetAudioEncoderConfiguration
-		error = Cmd_setAudioEncConfig(deviceInfo, command);
-		break;
-	case CMD_SetVideoOSDConfigurationInput:	//SetVideoOSDConfiguration
-		error = Cmd_setVideoOSDConfig(deviceInfo, command);
-		break;
-	case CMD_SetVideoPrivateAreaInput:	//SetVideoPrivateArea
-		error = Cmd_setVideoPrivateArea(deviceInfo, command);
-		break;
-	case CMD_SetVideoSourceControlInput:
-		error = Cmd_setVideoSrcControl(deviceInfo, command);
-		break;
-	case CMD_GetConfigurationsInput:	//GetConfigurations
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_PTZ_GetStatusInput:	//GetStatus
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->ptzStatus.token , command);
-		break;
-	case CMD_GetPresetsInput:	//GetPresets
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->ptzPresetsGet.token , command);
-		break;
-	case CMD_GotoPresetInput:	//GotoPreset
-		error = Cmd_gotoPreset(deviceInfo, command);
-		break;
-	case CMD_RemovePresetInput:	//RemovePreset
-		error = Cmd_removePreset(deviceInfo, command);
-		break;
-	case CMD_SetPresetInput:	//SetPreset
-		error = Cmd_setPreset(deviceInfo, command);
-		break;
-	case CMD_AbsoluteMoveInput:	//AbsoluteMove
-		error = Cmd_absoluteMove(deviceInfo, command);
-		break;
-	case CMD_RelativeMoveInput:	//RelativeMove
-		error = Cmd_relativeMove(deviceInfo, command);
-		break;
-	case CMD_ContinuousMoveInput:	//ContinuousMove
-		error = Cmd_continuousMove(deviceInfo, command);
-		break;
-	case CMD_SetHomePositionInput:	//SetHomePosition
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->ptzHomePosition.token , command);
-		break;
-	case CMD_GotoHomePositionInput:	//GotoHomePosition
-		error = Cmd_gotoHomePosition(deviceInfo, command);
-		break;
-	case CMD_PTZ_StopInput:	//Stop
-		error = Cmd_PTZStop(deviceInfo, command);
-		break;
-	case CMD_GetSupportedRulesInput:	//GetSupportedRules
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_GetRulesInput:	//GetRules
-		error = Cmd_generalGet(deviceInfo, command);
-		break;
-	case CMD_CreateRuleInput:	//CreateRule
-		error = Cmd_createRule(deviceInfo, command);
-		break;
-	case CMD_ModifyRuleInput:	//ModifyRule
-		error = Cmd_modifyRule(deviceInfo, command);
-		break;
-	case CMD_DeleteRuleInput:	//DeleteRule
-		error = Cmd_getWithString(deviceInfo,  &deviceInfo->deleteRule.ruleToken , command);
-		break;
-	case CMD_GetMetadataSettingsInput:
-		error = Cmd_getMetadataSettings(deviceInfo, command);
-		break;
-	case CMD_SetMetadataSettingsInput:
-		error = Cmd_setMetadataSettings(deviceInfo, command);
-		break;
-		//------------ Metadata Stream Service Service------------
-	default:
-		error = ReturnChannelError_CMD_NOT_SUPPORTED;
-		printf("\nCMD Error : CMD_NOT_SUPPORTED\n");
-		break;
-	}
-	return error;
-}
+    unsigned cmd_buffer_size = 8;
 
-unsigned Cmd_generalGet(IN RCHostInfo * deviceInfo, IN Word command)
-{
-	unsigned	error = ModulatorError_NO_ERROR;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
-	unsigned cmd_buffer_size = 8;
-	unsigned cmdsize = 0;
+    const Security * security = &deviceInfo->security;
 
-	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-	cmd_buffer_size = cmd_buffer_size + ( 4 + security->userName.stringLength) + ( 4 + security->password.stringLength);
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
 
-	payload_start_point = bufferLength;
-	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
-	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
+    Cmd_DwordAssign(cmd_buffer, cmdsize, &bufferLength);
+    Cmd_WordAssign(cmd_buffer, command, &bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
 	Cmd_StringAssign(cmd_buffer, &security->userName, &bufferLength);
 	Cmd_StringAssign(cmd_buffer, &security->password, &bufferLength);
 
-    payload_end_point = bufferLength-1;
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
-
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_getWithByte(IN RCHostInfo * deviceInfo, IN Byte byteData, IN Word command)
+static unsigned Cmd_getWithByte(IN TxDevice * deviceInfo, IN Byte byteData, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
-	unsigned cmd_buffer_size = 9;
-   	unsigned cmdsize = 0;
+    unsigned cmd_buffer_size = 9;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 
-	cmd_buffer_size = cmd_buffer_size + ( 4 + security->userName.stringLength) + ( 4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
-	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
-	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
+    Cmd_DwordAssign(cmd_buffer, cmdsize, &bufferLength);
+    Cmd_WordAssign(cmd_buffer, command, &bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
 	Cmd_StringAssign(cmd_buffer, &security->userName, &bufferLength);
 	Cmd_StringAssign(cmd_buffer, &security->password, &bufferLength);
 
 	cmd_buffer[bufferLength++] = byteData;
 
-    payload_end_point = bufferLength-1;
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
-
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_getWithString(IN RCHostInfo * deviceInfo, IN const RCString * string, IN Word command)
+static unsigned Cmd_getWithString(IN TxDevice * deviceInfo, IN const RCString * string, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
-	unsigned cmd_buffer_size = 8;
-	unsigned cmdsize = 0;
+    unsigned cmd_buffer_size = 8;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size =  cmd_buffer_size + (4 + string->stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + string->stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2240,84 +1943,59 @@ unsigned Cmd_getWithString(IN RCHostInfo * deviceInfo, IN const RCString * strin
 
 	Cmd_StringAssign(cmd_buffer, string, &bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_getWithStrings(IN RCHostInfo * deviceInfo, IN const RCString * stringArray, IN unsigned stringSize, IN Word command)
+static unsigned Cmd_getWithStrings(IN TxDevice * deviceInfo, IN const RCString * stringArray, IN unsigned stringSize, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
-	unsigned cmd_buffer_size = 8;
-	unsigned cmdsize = 0;
-	unsigned i;
+    unsigned cmd_buffer_size = 8;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	for( i = 0; i < stringSize; i ++)
-		cmd_buffer_size =  cmd_buffer_size + (4 + stringArray[i].stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    for (unsigned i = 0; i < stringSize; ++i)
+        cmd_buffer_size += (4 + stringArray[i].stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
 	Cmd_StringAssign(cmd_buffer, &security->userName, &bufferLength);
 	Cmd_StringAssign(cmd_buffer, &security->password, &bufferLength);
 
-	for( i = 0; i < stringSize; i ++)
+    for (unsigned i = 0; i < stringSize; ++i)
 		Cmd_StringAssign(cmd_buffer, &stringArray[i], &bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
 //----------------------General-----------------------
 
 //----------------------ccHDtv Service---------------
-unsigned Cmd_getHwRegisterValues(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_getHwRegisterValues(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 14;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const HwRegisterInfo* hwRegisterInfo = &deviceInfo->hwRegisterInfo;
 
-	cmd_buffer_size = cmd_buffer_size + ( 4 + security->userName.stringLength) + ( 4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command, &bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2328,40 +2006,27 @@ unsigned Cmd_getHwRegisterValues(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_DwordAssign(cmd_buffer,hwRegisterInfo->registerAddress ,&bufferLength);
 	cmd_buffer[bufferLength++] = hwRegisterInfo->valueListSize;
 
-    payload_end_point = bufferLength-1;
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
-
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setTxDeviceAddressID(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setTxDeviceAddressID(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0080;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 11;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const NewTxDevice* newTxDevice = &deviceInfo->newTxDevice;
 
-	cmd_buffer_size = cmd_buffer_size + ( 4 + security->userName.stringLength) + ( 4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2371,40 +2036,28 @@ unsigned Cmd_setTxDeviceAddressID(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = newTxDevice->IDType;
 	Cmd_WordAssign(cmd_buffer, newTxDevice->deviceAddressID,&bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setCalibrationTable(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setCalibrationTable(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0081;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 10;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const CalibrationTable* calibrationTable = &deviceInfo->calibrationTable;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + ( 4 + calibrationTable->tableData.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + calibrationTable->tableData.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2415,39 +2068,27 @@ unsigned Cmd_setCalibrationTable(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = calibrationTable->tableType;
 	Cmd_StringAssign(cmd_buffer, &calibrationTable->tableData, &bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setTransmissionParameters(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setTransmissionParameters(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0082;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 29;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const TransmissionParameter* transmissionParameter = &deviceInfo->transmissionParameter;
 
-	cmd_buffer_size = cmd_buffer_size + ( 4 + security->userName.stringLength) + ( 4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2472,41 +2113,28 @@ unsigned Cmd_setTransmissionParameters(IN RCHostInfo * deviceInfo, IN Word comma
 	cmd_buffer[bufferLength++] = transmissionParameter->oneSeg_CodeRate;
 	cmd_buffer[bufferLength++] = 0;
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setHwRegisterValues(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setHwRegisterValues(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0083;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
-	Byte	i;
 	unsigned cmd_buffer_size = 14;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const HwRegisterInfo* hwRegisterInfo = &deviceInfo->hwRegisterInfo;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + hwRegisterInfo->valueListSize;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += hwRegisterInfo->valueListSize;
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2516,42 +2144,30 @@ unsigned Cmd_setHwRegisterValues(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = hwRegisterInfo->processor;
 	Cmd_DwordAssign(cmd_buffer,hwRegisterInfo->registerAddress,&bufferLength);
 	cmd_buffer[bufferLength++] = hwRegisterInfo->valueListSize;
-	for( i = 0; i < hwRegisterInfo->valueListSize; i ++)
+    for (Byte i = 0; i < hwRegisterInfo->valueListSize; i ++)
 		cmd_buffer[bufferLength++] = hwRegisterInfo->registerValues[i];
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setAdvanceOptions(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setAdvanceOptions(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0084;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 26;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const AdvanceOptions* advanceOptions = &deviceInfo->advanceOptions;
 
-	cmd_buffer_size = cmd_buffer_size + ( 4 + security->userName.stringLength) + ( 4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2572,39 +2188,27 @@ unsigned Cmd_setAdvanceOptions(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = advanceOptions->repeatPacketTimeInterval;
 	cmd_buffer[bufferLength++] = advanceOptions->TS_TableDisable;
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setTPSInfo(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setTPSInfo(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0085;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 15;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const TPSInfo* tpsInfo = &deviceInfo->tpsInfo;
 
-	cmd_buffer_size = cmd_buffer_size + ( 4 + security->userName.stringLength) + ( 4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2618,41 +2222,27 @@ unsigned Cmd_setTPSInfo(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = tpsInfo->constellation;
 	cmd_buffer[bufferLength++] = tpsInfo->interval;
 
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
-
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setPSITable(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setPSITable(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0090;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
-	Byte	i;
 	unsigned cmd_buffer_size = 62;
-    unsigned cmdsize = 0;
 
-	 const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
+    const Security* security = &deviceInfo->security;
 	const PSITable* psiTable = &deviceInfo->psiTable;
 
-	cmd_buffer_size = cmd_buffer_size + ( 4 + security->userName.stringLength) + ( 4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2662,49 +2252,37 @@ unsigned Cmd_setPSITable(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_WordAssign(cmd_buffer, psiTable->ONID,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, psiTable->NID,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, psiTable->TSID,&bufferLength);
-	for(i=0;i<32;i++)
+    for (Byte i=0; i<32; i++)
 		cmd_buffer[bufferLength++] = psiTable->networkName[i];
 	cmd_buffer[bufferLength++] = psiTable->extensionFlag;
 	Cmd_DwordAssign(cmd_buffer, psiTable->privateDataSpecifier,&bufferLength);
 	cmd_buffer[bufferLength++] = psiTable->NITVersion;
 	cmd_buffer[bufferLength++] = psiTable->countryID;
 	cmd_buffer[bufferLength++] = psiTable->languageID;
-	for( i=0; i < 8; i++)
+    for (Byte i=0; i < 8; i++)
 		cmd_buffer[bufferLength++] = 0;
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setNitLocation(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setNitLocation(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0091;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 16;
-   	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const NITLoacation* nitLoacation = &deviceInfo->nitLoacation;
 
-	cmd_buffer_size = cmd_buffer_size + ( 4 + security->userName.stringLength) + ( 4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2716,40 +2294,28 @@ unsigned Cmd_setNitLocation(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_WordAssign(cmd_buffer, nitLoacation->extentLatitude,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, nitLoacation->extentLongitude,&bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setSdtServiceConfiguration(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setSdtServiceConfiguration(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0092;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 24;
-   	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const ServiceConfig* serviceConfig = &deviceInfo->serviceConfig;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + serviceConfig->serviceName.stringLength) + (4 + serviceConfig->provider.stringLength)  ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + serviceConfig->serviceName.stringLength) + (4 + serviceConfig->provider.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2770,45 +2336,32 @@ unsigned Cmd_setSdtServiceConfiguration(IN RCHostInfo * deviceInfo, IN Word comm
 	Cmd_WordAssign(cmd_buffer, serviceConfig->ISDBT_ServiceIDDataType_2, &bufferLength);
 	Cmd_WordAssign(cmd_buffer, serviceConfig->ISDBT_ServiceIDPartialReception, &bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setEITInformation(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setEITInformation(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
 	//Word    command = 0x0093;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 9;
-   	unsigned cmdsize = 0;
-	Byte i = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const EITInfo* eitInfo = &deviceInfo->eitInfo;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + eitInfo->videoEncConfigToken.stringLength);
-	for( i = 0; i < eitInfo->listSize; i ++)
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + eitInfo->videoEncConfigToken.stringLength);
+    for (Byte i = 0; i < eitInfo->listSize; i ++)
 	{
-		cmd_buffer_size = cmd_buffer_size + 13 + (4 + eitInfo->eitInfoParam[i].eventName.stringLength) + (4 + eitInfo->eitInfoParam[i].eventText.stringLength);
+        cmd_buffer_size += 13 + (4 + eitInfo->eitInfoParam[i].eventName.stringLength) + (4 + eitInfo->eitInfoParam[i].eventText.stringLength);
 	}
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2817,7 +2370,7 @@ unsigned Cmd_setEITInformation(IN RCHostInfo * deviceInfo, IN Word command)
 
 	Cmd_StringAssign(cmd_buffer, &eitInfo->videoEncConfigToken, &bufferLength);
 	cmd_buffer[bufferLength++] = eitInfo->listSize;
-	for( i = 0; i < eitInfo->listSize; i ++)
+    for (Byte i = 0; i < eitInfo->listSize; i ++)
 	{
 		cmd_buffer[bufferLength++] = eitInfo->eitInfoParam[i].enable;
 		Cmd_DwordAssign(cmd_buffer,eitInfo->eitInfoParam[i].startDate,&bufferLength);
@@ -2827,49 +2380,36 @@ unsigned Cmd_setEITInformation(IN RCHostInfo * deviceInfo, IN Word command)
 		Cmd_StringAssign(cmd_buffer, &eitInfo->eitInfoParam[i].eventText, &bufferLength);
 	}
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 //----------------------ccHDtv Service---------------
 
 //-----------Device Management Service----------
-unsigned Cmd_setSystemDateAndTime(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setSystemDateAndTime(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0183;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
-	Byte i = 0;
 	unsigned cmd_buffer_size = 35;
-   	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const SystemTime* systemTime = &deviceInfo->systemTime;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
 	Cmd_StringAssign(cmd_buffer, &security->userName, &bufferLength);
 	Cmd_StringAssign(cmd_buffer, &security->password, &bufferLength);
 
-	for( i = 0; i < 3; i ++)
+    for (Byte i = 0; i < 3; i ++)
 		cmd_buffer[bufferLength++] = systemTime->countryCode[i];
 	cmd_buffer[bufferLength++] = systemTime->countryRegionID;
 	cmd_buffer[bufferLength++] = systemTime->daylightSavings;
@@ -2887,40 +2427,28 @@ unsigned Cmd_setSystemDateAndTime(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_DwordAssign(cmd_buffer,  systemTime->timeAdjustmentCriterionMin,&bufferLength);
 	Cmd_WordAssign(cmd_buffer,  systemTime->timeSyncDuration,&bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setOSDInformation(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setOSDInformation(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0185;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 22;
-   	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const OSDInfo* osdInfo = &deviceInfo->osdInfo;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + osdInfo->text.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + osdInfo->text.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2943,40 +2471,28 @@ unsigned Cmd_setOSDInformation(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = osdInfo->textPosition;
 	Cmd_StringAssign(cmd_buffer, &osdInfo->text, &bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_upgradeSystemFirmware(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_upgradeSystemFirmware(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0186;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 9;
-   	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const SystemFirmware* systemFirmware = &deviceInfo->systemFirmware;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + systemFirmware->data.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + systemFirmware->data.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -2986,43 +2502,31 @@ unsigned Cmd_upgradeSystemFirmware(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = systemFirmware->firmwareType;
 	Cmd_StringAssign(cmd_buffer, &systemFirmware->data, &bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 //-----------Device Management Service----------
 
 //-----------Device IO Service----------
 
-unsigned Cmd_setRelayOutputSettings(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setRelayOutputSettings(IN TxDevice * deviceInfo, IN Word command)
 {
-   unsigned	error = ModulatorError_NO_ERROR;
-   //Word    command = 0x0281;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
+    //Word   command = 0x0281;
 	unsigned cmd_buffer_size = 14;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const RelayOutputsParam* relayOutputsParam = &deviceInfo->relayOutputsSetParam;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + relayOutputsParam->token.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + relayOutputsParam->token.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3034,40 +2538,28 @@ unsigned Cmd_setRelayOutputSettings(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_DwordAssign(cmd_buffer,relayOutputsParam->delayTime,&bufferLength);
 	cmd_buffer[bufferLength++] = relayOutputsParam->idleState;
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setRelayOutputState(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setRelayOutputState(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-    //Word    command = 0x0280;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
+    //Word   command = 0x0280;
 	unsigned cmd_buffer_size = 9;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const RelayOutputState* relayOutputState = &deviceInfo->relayOutputState;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + relayOutputState->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + relayOutputState->token.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3077,44 +2569,32 @@ unsigned Cmd_setRelayOutputState(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_StringAssign(cmd_buffer, &relayOutputState->token, &bufferLength);
 	cmd_buffer[bufferLength++] = relayOutputState->logicalState;
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
 //-----------Device IO Service----------
 
 //-----------Imaging Service------------
 
-unsigned Cmd_move(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_move(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0381;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 28;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const FocusMoveInfo* focusMoveInfo = &deviceInfo->focusMoveInfo;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + focusMoveInfo->videoSourceToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + focusMoveInfo->videoSourceToken.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3128,40 +2608,28 @@ unsigned Cmd_move(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_FloatAssign(cmd_buffer,focusMoveInfo->relativeSpeed,&bufferLength);
 	Cmd_FloatAssign(cmd_buffer,focusMoveInfo->continuousSpeed,&bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setImagingSettings(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setImagingSettings(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-    //Word    command = 0x0380;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
+    //Word   command = 0x0380;
 	unsigned cmd_buffer_size = 122;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const ImageConfig* imageConfig = &deviceInfo->imageConfig;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + imageConfig->videoSourceToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + imageConfig->videoSourceToken.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3211,56 +2679,42 @@ unsigned Cmd_setImagingSettings(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = imageConfig->backLightControlMode;
 	Cmd_FloatAssign(cmd_buffer,imageConfig->backLightControlStrength,&bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setUserDefinedSettings(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setUserDefinedSettings(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x03FF;
 	const UserDefinedSettings* userDefinedSettings = &deviceInfo->userDefinedSettings;
 
 	RCString RCStringArrayTmp[2];
 	RCStringArrayTmp[0] = userDefinedSettings->videoSourceToken;
 	RCStringArrayTmp[1] = userDefinedSettings->uerDefinedData;
-	error = Cmd_getWithStrings(deviceInfo,RCStringArrayTmp, 2, command);
 
-	return (error);
+    return Cmd_getWithStrings(deviceInfo, RCStringArrayTmp, 2, command);
 }
 //-----------Imaging Service------------
 
 //-----------Media Service-------------
-unsigned Cmd_setVideoSrcControl(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setVideoSrcControl(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-    //Word    command = 0x04C2;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
+    //Word   command = 0x04C2;
 	unsigned cmd_buffer_size = 9;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const VideoSrcControl* videoSrcControl = &deviceInfo->videoSrcControl;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + videoSrcControl->videoSrcToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + videoSrcControl->videoSrcToken.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3270,42 +2724,29 @@ unsigned Cmd_setVideoSrcControl(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_StringAssign(cmd_buffer, &videoSrcControl->videoSrcToken, &bufferLength);
 	cmd_buffer[bufferLength++] = videoSrcControl->controlCommand;
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setVideoPrivateArea(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setVideoPrivateArea(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x04C1;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 10;
-	unsigned cmdsize = 0;
-	Byte i = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const VideoPrivateArea* videoPrivateArea = &deviceInfo->videoPrivateArea;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + videoPrivateArea->videoSrcToken.stringLength);
-	cmd_buffer_size = cmd_buffer_size + 4 * videoPrivateArea->polygonListSize;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + videoPrivateArea->videoSrcToken.stringLength);
+    cmd_buffer_size += 4 * videoPrivateArea->polygonListSize;
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3314,47 +2755,35 @@ unsigned Cmd_setVideoPrivateArea(IN RCHostInfo * deviceInfo, IN Word command)
 
 	Cmd_StringAssign(cmd_buffer, &videoPrivateArea->videoSrcToken, &bufferLength);
 	cmd_buffer[bufferLength++] = videoPrivateArea->polygonListSize;
-	for( i = 0; i < videoPrivateArea->polygonListSize; i ++)
+    for (Byte i = 0; i < videoPrivateArea->polygonListSize; ++i)
 	{
 		Cmd_WordAssign(cmd_buffer, videoPrivateArea->privateAreaPolygon[i].polygon_x,&bufferLength);
 		Cmd_WordAssign(cmd_buffer, videoPrivateArea->privateAreaPolygon[i].polygon_y,&bufferLength);
 	}
 	cmd_buffer[bufferLength++] = videoPrivateArea->privateAreaEnable;
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setVideoOSDConfig(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setVideoOSDConfig(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x04C0;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 22;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const VideoOSDConfig* videoOSDConfig = &deviceInfo->videoOSDConfig;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + videoOSDConfig->videoSrcToken.stringLength) + (4 + videoOSDConfig->text.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + videoOSDConfig->videoSrcToken.stringLength) + (4 + videoOSDConfig->text.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3378,40 +2807,28 @@ unsigned Cmd_setVideoOSDConfig(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = videoOSDConfig->textPosition;
 	Cmd_StringAssign(cmd_buffer, &videoOSDConfig->text, &bufferLength);
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setAudioEncConfig(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setAudioEncConfig(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-    //Word    command = 0x0487;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
+    //Word   command = 0x0487;
 	unsigned cmd_buffer_size = 15;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const AudioEncConfigParam* audioEncConfigParam = &deviceInfo->audioEncConfigSetParam;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + audioEncConfigParam->name.stringLength) + (4 + audioEncConfigParam->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + audioEncConfigParam->name.stringLength) + (4 + audioEncConfigParam->token.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3426,40 +2843,28 @@ unsigned Cmd_setAudioEncConfig(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_WordAssign(cmd_buffer,audioEncConfigParam->sampleRate, &bufferLength);
 	cmd_buffer[bufferLength++] = audioEncConfigParam->forcePersistence;
 
-    payload_end_point = bufferLength-1;
-    cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setAudioSrcConfig(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setAudioSrcConfig(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0486;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 10;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const AudioSrcConfigParam* audioSrcConfig = &deviceInfo->audioSrcConfigSetParam;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + audioSrcConfig->name.stringLength) + (4 + audioSrcConfig->token.stringLength) + (4 + audioSrcConfig->sourceToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + audioSrcConfig->name.stringLength) + (4 + audioSrcConfig->token.stringLength) + (4 + audioSrcConfig->sourceToken.stringLength) ;
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3472,40 +2877,28 @@ unsigned Cmd_setAudioSrcConfig(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = audioSrcConfig->useCount;
 	cmd_buffer[bufferLength++] = audioSrcConfig->forcePersistence;
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setVideoEncConfig(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setVideoEncConfig(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-    //Word    command = 0x0484;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
+    //Word   command = 0x0484;
 	unsigned cmd_buffer_size = 28;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const VideoEncConfigParam* videoEncConfigParam = &deviceInfo->videoEncConfigSetParam;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + videoEncConfigParam->name.stringLength) + (4 + videoEncConfigParam->token.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + videoEncConfigParam->name.stringLength) + (4 + videoEncConfigParam->token.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3530,40 +2923,28 @@ unsigned Cmd_setVideoEncConfig(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_WordAssign(cmd_buffer,videoEncConfigParam->targetBitrateLimit, &bufferLength);
 	Cmd_WordAssign(cmd_buffer,videoEncConfigParam->aspectRatio, &bufferLength);
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setVideoSrcConfig(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setVideoSrcConfig(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-    //Word    command = 0x0482;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
+    //Word   command = 0x0482;
 	unsigned cmd_buffer_size = 24;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const VideoSrcConfigParam* videoSrcConfigParam = &deviceInfo->videoSrcConfigSetParam;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + videoSrcConfigParam->name.stringLength) + (4 + videoSrcConfigParam->token.stringLength) + (4 + videoSrcConfigParam->srcToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + videoSrcConfigParam->name.stringLength) + (4 + videoSrcConfigParam->token.stringLength) + (4 + videoSrcConfigParam->srcToken.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3585,74 +2966,61 @@ unsigned Cmd_setVideoSrcConfig(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = videoSrcConfigParam->extensionFlag;
 	cmd_buffer[bufferLength++] = videoSrcConfigParam->maxFrameRate;
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_getVideoSrcConfigOptions(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_getVideoSrcConfigOptions(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-    //Word    command = 0x0408;
+    //Word command = 0x0408;
 	const VideoSrcConfigOptions* videoSrcConfigOptions = &deviceInfo->videoSrcConfigOptions;
 
 	RCString RCStringArrayTmp[2];
 	RCStringArrayTmp[0] = videoSrcConfigOptions->videoSrcConfigToken;
 	RCStringArrayTmp[1] = videoSrcConfigOptions->profileToken;
-	error = Cmd_getWithStrings(deviceInfo, RCStringArrayTmp, 2, command);
 
-	return (error);
+    return Cmd_getWithStrings(deviceInfo, RCStringArrayTmp, 2, command);
 }
 
-unsigned Cmd_getVideoEncConfigOptions(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_getVideoEncConfigOptions(IN TxDevice * deviceInfo, IN Word command)
 {
-	unsigned	error = ModulatorError_NO_ERROR;
-	//Word    command = 0x0409;
+    //Word command = 0x0409;
 	const VideoEncConfigOptions* videoEncConfigOptions = &deviceInfo->videoEncConfigOptions;
 
 	RCString RCStringArrayTmp[2];
 	RCStringArrayTmp[0] = videoEncConfigOptions->videoEncConfigToken;
 	RCStringArrayTmp[1] = videoEncConfigOptions->profileToken;
-	error = Cmd_getWithStrings(deviceInfo, RCStringArrayTmp, 2, command);
 
-	return (error);
+    return Cmd_getWithStrings(deviceInfo, RCStringArrayTmp, 2, command);
 }
 
-unsigned Cmd_getAudioSrcConfigOptions(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_getAudioSrcConfigOptions(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x040A;
 	const AudioSrcConfigOptions* audioSrcConfigOptions = &deviceInfo->audioSrcConfigOptions;
 
-   RCString RCStringArrayTmp[2];
-   RCStringArrayTmp[0] = audioSrcConfigOptions->audioSrcConfigToken;
-   RCStringArrayTmp[1] = audioSrcConfigOptions->profileToken;
-   error = Cmd_getWithStrings(deviceInfo, RCStringArrayTmp, 2, command);
+    RCString RCStringArrayTmp[2];
+    RCStringArrayTmp[0] = audioSrcConfigOptions->audioSrcConfigToken;
+    RCStringArrayTmp[1] = audioSrcConfigOptions->profileToken;
 
-	return (error);
+    return Cmd_getWithStrings(deviceInfo, RCStringArrayTmp, 2, command);
 }
 
-unsigned Cmd_getAudioEncConfigOptions(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_getAudioEncConfigOptions(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x040B;
 	const AudioEncConfigOptions* audioEncConfigOptions = &deviceInfo->audioEncConfigOptions;
 
-   RCString RCStringArrayTmp[2];
-   RCStringArrayTmp[0] = audioEncConfigOptions->audioEncConfigToken;
-   RCStringArrayTmp[1] = audioEncConfigOptions->profileToken;
-   error = Cmd_getWithStrings(deviceInfo, RCStringArrayTmp, 2, command);
+    RCString RCStringArrayTmp[2];
+    RCStringArrayTmp[0] = audioEncConfigOptions->audioEncConfigToken;
+    RCStringArrayTmp[1] = audioEncConfigOptions->profileToken;
 
-	return (error);
+    return Cmd_getWithStrings(deviceInfo, RCStringArrayTmp, 2, command);
 }
 
-unsigned Cmd_getVideoOSDConfig(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_getVideoOSDConfig(IN TxDevice * deviceInfo, IN Word command)
 {
     //Word    command = 0x0440;
 	const VideoOSDConfig* videoOSDConfig = &deviceInfo->videoOSDConfig;
@@ -3660,7 +3028,7 @@ unsigned Cmd_getVideoOSDConfig(IN RCHostInfo * deviceInfo, IN Word command)
     return Cmd_getWithString(deviceInfo,  &videoOSDConfig->videoSrcToken ,command);
 }
 
-unsigned Cmd_getVideoPrivateArea(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_getVideoPrivateArea(IN TxDevice * deviceInfo, IN Word command)
 {
     //Word    command = 0x0441;
     const VideoPrivateArea* videoPrivateArea = &deviceInfo->videoPrivateArea;
@@ -3670,29 +3038,22 @@ unsigned Cmd_getVideoPrivateArea(IN RCHostInfo * deviceInfo, IN Word command)
 //-----------Media Service------------
 
 //----------- PTZ  Service------------
-unsigned Cmd_gotoPreset(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_gotoPreset(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
-    //Word    command = 0x0580;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
+    //Word   command = 0x0580;
 	unsigned cmd_buffer_size = 14;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const PTZGotoParam* ptzGotoParam = &deviceInfo->ptzGotoParam;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + ptzGotoParam->token.stringLength) + (4 + ptzGotoParam->presetToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + ptzGotoParam->token.stringLength) + (4 + ptzGotoParam->presetToken.stringLength) ;
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3705,40 +3066,28 @@ unsigned Cmd_gotoPreset(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_ShortAssign(cmd_buffer, ptzGotoParam->tiltSpeed,&bufferLength);
 	Cmd_ShortAssign(cmd_buffer, ptzGotoParam->zoomSpeed,&bufferLength);
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_removePreset(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_removePreset(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0581;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 8;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const PTZRemoveParam* ptzRemoveParam = &deviceInfo->ptzRemoveParam;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + ptzRemoveParam->token.stringLength) + (4 + ptzRemoveParam->presetToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + ptzRemoveParam->token.stringLength) + (4 + ptzRemoveParam->presetToken.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3748,40 +3097,28 @@ unsigned Cmd_removePreset(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_StringAssign(cmd_buffer, &ptzRemoveParam->token, &bufferLength);
 	Cmd_StringAssign(cmd_buffer, &ptzRemoveParam->presetToken, &bufferLength);
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_setPreset(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setPreset(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0582;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 8;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const PTZPresetsSet* ptzPresetsSet = &deviceInfo->ptzPresetsSet;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + ptzPresetsSet->token.stringLength) + (4 + ptzPresetsSet->presetName.stringLength) + (4 + ptzPresetsSet->presetToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + ptzPresetsSet->token.stringLength) + (4 + ptzPresetsSet->presetName.stringLength) + (4 + ptzPresetsSet->presetToken.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3792,40 +3129,28 @@ unsigned Cmd_setPreset(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_StringAssign(cmd_buffer, &ptzPresetsSet->presetName, &bufferLength);
 	Cmd_StringAssign(cmd_buffer, &ptzPresetsSet->presetToken, &bufferLength);
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_absoluteMove(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_absoluteMove(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0583;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 20;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const PTZAbsoluteMove* ptzAbsoluteMove = &deviceInfo->ptzAbsoluteMove;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + ptzAbsoluteMove->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + ptzAbsoluteMove->token.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3840,40 +3165,28 @@ unsigned Cmd_absoluteMove(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_ShortAssign(cmd_buffer, ptzAbsoluteMove->tiltSpeed,&bufferLength);
 	Cmd_ShortAssign(cmd_buffer, ptzAbsoluteMove->zoomSpeed,&bufferLength);
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_relativeMove(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_relativeMove(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0584;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 20;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const PTZRelativeMove* ptzRelativeMove = &deviceInfo->ptzRelativeMove;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + ptzRelativeMove->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + ptzRelativeMove->token.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3888,40 +3201,28 @@ unsigned Cmd_relativeMove(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_ShortAssign(cmd_buffer, ptzRelativeMove->tiltSpeed,&bufferLength);
 	Cmd_ShortAssign(cmd_buffer, ptzRelativeMove->zoomSpeed,&bufferLength);
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_continuousMove(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_continuousMove(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0585;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 18;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const PTZContinuousMove* ptzContinuousMove = &deviceInfo->ptzContinuousMove;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + ptzContinuousMove->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + ptzContinuousMove->token.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3934,40 +3235,28 @@ unsigned Cmd_continuousMove(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_ShortAssign(cmd_buffer, ptzContinuousMove->zoomVelocity,&bufferLength);
 	Cmd_DwordAssign(cmd_buffer,ptzContinuousMove->timeout,&bufferLength);
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_gotoHomePosition(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_gotoHomePosition(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0587;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 14;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const PTZHomePosition* ptzHomePosition = &deviceInfo->ptzHomePosition;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + ptzHomePosition->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + ptzHomePosition->token.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -3979,40 +3268,28 @@ unsigned Cmd_gotoHomePosition(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_ShortAssign(cmd_buffer, ptzHomePosition->tiltSpeed,&bufferLength);
 	Cmd_ShortAssign(cmd_buffer, ptzHomePosition->zoomSpeed,&bufferLength);
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_PTZStop(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_PTZStop(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0588;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 9;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const PTZStop* ptzStop = &deviceInfo->ptzStop;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + ptzStop->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + ptzStop->token.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -4022,79 +3299,71 @@ unsigned Cmd_PTZStop(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_StringAssign(cmd_buffer, &ptzStop->token, &bufferLength);
 	cmd_buffer[bufferLength++] = ptzStop->panTiltZoom;
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 //----------- PTZ  Service------------
 
 //----------- Video Analytics  Service------------
-unsigned Cmd_createRule(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_createRule(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0680;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 12;
-	unsigned cmdsize = 0;
-	Byte i;
-	Rule_LineDetector* ptrRule_LineDetector = NULL;
-	Rule_FieldDetector* ptrRule_FieldDetector = NULL;
-	Rule_MotionDetector* ptrRule_MotionDetector = NULL;
-	Rule_Counting* ptrRule_Counting = NULL;
-	Rule_CellMotion* ptrRule_CellMotion = NULL;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const TotalRule* totalRule = &deviceInfo->totalRule;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + totalRule->ruleName.stringLength) + (4 + totalRule->ruleToken.stringLength) + (4 + totalRule->videoSrcToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + totalRule->ruleName.stringLength) + (4 + totalRule->ruleToken.stringLength) + (4 + totalRule->videoSrcToken.stringLength);
 
-	if(totalRule->type == 0x10)
-	{
-		ptrRule_LineDetector = (Rule_LineDetector*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 4 + ( ptrRule_LineDetector->polygonListSize * 4 ) ;
-		ptrRule_LineDetector = NULL;
-	}else if(totalRule->type == 0x11)
-	{
-		ptrRule_FieldDetector = (Rule_FieldDetector*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 2 + ( ptrRule_FieldDetector->polygonListSize * 4 ) ;
-		ptrRule_FieldDetector = NULL;
-	}else if(totalRule->type == 0x12)
-	{
-		ptrRule_MotionDetector = (Rule_MotionDetector*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 3 + ( ptrRule_MotionDetector->polygonListSize * 4 ) ;
-		ptrRule_MotionDetector = NULL;
-	}else if(totalRule->type == 0x13)
-	{
-		ptrRule_Counting = (Rule_Counting*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 12 + ( ptrRule_Counting->polygonListSize * 4 ) ;
-		ptrRule_Counting = NULL;
-	}else if(totalRule->type == 0x14)
-	{
-		ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 24 + ( 4 + ptrRule_CellMotion->activeCells.stringLength ) ;
-		ptrRule_CellMotion = NULL;
-	}else
-	{
-		error = ReturnChannelError_CMD_CONTENT_ERROR;
-		return error;
-	}
+    switch (totalRule->type)
+    {
+        case 0x10:
+        {
+            Rule_LineDetector * ptrRule_LineDetector = (Rule_LineDetector*) totalRule->rule;
+            cmd_buffer_size += 4 + ( ptrRule_LineDetector->polygonListSize * 4 ) ;
+            break;
+        }
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+        case 0x11:
+        {
+            Rule_FieldDetector * ptrRule_FieldDetector = (Rule_FieldDetector*) totalRule->rule;
+            cmd_buffer_size += 2 + ( ptrRule_FieldDetector->polygonListSize * 4 ) ;
+            break;
+        }
 
-	payload_start_point = bufferLength;
+        case 0x12:
+        {
+            Rule_MotionDetector * ptrRule_MotionDetector = (Rule_MotionDetector*) totalRule->rule;
+            cmd_buffer_size += 3 + ( ptrRule_MotionDetector->polygonListSize * 4 ) ;
+            break;
+        }
+
+        case 0x13:
+        {
+            Rule_Counting * ptrRule_Counting = (Rule_Counting*) totalRule->rule;
+            cmd_buffer_size += 12 + ( ptrRule_Counting->polygonListSize * 4 ) ;
+            break;
+        }
+
+        case 0x14:
+        {
+            Rule_CellMotion * ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
+            cmd_buffer_size += 24 + ( 4 + ptrRule_CellMotion->activeCells.stringLength ) ;
+            break;
+        }
+
+        default:
+            return ReturnChannelError::CMD_CONTENT_ERROR;
+    }
+
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
+
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -4105,150 +3374,158 @@ unsigned Cmd_createRule(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_StringAssign(cmd_buffer, &totalRule->ruleToken, &bufferLength);
 	cmd_buffer[bufferLength++] = totalRule->type;
 
-	if(totalRule->type == 0x10)
-	{
-		ptrRule_LineDetector = (Rule_LineDetector*) totalRule->rule;
-		Cmd_WordAssign(cmd_buffer, ptrRule_LineDetector->direction, &bufferLength);
-		cmd_buffer[bufferLength++] = ptrRule_LineDetector->polygonListSize;
-		for( i = 0; i < ptrRule_LineDetector->polygonListSize; i ++)
-		{
-			Cmd_WordAssign(cmd_buffer,  ptrRule_LineDetector->detectPolygon[i].polygon_x,&bufferLength);
-			Cmd_WordAssign(cmd_buffer,  ptrRule_LineDetector->detectPolygon[i].polygon_y,&bufferLength);
-		}
-		cmd_buffer[bufferLength++] = ptrRule_LineDetector->metadataStreamSwitch;
-		ptrRule_LineDetector = NULL;
-	}else if(totalRule->type == 0x11)
-	{
-		ptrRule_FieldDetector = (Rule_FieldDetector*) totalRule->rule;
-		cmd_buffer[bufferLength++] = ptrRule_FieldDetector->polygonListSize;
-		for( i = 0; i < ptrRule_FieldDetector->polygonListSize; i ++)
-		{
-			Cmd_WordAssign(cmd_buffer,  ptrRule_FieldDetector->detectPolygon[i].polygon_x,&bufferLength);
-			Cmd_WordAssign(cmd_buffer,  ptrRule_FieldDetector->detectPolygon[i].polygon_y,&bufferLength);
-		}
-		cmd_buffer[bufferLength++] = ptrRule_FieldDetector->metadataStreamSwitch;
-		ptrRule_FieldDetector = NULL;
-	}else if(totalRule->type == 0x12)
-	{
-		ptrRule_MotionDetector = (Rule_MotionDetector*) totalRule->rule;
-		cmd_buffer[bufferLength++] = ptrRule_MotionDetector->motionExpression;
-		cmd_buffer[bufferLength++] = ptrRule_MotionDetector->polygonListSize;
-		for( i = 0; i < ptrRule_MotionDetector->polygonListSize; i ++)
-		{
-			Cmd_WordAssign(cmd_buffer,  ptrRule_MotionDetector->detectPolygon[i].polygon_x,&bufferLength);
-			Cmd_WordAssign(cmd_buffer,  ptrRule_MotionDetector->detectPolygon[i].polygon_y,&bufferLength);
-		}
-		cmd_buffer[bufferLength++] = ptrRule_MotionDetector->metadataStreamSwitch;
-		ptrRule_MotionDetector = NULL;
-	}else if(totalRule->type == 0x13)
-	{
-		ptrRule_Counting = (Rule_Counting*) totalRule->rule;
-		Cmd_DwordAssign(cmd_buffer, ptrRule_Counting->reportTimeInterval,&bufferLength);
-		Cmd_DwordAssign(cmd_buffer, ptrRule_Counting->resetTimeInterval,&bufferLength);
-		Cmd_WordAssign(cmd_buffer, ptrRule_Counting->direction,&bufferLength);
-		cmd_buffer[bufferLength++] = ptrRule_Counting->polygonListSize;
-		for( i = 0; i < ptrRule_Counting->polygonListSize; i ++)
-		{
-			Cmd_WordAssign(cmd_buffer,  ptrRule_Counting->detectPolygon[i].polygon_x,&bufferLength);
-			Cmd_WordAssign(cmd_buffer,  ptrRule_Counting->detectPolygon[i].polygon_y,&bufferLength);
-		}
-		cmd_buffer[bufferLength++] = ptrRule_Counting->metadataStreamSwitch;
-		ptrRule_Counting = NULL;
-	}else if(totalRule->type == 0x14)
-	{
-		ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->minCount,&bufferLength);
-		Cmd_DwordAssign(cmd_buffer,  ptrRule_CellMotion->alarmOnDelay,&bufferLength);
-		Cmd_DwordAssign(cmd_buffer,  ptrRule_CellMotion->alarmOffDelay,&bufferLength);
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->activeCellsSize,&bufferLength);
-		Cmd_StringAssign(cmd_buffer, &ptrRule_CellMotion->activeCells, &bufferLength);
-		cmd_buffer[bufferLength++] = ptrRule_CellMotion->sensitivity;
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_x,&bufferLength);
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_y,&bufferLength);
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_width,&bufferLength);
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_height,&bufferLength);
-		cmd_buffer[bufferLength++] = ptrRule_CellMotion->layoutColumns;
-		cmd_buffer[bufferLength++] = ptrRule_CellMotion->layoutRows;
-		cmd_buffer[bufferLength++] = ptrRule_CellMotion->metadataStreamSwitch;
-		ptrRule_CellMotion = NULL;
-	}
+    switch (totalRule->type)
+    {
+        case 0x10:
+        {
+            Rule_LineDetector * ptrRule_LineDetector = (Rule_LineDetector*) totalRule->rule;
+
+            Cmd_WordAssign(cmd_buffer, ptrRule_LineDetector->direction, &bufferLength);
+            cmd_buffer[bufferLength++] = ptrRule_LineDetector->polygonListSize;
+            for (Byte i = 0; i < ptrRule_LineDetector->polygonListSize; ++i)
+            {
+                Cmd_WordAssign(cmd_buffer,  ptrRule_LineDetector->detectPolygon[i].polygon_x,&bufferLength);
+                Cmd_WordAssign(cmd_buffer,  ptrRule_LineDetector->detectPolygon[i].polygon_y,&bufferLength);
+            }
+            cmd_buffer[bufferLength++] = ptrRule_LineDetector->metadataStreamSwitch;
+            break;
+        }
+
+        case 0x11:
+        {
+            Rule_FieldDetector * ptrRule_FieldDetector = (Rule_FieldDetector*) totalRule->rule;
+
+            cmd_buffer[bufferLength++] = ptrRule_FieldDetector->polygonListSize;
+            for (Byte i = 0; i < ptrRule_FieldDetector->polygonListSize; ++i)
+            {
+                Cmd_WordAssign(cmd_buffer,  ptrRule_FieldDetector->detectPolygon[i].polygon_x,&bufferLength);
+                Cmd_WordAssign(cmd_buffer,  ptrRule_FieldDetector->detectPolygon[i].polygon_y,&bufferLength);
+            }
+            cmd_buffer[bufferLength++] = ptrRule_FieldDetector->metadataStreamSwitch;
+            break;
+        }
+
+        case 0x12:
+        {
+            Rule_MotionDetector * ptrRule_MotionDetector = (Rule_MotionDetector*) totalRule->rule;
+
+            cmd_buffer[bufferLength++] = ptrRule_MotionDetector->motionExpression;
+            cmd_buffer[bufferLength++] = ptrRule_MotionDetector->polygonListSize;
+            for (Byte i = 0; i < ptrRule_MotionDetector->polygonListSize; ++i)
+            {
+                Cmd_WordAssign(cmd_buffer,  ptrRule_MotionDetector->detectPolygon[i].polygon_x,&bufferLength);
+                Cmd_WordAssign(cmd_buffer,  ptrRule_MotionDetector->detectPolygon[i].polygon_y,&bufferLength);
+            }
+            cmd_buffer[bufferLength++] = ptrRule_MotionDetector->metadataStreamSwitch;
+            break;
+        }
+
+        case 0x13:
+        {
+            Rule_Counting * ptrRule_Counting = (Rule_Counting*) totalRule->rule;
+
+            Cmd_DwordAssign(cmd_buffer, ptrRule_Counting->reportTimeInterval,&bufferLength);
+            Cmd_DwordAssign(cmd_buffer, ptrRule_Counting->resetTimeInterval,&bufferLength);
+            Cmd_WordAssign(cmd_buffer, ptrRule_Counting->direction,&bufferLength);
+            cmd_buffer[bufferLength++] = ptrRule_Counting->polygonListSize;
+            for (Byte i = 0; i < ptrRule_Counting->polygonListSize; ++i)
+            {
+                Cmd_WordAssign(cmd_buffer,  ptrRule_Counting->detectPolygon[i].polygon_x,&bufferLength);
+                Cmd_WordAssign(cmd_buffer,  ptrRule_Counting->detectPolygon[i].polygon_y,&bufferLength);
+            }
+            cmd_buffer[bufferLength++] = ptrRule_Counting->metadataStreamSwitch;
+            break;
+        }
+
+        case 0x14:
+        {
+            Rule_CellMotion * ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
+
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->minCount,&bufferLength);
+            Cmd_DwordAssign(cmd_buffer,  ptrRule_CellMotion->alarmOnDelay,&bufferLength);
+            Cmd_DwordAssign(cmd_buffer,  ptrRule_CellMotion->alarmOffDelay,&bufferLength);
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->activeCellsSize,&bufferLength);
+            Cmd_StringAssign(cmd_buffer, &ptrRule_CellMotion->activeCells, &bufferLength);
+            cmd_buffer[bufferLength++] = ptrRule_CellMotion->sensitivity;
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_x,&bufferLength);
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_y,&bufferLength);
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_width,&bufferLength);
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_height,&bufferLength);
+            cmd_buffer[bufferLength++] = ptrRule_CellMotion->layoutColumns;
+            cmd_buffer[bufferLength++] = ptrRule_CellMotion->layoutRows;
+            cmd_buffer[bufferLength++] = ptrRule_CellMotion->metadataStreamSwitch;
+            break;
+        }
+    }
 
 	cmd_buffer[bufferLength++] = totalRule->extensionFlag;
 	Cmd_StringAssign(cmd_buffer, &totalRule->videoSrcToken, &bufferLength);
 	cmd_buffer[bufferLength++] = totalRule->threshold;
 	cmd_buffer[bufferLength++] = totalRule->motionSensitivity;
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 
-unsigned Cmd_modifyRule(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_modifyRule(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0x0681;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 12;
-	unsigned cmdsize = 0;
-	Byte i;
-	Rule_LineDetector* ptrRule_LineDetector = NULL;
-	Rule_FieldDetector* ptrRule_FieldDetector = NULL;
-	Rule_MotionDetector* ptrRule_MotionDetector = NULL;
-	Rule_Counting* ptrRule_Counting = NULL;
-	Rule_CellMotion* ptrRule_CellMotion = NULL;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const TotalRule* totalRule = &deviceInfo->totalRule;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-	cmd_buffer_size = cmd_buffer_size + (4 + totalRule->ruleName.stringLength) + (4 + totalRule->ruleToken.stringLength) + (4 + totalRule->videoSrcToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + totalRule->ruleName.stringLength) + (4 + totalRule->ruleToken.stringLength) + (4 + totalRule->videoSrcToken.stringLength);
 
-	if(totalRule->type == 0x10)
-	{
-		ptrRule_LineDetector = (Rule_LineDetector*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 4 + ( ptrRule_LineDetector->polygonListSize * 4 ) ;
-		ptrRule_LineDetector = NULL;
-	}else if(totalRule->type == 0x11)
-	{
-		ptrRule_FieldDetector = (Rule_FieldDetector*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 2 + ( ptrRule_FieldDetector->polygonListSize * 4 ) ;
-		ptrRule_FieldDetector = NULL;
-	}else if(totalRule->type == 0x12)
-	{
-		ptrRule_MotionDetector = (Rule_MotionDetector*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 3 + ( ptrRule_MotionDetector->polygonListSize * 4 ) ;
-		ptrRule_MotionDetector = NULL;
-	}else if(totalRule->type == 0x13)
-	{
-		ptrRule_Counting = (Rule_Counting*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 12 + ( ptrRule_Counting->polygonListSize * 4 ) ;
-		ptrRule_Counting = NULL;
-	}else if(totalRule->type == 0x14)
-	{
-		ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
-		cmd_buffer_size = cmd_buffer_size + 24 + ( 4 + ptrRule_CellMotion->activeCells.stringLength ) ;
-		ptrRule_CellMotion = NULL;
-	}else
-	{
-		error = ReturnChannelError_CMD_CONTENT_ERROR;
-		return error;
-	}
+    switch (totalRule->type)
+    {
+        case 0x10:
+        {
+            Rule_LineDetector * ptrRule_LineDetector = (Rule_LineDetector*) totalRule->rule;
+            cmd_buffer_size += 4 + ( ptrRule_LineDetector->polygonListSize * 4 ) ;
+            break;
+        }
 
-	std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+        case 0x11:
+        {
+            Rule_FieldDetector * ptrRule_FieldDetector = (Rule_FieldDetector*) totalRule->rule;
+            cmd_buffer_size += 2 + ( ptrRule_FieldDetector->polygonListSize * 4 ) ;
+            break;
+        }
 
-	payload_start_point = bufferLength;
+        case 0x12:
+        {
+            Rule_MotionDetector * ptrRule_MotionDetector = (Rule_MotionDetector*) totalRule->rule;
+            cmd_buffer_size += 3 + ( ptrRule_MotionDetector->polygonListSize * 4 ) ;
+            break;
+        }
+
+        case 0x13:
+        {
+            Rule_Counting * ptrRule_Counting = (Rule_Counting*) totalRule->rule;
+            cmd_buffer_size += 12 + ( ptrRule_Counting->polygonListSize * 4 ) ;
+            break;
+        }
+
+        case 0x14:
+        {
+            Rule_CellMotion * ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
+            cmd_buffer_size += 24 + ( 4 + ptrRule_CellMotion->activeCells.stringLength ) ;
+            break;
+        }
+
+        default:
+            return ReturnChannelError::CMD_CONTENT_ERROR;
+    }
+
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
+
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -4259,120 +3536,119 @@ unsigned Cmd_modifyRule(IN RCHostInfo * deviceInfo, IN Word command)
 	Cmd_StringAssign(cmd_buffer, &totalRule->ruleToken, &bufferLength);
 	cmd_buffer[bufferLength++] = totalRule->type;
 
-	if(totalRule->type == 0x10)
-	{
-		ptrRule_LineDetector = (Rule_LineDetector*) totalRule->rule;
-		Cmd_WordAssign(cmd_buffer, ptrRule_LineDetector->direction, &bufferLength);
-		cmd_buffer[bufferLength++] = ptrRule_LineDetector->polygonListSize;
-		for( i = 0; i < ptrRule_LineDetector->polygonListSize; i ++)
-		{
-			Cmd_WordAssign(cmd_buffer,  ptrRule_LineDetector->detectPolygon[i].polygon_x,&bufferLength);
-			Cmd_WordAssign(cmd_buffer,  ptrRule_LineDetector->detectPolygon[i].polygon_y,&bufferLength);
-		}
-		cmd_buffer[bufferLength++] = ptrRule_LineDetector->metadataStreamSwitch;
-		ptrRule_LineDetector = NULL;
-	}else if(totalRule->type == 0x11)
-	{
-		ptrRule_FieldDetector = (Rule_FieldDetector*) totalRule->rule;
-		cmd_buffer[bufferLength++] = ptrRule_FieldDetector->polygonListSize;
-		for( i = 0; i < ptrRule_FieldDetector->polygonListSize; i ++)
-		{
-			Cmd_WordAssign(cmd_buffer,  ptrRule_FieldDetector->detectPolygon[i].polygon_x,&bufferLength);
-			Cmd_WordAssign(cmd_buffer,  ptrRule_FieldDetector->detectPolygon[i].polygon_y,&bufferLength);
-		}
-		cmd_buffer[bufferLength++] = ptrRule_FieldDetector->metadataStreamSwitch;
-		ptrRule_FieldDetector = NULL;
-	}else if(totalRule->type == 0x12)
-	{
-		ptrRule_MotionDetector = (Rule_MotionDetector*) totalRule->rule;
-		cmd_buffer[bufferLength++] = ptrRule_MotionDetector->motionExpression;
-		cmd_buffer[bufferLength++] = ptrRule_MotionDetector->polygonListSize;
-		for( i = 0; i < ptrRule_MotionDetector->polygonListSize; i ++)
-		{
-			Cmd_WordAssign(cmd_buffer,  ptrRule_MotionDetector->detectPolygon[i].polygon_x,&bufferLength);
-			Cmd_WordAssign(cmd_buffer,  ptrRule_MotionDetector->detectPolygon[i].polygon_y,&bufferLength);
-		}
-		cmd_buffer[bufferLength++] = ptrRule_MotionDetector->metadataStreamSwitch;
-		ptrRule_MotionDetector = NULL;
-	}else if(totalRule->type == 0x13)
-	{
-		ptrRule_Counting = (Rule_Counting*) totalRule->rule;
-		Cmd_DwordAssign(cmd_buffer, ptrRule_Counting->reportTimeInterval,&bufferLength);
-		Cmd_DwordAssign(cmd_buffer, ptrRule_Counting->resetTimeInterval,&bufferLength);
-		Cmd_WordAssign(cmd_buffer, ptrRule_Counting->direction,&bufferLength);
-		cmd_buffer[bufferLength++] = ptrRule_Counting->polygonListSize;
-		for( i = 0; i < ptrRule_Counting->polygonListSize; i ++)
-		{
-			Cmd_WordAssign(cmd_buffer,  ptrRule_Counting->detectPolygon[i].polygon_x,&bufferLength);
-			Cmd_WordAssign(cmd_buffer,  ptrRule_Counting->detectPolygon[i].polygon_y,&bufferLength);
-		}
-		cmd_buffer[bufferLength++] = ptrRule_Counting->metadataStreamSwitch;
-		ptrRule_Counting = NULL;
-	}else if(totalRule->type == 0x14)
-	{
-		ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->minCount,&bufferLength);
-		Cmd_DwordAssign(cmd_buffer,  ptrRule_CellMotion->alarmOnDelay,&bufferLength);
-		Cmd_DwordAssign(cmd_buffer,  ptrRule_CellMotion->alarmOffDelay,&bufferLength);
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->activeCellsSize,&bufferLength);
-		Cmd_StringAssign(cmd_buffer, &ptrRule_CellMotion->activeCells, &bufferLength);
-		cmd_buffer[bufferLength++] = ptrRule_CellMotion->sensitivity;
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_x,&bufferLength);
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_y,&bufferLength);
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_width,&bufferLength);
-		Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_height,&bufferLength);
-		cmd_buffer[bufferLength++] = ptrRule_CellMotion->layoutColumns;
-		cmd_buffer[bufferLength++] = ptrRule_CellMotion->layoutRows;
-		cmd_buffer[bufferLength++] = ptrRule_CellMotion->metadataStreamSwitch;
-		ptrRule_CellMotion = NULL;
-	}
+    switch (totalRule->type)
+    {
+        case 0x10:
+        {
+            Rule_LineDetector * ptrRule_LineDetector = (Rule_LineDetector*) totalRule->rule;
+
+            Cmd_WordAssign(cmd_buffer, ptrRule_LineDetector->direction, &bufferLength);
+            cmd_buffer[bufferLength++] = ptrRule_LineDetector->polygonListSize;
+            for (Byte i = 0; i < ptrRule_LineDetector->polygonListSize; ++i)
+            {
+                Cmd_WordAssign(cmd_buffer,  ptrRule_LineDetector->detectPolygon[i].polygon_x,&bufferLength);
+                Cmd_WordAssign(cmd_buffer,  ptrRule_LineDetector->detectPolygon[i].polygon_y,&bufferLength);
+            }
+            cmd_buffer[bufferLength++] = ptrRule_LineDetector->metadataStreamSwitch;
+            break;
+        }
+
+        case 0x11:
+        {
+            Rule_FieldDetector * ptrRule_FieldDetector = (Rule_FieldDetector*) totalRule->rule;
+
+            cmd_buffer[bufferLength++] = ptrRule_FieldDetector->polygonListSize;
+            for (Byte i = 0; i < ptrRule_FieldDetector->polygonListSize; ++i)
+            {
+                Cmd_WordAssign(cmd_buffer,  ptrRule_FieldDetector->detectPolygon[i].polygon_x,&bufferLength);
+                Cmd_WordAssign(cmd_buffer,  ptrRule_FieldDetector->detectPolygon[i].polygon_y,&bufferLength);
+            }
+            cmd_buffer[bufferLength++] = ptrRule_FieldDetector->metadataStreamSwitch;
+            break;
+        }
+
+        case 0x12:
+        {
+            Rule_MotionDetector * ptrRule_MotionDetector = (Rule_MotionDetector*) totalRule->rule;
+
+            cmd_buffer[bufferLength++] = ptrRule_MotionDetector->motionExpression;
+            cmd_buffer[bufferLength++] = ptrRule_MotionDetector->polygonListSize;
+            for (Byte i = 0; i < ptrRule_MotionDetector->polygonListSize; ++i)
+            {
+                Cmd_WordAssign(cmd_buffer,  ptrRule_MotionDetector->detectPolygon[i].polygon_x,&bufferLength);
+                Cmd_WordAssign(cmd_buffer,  ptrRule_MotionDetector->detectPolygon[i].polygon_y,&bufferLength);
+            }
+            cmd_buffer[bufferLength++] = ptrRule_MotionDetector->metadataStreamSwitch;
+            break;
+        }
+
+        case 0x13:
+        {
+            Rule_Counting * ptrRule_Counting = (Rule_Counting*) totalRule->rule;
+
+            Cmd_DwordAssign(cmd_buffer, ptrRule_Counting->reportTimeInterval,&bufferLength);
+            Cmd_DwordAssign(cmd_buffer, ptrRule_Counting->resetTimeInterval,&bufferLength);
+            Cmd_WordAssign(cmd_buffer, ptrRule_Counting->direction,&bufferLength);
+            cmd_buffer[bufferLength++] = ptrRule_Counting->polygonListSize;
+            for (Byte i = 0; i < ptrRule_Counting->polygonListSize; ++i)
+            {
+                Cmd_WordAssign(cmd_buffer,  ptrRule_Counting->detectPolygon[i].polygon_x,&bufferLength);
+                Cmd_WordAssign(cmd_buffer,  ptrRule_Counting->detectPolygon[i].polygon_y,&bufferLength);
+            }
+            cmd_buffer[bufferLength++] = ptrRule_Counting->metadataStreamSwitch;
+            break;
+        }
+
+        case 0x14:
+        {
+            Rule_CellMotion * ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
+
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->minCount,&bufferLength);
+            Cmd_DwordAssign(cmd_buffer,  ptrRule_CellMotion->alarmOnDelay,&bufferLength);
+            Cmd_DwordAssign(cmd_buffer,  ptrRule_CellMotion->alarmOffDelay,&bufferLength);
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->activeCellsSize,&bufferLength);
+            Cmd_StringAssign(cmd_buffer, &ptrRule_CellMotion->activeCells, &bufferLength);
+            cmd_buffer[bufferLength++] = ptrRule_CellMotion->sensitivity;
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_x,&bufferLength);
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_y,&bufferLength);
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_width,&bufferLength);
+            Cmd_WordAssign(cmd_buffer,  ptrRule_CellMotion->layoutBounds_height,&bufferLength);
+            cmd_buffer[bufferLength++] = ptrRule_CellMotion->layoutColumns;
+            cmd_buffer[bufferLength++] = ptrRule_CellMotion->layoutRows;
+            cmd_buffer[bufferLength++] = ptrRule_CellMotion->metadataStreamSwitch;
+            break;
+        }
+    }
 
 	cmd_buffer[bufferLength++] = totalRule->extensionFlag;
 	Cmd_StringAssign(cmd_buffer, &totalRule->videoSrcToken, &bufferLength);
 	cmd_buffer[bufferLength++] = totalRule->threshold;
 	cmd_buffer[bufferLength++] = totalRule->motionSensitivity;
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-
-	return (error);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
 }
 //----------- Video Analytics  Service------------
 
 //----------- Metadata Stream Service------------
-unsigned Cmd_getMetadataSettings(IN RCHostInfo * deviceInfo, IN Word command)
-{
-    //Word    command = 0xE001;
-    return Cmd_generalGet(deviceInfo, command);
-}
 
-unsigned Cmd_setMetadataSettings(IN RCHostInfo * deviceInfo, IN Word command)
+static unsigned Cmd_setMetadataSettings(IN TxDevice * deviceInfo, IN Word command)
 {
-    unsigned	error = ModulatorError_NO_ERROR;
     //Word    command = 0xE081;
-	unsigned	payload_start_point,payload_end_point;
-	unsigned	bufferLength = 0;
-	int		txLen;
 	unsigned cmd_buffer_size = 17;
-	unsigned cmdsize = 0;
 
 	const Security* security = &deviceInfo->security;
-	Device* device = &deviceInfo->device;
-	CmdSendConfig* cmdSendConfig = &deviceInfo->cmdSendConfig;
 	const MetadataSettings* metadataSettings = &deviceInfo->metadataSettings;
 
-	cmd_buffer_size = cmd_buffer_size + (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
 
-    std::vector<Byte> cmdBuf(cmd_buffer_size);
-    Byte * cmd_buffer = &cmdBuf[0];
-	cmdsize = cmd_buffer_size - 1;
+    Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
-	payload_start_point = bufferLength;
+    unsigned cmdsize = cmd_buffer_size - 1;
+    unsigned bufferLength = 0;
+
 	Cmd_DwordAssign(cmd_buffer,cmdsize,&bufferLength);
 	Cmd_WordAssign(cmd_buffer, command,&bufferLength);
 	cmd_buffer[bufferLength++] = 0xFF;
@@ -4386,13 +3662,230 @@ unsigned Cmd_setMetadataSettings(IN RCHostInfo * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = metadataSettings->motionDetectorEnable;
 	Cmd_WordAssign(cmd_buffer, metadataSettings->motionDetectorPeriod,&bufferLength);
 
-	payload_end_point = bufferLength-1;
-	cmd_buffer[bufferLength++] = Cmd_calChecksum(payload_start_point,payload_end_point,cmd_buffer);
+    cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
+    ++bufferLength;
 
-	if(deviceInfo->device.TSMode)
-		error = Cmd_sendTSCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
-	else
-		error = Cmd_sendRCCmd(cmd_buffer, bufferLength, device, &txLen, cmdSendConfig);
+    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+}
 
-	return (error);
+///
+unsigned sendRC(IN ite::TxDevice * deviceInfo, IN Word command)
+{
+    unsigned error = ReturnChannelError::NO_ERROR;
+
+    switch (command)
+    {
+        case CMD_GetTxDeviceAddressIDInput:
+        case CMD_GetTransmissionParameterCapabilitiesInput:
+        case CMD_GetTransmissionParametersInput:
+        case CMD_GetAdvanceOptionsInput:
+        case CMD_GetTPSInformationInput:
+        case CMD_GetSiPsiTableInput:
+        case CMD_GetNitLocationInput:
+        case CMD_GetSdtServiceInput:
+        case CMD_GetCapabilitiesInput:
+        case CMD_GetDeviceInformationInput:
+        case CMD_GetHostnameInput:
+        case CMD_GetSystemDateAndTimeInput:
+        case CMD_GetOSDInformationInput:
+        case CMD_GetDigitalInputsInput:
+        case CMD_GetRelayOutputsInput:
+        case CMD_GetProfilesInput:
+        case CMD_GetVideoSourcesInput:
+        case CMD_GetVideoSourceConfigurationsInput:
+        case CMD_GetVideoEncoderConfigurationsInput:
+        case CMD_GetAudioSourcesInput:
+        case CMD_GetAudioSourceConfigurationsInput:
+        case CMD_GetAudioEncoderConfigurationsInput:
+        case CMD_GetSupportedRulesInput:
+        case CMD_GetRulesInput:
+        case CMD_GetConfigurationsInput:
+        case CMD_GetMetadataSettingsInput:
+            error = Cmd_generalGet(deviceInfo, command);
+            break;
+        case CMD_GetHwRegisterValuesInput:
+            error = Cmd_getHwRegisterValues(deviceInfo, command);
+            break;
+        case CMD_GetEITInformationInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->eitInfo.videoEncConfigToken, command);
+            break;
+        case CMD_SetTxDeviceAddressIDInput:
+            error = Cmd_setTxDeviceAddressID(deviceInfo, command);
+            break;
+        case CMD_SetCalibrationTableInput:
+            error = Cmd_setCalibrationTable(deviceInfo, command);
+            break;
+        case CMD_SetTransmissionParametersInput:
+            error = Cmd_setTransmissionParameters(deviceInfo, command);
+            break;
+        case CMD_SetHwRegisterValuesInput:
+            error = Cmd_setHwRegisterValues(deviceInfo, command);
+            break;
+        case CMD_SetAdvaneOptionsInput:
+            error = Cmd_setAdvanceOptions(deviceInfo, command);
+            break;
+        case CMD_SetTPSInformationInput:
+            error = Cmd_setTPSInfo(deviceInfo, command);
+            break;
+        case CMD_SetSiPsiTableInput:
+            error = Cmd_setPSITable(deviceInfo, command);
+            break;
+        case CMD_SetNitLocationInput:
+            error = Cmd_setNitLocation(deviceInfo, command);
+            break;
+        case CMD_SetSdtServiceInput:
+            error = Cmd_setSdtServiceConfiguration(deviceInfo, command);
+            break;
+        case CMD_SetEITInformationInput:
+            error = Cmd_setEITInformation(deviceInfo, command);
+            break;
+        case CMD_GetSystemLogInput:
+            error = Cmd_getWithByte(deviceInfo, deviceInfo->systemLog.logType, command);
+            break;
+        case CMD_SystemRebootInput:
+            error = Cmd_getWithByte(deviceInfo, deviceInfo->systemReboot.rebootType, command);
+            break;
+        case CMD_SetSystemFactoryDefaultInput:
+            error = Cmd_getWithByte(deviceInfo, deviceInfo->systemDefault.factoryDefault, command);
+            break;
+        case CMD_SetHostnameInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->hostInfo.hostName, command);
+            break;
+        case CMD_SetSystemDateAndTimeInput:
+            error = Cmd_setSystemDateAndTime(deviceInfo, command);
+            break;
+        case CMD_SetOSDInformationInput:
+            error = Cmd_setOSDInformation(deviceInfo, command);
+            break;
+        case CMD_UpgradeSystemFirmwareInput:
+            error = Cmd_upgradeSystemFirmware(deviceInfo, command);
+            break;
+        case CMD_SetRelayOutputStateInput:
+            error = Cmd_setRelayOutputState(deviceInfo, command);
+            break;
+        case CMD_SetRelayOutputSettingsInput:
+            error = Cmd_setRelayOutputSettings(deviceInfo, command);
+            break;
+        case CMD_GetImagingSettingsInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->imageConfig.videoSourceToken, command);
+            break;
+        case CMD_IMG_GetStatusInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->focusStatusInfo.videoSourceToken, command);
+            break;
+        case CMD_IMG_GetOptionsInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->imageConfigOption.videoSourceToken, command);
+            break;
+        case CMD_GetUserDefinedSettingsInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->userDefinedSettings.videoSourceToken, command);
+            break;
+        case CMD_SetImagingSettingsInput:
+            error = Cmd_setImagingSettings(deviceInfo, command);
+            break;
+        case CMD_IMG_MoveInput:
+            error = Cmd_move(deviceInfo, command);
+            break;
+        case CMD_IMG_StopInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->focusStopInfo.videoSourceToken, command);
+            break;
+        case CMD_SetUserDefinedSettingsInput:
+            error = Cmd_setUserDefinedSettings(deviceInfo, command);
+            break;
+        case CMD_GetGuaranteedNumberOfVideoEncoderInstancesInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->guaranteedEncs.configurationToken, command);
+            break;
+        case CMD_GetVideoSourceConfigurationOptionsInput:
+            error = Cmd_getVideoSrcConfigOptions(deviceInfo, command);
+            break;
+        case CMD_GetVideoEncoderConfigurationOptionsInput:
+            error = Cmd_getVideoEncConfigOptions(deviceInfo, command);
+            break;
+        case CMD_GetAudioSourceConfigurationOptionsInput:
+            error = Cmd_getAudioSrcConfigOptions(deviceInfo, command);
+            break;
+        case CMD_GetAudioEncoderConfigurationOptionsInput:
+            error = Cmd_getAudioEncConfigOptions(deviceInfo, command);
+            break;
+        case CMD_GetVideoOSDConfigurationInput:
+            error = Cmd_getVideoOSDConfig(deviceInfo, command);
+            break;
+        case CMD_GetVideoPrivateAreaInput:
+            error = Cmd_getVideoPrivateArea(deviceInfo, command);
+            break;
+        case CMD_SetSynchronizationPointInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->syncPoint.profileToken, command);
+            break;
+        case CMD_SetVideoSourceConfigurationInput:
+            error = Cmd_setVideoSrcConfig(deviceInfo, command);
+            break;
+        case CMD_SetVideoEncoderConfigurationInput:
+            error = Cmd_setVideoEncConfig(deviceInfo, command);
+            break;
+        case CMD_SetAudioSourceConfigurationInput:
+            error = Cmd_setAudioSrcConfig(deviceInfo, command);
+            break;
+        case CMD_SetAudioEncoderConfigurationInput:
+            error = Cmd_setAudioEncConfig(deviceInfo, command);
+            break;
+        case CMD_SetVideoOSDConfigurationInput:
+            error = Cmd_setVideoOSDConfig(deviceInfo, command);
+            break;
+        case CMD_SetVideoPrivateAreaInput:
+            error = Cmd_setVideoPrivateArea(deviceInfo, command);
+            break;
+        case CMD_SetVideoSourceControlInput:
+            error = Cmd_setVideoSrcControl(deviceInfo, command);
+            break;
+        case CMD_PTZ_GetStatusInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->ptzStatus.token, command);
+            break;
+        case CMD_GetPresetsInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->ptzPresetsGet.token, command);
+            break;
+        case CMD_GotoPresetInput:
+            error = Cmd_gotoPreset(deviceInfo, command);
+            break;
+        case CMD_RemovePresetInput:
+            error = Cmd_removePreset(deviceInfo, command);
+            break;
+        case CMD_SetPresetInput:
+            error = Cmd_setPreset(deviceInfo, command);
+            break;
+        case CMD_AbsoluteMoveInput:
+            error = Cmd_absoluteMove(deviceInfo, command);
+            break;
+        case CMD_RelativeMoveInput:
+            error = Cmd_relativeMove(deviceInfo, command);
+            break;
+        case CMD_ContinuousMoveInput:
+            error = Cmd_continuousMove(deviceInfo, command);
+            break;
+        case CMD_SetHomePositionInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->ptzHomePosition.token, command);
+            break;
+        case CMD_GotoHomePositionInput:
+            error = Cmd_gotoHomePosition(deviceInfo, command);
+            break;
+        case CMD_PTZ_StopInput:
+            error = Cmd_PTZStop(deviceInfo, command);
+            break;
+        case CMD_CreateRuleInput:
+            error = Cmd_createRule(deviceInfo, command);
+            break;
+        case CMD_ModifyRuleInput:
+            error = Cmd_modifyRule(deviceInfo, command);
+            break;
+        case CMD_DeleteRuleInput:
+            error = Cmd_getWithString(deviceInfo, &deviceInfo->deleteRule.ruleToken, command);
+            break;
+
+        case CMD_SetMetadataSettingsInput:
+            error = Cmd_setMetadataSettings(deviceInfo, command);
+            break;
+            //------------ Metadata Stream Service Service------------
+        default:
+            error = ReturnChannelError::CMD_NOT_SUPPORTED;
+            printf("\nCMD Error : CMD_NOT_SUPPORTED\n");
+            break;
+    }
+    return error;
 }

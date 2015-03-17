@@ -158,16 +158,18 @@ namespace ite
     INIT_OBJECT_COUNTER(CameraManager)
     DEFAULT_REF_COUNTER(CameraManager)
 
-    CameraManager::CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper)
+    CameraManager::CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper, TxDevicePtr txDev)
     :   m_refManager(this),
         m_devMapper(devMapper),
-        m_errorStr( nullptr )
+        m_txDev(txDev),
+        m_errorStr(nullptr)
     {
         updateCameraInfo(info);
 
         unsigned frequency;
+        unsigned short txID;
         std::vector<unsigned short> rxIDs;
-        DeviceMapper::parseInfo(info, m_txID, frequency, rxIDs);
+        DeviceMapper::parseInfo(info, txID, frequency, rxIDs);
     }
 
     CameraManager::~CameraManager()
@@ -339,7 +341,7 @@ namespace ite
             // Camera
 
             case ITE_PARAM_TX_ID:
-                strValue = num2str(m_txID);
+                strValue = num2str(txID());
                 break;
             case ITE_PARAM_TX_HWID:
                 getParamStr_TxHwID(strValue);
@@ -486,17 +488,14 @@ namespace ite
 
         if (m_rxDevice)
         {
-            //std::lock_guard<std::mutex> lock( m_rxDevice->mutex() ); // LOCK device
+            if (chan == m_rxDevice->channel())
+                return true;
 
-            RxDevicePtr dev = m_rxDevice;
-            unsigned curChan = m_rxDevice->channel();
-
-            /// @warning locks m_reloadMutex inside (possible deadlock if we lock device)
+            // TODO: do we realy need it?
             if (! stopStreams(true))
                 return false;
 
-            if (dev->tryLockC(curChan))
-                return dev->changeChannel(m_txID, chan);
+            return m_rxDevice->changeChannel(chan);
         }
 
         return false;
@@ -626,7 +625,7 @@ namespace ite
 
     CameraManager::State CameraManager::checkState() const
     {
-        if (! m_txID)
+        if (! txID())
             return STATE_NO_CAMERA;
 
         if (! m_rxDevice)
@@ -716,7 +715,7 @@ namespace ite
         // reopen same device
         if (m_rxDevice)
         {
-            if (m_rxDevice->isLocked() && m_rxDevice->txID() == m_txID)
+            if (m_rxDevice->isLocked() && m_rxDevice->txID() == txID())
             {
                 m_stopTimer.stop();
                 return true;
@@ -741,14 +740,14 @@ namespace ite
         RxDevicePtr best;
 
         std::vector<RxDevicePtr> supportedRxDevices;
-        m_devMapper->getRx4Tx(m_txID, supportedRxDevices);
+        m_devMapper->getRx4Tx(txID(), supportedRxDevices);
 
         for (size_t i = 0; i < supportedRxDevices.size(); ++i)
         {
             RxDevicePtr dev = supportedRxDevices[i];
 
             bool isGood = true;
-            if (dev->lockCamera(m_txID)) // delay inside
+            if (dev->lockCamera(m_txDev)) // delay inside
             {
                 isGood = dev->good();
                 if (isGood)
@@ -764,12 +763,12 @@ namespace ite
 #if 1
             else
             {
-                printf("-- Can't lock camera for Tx: %d\n", m_txID);
+                printf("-- Can't lock camera for Tx: %d\n", txID());
             }
         }
 
         if (supportedRxDevices.empty())
-            printf("-- No devices for Tx: %d\n", m_txID);
+            printf("-- No devices for Tx: %d\n", txID());
 #else
         }
 #endif

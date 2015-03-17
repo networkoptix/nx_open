@@ -3,16 +3,13 @@
 
 #include "ret_chan_cmd_host.h"
 
-//*******************User Define Init********************
 void User_Host_init(RCHostInfo* deviceInfo);
-void User_init_DeviceID_Host(Word* TxID, Word* RxID);
-//*******************User Define Init********************
-//*******************User Define UnInit********************
 void User_Host_uninit(RCHostInfo* deviceInfo);
-//*******************User Define UnInit********************
+
 //*******************User Define Reply********************
+
 //--------------------------General-------------------------------
-void User_getSecurity(RCString userName, RCString password,  Byte* valid);
+void User_getSecurity(RCString userName, RCString password, Byte* valid);
 void User_getGeneralReply(RCHostInfo* deviceInfo, Word command);
 //void User_getErrorReply(Device device, ReturnValue returnValue, Word command);
 //--------------------------General-------------------------------
@@ -84,5 +81,5 @@ void User_metadataStreamCountingEventReply(RCHostInfo* deviceInfo, Word command)
 void User_metadataStreamCellMotionEventReply(RCHostInfo* deviceInfo, Word command);
 void User_getMetadataSettingsReply(RCHostInfo* deviceInfo, Word command);
 //-------------------Metadata Stream Service--------------------
-//*******************User Define Reply********************
+
 #endif

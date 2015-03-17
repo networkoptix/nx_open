@@ -1,7 +1,8 @@
 #ifndef RETURN_CHANNEL_CMD_H
 #define RETURN_CHANNEL_CMD_H
 
-#define UART_TEST	1
+#define USER_REPLY  1
+
 #define RETURN_CHANNEL_VERSION					0x14032700	// yy/mm/dd/version
 #define RETURN_CHANNEL_PID						0x201
 #define RETURN_CHANNEL_API_VERSION				0x0013		// Version 0.13
@@ -29,10 +30,6 @@
 
 #include "../it930x/type.h"
 
-#ifndef ModulatorError_NO_ERROR
-#define ModulatorError_NO_ERROR	0
-#endif
-
 #ifndef IN
 #define IN
 #endif
@@ -41,40 +38,40 @@
 #define OUT
 #endif
 
-/**
- * The type defination of 32-bits signed type.
- */
-typedef unsigned int Float;
 
+struct ReturnChannelError
+{
+    enum
+    {
+        NO_ERROR =                  0,
+        //RerurnCode_Error =		0x05000000ul, // 0x05000000ul | RerurnCode
+        CMD_NOT_SUPPORTED =			0x05000001ul,
+        //BUS_INIT_FAIL =			0x05000002ul,
+        //Reply_WRONG_CHECKSUM =	0x05000036ul,
+        //GET_WRONG_LENGTH =		0x05000037ul,
+        Reply_WRONG_LENGTH =		0x05000038ul,
+        CMD_WRONG_LENGTH =			0x05000039ul,
+        CMD_READ_FAIL =				0x05000003ul,
+        USER_INVALID =				0x05000004ul,
+        PASSWORD_INVALID =			0x05000005ul,
+        //UNDEFINED_INVALID =		0x05000006ul,
+        //STRING_WRONG_LENGTH =		0x05000007ul,
+        //EVENT_QUEUE_ERROR	=		0x05000008ul,
+        //CMD_REPEAT_ERROR =		0x05000009ul,
+        //CMD_RETURN_INDEX_ERROR =	0x0500000aul,
+        CMD_CONTENT_ERROR =			0x0500000bul,
 
-//---------for return channel
-#define ReturnChannelError_RerurnCode_Error				0x05000000ul // 0x05000000ul | RerurnCode
-#define ReturnChannelError_CMD_NOT_SUPPORTED			0x05000001ul
-#define ReturnChannelError_BUS_INIT_FAIL				0x05000002ul
-#define ReturnChannelError_Reply_WRONG_CHECKSUM			0x05000036ul
-#define ReturnChannelError_GET_WRONG_LENGTH				0x05000037ul
-#define ReturnChannelError_Reply_WRONG_LENGTH			0x05000038ul
-#define ReturnChannelError_CMD_WRONG_LENGTH				0x05000039ul
-#define ReturnChannelError_CMD_READ_FAIL				0x05000003ul
-#define ReturnChannelError_USER_INVALID					0x05000004ul
-#define ReturnChannelError_PASSWORD_INVALID				0x05000005ul
-#define ReturnChannelError_UNDEFINED_INVALID			0x05000006ul
-#define ReturnChannelError_STRING_WRONG_LENGTH			0x05000007ul
-#define ReturnChannelError_EVENT_QUEUE_ERROR			0x05000008ul
-#define ReturnChannelError_CMD_REPEAT_ERROR				0x05000009ul
-#define ReturnChannelError_CMD_RETURN_INDEX_ERROR		0x0500000aul
-#define ReturnChannelError_CMD_CONTENT_ERROR			0x0500000bul
+        //CMD_SYNTAX_ERROR			0x05010001ul,
+        //CMD_RXDEVICEID_ERROR		0x05010002ul,
+        CMD_TXDEVICEID_ERROR =		0x05010003ul,
+        //CMD_SEQUENCE_ERROR =		0x05010004ul,
+        //CMD_CHECKSUM_ERROR =		0x05010005ul,
+        CMD_PKTCHECK_ERROR =		0x05010006ul,
 
-#define ReturnChannelError_CMD_SYNTAX_ERROR				0x05010001ul
-#define ReturnChannelError_CMD_RXDEVICEID_ERROR			0x05010002ul
-#define ReturnChannelError_CMD_TXDEVICEID_ERROR			0x05010003ul
-#define ReturnChannelError_CMD_SEQUENCE_ERROR			0x05010004ul
-#define ReturnChannelError_CMD_CHECKSUM_ERROR			0x05010005ul
-#define ReturnChannelError_CMD_PKTCHECK_ERROR			0x05010006ul
-
-#define ReturnChannelError_CMD_TS_SYNTEX_ERROR			0x05020001ul
-#define ReturnChannelError_CMD_TS_PID_ERROR				0x05020002ul
-
+        //CMD_TS_SYNTEX_ERROR		0x05020001ul
+        //CMD_TS_PID_ERROR			0x05020002ul
+    };
+};
 
 //=============================================================================
 //					ccHDtv Service Definition
@@ -321,12 +318,14 @@ typedef struct {
 	Byte* stringData;
 } RCString;
 
+#if 0
 typedef struct {
 	Bool bIsRepeatPacket;
 	Byte byRepeatPacketNumber;
 	Byte byRepeatPacketTimeInterval;
 	Bool bIsCmdBroadcast;
 }CmdSendConfig;
+#endif
 
 typedef struct {
 	Word PID;
@@ -1395,156 +1394,30 @@ typedef struct{
 	Word motionDetectorPeriod;
 }MetadataSettings;
 
-//-----Metadata Stream Service----
+//
 
+void Cmd_CheckByteIndexRead(IN const Byte * buf, IN unsigned length, OUT unsigned * var);
 
-//---------------------General Process------------------------
-
-Byte Cmd_calChecksum(IN unsigned payload_start_point, IN unsigned payload_end_point, IN const Byte * buffer);
-unsigned Cmd_splitBuffer(IN Byte * buf, IN unsigned length, OUT Byte * splitBuf, IN unsigned splitLength, IN unsigned * start);
-
-void SWordToshort(IN unsigned short SWordNum, OUT short * num);
-void shortToSWord(IN short num, OUT unsigned short * SWordNum);
-
-unsigned full(Byte front, Byte rear, Byte size);
-unsigned empty(Byte front, Byte rear);
-unsigned enqueue(EventQueue* eventQueue, Byte item );
-unsigned dequeue(EventQueue* eventQueue, Byte* item );
-void initQueue(EventQueue* queue);
-
-//--------------------------TS-------------------
-unsigned Cmd_addTS(OUT Byte * dstbuf, IN Word PID, IN Byte seqNum);
-unsigned Cmd_sendTSCmd(IN Byte * buffer, IN unsigned bufferSize, IN Device * device, OUT int * txLen, IN CmdSendConfig * cmdSendConfig);
-//--------------------------TS-------------------
-
-//--------------------------RC-------------------
-unsigned Cmd_addRC(
-	IN Byte* srcbuf,
-	OUT Byte* dstbuf,
-	IN Word RXDeviceID,
-	IN Word TXDeviceID,
-	IN Word seqNum,
-	IN unsigned total_pktNum,
-	IN unsigned pktNum,
-	IN unsigned pktLength,
-	IN Byte index
-);
-unsigned Cmd_sendRCCmd(
-	IN Byte* buffer,
-	IN unsigned bufferSize,
-	IN Device* device,
-	OUT int *txLen,
-	IN CmdSendConfig* cmdSendConfig
-);
-//--------------------------RC-------------------
-void Cmd_CheckByteIndexRead(
-	IN const Byte* buf ,
-	IN unsigned length,
-	OUT unsigned* var
-);
-unsigned Cmd_DwordRead(
-	IN const Byte* buf ,
-	IN unsigned bufferLength,
-	IN unsigned* index,
-	OUT unsigned* var,
-	IN unsigned defaultValue
-);
-unsigned Cmd_QwordRead(
-	IN const Byte* buf ,
-	IN unsigned bufferLength,
-	IN unsigned* index,
-	OUT unsigned long long * var,
-	IN unsigned long long defaultValue
-);
-unsigned Cmd_StringRead(
-	IN const Byte* buf ,
-	IN unsigned bufferLength,
-	IN unsigned* index,
-	OUT RCString* str
-);
-unsigned Cmd_BytesRead(
-	IN const Byte* buf ,
-	IN unsigned bufferLength,
-	IN unsigned* index,
-	OUT Byte* bufDst,
-	IN unsigned dstLength
-);
-unsigned Cmd_ByteRead(
-	IN const Byte* buf ,
-	IN unsigned bufferLength,
-	IN unsigned* index,
-	OUT Byte* var,
-	IN Byte defaultValue
-);
-unsigned Cmd_WordRead(
-	IN const Byte* buf ,
-	IN unsigned bufferLength,
-	IN unsigned* index,
-	OUT Word* var,
-	IN Word defaultValue
-);
-unsigned Cmd_FloatRead(
-	IN const Byte* buf ,
-	IN unsigned bufferLength,
-	IN unsigned* index,
-	OUT float* var,
-	IN float  defaultValue
-);
-unsigned Cmd_ShortRead(
-	IN const Byte* buf ,
-	IN unsigned bufferLength,
-	IN unsigned* index,
-	OUT short* var,
-	IN short defaultValue
-);
-unsigned Cmd_CharRead(
-	IN const Byte* buf ,
-	IN unsigned bufferLength,
-	IN unsigned* index,
-	OUT char* var,
-	IN char defaultValue
-);
-void Cmd_WordAssign(
-	IN Byte* buf,
-	IN Word var,
-	IN unsigned* length
-);
-void Cmd_DwordAssign(
-	IN Byte* buf,
-	IN unsigned var,
-	IN unsigned* length
-);
-void Cmd_QwordAssign(
-	IN Byte* buf,
-	IN unsigned long long var,
-	IN unsigned* length
-);
-void Cmd_StringAssign(
-	IN Byte* buf,
-	IN const RCString* str,
-	IN unsigned* length
-);
-void Cmd_FloatAssign(
-	IN Byte* buf,
-	IN float var,
-	IN unsigned* length
-);
-void Cmd_ShortAssign(
-	IN Byte* buf,
-	IN short var,
-	IN unsigned* length
-);
-
-//-------------------RC-----------------
-
-unsigned TSHeadCheck(Byte * srcbuf, Device * device);
+unsigned Cmd_DwordRead(IN const Byte * buf, IN unsigned bufferLength, IN unsigned * index, OUT unsigned * var, IN unsigned defaultValue);
+unsigned Cmd_QwordRead(IN const Byte * buf, IN unsigned bufferLength, IN unsigned * index, OUT unsigned long long * var, IN unsigned long long defaultValue);
+unsigned Cmd_StringRead(IN const Byte * buf, IN unsigned bufferLength, IN unsigned * index, OUT RCString * str);
+unsigned Cmd_BytesRead(IN const Byte * buf, IN unsigned bufferLength, IN unsigned * index, OUT Byte* bufDst, IN unsigned dstLength);
+unsigned Cmd_ByteRead(IN const Byte * buf, IN unsigned bufferLength, IN unsigned * index, OUT Byte * var, IN Byte defaultValue);
+unsigned Cmd_WordRead(IN const Byte * buf, IN unsigned bufferLength, IN unsigned * index, OUT Word * var, IN Word defaultValue);
+unsigned Cmd_FloatRead(IN const Byte * buf, IN unsigned bufferLength, IN unsigned * index, OUT float * var, IN float defaultValue);
+unsigned Cmd_ShortRead(IN const Byte * buf, IN unsigned bufferLength, IN unsigned * index, OUT short * var, IN short defaultValue);
+unsigned Cmd_CharRead(IN const Byte * buf, IN unsigned bufferLength, IN unsigned * index, OUT char* var, IN char defaultValue);
+void Cmd_WordAssign(IN Byte * buf, IN Word var, IN unsigned * length);
+void Cmd_DwordAssign(IN Byte * buf, IN unsigned var, IN unsigned * length);
+void Cmd_QwordAssign(IN Byte * buf, IN unsigned long long var, IN unsigned * length);
+void Cmd_StringAssign(IN Byte * buf, IN const RCString * str, IN unsigned * length);
+void Cmd_FloatAssign(IN Byte * buf, IN float var, IN unsigned * length);
+void Cmd_ShortAssign(IN Byte * buf, IN short var, IN unsigned * length);
 
 unsigned Cmd_StringReset(IN const Byte * buf, IN unsigned bufferLength, OUT RCString * dstStr);
 unsigned Cmd_StringResetCopy(IN const RCString * srcStr, OUT RCString * dstStr);
 unsigned Cmd_StringCopy(IN const RCString * srcStr, OUT RCString * dstStr);
 unsigned Cmd_StringSet(IN const Byte * buf, IN unsigned bufferLength, OUT RCString * str);
 unsigned Cmd_StringClear(IN RCString * str);
-
-//---------------------General Process------------------------
 
 #endif

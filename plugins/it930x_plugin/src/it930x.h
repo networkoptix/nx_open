@@ -8,6 +8,8 @@ extern "C"
 #include "DTVAPI.h"
 }
 
+#include "rc_command.h"
+
 namespace ite
 {
     struct IteDriverInfo
@@ -200,6 +202,13 @@ namespace ite
             strncpy(info.fwVersionOFDM, (const char *)driverInfo.FWVersionOFDM, 16);
             strncpy(info.company,       (const char *)driverInfo.Company, 8);
             strncpy(info.supportHWInfo, (const char *)driverInfo.SupportHWInfo, 32);
+        }
+
+        void sendCommand(const RCCommand& cmd)
+        {
+            int result = DTV_SendCommand(m_handle, cmd.rawData(), cmd.rawSize());
+            if (result)
+                throw "DTV_SendCommand";
         }
 
         int read(uint8_t * buf, int size)

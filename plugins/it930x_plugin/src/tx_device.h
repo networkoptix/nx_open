@@ -1,10 +1,12 @@
 #ifndef RETURN_CHANNEL_DEVICE_INFO_H
 #define RETURN_CHANNEL_DEVICE_INFO_H
 
-#include <memory>
+#include <vector>
+#include <string>
 
 #include "ret_chan/ret_chan_cmd_host.h"
 #include "rc_command.h"
+
 
 namespace ite
 {
@@ -50,7 +52,7 @@ namespace ite
     };
 
     ///
-    class TxDevice
+    class TxDevice : public TxRC
     {
     public:
         static const unsigned SLEEP_TIME_MS = 200;
@@ -136,19 +138,17 @@ namespace ite
         TxDevice(unsigned short txID, unsigned freq);
         ~TxDevice();
 
-        RCHostInfo * rcHost() { return &info_; }
-
         bool setChannel(unsigned channel);
 
         void resetCmd() { cmd_.clear(); }
 
-        unsigned short sequenceRecv() const { return info_.device.RCCmd_sequence_recv; }
-        void setSequenceRecv(unsigned short value) { info_.device.RCCmd_sequence_recv = value; }
+        unsigned short sequenceRecv() const { return device.RCCmd_sequence_recv; }
+        void setSequenceRecv(unsigned short value) { device.RCCmd_sequence_recv = value; }
 
-        unsigned short txID() const { return info_.device.clientTxDeviceID; }
-        //unsigned short rxID() const { return info_.device.hostRxDeviceID; }
-        unsigned frequency() const { return info_.transmissionParameter.frequency; }
-        void setFrequency(unsigned freq) { info_.transmissionParameter.frequency = freq; }
+        unsigned short txID() const { return device.clientTxDeviceID; }
+        //unsigned short rxID() const { return device.hostRxDeviceID; }
+        unsigned frequency() const { return transmissionParameter.frequency; }
+        void setFrequency(unsigned freq) { transmissionParameter.frequency = freq; }
 
         void setWaiting(bool wr, unsigned short cmd = 0)
         {
@@ -164,12 +164,8 @@ namespace ite
         RebuiltCmd& cmd() { return cmd_; }
         RCError parseCommand();
 
-        bool isActive() const { return isActive_; }
-        void setActive(bool a = true) { isActive_ = a; }
-
         void print() const;
 
-        //
 #if 0
         //void getTxDeviceAddressID()               { sendCmd(CMD_GetTxDeviceAddressIDInput); }
         void getTransmissionParameterCapabilities() { sendCmd(CMD_GetTransmissionParameterCapabilitiesInput); }
@@ -284,17 +280,17 @@ namespace ite
         TxManufactureInfo txDeviceInfo() const
         {
             TxManufactureInfo mInfo;
-            mInfo.companyName = rcStr2str(info_.manufactureInfo.manufactureName);
-            mInfo.modelName = rcStr2str(info_.manufactureInfo.modelName);
-            mInfo.firmwareVersion = rcStr2str(info_.manufactureInfo.firmwareVersion);
-            mInfo.serialNumber = rcStr2str(info_.manufactureInfo.serialNumber);
-            mInfo.hardwareId = rcStr2str(info_.manufactureInfo.hardwareId);
+            mInfo.companyName = rcStr2str(manufactureInfo.manufactureName);
+            mInfo.modelName = rcStr2str(manufactureInfo.modelName);
+            mInfo.firmwareVersion = rcStr2str(manufactureInfo.firmwareVersion);
+            mInfo.serialNumber = rcStr2str(manufactureInfo.serialNumber);
+            mInfo.hardwareId = rcStr2str(manufactureInfo.hardwareId);
             return mInfo;
         }
 
         // encoder
 
-        uint8_t encodersCount() const { return info_.videoEncConfig.configListSize; }
+        uint8_t encodersCount() const { return videoEncConfig.configListSize; }
 
         TxVideoEncConfig txVideoEncConfig(uint8_t encoderNo)
         {
@@ -302,40 +298,45 @@ namespace ite
                 return TxVideoEncConfig();
 
             TxVideoEncConfig conf;
-            conf.width = info_.videoEncConfig.configList[encoderNo].width;
-            conf.height = info_.videoEncConfig.configList[encoderNo].height;
-            conf.bitrateLimit = info_.videoEncConfig.configList[encoderNo].bitrateLimit;
-            conf.frameRateLimit = info_.videoEncConfig.configList[encoderNo].frameRateLimit;
-            conf.quality = info_.videoEncConfig.configList[encoderNo].quality;
+            conf.width = videoEncConfig.configList[encoderNo].width;
+            conf.height = videoEncConfig.configList[encoderNo].height;
+            conf.bitrateLimit = videoEncConfig.configList[encoderNo].bitrateLimit;
+            conf.frameRateLimit = videoEncConfig.configList[encoderNo].frameRateLimit;
+            conf.quality = videoEncConfig.configList[encoderNo].quality;
             return conf;
         }
 
         //bool setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf);
 
+        static uint8_t checksum(const uint8_t * buffer, unsigned length) { return RCCommand::checksum(buffer, length); }
+        void sendRC(uint16_t command);
+
+        Byte * rc_getBuffer(unsigned size)  // <-- ret_chan
+        {
+            m_rcBuffer.resize(size);
+            return &m_rcBuffer[0];
+        }
+
+        unsigned rc_sendBuffer(Byte * buffer, unsigned bufferSize); // <-- ret_chan
+
     private:
-        RCHostInfo info_;
         RebuiltCmd cmd_;
+        std::vector<Byte> m_rcBuffer;
         unsigned short waitingCmd_;
         bool waitingResponse_;
-        bool isActive_;
-#if 0
-        void sendCmd(unsigned short command)
-        {
-            setWaiting(true, input2output(command));
 
-            info_.cmdSendConfig.bIsCmdBroadcast = False;
-            unsigned error = Cmd_Send(&info_, command);
-            if (error)
-                throw "Can't send cmd";
-        }
-#endif
         static std::string rcStr2str(const RCString& s) { return std::string((const char *)s.stringData, s.stringLength); }
+
+        // ---- TODO: to RCCommand / RebuiltCmd
+        unsigned rc_sendTSCmd(Byte * buffer, unsigned bufferSize);
+        unsigned rc_splitBuffer(Byte * buf, unsigned length, Byte * splitBuf, unsigned splitLength, unsigned * start);
+        void rc_addRC(Byte * srcbuf,  Byte * dstbuf, unsigned total_pktNum, unsigned pktNum, unsigned pktLength);
+        void rc_addTS(Byte * dstbuf);
+        // ----
 
         TxDevice(const TxDevice& );
         TxDevice& operator = (const TxDevice& );
     };
-
-    typedef std::shared_ptr<TxDevice> TxDevicePtr;
 }
 
 #endif

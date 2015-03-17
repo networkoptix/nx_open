@@ -108,6 +108,7 @@ Dword DTV_AcquireChannel(
 	return result;
 }
 
+#if 1
 Dword DTV_IsLocked(
 	IN	int handle,
 	OUT	Bool *is_lock)
@@ -133,6 +134,7 @@ Dword DTV_IsLocked(
 	
 	return result;
 }
+#endif
 
 Dword DTV_EnablePIDTable(
 	IN	int handle)
@@ -400,6 +402,21 @@ Dword DTV_GetDriverInformation(
 	}
 	
 	return result;
+}
+
+Dword DTV_SendCommand(IN int handle, IN const Byte * data, IN unsigned length)
+{
+    if (handle <= 0)
+        return ERR_USB_INVALID_HANDLE;
+
+    SentUartData uartData;
+    uartData.len = length;
+    uartData.cmd = (Dword)data;
+
+    if (ioctl(handle, IOCTL_ITE_ENDEAVOUR_SENTUARTDATA, (void *)&uartData))
+        return ERR_CANT_FIND_USB_DEV;
+
+    return ERR_NO_ERROR;
 }
 
 int DTV_GetData(
