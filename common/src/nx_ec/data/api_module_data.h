@@ -11,6 +11,11 @@ namespace ec2 {
         bool isAlive;
 
         ApiModuleData() : isAlive(false) {}
+
+        ApiModuleData(const QnModuleInformation &moduleInformation, bool alive) :
+            moduleInformation(moduleInformation),
+            isAlive(alive)
+        {}
     };
 
 #define ApiModuleData_Fields (moduleInformation)(isAlive)
