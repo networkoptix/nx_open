@@ -171,6 +171,7 @@ RevealResponse *QnMulticastModuleFinder::getCachedValue(const quint8* buffer, co
             delete response;
             return 0;
         }
+        response->fixRuntimeId();
         m_cachedResponse.insert(result, response, bufferEnd - buffer);
     }
     return response;

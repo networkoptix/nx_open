@@ -70,6 +70,12 @@ private:
         qint64 lastConflictResponse;
         int conflictResponseCount;
         QSet<QString> addresses;
+
+        ModuleItem() :
+            lastResponse(0),
+            lastConflictResponse(0),
+            conflictResponseCount(0)
+        {}
     };
 
     QHash<QnUuid, ModuleItem> m_moduleItemById;

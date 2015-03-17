@@ -96,9 +96,11 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         return;
     }
 
-    QnUuid oldId = m_idByAddress.value(address);
+    SocketAddress socketAddress(address, moduleInformation.port);
+
+    QnUuid oldId = m_idByAddress.value(socketAddress);
     if (!oldId.isNull() && oldId != moduleInformation.id)
-        removeAddress(address, true);
+        removeAddress(socketAddress, true);
 
     qint64 currentTime = m_elapsedTimer.elapsed();
 
@@ -162,6 +164,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
     int count = item.addresses.size();
     item.addresses.insert(address);
+    m_idByAddress[socketAddress] = moduleInformation.id;
     if (count < item.addresses.size()) {
         NX_LOG(lit("QnModuleFinder: New module URL: %1 %2:%3")
                .arg(moduleInformation.id.toString()).arg(address).arg(moduleInformation.port), cl_logDEBUG1);
