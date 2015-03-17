@@ -36,11 +36,9 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     ui->assureWidget->setEnabled(false);
 
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, ui->qualityGroupBox, &QGroupBox::setDisabled);
-    connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, ui->settingsWarningLabel, [this](bool visible) {
-        ui->settingsWarningLabel->setVisible(visible && !ui->settingsDisabledWarningLabel->isVisible());
-    });
-    ui->settingsWarningLabel->setVisible(false);
-    ui->settingsDisabledWarningLabel->setVisible(false);
+    connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, this, &QnCameraExpertSettingsWidget::updateControlBlock);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::cameraSettingsOptimizationChanged, this, &QnCameraExpertSettingsWidget::updateControlBlock);
+    updateControlBlock();
 
     connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), ui->qualitySlider, SLOT(setVisible(bool)));
     connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), ui->qualityLabelsWidget, SLOT(setVisible(bool)));
@@ -189,14 +187,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     else
         ui->comboBoxTransport->setCurrentIndex(-1);
 
-    bool globalControlEnabled = QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
-    if (!globalControlEnabled) {
-        controlDisabled = true;
-        sameControlState = true;
-        ui->settingsWarningLabel->setVisible(false);
-    }
-    ui->settingsDisableControlCheckBox->setEnabled(globalControlEnabled);
-    ui->settingsDisabledWarningLabel->setVisible(!globalControlEnabled);
+    updateControlBlock();
     ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
     ui->settingsDisableControlCheckBox->setTristate(!sameControlState);
     if (sameControlState)
@@ -204,7 +195,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     else
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
-    bool defaultValues = (ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked || !globalControlEnabled)
+    bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
             && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
@@ -220,19 +211,19 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
 
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
+    bool globalControlEnabled = QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
     Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
 
-    foreach(const QnVirtualCameraResourcePtr &camera, cameras) 
-    {
-        if (!isArecontCamera(camera)) {
+    for (const QnVirtualCameraResourcePtr &camera: cameras) {
+        if (globalControlEnabled && !isArecontCamera(camera)) {
             if (disableControls)
                 camera->setCameraControlDisabled(true);
             else if (enableControls)
                 camera->setCameraControlDisabled(false);
         }
 
-        if (enableControls && ui->qualityOverrideCheckBox->isChecked() && camera->hasDualStreaming())
+        if (globalControlEnabled && enableControls && ui->qualityOverrideCheckBox->isChecked() && camera->hasDualStreaming())
             camera->setSecondaryStreamQuality(quality);
 
         if (ui->checkBoxPrimaryRecorder->checkState() != Qt::PartiallyChecked)
@@ -276,6 +267,13 @@ void QnCameraExpertSettingsWidget::at_qualitySlider_valueChanged(int value) {
     Qn::SecondStreamQuality quality = sliderPosToQuality(value);
     ui->lowQualityWarningLabel->setVisible(quality == Qn::SSQualityLow);
     ui->highQualityWarningLabel->setVisible(quality == Qn::SSQualityHigh);
+}
+
+void QnCameraExpertSettingsWidget::updateControlBlock() {
+    bool globalControlEnabled = QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
+    ui->settingsDisableControlCheckBox->setEnabled(globalControlEnabled);
+    ui->settingsDisabledWarningLabel->setVisible(!globalControlEnabled);
+    ui->settingsWarningLabel->setVisible(globalControlEnabled && !ui->settingsDisableControlCheckBox->isChecked());
 }
 
 Qn::SecondStreamQuality QnCameraExpertSettingsWidget::sliderPosToQuality(int pos) const {
