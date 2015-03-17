@@ -75,6 +75,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     authHash = QByteArray::fromBase64(map.value(lit("authHash")).toByteArray());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
+    fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();
 }
