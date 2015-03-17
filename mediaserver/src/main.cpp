@@ -1247,9 +1247,13 @@ void QnMain::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
-void QnMain::at_serverModuleConflict(const QnModuleInformationEx &moduleInformation, const QUrl &url)
+void QnMain::at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address)
 {
-    qnBusinessRuleConnector->at_mediaServerConflict(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch(), moduleInformation, url);
+    qnBusinessRuleConnector->at_mediaServerConflict(
+                qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(),
+                qnSyncTime->currentUSecsSinceEpoch(),
+                moduleInformation,
+                QUrl(lit("http://%1").arg(address.toString())));
 }
 
 void QnMain::at_timer()
@@ -1784,7 +1788,7 @@ void QnMain::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformationEx selfInformation;
+    QnModuleInformation selfInformation;
     selfInformation.type = moduleName;
     if (!compatibilityMode)
         selfInformation.customization = QnAppInfo::customizationName();
@@ -1925,8 +1929,6 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
-    connect(m_mediaServer.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnMain::updateModuleInfo);
-    connect(m_mediaServer.data(), &QnMediaServerResource::resourceChanged, this, &QnMain::updateModuleInfo);
     QnUserResourcePtr adminUser = qnResPool->getAdministrator();
     if (adminUser)
         connect(adminUser.data(), &QnResource::resourceChanged, this, &QnMain::updateModuleInfo);
@@ -2157,28 +2159,8 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
 
 void QnMain::updateModuleInfo()
 {
-    QnModuleInformationEx moduleInformationCopy = qnCommon->moduleInformation();
+    QnModuleInformation moduleInformationCopy = qnCommon->moduleInformation();
     if (qnResPool) {
-        moduleInformationCopy.remoteAddresses.clear();
-        const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-        if (server) {
-            QSet<QString> ignoredHosts;
-            for (const QUrl &url: server->getIgnoredUrls())
-                ignoredHosts.insert(url.host());
-
-            for(const QHostAddress &address: server->getNetAddrList()) {
-                QString addressString = address.toString();
-                if (!ignoredHosts.contains(addressString))
-                    moduleInformationCopy.remoteAddresses.insert(addressString);
-            }
-            for(const QUrl &url: server->getAdditionalUrls()) {
-                if (!ignoredHosts.contains(url.host()))
-                    moduleInformationCopy.remoteAddresses.insert(url.host());
-            }
-            moduleInformationCopy.port = server->getPort();
-            moduleInformationCopy.name = server->getName();
-        }
-
         QnUserResourcePtr admin = qnResPool->getAdministrator();
         if (admin) {
             QCryptographicHash md5(QCryptographicHash::Md5);

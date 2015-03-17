@@ -16,15 +16,7 @@ bool QnModuleInformation::hasCompatibleVersion() const {
             isCompatible(version, qnCommon->engineVersion());
 }
 
-bool QnModuleInformation::isLocal() const {
-    for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
-        if (remoteAddresses.contains(address.toString()))
-            return true;
-    }
-    return false;
-}
-
-void QnModuleInformationEx::fixRuntimeId()
+void QnModuleInformation::fixRuntimeId()
 {
     if (!runtimeId.isNull())
         return;
@@ -35,8 +27,6 @@ void QnModuleInformationEx::fixRuntimeId()
     md5.addData(customization.toLatin1());
     md5.addData(systemName.toLatin1());
     md5.addData(QByteArray::number(port));
-    for (const QString &address: remoteAddresses)
-        md5.addData(address.toLatin1());
 
     QByteArray hash = md5.result();
     while (hash.size() < bytesNeeded)
@@ -45,7 +35,6 @@ void QnModuleInformationEx::fixRuntimeId()
     runtimeId = QnUuid::fromRfc4122(hash);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation,   (json)(eq), QnModuleInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(eq), QnModuleInformation_Fields)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformationEx, (json)(eq), QnModuleInformationEx_Fields)
-
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformationWithAddresses, (xml)(json)(eq), QnModuleInformationWithAddresses_Fields)

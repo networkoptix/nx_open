@@ -7,6 +7,7 @@
 
 #include <utils/common/singleton.h>
 #include <utils/network/module_information.h>
+#include <utils/network/socket_common.h>
 #include <core/resource/resource_fwd.h>
 
 class QnMulticastModuleFinder;
@@ -27,6 +28,7 @@ public:
     QList<QnModuleInformation> foundModules() const;
 
     QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
+    QSet<QString> moduleAddresses(const QnUuid &id) const;
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
@@ -42,19 +44,17 @@ public slots:
 signals:
     void moduleChanged(const QnModuleInformation &moduleInformation);
     void moduleLost(const QnModuleInformation &moduleInformation);
-    void moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void moduleConflict(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void moduleAddressLost(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void moduleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 private slots:
-    void at_responseReceived(QnModuleInformationEx moduleInformation, QUrl url);
+    void at_responseReceived(const QnModuleInformation &moduleInformation, const QString &address);
     void at_timer_timeout();
 
 private:
-    QSet<QString> moduleAddresses(const QnUuid &id) const;
-    void removeUrl(const QUrl &url);
-    void addUrl(const QUrl &url, const QnUuid &id);
-    void handleSelfResponse(const QnModuleInformationEx &moduleInformation, const QUrl &url);
+    void removeAddress(const SocketAddress &address, bool holdItem);
+    void handleSelfResponse(const QnModuleInformation &moduleInformation, const QString &address);
 
 private:
     QElapsedTimer m_elapsedTimer;
@@ -64,13 +64,23 @@ private:
     QnDirectModuleFinder *m_directModuleFinder;
     QnDirectModuleFinderHelper *m_helper;
 
-    QHash<QnUuid, QnModuleInformationEx> m_foundModules;
-    QMultiHash<QnUuid, QUrl> m_urlById;
-    QHash<QUrl, QnUuid> m_idByUrl;
-    QHash<QUrl, qint64> m_lastResponse;
-    QHash<QnUuid, qint64> m_lastResponseById;
-    QHash<QnUuid, qint64> m_lastConflictResponseById;
-    QHash<QnUuid, int> m_conflictResponseCountById;
+    struct ModuleItem {
+        QnModuleInformation moduleInformation;
+        qint64 lastResponse;
+        qint64 lastConflictResponse;
+        int conflictResponseCount;
+        QSet<QString> addresses;
+
+        ModuleItem() :
+            lastResponse(0),
+            lastConflictResponse(0),
+            conflictResponseCount(0)
+        {}
+    };
+
+    QHash<QnUuid, ModuleItem> m_moduleItemById;
+    QHash<SocketAddress, QnUuid> m_idByAddress;
+    QHash<SocketAddress, qint64> m_lastResponse;
 
     qint64 m_lastSelfConflict;
     int m_selfConflictCount;

@@ -23,6 +23,7 @@ inline void serialize_field(const ec2::ApiPeerData &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiRuntimeData &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiPeerAliveData &, QVariant *) { return; }
 inline void serialize_field(const ec2::QnTranState &, QVariant *) { return; }
+inline void serialize_field(const ec2::ApiModuleData &, QVariant *) { return; }
 
 template<class T, class Allocator>
 inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }

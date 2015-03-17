@@ -159,10 +159,10 @@ void QnMulticastModuleFinder::at_moduleInformationChanged()
     m_serializedModuleInfo.clear(); // clear cached value
 }
 
-RevealResponse* QnMulticastModuleFinder::getCachedValue(const quint8* buffer, const quint8* bufferEnd)
+RevealResponse *QnMulticastModuleFinder::getCachedValue(const quint8* buffer, const quint8* bufferEnd)
 {
     QnCryptographicHash m_mdctx(QnCryptographicHash::Md5);
-    m_mdctx.addData((const char*) buffer, bufferEnd - buffer);
+    m_mdctx.addData(reinterpret_cast<const char*>(buffer), bufferEnd - buffer);
     QByteArray result = m_mdctx.result();
     RevealResponse* response = m_cachedResponse[result];
     if (!response) {
@@ -189,12 +189,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return false;
     }
 
-    /*
-    RevealResponse response;
-    const quint8 *responseBufStart = readBuffer;
-    if (!response.deserialize(&responseBufStart, readBuffer + bytesRead)) {
-    */
-    RevealResponse* response = getCachedValue(readBuffer, readBuffer + bytesRead);
+    RevealResponse *response = getCachedValue(readBuffer, readBuffer + bytesRead);
     if (!response) {
         //invalid response
         NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1) on local address %2").
@@ -211,12 +206,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
         return false;
 
-    //const QnModuleInformationEx& moduleInformation = response->toModuleInformation();
-    QUrl url;
-    url.setHost(remoteEndpoint.address.toString());
-    url.setPort(response->moduleInformation.port);
-
-    emit responseReceived(response->moduleInformation, url);
+    emit responseReceived(*response, remoteEndpoint.address.toString());
 
     return true;
 }

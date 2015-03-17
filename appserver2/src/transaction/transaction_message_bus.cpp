@@ -1007,12 +1007,8 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
 QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
     QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
-    for(const QnModuleInformation &moduleInformation: QnGlobalModuleFinder::instance()->foundModules()) {
-        ApiModuleData data;
-        QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
-        data.isAlive = true;
-        transaction.params.push_back(data);
-    }
+    for (const QnGlobalModuleInformation &moduleInformation: QnGlobalModuleFinder::instance()->foundModules())
+        transaction.params.push_back(ApiModuleData(moduleInformation, true));
     transaction.peerID = m_localPeer.id;
     return transaction;
 }

@@ -35,32 +35,10 @@ typedef QMap<QString, QString> TypeSpecificParamMap;
 Q_DECLARE_METATYPE(TypeSpecificParamMap)
 
 //!Sent in response to RevealRequest by module which reveals itself
-class RevealResponse
-{
+struct RevealResponse : public QnModuleInformation {
 public:
-    //!Name of module (server, client, etc...)
-    QString type;
-    QString version;
-    QString systemInformation;
-    QString customization;
-    QString name;
-    QString moduleName;
-    //!random string, unique for particular module instance
-    QnUuid seed;
-    quint16 port;
-    bool sslAllowed;
-    QStringList remoteAddresses;
-    QByteArray authHash;
-    int protoVersion;
-    QnUuid runtimeId;
-
-    QnModuleInformationEx moduleInformation;
-
-    RevealResponse();
-    RevealResponse(const QnModuleInformationEx &moduleInformation);
-
-    //QnModuleInformationEx toModuleInformation() const;
-
+    RevealResponse() {}
+    RevealResponse(const QnModuleInformation &other);
     QByteArray serialize();
     bool deserialize(const quint8 *bufStart, const quint8 *bufEnd);
 };

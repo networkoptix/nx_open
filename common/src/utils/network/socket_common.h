@@ -101,6 +101,10 @@ public:
     }
 };
 
+inline uint qHash(const SocketAddress &address) {
+    return qHash(address.address.toString(), address.port);
+}
+
 class SocketGlobalRuntimeInternal;
 
 //!This class instance MUST be created for sockets to be operational
@@ -115,5 +119,7 @@ public:
 private:
     SocketGlobalRuntimeInternal* m_data;
 };
+
+Q_DECLARE_METATYPE(SocketAddress)
 
 #endif  //SOCKET_COMMON_H
