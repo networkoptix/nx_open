@@ -159,7 +159,8 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
         return;
     }
 
-    QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getServersByCamera(camera);
+    QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getFootageServersByCamera(camera);
+    /* Check if no archive available on any server. */
     if (mediaServerList.isEmpty()) {
         QMutexLocker lock(&m_timeMutex);
         m_globalMinArchiveTime = AV_NOPTS_VALUE;

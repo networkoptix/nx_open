@@ -466,7 +466,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!res)
         return QString();
 
-    QnResourcePtr mserverRes = res->getParentResource();
+    QnMediaServerResourcePtr mserverRes = res->getParentResource().dynamicCast<QnMediaServerResource>();
     if (!mserverRes)
         return QString();
 

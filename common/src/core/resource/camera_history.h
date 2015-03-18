@@ -25,14 +25,14 @@ public:
     std::vector<QnUuid> getCamerasWithArchive(const QnUuid& serverGuid) const;
 
     /*
-    *   \return Server list where camera were archived
+    *   \return Server list where camera were archived.
     */
-    QnMediaServerResourceList getServersByCamera(const QnNetworkResourcePtr &camera) const;
+    QnMediaServerResourceList getFootageServersByCamera(const QnVirtualCameraResourcePtr &camera) const;
 
     /*
-    *   \return Server list where camera were archived during specified period
+    *   \return nServer list where camera were archived during specified period - if data is loaded.
     */
-    QnMediaServerResourceList getServersByCamera(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const;
+    QnMediaServerResourceList tryGetFootageServersByCameraPeriod(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const;
 
     /*
     *  \return media server where camera was recorded on specified time
@@ -40,11 +40,11 @@ public:
     * @param timestamp     timestamp in milliseconds to find
     * @param allowOfflineServers  drop out offline media servers if parameter is false
     */
-    QnMediaServerResourcePtr getMediaServerOnTime(const QnNetworkResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0) const;
+    QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0) const;
 
-    QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnNetworkResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
+    QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
 private:
-    QnMediaServerResourcePtr getCurrentServer(const QnNetworkResourcePtr &camera) const;
+    QnMediaServerResourcePtr getCurrentServer(const QnVirtualCameraResourcePtr &camera) const;
     void setCamerasWithArchiveNoLock(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
     ec2::ApiCameraHistoryMoveDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryMoveDataList& detailData, qint64 timestamp) const;
     ec2::ApiCameraHistoryMoveDataList filterOnlineServers(const ec2::ApiCameraHistoryMoveDataList& dataList) const;
@@ -52,7 +52,7 @@ private:
 private:
 
     mutable QMutex m_mutex;
-    QMap<QnUuid, std::vector<QnUuid>> m_archivedCameras; // archived cameras by server
+    QMap<QnUuid, std::vector<QnUuid>> m_archivedCamerasByServer; // archived cameras by server
 
     typedef QMap<QnUuid, ec2::ApiCameraHistoryMoveDataList> DetailHistoryMap;
     DetailHistoryMap m_historyDetail; // camera move detail by camera

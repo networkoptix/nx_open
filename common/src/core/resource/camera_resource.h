@@ -4,6 +4,7 @@
 #include <deque>
 
 #include <QtCore/QMetaType>
+#include <QtCore/QElapsedTimer>
 
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/model_functions_fwd.h>
@@ -46,7 +47,8 @@ protected:
 
 private:
     QnAbstractDTSFactory* m_dtsFactory;
-    std::deque<qint64> m_issueTimes;
+    int m_issueTimes;
+    QElapsedTimer m_lastIssueTimer;
 };
 
 

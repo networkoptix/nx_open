@@ -246,8 +246,13 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
     }
 }
 
-void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourcePtr &camera, qint64 usecsSinceEpoch) {
-    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(camera, usecsSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
+void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, 
+                                                           const QnVirtualCameraResourcePtr &camera, 
+                                                           const QnMediaServerResourcePtr &server, 
+                                                           qint64 usecsSinceEpoch) {
+    QnSingleThumbnailLoader *loader = new QnSingleThumbnailLoader(camera,
+        server,
+        usecsSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
     item->setImageProvider(loader);
 }
 
@@ -282,6 +287,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     switch (eventType) {
     case QnBusiness::CameraMotionEvent: {
+        qint64 timestampMs = params.eventTimestamp / 1000;
         QIcon icon = soundAction 
             ? qnSkin->icon("events/sound.png") 
             : qnSkin->icon("events/camera.png");
@@ -289,9 +295,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             icon,
             tr("Browse Archive"),
             Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.eventTimestamp/1000)
+            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, timestampMs)
         );
-        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), params.eventTimestamp);
+        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), timestampMs);
         break;
     }
     case QnBusiness::CameraInputEvent: {

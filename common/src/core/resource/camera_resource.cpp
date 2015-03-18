@@ -14,10 +14,12 @@
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
-static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;
+static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 
 QnVirtualCameraResource::QnVirtualCameraResource():
-    m_dtsFactory(0)
+    m_dtsFactory(0),
+    m_issueTimes(0),
+    m_lastIssueTimer()
 {}
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): 
@@ -365,16 +367,17 @@ QString QnVirtualCameraResource::toSearchString() const
 }
 
 
-void QnVirtualCameraResource::issueOccured()
-{
+void QnVirtualCameraResource::issueOccured() {
     QMutexLocker lock(&m_mutex);
-    m_issueTimes.push_back(getUsecTimer());
-    if (m_issueTimes.size() >= MAX_ISSUE_CNT) {
-        if (!hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-            addStatusFlags(Qn::CSF_HasIssuesFlag);
-            lock.unlock();
-            saveAsync();
-        }
+
+    /* Calculate how many issues have occurred during last minute. */
+    m_issueTimes++;
+    m_lastIssueTimer.restart();
+    
+    if (m_issueTimes >= MAX_ISSUE_CNT && !hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+        addStatusFlags(Qn::CSF_HasIssuesFlag);
+        lock.unlock();
+        saveAsync();
     }
 }
 
@@ -389,18 +392,18 @@ void QnVirtualCameraResource::at_saveAsyncFinished(int, ec2::ErrorCode, const Qn
     // not used
 }
 
-void QnVirtualCameraResource::noCameraIssues()
-{
+/* Tick every minute. */
+void QnVirtualCameraResource::noCameraIssues() {
     QMutexLocker lock(&m_mutex);
-    qint64 threshold = getUsecTimer() - ISSUE_KEEP_TIMEOUT;
-    while(!m_issueTimes.empty() && m_issueTimes.front() < threshold)
-        m_issueTimes.pop_front();
-
-    if (m_issueTimes.empty() && hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-        removeStatusFlags(Qn::CSF_HasIssuesFlag);
-        lock.unlock();
-        saveAsync();
-    }
+    /* Check if no issues occurred during last minute. */
+    if (m_lastIssueTimer.hasExpired(ISSUE_KEEP_TIMEOUT_MS)) {
+        m_issueTimes = 0;
+        if (hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+            removeStatusFlags(Qn::CSF_HasIssuesFlag);
+            lock.unlock();
+            saveAsync();
+        }
+    }   
 }
 
 
