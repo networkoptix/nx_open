@@ -210,11 +210,8 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem) 
            .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG1);
     emit moduleAddressLost(moduleInformation, address);
 
-    if (!it->addresses.isEmpty()) {
-        NX_LOG(lit("QnModuleFinder: Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
-        emit moduleChanged(moduleInformation);
+    if (!it->addresses.isEmpty())
         return;
-    }
 
     NX_LOG(lit("QnModuleFinder: Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
 
