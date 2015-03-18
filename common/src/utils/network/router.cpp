@@ -209,6 +209,11 @@ void QnRouter::updateRuntimeData(bool force) {
     }
 
     QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
+    if (localInfo.data.availableConnections == connections) {
+        m_runtimeDataElapsedTimer->start();
+        return;
+    }
+
     localInfo.data.availableConnections = connections;
     runtimeInfoManager->updateLocalItem(localInfo);
 
