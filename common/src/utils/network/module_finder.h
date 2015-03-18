@@ -49,12 +49,12 @@ signals:
     void moduleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 private slots:
-    void at_responseReceived(const QnModuleInformation &moduleInformation, const QString &address);
+    void at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void at_timer_timeout();
 
 private:
     void removeAddress(const SocketAddress &address, bool holdItem);
-    void handleSelfResponse(const QnModuleInformation &moduleInformation, const QString &address);
+    void handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 private:
     QElapsedTimer m_elapsedTimer;

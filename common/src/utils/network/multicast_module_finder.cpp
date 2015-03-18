@@ -206,7 +206,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
         return false;
 
-    emit responseReceived(*response, remoteEndpoint.address.toString());
+    emit responseReceived(*response, SocketAddress(remoteEndpoint.address.toString(), response->port));
 
     return true;
 }

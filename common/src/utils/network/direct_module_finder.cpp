@@ -173,7 +173,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     moduleInformation.fixRuntimeId();
     m_lastPingByUrl[url] = m_elapsedTimer.elapsed();
 
-    emit responseReceived(moduleInformation, url.host());
+    emit responseReceived(moduleInformation, SocketAddress(url.host(), url.port()));
 }
 
 void QnDirectModuleFinder::at_checkTimer_timeout() {

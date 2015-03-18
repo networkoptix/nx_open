@@ -87,7 +87,7 @@ void QnModuleFinder::pleaseStop() {
     m_directModuleFinder->pleaseStop();
 }
 
-void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInformation, const QString &address) {
+void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
@@ -96,11 +96,9 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         return;
     }
 
-    SocketAddress socketAddress(address, moduleInformation.port);
-
-    QnUuid oldId = m_idByAddress.value(socketAddress);
+    QnUuid oldId = m_idByAddress.value(address);
     if (!oldId.isNull() && oldId != moduleInformation.id)
-        removeAddress(socketAddress, true);
+        removeAddress(address, true);
 
     qint64 currentTime = m_elapsedTimer.elapsed();
 
@@ -137,8 +135,8 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             item.lastConflictResponse = currentTime;
 
             if (item.conflictResponseCount >= noticeableConflictCount && item.conflictResponseCount % noticeableConflictCount == 0) {
-                NX_LOG(lit("QnModuleFinder: Server %1 conflict: %2:%3")
-                       .arg(moduleInformation.id.toString()).arg(address).arg(moduleInformation.port), cl_logWARNING);
+                NX_LOG(lit("QnModuleFinder: Server %1 conflict: %2")
+                       .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logWARNING);
             }
 
             return;
@@ -163,11 +161,11 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     item.lastResponse = currentTime;
 
     int count = item.addresses.size();
-    item.addresses.insert(address);
-    m_idByAddress[socketAddress] = moduleInformation.id;
+    item.addresses.insert(address.address.toString());
+    m_idByAddress[address] = moduleInformation.id;
     if (count < item.addresses.size()) {
-        NX_LOG(lit("QnModuleFinder: New module URL: %1 %2:%3")
-               .arg(moduleInformation.id.toString()).arg(address).arg(moduleInformation.port), cl_logDEBUG1);
+        NX_LOG(lit("QnModuleFinder: New module URL: %1 %2")
+               .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
 
         emit moduleAddressFound(moduleInformation, socketAddress);
     }
@@ -225,7 +223,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem) 
     emit moduleLost(moduleInformationCopy);
 }
 
-void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInformation, const QString &address) {
+void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
     QnModuleInformation current = qnCommon->moduleInformation();
     if (current.runtimeId == moduleInformation.runtimeId)
         return;
@@ -240,5 +238,5 @@ void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInforma
     ++m_selfConflictCount;
 
     if (m_selfConflictCount >= noticeableConflictCount && m_selfConflictCount % noticeableConflictCount == 0)
-        emit moduleConflict(moduleInformation, SocketAddress(address, moduleInformation.port));
+        emit moduleConflict(moduleInformation, address);
 }
