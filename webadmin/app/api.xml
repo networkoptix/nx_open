@@ -703,6 +703,12 @@
                             <optional>true</optional>
                             <values/>
                         </param>
+                        <param>
+                            <name>showAddresses</name>
+                            <description>Set it to true to show server addresses.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
                     </params>
                     <result>
                         <caption>JSON object with module information.</caption>
