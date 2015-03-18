@@ -289,7 +289,7 @@ public:
     TrackMap getTrackInfo() const;
 
     AbstractStreamSocket* tcpSock();
-
+    void setUserAgent(const QString& value);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -323,7 +323,6 @@ private:
     nx_http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
     bool sendRequestInternal(nx_http::Request&& request);
-
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
@@ -383,7 +382,7 @@ private:
     int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
     mutable QMutex m_sockMutex;
-
+    QByteArray m_userAgent;
 #ifdef _DUMP_STREAM
     std::ofstream m_inStreamFile;
     std::ofstream m_outStreamFile;

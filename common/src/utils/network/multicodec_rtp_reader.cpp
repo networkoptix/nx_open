@@ -589,4 +589,9 @@ QnConstResourceVideoLayoutPtr QnMulticodecRtpReader::getVideoLayout() const
     return m_customVideoLayout;
 }
 
+void QnMulticodecRtpReader::setUserAgent(const QString& value)
+{
+    m_RtpSession.setUserAgent(value);
+}
+
 #endif // ENABLE_DATA_PROVIDERS

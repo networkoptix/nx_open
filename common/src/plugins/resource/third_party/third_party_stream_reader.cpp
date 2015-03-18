@@ -22,7 +22,7 @@
 #include "plugins/resource/onvif/dataprovider/onvif_mjpeg.h"
 
 #include "motion_data_picture.h"
-
+#include "version.h"
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnResourcePtr res,
@@ -194,6 +194,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
         if( mediaUrl.scheme().toLower() == lit("rtsp") )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
+            rtspStreamReader->setUserAgent(lit(QN_PRODUCT_NAME));
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             m_builtinStreamReader.reset( rtspStreamReader );
