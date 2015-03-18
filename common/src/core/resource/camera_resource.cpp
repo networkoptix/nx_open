@@ -13,16 +13,8 @@
 #include "param.h"
 
 static const float MAX_EPS = 0.01f;
-
-//#define CAMERA_ISSUES_DEBUG
-
-#ifdef CAMERA_ISSUES_DEBUG
-    static const int MAX_ISSUE_CNT = 1; // max camera issues during a period
-    static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 5;
-#else
-    static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
-    static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
-#endif
+static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
+static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0),
@@ -382,47 +374,32 @@ int QnVirtualCameraResource::saveAsync()
 }
 
 void QnVirtualCameraResource::issueOccured() {
-    QMutexLocker lock(&m_mutex);
-
-    /* Calculate how many issues have occurred during last check period. */
-    m_issueCounter++;
-    m_lastIssueTimer.restart();
-
-#ifdef CAMERA_ISSUES_DEBUG
-    qDebug() << "issue occurred on the" << m_name << "total count is" << m_issueCounter;
-#endif
-
-    if (m_issueCounter >= MAX_ISSUE_CNT && !hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-#ifdef CAMERA_ISSUES_DEBUG
-        qDebug() << "set buggy status on the" << m_name;
-#endif
+    bool tooManyIssues = false;
+    {
+        /* Calculate how many issues have occurred during last check period. */
+        QMutexLocker lock(&m_mutex);
+        m_issueCounter++;
+        tooManyIssues = m_issueCounter >= MAX_ISSUE_CNT;
+        m_lastIssueTimer.restart();
+    }  
+    if (tooManyIssues && !hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
         addStatusFlags(Qn::CSF_HasIssuesFlag);
-        lock.unlock();
         saveAsync();
     }
 }
 
 void QnVirtualCameraResource::cleanCameraIssues() {
-    QMutexLocker lock(&m_mutex);
-    /* Check if no issues occurred during last check period. */
-    if (!m_lastIssueTimer.hasExpired(issuesTimeoutMs())) 
-        return;
-
-#ifdef CAMERA_ISSUES_DEBUG
-    if (m_issueCounter > 0)
-        qDebug() << "clean issues on the" << m_name;
-#endif
-
-    m_issueCounter = 0;
+    {
+        /* Check if no issues occurred during last check period. */
+        QMutexLocker lock(&m_mutex);
+        if (!m_lastIssueTimer.hasExpired(issuesTimeoutMs())) 
+            return;
+        m_issueCounter = 0;
+    }
     if (hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-#ifdef CAMERA_ISSUES_DEBUG
-        qDebug() << "clean buggy status on the" << m_name;
-#endif
         removeStatusFlags(Qn::CSF_HasIssuesFlag);
-        lock.unlock();
         saveAsync();
     }
-
 }
 
 int QnVirtualCameraResource::issuesTimeoutMs() {
