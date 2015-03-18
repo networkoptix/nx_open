@@ -74,3 +74,10 @@ void QnServerCamera::setParentId(const QnUuid& parent)
             emit statusChanged(toSharedPointer(this));
     }
 }
+
+void QnServerCamera::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) 
+{
+    if (other->getParentId() != m_parentId)
+        modifiedFields << "statusChanged";
+    QnVirtualCameraResource::updateInner(other, modifiedFields);
+}
