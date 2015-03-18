@@ -169,7 +169,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         NX_LOG(lit("QnModuleFinder: New module URL: %1 %2:%3")
                .arg(moduleInformation.id.toString()).arg(address).arg(moduleInformation.port), cl_logDEBUG1);
 
-        emit moduleAddressFound(moduleInformation, address);
+        emit moduleAddressFound(moduleInformation, socketAddress);
     }
 }
 
