@@ -23,6 +23,7 @@
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
 static const int CONNECT_TIMEOUT = 1000 * 2;
+static const int MAX_PROXY_TTL = 8;
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
@@ -217,15 +218,17 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
     if (!xServerGUID.isEmpty())
         route = QnRouter::instance()->routeTo(xServerGUID);
     else
-        route = QnRouter::instance()->routeTo(dstUrl.host(), dstUrl.port());
+        route.addr = SocketAddress(dstUrl.host(), dstUrl.port(80));
 
-    if (route.isValid()) {
-        if (route.points.size() > 1) {
+    if (route.isValid()) 
+    {
+        if (!route.gatewayId.isNull())
+        {
             nx_http::StringType ttlString = nx_http::getHeaderValue(d->request.headers, "x-proxy-ttl");
             bool ok;
             int ttl = ttlString.toInt(&ok);
             if (!ok)
-                ttl = route.points.size();
+                ttl = MAX_PROXY_TTL;
             --ttl;
 
             if (ttl <= 0)
@@ -241,31 +244,9 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             else
                 path.prepend(QString(lit("/proxy/%1/%2")).arg(dstUrl.scheme()).arg(xServerGUID));
             d->request.requestLine.url = path;
-
-            dstUrl.setHost(route.points.first().host);
-            dstUrl.setPort(route.points.first().port);
-        } else if (route.points.size() == 1 && !xServerGUID.isEmpty()) {
-            // check connectivity and fix destination address if needed
-            QHostAddress address(dstUrl.host());
-            if (!address.isNull()) {
-                bool found = false;
-                for (const QnRouter::Endpoint &endpoint: QnRouter::instance()->connections().values(QnUuid(xServerGUID))) {
-                    if (endpoint.host == address.toString() && endpoint.port == dstUrl.port()) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    dstUrl.setHost(route.points.first().host);
-                    dstUrl.setPort(route.points.first().port);
-                }
-            }
-            else
-            {
-                dstUrl.setHost( route.points.front().host );
-                dstUrl.setPort( route.points.front().port );
-            }
         }
+        dstUrl.setHost(route.addr.address.toString());
+        dstUrl.setPort(route.addr.port);
 
         //adding entry corresponding to current server to Via header
         nx_http::header::Via via;
