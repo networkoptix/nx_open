@@ -28,7 +28,7 @@ public:
     QList<QnModuleInformation> foundModules() const;
 
     QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
-    QSet<QString> moduleAddresses(const QnUuid &id) const;
+    QSet<SocketAddress> moduleAddresses(const QnUuid &id) const;
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
@@ -69,7 +69,7 @@ private:
         qint64 lastResponse;
         qint64 lastConflictResponse;
         int conflictResponseCount;
-        QSet<QString> addresses;
+        QSet<SocketAddress> addresses;
 
         ModuleItem() :
             lastResponse(0),

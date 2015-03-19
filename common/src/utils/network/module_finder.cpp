@@ -142,8 +142,8 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             return;
         }
 
-        foreach (const QString &address, item.addresses)
-            removeAddress(SocketAddress(address, item.moduleInformation.port), true);
+        foreach (const SocketAddress &address, item.addresses)
+            removeAddress(address, true);
     }
 
     if (item.moduleInformation != moduleInformation) {
@@ -151,8 +151,10 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         emit moduleChanged(moduleInformation);
 
         if (item.moduleInformation.port != moduleInformation.port) {
-            foreach (const QString &address, item.addresses)
-                removeAddress(SocketAddress(address, item.moduleInformation.port), true);
+            foreach (const SocketAddress &address, item.addresses) {
+                if (address.port == item.moduleInformation.port)
+                    removeAddress(address, true);
+            }
         }
 
         item.moduleInformation = moduleInformation;
@@ -161,7 +163,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     item.lastResponse = currentTime;
 
     int count = item.addresses.size();
-    item.addresses.insert(address.address.toString());
+    item.addresses.insert(address);
     m_idByAddress[address] = moduleInformation.id;
     if (count < item.addresses.size()) {
         NX_LOG(lit("QnModuleFinder: New module URL: %1 %2")
@@ -186,7 +188,7 @@ void QnModuleFinder::at_timer_timeout() {
         removeAddress(address, false);
 }
 
-QSet<QString> QnModuleFinder::moduleAddresses(const QnUuid &id) const {
+QSet<SocketAddress> QnModuleFinder::moduleAddresses(const QnUuid &id) const {
     return m_moduleItemById.value(id).addresses;
 }
 
