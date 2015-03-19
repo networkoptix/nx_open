@@ -15,25 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnAbstractStorageResource</name>
-    <message>
-        <source>Windows Network Shared Resource</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Coldstore Network Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>coldstore://&lt;Address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Camera output</source>

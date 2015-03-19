@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Information</source>
-        <translation>สารสนเทศ</translation>
+        <translation>ข้อมูล</translation>
     </message>
     <message>
         <source>Credits</source>
@@ -17,11 +17,11 @@
     </message>
     <message>
         <source>GPU Information</source>
-        <translation>สารสนเทศ GPU </translation>
+        <translation>ข้อมูล GPU</translation>
     </message>
     <message>
         <source>Connected servers</source>
-        <translation>เชื่อมต่อเซิร์ฟเวอร์</translation>
+        <translation>เชื่อมต่อกับเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Support</source>
@@ -129,7 +129,7 @@
     </message>
     <message>
         <source>Event log</source>
-        <translation>เหตุการณ์</translation>
+        <translation>log เหตุการณ์</translation>
     </message>
     <message>
         <source>Advanced...</source>
@@ -287,7 +287,7 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
         <source>I have read the manual and understand the risks</source>
-        <translation>ฉันได้อ่านคู่มือและเข้าใจความเสี่ยง</translation>
+        <translation>ฉันได้อ่านคู่มือและเข้าใจความเสี่ยงเรียบร้อยแล้ว</translation>
     </message>
     <message>
         <source>Camera Settings Control</source>
@@ -295,23 +295,23 @@
     </message>
     <message>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>เก็บโปรไฟล์การตั้งค่า</translation>
+        <translation>เก็บสัญญาณภาพและโปรไฟล์การตั้งค่าของกล้อง</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>คำเตือน! FPS และการตั้งค่าที่มีคุณภาพในตารางเวลาการบันทึกจะไม่ทำงาน!</translation>
+        <translation>คำเตือน! FPS และคุณภาพใน การตั้งค่าการบันทึก จะไม่ทำงาน!</translation>
     </message>
     <message>
         <source>Secondary Stream Control</source>
-        <translation>การควบคุมสำรอง</translation>
+        <translation>การควบคุมสัญญาณภาพสำรอง</translation>
     </message>
     <message>
         <source>Override secondary stream quality</source>
-        <translation>ตั้งค่าการควบคุม</translation>
+        <translation>การเขียนทับคุณภาพของสัญญาณภาพสำรอง</translation>
     </message>
     <message>
         <source>Don&apos;t use</source>
-        <translation>ไม่ใช้</translation>
+        <translation>ไม่ได้ใช้</translation>
     </message>
     <message>
         <source>Low quality</source>
@@ -371,6 +371,10 @@
     </message>
     <message>
         <source>Warning! Low quality may result in low resolution image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -646,7 +650,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>GeneralPreferencesWidget</name>
     <message>
         <source>Main Media Folder</source>
-        <translation>หน้าหลัก Media โฟลเดอร์</translation>
+        <translation>หน้าหลัก มีเดีย โฟลเดอร์</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
@@ -654,7 +658,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Extra Media Folders</source>
-        <translation>ค้นหาเพิ่มเติม</translation>
+        <translation>ค้นหา มีเดีย เพิ่มเติม</translation>
     </message>
     <message>
         <source>&amp;Add...</source>
@@ -682,7 +686,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>minutes of inactivity</source>
-        <translation>นาที</translation>
+        <translation>นาที ไม่มีการใช้งาน</translation>
     </message>
     <message>
         <source>Run application when PC boots up:</source>
@@ -694,7 +698,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Browse logs</source>
-        <translation>สิบค้นการทำงาน</translation>
+        <translation>ค้นหา logs</translation>
     </message>
     <message>
         <source>Clear local cache</source>
@@ -817,7 +821,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading image... Please wait.</source>
-        <translation>กำลังโหลดภาพ..</translation>
+        <translation>กำลังโหลดภาพ..กรุณารอสักครู่.</translation>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
@@ -1226,7 +1230,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>PreferencesDialog</name>
     <message>
         <source>Local Settings</source>
-        <translation>การตั้งค่าภายใน</translation>
+        <translation>การตั้งค่าภายในระบบ</translation>
     </message>
 </context>
 <context>
@@ -1241,11 +1245,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Create Tour</source>
-        <translation>สร้างทัวร์</translation>
+        <translation>สร้างตำแหน่งทัวร์</translation>
     </message>
     <message>
         <source>Start Tour</source>
-        <translation>เริ่มทัวร์</translation>
+        <translation>เริ่มทัวร์ตามตำแหน่ง</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1257,7 +1261,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>No tour selected</source>
-        <translation>ไม่ได้เลือกทัวร์</translation>
+        <translation>ไม่ได้เลือกตำแหน่งทัวร์</translation>
     </message>
     <message>
         <source>Preview</source>
@@ -1269,26 +1273,26 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Get Preview</source>
-        <translation>ได้รับแสดงตัวอย่าง</translation>
+        <translation>ได้รับตัวอย่างที่แสดง</translation>
     </message>
 </context>
 <context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
-        <translation>ขยายเข้า</translation>
+        <translation>ซูมเข้า</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation>ขยายออก</translation>
+        <translation>ซูมออก</translation>
     </message>
     <message>
         <source>Focus Far</source>
-        <translation>ปรับโฟกัลไกล</translation>
+        <translation>ปรับโฟกัลระยะไกล</translation>
     </message>
     <message>
         <source>Focus Near</source>
-        <translation>ปรับโฟกัสใกล้</translation>
+        <translation>ปรับโฟกัสระยะใกล้</translation>
     </message>
     <message>
         <source>Auto Focus</source>
@@ -1319,18 +1323,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Parameter 1 is null.</source>
         <translation>พารามิเตอร์ 1 ห้ามว่าง.</translation>
-    </message>
-    <message>
-        <source>b/s</source>
-        <translation>b/s</translation>
-    </message>
-    <message>
-        <source>Kb/s</source>
-        <translation>Kb/s</translation>
-    </message>
-    <message>
-        <source>Mb/s</source>
-        <translation>Mb/s</translation>
     </message>
     <message>
         <source>None</source>
@@ -1408,7 +1400,23 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnAboutDialog</name>
     <message>
         <source>Copy to Clipboard</source>
-        <translation>คัดลอกคลิปบอร์ด</translation>
+        <translation>คัดลอกไปคลิปบอร์ด</translation>
+    </message>
+    <message>
+        <source>Server at %2: v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 version %2 (%3).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Built for %1-%2 with %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client is not connected to any server</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 uses the following external libraries:</source>
@@ -1433,22 +1441,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Support</source>
         <translation type="unfinished">ทีมช่วยเหลือ</translation>
-    </message>
-    <message>
-        <source>Server at %2: v%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 version %2 (%3).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Built for %1-%2 with %3.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Client is not connected to any server</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1642,19 +1634,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Layout...</source>
-        <translation>เค้าโครง ...</translation>
+        <translation>หน้าต่าง ...</translation>
     </message>
     <message>
         <source>New Layout...</source>
-        <translation>เคร้าโครงใหม่...</translation>
+        <translation>หน้าต่างใหม่...</translation>
     </message>
     <message>
         <source>Tab</source>
-        <translation>Tab</translation>
+        <translation>แท็บ</translation>
     </message>
     <message>
         <source>New Tab</source>
-        <translation>Tab ใหม่</translation>
+        <translation>แท็บใหม่</translation>
     </message>
     <message>
         <source>Ctrl+T</source>
@@ -3764,10 +3756,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>วีดีโอการเคลื่อนไหว</translation>
     </message>
     <message>
-        <source> (%1 times)</source>
-        <translation> (%1 เวลา)</translation>
-    </message>
-    <message>
         <source>Date/Time</source>
         <translation>วัน/เวลา</translation>
     </message>
@@ -3790,6 +3778,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Description</source>
         <translation>รายละเอียด</translation>
+    </message>
+    <message>
+        <source>%1 times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3962,28 +3954,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>ไม่สามารถแสดงข้อมูลได้ %1</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%2&quot;...</source>
-        <translation>กำลังนำข้อมูลออก&quot;%2&quot;...</translation>
-    </message>
-    <message>
         <source>Could not export camera %1</source>
         <translation>ไม่สามารถนำข้อมูลกล้องออกได้ %1</translation>
+    </message>
+    <message>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation type="unfinished">กำลังส่งออก &quot;%1&quot;...</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
-    <message>
-        <source>&lt;No image&gt;</source>
-        <translation>ไม่มีภาพ</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be loaded&gt;</source>
-        <translation>ไม่สามารถโหลดภาพได้</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be uploaded&gt;</source>
-        <translation>ไม่สามารถอัพโหลดภาพได้</translation>
-    </message>
     <message>
         <source>Select file...</source>
         <translation>เลือกไฟล์...</translation>
@@ -3991,6 +3971,30 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Pictures %1</source>
         <translation>รูปภาพ %1</translation>
+    </message>
+    <message>
+        <source>&lt;No picture&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Error while loading picture&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Error while uploading picture&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be read&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be loaded&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4435,10 +4439,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>ภาพสด</translation>
     </message>
     <message>
-        <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7</translation>
-    </message>
-    <message>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
         <translation>%1 (Tour &quot;%2&quot; is active)</translation>
     </message>
@@ -4631,6 +4631,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnNetworkSpeedStrings</name>
+    <message>
+        <source>b/s</source>
+        <translation type="unfinished">b/s</translation>
+    </message>
+    <message>
+        <source>Kb/s</source>
+        <translation type="unfinished">Kb/s</translation>
+    </message>
+    <message>
+        <source>Mb/s</source>
+        <translation type="unfinished">Mb/s</translation>
+    </message>
+</context>
+<context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
         <source>%n more item(s)</source>
@@ -4674,10 +4689,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>คลิปเสียงได้ถึง %1 วินาที</translation>
     </message>
     <message>
-        <source>Custom Title:</source>
-        <translation>ชื่อเรื่องที่กำหนดเอง:</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>ข้อผิดพลาด</translation>
     </message>
@@ -4704,6 +4715,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Custom title:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4788,14 +4803,18 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnPerformance</name>
+    <name>QnPerformanceTest</name>
     <message>
-        <source>Warning</source>
-        <translation>คำเตือน</translation>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Performance of this computer allows running %1 in configuration mode only. For full-featured mode please use another computer.</source>
-        <translation>ประสิทธิภาพการทำงานของคอมพิวเตอร์เครื่องนี้ช่วยให้การทำงาน %1 ในโหมดการตั้งค่าเท่านั้น สำหรับโหมดเต็มรูปแบบกรุณาใช้คอมพิวเตอร์เครื่องอื่น.</translation>
+        <source>For full-featured mode please use another computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4890,14 +4909,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>การเปลี่ยนแปลงยังไม่ถูกบันทึก คุณต้องการที่จะบันทึกหรือไ่ม่?</translation>
     </message>
     <message>
-        <source>This preset is used in some tours.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These tours will become invalid if you remove it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to get current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4907,6 +4918,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This preset is used in some tours.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These tours will become invalid if you remove it.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5348,14 +5367,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>คำเตือน</translation>
     </message>
     <message>
-        <source>Rebuild archive index</source>
-        <translation>สร้างดัชนีเก็บ</translation>
-    </message>
-    <message>
-        <source>Fast initial scan in progress</source>
-        <translation>เริ่มต้นสแกนอย่างรวดเร็วในความคืบหน้า</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>เสร็จสิ้น</translation>
     </message>
@@ -5397,6 +5408,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5697,6 +5716,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Check for updates automatically</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -5910,6 +5933,22 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Provided storage path does not define a valid external storage.</source>
         <translation>เส้นทางการจัดเก็บที่มีให้ไม่ได้กำหนดจัดเก็บข้อมูลภายนอกที่ถูกต้อง.</translation>
     </message>
+    <message>
+        <source>Windows Network Shared Resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Coldstore Network Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>coldstore://&lt;Address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
@@ -5991,98 +6030,116 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnTimeSlider</name>
     <message>
+        <source>NO THUMBNAILS AVAILABLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>auto</source>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>อัตโนมัต</translation>
+        <comment>AM/PM usage based on user&apos;s system locale.</comment>
+        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">อัตโนมัติ</translation>
     </message>
     <message>
         <source>ms</source>
-        <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>ms</translation>
+        <comment>Suffix for displaying milliseconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">ms</translation>
     </message>
     <message>
         <source>s</source>
-        <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>s</translation>
+        <comment>Suffix for displaying seconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">s</translation>
     </message>
     <message>
         <source>m</source>
-        <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>m</translation>
+        <comment>Suffix for displaying minutes on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">m</translation>
     </message>
     <message>
         <source>h</source>
-        <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>h</translation>
+        <comment>Suffix for displaying hours on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">h</translation>
     </message>
     <message>
         <source>d</source>
-        <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>d</translation>
+        <comment>Suffix for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">d</translation>
     </message>
     <message>
         <source>M</source>
-        <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>M</translation>
+        <comment>Suffix for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">M</translation>
     </message>
     <message>
         <source>y</source>
-        <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>y</translation>
+        <comment>Suffix for displaying years on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">y</translation>
     </message>
     <message>
         <source>dd MMMM</source>
-        <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM</translation>
+        <comment>Format for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
-        <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translatorcomment>MMMM</translatorcomment>
-        <translation>dd</translation>
+        <comment>Format for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
-----------
-Format for displaying year caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>yyyy</translation>
+        <comment>Format for displaying years on timeline</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>MINUTES</comment>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy hh:mm</translation>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy hh:mm ap</translation>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>HOURS</comment>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy hh:mm</translation>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy h ap</translation>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy</translation>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>MMMM yyyy</translation>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">MMMM yyyy</translation>
     </message>
     <message>
-        <source>NO THUMBNAILS AVAILABLE</source>
-        <translation type="unfinished"></translation>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">yyyy</translation>
     </message>
 </context>
 <context>
@@ -6138,16 +6195,16 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <name>QnUserEmailPolicy</name>
     <message>
         <source>Select at least one user</source>
-        <translation>เลือกอย่างน้อยหนึ่งของผู้ใช้</translation>
+        <translation>เลือกผู้ใช้งานอย่างน้อยหนึ่งคน</translation>
     </message>
     <message>
         <source>User %1 has invalid email address</source>
-        <translation>ผู้ใช้ %1 มีที่อยู่อีเมลไม่ถูกต้อง</translation>
+        <translation>ผู้ใช้งาน %1 มีที่อยู่อีเมลไม่ถูกต้อง</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid email address</source>
         <translation>
-            <numerusform>%n ของ %1 ผู้ใช้ที่อยู่อีเมลที่ไม่ถูกต้อง</numerusform>
+            <numerusform>%n ของ %1 ผู้ใช้งาน ที่อยู่อีเมลที่ไม่ถูกต้อง</numerusform>
         </translation>
     </message>
     <message>
@@ -6189,7 +6246,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Login cannot be empty.</source>
-        <translation>ช่องผู้ใช้งานต้องไม่ปล่อยว่าง.</translation>
+        <translation>ช่องผู้ใช้งาน ต้องไม่ปล่อยว่าง.</translation>
     </message>
     <message>
         <source>User with specified login already exists.</source>
@@ -6241,7 +6298,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Live Viewer</source>
-        <translation>ดูสด</translation>
+        <translation>ดูภาพปัจจุบัน</translation>
     </message>
     <message>
         <source>Custom...</source>
@@ -6311,7 +6368,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message numerus="yes">
         <source>Pc %1 - Screens %2</source>
         <translation>
-            <numerusform>Pc %1 - จอภาพ %2</numerusform>
+            <numerusform>Pc %1 - จอภาพ %2 %n</numerusform>
         </translation>
     </message>
 </context>
@@ -6345,23 +6402,23 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <name>QnWorkbenchActionHandler</name>
     <message>
         <source>New layout</source>
-        <translation>เปิดหน้าใหม่</translation>
+        <translation>เปิดหน้าต่างใหม่</translation>
     </message>
     <message>
         <source>New layout %1</source>
-        <translation>เปิดหน้าใหม่ %1</translation>
+        <translation>เปิดหน้าต่างใหม่ %1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>ผิดพลาด</translation>
+        <translation>เกิดข้อผิดพลาด</translation>
     </message>
     <message>
         <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
-        <translation>ไม่สามารถย้ายกล้อง (s) ไปยังเซิร์ฟเวอร์อื่น ๆ เซิร์ฟเวอร์%1 ไม่ตอบการร้องขอ.</translation>
+        <translation>ไม่สามารถย้ายกล้อง (s) ไปยังเซิร์ฟเวอร์อื่นได้ เซิร์ฟเวอร์%1 ไม่ตอบสนองการรร้องขอ.</translation>
     </message>
     <message>
         <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
-        <translation>%1  ของเซิร์ฟเวอร์ไม่สามารถค้นพบกล้องเหล่านี้เพื่อให้ห่างไกล คุณแน่ใจว่าคุณต้องการที่จะย้ายพวกเขา?</translation>
+        <translation>%1  ของเซิร์ฟเวอร์ไม่สามารถค้นพบกล้อง  คุณแน่ใจว่าคุณต้องการที่จะย้ายพวกเขา?</translation>
     </message>
     <message>
         <source>Layout is locked and cannot be changed.</source>
@@ -6369,15 +6426,15 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Cannot add item</source>
-        <translation>ไม่สามารถเพิ่มรายการ</translation>
+        <translation>ไม่สามารถเพิ่มรายการได้</translation>
     </message>
     <message>
         <source>Cannot add a local file to Multi-Video</source>
-        <translation>ไม่สามารถเพิ่มไฟล์ในท้องถิ่นไปยังหลายวิดีโอ</translation>
+        <translation>ไม่สามารถเพิ่มไฟล์ในเครื่องไปหลายวิดีโอได้</translation>
     </message>
     <message>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation>ทั้งหมดได้รับการสนับสนุน (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+        <translation>สกุลไฟล์ที่รองรับทั้งหมด (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
@@ -6425,7 +6482,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>กล้องมีอยู่แล้วในความคืบหน้า คุณแน่ใจว่าคุณต้องการที่จะยกเลิกการดำเนินการในปัจจุบัน?</translation>
+        <translation>กล้องอยู่ใน การดำเนินการ คุณแน่ใจว่าคุณต้องการที่จะยกเลิกการดำเนินการในปัจจุบัน?</translation>
     </message>
     <message>
         <source>Delete Files</source>
@@ -6453,15 +6510,15 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Video Wall already exists</source>
-        <translation>วีดีโอที่มีอยู่แล้ว</translation>
+        <translation>จอแสดงผลวีดีโอ มีอยู่แล้ว</translation>
     </message>
     <message>
         <source>User with the same name already exists</source>
-        <translation>ผู้ใช้ที่มีชื่อเดียวกันมีอยู่แล้ว</translation>
+        <translation>มีชื่อผู้ใช้งานเดียวกัน ใช้งานอยู่แล้ว</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists</source>
-        <translation>วีดีโอที่มีชื่อเดียวกันมีอยู่แล้ว</translation>
+        <translation>จอแสดงผลวีดีโอ มีชื่อผู้ใช้งานเดียวกัน ใช้งานอยู่แล้ว</translation>
     </message>
     <message>
         <source>Rename</source>
@@ -6483,19 +6540,15 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>User Settings</source>
-        <translation>ตั้งค่าผู้ใช้</translation>
+        <translation>ตั้งค่าผู้ใช้งาน</translation>
     </message>
     <message>
         <source>Updating background</source>
-        <translation>การอัปเดตพื้นหลัง</translation>
+        <translation>การอัพเดทพื้นหลัง</translation>
     </message>
     <message>
         <source>Image processing can take a lot of time. Please be patient.</source>
-        <translation>การประมวลผลภาพสามารถใช้เวลามาก กรุณารอสักครู่.</translation>
-    </message>
-    <message>
-        <source>Image cannot be uploaded</source>
-        <translation>ภาพไม่สามารถอัปโหลด</translation>
+        <translation>การประมวลผลภาพใช้เวลามาก กรุณารอสักครู่.</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items.</source>
@@ -6510,7 +6563,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
-            <numerusform>ไม่สามารถบันทึกการเปลี่ยนแปลงที่เกิดขึ้นกับทรัพยากรต่อไปนี้ n%n (s).</numerusform>
+            <numerusform>ไม่สามารถบันทึกการเปลี่ยนแปลงที่เกิดขึ้นกับทรัพยากรต่อไปนี้ %n (s).</numerusform>
         </translation>
     </message>
     <message>
@@ -6527,7 +6580,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>บางส่วนของระบบจะไม่ปรับปรุง: &lt;br/&gt; %1 &lt;br/&gt; โปรดอัปเดตทุกองค์ประกอบที่จะ รุ่นล่าสุด %2.</translation>
+        <translation>บางส่วนของระบบจะไม่อัพเดท: &lt;br/&gt; %1 &lt;br/&gt; โปรดทำการอัพเดตทุกองค์ประกอบจาก รุ่นล่าสุด %2.</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -6535,15 +6588,15 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Update...</source>
-        <translation>อัปเดต ...</translation>
+        <translation>อัพเดต ...</translation>
     </message>
     <message>
         <source>Beta version %1</source>
-        <translation>รุ่น Beta %1</translation>
+        <translation>รุ่น ทดสอบ %1</translation>
     </message>
     <message>
         <source>You are running beta version of %1.</source>
-        <translation>คุณกำลังเรียกใช้รุ่นเบต้าของ %1.</translation>
+        <translation>คุณกำลังเรียกใช้ รุ่นทดสอบ ของ %1.</translation>
     </message>
     <message>
         <source>Launcher process is not found</source>
@@ -6585,16 +6638,24 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while uploading picture.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
         <source>Error</source>
-        <translation>ผิดพลาด</translation>
+        <translation>เกิดข้อผิดพลาด</translation>
     </message>
     <message>
         <source>Bookmark can only be added to an online server.</source>
-        <translation>บุ๊คมาร์ค เท่านั้นที่สามารถเพิ่มไปยังเซิร์ฟเวอร์ออนไลน์.</translation>
+        <translation>บุ๊คมาร์ค สามารถเพิ่มไปยังเซิร์ฟเวอร์ออนไลน์.</translation>
     </message>
     <message>
         <source>Bookmark</source>
@@ -7142,11 +7203,11 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation>หมายเหตุ</translation>
     </message>
     <message>
-        <source>Please update %1 Client.</source>
+        <source>New version %1 is available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New version %1 is available.</source>
+        <source>Please update %1 Client.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7158,11 +7219,11 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Error</source>
-        <translation>ความผิดพลาด</translation>
+        <translation>เกิดข้อผิดพลาด</translation>
     </message>
     <message>
         <source>Unexpected error has occurred. Changes cannot be saved.</source>
-        <translation>ข้อผิดพลาดที่ไม่คาดคิดได้เกิดขึ้น การเปลี่ยนแปลงไม่สามารถบันทึกได้.</translation>
+        <translation>เกิดข้อผิดพลาดที่ไม่คาดคิดขึ้น การเปลี่ยนแปลงไม่สามารถบันทึกได้.</translation>
     </message>
     <message>
         <source>There are no offline videowall items attached to this pc.</source>
@@ -7178,7 +7239,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>More licenses required</source>
-        <translation>ต้องการใบอนุญาติเพิ่มเติม</translation>
+        <translation>ต้องการสิทธ์เพิ่มเติม</translation>
     </message>
     <message>
         <source>To enable the feature please activate at least one Video Wall license.</source>
@@ -7202,31 +7263,31 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation>เมื่อต้องการเปิดใช้งานคุณลักษณะกรุณาเปิดใช้งานอย่างน้อยหนึ่งใบอนุญาตของ Video Wall</translation>
+        <translation>เมื่อต้องการเปิดใช้งานเพิ่มกรุณาเปิดใช้งานใบอนุญาตของจอแสดงผล</translation>
     </message>
     <message>
         <source>Video Wall</source>
-        <translation>วีดีโอ Wall</translation>
+        <translation>จอแสดงผล</translation>
     </message>
     <message>
         <source>Video Wall %1</source>
-        <translation>วีดีโอ Wall %1</translation>
+        <translation>จอแสดงผลl %1</translation>
     </message>
     <message>
         <source>New Video Wall...</source>
-        <translation>สร้าง Video Wall...</translation>
+        <translation>สร้างจอแสดงผลใหม่...</translation>
     </message>
     <message>
         <source>Enter the name of the Video Wall to create:</source>
-        <translation>ใส่ชื่อของ Video Wall ของการสร้าง:</translation>
+        <translation>ใส่ชื่อของจอแสดงผล ของการสร้าง:</translation>
     </message>
     <message>
         <source>Video Wall already exists</source>
-        <translation>Video Wall มีอยู่แล้ว</translation>
+        <translation>จอแสดงผลl มีอยู่แล้ว</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists</source>
-        <translation>Video Wall มีชื่อเดียวกันกับที่มีอยู่แล้ว</translation>
+        <translation>จอแสดงผล มีชื่อเดียวกันกับที่มีอยู่แล้ว</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7246,11 +7307,11 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Could not start Video Wall.</source>
-        <translation>ไม่สามารถเริ่ม Video Wall.</translation>
+        <translation>ไม่สามารถเริ่ม จอแสดงผล.</translation>
     </message>
     <message>
         <source>Confirm Video Wall stop</source>
-        <translation>ยืนยันการหยุดของ Video Wall</translation>
+        <translation>ยืนยันการหยุดของ จอแสดงผล</translation>
     </message>
     <message>
         <source>New Matrix %1</source>
@@ -7299,7 +7360,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Please wait while connection is being restored...</source>
-        <translation>โปรดรอสักครู่ในขณะที่การเชื่อมต่อจะถูกคืนค่า ...</translation>
+        <translation>โปรดรอสักครู่ในขณะที่การเชื่อมต่อจะถูกเรียกคืน...</translation>
     </message>
 </context>
 <context>
@@ -7508,7 +7569,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Ping</source>
-        <translation>ทดสอบ</translation>
+        <translation>Ping ทดสอบ</translation>
     </message>
     <message>
         <source>Port:</source>
@@ -7594,7 +7655,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <name>SingleCameraSettingsWidget</name>
     <message>
         <source>Camera settings</source>
-        <translation>การตั้งค่ากล้อง</translation>
+        <translation>การตั้งค่าของกล้อง</translation>
     </message>
     <message>
         <source>General</source>
@@ -7622,11 +7683,11 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Ping</source>
-        <translation>ทดสอบ</translation>
+        <translation>Ping ทดสอบ</translation>
     </message>
     <message>
         <source>Web Page:</source>
-        <translation>หน้าเว็บ:</translation>
+        <translation>เว็บเพจ:</translation>
     </message>
     <message>
         <source>IP Address:</source>
@@ -7662,15 +7723,15 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Licensing</source>
-        <translation>การออกใบอนุญาต</translation>
+        <translation>การออกไลเซ็นส์</translation>
     </message>
     <message>
         <source>Use an analog license to view this camera</source>
-        <translation>ใช้ใบอนุญาตเพื่อดูกล้องนี้</translation>
+        <translation type="unfinished">ใช้ใบไลเซ็นส์อนาล๊อกเ พื่อดูกล้องนี้</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation>ได้รับอนุญาตเพิ่มเติม ...</translation>
+        <translation>ต้องการไลเซ็นส์เพิ่ม ...</translation>
     </message>
     <message>
         <source>Enable audio</source>
@@ -7749,7 +7810,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <name>SmtpSettingsWidget</name>
     <message>
         <source>Outgoing Email Settings</source>
-        <translation>การตั้งค่าอีเมลขาออก</translation>
+        <translation>การตั้งค่าอีเมล์ขาออก</translation>
     </message>
     <message>
         <source>Advanced settings...</source>
@@ -7761,7 +7822,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>&amp;Email:</source>
-        <translation>&amp;Email:</translation>
+        <translation>&amp;อีเมล์l:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
@@ -7769,15 +7830,15 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>&amp;System Signature:</source>
-        <translation>&amp;ระบบลายเซ็น:</translation>
+        <translation>&amp;ลายเซ็นระบบ:</translation>
     </message>
     <message>
         <source>Enter short system description here...</source>
-        <translation>ป้อนคำอธิบายสั้น ๆ ระบบที่นี่ ...</translation>
+        <translation>ป้อนรายละเอียดของระบบสั้น ๆ ที่นี่ ...</translation>
     </message>
     <message>
         <source>Support Signature:</source>
-        <translation>ลายเซ็นสนับสนุน:</translation>
+        <translation>ลายเซ็นทีมช่วยเหลือ:</translation>
     </message>
     <message>
         <source>SMTP &amp;Server:</source>
@@ -7785,11 +7846,11 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>&amp;User:</source>
-        <translation>&amp;ชื่อ:</translation>
+        <translation>&amp;ผู้ใช้งาน:</translation>
     </message>
     <message>
         <source>Email:</source>
-        <translation>อีเมลล์:</translation>
+        <translation>อีเมล์:</translation>
     </message>
     <message>
         <source>P&amp;ort:</source>
@@ -7829,7 +7890,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Result:</source>
-        <translation>ผล:</translation>
+        <translation>เหตุผล:</translation>
     </message>
     <message>
         <source>OK</source>
@@ -7871,7 +7932,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Login:</source>
-        <translation>ลงชื่อผู้ใช้:</translation>
+        <translation>ชื่อผู้ใช้:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -7897,7 +7958,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <name>UserSettingsDialog</name>
     <message>
         <source>Create New User</source>
-        <translation>สร้างผู้ใช้ใหม่</translation>
+        <translation>สร้างผู้ใช้งานใหม่</translation>
     </message>
     <message>
         <source>User Properties</source>

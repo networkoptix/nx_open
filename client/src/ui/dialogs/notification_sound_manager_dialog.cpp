@@ -72,7 +72,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     QString title;
 
     dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
-    dialog->addLineEdit(tr("Custom Title:"), &title); // TODO: #Elric #TR no caps in 2nd word
+    dialog->addLineEdit(tr("Custom title:"), &title);
     if(!dialog->exec())
         return;
 

@@ -41,8 +41,9 @@ QList<QByteArray> getCompatibleHardwareIds(int guidCompatibility)
 
 namespace LLUtil
 {
-void fillHardwareIds(QList<QByteArray>& hardwareIds)
+void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings)
 {
+    Q_UNUSED(settings)
     #define MAX_HWID_SIZE 1024
 
     char buf[MAX_HWID_SIZE];

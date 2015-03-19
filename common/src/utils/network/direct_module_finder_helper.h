@@ -13,6 +13,7 @@ typedef QSet<QUrl> QnUrlSet;
 
 class QnModuleFinder;
 class QnMulticastModuleFinder;
+class SocketAddress;
 struct QnModuleInformation;
 
 class QnDirectModuleFinderHelper : public Connective<QObject> {
@@ -22,12 +23,14 @@ class QnDirectModuleFinderHelper : public Connective<QObject> {
 public:
     explicit QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder);
 
+    void setForcedUrls(const QSet<QUrl> &forcedUrls);
+
 private slots:
     void at_resourceAdded(const QnResourcePtr &resource);
     void at_resourceRemoved(const QnResourcePtr &resource);
     void at_resourceChanged(const QnResourcePtr &resource);
     void at_resourceAuxUrlsChanged(const QnResourcePtr &resource);
-    void at_responseReceived(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void at_timer_timeout();
 
 private:
@@ -39,6 +42,7 @@ private:
 
     QHash<QUrl, int> m_urls;
     QHash<QUrl, int> m_ignoredUrls;
+    QSet<QUrl> m_forcedUrls;
 
     QHash<QnUuid, QnUrlSet> m_serverUrlsById;
     QHash<QnUuid, QnUrlSet> m_additionalServerUrlsById;

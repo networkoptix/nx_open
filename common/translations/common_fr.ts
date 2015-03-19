@@ -15,26 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnAbstractStorageResource</name>
-    <message>
-        <source>Windows Network Shared Resource</source>
-        <translation>Ressource partagé de réseau Windows</translation>
-    </message>
-    <message>
-        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>\\&lt;Nom Ordinateur&gt;\&lt;Dossier&gt;</translation>
-    </message>
-    <message>
-        <source>Coldstore Network Storage</source>
-        <translatorcomment>There&apos;s no word in French for ColdStore, we&apos;ve added (NAS) for explanation purpose</translatorcomment>
-        <translation>Stockage réseau &apos;ColdStore&apos; (NAS)</translation>
-    </message>
-    <message>
-        <source>coldstore://&lt;Address&gt;</source>
-        <translation>coldstore://&lt;Adresse&gt;</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>User Defined (%1)</source>

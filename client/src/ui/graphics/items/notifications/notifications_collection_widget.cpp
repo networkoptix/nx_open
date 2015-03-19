@@ -212,7 +212,12 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventAdded,   this,   &QnNotificationsCollectionWidget::showSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
-    connect(this->context()->instance<QnAppServerNotificationCache>(), &QnAppServerNotificationCache::fileDownloaded, this, &QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded);
+    connect(this->context()->instance<QnAppServerNotificationCache>(), &QnAppServerNotificationCache::fileDownloaded, 
+        this, [this](const QString &filename, QnAppServerFileCache::OperationResult status) {
+            if (status != QnAppServerFileCache::OperationResult::ok)
+                return;
+            at_notificationCache_fileDownloaded(filename);
+    });
 }
 
 QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget() {
@@ -701,10 +706,7 @@ void QnNotificationsCollectionWidget::at_item_actionTriggered(Qn::ActionId actio
     menu()->trigger(actionId, parameters);
 }
 
-void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const QString &filename, bool ok) {
-    if (!ok)
-        return;
-
+void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const QString &filename) {
     QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
     foreach (QnNotificationWidget* item, m_itemsByLoadingSound.values(filename)) {
         item->setSound(filePath, true);

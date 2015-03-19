@@ -71,10 +71,8 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             QByteArray responseData;
             responseData.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-
-            QString sender;
-            quint16 senderPort;
-            int readed = sock->recvFrom(responseData.data(), responseData.size(), sender, senderPort);
+            SocketAddress remoteEndpoint;
+            int readed = sock->recvFrom(responseData.data(), responseData.size(), &remoteEndpoint);
             if (readed < 1)
                 continue;
             QList<QByteArray> params = responseData.left(readed).split(';');
@@ -102,7 +100,9 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 processedMac << mac;
 
                 resource->setMAC(QnMacAddress(mac));
-                resource->setUrl(QLatin1String("tcp://") + sender + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]));
+                resource->setUrl(
+                    QLatin1String("tcp://") + remoteEndpoint.address.toString() + QLatin1Char(':') +
+                    QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]) );
                 resources.insert(mac, resource);
             }
         }

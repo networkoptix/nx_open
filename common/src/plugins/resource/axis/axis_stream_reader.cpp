@@ -222,7 +222,7 @@ bool QnAxisStreamReader::isStreamOpened() const
 QnMetaDataV1Ptr QnAxisStreamReader::getCameraMetadata()
 {
     QnMetaDataV1Ptr rez = m_lastMetadata != 0 ? m_lastMetadata : QnMetaDataV1Ptr(new QnMetaDataV1());
-    m_lastMetadata.clear();
+    m_lastMetadata.reset();
     if (rez)
         filterMotionByMask(rez);
     return rez;
@@ -259,7 +259,7 @@ void QnAxisStreamReader::processTriggerData(const quint8* payload, int len)
     }
 }
 
-void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
+void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoData* videoData)
 {
     const quint8* curNal = (const quint8*) videoData->data();
     const quint8* end = curNal + videoData->dataSize();
@@ -358,8 +358,7 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
         if (rez) 
         {
             if (rez->dataType == QnAbstractMediaData::VIDEO) {
-                QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
-                parseMotionInfo(videoData);
+                parseMotionInfo(static_cast<QnCompressedVideoData*>(rez.get()));
                 //if (isGotFrame(videoData))
                 break;
             }

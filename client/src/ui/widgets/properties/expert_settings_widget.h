@@ -28,6 +28,9 @@ private slots:
 
     void at_restoreDefaultsButton_clicked();
     void at_qualitySlider_valueChanged(int value);
+
+    void updateControlBlock();
+
 private:
     Qn::SecondStreamQuality sliderPosToQuality(int pos) const;
     int qualityToSliderPos(Qn::SecondStreamQuality quality);

@@ -540,13 +540,14 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             m_motionMap.remove(motionIndex);
         }
         else
-            outFrame->metadata.clear();
+            outFrame->metadata.reset();
 
+        PixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height || 
-            outFrame->format != m_context->pix_fmt || outFrame->linesize[0] != m_frame->linesize[0]))
+            outFrame->format != correctedPixelFormat || outFrame->linesize[0] != m_frame->linesize[0]))
         {
-            outFrame->reallocate(m_context->width, m_context->height, m_context->pix_fmt, m_frame->linesize[0]);
+            outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, m_frame->linesize[0]);
         }
 
         if (m_frame->interlaced_frame && m_context->thread_count > 1)
@@ -615,7 +616,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             outFrame->linesize[2] = copyFromFrame->linesize[2];
             outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
-        outFrame->format = GetPixelFormat();
+        outFrame->format = correctedPixelFormat;
         outFrame->sample_aspect_ratio = getSampleAspectRatio();
         return m_context->pix_fmt != PIX_FMT_NONE;
     }

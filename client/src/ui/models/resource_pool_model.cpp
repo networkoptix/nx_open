@@ -575,6 +575,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
         connect(camera,     &QnVirtualCameraResource::groupIdChanged,   this,   &QnResourcePoolModel::at_resource_parentIdChanged);
         connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
+        connect(camera,     &QnVirtualCameraResource::statusFlagsChanged, this, &QnResourcePoolModel::at_resource_resourceChanged);
         auto updateParent = [this](const QnResourcePtr &resource) {
             /* Automatically update display name of the EDGE server if its camera was renamed. */
             QnResourcePtr parent = resource->getParentResource();
@@ -603,7 +604,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (server) {
         m_rootNodes[Qn::OtherSystemsNode]->update();
         for (const QnResourcePtr &resource: qnResPool->getResourcesByParentId(server->getId())) {
-            if (m_itemNodeByUuid.contains(resource->getId()))
+            if (m_resourceNodeByResource.contains(resource))
                 at_resource_parentIdChanged(resource);
         }
     }

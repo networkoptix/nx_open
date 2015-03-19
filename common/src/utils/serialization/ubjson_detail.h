@@ -137,6 +137,10 @@ namespace QnUbjsonDetail {
             return true;
         }
 
+        bool readBytes(int size, char *target) {
+            return m_stream.read(target, size) == size;
+        }
+
         bool readBytes(int size, QByteArray *target) {
             const int chunkSize = 16 * 1024 * 1024;
             if(size < chunkSize) {

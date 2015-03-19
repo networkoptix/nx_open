@@ -75,8 +75,6 @@ QnUuid QnUuid::fromRfc4122( const QByteArray& bytes )
 {
     QnUuid _uuid;
     _uuid.m_uuid = QUuid::fromRfc4122( bytes );
-    if( !bytes.isEmpty() )
-        _uuid.m_rfc4122Representation = bytes;
     return _uuid;
 }
 

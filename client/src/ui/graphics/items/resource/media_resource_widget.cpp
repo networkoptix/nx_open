@@ -952,8 +952,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         
     }
 
-    //TODO: #Elric #TR are you sure this string must be translatable???
-    return tr("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
+    return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
         .arg(size.width())
         .arg(size.height())
         .arg(fps, 0, 'f', 2)

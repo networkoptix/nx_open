@@ -150,7 +150,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     }
 
     
-    const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(nonConstData.data());
+    const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(nonConstData.get());
     if (media) {
         QMutexLocker lock(&m_queueSizeMutex);
         m_queuedSize += media->dataSize();
@@ -205,9 +205,9 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
     m_lastMediaTime = media->timestamp;
 
     Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
-    QnConstMetaDataV1Ptr metaData = qSharedPointerDynamicCast<const QnMetaDataV1>(media);
+    QnConstMetaDataV1Ptr metaData = std::dynamic_pointer_cast<const QnMetaDataV1>(media);
     if (metaData) {
-        m_dualStreamingHelper->onMotion(metaData.data());
+        m_dualStreamingHelper->onMotion(metaData.get());
         qint64 motionTime = m_dualStreamingHelper->getLastMotionTime();
         if (!metaData->isEmpty()) {
             updateMotionStateInternal(true, metaData->timestamp, metaData);
@@ -269,7 +269,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     QnScheduleTask task = currentScheduleTask();
 
     const QnSecurityCamResource* camera = static_cast<const QnSecurityCamResource*>(m_device.data());
-    const QnMetaDataV1* metaData = dynamic_cast<const QnMetaDataV1*>(media.data());
+    const QnMetaDataV1* metaData = dynamic_cast<const QnMetaDataV1*>(media.get());
 
     if (m_catalog == QnServer::LowQualityCatalog && !metaData && !m_useSecondaryRecorder)
     {
@@ -471,7 +471,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 
 bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!media)
         return true; // skip data
 

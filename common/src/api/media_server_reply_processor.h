@@ -33,7 +33,7 @@ public:
     virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
 
 signals:
-    void finished(int status, const QnRebuildArchiveReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnStorageScanData &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraListReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnStorageStatusReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnStorageSpaceReply &reply, int handle, const QString &errorString);

@@ -13,7 +13,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <utils/common/product_features.h>
-#include <api/runtime_info_manager.h>
 
 
 QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
@@ -58,23 +57,6 @@ QnUuid QnCommonModule::remoteGUID() const {
     return m_remoteUuid;
 }
 
-void QnCommonModule::setLocalSystemName(const QString &value) {
-    if (m_localSystemName == value)
-        return;
-
-    {
-        QMutexLocker lk(&m_mutex);
-        m_localSystemName = value;
-    }
-    emit systemNameChanged(m_localSystemName);
-}
-
-QString QnCommonModule::localSystemName() const
-{
-    QMutexLocker lk(&m_mutex);
-    return m_localSystemName;
-}
-
 QnSoftwareVersion QnCommonModule::engineVersion() const {
     QMutexLocker lk(&m_mutex);
     return m_engineVersion;
@@ -85,20 +67,49 @@ void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
     m_engineVersion = version;
 }
 
-void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation) {
-    QMutexLocker lk(&m_mutex);
-    m_moduleInformation = moduleInformation;
+void QnCommonModule::setLocalSystemName(const QString& value)
+{
+    QnModuleInformation info = moduleInformation();
+    info.systemName = value;
+    setModuleInformation(info);
 }
 
-QnModuleInformationEx QnCommonModule::moduleInformation() const
+QString QnCommonModule::localSystemName() const
 {
-    QnModuleInformationEx moduleInformationCopy;
+    return moduleInformation().systemName;
+}
+
+void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation)
+{
+    bool isSystemNameChanged = false;
+    {
+        QMutexLocker lk(&m_mutex);
+        if (m_moduleInformation == moduleInformation)
+            return;
+
+        isSystemNameChanged = m_moduleInformation.systemName != moduleInformation.systemName;
+        m_moduleInformation = moduleInformation;
+    }
+    if (isSystemNameChanged)
+        emit systemNameChanged(moduleInformation.systemName);
+    emit moduleInformationChanged();
+}
+
+QnModuleInformation QnCommonModule::moduleInformation() const
+{
+    QMutexLocker lk(&m_mutex);
+    return m_moduleInformation;
+}
+
+/*
+QnModuleInformation QnCommonModule::moduleInformation() const
+{
+    QnModuleInformation moduleInformationCopy;
     {
         QMutexLocker lk(&m_mutex);
         moduleInformationCopy = m_moduleInformation;
-        moduleInformationCopy.systemName = m_localSystemName;
-        moduleInformationCopy.runtimeId = QnRuntimeInfoManager::instance()->localInfo().uuid;
     }
+    moduleInformationCopy.runtimeId = runningInstanceGUID();
     //filling dynamic fields
     if (qnResPool) {
         moduleInformationCopy.remoteAddresses.clear();
@@ -133,6 +144,7 @@ QnModuleInformationEx QnCommonModule::moduleInformation() const
 
     return moduleInformationCopy;
 }
+*/
 
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);

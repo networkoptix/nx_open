@@ -6,11 +6,15 @@
 #include <QtWidgets/QPushButton>
 #include <QtGui/QDesktopServices>
 
+#include <api/global_settings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+
 #include <client/client_settings.h>
 #include <common/common_module.h>
 #include <update/update_checker.h>
+
+#include <ui/actions/action_manager.h>
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -59,13 +63,16 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
     if (!m_timer->isActive())
         return;
 
+    if (!menu()->canTrigger(Qn::SystemUpdateAction))
+        return;
+
     if (m_latestVersion == updateVersion || qnSettings->ignoredUpdateVersion() >= updateVersion || qnCommon->engineVersion() >= updateVersion)
         return;
 
-    m_latestVersion = updateVersion;
-
-    if (!qnSettings->isAutoCheckForUpdates())
+    if (!QnGlobalSettings::instance()->isUpdateNotificationsEnabled())
         return;
+
+    m_latestVersion = updateVersion;
 
     QnSoftwareVersion current = qnCommon->engineVersion();
     bool majorVersionChange = updateVersion.major() > current.major() || updateVersion.minor() > current.minor();

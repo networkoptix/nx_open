@@ -103,7 +103,7 @@ QnAbstractMediaDataPtr QnStardotStreamReader::getNextData()
 
     if (rez) {
         if (rez->dataType == QnAbstractMediaData::VIDEO)
-            parseMotionInfo(rez.dynamicCast<QnCompressedVideoData>());
+            parseMotionInfo(std::dynamic_pointer_cast<QnCompressedVideoData>(rez));
     }
     else {
         closeStream();
@@ -205,8 +205,7 @@ QnMetaDataV1Ptr QnStardotStreamReader::getCameraMetadata()
         if (mask)
             m_lastMetadata->removeMotion(mask);
 
-        rez = m_lastMetadata;
-        m_lastMetadata.clear();
+        rez.swap( m_lastMetadata );
     }
     return rez;
 

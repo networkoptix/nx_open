@@ -3,11 +3,12 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include <chrono>
 #include <condition_variable>
 #include <mutex>
 
 #include <gtest/gtest.h>
+
+#include <QtCore/QElapsedTimer>
 
 #include <utils/network/time/multiple_internet_time_fetcher.h>
 #include <utils/network/time/time_protocol_client.h>
@@ -31,7 +32,8 @@ TEST( InternetTimeFetcher, genericTest )
     bool done = false;
     std::vector<qint64> utcMillis;
 
-    const auto timerStart = std::chrono::steady_clock::now();
+    QElapsedTimer et;
+    et.restart();
 
     for( int i = 0; i < 10; ++i )
     {
@@ -52,14 +54,11 @@ TEST( InternetTimeFetcher, genericTest )
 
     ASSERT_GT( utcMillis.size(), 0 );
 
-    const auto elapsedMillis = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - timerStart);
-
     qint64 minTimestamp = std::numeric_limits<qint64>::max();
     for( qint64 ts: utcMillis )
     {
         if( ts < minTimestamp )
             minTimestamp = ts;
-        ASSERT_TRUE( abs(ts - minTimestamp) < (elapsedMillis.count() * 2) );
+        ASSERT_TRUE( abs(ts - minTimestamp) < (et.elapsed() * 2) );
     }
 }

@@ -117,7 +117,8 @@ void QnDirectModuleFinder::activateRequests() {
     while (m_activeRequests.size() < m_maxConnections && !m_requestQueue.isEmpty()) {
         QUrl url = m_requestQueue.dequeue();
 
-        m_lastCheckByUrl[trimmedUrl(url)] = m_elapsedTimer.elapsed();
+        qint64 time = m_elapsedTimer.elapsed();
+        m_lastCheckByUrl[trimmedUrl(url)] = time;
 
         nx_http::AsyncHttpClientPtr client = std::make_shared<nx_http::AsyncHttpClient>();
         std::unique_ptr<QnAsyncHttpClientReply> reply( new QnAsyncHttpClientReply(client, this) );
@@ -152,7 +153,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 
     QnJsonRestResult result;
     QJson::deserialize(data, &result);
-    QnModuleInformationEx moduleInformation;
+    QnModuleInformation moduleInformation;
     QJson::deserialize(result.reply(), &moduleInformation);
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
@@ -166,9 +167,13 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
         return;
 
+    if (moduleInformation.port != url.port())
+        return;
+
+    moduleInformation.fixRuntimeId();
     m_lastPingByUrl[url] = m_elapsedTimer.elapsed();
 
-    emit responseReceived(moduleInformation, url);
+    emit responseReceived(moduleInformation, SocketAddress(url.host(), url.port()));
 }
 
 void QnDirectModuleFinder::at_checkTimer_timeout() {
@@ -186,4 +191,5 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
         }
         enqueRequest(url);
     }
+    activateRequests();
 }
