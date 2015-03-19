@@ -572,7 +572,7 @@ QnResourceList QnResourcePool::getAllIncompatibleResources() const {
 }
 
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QnUuid &uuid) const {
-    QMutexLocker lk( &m_resourcesMtx );
+    SCOPED_MUTEX_LOCK( lk, &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
         if (!videoWall || !videoWall->items()->hasItem(uuid))
@@ -593,7 +593,7 @@ QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QnU
 }
 
 QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const QnUuid &uuid) const {
-    QMutexLocker lk( &m_resourcesMtx );
+    SCOPED_MUTEX_LOCK( lk, &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
         if (!videoWall || !videoWall->matrices()->hasItem(uuid))
@@ -616,6 +616,6 @@ QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QLis
 
 void QnResourcePool::invalidateCache()
 {
-    QMutexLocker lk( &m_resourcesMtx );
+    SCOPED_MUTEX_LOCK( lk, &m_resourcesMtx );
     m_cachedServerList.clear();
 }

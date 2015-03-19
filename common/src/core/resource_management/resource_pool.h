@@ -73,7 +73,7 @@ public:
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources(const QVector<QnUuid>& idList) const {
-        QMutexLocker locker(&m_resourcesMtx);
+        SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
         for (const auto& id: idList) {
             const auto itr = m_resources.find(id);

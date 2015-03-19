@@ -52,9 +52,10 @@ private:
     };
     QnStorageManager* m_owner;
     CLThreadQueue<ScanData> m_scanTasks;
-    QMutex m_mutex;
-    QWaitCondition m_waitCond;
+    QnMutex m_mutex;
+    QnWaitCondition m_waitCond;
     bool m_fullScanCanceled;
+
 public:
     ScanMediaFilesTask(QnStorageManager* owner): QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
     {
@@ -68,7 +69,7 @@ public:
         if (m_scanTasks.isEmpty())
             m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, QString(), 0.0));
 
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK( lock, &m_mutex );
         m_scanTasks.push(std::move(scanData));
         m_waitCond.wakeAll();
     }
@@ -104,7 +105,7 @@ public:
             }
 
             {
-                QMutexLocker lock(&m_mutex);
+                SCOPED_MUTEX_LOCK( lock, &m_mutex );
                 if (m_scanTasks.isEmpty()) {
                     m_waitCond.wait(&m_mutex, 100);
                     continue;
@@ -289,7 +290,7 @@ void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
 
 QnStorageScanData QnStorageManager::rebuildInfo() const
 {
-    QMutexLocker lock(&m_rebuildStateMtx);
+    SCOPED_MUTEX_LOCK( lock, &m_rebuildStateMtx );
     return m_archiveRebuildInfo;
 }
 
@@ -311,7 +312,7 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 
 void QnStorageManager::cancelRebuildCatalogAsync()
 {
-    QMutexLocker lock (&m_mutexRebuild);
+    SCOPED_MUTEX_LOCK( lock, &m_mutexRebuild );
     m_rebuildCancelled = true;
     m_rebuildArchiveThread->cancelFullScanTasks();
     NX_LOG("Catalog rebuild operation is canceled", cl_logINFO);
@@ -319,13 +320,13 @@ void QnStorageManager::cancelRebuildCatalogAsync()
 
 bool QnStorageManager::needToStopMediaScan() const
 {
-    QMutexLocker lock (&m_mutexRebuild);
+    SCOPED_MUTEX_LOCK( lock, &m_mutexRebuild );
     return m_rebuildCancelled && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan;
 }
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
-    QMutexLocker lock(&m_rebuildStateMtx);
+    SCOPED_MUTEX_LOCK( lock, &m_rebuildStateMtx );
     m_archiveRebuildInfo = data;
 }
 
@@ -1326,7 +1327,7 @@ void QnStorageManager::backupFolderRecursive(const QString& srcDir, const QStrin
 
 void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, QnStorageResourcePtr extraAllowedStorage)
 {
-    QMutexLocker lock(&m_csvMigrationMutex);
+    SCOPED_MUTEX_LOCK( lock, &m_csvMigrationMutex );
 
     QString base = closeDirPath(getDataDirectory());
     QString separator = getPathSeparator(base);

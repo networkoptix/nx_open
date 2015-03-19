@@ -59,7 +59,6 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_motionType(
         std::bind( &QnSecurityCamResource::calculateMotionType, this ),
         &m_mutex )
-
 {
     addFlags(Qn::live_cam);
 
@@ -736,7 +735,7 @@ bool QnSecurityCamResource::hasStatusFlags(Qn::CameraStatusFlag value) const
 
 void QnSecurityCamResource::setStatusFlags(Qn::CameraStatusFlags value) {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex );
         if(m_statusFlags == value)
             return;
         m_statusFlags = value;
@@ -746,7 +745,7 @@ void QnSecurityCamResource::setStatusFlags(Qn::CameraStatusFlags value) {
 
 void QnSecurityCamResource::addStatusFlags(Qn::CameraStatusFlag flag) {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex );
         Qn::CameraStatusFlags value = m_statusFlags | flag;
         if(m_statusFlags == value)
             return;
@@ -757,7 +756,7 @@ void QnSecurityCamResource::addStatusFlags(Qn::CameraStatusFlag flag) {
 
 void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag flag) {
     {
-        QMutexLocker locker(&m_mutex);
+        SCOPED_MUTEX_LOCK( locker, &m_mutex );
         Qn::CameraStatusFlags value = m_statusFlags & ~flag;
         if(m_statusFlags == value)
             return;

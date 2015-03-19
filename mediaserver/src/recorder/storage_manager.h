@@ -188,7 +188,7 @@ private:
     bool m_initInProgress;
     mutable QnMutex m_sdbMutex;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
-    mutable QMutex m_csvMigrationMutex;
+    mutable QnMutex m_csvMigrationMutex;
 };
 
 #define qnStorageMan QnStorageManager::instance()

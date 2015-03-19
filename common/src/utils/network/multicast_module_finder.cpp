@@ -61,7 +61,7 @@ QnMulticastModuleFinder::~QnMulticastModuleFinder() {
 }
 
 bool QnMulticastModuleFinder::isValid() const {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex );
     return !m_clientSockets.empty();
 }
 
@@ -74,7 +74,7 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
 }
 
 void QnMulticastModuleFinder::updateInterfaces() {
-    QMutexLocker lk(&m_mutex);
+    SCOPED_MUTEX_LOCK( lk, &m_mutex );
 
     QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
@@ -239,7 +239,7 @@ void QnMulticastModuleFinder::run() {
         currentClock = QDateTime::currentMSecsSinceEpoch();
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
-            QMutexLocker lk(&m_mutex);
+            SCOPED_MUTEX_LOCK( lk, &m_mutex );
 
             for (UDPSocket *socket: m_clientSockets) {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {

@@ -102,7 +102,7 @@ private:
     QSet<QString> m_ids;
 };
 
-typedef QSharedPointer<QnResourceGetParamsCommand> QnResourceGetParamsCommandPtr;
+typedef std::shared_ptr<QnResourceGetParamsCommand> QnResourceGetParamsCommandPtr;
 
 // -------------------------------------------------------------------------- //
 // QnResourceSetParamCommand
@@ -132,7 +132,7 @@ private:
     QString m_id;
     QString m_value;
 };
-typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+typedef std::shared_ptr<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 // -------------------------------------------------------------------------- //
 // QnResourceSetParamsCommand

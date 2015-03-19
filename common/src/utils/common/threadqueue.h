@@ -41,7 +41,7 @@ public:
 
     bool contains(const T& val) const
     { 
-        QMutexLocker mutex(&m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs );
         for (int i = 0; i < m_bufferLen; ++i) {
             if (atUnsafe(i) == val)
                 return true;
@@ -51,7 +51,7 @@ public:
 
     bool push(const T& val) 
     { 
-        SCOPED_MUTEX_LOCK( mutex, &m_cs);
+        SCOPED_MUTEX_LOCK( mutex, &m_cs );
 
 
         if ((uint)m_bufferLen == m_buffer.size())
