@@ -8,6 +8,7 @@
 #include "common/common_module.h"
 #include "route_builder.h"
 #include "module_finder.h"
+#include "api/app_server_connection.h"
 
 namespace {
     static const int runtimeDataUpdateTimeout = 3000;
@@ -44,22 +45,22 @@ QMultiHash<QnUuid, QnRouter::Endpoint> QnRouter::connections() const {
     return m_connections;
 }
 
-QHash<QnUuid, QnRoute> QnRouter::routes() const {
+QHash<QnUuid, QnOldRoute> QnRouter::routes() const {
     QMutexLocker lk(&m_mutex);
     return m_routeBuilder->routes();
 }
 
-QnRoute QnRouter::routeTo(const QnUuid &id, const QnUuid &via) const {
+QnOldRoute QnRouter::oldRouteTo(const QnUuid &id, const QnUuid &via) const {
     QMutexLocker lk(&m_mutex);
     return m_routeBuilder->routeTo(id, via);
 }
 
-QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
+QnOldRoute QnRouter::oldRouteTo(const QString &host, quint16 port) const {
     QnUuid id = whoIs(host, port);
     if (id.isNull())
-        return QnRoute();
+        return QnOldRoute();
 
-    QnRoute route = routeTo(id);
+    QnOldRoute route = oldRouteTo(id);
 
     /* Ensure the latest point is the requested point */
     if (route.isValid() && route.points.last().host != host) {
@@ -218,4 +219,23 @@ void QnRouter::updateRuntimeData(bool force) {
     runtimeInfoManager->updateLocalItem(localInfo);
 
     m_runtimeDataElapsedTimer->start();
+}
+
+QnRoute QnRouter::routeTo(const QnUuid &id)
+{
+    QnRoute result;
+    result.id = id;
+    result.addr = QnModuleFinder::instance()->preferredModuleAddress(id);
+    if (!result.addr.isNull())
+        return result; // direct access to peer
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return result; // no connection to the server, can't route
+    QnUuid routeVia = connection->routeToPeerVia(id);
+    if (routeVia == id || routeVia.isNull())
+        return result; // can't route
+    result.addr = QnModuleFinder::instance()->preferredModuleAddress(routeVia);
+    if (!result.addr.isNull())
+        result.gatewayId = routeVia; // route gateway is found
+    return result;
 }

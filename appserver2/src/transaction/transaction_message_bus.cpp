@@ -1422,7 +1422,7 @@ QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
     QMutexLocker lock(&m_mutex);
     const auto itr = m_alivePeers.find(dstPeer);
     if (itr == m_alivePeers.cend())
-        return dstPeer; // route info not found
+        return QnUuid(); // route info not found
     const AlivePeerInfo& peerInfo = itr.value();
     int minDistance = INT_MAX;
     QnUuid result;
@@ -1434,7 +1434,7 @@ QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
             result = itr2.key();
         }
     }
-    return result.isNull() ? dstPeer : result;
+    return result;
 }
 
 }

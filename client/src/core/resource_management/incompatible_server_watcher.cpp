@@ -20,7 +20,7 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnGlobalModuleIn
         QString address = addressList.first().toString();
         quint16 port = moduleInformation.port;
         if (QnRouter::instance()) {
-            QnRoute route = QnRouter::instance()->routeTo(moduleInformation.id, qnCommon->remoteGUID());
+            QnOldRoute route = QnRouter::instance()->oldRouteTo(moduleInformation.id, qnCommon->remoteGUID());
             if (route.isValid()) {
                 address = route.points.last().host;
                 port = route.points.last().port;

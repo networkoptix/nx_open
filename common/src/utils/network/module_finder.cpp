@@ -192,6 +192,12 @@ QSet<SocketAddress> QnModuleFinder::moduleAddresses(const QnUuid &id) const {
     return m_moduleItemById.value(id).addresses;
 }
 
+SocketAddress QnModuleFinder::preferredModuleAddress(const QnUuid &id) const
+{
+    QSet<SocketAddress> addrList = moduleAddresses(id);
+    return addrList.isEmpty() ? SocketAddress() : *addrList.begin();
+}
+
 void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem) {
     QnUuid id = m_idByAddress.take(address);
     if (id.isNull())

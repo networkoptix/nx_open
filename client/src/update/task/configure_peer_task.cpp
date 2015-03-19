@@ -57,7 +57,7 @@ void QnConfigurePeerTask::doStart() {
         /* Find the server to call marge and URL of the peer to be merged.
            We need to guarantee the route will go through a server from our system.
            For that we build route via our EC */
-        QnRoute route = router->routeTo(realId, qnCommon->remoteGUID());
+        QnOldRoute route = router->oldRouteTo(realId, qnCommon->remoteGUID());
         if (!route.isValid()) {
             m_failedPeers.insert(id);
             continue;

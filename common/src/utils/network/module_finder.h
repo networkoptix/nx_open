@@ -29,6 +29,7 @@ public:
 
     QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
     QSet<SocketAddress> moduleAddresses(const QnUuid &id) const;
+    SocketAddress preferredModuleAddress(const QnUuid &id) const;
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;

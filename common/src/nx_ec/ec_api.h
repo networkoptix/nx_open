@@ -1093,6 +1093,7 @@ namespace ec2
         virtual AbstractMiscManagerPtr getMiscManager() = 0;
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
         virtual AbstractTimeManagerPtr getTimeManager() = 0;
+        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer) const = 0;
 
         /*!
             \param handler Functor with params: (requestID, ErrorCode, QByteArray dbFile)

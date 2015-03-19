@@ -97,7 +97,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resour
 		if (id.isNull())
 			id = server->getId();
 
-        QnRoute route = QnRouter::instance()->routeTo(id);
+        QnOldRoute route = QnRouter::instance()->oldRouteTo(id);
         if (route.isValid()) {
             /* Requests to cameras should be always proxied.
                Requests to servers should be proxied wher the server is not directly available from the client. */

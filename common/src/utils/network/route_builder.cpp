@@ -46,20 +46,20 @@ void QnRouteBuilder::removeConnection(const QnUuid &from, const QnUuid &to, cons
     }
 }
 
-QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId, const QnUuid &via) {
+QnOldRoute QnRouteBuilder::routeTo(const QnUuid &peerId, const QnUuid &via) {
 	if (!via.isNull() && via != peerId && via != m_startId) {
-		QnRoute preRoute = buildRouteTo(via);
+		QnOldRoute preRoute = buildRouteTo(via);
 		if (!preRoute.isValid())
-			return QnRoute();
+			return QnOldRoute();
 
-		QnRoute postRoute = buildRouteTo(peerId, via);
+		QnOldRoute postRoute = buildRouteTo(peerId, via);
 		if (!postRoute.isValid())
-			return QnRoute();
+			return QnOldRoute();
 
 		return preRoute + postRoute;
 	}
 
-    QnRoute route = m_routes.value(peerId);
+    QnOldRoute route = m_routes.value(peerId);
     if (route.isValid())
         return route;
 
@@ -70,7 +70,7 @@ QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId, const QnUuid &via) {
     return route;
 }
 
-QHash<QnUuid, QnRoute> QnRouteBuilder::routes() const {
+QHash<QnUuid, QnOldRoute> QnRouteBuilder::routes() const {
     return m_routes;
 }
 
@@ -82,7 +82,7 @@ void QnRouteBuilder::setEnforcedConnection(const QnRoutePoint &enforcedConnectio
     m_enforcedConnection = enforcedConnection;
 }
 
-QnRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId, const QnUuid &from) {
+QnOldRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId, const QnUuid &from) {
     QHash<QnUuid, QnUuid> trace;
     QHash<QPair<QnUuid, QnUuid>, WeightedPoint> usedPoints;
     QQueue<QnUuid> points;
@@ -125,7 +125,7 @@ QnRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId, const QnUuid &from) {
                     id = source;
                 }
 
-                QnRoute route;
+                QnOldRoute route;
                 for (const WeightedPoint &point: points)
                     route.addPoint(point.first, point.second);
 
@@ -137,7 +137,7 @@ QnRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId, const QnUuid &from) {
         }
     }
 
-    return QnRoute();
+    return QnOldRoute();
 }
 
 QMultiHash<QnUuid, QnRouteBuilder::WeightedPoint>::iterator QnRouteBuilder::findConnection(const QnUuid &from, const QnRoutePoint &point) {

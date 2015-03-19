@@ -8,12 +8,22 @@
 #include <api/runtime_info_manager.h>
 #include <utils/common/singleton.h>
 #include <utils/network/route.h>
+#include "socket_common.h"
 
 class QnRouteBuilder;
 class QnModuleFinder;
 struct QnModuleInformation;
 class QElapsedTimer;
 class SocketAddress;
+
+struct QnRoute
+{
+    SocketAddress addr; // address for physical connect
+    QnUuid id;          // requested server ID
+    QnUuid gatewayId;   // proxy server ID. May be null
+
+    bool isValid() const { return !addr.isNull(); }
+};
 
 class QnRouter : public QObject, public Singleton<QnRouter> {
     Q_OBJECT
@@ -31,15 +41,18 @@ public:
     ~QnRouter();
 
     QMultiHash<QnUuid, Endpoint> connections() const;
-    QHash<QnUuid, QnRoute> routes() const;
+    QHash<QnUuid, QnOldRoute> routes() const;
 
-    QnRoute routeTo(const QnUuid &id, const QnUuid &via = QnUuid()) const;
-    QnRoute routeTo(const QString &host, quint16 port) const;
+    QnOldRoute oldRouteTo(const QnUuid &id, const QnUuid &via = QnUuid()) const;
+    QnOldRoute oldRouteTo(const QString &host, quint16 port) const;
 
     QnUuid whoIs(const QString &host, quint16 port) const;
 
     QnRoutePoint enforcedConnection() const;
     void setEnforcedConnection(const QnRoutePoint &enforcedConnection);
+
+    // todo: new routing functions below. We have to delete above functions
+    QnRoute routeTo(const QnUuid &id);
 
 signals:
     void connectionAdded(const QnUuid &discovererId, const QnUuid &peerId, const QString &host, quint16 port);

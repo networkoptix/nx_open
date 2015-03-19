@@ -99,6 +99,8 @@ public:
     {
         return address == rhs.address && port == rhs.port;
     }
+
+    bool isNull() const { return address == HostAddress() && port == 0; }
 };
 
 inline uint qHash(const SocketAddress &address) {

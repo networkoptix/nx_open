@@ -39,7 +39,7 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
 }
 
 void QnServerInterfaceWatcher::updatePriaryInterface(const QnMediaServerResourcePtr &server) {
-    QnRoute route = QnRouter::instance()->routeTo(server->getId());
+    QnOldRoute route = QnRouter::instance()->oldRouteTo(server->getId());
     if (!route.isValid())
         return;
 

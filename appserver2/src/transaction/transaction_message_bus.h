@@ -110,7 +110,10 @@ namespace ec2
         AlivePeersMap aliveClientPeers() const;
 
         /*
-        * Return routing information: how to access to dstPeer
+        * Return routing information: how to access to a dstPeer. 
+        * if peer can be access directly then return same value as input. 
+        * If can't find route info then return null value. 
+        * Otherwise return route gateway.
         */
         QnUuid routeToPeerVia(const QnUuid& dstPeer) const;
 
