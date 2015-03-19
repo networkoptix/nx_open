@@ -81,10 +81,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>at</source>
         <translation type="unfinished"></translation>
     </message>
@@ -101,15 +97,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&lt;Select at least one camera&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Comments:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -163,10 +163,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>IP, hostname, RTSP link...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -203,10 +199,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Manuf.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -236,6 +228,10 @@
     </message>
     <message>
         <source>New scan...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discovered Cameras:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -329,10 +325,6 @@
         <source>High quality</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message utf8="true">
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation type="unfinished"></translation>
@@ -375,6 +367,10 @@
     </message>
     <message>
         <source>Restore Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! Low quality may result in low resolution image.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -677,10 +673,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Auto pause video:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -701,15 +693,15 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Disable only if the client takes too much CPU.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Browse logs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Clear local cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart required</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -736,23 +728,11 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;Camera List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Ctrl+M</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -835,6 +815,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading image... Please wait.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;No image&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1085,11 +1069,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source> seconds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This option will not affect Recording Schedule.
-Recording Schedule is always based on Server Time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1434,49 +1413,47 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnAboutDialog</name>
     <message>
-        <source>Server at %2: v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Copy to Clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
-Built for %5-%6 with %7.&lt;br/&gt;
-</source>
+        <source>%1 uses the following external libraries:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</source>
+        <source>OpenGL version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br/&gt;
-&lt;br /&gt;
-&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
-&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
-&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
-&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
-&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
-&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
-</source>
+        <source>OpenGL renderer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</source>
+        <source>OpenGL vendor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br/&gt;
-&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;
-&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br/&gt;
-&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br/&gt;
-</source>
+        <source>OpenGL max texture size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Support&lt;/b&gt;: %1</source>
+        <source>Support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server at %2: v%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 version %2 (%3).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Built for %1-%2 with %3.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client is not connected to any server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1488,17 +1465,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Saving...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnAction</name>
-    <message>
-        <source>%n</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2599,31 +2565,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
 </context>
 <context>
-    <name>QnAutoTester</name>
-    <message>
-        <source>Time to wait before finishing the test, in milliseconds. Default is %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Substring that must be present in one of the resources.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show this help screen.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All tests completed successfully.
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Test for resource substring &apos;%1&apos; failed.
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnBlinkingImageButtonWidget</name>
     <message>
         <source>You have new notifications</source>
@@ -2839,11 +2780,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to reset rules to the defaults?
-This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2895,6 +2831,14 @@ This action CANNOT be undone!</source>
         <source>Unsaved changes will be lost. Save?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Are you sure you want to reset rules to the defaults?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
@@ -2942,11 +2886,6 @@ This action CANNOT be undone!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server is offline.
-Camera addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>First address in range is greater than the last one.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2973,21 +2912,6 @@ Camera addition is possible for online servers only.</source>
     <message>
         <source>Success</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n camera(s) added successfully.
-It might take a few moments to populate them in the tree.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Error while adding camera(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>Server went offline, search aborted.</source>
@@ -3051,14 +2975,39 @@ It might take a few moments to populate them in the tree.</source>
         <source>Select target server...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Examples:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server is offline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera addition is possible for online servers only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras added successfully.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>It might take a few moments to populate them in the tree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding %n cameras.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
-    <message>
-        <source>Please wait while settings are being loaded.
-This can take a lot of time.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Applying settings...</source>
         <translation type="unfinished"></translation>
@@ -3078,6 +3027,14 @@ This can take a lot of time.</source>
     <message>
         <source>Failed to save the following parameters (%1):
 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait while settings are being loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This can take a lot of time.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3466,13 +3423,6 @@ This can take a lot of time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You are trying to connect to incompatible Server.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3489,62 +3439,7 @@ If this error persists, please contact your VMS administrator.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - EC version: %2.
-You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Client version %3 is required to connect to this Server.
-Download version %3?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Would you like to restart the Client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot restart the Client in compatibility mode.
-Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3552,8 +3447,87 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to launch compatibility version %1
-Try to restore version %1?</source>
+        <source>Connection to the Server could not be established.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection details that you have entered are incorrect, please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this error persists, please contact your VMS administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> - Client version: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> - Server version: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Server which has a different version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These versions are not compatible. Please update your %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compatibility mode for versions lower than %1 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Server has a different version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to restart in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client version %1 is required to connect to this Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download version %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to restart the Client in compatibility mode?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot restart the Client in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to launch compatibility version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try to restore version %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server has a different version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will be asked to restart the client in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will be asked to update your %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3561,50 +3535,6 @@ Try to restore version %1?</source>
     <name>QnConnectionTestingDialog</name>
     <message>
         <source>Request timed out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are trying to connect to incompatible Server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Client</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3863,11 +3793,6 @@ These versions are not compatible. Please update your %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source> (%1 times)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3956,6 +3881,25 @@ These versions are not compatible. Please update your %3</source>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Disable only if the client takes too much CPU</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnGeneralSystemAdministrationWidget</name>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Camera List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnGenericTabbedDialog</name>
@@ -3968,8 +3912,7 @@ These versions are not compatible. Please update your %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unsaved changes will be lost. Save the following pages?
-</source>
+        <source>Unsaved changes will be lost. Save the following pages?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4080,6 +4023,14 @@ These versions are not compatible. Please update your %3</source>
     </message>
 </context>
 <context>
+    <name>QnLayoutTabBar</name>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnLicenseDetailsDialog</name>
     <message>
         <source>Screens Allowed:</source>
@@ -4183,38 +4134,7 @@ These versions are not compatible. Please update your %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>
-%1 %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>
-At least %n %2 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>
-%n %2 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Obtaining licenses from Server...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4223,11 +4143,6 @@ Please activate your commercial license.</source>
     </message>
     <message>
         <source>License Activation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Network error has occurred during automatic license activation.
-Try to activate your license manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4276,6 +4191,44 @@ Try to activate your license manually.</source>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %2 are required</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %2 are currently in use</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please activate your commercial or trial license.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please activate your commercial license.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try to activate your license manually.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4404,8 +4357,7 @@ Try to activate your license manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to delete the connection
-%1?</source>
+        <source>Are you sure you want to delete this connection: %1?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4465,6 +4417,10 @@ Try to activate your license manually.</source>
     </message>
     <message>
         <source>Crop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4542,13 +4498,6 @@ Try to activate your license manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Success!
-
-The system was configured successfully.
-The servers from the remote system should appear in your system soon.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>http(s)://host:port</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4614,6 +4563,18 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
     <message>
         <source>Cannot merge systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The system was configured successfully.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The servers from the remote system should appear in your system soon.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4800,7 +4761,11 @@ The servers from the remote system should appear in your system soon.</source>
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
-        <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right Click</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4900,21 +4865,23 @@ The servers from the remote system should appear in your system soon.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Settings file is read-only. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Settings cannot be saved. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file is read-only. Please contact your system administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All changes will be lost after program exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings cannot be saved. Please contact your system administrator.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4932,28 +4899,11 @@ All changes will be lost after program exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not set position for camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Remove preset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This preset is used in some tours.
-These tours will become invalid if you remove it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4970,6 +4920,26 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Changes are not saved. Do you want to save them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This preset is used in some tours.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These tours will become invalid if you remove it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5416,10 +5386,6 @@ These tours will become invalid if you remove it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Rebuild archive index</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5453,6 +5419,22 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Add external Storage...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to launch the archive re-synchronization routine.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5582,11 +5564,6 @@ These tours will become invalid if you remove it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot cancel update at this state.
-Please wait until update is finished</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Update finished... 100%</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5612,11 +5589,6 @@ Please wait until update is finished</source>
     </message>
     <message>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5751,6 +5723,22 @@ Please close the application and start it again using the shortcut in the start 
         <source>Installing updates... %1%</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cannot cancel update at this state.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait until update is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -5822,8 +5810,11 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to reset motion regions to the defaults?
-This action CANNOT be undone!</source>
+        <source>Are you sure you want to reset motion regions to the defaults?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6131,8 +6122,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>NO THUMBNAILS
-AVAILABLE</source>
+        <source>NO THUMBNAILS AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6530,24 +6520,6 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>These %n cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these %1 cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6583,12 +6555,6 @@ Are you sure you want to delete them?</source>
     </message>
     <message>
         <source>Could not delete resource</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. 
-
-Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -6634,9 +6600,42 @@ Error description: &apos;%2&apos;</source>
         <source>Launcher process is not found</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>These %n cameras are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
+        <source>They may be auto-discovered again after removing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these %1 cameras are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to delete a resource from Server. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error description: &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6771,12 +6770,6 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>AVI (*.avi)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6885,17 +6878,27 @@ Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export successfully finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not export video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6934,17 +6937,23 @@ Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Authentification failed.
-Please, check the password you have entered.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not configure the selected servers.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not update the selected servers.
-You can try to update the servers again in the System Administration.</source>
+        <source>Authentication failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please, check the password you have entered.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not update the selected servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7038,24 +7047,23 @@ You can try to update the servers again in the System Administration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&apos;Live&apos;</source>
-        <extracomment>Time slider&apos;s tooltip for position on live. Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for. That&apos;s where these single quotes come from.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>yyyy MMM dd
-hh:mm:ss</source>
+        <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <source>mm:ss</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for short local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <source>yyyy MMM dd</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live</source>
+        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7066,19 +7074,7 @@ hh:mm:ss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not set position for camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7087,6 +7083,18 @@ Please wait for the camera to go online.</source>
     </message>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7168,10 +7176,6 @@ Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Would you like to update?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7195,16 +7199,19 @@ Please wait for the camera to go online.</source>
         <source>Release Notes</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Please update %1 Client.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New version %1 is available.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
         <source>Control session is already running</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not start control session.
-Another user is already controlling this screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7306,11 +7313,6 @@ Another user is already controlling this screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?
-You&apos;ll have to start it manually.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Matrix %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7332,6 +7334,22 @@ You&apos;ll have to start it manually.</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Could not start control session.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Another user is already controlling this screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop the Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You&apos;ll have to start it manually.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7843,10 +7861,6 @@ You&apos;ll have to start it manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Secure connection using TLS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7884,6 +7898,10 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

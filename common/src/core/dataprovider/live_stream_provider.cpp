@@ -621,7 +621,7 @@ void QnLiveStreamProvider::extractSpsPps(
 
                 profileLevelID = QByteArray::fromRawData( (const char*)nalu.first + 1, 3 ).toHex();
                 spropParameterSets = NALUnit::decodeNAL( 
-                    QByteArray::fromRawData( (const char*)nalu.first, nalu.second ) ).toBase64() +
+                    QByteArray::fromRawData( (const char*)nalu.first, static_cast<int>(nalu.second) ) ).toBase64() +
                         "," + spropParameterSets;
                 break;
 
@@ -632,7 +632,7 @@ void QnLiveStreamProvider::extractSpsPps(
                     ppsFound = true;
 
                 spropParameterSets += NALUnit::decodeNAL( 
-                    QByteArray::fromRawData( (const char*)nalu.first, nalu.second ) ).toBase64();
+                    QByteArray::fromRawData( (const char*)nalu.first, static_cast<int>(nalu.second) ) ).toBase64();
                 break;
         }
     }

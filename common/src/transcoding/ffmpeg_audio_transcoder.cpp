@@ -159,7 +159,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         AVPacket avpkt;
         av_init_packet(&avpkt);
         avpkt.data = const_cast<quint8*>((const quint8*)media->data());
-        avpkt.size = media->dataSize();
+        avpkt.size = static_cast<int>(media->dataSize());
 
         int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
         // TODO: #vasilenko avoid using deprecated methods

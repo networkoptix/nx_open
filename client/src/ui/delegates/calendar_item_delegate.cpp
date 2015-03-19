@@ -13,6 +13,7 @@ namespace
 {
     enum FillType 
     {
+        kNoFill          = 0x0,
         kRecordingFill   = 0x1,
         kBookmarkFill    = 0x2,
         kMotionFill      = 0x4
@@ -26,10 +27,9 @@ namespace
 
     int fillType(const QnTimePeriod &period, const QnTimePeriodStorage &periodStorage) 
     {
-        enum { kNoFlag = 0 };
-        return ((periodStorage.periods(Qn::MotionContent).intersects(period) ? kMotionFill : kNoFlag)
-            | (periodStorage.periods(Qn::RecordingContent).intersects(period) ? kRecordingFill : kNoFlag)
-            | (periodStorage.periods(Qn::BookmarksContent).intersects(period) ? kBookmarkFill : kNoFlag));
+        return ((periodStorage.periods(Qn::MotionContent).intersects(period) ? kMotionFill : kNoFill)
+            | (periodStorage.periods(Qn::RecordingContent).intersects(period) ? kRecordingFill : kNoFill)
+            | (periodStorage.periods(Qn::BookmarksContent).intersects(period) ? kBookmarkFill : kNoFill));
     }
 
     bool paintBackground(int fillType
@@ -90,22 +90,20 @@ void QnCalendarItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     base_type::paint(painter, option, index);
 }
 
-void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette, const QRect &rect
-    , const QnTimePeriod &period, qint64 localOffset, const QnTimePeriod &enabledRange
-    , const QnTimePeriod &selectedRange, const QnTimePeriodStorage &primaryPeriods
-    , const QnTimePeriodStorage &secondaryPeriods, const QString &text) const 
+void QnCalendarItemDelegate::paintCell(QPainter *painter
+    , const QRect &rect
+    , const QnTimePeriod &localPeriod
+    , const QnTimePeriodStorage &primaryPeriods
+    , const QnTimePeriodStorage &secondaryPeriods
+    , bool isEnabled
+    , bool isSelected) const 
 {
-    assert(painter);
-    
-    const QnTimePeriod localPeriod(period.startTimeMs - localOffset, period.durationMs);
-    const bool isEnabled = enabledRange.intersects(localPeriod);
-    const bool isSelected = selectedRange.intersects(localPeriod);
+    const QnScopedPainterBrushRollback brushRollback(painter);
+    const QnScopedPainterPenRollback penRollback(painter);
+
     const int primaryFill = fillType(localPeriod, primaryPeriods);
     const int secondaryFill = fillType(localPeriod, secondaryPeriods);
     
-    const QnScopedPainterBrushRollback brushRollback(painter);
-    const QnScopedPainterPenRollback penRollback(painter);
-    const QnScopedPainterFontRollback fontRollback(painter);
 
     /* Draws the background - could be one of the recording or bookmark fill types*/
     if (!paintBackground(primaryFill, true, rect, m_colors, *painter))
@@ -140,13 +138,23 @@ void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palett
     painter->setPen(QPen(m_colors.separator, kPenWidth));
     painter->setBrush(Qt::NoBrush);
     painter->drawRect(rect);
+}
 
-    /* Text. */
+void QnCalendarItemDelegate::paintCellText(QPainter *painter
+    , const QPalette &palette
+    , const QRect &rect
+    , const QString &text
+    , bool isEnabled) const
+{
+    const QnScopedPainterPenRollback penRollback(painter);
+    const QnScopedPainterFontRollback fontRollback(painter);
+
     const QColor color = (isEnabled ? palette.color(QPalette::Active, QPalette::Text)
         : palette.color(QPalette::Disabled, QPalette::Text));
     QFont font = painter->font();
     font.setBold(isEnabled);
 
+    enum { kPenWidth = 1 };
     painter->setPen(QPen(color, kPenWidth));
     painter->setFont(font);
     painter->drawText(rect, Qt::AlignCenter, text);

@@ -2,6 +2,8 @@
 #include "utils/network/rtp_stream_parser.h"
 #include "common/common_module.h"
 
+#include <core/resource/param.h>
+
 extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/base64.h>

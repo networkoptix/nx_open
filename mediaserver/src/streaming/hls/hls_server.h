@@ -9,13 +9,13 @@
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
 
-#include <core/resource/media_resource.h>
 #include <utils/network/http/httpstreamreader.h>
 #include <utils/network/tcp_connection_processor.h>
 
 #include "hls_playlist_manager.h"
 #include "../streaming_chunk.h"
 
+#include <core/resource/resource_fwd.h>
 
 class QnVideoCamera;
 

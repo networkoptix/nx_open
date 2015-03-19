@@ -78,8 +78,10 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     QnResourceList& result,
     const QByteArray& responseData,
     const QHostAddress& discoveryAddress,
-    const QHostAddress& /*foundHostAddress*/ )
+    const QHostAddress& foundHostAddress )
 {
+    Q_UNUSED(discoveryAddress)
+    Q_UNUSED(foundHostAddress)
 
     QString smac;
     QString name;
@@ -104,8 +106,8 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     name.replace(QLatin1Char(' '), QString()); // remove spaces
     name.replace(QLatin1Char('-'), QString()); // remove spaces
     name.replace(QLatin1Char('\t'), QString()); // remove tabs
-    if (!name.toLower().contains(lit("iqa")))
-        return local_results; // any IQA camera MUST contain IQA prefix in the name
+    if (!name.toLower().startsWith(lit("iq")))
+        return local_results; // any IQA camera MUST contain IQ prefix in the name
 
     if (macpos+12 > responseData.size())
         return local_results;

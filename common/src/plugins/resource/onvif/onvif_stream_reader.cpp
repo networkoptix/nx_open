@@ -275,6 +275,9 @@ void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) c
     qDebug() << "Resolution: " << profile.VideoEncoderConfiguration->Resolution->Width << "x"
              << profile.VideoEncoderConfiguration->Resolution->Height;
     qDebug() << "FPS: " << profile.VideoEncoderConfiguration->RateControl->FrameRateLimit;
+#else
+    Q_UNUSED(profile)
+    Q_UNUSED(isPrimary)
 #endif
 }
 
@@ -492,7 +495,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
 
     if (!isCameraControlRequired()) {
         // TODO: #Elric need to untangle this evil.
-        m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
+        m_onvifRes->setPtzProfileToken(info.profileToken);
 
         return CameraDiagnostics::NoErrorResult();
     } else {

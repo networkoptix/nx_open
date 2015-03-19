@@ -18,6 +18,8 @@
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
 
+#include <platform/monitoring/global_monitor.h>
+#include <platform/platform_abstraction.h>
 #include <plugins/resource/server_archive/dualquality_helper.h>
 
 #include "plugins/storage/file_storage/file_storage_resource.h"
@@ -27,6 +29,7 @@
 #include "utils/common/synctime.h"
 #include "motion/motion_helper.h"
 #include "common/common_module.h"
+
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -176,9 +179,14 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
 
 void QnStorageManager::initDone()
 {
+    m_catalogLoaded = true;
+    m_rebuildProgress = 1.0;
+
     m_initInProgress = false;
-    for(const QnStorageResourcePtr& storage: getStorages())
-        addDataFromDatabase(storage);
+    for(const QnStorageResourcePtr& storage: getStorages()) {
+        if (storage->getStatus() == Qn::Online)
+            addDataFromDatabase(storage);
+    }
     disconnect(qnResPool);
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
@@ -273,8 +281,10 @@ void QnStorageManager::rebuildCatalogIndexInternal()
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     }
 
-    for (const QnStorageResourcePtr& storage: m_storageRoots.values())
-        loadFullFileCatalog(storage, true, 1.0 / m_storageRoots.size());
+    for (const QnStorageResourcePtr& storage: m_storageRoots.values()) {
+        if (storage->getStatus() == Qn::Online)
+            loadFullFileCatalog(storage, true, 1.0 / m_storageRoots.size());
+    }
 
     m_rebuildState = RebuildState_None;
     m_catalogLoaded = true;
@@ -386,17 +396,96 @@ int QnStorageManager::detectStorageIndex(const QString& p)
     }
 }
 
+static QString getLocalGuid()
+{
+    QString simplifiedGUID = qnCommon->moduleGUID().toString();
+    simplifiedGUID = simplifiedGUID.replace("{", "");
+    simplifiedGUID = simplifiedGUID.replace("}", "");
+    return simplifiedGUID;
+}
+
+static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
+
+static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
+{
+    QString storagePath = storage->getPath();
+    const QString dbRefFilePath = closeDirPath(storagePath) + dbRefFileName.arg(getLocalGuid());
+
+    QByteArray dbRefGuidStr;
+    //checking for file db_ref.guid existence
+    if( QFile::exists(dbRefFilePath) )
+    {
+        //have to use db from data directory, not from storage
+        //reading guid from file
+        QFile dbGuidFile( dbRefFilePath );
+        if( !dbGuidFile.open( QIODevice::ReadOnly ) )
+            return false;
+        dbRefGuidStr = dbGuidFile.readAll();
+    }
+
+    if( !dbRefGuidStr.isEmpty() )
+    {
+        *dbDirectory = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        return true;
+    }
+
+#ifdef _WIN32
+    //on windows always placing db to a storage directory
+    *dbDirectory = storagePath;
+    return true;
+#else
+    //On linux, sqlite db cannot be safely placed on a network partition due to lock problem
+        //So, for such storages creating DB in data dir
+
+    QList<QnPlatformMonitor::PartitionSpace> partitions = 
+        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
+            QnPlatformMonitor::NetworkPartition );
+
+    for( const QnPlatformMonitor::PartitionSpace& partition: partitions )
+    {
+        if( !storagePath.startsWith( partition.path ) )
+            continue;
+
+        dbRefGuidStr = QUuid::createUuid().toString().toLatin1();
+        if( dbRefGuidStr.size() < 2 )
+            return false;   //bad guid, somehow
+        //removing {}
+        dbRefGuidStr.remove( dbRefGuidStr.size()-1, 1 );
+        dbRefGuidStr.remove( 0, 1 );
+        //saving db ref guid to file on storage
+        QFile dbGuidFile( dbRefFilePath );
+        if( !dbGuidFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+            return false;
+        if( dbGuidFile.write( dbRefGuidStr ) != dbRefGuidStr.size() )
+            return false;
+        dbGuidFile.close();
+
+        storagePath = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        if( !QDir().mkpath( storagePath ) )
+            return false;
+        break;
+    }
+
+    *dbDirectory = storagePath;
+    return true;
+#endif
+}
+
 QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 {
     SCOPED_MUTEX_LOCK( lock, &m_sdbMutex);
     QnStorageDbPtr sdb = m_chunksDB[storage->getPath()];
     if (!sdb) 
     {
-        QString simplifiedGUID = qnCommon->moduleGUID().toString();
-        simplifiedGUID = simplifiedGUID.replace("{", "");
-        simplifiedGUID = simplifiedGUID.replace("}", "");
-        QString fileName = closeDirPath(storage->getPath()) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
-        QString oldFileName = closeDirPath(storage->getPath()) + QString::fromLatin1("media.sqlite");
+        QString simplifiedGUID = getLocalGuid();
+        QString dbPath;
+        if( !getDBPath(storage, &dbPath) )
+        {
+            NX_LOG( lit("Failed to file path to storage DB file. Storage is not writable?"), cl_logWARNING );
+            return QnStorageDbPtr();
+        }
+        QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+        QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
         if (QFile::exists(oldFileName) && !QFile::exists(fileName))
             QFile::rename(oldFileName, fileName);
 
@@ -426,18 +515,21 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         m_storageRoots.insert(storageIndex, storage);
         if (storage->isStorageAvailable())
             storage->setStatus(Qn::Online);
+        else
+            storage->setStatus(Qn::Offline);
 
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), 
                 this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
     }
-#if 0
-    if (m_catalogLoaded) 
-    {
-        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
-            doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i));
+#if 1
+    if (m_catalogLoaded && storage->getStatus() == Qn::Online) {
+        doMigrateCSVCatalog();
+        addDataFromDatabase(storage);
     }
+#else
+    if (storage->getStatus() == Qn::Online)
+        loadFullFileCatalog(storage);
 #endif
-    loadFullFileCatalog(storage);
     updateStorageStatistics();
 }
 
@@ -624,6 +716,7 @@ void QnStorageManager::clearSpace()
     if (!m_catalogLoaded)
         return;
 
+    testOfflineStorages();
     {
         SCOPED_MUTEX_LOCK( lock, &m_sdbMutex);
         for(const QnStorageDbPtr& sdb: m_chunksDB) {
@@ -903,11 +996,17 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    //SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
+        // add data before storage goes to the writable state
+        doMigrateCSVCatalog(fileStorage);
+        addDataFromDatabase(fileStorage);
+    }
+
     fileStorage->setStatus(status);
-    m_storagesStatisticsReady = false;
     if (status == Qn::Offline)
         emit storageFailure(fileStorage, QnBusiness::StorageIoErrorReason);
+    m_storagesStatisticsReady = false;
 }
 
 void QnStorageManager::testOfflineStorages()
@@ -1225,11 +1324,9 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
 
 // data migration from previous versions
 
-void QnStorageManager::doMigrateCSVCatalog() {
+void QnStorageManager::doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage) {
     for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
-        doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i));
-    m_catalogLoaded = true;
-    m_rebuildProgress = 1.0;
+        doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i), extraAllowedStorage);
 }
 
 QnStorageResourcePtr QnStorageManager::findStorageByOldIndex(int oldIndex)
@@ -1278,8 +1375,10 @@ void QnStorageManager::backupFolderRecursive(const QString& srcDir, const QStrin
     }
 }
 
-void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType)
+void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, QnStorageResourcePtr extraAllowedStorage)
 {
+    QMutexLocker lock(&m_csvMigrationMutex);
+
     QString base = closeDirPath(getDataDirectory());
     QString separator = getPathSeparator(base);
     backupFolderRecursive(base + lit("record_catalog"), base + lit("record_catalog_backup"));
@@ -1291,21 +1390,40 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType)
         DeviceFileCatalogPtr catalogFile(new DeviceFileCatalog(mac, catalogType));
         QString catalogName = closeDirPath(fi.absoluteFilePath()) + lit("title.csv");
         QVector<DeviceFileCatalog::Chunk> notMigratedChunks;
-        if (catalogFile->fromCSVFile(catalogName)) 
+        if (catalogFile->fromCSVFile(catalogName))
         {
             for(const DeviceFileCatalog::Chunk& chunk: catalogFile->m_chunks) 
             {
                 QnStorageResourcePtr storage = findStorageByOldIndex(chunk.storageIndex);
+                if (storage && storage != extraAllowedStorage && storage->getStatus() != Qn::Online)
+                    storage.clear();
+
                 QnStorageDbPtr sdb = storage ? getSDB(storage) : QnStorageDbPtr();
-                if (sdb)
-                    sdb->addRecord(mac, catalogType, chunk);
-                else
+                if (sdb) 
+                {
+                    if (catalogFile->csvMigrationCheckFile(chunk, storage)) 
+                    {
+                        if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
+                        {
+                            const QString fileName = catalogFile->fullFileName(chunk);
+                            qWarning() << "File " << fileName << "has invalid duration " << chunk.durationMs/1000.0 << "s and corrupted. Delete file from catalog";
+                            storage->removeFile(fileName);
+                        }
+                        else {
+                            sdb->addRecord(mac, catalogType, chunk);
+                        }
+                    }
+                }
+                else {
                     notMigratedChunks << chunk;
+                }
             }
-            SCOPED_MUTEX_LOCK( lock, &m_sdbMutex);
-            for(const QnStorageDbPtr& sdb: m_chunksDB.values()) {
-                if (sdb)
-                    sdb->flushRecords();
+            {
+                SCOPED_MUTEX_LOCK( lock, &m_sdbMutex );
+                for(const QnStorageDbPtr& sdb: m_chunksDB.values()) {
+                    if (sdb)
+                        sdb->flushRecords();
+                }
             }
             QFile::remove(catalogName);
             if (!notMigratedChunks.isEmpty())

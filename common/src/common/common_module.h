@@ -84,7 +84,7 @@ public:
     void setEngineVersion(const QnSoftwareVersion &version);
 
     void setModuleInformation(const QnModuleInformation &moduleInformation);
-    QnModuleInformation moduleInformation() const;
+    QnModuleInformationEx moduleInformation() const;
 
     bool isTranscodeDisabled() const { return m_transcodingDisabled; }
     void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }

@@ -391,7 +391,9 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         {
             // check current persistent state
             if (!m_runtimeTransactionLog->contains(aliveData.runtimeState)) {
-                qWarning() << "DETECT runtime transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
+                NX_LOG( QnLog::EC2_TRAN_LOG, lit("DETECT runtime transaction GAP via update message. Resync with peer %1").
+                    arg(transport->remotePeer().id.toString()), cl_logDEBUG1 );
+
                 needResync = true;
             }
         }

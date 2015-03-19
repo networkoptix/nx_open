@@ -93,15 +93,8 @@ QString getDirName(const QString& prefix, int currentParts[4], int i)
     return result;
 }
 
-bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, bool checkDirOnly)
+bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage)
 {
-    //fileSize = 0;
-    QnStorageResourcePtr storage = qnStorageMan->findStorageByOldIndex(chunk.storageIndex);
-    if (!storage)
-        return false;
-
-    if (!storage->isCatalogAccessible())
-        return true; // Can't check if file really exists
 	QString prefix = rootFolder(storage, m_catalog); 
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
@@ -148,6 +141,9 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, bool checkDirO
     if (!prevParts[3].second)
         return false;
 
+    return true;
+
+    /*
     // do not check files. just check dirs
     if (checkDirOnly)
         return true;
@@ -175,6 +171,7 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, bool checkDirO
     }
     //m_prevFileNames[chunk.storageIndex] = fName;
     return found;
+    */
 }
 
 qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs, const QnStorageResourcePtr &storage)
@@ -820,8 +817,6 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
 
     // deserializeTitleFile()
 
-    bool needRewriteCatalog = false;
-
     int timeZoneExist = 0;
     QByteArray headerLine = file.readLine();
     if (headerLine.contains("timezone"))
@@ -843,13 +838,15 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
         int duration = fields[3+timeZoneExist].trimmed().toInt()/coeff;
         Chunk chunk(startTime, fields[1+timeZoneExist].toInt(), fields[2+timeZoneExist].toInt(), duration, timeZone);
 
+        addChunk(chunk);
+
+        /*
         QnStorageResourcePtr storage = qnStorageMan->findStorageByOldIndex(chunk.storageIndex);
         if (fields[3+timeZoneExist].trimmed().isEmpty()) 
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
             if (qnStorageMan->isStorageAvailable(storage))
             {
-                needRewriteCatalog = true;
                 //chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
                 storage->removeFile(fullFileName(chunk));
                 continue;
@@ -862,7 +859,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
         //qint64 chunkFileSize = 0;
         if (!qnStorageMan->isStorageAvailable(storage)) 
         {
-             needRewriteCatalog |= addChunk(chunk);
+             addChunk(chunk);
         }
         else if (csvMigrationCheckFile(chunk, checkDirOnly))
         {
@@ -877,21 +874,14 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
 
                 qWarning() << "File " << fileName << "has invalid duration " << chunk.durationMs/1000.0 << "s and corrupted. Delete file from catalog";
                 storage->removeFile(fileName);
-                needRewriteCatalog = true;
                 continue;
             }
-            needRewriteCatalog |= addChunk(chunk);
+            addChunk(chunk);
         }
-        else {
-            needRewriteCatalog = true;
-        }
+        */
 
     } while (!line.isEmpty());
     
-    if (!timeZoneExist)
-        needRewriteCatalog = true; // update catalog to new version
-
-
     return true;
 }
 

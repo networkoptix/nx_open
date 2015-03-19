@@ -147,7 +147,7 @@ bool PluginUsageWatcher::updateUsageParams()
         m_usageRecordID = ++m_totalUsageArray.prevUsageRecordID;
         NX_LOG( lit("PluginUsageWatcher. Selected usage record id %1").arg(m_usageRecordID), cl_logDEBUG1 );
     }
-    localUsage.sequence = m_usageRecordID;
+    localUsage.sequence = static_cast<quint32>(m_usageRecordID);
     localUsage.updateClock = QDateTime::currentMSecsSinceEpoch();
     m_totalUsageArray.records.push_back( localUsage );
 
@@ -246,7 +246,7 @@ UsageRecord PluginUsageWatcher::currentUsage() const
         if( (*it)->getTypedVal( DecoderParameter::videoMemoryUsage, &videoMemoryUsage ) )
             rec.videoMemoryUsage += videoMemoryUsage;
     }
-    rec.simultaneousStreamCount = m_currentSessions.size();
+    rec.simultaneousStreamCount = static_cast<quint32>(m_currentSessions.size());
 
     return rec;
 }

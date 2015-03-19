@@ -42,6 +42,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -680,6 +681,8 @@ int serverMain(int argc, char *argv[])
 
 
     const QString& dataLocation = getDataDirectory();
+    const QString& logDir = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
+
     QDir::setCurrent(qApp->applicationDirPath());
 
     if (cmdLineArguments.rebuildArchive.isEmpty()) {
@@ -696,7 +699,7 @@ int serverMain(int argc, char *argv[])
 
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
-            dataLocation + QLatin1String("/log/http_log"),
+            logDir + QLatin1String("/http_log"),
             DEFAULT_MAX_LOG_FILE_SIZE,
             DEFAULT_MSG_LOG_ARCHIVE_SIZE,
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
@@ -710,7 +713,7 @@ int serverMain(int argc, char *argv[])
     if( cmdLineArguments.ec2TranLogLevel != lit("none") )
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            dataLocation + QLatin1String("/log/ec2_tran"),
+            logDir + QLatin1String("/ec2_tran"),
             DEFAULT_MAX_LOG_FILE_SIZE,
             DEFAULT_MSG_LOG_ARCHIVE_SIZE,
             QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );
@@ -997,6 +1000,17 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             messageProcessor->updateResource(mediaServer);
         }
 
+        // read resource status
+        ec2::ApiResourceStatusDataList statusList;
+        while ((rez = ec2Connection->getResourceManager()->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
+        {
+            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->resetStatusList( statusList );
+
         //reading server attributes
         QnMediaServerUserAttributesList mediaServerUserAttributesList;
         while ((rez = ec2Connection->getMediaServerManager()->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
@@ -1065,16 +1079,6 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
 
-        // read resource status
-        ec2::ApiResourceStatusDataList statusList;
-        while ((rez = ec2Connection->getResourceManager()->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetStatusList( statusList );
     }
 
     {
@@ -1119,6 +1123,21 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 
         for(const QnVideoWallResourcePtr &videowall: videowalls)
             messageProcessor->updateResource(videowall);
+    }
+
+    {
+        //loading layouts
+        QnLayoutResourceList layouts;
+        while(( rez = ec2Connection->getLayoutManager()->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+
+        for(const auto &layout: layouts)
+            messageProcessor->updateResource(layout);
     }
 
     {
@@ -1233,6 +1252,11 @@ void QnMain::at_connectionOpened()
         m_startMessageSent = true;
     }
     m_firstRunningTime = 0;
+}
+
+void QnMain::at_serverModuleConflict(const QnModuleInformationEx &moduleInformation, const QUrl &url)
+{
+    qnBusinessRuleConnector->at_mediaServerConflict(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch(), moduleInformation, url);
 }
 
 void QnMain::at_timer()
@@ -1794,6 +1818,8 @@ void QnMain::run()
         }
         qnCommon->setAllowedPeers(allowedPeers);
     }
+
+    connect(m_moduleFinder, &QnModuleFinder::moduleConflict, this, &QnMain::at_serverModuleConflict);
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
 

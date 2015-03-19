@@ -53,14 +53,13 @@ public:
     QnCheckForUpdateResult checkResult() const;
     void setCheckResult(const QnCheckForUpdateResult &result);
 
-public slots:
-    void setTargets(const QSet<QnUuid> &targets);
-
 private:
     void resetResourses();
     void updateVersionColumn();
 
 private slots:
+    void at_resourceAdded(const QnResourcePtr &resource);
+    void at_resourceRemoved(const QnResourcePtr &resource);
     void at_resourceChanged(const QnResourcePtr &resource);
 
 private:

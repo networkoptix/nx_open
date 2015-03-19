@@ -6,6 +6,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtGui/QDesktopServices>
 
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <client/client_settings.h>
 #include <common/common_module.h>
 #include <update/update_checker.h>
@@ -14,6 +16,9 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/common/geometry.h>
+
+#include <utils/common/app_info.h>
+#include <utils/common/string.h>
 
 namespace {
     const int updatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
@@ -67,28 +72,48 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
 
     QString title;
     QString message;
+    QString actionMessage = tr("Would you like to update?");
+    QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Yes | QDialogButtonBox::No;
+
     if (majorVersionChange) {
         title = tr("Newer version is available");
-        message = tr("New version <b>%1</b> is available.").arg(updateVersion.toString());
+        message = tr("New version %1 is available.").arg(htmlBold(updateVersion.toString()));
         message += lit("<br/>");
-        message += tr("Would you like to update?");
     } else {
         title = tr("Update is recommended");
-        message = tr("New version <b>%1</b> is available.").arg(updateVersion.toString());
+        message = tr("New version %1 is available.").arg(htmlBold(updateVersion.toString()));
         message += lit("<br/>");
         message += tr("Major issues have been fixed.");
         message += lit("<br/><span style=\"color:%1;\">").arg(qnGlobals->errorTextColor().name());
         message += tr("Update is strongly recommended.");
         message += lit("</span><br/>");
-        message += tr("Would you like to update?");
     }
 
     QnCheckableMessageBox messageBox(0);
-    messageBox.setWindowTitle(title);
+
+    messageBox.setStandardButtons(buttons);
     messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
+
+#ifdef Q_OS_MAC
+    bool hasOutdatedServer = false;
+    for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers()) {
+        if (server->getVersion() < updateVersion) {
+            hasOutdatedServer = true;
+            break;
+        }
+    }
+    if (!hasOutdatedServer) {
+        actionMessage = tr("Please update %1 Client.").arg(QnAppInfo::productNameLong());
+        messageBox.setStandardButtons(QDialogButtonBox::Ok);
+        messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Information));
+    }
+#endif
+
+    message += actionMessage;
+
+    messageBox.setWindowTitle(title);
     messageBox.setRichText(message);
     messageBox.setCheckBoxText(tr("Don't notify again about this update."));
-    messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
     setHelpTopic(&messageBox, Qn::Upgrade_Help);
 
     if (releaseNotesUrl.isValid()) {
@@ -102,9 +127,10 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
     messageBox.adjustSize();
     messageBox.setGeometry(QnGeometry::aligned(messageBox.size(), mainWindow()->geometry(), Qt::AlignCenter));
 
-    int res = messageBox.exec();
+    messageBox.exec();
 
-    if (res == QnCheckableMessageBox::Accepted) {
+    /* We check for 'Yes' button. 'No' and even 'Ok' buttons are considered negative. */
+    if (messageBox.clickedStandardButton() == QDialogButtonBox::Yes) {
         action(Qn::SystemUpdateAction)->trigger();
     } else {
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? updateVersion : QnSoftwareVersion());

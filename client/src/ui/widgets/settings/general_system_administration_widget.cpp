@@ -1,17 +1,20 @@
 #include "general_system_administration_widget.h"
 #include "ui_general_system_administration_widget.h"
 
-#include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
-#include <ui/actions/action_manager.h>
+#include <api/runtime_info_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_context.h>
+#include <nx_ec/data/api_runtime_data.h>
+
+#include <ui/actions/actions.h>
+#include <ui/actions/action_parameters.h>
+#include <ui/actions/action_manager.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
 
 QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget *parent /*= NULL*/):
     base_type(parent),
@@ -19,6 +22,19 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     ui(new Ui::GeneralSystemAdministrationWidget)
 {
     ui->setupUi(this);
+
+    auto shortcutString = [this](const Qn::ActionId actionId, const QString &baseString) -> QString {
+        auto shortcut = action(actionId)->shortcut();
+        if (shortcut.isEmpty())
+            return baseString;
+        return lit("%1 (<b>%2</b>)")
+            .arg(baseString)
+            .arg(shortcut.toString(QKeySequence::NativeText));
+    };
+
+    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
+    ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log")));
+    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open Camera List")));
 
     setHelpTopic(ui->businessRulesButton,   Qn::EventsActions_Help);
     setHelpTopic(ui->cameraListButton,      Qn::Administration_General_CamerasList_Help);
@@ -34,6 +50,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 void QnGeneralSystemAdministrationWidget::updateFromSettings() {
     ui->cameraWidget->updateFromSettings();
     ui->backupWidget->updateFromSettings();
+    ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
 }
 
 void QnGeneralSystemAdministrationWidget::submitToSettings() {
@@ -61,4 +78,8 @@ void QnGeneralSystemAdministrationWidget::resizeEvent(QResizeEvent *event) {
         button->setMinimumWidth(maxWidht);
 
     updateGeometry();
+}
+
+bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.box != lit("isd");
 }

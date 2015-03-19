@@ -222,7 +222,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnResourceList resList = action->getResourceObjects().filtered<QnNetworkResource>();
+    QnNetworkResourceList resList = qnResPool->getResources<QnNetworkResource>(action->getResources());
     if (resList.isEmpty()) {
         executeAction(action, QnResourcePtr());
     }
@@ -457,6 +457,8 @@ void QnBusinessRuleProcessor::at_timer()
 bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule)
 {
     bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || rule->eventResources().contains(bEvent->getResource()->getId());
+//    auto resList = rule->eventResourceObjects<QnResource>();
+//    bool resOK = !bEvent->getResource() || resList.isEmpty() || resList.contains(bEvent->getResource());
     if (!resOK)
         return false;
 
@@ -538,7 +540,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     }
 
     QStringList recipients;
-    for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) {
         QString email = user->getEmail();
         if (!email.isEmpty() && QnEmailAddress::isValid(email))
             recipients << email;
@@ -587,7 +589,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
 
     QStringList log;
     QStringList recipients;
-    for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) {
         QString email = user->getEmail();
         log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
         if (!email.isEmpty() && QnEmailAddress::isValid(email))
@@ -734,8 +736,8 @@ void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& res
 {
     SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
-    QnSecurityCamResource* camResource = dynamic_cast<QnSecurityCamResource*>(resource.data());
-    if( camResource == nullptr )
+    QnVirtualCameraResourcePtr camResource = resource.staticCast<QnVirtualCameraResource>();
+    if(!camResource)
         return;
 
     for( const QnBusinessEventRulePtr& rule: m_rules )
@@ -745,9 +747,9 @@ void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& res
 
         if( rule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnVirtualCameraResourceList resList = rule->eventResourceObjects().filtered<QnVirtualCameraResource>();
+            QnVirtualCameraResourceList resList = qnResPool->getResources<QnVirtualCameraResource>(rule->eventResources());
             if( resList.isEmpty() ||            //listening all cameras
-                resList.contains(resource.staticCast<QnVirtualCameraResource>()) )
+                resList.contains(camResource) )
             {
                 if( toggle )
                     camResource->inputPortListenerAttached();
@@ -815,11 +817,11 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
     {
         if( businessRule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnVirtualCameraResourceList resList = businessRule->eventResourceObjects().filtered<QnVirtualCameraResource>();
+            QnVirtualCameraResourceList resList = qnResPool->getResources<QnVirtualCameraResource>(businessRule->eventResources());
             if (resList.isEmpty())
                 resList = qnResPool->getAllCameras(QnResourcePtr(), true);
 
-            for(const QnVirtualCameraResourcePtr camera: resList)
+            for(const QnVirtualCameraResourcePtr &camera: resList)
             {
                 if( isRuleAdded )
                     camera->inputPortListenerAttached();
@@ -831,10 +833,10 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
 
     //notifying resources about recording action
     {
-        QnVirtualCameraResourceList resList = businessRule->actionResourceObjects().filtered<QnVirtualCameraResource>();
         if( businessRule->actionType() == QnBusiness::CameraRecordingAction)
         {
-            for(const QnVirtualCameraResourcePtr camera: resList)
+            QnVirtualCameraResourceList resList = qnResPool->getResources<QnVirtualCameraResource>(businessRule->actionResources());
+            for(const QnVirtualCameraResourcePtr &camera: resList)
             {
                 if( isRuleAdded )
                     camera->recordingEventAttached();

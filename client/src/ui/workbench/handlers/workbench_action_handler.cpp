@@ -1849,27 +1849,30 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     QString question;
     /* First version of the dialog if all cameras are auto-discovered. */
-    if (resources.size() == onlineAutoDiscoveredCameras.size()) 
-        question = tr("These %n cameras are auto-discovered.\n"\
-            "They may be auto-discovered again after removing.\n"\
-            "Are you sure you want to delete them?",
-            "", resources.size());
+    if (resources.size() == onlineAutoDiscoveredCameras.size()) {
+        question =
+            tr("These %n cameras are auto-discovered.", "", resources.size()) + L'\n' 
+          + tr("They may be auto-discovered again after removing.") + L'\n' 
+          + tr("Are you sure you want to delete them?");
+    }
     else 
     /* Second version - some cameras are auto-discovered, some not. */
-    if (!onlineAutoDiscoveredCameras.isEmpty())
-        question = tr("%n of these %1 cameras are auto-discovered.\n"\
-            "They may be auto-discovered again after removing.\n"\
-            "Are you sure you want to delete them?",
-            "", onlineAutoDiscoveredCameras.size()).arg(resources.size());
-     else
+    if (!onlineAutoDiscoveredCameras.isEmpty()) {
+        question = 
+            tr("%n of these %1 cameras are auto-discovered.", "", onlineAutoDiscoveredCameras.size()).arg(resources.size()) + L'\n' 
+          + tr("They may be auto-discovered again after removing.") + L'\n' 
+          + tr("Are you sure you want to delete them?");
+    }
+    else {
     /* Third version - no auto-discovered cameras in the list. */
-        question = tr("Do you really want to delete the following %n item(s)?",
-            "", resources.size());
+        question =
+            tr("Do you really want to delete the following %n item(s)?", "", resources.size());
+    }
     
     if (moreResourceToDelete.isEmpty())
         return;
     
-    int helpId = -1;
+    int helpId = Qn::Empty_Help;
     for (const QnResourcePtr &resource: resources) {
         if (resource->hasFlags(Qn::live_cam)) {
             helpId = Qn::DeletingCamera_Help;
@@ -2227,7 +2230,10 @@ void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode e
     if( errorCode == ec2::ErrorCode::ok )
         return;
 
-    QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Server. \n\nError description: '%2'").arg(ec2::toString(errorCode)));
+    QMessageBox::critical(mainWindow(), 
+        tr("Could not delete resource"),
+        tr("An error has occurred while trying to delete a resource from Server. ") + L'\n'
+      + tr("Error description: '%1'").arg(ec2::toString(errorCode)));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources) {
@@ -2468,8 +2474,8 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
         QMessageBox::critical(
                     mainWindow(),
                     tr("Launcher process is not found"),
-                    tr("Cannot restart the client.\n"
-                       "Please close the application and start it again using the shortcut in the start menu.")
+                    tr("Cannot restart the client.") + L'\n' 
+                  + tr("Please close the application and start it again using the shortcut in the start menu.")
                     );
         return;
     }

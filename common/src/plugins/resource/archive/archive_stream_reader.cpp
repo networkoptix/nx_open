@@ -593,7 +593,7 @@ begin_label:
                     m_frameTypeExtractor = new FrameTypeExtractor((AVCodecContext*) videoData->context->ctx());
                 }
 
-                frameType = m_frameTypeExtractor->getFrameType((const quint8*) videoData->data(), videoData->dataSize());
+                frameType = m_frameTypeExtractor->getFrameType((const quint8*) videoData->data(), static_cast<int>(videoData->dataSize()));
             }
             bool isKeyFrame;
 

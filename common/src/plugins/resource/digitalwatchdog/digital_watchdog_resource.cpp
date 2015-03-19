@@ -1,6 +1,7 @@
 #ifdef ENABLE_ONVIF
 
 #include "digital_watchdog_resource.h"
+
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"

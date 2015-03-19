@@ -250,6 +250,7 @@ int MediaStreamCache::getMaxBitrate() const
     const qint64 durationUSec = m_packetsByTimestamp.empty() ? 0 : (m_packetsByTimestamp.rbegin()->timestamp - m_packetsByTimestamp.begin()->timestamp);
     if( durationUSec == 0 )
         return -1;
+    //TODO: #ak is is normal to make calculations in 64 bit and return 32 bit?
     return ((qint64)m_cacheSizeInBytes) * USEC_PER_SEC / durationUSec * CHAR_BIT;
 }
 

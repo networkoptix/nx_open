@@ -13,7 +13,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
     case QnSystemHealth::ConnectionLost:
         return tr("Connection to server lost");
     case QnSystemHealth::NoPrimaryTimeServer:
-        return tr("Select server for others to synchronise time with");
+        return tr("Select server for others to synchronize time with");
     case QnSystemHealth::EmailSendError:
         return tr("Error while sending email");
     case QnSystemHealth::StoragesAreFull:
@@ -21,7 +21,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
     case QnSystemHealth::StoragesNotConfigured:
         return tr("Storages are not configured");
     case QnSystemHealth::ArchiveRebuildFinished:
-        return tr("Rebuilding archive index is completed.");
+        return tr("Rebuilding archive index is completed");
     default:
         break;
     }
@@ -40,27 +40,41 @@ QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType mes
 }
 
 QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, QString resourceName) {
+    QStringList messageParts;
+
     switch (messageType) {
     case QnSystemHealth::EmailIsEmpty:
-        return tr("Email address is not set.\nYou cannot receive system notifications via email.");
+        messageParts << tr("Email address is not set.") << tr("You cannot receive system notifications via email.");
+        break;
     case QnSystemHealth::SmtpIsNotSet:
-        return tr("Email server is not set.\nYou cannot receive system notifications via email.");
+        messageParts << tr("Email server is not set.") << tr("You cannot receive system notifications via email.");
+        break;
     case QnSystemHealth::UsersEmailIsEmpty:
-        return tr("Some users have not set their email addresses.\nThey cannot receive system notifications via email.");
+        messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive system notifications via email.");
+        break;
     case QnSystemHealth::NoPrimaryTimeServer:
-        return tr( "Multiple servers have different time and correct time could not be detected automatically." );
+        messageParts << tr("Multiple servers have different time and correct time could not be detected automatically." );
+        break;
     case QnSystemHealth::StoragesAreFull:
-        return tr("Storages are full on the following Server:\n%1.").arg(resourceName);
+        messageParts << tr("Storages are full on the following Server:") << resourceName;
+        break;
     case QnSystemHealth::StoragesNotConfigured:
-        return tr("Storages are not configured on the following Server:\n%1.").arg(resourceName);
+        messageParts << tr("Storages are not configured on the following Server:") << resourceName;
+        break;
     case QnSystemHealth::NoLicenses:
-        return tr("You have no licenses.\nYou cannot record video from cameras.");
+        messageParts << tr("You have no licenses.") << tr("You cannot record video from cameras.");
+        break;
     case QnSystemHealth::ArchiveRebuildFinished:
-        return tr("Rebuilding archive index is completed on the following Server:\n%1.").arg(resourceName);
+        messageParts << tr("Rebuilding archive index is completed on the following Server:") << resourceName;
+        break;
     default:
         break;
     }
-    return messageName(messageType, resourceName);
+    if (!messageParts.isEmpty())
+        return messageParts.join(L'\n');
+
+    /* Description is ended with a dot, title is not. */
+    return messageName(messageType, resourceName) + L'.';
 }
 
 

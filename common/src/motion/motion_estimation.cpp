@@ -18,6 +18,8 @@
 #   define __forceinline inline
 #endif
 
+/* Do not warn about uninitialized variables in this module due to low-level optimization. */
+#pragma warning( disable : 4700 )
 
 //#define DEBUG_CPU_MODE
 static const unsigned char BitReverseTable256[] = 

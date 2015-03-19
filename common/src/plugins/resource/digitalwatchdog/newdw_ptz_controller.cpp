@@ -144,6 +144,7 @@ QString QnNewDWPtzController::fromExtarnalID(const QString& externalId)
 
 bool QnNewDWPtzController::activatePreset(const QString &presetId, qreal speed)
 {
+    Q_UNUSED(speed)
     return doQuery(lit("/cgi-bin/ptz.cgi?gotopreset=%1").arg(fromExtarnalID(presetId)));
 }
 

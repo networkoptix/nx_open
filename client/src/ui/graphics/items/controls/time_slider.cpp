@@ -23,6 +23,7 @@
 #include <ui/common/geometry.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider_pixmap_cache.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
@@ -277,7 +278,7 @@ class QnTimeSliderChunkPainter {
 public:
     QnTimeSliderChunkPainter(QnTimeSlider *slider, QPainter *painter): 
         m_slider(slider), 
-        m_painter(painter) 
+        m_painter(painter)
     {
         assert(m_painter && m_slider);
 
@@ -477,6 +478,10 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(this)),
     m_localOffset(0)
+
+    , m_lastLineBarMousePos()
+    , m_lastLineBarValue()
+    , m_bookmarksViewer(QnBookmarksViewer::create(parent))
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -811,7 +816,31 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
             m_animating = true;
             setAnimationStart(start);
             setAnimationEnd(end);
-        } else {
+        }
+        else 
+        {
+            if (!m_lastLineBarMousePos.isNull())
+            {
+                if ((m_lastLineBarValue >= start) && (m_lastLineBarValue <= end))
+                {
+                    const qreal endDiff = std::abs(m_windowEnd - end);
+                    const qreal startDiff = std::abs(m_windowStart - start);
+                    const qreal maxDiff = std::max(startDiff, endDiff);
+                    enum { kMinUpdateInterval = 1000 };
+                    if (maxDiff > kMinUpdateInterval)
+                    {
+                        const qreal coeff = (m_lastLineBarValue - start) / (end - start);
+                        m_lastLineBarMousePos = QPointF(coeff * rulerRect().width() , m_lastLineBarMousePos.y());
+                        m_bookmarksViewer->updatePosition(QPointF(mapToParent(m_lastLineBarMousePos).x(), 0), true);
+                    }
+                }
+                else
+                {
+                    m_lastLineBarMousePos = QPointF();
+                    m_bookmarksViewer->hide();
+                }
+            }
+            
             m_windowStart = start;
             m_windowEnd = end;
 
@@ -1244,10 +1273,14 @@ bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
     return m_lastMinuteIndicatorVisible[line];
 }
 
+QnBookmarksViewer *QnTimeSlider::bookmarksViewer()
+{
+    return m_bookmarksViewer;
+}
+
 int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
     if (thumbnailsRect().contains(pos))
         return Qn::MainWindow_Thumbnails_Help;
-
     bool hasMotion = false;
     for (int i = 0; i < m_lineCount; i++) {
         if (!timePeriods(i, Qn::MotionContent).isEmpty()) {
@@ -1269,7 +1302,7 @@ int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
 void QnTimeSlider::updatePixmapCache() {
     m_pixmapCache->setFont(font());
     m_pixmapCache->setColor(palette().color(QPalette::WindowText));
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16); 
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16); 
 
     updateLineCommentPixmaps();
     updateTickmarkTextSteps();
@@ -2396,12 +2429,16 @@ void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 
 void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverEnterEvent(event);
-
+    
+    grabMouse();
+    
     unsetCursor();
 }
 
 void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
+
+    ungrabMouse();
 
     unsetCursor();
 
@@ -2460,9 +2497,33 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     event->accept();
 }
 
-void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) 
+{
     dragProcessor()->mouseMoveEvent(this, event);
 
+    const auto pos = event->pos();
+    const bool isGrabbing = (scene()->mouseGrabberItem() == this);
+    if (!rulerRect().contains(pos) && isGrabbing)
+    {
+        ungrabMouse();
+        m_bookmarksViewer->hideDelayed();
+    }
+    else
+    {
+        const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
+        if (lineBarRect.contains(pos))
+        {
+            m_lastLineBarMousePos = pos;
+            m_lastLineBarValue = valueFromPosition(pos);
+
+            m_bookmarksViewer->updatePosition(QPointF(mapToParent(pos).x(), 0), false);
+            bookmarksUnderCursorUpdated(pos);
+        }
+        else if (isGrabbing)
+        {
+            m_bookmarksViewer->hideDelayed();
+        }
+    }
     event->accept();
 }
 

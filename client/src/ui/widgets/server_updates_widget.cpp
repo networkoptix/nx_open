@@ -288,7 +288,7 @@ bool QnServerUpdatesWidget::confirm() {
 
 bool QnServerUpdatesWidget::discard() {
     if(!cancelUpdate()) {
-        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.\nPlease wait until update is finished"));
+        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.") + L'\n' + tr("Please wait until update is finished"));
         return false;
     }
 
@@ -328,8 +328,8 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                         unholdConnection = true;
                         QMessageBox::critical(this,
                             tr("Launcher process is not found"),
-                            tr("Cannot restart the client.\n"
-                            "Please close the application and start it again using the shortcut in the start menu."));
+                            tr("Cannot restart the client.") + L'\n' 
+                          + tr("Please close the application and start it again using the shortcut in the start menu."));
                     } else {
                         qApp->exit(0);
                         applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);

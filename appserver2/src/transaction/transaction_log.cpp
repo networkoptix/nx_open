@@ -316,11 +316,8 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     QnTranStateKey key (tran.peerID, tran.persistentInfo.dbID);
     Q_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
-#ifdef _DEBUG
-        qDebug() << "Transaction log contains transaction " << tran.toString() << 
-            "because of precessed seq:" << m_state.values.value(key) << ">=" << tran.persistentInfo.sequence;
-#endif
-        NX_LOG( lit("Transaction log contains transaction %1 because of precessed seq: %2 >= %3").
+        NX_LOG( QnLog::EC2_TRAN_LOG,
+            lit("Transaction log contains transaction %1 because of precessed seq: %2 >= %3").
             arg(tran.toString()).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
         return Reason_Sequence;
     }
@@ -333,11 +330,8 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     if (lastTime == tran.persistentInfo.timestamp)
         rez = key < itr.value().updatedBy;
     if (rez) {
-#ifdef _DEBUG
-        qDebug() << "Transaction log contains transaction " << tran.toString() << 
-            "because of timestamp:" << lastTime << ">=" << tran.persistentInfo.timestamp;
-#endif
-        NX_LOG( lit("Transaction log contains transaction %1 because of timestamp: %2 >= %3").
+        NX_LOG( QnLog::EC2_TRAN_LOG,
+            lit("Transaction log contains transaction %1 because of timestamp: %2 >= %3").
             arg(tran.toString()).arg(lastTime).arg(tran.persistentInfo.timestamp), cl_logDEBUG1 );
         return Reason_Timestamp;
     }
