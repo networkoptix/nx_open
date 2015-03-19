@@ -92,7 +92,6 @@ namespace ite
             {
                 if (tryLockC(chan))
                 {
-                    updateTxParams();
                     if (good())
                         m_devReader->start(m_device.get());
 
@@ -263,18 +262,18 @@ namespace ite
                 bool first = true;
                 for (;;)
                 {
-                    RCCmdBuffer cmdBuf;
-                    if (! m_devReader->getRetChanCmd(cmdBuf))
+                    RcPacketBuffer pktBuf;
+                    if (! m_devReader->getRcPacket(pktBuf))
                         break;
 
-                    RCCommand cmd = cmdBuf.cmd();
-                    if (! cmd.isOK())
+                    RcPacket pkt = pktBuf.packet();
+                    if (! pkt.isOK())
                     {
 #if 1
-                        if (cmd.hasData())
-                            printf("wrong RC command. tags: %d; sum val: %d; sum calc: %d\n", cmd.hasTags(), cmd.checksumValue(), cmd.calcChecksum());
+                        if (pkt.hasData())
+                            printf("bad RC packet. tags: %d; sum val: %d; sum calc: %d\n", pkt.hasTags(), pkt.checksumValue(), pkt.calcChecksum());
                         else
-                            printf("wrong RC command. No data\n");
+                            printf("bad RC packet. No data\n");
 #endif
                         continue;
                     }
@@ -282,14 +281,14 @@ namespace ite
                     if (first)
                     {
                         first = false;
-                        devLink.txID = cmd.txID();
+                        devLink.txID = pkt.txID();
                         devLink.channel = m_channel;
 
                         setTx(m_channel, devLink.txID);
                     }
 #if 1
-                    if (cmd.txID() != devLink.txID)
-                        printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, cmd.txID());
+                    if (pkt.txID() != devLink.txID)
+                        printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, pkt.txID());
                     if (! devLink.txID)
                         printf("txID == 0\n");
 #endif
@@ -304,30 +303,63 @@ namespace ite
         m_sync.searching.store(false);
     }
 
-    // TODO
     void RxDevice::updateTxParams()
     {
-#if 0
-        // TODO: check device link first?
+        if (! m_txDev)
+            return;
 
-        if (m_txDev)
+        for (;;)
         {
-            m_txDev->getTransmissionParameterCapabilities();
-            m_txDev->getTransmissionParameters();
-            m_txDev->getDeviceInformation();
-            m_txDev->getVideoSources();
-            m_txDev->getVideoSourceConfigurations();
-            m_txDev->getVideoEncoderConfigurations();
+            RcPacketBuffer pktBuf;
+            if (! m_devReader->getRcPacket(pktBuf))
+                break;
 
-            m_txDev->wait();
+            RcPacket pkt = pktBuf.packet();
+            if (! pkt.isOK())
+            {
+                printf("bad RC packet\n");
+                continue;
+            }
+
+            m_txDev->parse(pkt);
         }
-#endif
+
+        std::vector<uint16_t> ids;
+        m_txDev->ids4update(ids);
+        for (size_t i = 0; i < ids.size(); ++i)
+        {
+            RcCommand * pcmd = m_txDev->mkRcCmd(ids[i]);
+            if (pcmd && pcmd->isValid())
+                sendRC(pcmd);
+        }
     }
 
     bool RxDevice::changeChannel(unsigned chan)
     {
-        if (m_txDev && m_txDev->setChannel(chan))
+        if (m_txDev)
+        {
+            RcCommand * pcmd = m_txDev->mkSetChannel(chan);
+            return sendRC(pcmd);
+        }
+
+        return false;
+    }
+
+    bool RxDevice::sendRC(RcCommand * cmd)
+    {
+        if (cmd && cmd->isValid() && m_txDev && m_device)
+        {
+            std::vector<RcPacketBuffer> pkts;
+            cmd->mkPackets(m_txDev->sendInfo(), m_rxID, pkts);
+
+            // TODO: do we need lock here?
+
+            for (auto itPkt = pkts.begin(); itPkt != pkts.end(); ++itPkt)
+                m_device->sendRcPacket(itPkt->packet());
+
             return true;
+        }
+
         return false;
     }
 

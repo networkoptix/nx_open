@@ -222,6 +222,8 @@ namespace ite
 
             if (pkt)
                 return pkt;
+
+            m_cameraManager->minorWork();
         }
 
         m_interrupted = false;

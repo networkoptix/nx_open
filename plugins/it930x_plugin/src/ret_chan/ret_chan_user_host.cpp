@@ -22,8 +22,6 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	Byte byRefStringBuffer[Ref_BufferSize] = "NONE";
 	Byte byActiveCellsBuffer[4] = {0xFF, 0xFF, 0xFF, 0xFF};
 
-	deviceInfo->device.bIsDebug = False;
-
 	//---------------------init_security-----------------------
 	Cmd_StringSet(byRefStringBuffer, Ref_BufferSize, &deviceInfo->security.userName);
 	Cmd_StringSet(byRefStringBuffer, Ref_BufferSize, &deviceInfo->security.password);

@@ -819,6 +819,20 @@ namespace ite
 
     // from StreamReader thread
 
+    /// @hack reading RC in StreamReader thread
+    void CameraManager::minorWork()
+    {
+        RxDevicePtr dev;
+        {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            dev = m_rxDevice;
+        }
+
+        if (dev)
+            dev->updateTxParams();
+    }
+
     DevReader * CameraManager::devReader() const
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK

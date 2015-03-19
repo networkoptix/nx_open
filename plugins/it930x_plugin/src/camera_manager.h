@@ -57,6 +57,7 @@ namespace ite
         // for StreamReader
 
         DevReader * devReader() const;
+        void minorWork();
 
         void openStream(unsigned encNo);
         void closeStream(unsigned encNo);

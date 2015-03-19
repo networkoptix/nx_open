@@ -2,6 +2,7 @@
 #define ITE_DEVICE_H
 
 #include <memory>
+#include <mutex>
 
 extern "C"
 {
@@ -105,12 +106,16 @@ namespace ite
 
         ~It930x()
         {
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             m_devStream.reset();
             DTV_DeviceClose(m_handle);
         }
 
         void enable(Option opt)
         {
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             switch (opt)
             {
             case NullPacketFilter:
@@ -126,6 +131,8 @@ namespace ite
 
         void disable(Option opt)
         {
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             switch (opt)
             {
             case NullPacketFilter:
@@ -147,6 +154,8 @@ namespace ite
         // both in KHz
         void lockFrequency(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
         {
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             if (m_devStream)
                 throw "It930x.lockFrequency() already locked";
 
@@ -164,11 +173,15 @@ namespace ite
 
         void unlockFrequency()
         {
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             m_devStream.reset();
         }
 #if 0
         bool isLocked() const
         {
+            std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             Bool locked = False;
             unsigned result = DTV_IsLocked(m_handle, &locked);
             return !result && (locked == True);
@@ -176,6 +189,8 @@ namespace ite
 #endif
         void statistic(uint8_t& quality, uint8_t& strength, bool& presented, bool& locked) const
         {
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             DTVStatistic statisic;
             unsigned result = DTV_GetStatistic(m_handle, &statisic);
             if (result)
@@ -189,6 +204,8 @@ namespace ite
 
         void info(IteDriverInfo& info)
         {
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             memset(&info, 0, sizeof(IteDriverInfo));
 
             DemodDriverInfo driverInfo;
@@ -204,15 +221,19 @@ namespace ite
             strncpy(info.supportHWInfo, (const char *)driverInfo.SupportHWInfo, 32);
         }
 
-        void sendCommand(const RCCommand& cmd)
+        void sendRcPacket(const RcPacket& cmd)
         {
-            int result = DTV_SendCommand(m_handle, cmd.rawData(), cmd.rawSize());
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
+            int result = DTV_SendRC(m_handle, cmd.rawData(), cmd.rawSize());
             if (result)
                 throw "DTV_SendCommand";
         }
 
         int read(uint8_t * buf, int size)
         {
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             if (m_devStream)
                 return m_devStream->read(buf, size);
             return -1;
@@ -221,6 +242,7 @@ namespace ite
         bool hasStream() const { return m_devStream.get(); }
 
     private:
+        //mutable std::mutex m_mutex;
         int m_handle;
         uint16_t m_rxID;
         std::unique_ptr<It930Stream> m_devStream;

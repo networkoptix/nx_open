@@ -303,41 +303,10 @@ typedef struct RcCmdInfo{
 	struct RcCmdInfo *next;
 }RcCmd;
 
-#if 0
-typedef struct {
-	unsigned totalGetBufferCount;
-	unsigned totalPKTCount;
-	unsigned leadingTagErrorCount;
-	unsigned endTagErrorCount;
-	unsigned checkSumErrorCount;
-}DebugInfo;
-#endif
-
 typedef struct {
 	unsigned stringLength;
 	Byte* stringData;
 } RCString;
-
-#if 0
-typedef struct {
-	Bool bIsRepeatPacket;
-	Byte byRepeatPacketNumber;
-	Byte byRepeatPacketTimeInterval;
-	Bool bIsCmdBroadcast;
-}CmdSendConfig;
-#endif
-
-typedef struct {
-	Word PID;
-	Byte TS_sequence;
-	Byte TS_sequence_recv;
-	Word clientTxDeviceID;
-	Word hostRxDeviceID;
-	Word RCCmd_sequence;
-	Word RCCmd_sequence_recv;
-	Bool bIsDebug;
-	Bool TSMode;
-} Device;
 
 typedef struct {
 	RCString userName;

@@ -419,7 +419,7 @@ namespace ite
 
         bool readStep(bool rcOnly = false);
 
-        bool getRetChanCmd(RCCmdBuffer& cmd);
+        bool getRcPacket(RcPacketBuffer& cmd);
 
         ContentPacketPtr getPacket(uint16_t pid, const std::chrono::milliseconds& timeout);
         void interrupt() const { m_cond.notify_all(); } // NOTIFY

@@ -5,40 +5,124 @@
 
 #include "tx_device.h"
 
-// TODO
-unsigned User_returnChannelBusTx(IN unsigned bufferLength, IN const Byte * buffer, OUT int * txLen)
-{
-    return 0;
-}
-
-unsigned User_returnChannelBusRx(IN unsigned bufferLength, OUT Byte * buffer, OUT int * rxLen)
-{
-    return 0;
-}
-
 // ret_chan/ret_chan_cmd_host.cpp
-unsigned sendRC(ite::TxDevice * tx, unsigned short command);
-unsigned parseRC(ite::TxDevice * tx, unsigned short command, const Byte * Buffer, unsigned bufferLength);
+unsigned makeRcCommand(ite::TxDevice * tx, unsigned short command);
+unsigned parseRC(ite::TxDevice * tx, unsigned short cmdID, const Byte * Buffer, unsigned bufferLength);
 
+#if 0
+        CMD_GetTxDeviceAddressIDInput
+        CMD_GetTransmissionParameterCapabilitiesInput
+        CMD_GetTransmissionParametersInput
+        CMD_GetHwRegisterValuesInput
+        CMD_GetAdvanceOptionsInput
+        CMD_GetTPSInformationInput
+        CMD_GetSiPsiTableInput
+        CMD_GetNitLocationInput
+        CMD_GetSdtServiceInput
+        CMD_GetEITInformationInput
+
+        //CMD_SetTxDeviceAddressIDInput
+        CMD_SetCalibrationTableInput
+        CMD_SetTransmissionParametersInput
+        CMD_SetHwRegisterValuesInput
+        CMD_SetAdvaneOptionsInput
+        CMD_SetTPSInformationInput
+        CMD_SetSiPsiTableInput
+        CMD_SetNitLocationInput
+        CMD_SetSdtServiceInput
+        CMD_SetEITInformationInput
+
+        //
+
+        CMD_GetCapabilitiesInput
+        CMD_GetDeviceInformationInput
+        CMD_GetHostnameInput
+        CMD_GetSystemDateAndTimeInput
+        CMD_GetSystemLogInput
+        CMD_GetOSDInformationInput
+
+        CMD_SetSystemFactoryDefaultInput
+        CMD_SetHostnameInput
+        CMD_SetSystemDateAndTimeInput
+        CMD_SetOSDInformationInput
+
+        CMD_SystemRebootInput
+        //CMD_UpgradeSystemFirmwareInput
+
+        //
+
+        CMD_GetDigitalInputsInput
+        CMD_GetRelayOutputsInput
+
+        CMD_SetRelayOutputStateInput
+        CMD_SetRelayOutputSettingsInput
+
+        //
+
+        CMD_GetImagingSettingsInput
+        CMD_IMG_GetStatusInput
+        CMD_IMG_GetOptionsInput
+        CMD_GetUserDefinedSettingsInput
+        CMD_SetImagingSettingsInput
+        CMD_IMG_MoveInput
+        CMD_IMG_StopInput
+        CMD_SetUserDefinedSettingsInput
+
+        //
+
+        CMD_GetProfilesInput
+        CMD_GetVideoSourcesInput
+        CMD_GetVideoSourceConfigurationsInput
+        CMD_GetGuaranteedNumberOfVideoEncoderInstancesInput
+        CMD_GetVideoEncoderConfigurationsInput
+        CMD_GetAudioSourcesInput
+        CMD_GetAudioSourceConfigurationsInput
+        CMD_GetAudioEncoderConfigurationsInput
+        CMD_GetVideoSourceConfigurationOptionsInput
+        CMD_GetVideoEncoderConfigurationOptionsInput
+        CMD_GetAudioSourceConfigurationOptionsInput
+        CMD_GetAudioEncoderConfigurationOptionsInput
+        CMD_GetVideoOSDConfigurationInput
+        CMD_GetVideoPrivateAreaInput
+
+        CMD_SetSynchronizationPointInput
+        CMD_SetVideoSourceConfigurationInput
+        CMD_SetVideoEncoderConfigurationInput
+        CMD_SetAudioSourceConfigurationInput
+        CMD_SetAudioEncoderConfigurationInput
+        CMD_SetVideoOSDConfigurationInput
+        CMD_SetVideoPrivateAreaInput
+        CMD_SetVideoSourceControlInput
+
+        //
+
+        CMD_GetConfigurationsInput
+        CMD_PTZ_GetStatusInput
+        CMD_GetPresetsInput
+        CMD_GotoPresetInput
+        CMD_RemovePresetInput
+        CMD_SetPresetInput
+        CMD_AbsoluteMoveInput
+        CMD_RelativeMoveInput
+        CMD_ContinuousMoveInput
+        CMD_SetHomePositionInput
+        CMD_GotoHomePositionInput
+        CMD_PTZ_StopInput
+
+        //
+
+        CMD_GetSupportedRulesInput
+        CMD_GetRulesInput
+        CMD_CreateRuleInput
+        CMD_ModifyRuleInput
+        CMD_DeleteRuleInput
+#endif
 
 namespace ite
 {
     TxDevice::TxDevice(unsigned short txID, unsigned freq)
-    :   waitingCmd_(CMD_GetTxDeviceAddressIDOutput),
-        waitingResponse_(false)
+    :   m_device(txID)
     {
-        //RC_Init_RCHeadInfo(&info_.device, rxID, txID, 0xFFFF);
-        device.clientTxDeviceID = txID;
-        device.hostRxDeviceID = 0xFFFF;
-        device.RCCmd_sequence = 0;
-        device.RCCmd_sequence_recv = 0xFFFF;
-
-        //RC_Init_TSHeadInfo(&info_.device, RETURN_CHANNEL_PID, 0, False);
-        device.PID = RETURN_CHANNEL_PID;
-        device.TS_sequence = 0;
-        device.TS_sequence_recv = 0;
-        device.TSMode = False;
-
         User_Host_init(this);
         User_askUserSecurity(&security);
 
@@ -50,75 +134,64 @@ namespace ite
         User_Host_uninit(this);
     }
 
-    RCError TxDevice::parseCommand()
+    bool TxDevice::parse(RcPacket& pkt)
     {
-        if (! cmd().isOK())
-            return RCERR_WRONG_CMD;
+        if (! pkt.isOK())
+            return false;
 
-        if (cmd().size() < 8)
-            return RCERR_WRONG_LENGTH;
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-        if (cmd().returnCode() != 0) // TODO: not all cammands
-            return RCERR_RET_CODE;
-
-        unsigned short commandID = cmd().commandID();
-        unsigned error = ::parseRC(this, commandID, cmd().data(), cmd().size());
-
-        if (isWaiting() && waitingCmd() == commandID)
-            setWaiting(false);
-
-        if (error == ReturnChannelError::NO_ERROR)
+        if (m_cmdRecv.addPacket(pkt) && m_cmdRecv.isValid())
         {
-            cmd().setValid();
-            return RCERR_NO_ERROR;
-        }
-        else if (error == ReturnChannelError::Reply_WRONG_LENGTH)
-            return RCERR_WRONG_LENGTH;
-        else if (error == ReturnChannelError::CMD_NOT_SUPPORTED)
-            return RCERR_WRONG_CMD;
-
-        return RCERR_NOT_PARSED;
-    }
-
-    bool TxDevice::wait(int iWaitTime)
-    {
-        struct timeval startTime;
-        gettimeofday(&startTime, NULL);
-
-        while (isWaiting())
-        {
-            usleep(SLEEP_TIME_MS * 1000);
-
-            struct timeval curTime;
-            gettimeofday(&curTime, NULL);
-
-            int diffTime = (curTime.tv_usec + 1000000 * curTime.tv_sec) - (startTime.tv_usec + 1000000 * startTime.tv_sec);
-            diffTime /= 1000; // usec -> msec
-            if (diffTime > iWaitTime)
+            uint16_t cmdID = m_cmdRecv.commandID();
+            uint8_t code = m_cmdRecv.returnCode();
+#if 1
+            printf("RC command: %d, code: %d\n", cmdID, code);
+#endif
+            unsigned error = ::parseRC(this, cmdID, m_cmdRecv.data(), m_cmdRecv.size());
+            if (error != ReturnChannelError::NO_ERROR)
                 return false;
         }
-
+#if 1
+        else
+            printf("RC packet (part or error)\n");
+#endif
         return true;
     }
 
-    bool TxDevice::setChannel(unsigned channel)
+    // TODO
+    void TxDevice::ids4update(std::vector<uint16_t>& ids)
+    {
+        // FIXME
+        static uint8_t num = 0;
+        if (num++ != 0)
+            return;
+
+        // TODO
+
+        ids.push_back(CMD_GetTransmissionParameterCapabilitiesInput);
+        ids.push_back(CMD_GetTransmissionParametersInput);
+        //ids.push_back(CMD_GetDeviceInformationInput);
+        //ids.push_back(CMD_GetVideoSourcesInput);
+        //ids.push_back(CMD_GetVideoSourceConfigurationsInput);
+        //ids.push_back(CMD_GetVideoEncoderConfigurationsInput);
+    }
+
+    RcCommand * TxDevice::mkSetChannel(unsigned channel)
     {
         unsigned freq = freq4chan(channel);
-#if 0
-        if (transmissionParameterCapabilities.frequencyMin > 0 &&
-            freq < transmissionParameterCapabilities.frequencyMin)
-            return false;
 
-        if (transmissionParameterCapabilities.frequencyMax > 0 &&
+        if (transmissionParameterCapabilities.frequencyMin == 0 ||
+            transmissionParameterCapabilities.frequencyMax == 0)
+            return nullptr;
+
+        if (freq < transmissionParameterCapabilities.frequencyMin ||
             freq > transmissionParameterCapabilities.frequencyMax)
-            return false;
+            return nullptr;
 
         transmissionParameter.frequency = freq;
 
-        //setTransmissionParameters();
-        return true;
-#endif
-        return false;
+        return mkRcCmd(CMD_SetTransmissionParametersInput);
     }
 
 
@@ -177,7 +250,7 @@ namespace ite
 
     void TxDevice::print() const
     {
-        printf("TX ID: %04x RX ID: %04x\n", device.clientTxDeviceID, device.hostRxDeviceID);
+        printf("TX ID: %04x\n", m_device.txID);
         printf("Frequency in KHz (ex. 666000): %u\n", transmissionParameter.frequency);
         printf("Bandwidth in MHz (ex. 1~8): %d\n", transmissionParameter.bandwidth);
 #if 0
@@ -198,191 +271,25 @@ namespace ite
 
     //
 
-    void TxDevice::sendRC(uint16_t command)
+    RcCommand * TxDevice::mkRcCmd(uint16_t command)
     {
-        //setWaiting(true, input2output(command));
-
-        unsigned error = ::sendRC(this, command); // --> ret_chan
-        if (error)
-            throw "Can't send cmd";
+        m_cmdSend.clear();
+        unsigned err = ::makeRcCommand(this, command); // --> ret_chan
+        if (! err && m_cmdSend.isValid())
+            return &m_cmdSend;
+        return nullptr;
     }
 
-    unsigned TxDevice::rc_splitBuffer(Byte * buf, unsigned length, Byte * splitBuf, unsigned splitLength, unsigned * start)
+    uint8_t * TxDevice::rc_getBuffer(unsigned size)  // <-- ret_chan
     {
-        unsigned offset = (*start);
-        User_memory_set(splitBuf, 0, splitLength);
-
-        if (length-offset > splitLength)
-        {
-            User_memory_copy(splitBuf, buf + offset, splitLength);
-
-            offset = offset + splitLength;
-            (*start) = offset;
-
-            return (length-offset);
-        }
-        else
-        {
-            User_memory_copy(splitBuf, buf + offset, length - offset);
-
-            (*start)  = length;
-            return 0;
-        }
+        m_cmdSend.resize(size);
+        return m_cmdSend.data();
     }
 
-    void TxDevice::rc_addRC(Byte * srcbuf,  Byte * dstbuf, unsigned total_pktNum, unsigned pktNum, unsigned pktLength)
+    unsigned TxDevice::rc_command(Byte * , unsigned bufferSize) // <-- ret_chan
     {
-        device.RCCmd_sequence++;
-        if (device.bIsDebug)
-            printf("RCCmd_sequence = %u\n", device.RCCmd_sequence);
-
-        Word rxID = device.hostRxDeviceID;
-        Word txID = device.clientTxDeviceID;
-        Word seqNum = device.RCCmd_sequence;
-
-        //RC header
-        Byte index = 0;
-        dstbuf[index + 183] = 0x0d;
-        dstbuf[index++] = '#';                          // Leading Tag
-        dstbuf[index++] = (Byte)(rxID>>8);
-        dstbuf[index++] = (Byte)rxID;
-
-        unsigned payload_start_point = index;
-        dstbuf[index++] = (Byte)(txID>>8);
-        dstbuf[index++] = (Byte)txID;
-        dstbuf[index++] = (Byte)(total_pktNum>>8);      // total_pktNum
-        dstbuf[index++] = (Byte)total_pktNum;           // total_pktNum
-        dstbuf[index++] = (Byte)(pktNum>>8);            // pktNum
-        dstbuf[index++] = (Byte)pktNum;                 // pktNum
-        dstbuf[index++] = (Byte)(seqNum>>8);            // seqNum
-        dstbuf[index++] = (Byte)seqNum;                 // seqNum
-        dstbuf[index++] = (Byte)(pktLength>>8);         // pktLength
-        dstbuf[index++] = (Byte)pktLength;              // pktLength
-
-        User_memory_copy(dstbuf + index, srcbuf, pktLength);
-        index = index + (Byte)pktLength;
-
-        dstbuf[index] = checksum(&dstbuf[payload_start_point], index - payload_start_point);
-        //++index;
-    }
-
-    void TxDevice::rc_addTS(Byte * dstbuf)
-    {
-        device.TS_sequence++;
-
-        Word PID = device.PID;
-        Byte seqNum = device.TS_sequence;
-
-        //TS header
-        dstbuf[0] = 0x47;                               // svnc_byte
-        dstbuf[1] = 0x20 | ((Byte) (PID >> 8));         // TEI + .. +PID
-        dstbuf[2] = (Byte) PID;                         // PID
-        dstbuf[3] = 0x10| ((Byte) (seqNum & 0x0F));     // ... + continuity counter
-    }
-
-    unsigned TxDevice::rc_sendTSCmd(Byte * buffer, unsigned bufferSize)
-    {
-        Word tmpcommand = buffer[4]<<8 | buffer[5];
-
-        if (device.clientTxDeviceID == 0xFFFF)
-        {
-            switch (tmpcommand)
-            {
-                case CMD_GetTxDeviceAddressIDInput:
-                    break;
-                default:
-                    return ReturnChannelError::CMD_TXDEVICEID_ERROR;
-            }
-        }
-
-        unsigned dwRemainder = bufferSize % RCMaxSize;
-        unsigned total_pktCount = bufferSize / RCMaxSize;
-        if (dwRemainder)
-            ++total_pktCount;
-
-        unsigned error = ReturnChannelError::NO_ERROR;
-        Byte tsPkt[188] = {0xFF};
-        Byte cmdData[RCMaxSize] = {0xFF};
-        unsigned start = 0;
-
-        //User_mutex_lock();
-
-        unsigned pktCount = 1;
-        for (; rc_splitBuffer(buffer, bufferSize, cmdData, RCMaxSize, &start); ++pktCount)
-        {
-            rc_addTS(tsPkt);
-            rc_addRC(cmdData, &tsPkt[4], total_pktCount, pktCount, RCMaxSize);
-
-            int txLen;
-            error = User_returnChannelBusTx(sizeof(tsPkt), tsPkt, &txLen); // FIXME
-            if (error)
-                goto exit;
-        }
-
-        rc_addTS(tsPkt);
-
-        if (dwRemainder == 0)
-            rc_addRC(cmdData, &tsPkt[4], total_pktCount, pktCount, RCMaxSize);
-        else
-            rc_addRC(cmdData, &tsPkt[4], total_pktCount, pktCount, dwRemainder);
-
-        int txLen;
-        error = User_returnChannelBusTx(sizeof(tsPkt), tsPkt, &txLen); // FIXME
-        if (error)
-            goto exit;
-
-    exit:
-        //User_mutex_unlock();
-        return error;
-    }
-
-    unsigned TxDevice::rc_sendBuffer(Byte * buffer, unsigned bufferSize)
-    {
-        if (bufferSize <= 0)
-            return ReturnChannelError::CMD_WRONG_LENGTH;
-
-        if (device.TSMode)
-            return rc_sendTSCmd(buffer, bufferSize);
-
-        if (device.clientTxDeviceID == 0xFFFF)
-            return ReturnChannelError::CMD_TXDEVICEID_ERROR;
-
-        //Word tmpcommand = buffer[4]<<8 | buffer[5];
-        unsigned dwRemainder = bufferSize % RCMaxSize;
-        unsigned total_pktCount = bufferSize / RCMaxSize;
-        if (dwRemainder)
-            ++total_pktCount;
-
-        Byte cmdData[RCMaxSize] = {0xFF};
-        Byte rcPkt[184] = {0xFF};
-        unsigned start = 0;
-        unsigned error = ReturnChannelError::NO_ERROR;
-
-        //User_mutex_lock(); // LOCK
-
-        unsigned pktCount = 1;
-        for (; rc_splitBuffer(buffer, bufferSize, cmdData, RCMaxSize, &start); ++pktCount)
-        {
-            rc_addRC(cmdData, rcPkt, total_pktCount, pktCount, RCMaxSize);
-
-            int txLen;
-            error = User_returnChannelBusTx(sizeof(rcPkt), rcPkt, &txLen); // FIXME
-            if (error)
-                goto exit;
-        }
-
-        if (dwRemainder == 0)
-            rc_addRC(cmdData, rcPkt, total_pktCount, pktCount, RCMaxSize);
-        else
-            rc_addRC(cmdData, rcPkt, total_pktCount, pktCount, dwRemainder);
-
-        int txLen;
-        error = User_returnChannelBusTx(sizeof(rcPkt), rcPkt, &txLen); // FIXME
-        if (error)
-            goto exit;
-
-    exit:
-        //User_mutex_unlock(); // UNLOCK
-        return error;
+        // data is already in m_cmd.data()
+        m_cmdSend.resize(bufferSize);
+        return 0;
     }
 }

@@ -404,7 +404,7 @@ Dword DTV_GetDriverInformation(
 	return result;
 }
 
-Dword DTV_SendCommand(IN int handle, IN const Byte * data, IN unsigned length)
+Dword DTV_SendRC(IN int handle, IN const Byte * data, IN unsigned length)
 {
     if (handle <= 0)
         return ERR_USB_INVALID_HANDLE;

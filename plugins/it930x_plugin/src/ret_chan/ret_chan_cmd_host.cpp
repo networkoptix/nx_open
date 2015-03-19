@@ -1891,7 +1891,7 @@ static unsigned Cmd_generalGet(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_getWithByte(IN TxDevice * deviceInfo, IN Byte byteData, IN Word command)
@@ -1918,7 +1918,7 @@ static unsigned Cmd_getWithByte(IN TxDevice * deviceInfo, IN Byte byteData, IN W
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_getWithString(IN TxDevice * deviceInfo, IN const RCString * string, IN Word command)
@@ -1946,7 +1946,7 @@ static unsigned Cmd_getWithString(IN TxDevice * deviceInfo, IN const RCString * 
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_getWithStrings(IN TxDevice * deviceInfo, IN const RCString * stringArray, IN unsigned stringSize, IN Word command)
@@ -1976,7 +1976,7 @@ static unsigned Cmd_getWithStrings(IN TxDevice * deviceInfo, IN const RCString *
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 //----------------------General-----------------------
@@ -2009,7 +2009,7 @@ static unsigned Cmd_getHwRegisterValues(IN TxDevice * deviceInfo, IN Word comman
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setTxDeviceAddressID(IN TxDevice * deviceInfo, IN Word command)
@@ -2039,7 +2039,7 @@ static unsigned Cmd_setTxDeviceAddressID(IN TxDevice * deviceInfo, IN Word comma
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setCalibrationTable(IN TxDevice * deviceInfo, IN Word command)
@@ -2071,7 +2071,7 @@ static unsigned Cmd_setCalibrationTable(IN TxDevice * deviceInfo, IN Word comman
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setTransmissionParameters(IN TxDevice * deviceInfo, IN Word command)
@@ -2116,7 +2116,7 @@ static unsigned Cmd_setTransmissionParameters(IN TxDevice * deviceInfo, IN Word 
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setHwRegisterValues(IN TxDevice * deviceInfo, IN Word command)
@@ -2150,7 +2150,7 @@ static unsigned Cmd_setHwRegisterValues(IN TxDevice * deviceInfo, IN Word comman
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setAdvanceOptions(IN TxDevice * deviceInfo, IN Word command)
@@ -2191,7 +2191,7 @@ static unsigned Cmd_setAdvanceOptions(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setTPSInfo(IN TxDevice * deviceInfo, IN Word command)
@@ -2225,7 +2225,7 @@ static unsigned Cmd_setTPSInfo(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setPSITable(IN TxDevice * deviceInfo, IN Word command)
@@ -2265,7 +2265,7 @@ static unsigned Cmd_setPSITable(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setNitLocation(IN TxDevice * deviceInfo, IN Word command)
@@ -2297,7 +2297,7 @@ static unsigned Cmd_setNitLocation(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setSdtServiceConfiguration(IN TxDevice * deviceInfo, IN Word command)
@@ -2339,7 +2339,7 @@ static unsigned Cmd_setSdtServiceConfiguration(IN TxDevice * deviceInfo, IN Word
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setEITInformation(IN TxDevice * deviceInfo, IN Word command)
@@ -2383,7 +2383,7 @@ static unsigned Cmd_setEITInformation(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 //----------------------ccHDtv Service---------------
 
@@ -2430,7 +2430,7 @@ static unsigned Cmd_setSystemDateAndTime(IN TxDevice * deviceInfo, IN Word comma
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setOSDInformation(IN TxDevice * deviceInfo, IN Word command)
@@ -2474,7 +2474,7 @@ static unsigned Cmd_setOSDInformation(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_upgradeSystemFirmware(IN TxDevice * deviceInfo, IN Word command)
@@ -2505,7 +2505,7 @@ static unsigned Cmd_upgradeSystemFirmware(IN TxDevice * deviceInfo, IN Word comm
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 //-----------Device Management Service----------
 
@@ -2541,7 +2541,7 @@ static unsigned Cmd_setRelayOutputSettings(IN TxDevice * deviceInfo, IN Word com
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setRelayOutputState(IN TxDevice * deviceInfo, IN Word command)
@@ -2572,7 +2572,7 @@ static unsigned Cmd_setRelayOutputState(IN TxDevice * deviceInfo, IN Word comman
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 //-----------Device IO Service----------
@@ -2611,7 +2611,7 @@ static unsigned Cmd_move(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setImagingSettings(IN TxDevice * deviceInfo, IN Word command)
@@ -2682,7 +2682,7 @@ static unsigned Cmd_setImagingSettings(IN TxDevice * deviceInfo, IN Word command
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setUserDefinedSettings(IN TxDevice * deviceInfo, IN Word command)
@@ -2727,7 +2727,7 @@ static unsigned Cmd_setVideoSrcControl(IN TxDevice * deviceInfo, IN Word command
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setVideoPrivateArea(IN TxDevice * deviceInfo, IN Word command)
@@ -2765,7 +2765,7 @@ static unsigned Cmd_setVideoPrivateArea(IN TxDevice * deviceInfo, IN Word comman
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setVideoOSDConfig(IN TxDevice * deviceInfo, IN Word command)
@@ -2810,7 +2810,7 @@ static unsigned Cmd_setVideoOSDConfig(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setAudioEncConfig(IN TxDevice * deviceInfo, IN Word command)
@@ -2846,7 +2846,7 @@ static unsigned Cmd_setAudioEncConfig(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setAudioSrcConfig(IN TxDevice * deviceInfo, IN Word command)
@@ -2880,7 +2880,7 @@ static unsigned Cmd_setAudioSrcConfig(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setVideoEncConfig(IN TxDevice * deviceInfo, IN Word command)
@@ -2926,7 +2926,7 @@ static unsigned Cmd_setVideoEncConfig(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setVideoSrcConfig(IN TxDevice * deviceInfo, IN Word command)
@@ -2969,7 +2969,7 @@ static unsigned Cmd_setVideoSrcConfig(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_getVideoSrcConfigOptions(IN TxDevice * deviceInfo, IN Word command)
@@ -3069,7 +3069,7 @@ static unsigned Cmd_gotoPreset(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_removePreset(IN TxDevice * deviceInfo, IN Word command)
@@ -3100,7 +3100,7 @@ static unsigned Cmd_removePreset(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_setPreset(IN TxDevice * deviceInfo, IN Word command)
@@ -3132,7 +3132,7 @@ static unsigned Cmd_setPreset(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_absoluteMove(IN TxDevice * deviceInfo, IN Word command)
@@ -3168,7 +3168,7 @@ static unsigned Cmd_absoluteMove(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_relativeMove(IN TxDevice * deviceInfo, IN Word command)
@@ -3204,7 +3204,7 @@ static unsigned Cmd_relativeMove(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_continuousMove(IN TxDevice * deviceInfo, IN Word command)
@@ -3238,7 +3238,7 @@ static unsigned Cmd_continuousMove(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_gotoHomePosition(IN TxDevice * deviceInfo, IN Word command)
@@ -3271,7 +3271,7 @@ static unsigned Cmd_gotoHomePosition(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_PTZStop(IN TxDevice * deviceInfo, IN Word command)
@@ -3302,7 +3302,7 @@ static unsigned Cmd_PTZStop(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 //----------- PTZ  Service------------
 
@@ -3466,7 +3466,7 @@ static unsigned Cmd_createRule(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 static unsigned Cmd_modifyRule(IN TxDevice * deviceInfo, IN Word command)
@@ -3628,7 +3628,7 @@ static unsigned Cmd_modifyRule(IN TxDevice * deviceInfo, IN Word command)
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 //----------- Video Analytics  Service------------
 
@@ -3665,11 +3665,11 @@ static unsigned Cmd_setMetadataSettings(IN TxDevice * deviceInfo, IN Word comman
     cmd_buffer[bufferLength] = deviceInfo->checksum(cmd_buffer, bufferLength);
     ++bufferLength;
 
-    return deviceInfo->rc_sendBuffer(cmd_buffer, bufferLength);
+    return deviceInfo->rc_command(cmd_buffer, bufferLength);
 }
 
 ///
-unsigned sendRC(IN ite::TxDevice * deviceInfo, IN Word command)
+unsigned makeRcCommand(IN ite::TxDevice * deviceInfo, IN Word command)
 {
     unsigned error = ReturnChannelError::NO_ERROR;
 

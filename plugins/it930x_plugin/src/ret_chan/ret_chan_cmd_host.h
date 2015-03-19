@@ -6,7 +6,6 @@
 typedef struct TxRC
 {
 	//--------------General-------------------
-	Device									device;
 	Security								security;
 	//--------------General-------------------
 

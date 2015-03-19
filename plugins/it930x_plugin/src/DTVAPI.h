@@ -435,7 +435,7 @@ Dword DTV_GetDriverInformation(
 	OUT	PDemodDriverInfo pDriverInfo);
 
 //
-Dword DTV_SendCommand(IN int handle, IN const Byte * data, IN unsigned length);
+Dword DTV_SendRC(IN int handle, IN const Byte * data, IN unsigned length);
 
 //-----------------------------------------------------------------------------
 //	PURPOSE:

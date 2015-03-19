@@ -119,6 +119,8 @@ namespace ite
         void startSearchLost(unsigned lostNum);
         void stopSearchTx(DevLink& outDevLink);
 
+        void updateTxParams();
+
         const IteDriverInfo rxDriverInfo() const { return m_rxInfo; }
         TxDevicePtr txDevice() const { return m_txDev; }
 
@@ -291,7 +293,8 @@ namespace ite
 
         bool open();
         bool stats();
-        void updateTxParams();
+
+        bool sendRC(RcCommand * cmd);
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;

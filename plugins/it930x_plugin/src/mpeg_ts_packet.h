@@ -314,6 +314,8 @@ namespace ite
             }
         }
 
+        const uint8_t * data() const { return data_; }
+
     private:
         const uint8_t * data_;
     };
