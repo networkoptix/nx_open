@@ -140,24 +140,30 @@ void QnPtzControllerPool::updateController(const QnResourcePtr &resource) {
 
 void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource) {
     QnPtzControllerPtr controller = q->createController(resource);
+    QnPtzControllerPtr oldController;
     {
         SCOPED_MUTEX_LOCK( locker, &mutex);
-        if(controllerByResource.value(resource) == controller)
-            return;
-
-        controllerByResource.insert(resource, controller);
+        oldController = controllerByResource.value(resource);
     }
+
+    if(oldController == controller)
+        return;
+
+    emit q->controllerAboutToBeChanged(resource);
+
+    controllerByResource.insert(resource, controller);
 
     /* Some controller require an event loop to function, so we move them
      * to executor thread. Note that controllers don't run synchronous requests 
      * in their associated thread, so this won't present any problems for
      * other users of the executor thread. */
-    while(controller) {
-        controller->moveToThread(executorThread);
-        if(QnProxyPtzControllerPtr proxyController = controller.dynamicCast<QnProxyPtzController>()) {
-            controller = proxyController->baseController();
+    QnPtzControllerPtr controllerIt = controller;
+    while(controllerIt) {
+        controllerIt->moveToThread(executorThread);
+        if(QnProxyPtzControllerPtr proxyController = controllerIt.dynamicCast<QnProxyPtzController>()) {
+            controllerIt = proxyController->baseController();
         } else {
-            controller.clear();
+            controllerIt.clear();
         }
     }
 

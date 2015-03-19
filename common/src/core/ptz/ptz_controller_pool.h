@@ -36,6 +36,7 @@ public:
     QnPtzControllerPtr controller(const QnResourcePtr &resource) const;
 
 signals:
+    void controllerAboutToBeChanged(const QnResourcePtr &resource);
     void controllerChanged(const QnResourcePtr &resource);
 
 protected:

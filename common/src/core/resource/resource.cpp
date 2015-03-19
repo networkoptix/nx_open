@@ -65,7 +65,7 @@ private:
     QString m_id;
 };
 
-typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
+typedef std::shared_ptr<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
 
 // -------------------------------------------------------------------------- //
 // QnResourceGetParamsCommand
@@ -167,7 +167,7 @@ public:
 private:
     QnCameraAdvancedParamValueList m_values;
 };
-typedef QSharedPointer<QnResourceSetParamsCommand> QnResourceSetParamsCommandPtr;
+typedef std::shared_ptr<QnResourceSetParamsCommand> QnResourceSetParamsCommandPtr;
 
 
 #endif // ENABLE_DATA_PROVIDERS

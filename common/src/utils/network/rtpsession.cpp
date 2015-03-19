@@ -2,6 +2,11 @@
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
 #endif
+#ifdef __arm__
+#include <sys/ioctl.h>
+#endif
+
+#include <atomic>
 
 #include "rtpsession.h"
 #include "rtp_stream_parser.h"
@@ -32,7 +37,7 @@ static const quint32 CSRC_CONST = 0xe8a9552a;
 static const int TCP_CONNECT_TIMEOUT = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
-static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
+static const char USER_AGENT_STR[] = "Network Optix";
 //static const int TIME_RESYNC_THRESHOLD = 15;
 //static const int TIME_FUTURE_THRESHOLD = 4;
 //static const double TIME_RESYNC_THRESHOLD2 = 30;
@@ -119,14 +124,13 @@ void RTPIODevice::processRtcpData()
     quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
     while( m_rtcpSocket->hasData() )
     {
-        QString lastReceivedAddr;
-        unsigned short lastReceivedPort = 0;
-        int readed = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), lastReceivedAddr, lastReceivedPort);
+        SocketAddress senderEndpoint;
+        int readed = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), &senderEndpoint);
         if (readed > 0)
         {
             if (!m_rtcpSocket->isConnected())
             {
-                if (!m_rtcpSocket->setDestAddr(lastReceivedAddr, lastReceivedPort))
+                if (!m_rtcpSocket->setDestAddr(senderEndpoint))
                 {
                     qWarning() << "RTPIODevice::processRtcpData(): setDestAddr() failed: " << SystemError::getLastOSErrorText();
                 }
@@ -363,8 +367,12 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
 
 static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64*1024;
 
+
+static std::atomic<int> RTPSessionInstanceCounter(0);
+
 // ================================================== RTPSession ==========================================
-RTPSession::RTPSession():
+RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
+:
     m_csec(2),
     //m_rtpIo(*this),
     m_transport(TRANSPORT_UDP),
@@ -380,14 +388,17 @@ RTPSession::RTPSession():
     m_useDigestAuth(false),
     m_numOfPredefinedChannels(0),
     m_TimeOut(0),
+    m_tcpSock(std::move(tcpSock)),
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
-    m_additionalReadBufferSize( 0 )
+    m_additionalReadBufferSize( 0 ),
+    m_userAgent(USER_AGENT_STR)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
 
-    m_tcpSock.reset( SocketFactory::createStreamSocket() );
+    if( !m_tcpSock )
+        m_tcpSock.reset( SocketFactory::createStreamSocket() );
 
     m_additionalReadBuffer = new char[ADDITIONAL_READ_BUFFER_CAPACITY];
 
@@ -432,11 +443,11 @@ void RTPSession::usePredefinedTracks()
     int trackNum = 0;
     for (; trackNum < m_numOfPredefinedChannels; ++trackNum)
     {
-        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QLatin1String("video"), QString(QLatin1String("trackID=%1")).arg(trackNum), FFMPEG_CODE, trackNum, this, true));
+        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QByteArray("video"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, trackNum, this, true));
     }
 
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QLatin1String("audio"), QString(QLatin1String("trackID=%1")).arg(trackNum), FFMPEG_CODE, trackNum, this, true));
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(METADATA_STR, QLatin1String("metadata"), QLatin1String("trackID=7"), METADATA_CODE, METADATA_TRACK_NUM, this, true));
+    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QByteArray("audio"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, trackNum, this, true));
+    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(METADATA_STR, QByteArray("metadata"), QByteArray("trackID=7"), METADATA_CODE, METADATA_TRACK_NUM, this, true));
 }
 
 bool trackNumLess(const QSharedPointer<RTPSession::SDPTrackInfo>& track1, const QSharedPointer<RTPSession::SDPTrackInfo>& track2)
@@ -488,8 +499,8 @@ void RTPSession::parseSDP()
 
     int mapNum = -1;
     QString codecName;
-    QString codecType;
-    QString setupURL;
+    QByteArray codecType;
+    QByteArray setupURL;
 
     for(QByteArray line: lines)
     {
@@ -505,7 +516,7 @@ void RTPSession::parseSDP()
                 setupURL.clear();
             }
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
-            codecType = QLatin1String(trackParams[0]);
+            codecType = trackParams[0];
             codecName.clear();
             mapNum = 0;
             if (trackParams.size() >= 4) {
@@ -527,7 +538,7 @@ void RTPSession::parseSDP()
         //else if (lineLower.startsWith("a=control:track"))
         else if (lineLower.startsWith("a=control:"))
         {
-            setupURL = QLatin1String(line.mid(QByteArray("a=control:").length()));
+            setupURL = line.mid(QByteArray("a=control:").length());
         }
     }
     if (mapNum >= 0) {
@@ -589,6 +600,18 @@ void RTPSession::updateResponseStatus(const QByteArray& response)
 
 CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
 {
+#ifdef _DUMP_STREAM
+    const int fileIndex = ++RTPSessionInstanceCounter;
+    std::ostringstream ss;
+    ss<<"C:\\tmp\\12\\in."<<fileIndex;
+    m_inStreamFile.open( ss.str(), std::ios_base::binary );
+    ss.str(std::string());
+    ss<<"C:\\tmp\\12\\out."<<fileIndex;
+    m_outStreamFile.open( ss.str(), std::ios_base::binary );
+#endif
+
+
+
     if ((quint64)startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
     m_SessionId.clear();
@@ -773,7 +796,7 @@ nx_http::Request RTPSession::createDescribeRequest()
     request.requestLine.url = mUrl;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
+    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
     request.headers.insert( nx_http::HttpHeader( "Accept", "application/sdp" ) );
     if( (quint64)m_openedTime != AV_NOPTS_VALUE )
         addRangeHeader( &request, m_openedTime, AV_NOPTS_VALUE );
@@ -787,7 +810,15 @@ bool RTPSession::sendRequestInternal(nx_http::Request&& request)
     addAdditionAttrs(&request);
     QByteArray requestBuf;
     request.serialize( &requestBuf );
+#ifdef _DUMP_STREAM
+    m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
+#endif
     return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
+}
+
+AbstractStreamSocket* RTPSession::tcpSock()
+{
+    return m_tcpSock.get();
 }
 
 bool RTPSession::sendDescribe()
@@ -802,7 +833,7 @@ bool RTPSession::sendOptions()
     request.requestLine.url = mUrl;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
+    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
     return sendRequestInternal(std::move(request));
 }
 
@@ -857,9 +888,9 @@ QList<QByteArray> RTPSession::getSdpByTrackNum(int trackNum) const
 void RTPSession::registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo)
 {
     while (m_rtpToTrack.size() <= rtpNum)
-        m_rtpToTrack << QSharedPointer<SDPTrackInfo>();
-    m_rtpToTrack[rtpNum] = trackInfo;
-};
+        m_rtpToTrack.emplace_back( QSharedPointer<SDPTrackInfo>() );
+    m_rtpToTrack[rtpNum] = std::move(trackInfo);
+}
 
 bool RTPSession::sendSetup()
 {
@@ -944,20 +975,21 @@ bool RTPSession::sendSetup()
 
         nx_http::Request request;
         request.requestLine.method = "SETUP";
-        if( trackInfo->setupURL.startsWith(QLatin1String("rtsp://")) )
+        if( trackInfo->setupURL.startsWith("rtsp://") )
         {
             // full track url in a prefix
-            request.requestLine.url = trackInfo->setupURL;
+            request.requestLine.url = QString::fromLatin1(trackInfo->setupURL);
         }   
         else
         {
             request.requestLine.url = mUrl;
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
-            request.requestLine.urlPostfix = QString(lit("/")) + trackInfo->setupURL;
+            request.requestLine.urlPostfix = QByteArray("/") + trackInfo->setupURL;
         }
         request.requestLine.version = nx_rtsp::rtsp_1_0;
         request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-        request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
+        request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+
 
         {   //generating transport header
             nx_http::StringType transportStr = "RTP/AVP/";
@@ -1077,7 +1109,7 @@ bool RTPSession::sendSetParameter( const QByteArray& paramName, const QByteArray
     request.requestLine.url = mUrl;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
+    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     request.headers.insert( nx_http::HttpHeader( "Content-Length", QByteArray::number(request.messageBody.size()) ) );
     return sendRequestInternal(std::move(request));
@@ -1119,7 +1151,7 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
     request.requestLine.url = m_contentBase;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
+    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     addRangeHeader( &request, startPos, endPos );
     request.headers.insert( nx_http::HttpHeader( "Scale", QByteArray::number(m_scale) ) );
@@ -1184,7 +1216,7 @@ bool RTPSession::sendPause()
     request.requestLine.url = mUrl;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
+    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
 }
@@ -1196,7 +1228,7 @@ bool RTPSession::sendTeardown()
     request.requestLine.url = mUrl;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
+    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
 }
@@ -1315,7 +1347,7 @@ bool RTPSession::sendKeepAlive()
     request.requestLine.url = mUrl;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
-    request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
+    request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
 }
@@ -1323,6 +1355,9 @@ bool RTPSession::sendKeepAlive()
 void RTPSession::sendBynaryResponse(quint8* buffer, int size)
 {
     m_tcpSock->send(buffer, size);
+#ifdef _DUMP_STREAM
+    m_outStreamFile.write( (const char*)buffer, size );
+#endif
 }
 
 
@@ -1575,7 +1610,7 @@ RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
     TrackType rez = TT_UNKNOWN;
     int rtpChannelNum = channelNum & ~1;
     if (rtpChannelNum < m_rtpToTrack.size()) {
-        QSharedPointer<SDPTrackInfo> track = m_rtpToTrack[rtpChannelNum];
+        const QSharedPointer<SDPTrackInfo>& track = m_rtpToTrack[rtpChannelNum];
         if (track)
             rez = track->trackType;
     }
@@ -1593,7 +1628,7 @@ int RTPSession::getChannelNum(int rtpChannelNum)
 {
     rtpChannelNum = rtpChannelNum & ~1;
     if (rtpChannelNum < m_rtpToTrack.size()) {
-        QSharedPointer<SDPTrackInfo> track = m_rtpToTrack[rtpChannelNum];
+        const QSharedPointer<SDPTrackInfo>& track = m_rtpToTrack[rtpChannelNum];
         if (track)
             return track->trackNum;
     }
@@ -1700,6 +1735,11 @@ void RTPSession::setUsePredefinedTracks(int numOfVideoChannel)
     m_numOfPredefinedChannels = numOfVideoChannel;
 }
 
+void RTPSession::setUserAgent(const QString& value)
+{
+    m_userAgent = value.toUtf8();
+}
+
 bool RTPSession::setTCPReadBufferSize(int value)
 {
     return m_tcpSock->setRecvBufferSize(value);
@@ -1710,8 +1750,37 @@ QString RTPSession::getVideoLayout() const
     return m_videoLayout;
 }
 
+static const size_t MAX_BITRATE_BITS_PER_SECOND = 50*1024*1024;
+static const size_t MAX_BITRATE_BYTES_PER_SECOND = MAX_BITRATE_BITS_PER_SECOND / CHAR_BIT;
+static_assert(
+    MAX_BITRATE_BYTES_PER_SECOND > ADDITIONAL_READ_BUFFER_CAPACITY * 10,
+    "MAX_BITRATE_BYTES_PER_SECOND MUST be 10 times greater than ADDITIONAL_READ_BUFFER_CAPACITY" );
+
+static const size_t MS_PER_SEC = 1000;
+
 int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome )
 {
+#if 1
+#ifdef __arm__
+    {
+        //TODO #ak Better to find other solution and remove this code.
+            //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
+            //(with nat traversal introduced, not every socket will have handle)
+        int bytesAv = 0;
+        if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) != 0) ||  //socket read buffer size is unknown to us
+            (bytesAv == 0) )    //socket read buffer is empty
+        {
+            //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
+                //Possibly, it is workaround of some other bug somewhere else
+                //This code works only on Raspberry and NX1
+            QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
+        }
+    }
+#endif
+
+    int bytesRead = m_tcpSock->recv( buf, bufSize, readSome ? 0 : MSG_WAITALL );
+    return bytesRead < 0 ? 0 : bytesRead;
+#else
     const size_t bufSizeBak = bufSize;
 
     //this method introduced to minimize m_tcpSock->recv calls (on isd edge m_tcpSock->recv call is rather heavy)
@@ -1734,13 +1803,34 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readS
         if( bufSize == 0 )
             return bufSizeBak;
 
+#ifdef __arm__
+        {
+            //TODO #ak Better to find other solution and remove this code.
+                //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
+                //(with nat traversal introduced, not every socket will have handle)
+            int bytesAv = 0;
+            if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) != 0) ||  //socket read buffer size is unknown to us
+                (bytesAv == 0) )    //socket read buffer is empty
+            {
+                //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
+                    //Possibly, it is workaround of some other bug somewhere else
+                    //This code works only on Raspberry and NX1
+                QThread::msleep( MS_PER_SEC / (MAX_BITRATE_BYTES_PER_SECOND / ADDITIONAL_READ_BUFFER_CAPACITY) );
+            }
+        }
+#endif
+
         m_additionalReadBufferSize = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
+#ifdef _DUMP_STREAM
+        m_inStreamFile.write( m_additionalReadBuffer, m_additionalReadBufferSize );
+#endif
         m_additionalReadBufferPos = 0;
         if( m_additionalReadBufferSize <= 0 )
             return bufSize == bufSizeBak
                 ? m_additionalReadBufferSize    //if could not read anything returning error
                 : bufSizeBak - bufSize;
     }
+#endif
 }
 
 bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responseBuf )
@@ -1756,6 +1846,9 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
         request.serialize( &requestBuf );
         if( m_tcpSock->send(requestBuf.constData(), requestBuf.size()) <= 0 )
             return false;
+#ifdef _DUMP_STREAM
+        m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
+#endif
 
         if( !readTextResponce(responseBuf) )
             return false;

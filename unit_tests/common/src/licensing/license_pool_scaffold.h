@@ -13,4 +13,4 @@ public:
     void addLicenses(Qn::LicenseType licenseType, int count);
 };
 
-#endif QN_LICENSE_POOL_SCAFFOLD
+#endif  // QN_LICENSE_POOL_SCAFFOLD

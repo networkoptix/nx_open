@@ -46,7 +46,7 @@ public:
     */
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
-        const QString& discoveredDevAddress,
+        const HostAddress& discoveredDevAddress,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) = 0;
 };
@@ -102,7 +102,7 @@ private:
     {
     public:
         //!Ip address of discovered device (address, UDP datagram came from)
-        QString deviceAddress;
+        HostAddress deviceAddress;
         //!Address of local interface, device has been discovered on
         QHostAddress localInterfaceAddress;
         //!Device uuid. Places as a separater member because it becomes known before \a devInfo
@@ -159,10 +159,13 @@ private:
 
     void dispatchDiscoverPackets();
     std::shared_ptr<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
-    void startFetchDeviceXml( const QByteArray& uuidStr, const QUrl& descriptionUrl, const QString& sender );
+    void startFetchDeviceXml(
+        const QByteArray& uuidStr,
+        const QUrl& descriptionUrl,
+        const HostAddress& sender );
     void processDeviceXml( const DiscoveredDeviceInfo& devInfo, const QByteArray& foundDeviceDescription );
     //QByteArray getDeviceDescription( const QByteArray& uuidStr, const QUrl& url );
-    QHostAddress findBestIface( const QString& host );
+    QHostAddress findBestIface( const HostAddress& host );
     /*!
         \note MUST be called with \a m_mutex locked. Also, returned item MUST be used under same lock
     */

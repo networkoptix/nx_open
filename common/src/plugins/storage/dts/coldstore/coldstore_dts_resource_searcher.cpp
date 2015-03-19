@@ -147,10 +147,8 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
                 responseData.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
 
-                QString sender;
-                quint16 senderPort;
-
-                int readed = recvSocket.recvFrom(responseData.data(), responseData.size(), sender, senderPort);
+                SocketAddress remoteEndpoint;
+                int readed = recvSocket.recvFrom(responseData.data(), responseData.size(), &remoteEndpoint);
                 if (readed < 157)
                     continue;
                 responseData = responseData.left(readed);
@@ -164,7 +162,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
                     continue;
                 
 
-                server_list.push_back(QHostAddress(sender));
+                server_list.push_back(QHostAddress(remoteEndpoint.address.toString()));
 
                 
             }

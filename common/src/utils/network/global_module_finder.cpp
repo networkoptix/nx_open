@@ -41,7 +41,7 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
     SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     ec2::AbstractECConnectionPtr oldConnection = m_connection.lock();
-    QList<QnModuleInformation> foundModules = m_moduleInformationById.values();
+    QList<QnGlobalModuleInformation> foundModules = m_moduleInformationById.values();
     m_moduleInformationById.clear();
     m_connection = connection;
 
@@ -50,7 +50,7 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
     if (oldConnection)
         oldConnection->getMiscManager()->disconnect(this);
 
-    for (const QnModuleInformation &moduleInformation: foundModules)
+    for (const QnGlobalModuleInformation &moduleInformation: foundModules)
         emit peerLost(moduleInformation);
 
     if (connection)
@@ -62,49 +62,18 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
     }
 }
 
-void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data) {
-    data->type = moduleInformation.type;
-    data->customization = moduleInformation.customization;
-    data->id = moduleInformation.id;
-    data->systemName = moduleInformation.systemName;
-    data->version = moduleInformation.version.toString();
-    data->systemInformation = moduleInformation.systemInformation.toString();
-    data->addresses = moduleInformation.remoteAddresses.toList();
-    data->port = moduleInformation.port;
-    data->name = moduleInformation.name;
-    data->authHash = moduleInformation.authHash;
-    data->sslAllowed = moduleInformation.sslAllowed;
-    data->protoVersion = moduleInformation.protoVersion;
-    data->isAlive = true;
-}
-
-void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data, QnModuleInformation *moduleInformation) {
-    moduleInformation->type = data.type;
-    moduleInformation->customization = data.customization;
-    moduleInformation->id = data.id;
-    moduleInformation->systemName = data.systemName;
-    moduleInformation->version = QnSoftwareVersion(data.version);
-    moduleInformation->systemInformation = QnSystemInformation(data.systemInformation);
-    moduleInformation->remoteAddresses = QSet<QString>::fromList(data.addresses);
-    moduleInformation->port = data.port;
-    moduleInformation->name = data.name;
-    moduleInformation->authHash = data.authHash;
-    moduleInformation->sslAllowed = data.sslAllowed;
-    moduleInformation->protoVersion = data.protoVersion == 0 ? nx_ec::INITIAL_EC2_PROTO_VERSION : data.protoVersion;
-}
-
-QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
+QList<QnGlobalModuleInformation> QnGlobalModuleFinder::foundModules() const {
     SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
-    QList<QnModuleInformation> result;
-    for (const QnModuleInformation &moduleInformation: m_moduleInformationById) {
+    QList<QnGlobalModuleInformation> result;
+    for (const QnGlobalModuleInformation &moduleInformation: m_moduleInformationById) {
         if (!moduleInformation.remoteAddresses.isEmpty())
             result.append(moduleInformation);
     }
     return result;
 }
 
-QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QnUuid &id) const {
+QnGlobalModuleInformation QnGlobalModuleFinder::moduleInformation(const QnUuid &id) const {
     SCOPED_MUTEX_LOCK( lock, &m_mutex);
     return m_moduleInformationById[id];
 }
@@ -171,7 +140,7 @@ void QnGlobalModuleFinder::at_router_connectionRemoved(const QnUuid &discovererI
 void QnGlobalModuleFinder::updateAddresses(const QnUuid &id) {
     SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
-    QnModuleInformation moduleInformation = m_moduleInformationById.value(id);
+    QnGlobalModuleInformation moduleInformation = m_moduleInformationById.value(id);
     if (moduleInformation.id.isNull())
         return;
 
@@ -201,14 +170,14 @@ void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformatio
 
     SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
-    QnModuleInformation updatedModuleInformation = moduleInformation;
+    QnGlobalModuleInformation updatedModuleInformation = moduleInformation;
     updatedModuleInformation.remoteAddresses = getModuleAddresses(moduleInformation.id);
     if (updatedModuleInformation.remoteAddresses.isEmpty()) {
         m_moduleInformationById[moduleInformation.id] = updatedModuleInformation;
         return;
     }
 
-    QnModuleInformation &oldModuleInformation = m_moduleInformationById[moduleInformation.id];
+    QnGlobalModuleInformation &oldModuleInformation = m_moduleInformationById[moduleInformation.id];
     if (oldModuleInformation != updatedModuleInformation) {
         oldModuleInformation = updatedModuleInformation;
 

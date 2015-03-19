@@ -60,18 +60,18 @@ public:
     void setQuality(MediaQuality quality);
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
-    QString getRangeHeaderIfChanged();
+    QByteArray getRangeHeaderIfChanged();
     int getMetadataChannelNum() const;
     int getAVTcpChannel(int trackNum) const;
     //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
     //UDPSocket* getMediaSocket(int trackNum) const;
-    RtspServerTrackInfoPtr getTrackInfo(int trackNum) const;
+    RtspServerTrackInfo* getTrackInfo(int trackNum) const;
     int getTracksCount() const;
 
 protected:
     virtual void run();
     void addResponseRangeHeader();
-    QString getRangeStr();
+    QByteArray getRangeStr();
 
 private slots:
     void at_camera_parentIdChanged();

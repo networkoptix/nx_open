@@ -85,7 +85,7 @@ void QnAbstractMediaStreamDataProvider::afterRun()
 bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketPtr& d)
 {
 
-    QnAbstractMediaData* data = dynamic_cast<QnAbstractMediaData*>(d.data());
+    QnAbstractMediaData* data = dynamic_cast<QnAbstractMediaData*>(d.get());
 
     if (data==0)
     {

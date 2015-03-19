@@ -53,6 +53,11 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     m_elapsedTimer.start();
 }
 
+void QnDirectModuleFinderHelper::setForcedUrls(const QSet<QUrl> &forcedUrls) {
+    m_forcedUrls = forcedUrls;
+    updateModuleFinder();
+}
+
 void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
     if (resource->getId() == qnCommon->moduleGUID())
         return;
@@ -66,9 +71,9 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
     QnUuid serverId = server->getId();
     quint16 port = server->getPort();
 
-    QnUrlSet urls = m_serverUrlsById[serverId];
-    QnUrlSet additionalUrls = m_additionalServerUrlsById[serverId];
-    QnUrlSet ignoredUrls = m_ignoredServerUrlsById[serverId];
+    QnUrlSet urls;
+    QnUrlSet additionalUrls;
+    QnUrlSet ignoredUrls;
 
     for (const QHostAddress &address: server->getNetAddrList()) {
         QUrl url = makeUrl(address.toString(), port);
@@ -91,6 +96,8 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
     m_serverUrlsById[serverId] = urls;
     m_additionalServerUrlsById[serverId] = additionalUrls;
     m_ignoredServerUrlsById[serverId] = ignoredUrls;
+
+    updateModuleFinder();
 }
 
 void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource) {
@@ -113,6 +120,8 @@ void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resourc
 
     for (const QUrl &url: m_ignoredServerUrlsById.take(serverId))
         removeUrl(url, m_ignoredUrls);
+
+    updateModuleFinder();
 }
 
 void QnDirectModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
@@ -125,9 +134,9 @@ void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &
     at_resourceAdded(resource);
 }
 
-void QnDirectModuleFinderHelper::at_responseReceived(const QnModuleInformation &moduleInformation, const QUrl &url) {
+void QnDirectModuleFinderHelper::at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
     Q_UNUSED(moduleInformation)
-    m_multicastedUrlLastPing[url] = m_elapsedTimer.elapsed();
+    m_multicastedUrlLastPing[makeUrl(address.address.toString(), address.port)] = m_elapsedTimer.elapsed();
 }
 
 void QnDirectModuleFinderHelper::at_timer_timeout() {
@@ -140,11 +149,12 @@ void QnDirectModuleFinderHelper::at_timer_timeout() {
         else
             ++it;
     }
+    updateModuleFinder();
 }
 
 void QnDirectModuleFinderHelper::updateModuleFinder() {
     QnUrlSet urls = QnUrlSet::fromList(m_urls.keys());
     QnUrlSet ignored = QnUrlSet::fromList(m_ignoredUrls.keys());
     QnUrlSet alive = QnUrlSet::fromList(m_multicastedUrlLastPing.keys());
-    m_moduleFinder->directModuleFinder()->setUrls(urls - ignored - alive);
+    m_moduleFinder->directModuleFinder()->setUrls((urls + m_forcedUrls) - ignored - alive);
 }

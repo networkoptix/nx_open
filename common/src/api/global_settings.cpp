@@ -43,6 +43,7 @@ namespace {
     const QString nameFrom(lit("emailFrom"));
     const QString nameSignature(lit("emailSignature"));
     const QString nameSupportEmail(lit("emailSupportEmail"));
+    const QString nameUpdateNotificationsEnabled(lit("updateNotificationEnabled"));
     
 }
 
@@ -63,6 +64,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
     m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameSimple, true, this);
+    m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, false, this);
 
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
@@ -81,6 +83,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_allAdaptors 
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
+        << m_updateNotificationsEnabledAdaptor
         << emailAdaptors
         ;
 
@@ -193,4 +196,12 @@ void QnGlobalSettings::synchronizeNow() {
 
 QnUserResourcePtr QnGlobalSettings::getAdminUser() {
     return m_admin;
+}
+
+bool QnGlobalSettings::isUpdateNotificationsEnabled() const {
+    return m_updateNotificationsEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setUpdateNotificationsEnabled(bool updateNotificationsEnabled) {
+    m_updateNotificationsEnabledAdaptor->setValue(updateNotificationsEnabled);
 }

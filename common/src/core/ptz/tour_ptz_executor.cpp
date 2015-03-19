@@ -160,6 +160,8 @@ void QnTourPtzExecutorPrivate::updateDefaults() {
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
+    TRACE("STOP TOUR" << data.tour.name);
+
     state = Stopped;
 
     moveTimer.stop();

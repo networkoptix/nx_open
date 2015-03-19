@@ -6,7 +6,6 @@
 
 #include "utils/common/util.h"
 #include "common/common_module.h"
-#include "managers/impl/license_manager_impl.h"
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_discovery_data.h"
@@ -373,6 +372,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 
 
     QSqlQuery identityTimeQuery(m_sdb);
+    identityTimeQuery.setForwardOnly(true);
     identityTimeQuery.prepare("SELECT data FROM misc_data WHERE key = ?");
     identityTimeQuery.addBindValue("gotDbDumpTime");
     if (identityTimeQuery.exec() && identityTimeQuery.next()) 
@@ -501,6 +501,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 
     // read license overflow time
     QSqlQuery query( m_sdb );
+    query.setForwardOnly(true);
     query.prepare( "SELECT data from misc_data where key = ?" );
     query.addBindValue( LICENSE_EXPIRED_TIME_KEY );
     qint64 licenseOverflowTime = 0;
@@ -1269,6 +1270,7 @@ bool QnDbManager::createDatabase()
     // move license table to static DB
     ec2::ApiLicenseDataList licenses;
     QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
     query.prepare(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
     if (!query.exec())
     {
@@ -1463,6 +1465,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     {
         // keep current digest value if exists
         QSqlQuery digestQuery(m_sdb);
+        digestQuery.setForwardOnly(true);
         digestQuery.prepare("SELECT digest FROM vms_userprofile WHERE user_id = ?");
         digestQuery.addBindValue(internalId);
         if (!digestQuery.exec()) {
@@ -1570,6 +1573,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
     if (data.authKey.isEmpty())
     {
         QSqlQuery selQuery(m_sdb);
+        selQuery.setForwardOnly(true);
         selQuery.prepare("SELECT auth_key from vms_server where resource_ptr_id = ?");
         selQuery.addBindValue(internalId);
         if (selQuery.exec() && selQuery.next())
@@ -2486,6 +2490,7 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
     QReadLocker lock(&m_mutex); //locking it here since this method is public
 
     QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
     query.prepare("SELECT data from misc_data where key = ?");
     query.addBindValue(name);
     if( query.exec() && query.next() ) {

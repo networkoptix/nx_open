@@ -99,6 +99,7 @@ private:
         MediaQuality streamQuality,
         const QnLiveStreamProviderPtr& primaryReader,
         qint64 targetDurationUSec );
+    QElapsedTimer m_lastActivityTimer;
 };
 
 #endif // __VIDEO_CAMERA_H__

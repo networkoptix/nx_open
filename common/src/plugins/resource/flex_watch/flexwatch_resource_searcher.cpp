@@ -93,9 +93,8 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             QByteArray datagram;
             datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-            QString sender;
-            quint16 senderPort;
-            int readed = sock->recvFrom(datagram.data(), datagram.size(),  sender, senderPort);
+            SocketAddress senderEndpoint;
+            int readed = sock->recvFrom(datagram.data(), datagram.size(), &senderEndpoint);
 
             if (readed < 4 || !datagram.startsWith("SFJ"))
                 continue;
@@ -115,7 +114,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             processedMac << info.mac;
 
             info.uniqId = info.mac;
-            info.discoveryIp = sender;
+            info.discoveryIp = senderEndpoint.toString();
 
             OnvifResourceInformationFetcher onfivFetcher;
             onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result, discoveryMode());

@@ -130,7 +130,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     //t.start();
     m_skipFramesToTime = 0;
     qint64 timeMs = time/1000;
-    m_newQualityTmpData.clear();
+    m_newQualityTmpData.reset();
     m_newQualityAviDelegate.clear();
 
     DeviceFileCatalog::Chunk newChunk;
@@ -312,7 +312,7 @@ begin_label:
             m_currentChunk = m_newQualityChunk;
             m_currentChunkCatalog = m_newQualityCatalog;
             data = m_newQualityTmpData;
-            m_newQualityTmpData.clear();
+            m_newQualityTmpData.reset();
             m_aviDelegate = m_newQualityAviDelegate;
             m_newQualityAviDelegate.clear();
             m_fileRes = m_newQualityFileRes;
@@ -424,7 +424,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
 {
     m_dialQualityHelper.setPrefferedQuality(quality);
     m_quality = quality;
-    m_newQualityTmpData.clear();
+    m_newQualityTmpData.reset();
     m_newQualityAviDelegate.clear();
 
     if (!fastSwitch)

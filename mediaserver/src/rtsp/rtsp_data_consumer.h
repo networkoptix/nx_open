@@ -123,5 +123,7 @@ private:
     bool m_someDataIsDropped;
     qint64 m_previousRtpTimestamp;
     qint64 m_previousScaledRtpTimestamp;
+
+    int m_framesSinceRangeCheck;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

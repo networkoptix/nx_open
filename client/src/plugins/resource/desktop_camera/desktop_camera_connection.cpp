@@ -37,7 +37,7 @@ protected:
 
         QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64);
 
-        QnAbstractMediaDataPtr media = packet.dynamicCast<QnAbstractMediaData>();
+        QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(packet);
         if (!media)
             return false;
 

@@ -39,6 +39,9 @@ public:
 
     void synchronizeNow();
     QnUserResourcePtr getAdminUser();
+
+    bool isUpdateNotificationsEnabled() const;
+    void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
 signals:
     void disabledVendorsChanged();
     void cameraSettingsOptimizationChanged();
@@ -64,6 +67,7 @@ private:
     QnResourcePropertyAdaptor<int> *m_timeoutAdaptor;
     /** Flag that we are using simple smtp settings set */
     QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;   //TODO: #GDM #Common think where else we can store it
+    QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 

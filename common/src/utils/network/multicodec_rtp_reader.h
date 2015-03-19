@@ -45,7 +45,9 @@ private:
     enum {BLOCK_SIZE = 1460};
 
 public:
-    QnMulticodecRtpReader( const QnResourcePtr& res );
+    QnMulticodecRtpReader(
+        const QnResourcePtr& res,
+        std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
     virtual ~QnMulticodecRtpReader();
 
     //!Implementation of QnAbstractMediaStreamProvider::getNextData
@@ -69,6 +71,7 @@ public:
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
+    void setUserAgent(const QString& value);
 signals:
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 

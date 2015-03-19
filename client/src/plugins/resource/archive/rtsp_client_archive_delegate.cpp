@@ -469,7 +469,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
         }
         else if (format == QLatin1String("ffmpeg")) {
-            result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2, &parserPosition));
+            result = std::dynamic_pointer_cast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2, &parserPosition));
             if (!result && m_frameCnt == 0 && receiveTimer.elapsed() > 4000)
                 emit dataDropped(m_reader); // if client can't receive first frame too long inform that stream is slow
         }
@@ -480,7 +480,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
 
         if (result && m_sendedCSec != result->opaque)
-            result.clear(); // ignore old archive data
+            result.reset(); // ignore old archive data
         if (result && parserPosition != AV_NOPTS_VALUE)
             m_position = parserPosition;
         /*

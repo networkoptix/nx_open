@@ -59,7 +59,7 @@ private slots:
     void at_tableViewport_resizeEvent();
     void at_tourSpotsChanged(const QnPtzTourSpotList &spots);
 
-    void at_cache_imageLoaded(const QString &fileName, bool ok);
+    void at_cache_imageLoaded(const QString &filename);
 
     void storePreview(const QString &id);
     void setPreview(const QImage &image);

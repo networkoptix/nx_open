@@ -22,7 +22,7 @@
 #include "plugins/resource/onvif/dataprovider/onvif_mjpeg.h"
 
 #include "motion_data_picture.h"
-
+#include "version.h"
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnResourcePtr res,
@@ -194,6 +194,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
         if( mediaUrl.scheme().toLower() == lit("rtsp") )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
+            rtspStreamReader->setUserAgent(lit(QN_PRODUCT_NAME));
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             m_builtinStreamReader.reset( rtspStreamReader );
@@ -242,8 +243,11 @@ QnMetaDataV1Ptr ThirdPartyStreamReader::getCameraMetadata()
 {
     //TODO/IMPL
 
-    QnMetaDataV1Ptr rez = m_lastMetadata != 0 ? m_lastMetadata : QnMetaDataV1Ptr(new QnMetaDataV1());
-    m_lastMetadata.clear();
+    QnMetaDataV1Ptr rez;
+    if( m_lastMetadata )
+        rez.swap( m_lastMetadata );
+    else
+        rez = QnMetaDataV1Ptr(new QnMetaDataV1());
     return rez;
 }
 
@@ -316,7 +320,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
             if( m_savedMediaPacket )
             {
                 rez = std::move(m_savedMediaPacket);
-                m_savedMediaPacket.clear(); //calling clear since QSharePointer move operator implementation leaves some questions...
+                m_savedMediaPacket.reset(); //calling clear since QSharePointer move operator implementation leaves some questions...
             }
             else
             {
@@ -325,12 +329,12 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                 if( rez )
                 {
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                    QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.data());
+                    QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.get());
                     if( videoData && videoData->motion )
                     {
                         m_savedMediaPacket = rez;
                         rez = std::move(videoData->motion);
-                        videoData->motion.clear();
+                        videoData->motion.reset();
                     }
                     else if( rez->dataType == QnAbstractMediaData::AUDIO )
                     {
@@ -340,7 +344,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                             if( m_mediaEncoder2Ref->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
                                 initializeAudioContext( audioFormat );
                         }
-                        static_cast<QnCompressedAudioData*>(rez.data())->context = m_audioContext;
+                        static_cast<QnCompressedAudioData*>(rez.get())->context = m_audioContext;
                     }
                 }
                 else

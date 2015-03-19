@@ -13,11 +13,13 @@
 #include "param.h"
 
 static const float MAX_EPS = 0.01f;
-static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
-static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;
+static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
+static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 
 QnVirtualCameraResource::QnVirtualCameraResource():
-    m_dtsFactory(0)
+    m_dtsFactory(0),
+    m_issueCounter(0),
+    m_lastIssueTimer()
 {}
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): 
@@ -365,44 +367,44 @@ QString QnVirtualCameraResource::toSearchString() const
 }
 
 
-void QnVirtualCameraResource::issueOccured()
-{
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
-    m_issueTimes.push_back(getUsecTimer());
-    if (m_issueTimes.size() >= MAX_ISSUE_CNT) {
-        if (!hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-            addStatusFlags(Qn::CSF_HasIssuesFlag);
-            lock.unlock();
-            saveAsync();
-        }
-    }
-}
-
 int QnVirtualCameraResource::saveAsync()
 {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    return conn->getCameraManager()->addCamera(::toSharedPointer(this), this, &QnVirtualCameraResource::at_saveAsyncFinished);
+    return conn->getCameraManager()->addCamera(::toSharedPointer(this), this, []{});
 }
 
-void QnVirtualCameraResource::at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
-{
-    // not used
-}
-
-void QnVirtualCameraResource::noCameraIssues()
-{
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
-    qint64 threshold = getUsecTimer() - ISSUE_KEEP_TIMEOUT;
-    while(!m_issueTimes.empty() && m_issueTimes.front() < threshold)
-        m_issueTimes.pop_front();
-
-    if (m_issueTimes.empty() && hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-        removeStatusFlags(Qn::CSF_HasIssuesFlag);
-        lock.unlock();
+void QnVirtualCameraResource::issueOccured() {
+    bool tooManyIssues = false;
+    {
+        /* Calculate how many issues have occurred during last check period. */
+        SCOPED_MUTEX_LOCK( lock, &m_mutex );
+        m_issueCounter++;
+        tooManyIssues = m_issueCounter >= MAX_ISSUE_CNT;
+        m_lastIssueTimer.restart();
+    }  
+    if (tooManyIssues && !hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+        addStatusFlags(Qn::CSF_HasIssuesFlag);
         saveAsync();
     }
 }
 
+void QnVirtualCameraResource::cleanCameraIssues() {
+    {
+        /* Check if no issues occurred during last check period. */
+        SCOPED_MUTEX_LOCK( lock, &m_mutex );
+        if (!m_lastIssueTimer.hasExpired(issuesTimeoutMs())) 
+            return;
+        m_issueCounter = 0;
+    }
+    if (hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+        removeStatusFlags(Qn::CSF_HasIssuesFlag);
+        saveAsync();
+    }
+}
+
+int QnVirtualCameraResource::issuesTimeoutMs() {
+    return ISSUE_KEEP_TIMEOUT_MS;
+}
 
 const QLatin1String CameraMediaStreamInfo::anyResolution( "*" );
 

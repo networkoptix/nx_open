@@ -45,6 +45,7 @@ bool QnTransactionLog::init()
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
 
     QSqlQuery query(m_dbManager->getDB());
+    query.setForwardOnly(true);
     bool seqFound = false;
     query.prepare("SELECT peer_guid, db_guid, sequence FROM transaction_sequence");
     if (query.exec()) {
@@ -63,6 +64,7 @@ bool QnTransactionLog::init()
         // migrate from previous version. Init sequence table
 
         QSqlQuery query(m_dbManager->getDB());
+        query.setForwardOnly(true);
         query.prepare("SELECT peer_guid, db_guid, max(sequence) as sequence FROM transaction_log GROUP BY peer_guid, db_guid");
         if (query.exec()) {
             while (query.next()) 
@@ -81,6 +83,7 @@ bool QnTransactionLog::init()
     }
 
     QSqlQuery query2(m_dbManager->getDB());
+    query2.setForwardOnly(true);
     query2.prepare("SELECT tran_guid, timestamp, peer_guid, db_guid FROM transaction_log"); 
     if (query2.exec()) {
         while (query2.next()) {
@@ -98,6 +101,7 @@ bool QnTransactionLog::init()
 
     m_lastTimestamp = qnSyncTime->currentMSecsSinceEpoch();
     QSqlQuery queryTime(m_dbManager->getDB());
+    queryTime.setForwardOnly(true);
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if( !queryTime.exec() )
         return false;
@@ -359,6 +363,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     {
         const QnTranStateKey& key = itr.key();
         QSqlQuery query(m_dbManager->getDB());
+        query.setForwardOnly(true);
         query.prepare("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by sequence");
         query.addBindValue(key.peerID.toRfc4122());
         query.addBindValue(key.dbID.toRfc4122());
@@ -374,6 +379,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
 
     // join fillter transactions to update state to the latest available sequences
     QSqlQuery query(m_dbManager->getDB());
+    query.setForwardOnly(true);
     query.prepare("SELECT peer_guid, db_guid, sequence from transaction_sequence");
     if (!query.exec())
         return ErrorCode::failure;

@@ -36,7 +36,7 @@
                     <div class="container">
                         <div class="navbar-header">
                             <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" >
-                                <img src="customization/hdw_logo.png" height="48"/>
+                                <img src="customization/webadmin_logo.png" height="48"/>
                                 API Reference
                             </a>
                         </div>

@@ -159,7 +159,7 @@ void UPNPDeviceSearcher::cancelHandlerRegistration( UPNPSearchHandler* handler )
 void UPNPDeviceSearcher::saveDiscoveredDevicesSnapshot()
 {
     SCOPED_MUTEX_LOCK( lk,  &m_mutex );
-    m_discoveredDevicesToProcess = m_discoveredDevices;
+    m_discoveredDevicesToProcess.swap( m_discoveredDevices );
     m_discoveredDevices.clear();
 }
 
@@ -233,9 +233,6 @@ void UPNPDeviceSearcher::onSomeBytesRead(
         return;
     }
 
-    nx_http::Request foundDeviceReply;
-    QString remoteHost;
-
     auto SCOPED_GUARD_FUNC = [this, readBuffer, sock]( UPNPDeviceSearcher* ){
         readBuffer->resize( 0 );
         using namespace std::placeholders;
@@ -243,10 +240,12 @@ void UPNPDeviceSearcher::onSomeBytesRead(
     };
     std::unique_ptr<UPNPDeviceSearcher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
+    HostAddress remoteHost;
+    nx_http::Request foundDeviceReply;
     {
         AbstractDatagramSocket* udpSock = static_cast<AbstractDatagramSocket*>(sock);
         //reading socket and parsing UPnP response packet
-        remoteHost = udpSock->lastDatagramSourceAddress().address.toString();
+        remoteHost = udpSock->lastDatagramSourceAddress().address;
         if( !foundDeviceReply.parse( *readBuffer ) )
             return;
     }
@@ -324,7 +323,10 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
     return sock;
 }
 
-void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const QUrl& descriptionUrl, const QString& remoteHost )
+void UPNPDeviceSearcher::startFetchDeviceXml(
+    const QByteArray& uuidStr,
+    const QUrl& descriptionUrl,
+    const HostAddress& remoteHost )
 {
     DiscoveredDeviceInfo info;
     info.deviceAddress = remoteHost;
@@ -403,16 +405,16 @@ void UPNPDeviceSearcher::processDeviceXml(
     updateItemInCache( devInfoFull );
 }
 
-QHostAddress UPNPDeviceSearcher::findBestIface( const QString& host )
+QHostAddress UPNPDeviceSearcher::findBestIface( const HostAddress& host )
 {
-    QString oldAddress;
-    for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
+    QHostAddress oldAddress;
+    for(const QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
-        const QString& newAddress = iface.address.toString();
+        const QHostAddress& newAddress = iface.address;
         if( isNewDiscoveryAddressBetter(host, newAddress, oldAddress) )
             oldAddress = newAddress;
     }
-    return QHostAddress(oldAddress);
+    return oldAddress;
 }
 
 int UPNPDeviceSearcher::cacheTimeout()

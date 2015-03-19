@@ -2113,13 +2113,20 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
-    if (!context()->user() || !workbench()->currentLayout()->resource())
-        return; // action should not be triggered while we are not connected
 
-    if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
-        return;
+    auto checkCondition = [this]() {
+        if (!context()->user() || !workbench()->currentLayout() || !workbench()->currentLayout()->resource())
+            return false; // action should not be triggered while we are not connected
 
-    if (workbench()->currentLayout()->resource()->locked())
+        if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
+            return false;
+
+        if (workbench()->currentLayout()->resource()->locked())
+            return false;
+        return true;
+    };
+
+    if (!checkCondition())
         return;
 
     QnProgressDialog *progressDialog = new QnProgressDialog(mainWindow());
@@ -2127,41 +2134,41 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
     progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
     progressDialog->setRange(0, 0);
     progressDialog->setCancelButton(NULL);
-    connect(progressDialog,   SIGNAL(canceled()),                   progressDialog,     SLOT(deleteLater()));
+    connect(progressDialog, &QnProgressDialog::canceled, progressDialog,     &QObject::deleteLater);
+
+    QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnAppServerImageCache *cache = new QnAppServerImageCache(this);
-    cache->setProperty(uploadingImageARPropertyName, menu()->currentParameters(sender()).widget()->aspectRatio());
-    connect(cache,            SIGNAL(fileUploaded(QString, bool)),  this,               SLOT(at_backgroundImageStored(QString, bool)));
-    connect(cache,            SIGNAL(fileUploaded(QString,bool)),   progressDialog,     SLOT(deleteLater()));
-    connect(cache,            SIGNAL(fileUploaded(QString, bool)),  cache,              SLOT(deleteLater()));
+    cache->setProperty(uploadingImageARPropertyName, parameters.widget()->aspectRatio());
+    connect(cache, &QnAppServerImageCache::fileUploaded,   progressDialog,     &QObject::deleteLater);
+    connect(cache, &QnAppServerImageCache::fileUploaded,   cache,              &QObject::deleteLater);
+    connect(cache, &QnAppServerImageCache::fileUploaded,   this, [this, checkCondition](const QString &filename, QnAppServerFileCache::OperationResult status) {
+        if (!checkCondition())
+            return;   
 
-    cache->storeImage(menu()->currentParameters(sender()).resource()->getUrl());
+        if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded) {
+            QMessageBox::warning(mainWindow(), tr("Error"), tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024))
+                );
+            return;
+        }
+
+        if (status != QnAppServerFileCache::OperationResult::ok) {
+            QMessageBox::warning(mainWindow(), tr("Error"), tr("Error while uploading picture."));
+            return;
+        }
+
+        setCurrentLayoutBackground(filename);
+
+    });
+
+    cache->storeImage(parameters.resource()->getUrl());
     progressDialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename, bool success) {
-    if (!context()->user())
-        return; // action should not be triggered while we are not connected
-
+void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filename) {
     QnWorkbenchLayout* wlayout = workbench()->currentLayout();
-    if (!wlayout)
-        return; //security check
-
     QnLayoutResourcePtr layout = wlayout->resource();
-    if (!layout)
-        return; //security check
-
-    if(!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
-        return;
-
-    if (layout->locked())
-        return;
-
-    if (!success) {
-        QMessageBox::warning(mainWindow(), tr("Error"), tr("Image cannot be uploaded"));
-        return;
-    }
-
+    
     layout->setBackgroundImageFilename(filename);
     if (qFuzzyCompare(layout->backgroundOpacity(), 0.0))
         layout->setBackgroundOpacity(0.7);

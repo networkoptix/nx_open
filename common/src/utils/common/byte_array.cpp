@@ -113,6 +113,13 @@ unsigned int QnByteArray::write( const char *data, unsigned int size )
     return size;
 }
 
+void QnByteArray::uncheckedWrite( const char *data, unsigned int size )
+{
+    Q_ASSERT_X(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
+    memcpy(m_data + m_size, data, size);  //1s
+    m_size += size;
+}
+
 unsigned int QnByteArray::write(quint8 value)
 {
     if( !m_ownBuffer )

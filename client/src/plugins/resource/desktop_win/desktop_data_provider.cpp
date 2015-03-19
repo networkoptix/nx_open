@@ -610,7 +610,7 @@ int QnDesktopDataProvider::processData(bool flush)
     EncodedAudioInfo* ai2 = m_audioInfo.size() > 1 ? m_audioInfo[1] : 0;
     while (ai && ai->m_audioQueue.size() > 0 && (ai2 == 0 || ai2->m_audioQueue.size() > 0))
     {
-        QnWritableCompressedAudioDataPtr audioData = ai->m_audioQueue.front().staticCast<QnWritableCompressedAudioData>();
+        QnWritableCompressedAudioDataPtr audioData = std::static_pointer_cast<QnWritableCompressedAudioData>(ai->m_audioQueue.front());
 
         qint64 audioPts = audioData->timestamp - m_audioFrameDuration;
         qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;

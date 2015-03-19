@@ -408,6 +408,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
     QVector<DeviceFileCatalogPtr> result;
 
     QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
     query.prepare("SELECT * FROM storage_data WHERE role <= :max_role ORDER BY unique_id, role, start_time");
     query.bindValue(":max_role", (int)QnServer::HiQualityCatalog);
 
@@ -463,6 +464,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
     QVector<DeviceFileCatalogPtr> result;
 
     QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
     query.prepare("SELECT unique_id, start_time, duration FROM storage_bookmark ORDER BY unique_id, start_time");
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();

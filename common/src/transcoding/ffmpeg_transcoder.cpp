@@ -363,7 +363,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     QnAbstractMediaDataPtr transcodedData;
     
     QnCodecTranscoderPtr transcoder;
-    if (dynamic_cast<const QnCompressedVideoData*>(media.data()))
+    if (dynamic_cast<const QnCompressedVideoData*>(media.get()))
         transcoder = m_vTranscoder;
     else
         transcoder = m_aTranscoder;

@@ -324,7 +324,7 @@ bool QnArchiveStreamReader::getNextVideoPacket()
         if (m_nextData->dataType == QnAbstractMediaData::META_V1)
             m_skippedMetadata << m_nextData;
 
-        QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(m_nextData);
+        QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(m_nextData);
         if (video)
             return true;
     }
@@ -530,8 +530,8 @@ begin_label:
 
     if (m_afterMotionData)
     {
-        QnAbstractMediaDataPtr result = m_afterMotionData;
-        m_afterMotionData.clear();
+        QnAbstractMediaDataPtr result;
+        result.swap( m_afterMotionData );
         return result;
     }
 
@@ -555,7 +555,7 @@ begin_label:
     // If there is no nextPacket - read it from file, otherwise use saved packet
     if (m_nextData) {
         m_currentData = m_nextData;
-        m_nextData.clear();
+        m_nextData.reset();
     }
     else {
         m_currentData = getNextPacket();
@@ -567,7 +567,7 @@ begin_label:
     if (m_currentData->flags & QnAbstractMediaData::MediaFlags_Skip)
         goto begin_label;
 
-    videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
+    videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(m_currentData);
 
     if (m_currentData->timestamp != qint64(AV_NOPTS_VALUE)) {
         setCurrentTime(m_currentData->timestamp);
@@ -684,7 +684,7 @@ begin_label:
                     }
 
                     if (m_currentTime != seekTime) {
-                        m_currentData.clear();
+                        m_currentData.reset();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
                         internalJumpTo(seekTime);
                         m_bofReached = (seekTime == m_delegate->startTime()) || m_topIFrameTime > seekTime;
@@ -717,8 +717,8 @@ begin_label:
                 {
                     // Some error or end of file. Stop reading frames.
                     setSkipFramesToTime(0, true);
-                    QnAbstractMediaDataPtr tmp = m_nextData;
-                    m_nextData.clear();
+                    QnAbstractMediaDataPtr tmp;
+                    tmp.swap( m_nextData );
                     if (tmp && tmp->dataType == QnAbstractMediaData::EMPTY_DATA)
                     {
                         return tmp; //createEmptyPacket(reverseMode); // EOF/BOF reached
@@ -852,8 +852,8 @@ begin_label:
 void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
 {
     m_skippedMetadata.clear();
-    m_nextData.clear();
-    m_afterMotionData.clear();
+    m_nextData.reset();
+    m_afterMotionData.reset();
     qint64 seekRez = 0;
     if (mksec > 0) {
         seekRez = m_delegate->seek(mksec, !m_exactJumpToSpecifiedFrame);

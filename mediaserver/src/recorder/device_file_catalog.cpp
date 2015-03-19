@@ -29,7 +29,6 @@
 
 #include <boost/array.hpp>
 
-DeviceFileCatalog::RebuildMethod DeviceFileCatalog::m_rebuildArchive = DeviceFileCatalog::Rebuild_None;
 QnMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
 
@@ -383,10 +382,10 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     QDir dir(folder);
     for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
-        while (m_rebuildArchive != Rebuild_None && needRebuildPause())
+        while (!qnStorageMan->needToStopMediaScan() && needRebuildPause())
             QnLongRunnable::msleep(100);
 
-        if (m_rebuildArchive == Rebuild_Canceled || QnResource::isStopping())
+        if (qnStorageMan->needToStopMediaScan() || QnResource::isStopping())
             return; // cancceled
 
         if (fi.isDir()) {
@@ -451,9 +450,9 @@ bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, co
     //m_rebuildStartTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QMap<qint64, Chunk> allChunks;
-    if (m_rebuildArchive == Rebuild_None || m_rebuildArchive == Rebuild_Canceled) {
+    if (qnStorageMan->needToStopMediaScan())
         return false;
-    }
+    
     QVector<EmptyFileInfo> emptyFileList;
     readStorageData(storage, m_catalog, allChunks, emptyFileList, period);
 
@@ -751,11 +750,6 @@ qint64 DeviceFileCatalog::firstTime() const
         return AV_NOPTS_VALUE;
     else
         return m_chunks[0].startTimeMs;
-}
-
-void DeviceFileCatalog::setRebuildArchive(RebuildMethod value)
-{
-    m_rebuildArchive = value;
 }
 
 void DeviceFileCatalog::close()

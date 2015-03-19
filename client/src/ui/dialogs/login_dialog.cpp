@@ -499,6 +499,11 @@ void QnLoginDialog::at_deleteButton_clicked() {
 }
 
 void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
+    QSet<QString> addresses = QnModuleFinder::instance()->moduleAddresses(moduleInformation.id);
+
+    if (addresses.isEmpty())
+        return;
+
     QnEcData data;
     data.id = moduleInformation.id;
     data.version = moduleInformation.version.toString();
@@ -506,8 +511,8 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
 
     /* prefer localhost */
     QString address = QHostAddress(QHostAddress::LocalHost).toString();
-    if (!moduleInformation.remoteAddresses.contains(address))
-        address = *moduleInformation.remoteAddresses.cbegin();
+    if (!addresses.contains(address))
+        address = *addresses.cbegin();
 
     data.url.setScheme(lit("http"));
     data.url.setHost(address);
@@ -515,7 +520,7 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
 
     QnEcData &oldData = m_foundEcs[moduleInformation.id];
     if (!oldData.id.isNull()) {
-        if (!QHostAddress(address).isLoopback() && moduleInformation.remoteAddresses.contains(oldData.url.host()))
+        if (!QHostAddress(address).isLoopback() && addresses.contains(oldData.url.host()))
             data.url.setHost(oldData.url.host());
 
         if (oldData != data) {

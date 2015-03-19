@@ -373,6 +373,10 @@
         <source>Warning! Low quality may result in low resolution image.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -1334,18 +1338,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Occurs</source>
         <translation>发生</translation>
-    </message>
-    <message>
-        <source>b/s</source>
-        <translation>b/s</translation>
-    </message>
-    <message>
-        <source>Kb/s</source>
-        <translation>Kb/s</translation>
-    </message>
-    <message>
-        <source>Mb/s</source>
-        <translation>Mb/s</translation>
     </message>
     <message>
         <source>Parameter 1 is null.</source>
@@ -3754,10 +3746,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>移动侦测视频</translation>
     </message>
     <message>
-        <source> (%1 times)</source>
-        <translation> (%1 时间)</translation>
-    </message>
-    <message>
         <source>Date/Time</source>
         <translation>日期/时间</translation>
     </message>
@@ -3788,6 +3776,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Administrators Only</source>
         <translation>仅管理员</translation>
+    </message>
+    <message>
+        <source>%1 times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3960,28 +3952,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>无法创建导出文件%1</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%2&quot;...</source>
-        <translation>导出至 &quot;%2&quot;...</translation>
-    </message>
-    <message>
         <source>Could not export camera %1</source>
         <translation>无法导出摄像机%1</translation>
+    </message>
+    <message>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation type="unfinished">导出至 &quot;%1&quot;...</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
-    <message>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;沒有图像&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be loaded&gt;</source>
-        <translation>&lt;图像无法加载&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be uploaded&gt;</source>
-        <translation>&lt;图像无法上传&gt;</translation>
-    </message>
     <message>
         <source>Select file...</source>
         <translation>选择文件...</translation>
@@ -3989,6 +3969,30 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Pictures %1</source>
         <translation>图片 %1</translation>
+    </message>
+    <message>
+        <source>&lt;No picture&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Error while loading picture&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Error while uploading picture&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be read&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be loaded&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4429,10 +4433,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>高分辨率</translation>
     </message>
     <message>
-        <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Dewarping</source>
         <translation>全景鱼眼矫正</translation>
     </message>
@@ -4629,6 +4629,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnNetworkSpeedStrings</name>
+    <message>
+        <source>b/s</source>
+        <translation type="unfinished">b/s</translation>
+    </message>
+    <message>
+        <source>Kb/s</source>
+        <translation type="unfinished">Kb/s</translation>
+    </message>
+    <message>
+        <source>Mb/s</source>
+        <translation type="unfinished">Mb/s</translation>
+    </message>
+</context>
+<context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
         <source>%n more item(s)</source>
@@ -4700,8 +4715,8 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>确认要删除%1?</translation>
     </message>
     <message>
-        <source>Custom Title:</source>
-        <translation>自定义标题:</translation>
+        <source>Custom title:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4786,14 +4801,18 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
-    <name>QnPerformance</name>
+    <name>QnPerformanceTest</name>
     <message>
-        <source>Warning</source>
-        <translation>注意</translation>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Performance of this computer allows running %1 in configuration mode only. For full-featured mode please use another computer.</source>
-        <translation>在配置模式下此电脑性能可满足运行 %1 要求. 若需要全功能模式，请使用更高级的计算机。</translation>
+        <source>For full-featured mode please use another computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5342,14 +5361,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>加载中...</translation>
     </message>
     <message>
-        <source>Rebuild archive index</source>
-        <translation>重建录像索引</translation>
-    </message>
-    <message>
-        <source>Fast initial scan in progress</source>
-        <translation>正在进行快速初始扫描</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>完成</translation>
     </message>
@@ -5395,6 +5406,14 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5695,6 +5714,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Check for updates automatically</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -5908,6 +5931,22 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Provided storage path does not define a valid external storage.</source>
         <translation>提供的存储路径无法定义可用的外部存储空间。</translation>
     </message>
+    <message>
+        <source>Windows Network Shared Resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Coldstore Network Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>coldstore://&lt;Address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
@@ -5989,97 +6028,116 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>QnTimeSlider</name>
     <message>
-        <source>ms</source>
-        <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>毫秒</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>分</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy hh:mm ap</source>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy hh:mm ap</translation>
-    </message>
-    <message>
-        <source>h</source>
-        <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>时</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy h ap</source>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy h ap</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy</source>
-        <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy</translation>
-    </message>
-    <message>
-        <source>MMMM</source>
-        <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>MMMM</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>MMMM yyyy</translation>
-    </message>
-    <message>
-        <source>yyyy</source>
-        <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
-----------
-Format for displaying year caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>yyyy</translation>
-    </message>
-    <message>
-        <source>d</source>
-        <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>日</translation>
-    </message>
-    <message>
-        <source>M</source>
-        <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>月</translation>
-    </message>
-    <message>
-        <source>y</source>
-        <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>年</translation>
+        <source>NO THUMBNAILS AVAILABLE</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>auto</source>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>自动</translation>
+        <comment>AM/PM usage based on user&apos;s system locale.</comment>
+        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">自动</translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">毫秒</translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">秒</translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">分</translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">时</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">日</translation>
+    </message>
+    <message>
+        <source>M</source>
+        <comment>Suffix for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">M</translation>
+    </message>
+    <message>
+        <source>y</source>
+        <comment>Suffix for displaying years on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">年</translation>
     </message>
     <message>
         <source>dd MMMM</source>
-        <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM</translation>
+        <comment>Format for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM</translation>
+    </message>
+    <message>
+        <source>MMMM</source>
+        <comment>Format for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">MMMM</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying years on timeline</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>MINUTES</comment>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy hh:mm</translation>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm ap</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>HOURS</comment>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy hh:mm</translation>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
-        <source>NO THUMBNAILS AVAILABLE</source>
-        <translation type="unfinished"></translation>
+        <source>dd MMMM yyyy h ap</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy h ap</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy</source>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">dd MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">yyyy</translation>
     </message>
 </context>
 <context>
@@ -6480,10 +6538,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation>图像处理需要很多时间。请耐心等待。</translation>
     </message>
-    <message>
-        <source>Image cannot be uploaded</source>
-        <translation>图像无法上传</translation>
-    </message>
     <message numerus="yes">
         <source>Could not save the following %n items.</source>
         <translation>
@@ -6580,6 +6634,14 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while uploading picture.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
