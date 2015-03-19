@@ -101,7 +101,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resour
             /* Requests to cameras should be always proxied.
                Requests to servers should be proxied wher the server is not directly available from the client. */
             if (camera || !route.gatewayId.isNull()) {
-                return QNetworkProxy(QNetworkProxy::HttpProxy, route.addr.host, route.addr.port,
+                return QNetworkProxy(QNetworkProxy::HttpProxy, route.addr.address.toString(), route.addr.port,
                                      QnAppServerConnectionFactory::url().userName(), QnAppServerConnectionFactory::url().password());
             }
         }
