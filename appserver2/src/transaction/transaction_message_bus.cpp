@@ -216,6 +216,7 @@ QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(500);
     m_aliveSendTimer.invalidate();
+    m_currentTimeTimer.restart();
 
     assert( m_globalInstance == nullptr );
     m_globalInstance = this;
@@ -258,14 +259,14 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnUuid& gotFromPeer, int distance)
+void QnTransactionMessageBus::addAlivePeerInfo(const ApiPeerData& peerData, const QnUuid& gotFromPeer, int distance)
 {
     AlivePeersMap::iterator itr = m_alivePeers.find(peerData.id);
     if (itr == m_alivePeers.end()) 
         itr = m_alivePeers.insert(peerData.id, peerData);
     AlivePeerInfo& currentValue = itr.value();
     
-    currentValue.routingInfo.insert(gotFromPeer, distance);
+    currentValue.routingInfo.insert(gotFromPeer, RoutingRecord(distance, m_currentTimeTimer.elapsed()));
 }
 
 void QnTransactionMessageBus::removeTTSequenceForPeer(const QnUuid& id)
@@ -572,6 +573,16 @@ void QnTransactionMessageBus::proxyFillerTransaction(const QnAbstractTransaction
     proxyTransaction(fillerTran, transportHeader);
 }
 
+void QnTransactionMessageBus::updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader)
+{
+    auto itr = m_alivePeers.find(transportHeader.sender);
+    if (itr == m_alivePeers.end())
+        return;
+    AlivePeerInfo& peerInfo = itr.value();
+    const QnUuid& gotFromPeer = sender->remotePeer().id;
+    peerInfo.routingInfo[gotFromPeer] = RoutingRecord(transportHeader.distance, m_currentTimeTimer.elapsed());
+}
+
 template <class T>
 void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
 {
@@ -609,10 +620,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         }
     }
 #endif
-    AlivePeersMap:: iterator itr = m_alivePeers.find(transportHeader.sender);
-    if (itr != m_alivePeers.end())
-        itr.value().lastActivity.restart();
-
+    updateLastActivity(sender, transportHeader);
+    
     if (!checkSequence(transportHeader, tran, sender))
         return;
 
@@ -1193,13 +1202,34 @@ void QnTransactionMessageBus::doPeriodicTasks()
         printTranState(transactionLog->getTransactionsState());
     }
 
-    // check if some server not accessible any more
+    QSet<QnUuid> lostPeers = checkAlivePeerRouteTimeout(); // check if some routs to a server not accessible any more
+    removePeersWithTimeout(lostPeers); // removeLostPeers
+}
+
+QSet<QnUuid> QnTransactionMessageBus::checkAlivePeerRouteTimeout()
+{
     QSet<QnUuid> lostPeers;
     for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
-        if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_TIMEOUT)
+        AlivePeerInfo& peerInfo = itr.value();
+        for (auto itr = peerInfo.routingInfo.begin(); itr != peerInfo.routingInfo.end();) {
+            if (m_currentTimeTimer.elapsed() - itr.value().lastRecvTime > ALIVE_UPDATE_TIMEOUT)
+                itr = peerInfo.routingInfo.erase(itr);
+            else
+                ++itr;
+        }
+        if (peerInfo.routingInfo.isEmpty())
+            lostPeers << peerInfo.peer.id;
+    }
+    return lostPeers;
+}
+
+void QnTransactionMessageBus::removePeersWithTimeout(const QSet<QnUuid>& lostPeers)
+{
+    for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
+    {
+        if (lostPeers.contains(itr.key()))
         {
-            itr.value().lastActivity.restart();
             for(QnTransactionTransport* transport: m_connectingConnections) {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
@@ -1217,7 +1247,6 @@ void QnTransactionMessageBus::doPeriodicTasks()
                     transport->setState(QnTransactionTransport::Error);
                 }
             }
-            lostPeers << itr.key();
         }
     }
     for (const QnUuid& id: lostPeers)
@@ -1399,7 +1428,7 @@ QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
     QnUuid result;
     for (auto itr2 = peerInfo.routingInfo.cbegin(); itr2 != peerInfo.routingInfo.cend(); ++itr2)
     {
-        int distance = itr2.value();
+        int distance = itr2.value().distance;
         if (distance < minDistance) {
             minDistance = distance;
             result = itr2.key();

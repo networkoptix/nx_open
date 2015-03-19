@@ -76,13 +76,21 @@ namespace ec2
             dstPeerId.isNull() ? sendTransaction(tran) : sendTransaction(tran, QnPeerSet() << dstPeerId);
         }
 
-        typedef QMap<QnUuid, int> RoutingInfo;
+        struct RoutingRecord
+        {
+            RoutingRecord(): distance(0), lastRecvTime(0) {}
+            RoutingRecord(int distance, qint64 lastRecvTime): distance(distance), lastRecvTime(lastRecvTime) {}
+            
+            int distance;
+            qint64 lastRecvTime;
+        };
+
+        typedef QMap<QnUuid, RoutingRecord> RoutingInfo;
         struct AlivePeerInfo
         {
-            AlivePeerInfo(): peer(QnUuid(), QnUuid(), Qn::PT_Server)  { lastActivity.restart(); }
-            AlivePeerInfo(const ApiPeerData &peer): peer(peer) { lastActivity.restart(); }
+            AlivePeerInfo(): peer(QnUuid(), QnUuid(), Qn::PT_Server)  {  }
+            AlivePeerInfo(const ApiPeerData &peer): peer(peer) { }
             ApiPeerData peer;
-            QElapsedTimer lastActivity;
             
             RoutingInfo routingInfo; // key: route throw, value - distance in hops
             //QSet<QnUuid> proxyVia;
@@ -196,7 +204,7 @@ namespace ec2
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 
-        void addAlivePeerInfo(ApiPeerData peerData, const QnUuid& gotFromPeer, int distance);
+        void addAlivePeerInfo(const ApiPeerData& peerData, const QnUuid& gotFromPeer, int distance);
         void removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive = false);
         bool sendInitialData(QnTransactionTransport* transport);
         void printTranState(const QnTranState& tranState);
@@ -205,6 +213,9 @@ namespace ec2
         void proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader);
         void removeTTSequenceForPeer(const QnUuid& id);
         bool isSyncInProgress() const;
+        void removePeersWithTimeout(const QSet<QnUuid>& lostPeers);
+        QSet<QnUuid> checkAlivePeerRouteTimeout();
+        void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -243,6 +254,7 @@ namespace ec2
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
+        QElapsedTimer m_currentTimeTimer;
         std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
         bool m_restartPending;
     };
