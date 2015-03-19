@@ -37,9 +37,6 @@ private slots:
     void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
-    void at_router_connectionAdded(const QnUuid &discovererId, const QnUuid &peerId, const QString &host);
-    void at_router_connectionRemoved(const QnUuid &discovererId, const QnUuid &peerId, const QString &host);
-
 private:
     void addModule(const QnModuleInformation &moduleInformation);
 

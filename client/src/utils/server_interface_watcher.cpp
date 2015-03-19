@@ -2,28 +2,21 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/network/router.h>
+#include "utils/network/module_finder.h"
 
-QnServerInterfaceWatcher::QnServerInterfaceWatcher(QnRouter *router, QObject *parent) :
+QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
     QObject(parent)
 {
-    connect(router,     &QnRouter::connectionAdded,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
-    connect(router,     &QnRouter::connectionRemoved,   this,   &QnServerInterfaceWatcher::at_connectionChanged);
+    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleAddressFound,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
+    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleAddressLost,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
     connect(qnResPool,  &QnResourcePool::statusChanged, this,   &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
 }
 
-void QnServerInterfaceWatcher::at_connectionChanged(const QnUuid &discovererId, const QnUuid &peerId) {
-    Q_UNUSED(discovererId);
-
-    QnRouter *router = QnRouter::instance();
-    if (!router)
-        return;
-
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(peerId).dynamicCast<QnMediaServerResource>();
-
+void QnServerInterfaceWatcher::at_connectionChanged(const QnModuleInformation &moduleInformation) 
+{
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
-
     updatePriaryInterface(server);
 }
 
@@ -39,9 +32,7 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
 }
 
 void QnServerInterfaceWatcher::updatePriaryInterface(const QnMediaServerResourcePtr &server) {
-    QnOldRoute route = QnRouter::instance()->oldRouteTo(server->getId());
-    if (!route.isValid())
-        return;
-
-    server->setPrimaryIF(route.points.last().host);
+    SocketAddress newAddr = QnModuleFinder::instance()->preferredModuleAddress(server->getId());
+    if (newAddr.address.toString() != QUrl(server->getApiUrl()).host())
+        server->setPrimaryIF(newAddr.address.toString());
 }

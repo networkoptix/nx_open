@@ -576,7 +576,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
     moduleFinder->start();
 
-    QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data(), true));
+    QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
 
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
 

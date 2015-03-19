@@ -307,7 +307,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     setUrl(mserver->getApiUrl());
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
 
-    QString guid = mserver->getProperty(lit("guid"));
+    QString guid = mserver->getProperty(lit("guid")); // todo: wtf?
 
     QnRequestHeaderList queryParameters;
 	queryParameters.insert(lit("x-server-guid"), mserver->getId().toString());

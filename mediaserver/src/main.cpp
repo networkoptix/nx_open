@@ -1829,7 +1829,7 @@ void QnMain::run()
 
     // ------------------------------------------
 
-    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
+    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
 
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
     globalModuleFinder->setConnection(ec2Connection);

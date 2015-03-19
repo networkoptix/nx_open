@@ -20,10 +20,10 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnGlobalModuleIn
         QString address = addressList.first().toString();
         quint16 port = moduleInformation.port;
         if (QnRouter::instance()) {
-            QnOldRoute route = QnRouter::instance()->oldRouteTo(moduleInformation.id, qnCommon->remoteGUID());
+            QnRoute route = QnRouter::instance()->routeTo(moduleInformation.id);
             if (route.isValid()) {
-                address = route.points.last().host;
-                port = route.points.last().port;
+                address = route.addr.address.toString();
+                port = route.addr.port;
             }
         }
         QString url = QString(lit("http://%1:%2")).arg(address).arg(port);

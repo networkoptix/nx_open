@@ -16,18 +16,6 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject
     m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
     m_moduleFinder(moduleFinder)
 {
-    connect(QnRouter::instance(),   &QnRouter::connectionAdded,     this,       &QnGlobalModuleFinder::at_router_connectionAdded);
-    connect(QnRouter::instance(),   &QnRouter::connectionRemoved,   this,       &QnGlobalModuleFinder::at_router_connectionRemoved);
-
-    QMultiHash<QnUuid, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
-    for (auto it = connections.begin(); it != connections.end(); ++it) {
-		/* Ignore addresses discovered by client */
-		if (!moduleFinder && it.key() == qnCommon->moduleGUID())
-			continue;
-
-        at_router_connectionAdded(it.key(), it->id, it->host);
-	}
-
     if (moduleFinder) {
         for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules())
             addModule(moduleInformation);
@@ -104,37 +92,6 @@ void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation 
 
     if (connection)
         connection->getMiscManager()->sendModuleInformation(moduleInformation, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-}
-
-void QnGlobalModuleFinder::at_router_connectionAdded(const QnUuid &discovererId, const QnUuid &peerId, const QString &host) {
-	/* Ignore addresses discovered by client */
-	if (!m_moduleFinder && discovererId == qnCommon->moduleGUID())
-		return;
-
-    {
-        QMutexLocker lock(&m_mutex);
-
-        QSet<QString> &addresses = m_discoveredAddresses[peerId][discovererId];
-        auto it = addresses.find(host);
-        if (it != addresses.end())
-            return;
-        addresses.insert(host);
-    }
-    updateAddresses(peerId);
-}
-
-void QnGlobalModuleFinder::at_router_connectionRemoved(const QnUuid &discovererId, const QnUuid &peerId, const QString &host) {
-	/* Ignore addresses discovered by client */
-	if (!m_moduleFinder && discovererId == qnCommon->moduleGUID())
-		return;
-
-    {
-        QMutexLocker lock(&m_mutex);
-
-        if (!m_discoveredAddresses[peerId][discovererId].remove(host))
-            return;
-    }
-    updateAddresses(peerId);
 }
 
 void QnGlobalModuleFinder::updateAddresses(const QnUuid &id) {
