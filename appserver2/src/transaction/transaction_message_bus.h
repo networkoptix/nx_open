@@ -76,14 +76,17 @@ namespace ec2
             dstPeerId.isNull() ? sendTransaction(tran) : sendTransaction(tran, QnPeerSet() << dstPeerId);
         }
 
+        typedef QMap<QnUuid, int> RoutingInfo;
         struct AlivePeerInfo
         {
-            AlivePeerInfo(): peer(QnUuid(), QnUuid(), Qn::PT_Server), directAccess(false) { lastActivity.restart(); }
-            AlivePeerInfo(const ApiPeerData &peer): peer(peer), directAccess(false) { lastActivity.restart(); }
+            AlivePeerInfo(): peer(QnUuid(), QnUuid(), Qn::PT_Server)  { lastActivity.restart(); }
+            AlivePeerInfo(const ApiPeerData &peer): peer(peer) { lastActivity.restart(); }
             ApiPeerData peer;
-            QSet<QnUuid> proxyVia;
             QElapsedTimer lastActivity;
-            bool directAccess;
+            
+            RoutingInfo routingInfo; // key: route throw, value - distance in hops
+            //QSet<QnUuid> proxyVia;
+            //bool directAccess;
         };
         typedef QMap<QnUuid, AlivePeerInfo> AlivePeersMap;
 
@@ -97,6 +100,11 @@ namespace ec2
         */
         AlivePeersMap aliveServerPeers() const;
         AlivePeersMap aliveClientPeers() const;
+
+        /*
+        * Return routing information: how to access to dstPeer
+        */
+        QnUuid routeToPeerVia(const QnUuid& dstPeer) const;
 
     signals:
         void peerLost(ApiPeerAliveData data);
@@ -177,18 +185,18 @@ namespace ec2
         QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
-        bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport);
+        bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
 
         /*
         * Return true if alive transaction accepted or false if it should be ignored (offline data is deprecated)
         */
-        bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport);
+        bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader);
 
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 
-        void addAlivePeerInfo(ApiPeerData peerData, const QnUuid& gotFromPeer = QnUuid());
+        void addAlivePeerInfo(ApiPeerData peerData, const QnUuid& gotFromPeer, int distance);
         void removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive = false);
         bool sendInitialData(QnTransactionTransport* transport);
         void printTranState(const QnTranState& tranState);

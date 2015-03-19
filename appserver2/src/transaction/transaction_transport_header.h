@@ -18,7 +18,7 @@ namespace ec2 {
 
     struct QnTransactionTransportHeader
     {
-        QnTransactionTransportHeader(): sequence(0), flags(TT_None) {}
+        QnTransactionTransportHeader(): sequence(0), flags(TT_None), distance(0) {}
         QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet()):
             processedPeers(processedPeers), 
             dstPeers(dstPeers), 
@@ -32,6 +32,7 @@ namespace ec2 {
         QnUuid sender;
         QnUuid senderRuntimeID;
         TTHeaderFlags flags;
+        int distance;
     };
 
 
