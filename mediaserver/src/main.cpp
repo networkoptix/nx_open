@@ -157,6 +157,7 @@
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
 #endif
+#include "common/src/platform/hardware_information.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
@@ -192,6 +193,9 @@ static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
+static const QString CPU_ARCHITECTURE = "cpuArchitecture";
+static const QString CPU_CORE_COUNT = "cpuCoreCount";
+static const QString MEMORY = "memory";
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -1734,6 +1738,27 @@ void QnMain::run()
         // Keep server auth key in registry. Server MUST be able pass authorization after deleting database in database restore process
         if (settingsAuthKey != authKey)
             encodeAndStoreAuthKey(authKey);
+
+        auto cpuArchitecture = QSysInfo::currentCpuArchitecture();
+        if (server->getProperty(CPU_ARCHITECTURE) != cpuArchitecture)
+        {
+            server->setProperty(CPU_ARCHITECTURE, cpuArchitecture);
+            isModified = true;
+        }
+
+        auto cpuCoreCount = QString::number(HardwareInformation::getCpuCoreCount());
+        if (server->getProperty(CPU_CORE_COUNT) != cpuCoreCount)
+        {
+            server->setProperty(CPU_CORE_COUNT, cpuCoreCount);
+            isModified = true;
+        }
+
+        auto memory = QString::number(HardwareInformation::getInstalledMemory());
+        if (server->getProperty(MEMORY) != memory)
+        {
+            server->setProperty(MEMORY, memory);
+            isModified = true;
+        }
 
         if (isModified)
             m_mediaServer = registerServer(ec2Connection, server);

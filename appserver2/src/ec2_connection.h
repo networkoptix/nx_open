@@ -9,9 +9,9 @@
 #include <memory>
 
 #include "base_ec2_connection.h"
+#include "ec2_statictics_reporter.h"
 #include "database/db_manager.h"
 #include "server_query_processor.h"
-
 
 namespace ec2
 {
@@ -38,6 +38,9 @@ namespace ec2
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;
+
+        // TODO: do not construct this object if statictics are disabled
+        Ec2StaticticsReporter m_staticticsReporter;
     };
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
 }
