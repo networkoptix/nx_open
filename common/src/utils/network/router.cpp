@@ -8,6 +8,8 @@
 #include "common/common_module.h"
 #include "module_finder.h"
 #include "api/app_server_connection.h"
+#include "core/resource/media_server_resource.h"
+#include "core/resource_management/resource_pool.h"
 
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),
@@ -29,15 +31,15 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     if (!connection)
         return result; // no connection to the server, can't route
 
-    QnUuid routeVia = connection->routeToPeerVia(id);
-
-    // todo: add code for other systems accessible from the current server (for client side only)
-    if (0) {
+    bool isknownServer = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>() != 0;
+    bool isClient = qnCommon->remoteGUID() != qnCommon->moduleGUID();
+    if (!isknownServer && isClient) {
         result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
         result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
         return result;
     }
 
+    QnUuid routeVia = connection->routeToPeerVia(id);
     if (routeVia == id || routeVia.isNull())
         return result; // can't route
     result.addr = m_moduleFinder->primaryAddress(routeVia);
