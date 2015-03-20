@@ -137,6 +137,7 @@ void QnTransactionTransport::startListening()
         m_chunkHeaderLen = 0;
         using namespace std::placeholders;
         m_lastReceiveTimer.restart();
+        m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
         if( !m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
         {
             m_lastReceiveTimer.invalidate();
@@ -445,6 +446,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
         return; //not reading futher while that much transactions are not processed yet
 
     using namespace std::placeholders;
+    m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
     if( m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
     {
         m_asyncReadScheduled = true;
@@ -477,6 +479,7 @@ void QnTransactionTransport::transactionProcessed()
     assert( m_socket );
 
     using namespace std::placeholders;
+    m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
     if( m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
     {
         m_asyncReadScheduled = true;

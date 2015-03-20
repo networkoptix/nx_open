@@ -11,6 +11,7 @@
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
+class QnArchiveStreamReader;
 
 struct RtspServerTrackInfo
 {
@@ -60,7 +61,7 @@ public:
     void setQuality(MediaQuality quality);
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
-    QByteArray getRangeHeaderIfChanged();
+    QByteArray getRangeStr(QnArchiveStreamReader* archiveDP);
     int getMetadataChannelNum() const;
     int getAVTcpChannel(int trackNum) const;
     //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
@@ -71,8 +72,6 @@ public:
 protected:
     virtual void run();
     void addResponseRangeHeader();
-    QByteArray getRangeStr();
-
 private slots:
     void at_camera_parentIdChanged();
     void at_camera_resourceChanged();
