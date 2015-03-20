@@ -199,19 +199,24 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
     }
     d->request.requestLine.url = urlPath;
 
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( "x-camera-guid" );
+    QnUuid cameraGuid;
+    if( xCameraGuidIter != d->request.headers.end() )
+        cameraGuid = xCameraGuidIter->second;
+    else
+        cameraGuid = d->request.getCookieValue("x-camera-guid");
+    if (!cameraGuid.isNull()) {
+        if (QnResourcePtr camera = qnResPool->getResourceById(cameraGuid))
+            xServerGUID = camera->getParentId().toString();
+    }
+
+
     for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
     {
-        if (itr->first.toLower() == "host" && !host.isEmpty()) {
+        if (itr->first.toLower() == "host" && !host.isEmpty())
             itr->second = host.toUtf8();
-        } else if (itr->first == "x-camera-guid") {
-            QnUuid cameraGuid = QnUuid::fromStringSafe(itr->second);
-            if (!cameraGuid.isNull()) {
-                if (QnResourcePtr camera = qnResPool->getResourceById(cameraGuid))
-                    xServerGUID = camera->getParentId().toString();
-            }
-        } else if (itr->first == "x-server-guid"){
+        else if (itr->first == "x-server-guid")
             xServerGUID = itr->second;
-        }
     }
 
     QnRoute route;
