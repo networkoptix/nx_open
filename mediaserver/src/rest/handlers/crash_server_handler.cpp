@@ -5,7 +5,9 @@
 
 #include "crash_server_handler.h"
 
+#ifdef _WIN32
 #include <common/systemexcept_win32.h>
+#endif
 #include <utils/common/log.h>
 #include <utils/network/http/httptypes.h>
 
@@ -20,8 +22,10 @@ int QnCrashServerHandler::executeGet(
     if( !params.contains(lit("razrazraz")) )
         return nx_http::StatusCode::forbidden;
 
+#ifdef _WIN32
     const bool createFullCrashDump = params.contains(lit("full"));
     win32_exception::setCreateFullCrashDump( createFullCrashDump );
+#endif
 
     NX_LOG( lit("Received request to kill server. Killing..."), cl_logALWAYS );
     int* x = nullptr;
