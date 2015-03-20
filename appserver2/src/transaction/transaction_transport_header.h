@@ -36,7 +36,7 @@ namespace ec2 {
     };
 
 
-#define QnTransactionTransportHeader_Fields (processedPeers)(dstPeers)(sequence)(sender)(senderRuntimeID)(flags)
+#define QnTransactionTransportHeader_Fields (processedPeers)(dstPeers)(sequence)(sender)(senderRuntimeID)(flags)(distance)
 
     QN_FUSION_DECLARE_FUNCTIONS(QnTransactionTransportHeader, (ubjson))
 
