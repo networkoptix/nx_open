@@ -7,7 +7,6 @@
 #include <utils/common/singleton.h>
 #include "socket_common.h"
 
-class SocketAddress;
 class QnModuleFinder;
 
 struct QnRoute

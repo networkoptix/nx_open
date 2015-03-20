@@ -12,7 +12,7 @@ namespace ec2 {
 
         ApiModuleData() : isAlive(false) {}
 
-        ApiModuleData(const QnModuleInformation &moduleInformation, bool alive) :
+        ApiModuleData(const QnModuleInformationWithAddresses &moduleInformation, bool alive) :
             moduleInformation(moduleInformation),
             isAlive(alive)
         {}
