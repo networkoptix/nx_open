@@ -32,7 +32,7 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
 }
 
 void QnServerInterfaceWatcher::updatePriaryInterface(const QnMediaServerResourcePtr &server) {
-    SocketAddress newAddr = QnModuleFinder::instance()->preferredModuleAddress(server->getId());
+    SocketAddress newAddr = QnModuleFinder::instance()->primaryAddress(server->getId());
     if (newAddr.address.toString() != QUrl(server->getApiUrl()).host())
         server->setPrimaryIF(newAddr.address.toString());
 }

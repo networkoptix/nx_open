@@ -4,7 +4,6 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include <api/model/configure_reply.h>
 #include <utils/merge_systems_tool.h>

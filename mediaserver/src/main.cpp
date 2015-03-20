@@ -141,7 +141,6 @@
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
 #include <utils/network/module_finder.h>
-#include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include <utils/common/ssl_gen_cert.h>
 
@@ -1830,9 +1829,6 @@ void QnMain::run()
     // ------------------------------------------
 
     QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
-
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
-    globalModuleFinder->setConnection(ec2Connection);
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 

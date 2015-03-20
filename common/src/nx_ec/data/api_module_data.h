@@ -7,7 +7,7 @@
 namespace ec2 {
 
     struct ApiModuleData : ApiData {
-        QnModuleInformation moduleInformation;
+        QnModuleInformationWithAddresses moduleInformation;
         bool isAlive;
 
         ApiModuleData() : isAlive(false) {}

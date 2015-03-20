@@ -16,8 +16,7 @@
 #include "nx_ec/data/api_server_alive_data.h"
 #include "utils/common/log.h"
 #include "utils/common/synctime.h"
-#include "utils/network/global_module_finder.h"
-#include "utils/network/router.h"
+#include "utils/network/module_finder.h"
 #include "nx_ec/data/api_server_alive_data.h"
 #include "ec_connection_notification_manager.h"
 #include "nx_ec/data/api_camera_data.h"
@@ -879,6 +878,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         transport->setWriteSync(true);
         sendRuntimeInfo(transport, processedPeers, QnTranState());
         transport->sendTransaction(tran, processedPeers);
+        transport->sendTransaction(prepareModulesDataTransaction(), processedPeers);
         transport->setReadSync(true);
 
         //sending local time information on known servers
@@ -1014,9 +1014,16 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
 QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
     QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
-    for (const QnGlobalModuleInformation &moduleInformation: QnGlobalModuleFinder::instance()->foundModules())
-        transaction.params.push_back(ApiModuleData(moduleInformation, true));
+    QnModuleFinder *moduleFinder = QnModuleFinder::instance();
+    for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules()) {
+        QnModuleInformationWithAddresses moduleInformationWithAddress(moduleInformation);
+        SocketAddress primaryAddress = moduleFinder->primaryAddress(moduleInformation.id);
+        moduleInformationWithAddress.remoteAddresses.insert(primaryAddress.address.toString());
+        moduleInformationWithAddress.port = primaryAddress.port;
+        transaction.params.push_back(ApiModuleData(std::move(moduleInformationWithAddress), true));
+    }
     transaction.peerID = m_localPeer.id;
+    transaction.isLocal = true;
     return transaction;
 }
 
@@ -1259,7 +1266,6 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
     m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
     for(const QnTransaction<ApiRuntimeData> &tran: result)
         transport->sendTransaction(tran, transportHeader);
-    transport->sendTransaction(prepareModulesDataTransaction(), transportHeader);
 }
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer, qint64 remoteSystemIdentityTime)

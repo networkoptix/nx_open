@@ -118,7 +118,6 @@ extern "C"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
 #include <utils/network/module_finder.h>
-#include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
@@ -577,8 +576,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->start();
 
     QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
-
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
 
     QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 

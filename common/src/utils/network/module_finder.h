@@ -29,7 +29,7 @@ public:
 
     QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
     QSet<SocketAddress> moduleAddresses(const QnUuid &id) const;
-    SocketAddress preferredModuleAddress(const QnUuid &id) const;
+    SocketAddress primaryAddress(const QnUuid &id) const;
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
@@ -49,17 +49,19 @@ signals:
     void moduleAddressLost(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void moduleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
-private slots:
+private:
     void at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void at_timer_timeout();
 
-private:
     void removeAddress(const SocketAddress &address, bool holdItem);
     void handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void sendModuleInformation(const QnModuleInformation &moduleInformation, const SocketAddress &address, bool isAlive);
 
 private:
     QElapsedTimer m_elapsedTimer;
     QTimer *m_timer;
+
+    bool m_clientOnly;
 
     QScopedPointer<QnMulticastModuleFinder> m_multicastModuleFinder;
     QnDirectModuleFinder *m_directModuleFinder;
@@ -71,6 +73,7 @@ private:
         qint64 lastConflictResponse;
         int conflictResponseCount;
         QSet<SocketAddress> addresses;
+        SocketAddress primaryAddress;
 
         ModuleItem() :
             lastResponse(0),

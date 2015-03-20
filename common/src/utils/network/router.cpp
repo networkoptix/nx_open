@@ -9,13 +9,9 @@
 #include "module_finder.h"
 #include "api/app_server_connection.h"
 
-namespace {
-    static const int runtimeDataUpdateTimeout = 3000;
-} // anonymous namespace
-
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
-    m_moduleFinder(moduleFinder),
-    QObject(parent)
+    QObject(parent),
+    m_moduleFinder(moduleFinder)
 {
 }
 
@@ -25,7 +21,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
 {
     QnRoute result;
     result.id = id;
-    result.addr = m_moduleFinder->preferredModuleAddress(id);
+    result.addr = m_moduleFinder->primaryAddress(id);
     if (!result.addr.isNull())
         return result; // direct access to peer
 
@@ -38,13 +34,13 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     // todo: add code for other systems accessible from the current server (for client side only)
     if (0) {
         result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
-        result.addr = m_moduleFinder->preferredModuleAddress(result.gatewayId);
+        result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
         return result;
     }
 
     if (routeVia == id || routeVia.isNull())
         return result; // can't route
-    result.addr = m_moduleFinder->preferredModuleAddress(routeVia);
+    result.addr = m_moduleFinder->primaryAddress(routeVia);
     if (!result.addr.isNull())
         result.gatewayId = routeVia; // route gateway is found
     return result;
