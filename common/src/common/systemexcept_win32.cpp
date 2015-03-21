@@ -125,9 +125,10 @@ void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
                                             MiniDumpWithUnloadedModules ); 
     if( globalCrashDumpSettingsInstance.dumpFullMemory )
     {
+        //TODO #ak if add MiniDumpWithCodeSegs, generated dump has 0 size
         sMDumpType = (MINIDUMP_TYPE)( sMDumpType |
-            MiniDumpWithFullMemory | MiniDumpWithCodeSegs | 
-            MiniDumpWithDataSegs | MiniDumpWithProcessThreadData | MiniDumpWithFullAuxiliaryState);
+            MiniDumpWithFullMemory | 
+            MiniDumpWithDataSegs | MiniDumpWithProcessThreadData | MiniDumpWithFullAuxiliaryState );
     }
 
     MiniDumpWriteDumpAddress( 

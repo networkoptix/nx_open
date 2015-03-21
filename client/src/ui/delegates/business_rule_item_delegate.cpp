@@ -34,8 +34,11 @@ QnSelectResourcesDialogButton::QnSelectResourcesDialogButton(QWidget *parent):
     connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
 }
 
-QnResourceList QnSelectResourcesDialogButton::resources() const {
-    return m_resources;
+IDList QnSelectResourcesDialogButton::resourceIds() const {
+    IDList result;
+    for (const QnResourcePtr &resource: m_resources)
+        result.append(resource->getId());
+    return result;
 }
 
 void QnSelectResourcesDialogButton::setResources(QnResourceList resources) {
@@ -304,7 +307,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
     case QnBusiness::SourceColumn:
     {
         if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
-            model->setData(index, QVariant::fromValue<QnResourceList>(btn->resources()));
+            model->setData(index, QVariant::fromValue<IDList>(btn->resourceIds()));
             return;
         }
 
@@ -344,7 +347,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
         }
 
         if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
-            model->setData(index, QVariant::fromValue<QnResourceList>(btn->resources()));
+            model->setData(index, QVariant::fromValue<IDList>(btn->resourceIds()));
             return;
         }
 
