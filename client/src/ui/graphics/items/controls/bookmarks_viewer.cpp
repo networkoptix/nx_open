@@ -51,7 +51,6 @@ namespace
 
     const QString kEditActionAnchorName = lit("e");
     const QString kRemoveActoinAnchorName = lit("r");
-    const QString kDelimiter = lit(" ");
     const QString kLinkTemplate = lit("<a href = \"%1\">%2</a>");
 
     class QnBookmarksViewerStrings
@@ -114,20 +113,6 @@ namespace
 
         label->setText(trimmedText);
         return (insertionIndex + 1);
-    }
-
-    QString tagsToString(const QnCameraBookmarkTags& tags)
-    {
-        QString result;
-        for(const auto& tag : tags)
-        {
-            result += (tag +  kDelimiter);
-        }
-        if (!result.isEmpty())
-        {
-            result.remove(result.length() - 1, kDelimiter.size());  /// removes last delimiter (whitespace)
-        }
-        return result;
     }
 
     ///
@@ -385,7 +370,7 @@ namespace
         enum { kFirstPosition = 0 };
         int position = renewLabel(m_name, bookmark.name, this, m_layout, kFirstPosition, kNameLabelIndex);
         position = renewLabel(m_description, bookmark.description, this, m_layout, position, kDescriptionLabelIndex);
-        position = renewLabel(m_tags, tagsToString(bookmark.tags), this, m_layout, position, kTagsLabelIndex);
+        position = renewLabel(m_tags, m_bookmark.tagsAsString(), this, m_layout, position, kTagsLabelIndex);
     }
 
     const QnCameraBookmark &BookmarkToolTipFrame::bookmark() const

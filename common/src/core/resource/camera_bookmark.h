@@ -44,6 +44,22 @@ struct QnCameraBookmark {
         startTimeMs(0),
         durationMs(0)
     {}
+
+    QString tagsAsString() const
+    {
+        static const QString kDelimiter = lit(" ");
+
+        QString result;
+        for(const auto& tag : tags)
+        {
+            result += (tag +  kDelimiter);
+        }
+        if (!result.isEmpty())
+        {
+            result.remove(result.length() - 1, kDelimiter.size());  /// removes last delimiter (whitespace)
+        }
+        return result;
+    }
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)
 

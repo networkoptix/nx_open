@@ -481,9 +481,11 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this));
 
     factory(Qn::OpenBusinessLogAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget 
+            | Qn::LayoutItemTarget | Qn::WidgetTarget | Qn::GlobalHotkey).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         icon(qnSkin->icon("events/log.png")).
+        shortcut(tr("Ctrl+L")).
         text(tr("Event Log..."));
 
     factory(Qn::OpenBusinessRulesAction).
@@ -793,12 +795,10 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+E")).
         autoRepeat(false);
 
-    factory(Qn::BusinessEventsLogAction).
+    factory(Qn::OpenBookmarksSearchAction).
         flags(Qn::GlobalHotkey).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Event Log...")).
-        icon(qnSkin->icon("events/log.png")).
-        shortcut(tr("Ctrl+L")).
+        text(tr("Bookmarks...")).
+        shortcut(tr("Ctrl+B")).
         autoRepeat(false);
 
     factory(Qn::CameraListAction).
