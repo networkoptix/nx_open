@@ -175,7 +175,7 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
 bool QnRecordingManager::updateCameraHistory() {
     
     if (!m_updateCameraHistoryTimer.hasExpired(UPDATE_CAMERA_HISTORY_PERIOD_MSEC))
-        return;
+        return true;
     m_updateCameraHistoryTimer.restart();
 
     std::vector<QnUuid> archivedListNew = qnStorageMan->getCamerasWithArchive();

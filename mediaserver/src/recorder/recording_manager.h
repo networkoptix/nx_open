@@ -4,6 +4,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QObject>
 #include <QtCore/QMap>
+#include <QtCore/QElapsedTimer>
 
 #include "core/resource/resource_fwd.h"
 #include "business/business_fwd.h"

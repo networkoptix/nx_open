@@ -35,7 +35,7 @@ struct QnBusinessEventParameters {
     QnUuid getParamsHash() const;
 };
 
-#define QnBusinessEventParameters_Fields (eventType)(eventTimestamp)(eventResourceId)(actionResourceId)(sourceServerId)\
+#define QnBusinessEventParameters_Fields (eventType)(eventTimestampUsec)(eventResourceId)(actionResourceId)(sourceServerId)\
     (reasonCode)(reasonParamsEncoded)(source)(conflicts)(inputPortId)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq));

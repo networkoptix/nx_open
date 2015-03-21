@@ -4,10 +4,12 @@
 #include <camera/data/abstract_camera_data.h>
 #include <camera/loaders/generic_camera_data_loader.h>
 
+#include <core/resource_management/resource_pool.h>
+
 #include <core/resource/network_resource.h>
-#include "core/resource/media_server_resource.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/camera_history.h"
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
 
 namespace {
     QAtomicInt qn_multiHandle(1);
@@ -35,7 +37,7 @@ int QnMultiServerCameraDataLoader::load(const QnTimePeriod &period, const QStrin
     QList<int> handles;
     
     // sometime camera moved between servers. Get all servers for requested time period
-    QnNetworkResourcePtr camera = m_resource.dynamicCast<QnNetworkResource>();
+    QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
     QnResourceList serverList = qnCameraHistoryPool->tryGetFootageServersByCameraPeriod(camera, period);
     foreach(const QnResourcePtr& server, serverList) {
         int handle = loadInternal(server.dynamicCast<QnMediaServerResource>(), camera, period, filter, resolutionMs);

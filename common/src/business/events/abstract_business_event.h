@@ -87,7 +87,7 @@ private:
     /**
      * @brief m_timeStamp       Event date and time in usec from UTC.
      */
-    const qint64 m_timeStamp;
+    const qint64 m_timeStampUsec;
 
     /**
      * @brief m_resource        Resource that provide this event.
