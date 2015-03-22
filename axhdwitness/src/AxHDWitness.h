@@ -56,6 +56,9 @@ public slots:
     void prevFrame();
     void clear();
 
+	double minimalSpeed();
+	double maximalSpeed();
+	double speed();
     void setSpeed(double speed);
 
     qint64 currentTime();

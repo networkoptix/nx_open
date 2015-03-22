@@ -10,20 +10,20 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Drawing;
 using Newtonsoft.Json;
-using AxaxhdwitnessLib;
+using AxInterop.hdwitness;
 
-namespace Company.Product.OemDvrMiniDriver {
+namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
     namespace Api {
         class Camera {
-            public string physicalId { get; set; }
+            public string id { get; set; }
             public string name { get; set; }
             public string model { get; set; }
         }
     }
 
-    public class SampleMiniDriver : IOemDvrMiniDriver {
+    public class NetworkOptixMiniDriver : IOemDvrMiniDriver {
         private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private AxAxHDWitness axAxHDWitness1;
+        private static AxAxHDWitness axAxHDWitness1;
         private Panel m_surface;
         private OemDvrCamera[] _cameras;
 
@@ -47,13 +47,14 @@ namespace Company.Product.OemDvrMiniDriver {
 
                 WebRequest request = HttpWebRequest.Create(String.Format("http://{0}:{1}/ec2/testConnection", url.Host, port));
 
-                request.Credentials = new System.Net.NetworkCredential(connectionInfo.UserId, connectionInfo.Password);
+                request.Credentials = new NetworkCredential(connectionInfo.UserId, connectionInfo.Password);
 
                 WebResponse response = request.GetResponse();
                 response.Close();
 
                 return OemDvrStatus.Succeeded;
-            } catch (Exception excp) {
+            }
+            catch (Exception excp) {
                 _logger.Error(excp);
             }
 
@@ -69,26 +70,29 @@ namespace Company.Product.OemDvrMiniDriver {
                 if (port == 0)
                     port = url.Port;
 
-                WebRequest request = HttpWebRequest.Create(String.Format("http://{0}:{1}/ec2/getCameras?format=json", url.Host, port));
+                WebRequest request = HttpWebRequest.Create(String.Format("http://{0}:{1}/ec2/getCamerasEx?format=json", url.Host, port));
 
-                request.Credentials = new System.Net.NetworkCredential(connectionInfo.UserId, connectionInfo.Password);
+                request.Credentials = new NetworkCredential(connectionInfo.UserId, connectionInfo.Password);
 
                 response = request.GetResponse();
 
                 StreamReader reader = new StreamReader(response.GetResponseStream());
                 List<Api.Camera> apiCameras = JsonConvert.DeserializeObject<List<Api.Camera>>(reader.ReadToEnd());
 
-                foreach(Api.Camera apiCamera in apiCameras) {
+                foreach (Api.Camera apiCamera in apiCameras) {
                     if (apiCamera.model.Contains("virtual desktop camera"))
                         continue;
-                    cameras.Add(new OemDvrCamera(apiCamera.physicalId, apiCamera.name));
+
+                    cameras.Add(new OemDvrCamera(apiCamera.id, apiCamera.name));
                 }
-                
+
                 _logger.InfoFormat("Found {0} cameras.", cameras.Count);
                 return OemDvrStatus.Succeeded;
-            } catch (Exception excp) {
+            }
+            catch (Exception excp) {
                 _logger.Error(excp);
-            } finally {
+            }
+            finally {
                 if (response != null)
                     response.Close();
             }
@@ -96,9 +100,10 @@ namespace Company.Product.OemDvrMiniDriver {
             _logger.Error("Could not list cameras.");
             return OemDvrStatus.FailedToListCameras;
         }
+
         /// <summary>
         /// Request the playback of footage according to the required speed, direction and cameras using the supplied credentials on the OEM dll.
-        ///		The image is to be rendered on the playback surface supplied.
+        ///     The image is to be rendered on the playback surface supplied.
         /// </summary>
         /// <param name="cnInfo">The user credentials structure.</param>
         /// <param name="pbInfo">The structure that holds the details of the footage and the cameras required.</param>
@@ -126,22 +131,13 @@ namespace Company.Product.OemDvrMiniDriver {
 
                 switch (pbInfo.PlaybackFunction) {
                     case OemDvrPlaybackFunction.Start: {
-                            Play();
+                            axAxHDWitness1.play();
                             break;
                         }
-                    case OemDvrPlaybackFunction.Forward: {
-                            break;
-                        }
-
-                    case OemDvrPlaybackFunction.Backward: {
-                            break;
-                        }
-                    case OemDvrPlaybackFunction.Pause: {
-                            Pause();
-                            break;
-                        }
+                    case OemDvrPlaybackFunction.Forward:
+                    case OemDvrPlaybackFunction.Backward:
+                    case OemDvrPlaybackFunction.Pause:
                     case OemDvrPlaybackFunction.Stop: {
-                            Stop();
                             break;
                         }
 
@@ -152,7 +148,8 @@ namespace Company.Product.OemDvrMiniDriver {
                 }
 
                 return OemDvrStatus.Succeeded;
-            } catch (Exception excp) {
+            }
+            catch (Exception excp) {
                 _logger.Error(excp);
             }
 
@@ -170,21 +167,28 @@ namespace Company.Product.OemDvrMiniDriver {
                 bool controlOk = false;
                 switch (pbFunction) {
                     case OemDvrPlaybackFunction.Pause: {
-                            Pause();
+                            axAxHDWitness1.pause();
                             controlOk = true;
                             break;
                         }
 
-                    case OemDvrPlaybackFunction.Forward:
+                    case OemDvrPlaybackFunction.Forward: {
+                            _logger.DebugFormat("Setting speed {0}", speed);
+                            axAxHDWitness1.setSpeed(1 + speed / 1000.0);
+                            controlOk = true;
+                            break;
+                        }
+
                     case OemDvrPlaybackFunction.Backward: {
-                            Play();
+                            _logger.DebugFormat("Setting speed -{0}", speed);
+                            axAxHDWitness1.setSpeed(-1 - speed / 1000.0);
                             controlOk = true;
                             break;
                         }
 
                     // Close down the session, such that the next actions can be closing the application or starting new session.
                     case OemDvrPlaybackFunction.Stop: {
-                            Stop();
+                            axAxHDWitness1.pause();
                             controlOk = true;
                             break;
                         }
@@ -197,7 +201,8 @@ namespace Company.Product.OemDvrMiniDriver {
                 if (controlOk) {
                     return OemDvrStatus.Succeeded;
                 }
-            } catch (Exception excp) {
+            }
+            catch (Exception excp) {
                 _logger.Error(excp);
             }
 
@@ -212,44 +217,33 @@ namespace Company.Product.OemDvrMiniDriver {
         private void updateControlSize() {
             short vidWidth = Convert.ToInt16(m_surface.Width);
             short vidHeight = Convert.ToInt16(m_surface.Height);
-            this.axAxHDWitness1.SetBounds(0, 0, vidWidth, vidHeight);
+            axAxHDWitness1.SetBounds(0, 0, vidWidth, vidHeight);
         }
 
         private void Load(Panel pbSurface, Uri url) {
             m_surface = pbSurface;
             pbSurface.SizeChanged += PbSurfaceResize;
 
-            // System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager();
-            this.axAxHDWitness1 = new AxAxHDWitness();
-            ((System.ComponentModel.ISupportInitialize)(this.axAxHDWitness1)).BeginInit();
+            axAxHDWitness1 = new AxAxHDWitness();
+            ((System.ComponentModel.ISupportInitialize)(axAxHDWitness1)).BeginInit();
             pbSurface.SuspendLayout();
-            // 
-            // axAxHDWitness1
-            // 
-            this.axAxHDWitness1.Enabled = true;
-            this.axAxHDWitness1.Location = new System.Drawing.Point(10, 10);
-            this.axAxHDWitness1.Name = "axAxHDWitness1";
-            // this.axAxHDWitness1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axAxHDWitness1.OcxState")));
-            this.axAxHDWitness1.Size = new System.Drawing.Size(831, 509);
-            this.axAxHDWitness1.TabIndex = 0;
-            // 
-            // Form1
-            // 
-//            pbSurface.AutoSize = true;
-            //pbSurface.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 
-//            pbSurface.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-//            pbSurface.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            axAxHDWitness1.Enabled = true;
+            axAxHDWitness1.Location = new System.Drawing.Point(10, 10);
+            axAxHDWitness1.Name = "axAxHDWitness1";
+            axAxHDWitness1.Size = new System.Drawing.Size(831, 509);
+            axAxHDWitness1.TabIndex = 0;
+
             pbSurface.ClientSize = new System.Drawing.Size(1251, 829);
-            pbSurface.Controls.Add(this.axAxHDWitness1);
+            pbSurface.Controls.Add(axAxHDWitness1);
             pbSurface.Name = "Form1";
             pbSurface.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(this.axAxHDWitness1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(axAxHDWitness1)).EndInit();
             pbSurface.ResumeLayout(false);
 
-            this.axAxHDWitness1.connectionProcessed += axAxHDWitness1_connectedProcessed;
+            axAxHDWitness1.connectionProcessed += axAxHDWitness1_connectedProcessed;
 
-            this.axAxHDWitness1.reconnect(url.ToString());
+            axAxHDWitness1.reconnect(url.ToString());
         }
 
         void axAxHDWitness1_connectedProcessed(object sender, IAxHDWitnessEvents_connectionProcessedEvent e) {
@@ -267,26 +261,15 @@ namespace Company.Product.OemDvrMiniDriver {
             axAxHDWitness1.addResourcesToLayout(String.Join("|", cameraIds), timestamp);
         }
 
-        private void Play() {
-            axAxHDWitness1.play();
-        }
+        /*
+                static void Main(string[] args) {
+                    OemDvrConnection connectionInfo = new OemDvrConnection("http://mono", 7001, "admin", "123");
+                    List<OemDvrCamera> cameras = new List<OemDvrCamera>();
 
-        private void Stop() {
-            axAxHDWitness1.pause();
-        }
+                    new NetworkOptixMiniDriver().GetListOfCameras(connectionInfo, cameras);
 
-        private void Pause() {
-            axAxHDWitness1.pause();
-        }
-/*
-        static void Main(string[] args) {
-            OemDvrConnection connectionInfo = new OemDvrConnection("http://mono", 7001, "admin", "123");
-            List<OemDvrCamera> cameras = new List<OemDvrCamera>();
-
-            new SampleMiniDriver().GetListOfCameras(connectionInfo, cameras);
-
-            // Display the number of command line arguments:
-            System.Console.WriteLine(args.Length);
-        } */
+                    // Display the number of command line arguments:
+                    System.Console.WriteLine(args.Length);
+                } */
     }
 }

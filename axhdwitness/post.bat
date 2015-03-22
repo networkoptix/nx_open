@@ -17,4 +17,9 @@ set PATH=%bebin_path%\%CONFIG%;%PATH%
 %bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /idl %bebin_path%\%CONFIG%\axhdwitness.idl -version 1.0
 midl %bebin_path%\%CONFIG%\axhdwitness.idl /nologo /tlb %bebin_path%\%CONFIG%\axhdwitness.tlb
 %bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /tlb %bebin_path%\%CONFIG%\axhdwitness.tlb
+
+cd %bebin_path%\%CONFIG%
+tlbimp /keyfile:C:\develop\netoptix_vms\ACS\Paxton\SampleKey.snk /out:Interop.hdwitness.dll axhdwitness.dll 
+AxImp /keyfile:C:\develop\netoptix_vms\ACS\Paxton\SampleKey.snk /rcw:Interop.hdwitness.dll /out:AxInterop.hdwitness.dll axhdwitness.dll
+
 ENDLOCAL

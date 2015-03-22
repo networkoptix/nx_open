@@ -239,6 +239,28 @@ void AxHDWitness::play()
     m_context->navigator()->setPlaying(true);
 }
 
+double AxHDWitness::minimalSpeed() {
+    if(!m_mainWindow)
+        return 0.0;
+		
+	return m_context->navigator()->minimalSpeed();
+}
+
+double AxHDWitness::maximalSpeed() {
+    if(!m_mainWindow)
+        return 0.0;
+
+	return m_context->navigator()->maximalSpeed();
+}
+
+double AxHDWitness::speed()
+{
+    if(!m_mainWindow)
+        return 1.0;
+
+    return m_context->navigator()->speed();
+}
+
 void AxHDWitness::setSpeed(double speed)
 {
     if(!m_mainWindow)
@@ -303,17 +325,17 @@ void AxHDWitness::clear()
     m_context->workbench()->currentLayout()->clear();
 }
 
-void AxHDWitness::addResourceToLayout(const QString &uniqueId, const QString &timestamp) {
-    addResourcesToLayout(uniqueId, timestamp);
+void AxHDWitness::addResourceToLayout(const QString &id, const QString &timestamp) {
+    addResourcesToLayout(id, timestamp);
 }
 
-void AxHDWitness::addResourcesToLayout(const QString &uniqueIds, const QString &timestamp) {
+void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timestamp) {
     if (!m_context->user())
         return;
 
     QnResourceList resources;
-    foreach(QString uniqueId, uniqueIds.split(QLatin1Char('|'))) {
-        QnResourcePtr resource = m_context->resourcePool()->getResourceByUniqId(uniqueId);
+    foreach(QString id, ids.split(QLatin1Char('|'))) {
+		QnResourcePtr resource = m_context->resourcePool()->getResourceById(id);
         if(resource)
             resources << resource;
     } 
