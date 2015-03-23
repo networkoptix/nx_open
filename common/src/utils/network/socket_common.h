@@ -30,7 +30,7 @@ class HostAddress
 public:
     //!Creates 0.0.0.0 address
     HostAddress();
-    HostAddress( const HostAddress& rhs ) = default;
+    HostAddress( const HostAddress& rhs );
     HostAddress( HostAddress&& rhs );
     HostAddress( const struct in_addr& sinAddr );
     /*!
@@ -44,7 +44,7 @@ public:
     uint32_t ipv4() const;
     QString toString() const;
 
-    HostAddress& operator=( const HostAddress& rhs ) = default;
+    HostAddress& operator=( const HostAddress& rhs );
     HostAddress& operator=( HostAddress&& rhs );
 
     bool operator==( const HostAddress& right ) const;
