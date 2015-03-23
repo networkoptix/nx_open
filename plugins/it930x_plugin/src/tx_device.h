@@ -1,9 +1,11 @@
 #ifndef RETURN_CHANNEL_DEVICE_INFO_H
 #define RETURN_CHANNEL_DEVICE_INFO_H
 
-#include <vector>
 #include <string>
+#include <vector>
+#include <set>
 #include <mutex>
+#include <atomic>
 
 #include "ret_chan/ret_chan_cmd_host.h"
 #include "rc_command.h"
@@ -196,9 +198,10 @@ namespace ite
 
         //
 
-        void ids4update(std::vector<uint16_t>& ids);
+        uint16_t getWanted();
+        void resetWanted(uint16_t cmd = 0);
 
-        bool parse(RcPacket& pkt);              // RcPacket -> RcCommand -> TxDevice
+        void parse(RcPacket& pkt);              // RcPacket -> RcCommand -> TxDevice
         RcCommand * mkRcCmd(uint16_t command);  // TxDevice -> RcCommand
         RcCommand * mkSetChannel(unsigned channel);
 
@@ -206,6 +209,8 @@ namespace ite
         static uint8_t checksum(const uint8_t * buffer, unsigned length) { return RcPacket::checksum(buffer, length); }
         uint8_t * rc_getBuffer(unsigned size);
         unsigned rc_command(Byte * buffer, unsigned bufferSize);
+        Security& rc_security();
+        SecurityValid rc_checkSecurity(Security& s);
         // --
 
     private:
@@ -213,8 +218,13 @@ namespace ite
         SendInfo m_device;
         RcCommand m_cmdRecv;
         RcCommand m_cmdSend;
+        Security m_recvSecurity;
+        std::atomic_ushort m_wantedCmd;
+        std::set<uint16_t> m_cmdReceived;
 
         static std::string rcStr2str(const RCString& s) { return std::string((const char *)s.stringData, s.stringLength); }
+
+        uint16_t id4update();
 
         TxDevice(const TxDevice& );
         TxDevice& operator = (const TxDevice& );

@@ -6,13 +6,6 @@
 namespace ite
 {
 
-uint16_t RcPacket::in2outID(uint16_t cmdID)
-{
-    if (cmdID >= CMD_GetMetadataSettingsInput)
-        return cmdID | 0xF000;
-    return cmdID | 0x8000;
-}
-
 bool RcPacket::checkPacketCount()
 {
     if (! totalPktNum())
@@ -41,7 +34,44 @@ uint8_t RcPacket::calcChecksum() const
     return checksum(&m_data[3], length-3);
 }
 
+void RcPacket::print() const
+{
+    if (! hasData())
+    {
+        printf("[RC] packet error: no data\n");
+        return;
+    }
+
+    if (! hasTags())
+    {
+        printf("[RC] packet error: no tag\n");
+        return;
+    }
+
+    if (! validLength())
+    {
+        printf("[RC] packet error: wrong legth %d\n", pktLength());
+        return;
+    }
+
+    if (! checksumOK())
+    {
+        printf("[RC] packet error: wrong checksum\n");
+        return;
+    }
+
+    printf("[RC] rx: %d; tx: %d; total pktNum: %d; pktNum: %d; seqNum: %d; pktLength: %d\n",
+           rxID(), txID(), totalPktNum(), paketNum(), sequenceNum(), pktLength());
+}
+
 //
+
+uint16_t RcCommand::in2outID(uint16_t cmdID)
+{
+    if (cmdID >= CMD_GetMetadataSettingsInput)
+        return cmdID | 0xF000;
+    return cmdID | 0x8000;
+}
 
 bool RcCommand::addPacket(const RcPacket& pkt)
 {
@@ -59,16 +89,36 @@ bool RcCommand::addPacket(const RcPacket& pkt)
         return false;
 
     if (pktNum == 1)
+    {
         clear();
+        for (unsigned i = 0; i < bufferSize; ++i)
+            m_buffer.push_back( buffer[i] );
+    }
+    else
+    {
+        if (size() < MIN_SIZE)
+            return false;
 
-    if (m_buffer.size() + bufferSize > sizeValue())
-        return false;
+        unsigned len = cmdLength() + 1;
+        if (m_buffer.size() + bufferSize > len)
+            return false;
 
-    for (unsigned i = 0; i < bufferSize; ++i)
-        m_buffer.push_back( buffer[i] );
+        for (unsigned i = 0; i < bufferSize; ++i)
+            m_buffer.push_back( buffer[i] );
+    }
 
-    if (total_pktNum == pktNum && ! isValid())
-        return false;
+    if (total_pktNum == pktNum)
+    {
+        if (size() < MIN_SIZE)
+            return false;
+
+        unsigned len = cmdLength() + 1;
+        if (size() > MIN_SIZE && size() > len)
+            m_buffer.resize(len);
+
+        if (! isValid())
+            return false;
+    }
 
     return true;
 }
@@ -93,8 +143,6 @@ void RcCommand::mkPackets(SendInfo& sinfo, uint16_t rxID, std::vector<RcPacketBu
         ++total_pktCount;
 
     pkts.resize(total_pktCount);
-
-    //std::lock_guard<std::mutex> lock(sinfo.mutex); // LOCK
 
     const uint8_t * ptr = data();
     const uint8_t * pEnd = data() + size();
@@ -133,15 +181,7 @@ void TxDevice::rc_sendTsPacket(uint8_t * tsPkt, unsigned length)
     tsPkt[2] = (uint8_t) pid;                       // PID
     tsPkt[3] = 0x10| ((uint8_t) (seqNum & 0x0F));   // ... + continuity counter
 
-    // TODO
     //User_returnChannelBusTx(length, tsPkt, &txLen);
-}
-
-void TxDevice::rc_sendRcPacket(const RcPacket& pkt)
-{
-    // TODO
-
-    //User_returnChannelBusTx(RcCommand::CMD_MAX_SIZE, cmd.rawData(), &txLen);
 }
 #endif
 

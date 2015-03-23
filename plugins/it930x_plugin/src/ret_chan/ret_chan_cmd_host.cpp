@@ -9,11 +9,11 @@ using ite::TxDevice;
 ///
 unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, unsigned bufferLength)
 {
-    unsigned error = ReturnChannelError::NO_ERROR;
+    if (bufferLength < 8)
+        return ReturnChannelError::Reply_WRONG_LENGTH;
+
     unsigned check;
 	Byte i = 0, j = 0;
-	unsigned index = 0;
-	unsigned checkByte = 0;
 	Rule_LineDetector * ptrRule_LineDetector = NULL;
 	Rule_FieldDetector * ptrRule_FieldDetector = NULL;
 	Rule_MotionDetector * ptrRule_MotionDetector = NULL;
@@ -21,23 +21,22 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 	Rule_CellMotion * ptrRule_CellMotion = NULL;
 	Byte tmpByte = 0;
 
-	if (bufferLength < 8)
-        error = ReturnChannelError::Reply_WRONG_LENGTH;
+    unsigned index = 0;
+    unsigned checkByte = 0;
+    Cmd_CheckByteIndexRead(Buffer, index, &checkByte);
 
-    if (error == ReturnChannelError::NO_ERROR)
-        Cmd_CheckByteIndexRead(Buffer, index, &checkByte);
+    unsigned error = ReturnChannelError::NO_ERROR;
 
-    if (error == ReturnChannelError::NO_ERROR)
     {
         index = 7;
 
         {
-            Security security;
+            Security& security = deviceInfo->rc_security();
+
             check = Cmd_StringRead(Buffer, checkByte, &index, &security.userName);
             check = Cmd_StringRead(Buffer, checkByte, &index, &security.password);
 
-            Byte valid = Valid;
-            User_getSecurity(security.userName, security.password, &valid);
+            Byte valid = deviceInfo->rc_checkSecurity(security);
             switch (valid)
             {
                 case UserNameInvalid:
@@ -47,13 +46,11 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
                 default:
                     break;
             }
-
-            check = Cmd_StringClear(&security.userName);
-            check = Cmd_StringClear(&security.password);
         }
 
-#if 0
-		if ((command == CMD_MetadataStreamOutput)|| ((deviceInfo->cmdConfig.IsTimeOut == 0) && ( deviceInfo->cmdConfig.ExpectCmd == command)))
+#if 1
+        if (command == CMD_MetadataStreamOutput)
+            return ReturnChannelError::NO_ERROR;
 #endif
 		{
 			switch (command)
@@ -99,7 +96,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_ModifyRuleOutput :
 			case CMD_DeleteRuleOutput :
 			case CMD_SetMetadataSettingsOutput :
-				if(bufferLength >=8)
+                if(bufferLength >=8)
 				{
 					User_getGeneralReply( deviceInfo, command );
 				}
@@ -1864,7 +1861,8 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			}
 		}
 	}
-	return (error);
+
+    return (error);
 }
 
 //----------------------General-----------------------

@@ -8,6 +8,8 @@
 
 namespace ite
 {
+    std::mutex It930x::m_rcMutex;
+
     unsigned str2num(std::string& s)
     {
         unsigned value;
@@ -244,7 +246,7 @@ namespace ite
         }
         else
         {
-            printf("cant't search, used. Rx: %d; frequency: %d\n", rxID(), TxDevice::freq4chan(channel));
+            printf("can't search, used. Rx: %d; frequency: %d\n", rxID(), TxDevice::freq4chan(channel));
         }
     }
 
@@ -270,10 +272,7 @@ namespace ite
                     if (! pkt.isOK())
                     {
 #if 1
-                        if (pkt.hasData())
-                            printf("bad RC packet. tags: %d; sum val: %d; sum calc: %d\n", pkt.hasTags(), pkt.checksumValue(), pkt.calcChecksum());
-                        else
-                            printf("bad RC packet. No data\n");
+                        printf("[RC] bad packet\n");
 #endif
                         continue;
                     }
@@ -317,20 +316,23 @@ namespace ite
             RcPacket pkt = pktBuf.packet();
             if (! pkt.isOK())
             {
-                printf("bad RC packet\n");
+                printf("[RC] bad packet\n");
                 continue;
             }
 
             m_txDev->parse(pkt);
+            return; ///< @note for better latency
         }
 
-        std::vector<uint16_t> ids;
-        m_txDev->ids4update(ids);
-        for (size_t i = 0; i < ids.size(); ++i)
+        uint16_t id = m_txDev->getWanted();
+        if (id)
         {
-            RcCommand * pcmd = m_txDev->mkRcCmd(ids[i]);
+            RcCommand * pcmd = m_txDev->mkRcCmd(id);
             if (pcmd && pcmd->isValid())
-                sendRC(pcmd);
+            {
+                if (! sendRC(pcmd))
+                    m_txDev->resetWanted();
+            }
         }
     }
 
@@ -350,9 +352,14 @@ namespace ite
         if (cmd && cmd->isValid() && m_txDev && m_device)
         {
             std::vector<RcPacketBuffer> pkts;
-            cmd->mkPackets(m_txDev->sendInfo(), m_rxID, pkts);
 
-            // TODO: do we need lock here?
+            {
+                SendInfo& sinfo = m_txDev->sendInfo();
+
+                std::lock_guard<std::mutex> lock(sinfo.mutex); // LOCK
+
+                cmd->mkPackets(sinfo, m_rxID, pkts);
+            }
 
             for (auto itPkt = pkts.begin(); itPkt != pkts.end(); ++itPkt)
                 m_device->sendRcPacket(itPkt->packet());

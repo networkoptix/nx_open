@@ -1,8 +1,6 @@
 #ifndef RETURN_CHANNEL_CMD_H
 #define RETURN_CHANNEL_CMD_H
 
-#define USER_REPLY  1
-
 #define RETURN_CHANNEL_VERSION					0x14032700	// yy/mm/dd/version
 #define RETURN_CHANNEL_PID						0x201
 #define RETURN_CHANNEL_API_VERSION				0x0013		// Version 0.13
@@ -50,7 +48,7 @@ struct ReturnChannelError
         //Reply_WRONG_CHECKSUM =	0x05000036ul,
         //GET_WRONG_LENGTH =		0x05000037ul,
         Reply_WRONG_LENGTH =		0x05000038ul,
-        CMD_WRONG_LENGTH =			0x05000039ul,
+        //CMD_WRONG_LENGTH =		0x05000039ul,
         CMD_READ_FAIL =				0x05000003ul,
         USER_INVALID =				0x05000004ul,
         PASSWORD_INVALID =			0x05000005ul,
@@ -63,10 +61,10 @@ struct ReturnChannelError
 
         //CMD_SYNTAX_ERROR			0x05010001ul,
         //CMD_RXDEVICEID_ERROR		0x05010002ul,
-        CMD_TXDEVICEID_ERROR =		0x05010003ul,
+        //CMD_TXDEVICEID_ERROR =	0x05010003ul,
         //CMD_SEQUENCE_ERROR =		0x05010004ul,
         //CMD_CHECKSUM_ERROR =		0x05010005ul,
-        CMD_PKTCHECK_ERROR =		0x05010006ul,
+        //CMD_PKTCHECK_ERROR =		0x05010006ul,
 
         //CMD_TS_SYNTEX_ERROR		0x05020001ul
         //CMD_TS_PID_ERROR			0x05020002ul
@@ -272,13 +270,14 @@ struct ReturnChannelError
 #define CMD_SetMetadataSettingsInput                                 0xE081
 #define CMD_SetMetadataSettingsOutput                                0xF081
 
-
+#if 0
 #define RCMaxSize 169
 #define CmdHeadSize 4
 #define TsCmdMaxSize 188
 #define RcCmdMaxSize 184
 
-//#define Debug_check_error
+#define Debug_check_error
+#endif
 
 typedef enum {
     Valid = 0,
@@ -296,12 +295,14 @@ typedef enum {
 
 //------------------General-----------------
 
+#if 0
 typedef struct RcCmdInfo{
 	Byte buffer_Cmd[RcCmdMaxSize];
 	unsigned cmdSize;
 	Byte cmdState;
 	struct RcCmdInfo *next;
 }RcCmd;
+#endif
 
 typedef struct {
 	unsigned stringLength;

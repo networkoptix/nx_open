@@ -3,6 +3,8 @@
 #include "ret_chan_user_host.h"
 #include "ret_chan_user.h"
 
+#define USER_REPLY  1
+
 #define Ref_BufferSize 64
 #define RC_USER_DEFINE_INIT_VALUE 0
 
@@ -1457,11 +1459,6 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 }
 
 //*******************User Define UnInit********************
-
-void User_getSecurity(RCString /*userName*/, RCString /*password*/, Byte* valid)
-{
-    *valid = Valid;
-}
 
 #if USER_REPLY
 

@@ -9,7 +9,6 @@ void User_Host_uninit(RCHostInfo* deviceInfo);
 //*******************User Define Reply********************
 
 //--------------------------General-------------------------------
-void User_getSecurity(RCString userName, RCString password, Byte* valid);
 void User_getGeneralReply(RCHostInfo* deviceInfo, Word command);
 //void User_getErrorReply(Device device, ReturnValue returnValue, Word command);
 //--------------------------General-------------------------------

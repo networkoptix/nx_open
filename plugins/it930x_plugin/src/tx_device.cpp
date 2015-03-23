@@ -121,60 +121,110 @@ unsigned parseRC(ite::TxDevice * tx, unsigned short cmdID, const Byte * Buffer, 
 namespace ite
 {
     TxDevice::TxDevice(unsigned short txID, unsigned freq)
-    :   m_device(txID)
+    :   m_device(txID),
+        m_wantedCmd(0)
     {
         User_Host_init(this);
         User_askUserSecurity(&security);
 
         setFrequency(freq);
+
+        m_recvSecurity.userName.stringData = nullptr;
+        m_recvSecurity.userName.stringLength = 0;
+        m_recvSecurity.password.stringData = nullptr;
+        m_recvSecurity.password.stringLength = 0;
     }
 
     TxDevice::~TxDevice()
     {
         User_Host_uninit(this);
+
+        Cmd_StringClear(&m_recvSecurity.userName);
+        Cmd_StringClear(&m_recvSecurity.password);
     }
 
-    bool TxDevice::parse(RcPacket& pkt)
+    void TxDevice::parse(RcPacket& pkt)
     {
         if (! pkt.isOK())
-            return false;
-
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+            return;
 
         if (m_cmdRecv.addPacket(pkt) && m_cmdRecv.isValid())
         {
             uint16_t cmdID = m_cmdRecv.commandID();
             uint8_t code = m_cmdRecv.returnCode();
-#if 1
-            printf("RC command: %d, code: %d\n", cmdID, code);
-#endif
-            unsigned error = ::parseRC(this, cmdID, m_cmdRecv.data(), m_cmdRecv.size());
+            unsigned error = ReturnChannelError::NO_ERROR;
+
+            {
+                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+                error = ::parseRC(this, cmdID, m_cmdRecv.data(), m_cmdRecv.size());
+            }
+
             if (error != ReturnChannelError::NO_ERROR)
-                return false;
+            {
+#if 1
+                printf("[RC] can't parse command %d, err: %d, code: %d\n", cmdID, error, code);
+#endif
+                return;
+            }
+
+            resetWanted(cmdID);
         }
 #if 1
         else
-            printf("RC packet (part or error)\n");
+            pkt.print();
 #endif
-        return true;
     }
 
-    // TODO
-    void TxDevice::ids4update(std::vector<uint16_t>& ids)
+    // TODO: reset wanted by timer (if no response)
+    uint16_t TxDevice::getWanted()
     {
-        // FIXME
-        static uint8_t num = 0;
-        if (num++ != 0)
-            return;
+        uint16_t cmd = id4update();
+        if (cmd)
+        {
+            uint16_t outCmd = RcCommand::in2outID(cmd);
+            uint16_t expected = 0;
+            if (m_wantedCmd.compare_exchange_strong(expected, outCmd))
+               return cmd;
+        }
 
-        // TODO
+        return 0;
+    }
 
-        ids.push_back(CMD_GetTransmissionParameterCapabilitiesInput);
-        ids.push_back(CMD_GetTransmissionParametersInput);
-        //ids.push_back(CMD_GetDeviceInformationInput);
-        //ids.push_back(CMD_GetVideoSourcesInput);
-        //ids.push_back(CMD_GetVideoSourceConfigurationsInput);
-        //ids.push_back(CMD_GetVideoEncoderConfigurationsInput);
+    void TxDevice::resetWanted(uint16_t cmd)
+    {
+        if (cmd)
+        {
+            if (m_wantedCmd.compare_exchange_strong(cmd, 0))
+                m_cmdReceived.insert(cmd);
+        }
+        else
+            m_wantedCmd.store(0);
+    }
+
+    // TODO: updates
+    uint16_t TxDevice::id4update()
+    {
+        static const uint16_t interested[] = {
+            CMD_GetTransmissionParameterCapabilitiesInput,
+            CMD_GetTransmissionParametersInput,
+            CMD_GetDeviceInformationInput,
+            CMD_GetVideoSourcesInput,
+            CMD_GetVideoSourceConfigurationsInput,
+            CMD_GetVideoEncoderConfigurationsInput
+        };
+
+        if (m_wantedCmd)
+            return 0;
+
+        for (size_t i = 0; i < sizeof(interested); ++i)
+        {
+            uint16_t outCmd = RcCommand::in2outID(interested[i]);
+            if (m_cmdReceived.find(outCmd) == m_cmdReceived.end())
+                return interested[i];
+        }
+
+        return 0;
     }
 
     RcCommand * TxDevice::mkSetChannel(unsigned channel)
@@ -273,6 +323,8 @@ namespace ite
 
     RcCommand * TxDevice::mkRcCmd(uint16_t command)
     {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
         m_cmdSend.clear();
         unsigned err = ::makeRcCommand(this, command); // --> ret_chan
         if (! err && m_cmdSend.isValid())
@@ -291,5 +343,18 @@ namespace ite
         // data is already in m_cmd.data()
         m_cmdSend.resize(bufferSize);
         return 0;
+    }
+
+    Security& TxDevice::rc_security()
+    {
+        Cmd_StringClear(&m_recvSecurity.userName);
+        Cmd_StringClear(&m_recvSecurity.password);
+
+        return m_recvSecurity;
+    }
+
+    SecurityValid TxDevice::rc_checkSecurity(Security& )
+    {
+        return Valid;
     }
 }

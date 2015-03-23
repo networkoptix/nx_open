@@ -278,7 +278,7 @@ unsigned Cmd_StringRead(const Byte* buf , unsigned bufferLength, unsigned* index
 	unsigned strLength = 0;
 	tempIndex = (* index);
 
-	if(bufferLength< tempIndex +4)
+    if (bufferLength < tempIndex + 4)
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
 		str->stringLength = 0;

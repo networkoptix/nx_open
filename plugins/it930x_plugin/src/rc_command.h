@@ -26,13 +26,12 @@ namespace ite
             m_size(size)
         {}
 
-        static uint16_t in2outID(uint16_t cmdID);
-
         bool hasData() const { return m_data && m_size; }
         bool hasLeadingTag() const { return m_data[0] == leadingTag(); }
         bool hasEndingTag() const { return m_data[m_size-1] == endingTag(); }
         bool hasTags() const { return hasLeadingTag() && hasEndingTag(); }
-        bool isOK() const { return hasData() && hasTags() && checksumOK(); }
+        bool validLength() const { return pktLength() <= RC_MAX_SIZE; }
+        bool isOK() const { return hasData() && hasTags() && validLength() && checksumOK(); }
 
         // header bytes
         uint16_t rxID() const           { return get16(1); }
@@ -90,6 +89,8 @@ namespace ite
             m_data[HEAD_SIZE() + pktLength()] = calcChecksum();
         }
 
+        void print() const;
+
     private:
         uint8_t * m_data;
         uint8_t m_size;
@@ -145,6 +146,14 @@ namespace ite
     class RcCommand
     {
     public:
+        enum
+        {
+            MIN_SIZE = 7,   // size (4) + ID (2) + checksum (1)
+            MAX_SIZE = 255
+        };
+
+        static uint16_t in2outID(uint16_t cmdID);
+
         RcCommand()
         {
             m_buffer.reserve(256);
@@ -159,25 +168,29 @@ namespace ite
         void resize(unsigned size) { m_buffer.resize(size); }
         void clear() { m_buffer.clear(); }
 
-        bool isValid() const { return (m_buffer.size() > 3) && m_buffer.size() == sizeValue(); }
-
-        uint16_t commandID() const { return (m_buffer[4]<<8) | m_buffer[5]; }
-        uint8_t returnCode() const { return m_buffer[6]; }
-
-        void mkPackets(SendInfo& sinfo, uint16_t rxID, std::vector<RcPacketBuffer>& pkts) const;
-
-    private:
-        std::vector<uint8_t> m_buffer;
-
-        unsigned sizeValue() const
+        unsigned cmdLength() const
         {
             unsigned x = m_buffer[0]; x <<= 8;
             x |= m_buffer[1]; x <<= 8;
             x |= m_buffer[2]; x <<= 8;
             x |= m_buffer[3];
-
-            return x + 1;
+            return x;
         }
+
+        uint16_t commandID() const { return (m_buffer[4]<<8) | m_buffer[5]; }
+        uint8_t returnCode() const { return m_buffer[6]; }
+
+        uint8_t calcChecksum() const { return RcPacket::checksum(&m_buffer[0], cmdLength()); }
+        uint8_t checksumValue() const { return m_buffer[cmdLength()]; }
+        bool checksumOK() const { return validLength() && checksumValue() == calcChecksum(); }
+
+        bool validLength() const { return m_buffer.size() >= MIN_SIZE && m_buffer.size() == cmdLength() + 1; }
+        bool isValid() const { return checksumOK(); }
+
+        void mkPackets(SendInfo& sinfo, uint16_t rxID, std::vector<RcPacketBuffer>& pkts) const;
+
+    private:
+        std::vector<uint8_t> m_buffer;
     };
 }
 
