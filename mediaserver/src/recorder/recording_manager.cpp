@@ -521,7 +521,7 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
     deleteRecorder(recorders, resource);
 }
 
-bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera)
+bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera) const
 {
     QMutexLocker lock(&m_mutex);
     QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(camera);

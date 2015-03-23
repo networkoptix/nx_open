@@ -18,6 +18,7 @@
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/network/http/multipart_content_parser.h"
+#include "utils/network/http/linesplitter.h"
 #include "utils/common/id.h"
 
 #ifdef _DEBUG
@@ -207,12 +208,18 @@ private:
 #ifdef USE_MULTIPART_CONTENT
     nx_http::MultipartContentParser m_contentParser;
 #endif
+    bool m_incomingConnection;
+    bool m_incomingTunnelOpened;
+    bool m_incomingTunnelOpenRequestRead;
+    nx_http::LineSplitter m_lineSplitter;
 
 private:
     void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
-    void addData(QByteArray &&data);
+    void addData(QByteArray&& data);
+    //!\a data will be sent as-is with no HTTP encoding applied
+    void addEncodedData(QByteArray&& data);
     /*!
         \return in case of success returns number of bytes read from \a data. In case of parse error returns 0
         \note In case of error \a chunkHeader contents are undefined
@@ -232,6 +239,11 @@ private:
 #ifdef USE_MULTIPART_CONTENT
     void receivedTransaction( const QnByteArrayConstRef& tranData );
 #endif
+    /*!
+        \note MUST be called with \a m_mutex locked
+    */
+    void scheduleAsyncRead();
+    void readCreateIncomingTunnelMessage();
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
