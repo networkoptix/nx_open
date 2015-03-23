@@ -67,7 +67,9 @@ void QnIncompatibleServerWatcher::start() {
 }
 
 void QnIncompatibleServerWatcher::stop() {
-    disconnect(QnAppServerConnectionFactory::getConnection2()->getMiscManager().get(), 0, this, 0);
+    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
+    if (connection)
+        disconnect(connection->getMiscManager().get(), 0, this, 0);
     disconnect(qnResPool, 0, this, 0);
 
     QList<QnUuid> ids;
