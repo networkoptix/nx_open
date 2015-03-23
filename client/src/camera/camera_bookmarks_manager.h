@@ -9,14 +9,19 @@
 class QnCameraBookmarksManager : public QObject
 {
 public:
-    struct FilterParameters;
+    struct FilterParameters;    /// Forward declaration of structure with filter parameters
     typedef std::function<void (bool success, const QnCameraBookmarkList &bookmarks)> BookmarksCallbackType;
 
-    QnCameraBookmarksManager(QObject *parent);
+    QnCameraBookmarksManager(QObject *parent = nullptr);
 
     virtual ~QnCameraBookmarksManager();
 
+    /// @brief Asynchroniously gathers bookmarks using specified filter
+    /// @param filter Filter parameters
+    /// @param clearBookmarkCache Shows if loaders should discard theri caches
+    /// @param callback Callback for receiving bookmarks data
     void getBookmarksAsync(const FilterParameters &filter
+        , bool clearBookmarksCache
         , const BookmarksCallbackType &callback);
 
 private:

@@ -2,7 +2,6 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/camera_bookmark_fwd.h>
 
 class QnSearchBookmarksModel : public QAbstractItemModel 
 {
@@ -24,17 +23,15 @@ public:
 
     virtual ~QnSearchBookmarksModel();
 
-    void reload();
-
-    void applyFilter();
+    void applyFilter(bool clearBookmarksCache);
 
     void setDates(const QDate &start
         , const QDate &finish);
 
-    void setFilter(const QString &text);
+    void setFilterText(const QString &text);
 
     void setCameras(const QnResourceList &cameras);
-    
+
     /// QAbstractItemModel overrides
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;

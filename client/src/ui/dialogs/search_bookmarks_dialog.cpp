@@ -1,7 +1,7 @@
 
 #include "search_bookmarks_dialog.h"
 
-#include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <ui/models/search_bookmarks_model.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -11,11 +11,13 @@
 class QnSearchBookmarksDialog::Impl : public QObject
 {
 public:
-    Impl(QnWorkbenchStateDependentButtonBoxDialog *owner);
+    Impl(QDialog *owner);
 
     ~Impl();
 
     void updateHeadersWidth();
+
+    void refresh();
 
 private:
     void chooseCamera();
@@ -24,7 +26,7 @@ private:
 private:
     typedef QScopedPointer<Ui::BookmarksLog> UiImpl;
     
-    QnWorkbenchStateDependentButtonBoxDialog * const m_owner;
+    QDialog * const m_owner;
     const UiImpl m_ui;
     QnSearchBookmarksModel * const m_model;
 
@@ -33,10 +35,11 @@ private:
 
 ///
 
-QnSearchBookmarksDialog::Impl::Impl(QnWorkbenchStateDependentButtonBoxDialog *owner)
+QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
     : m_owner(owner)
     , m_ui(new Ui::BookmarksLog())
     , m_model(new QnSearchBookmarksModel(this))
+
     , m_cameras()
 {
     m_ui->setupUi(m_owner);
@@ -48,26 +51,33 @@ QnSearchBookmarksDialog::Impl::Impl(QnWorkbenchStateDependentButtonBoxDialog *ow
 
     m_model->setDates(m_ui->dateEditFrom->date(), m_ui->dateEditTo->date());
     connect(m_ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this
-        , [this]() { m_model->setFilter(m_ui->filterLineEdit->lineEdit()->text()); });
+        , [this]() 
+    { 
+        m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text()); 
+        m_model->applyFilter(false);
+    });
     connect(m_ui->filterLineEdit, &QnSearchLineEdit::escKeyPressed, this, [this]() 
     {
         m_ui->filterLineEdit->lineEdit()->setText(QString());
-        m_model->setFilter(QString());
+        m_model->setFilterText(QString());
+        m_model->applyFilter(false);
     });
 
     connect(m_ui->dateEditFrom, &QDateEdit::userDateChanged, this, [this](const QDate &date) 
     { 
         m_model->setDates(date, m_ui->dateEditTo->date()); 
-        m_model->applyFilter();
+        m_model->applyFilter(false);
     });
     connect(m_ui->dateEditTo, &QDateEdit::userDateChanged, this, [this](const QDate &date) 
     { 
         m_model->setDates(m_ui->dateEditFrom->date(), date); 
-        m_model->applyFilter();
+        m_model->applyFilter(false);
     });
-    connect(m_ui->refreshButton, &QPushButton::clicked, m_model, &QnSearchBookmarksModel::reload);
+    
+    connect(m_ui->refreshButton, &QPushButton::clicked, this, &Impl::refresh);
     connect(m_ui->cameraButton, &QPushButton::clicked, this, &Impl::chooseCamera);
 
+    m_model->applyFilter(true);
 }
 
 QnSearchBookmarksDialog::Impl::~Impl()
@@ -95,6 +105,11 @@ void QnSearchBookmarksDialog::Impl::updateHeadersWidth()
     header->resizeSection(QnSearchBookmarksModel::kCamera, totalWidth * kCameraPart / kPartsTotalNumber);
 }
 
+void QnSearchBookmarksDialog::Impl::refresh()
+{
+    m_model->applyFilter(true);
+}
+
 void QnSearchBookmarksDialog::Impl::chooseCamera()
 {
     QnResourceSelectionDialog dialog(m_owner);
@@ -104,7 +119,7 @@ void QnSearchBookmarksDialog::Impl::chooseCamera()
     {
         m_cameras = dialog.selectedResources();
         m_model->setCameras(m_cameras);
-        m_model->applyFilter();
+        m_model->applyFilter(false);
 
         static const QString kEmptyCamerasCaption = tr("<Any camera>");
         static const QString kCamerasTemplate = tr("camera(s)");
@@ -117,7 +132,7 @@ void QnSearchBookmarksDialog::Impl::chooseCamera()
 ///
 
 QnSearchBookmarksDialog::QnSearchBookmarksDialog(QWidget *parent)
-    : QnWorkbenchStateDependentButtonBoxDialog(parent)
+    : QnButtonBoxDialog(parent)
     , m_impl(new Impl(this))
 {
 }
@@ -130,4 +145,10 @@ void QnSearchBookmarksDialog::resizeEvent(QResizeEvent *event)
 {
     Base::resizeEvent(event);
     m_impl->updateHeadersWidth();
+}
+
+void QnSearchBookmarksDialog::showEvent(QShowEvent *event)
+{
+    Base::showEvent(event);
+    m_impl->refresh();
 }

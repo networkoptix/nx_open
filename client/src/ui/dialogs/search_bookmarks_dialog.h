@@ -3,10 +3,8 @@
 
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 
-class QnSearchBookmarksDialog: public QnWorkbenchStateDependentButtonBoxDialog
+class QnSearchBookmarksDialog: public QnButtonBoxDialog
 {
-    Q_OBJECT
-
 public:
     QnSearchBookmarksDialog(QWidget *parent = nullptr);
 
@@ -15,8 +13,10 @@ public:
 private:
     void resizeEvent(QResizeEvent *event);
 
+    void showEvent(QShowEvent *event);
+
 private:
-    typedef QnWorkbenchStateDependentButtonBoxDialog Base;
+    typedef QnButtonBoxDialog Base;
     class Impl;
 
     Impl * const m_impl;
