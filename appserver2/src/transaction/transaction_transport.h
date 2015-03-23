@@ -17,6 +17,7 @@
 #include <utils/common/uuid.h>
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
+#include "utils/network/http/linesplitter.h"
 #include "utils/common/id.h"
 
 #ifdef _DEBUG
@@ -207,11 +208,18 @@ private:
     int m_postedTranCount;
     bool m_asyncReadScheduled;
     qint64 m_remoteIdentityTime;
+    bool m_incomingConnection;
+    bool m_incomingTunnelOpened;
+    bool m_incomingTunnelOpenRequestRead;
+    nx_http::LineSplitter m_lineSplitter;
+
 private:
     void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
-    void addData(QByteArray &&data);
+    void addData(QByteArray&& data);
+    //!\a data will be sent as-is with no HTTP encoding applied
+    void addEncodedData(QByteArray&& data);
     /*!
         \return in case of success returns number of bytes read from \a data. In case of parse error returns 0
         \note In case of error \a chunkHeader contents are undefined
@@ -228,6 +236,12 @@ private:
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
     void fillAuthInfo();
+    /*!
+        \note MUST be called with \a m_mutex locked
+    */
+    void scheduleAsyncRead();
+    void readCreateIncomingTunnelMessage();
+
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );

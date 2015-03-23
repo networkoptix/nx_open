@@ -20,6 +20,7 @@
 #include "api/global_settings.h"
 #include "database/db_manager.h"
 #include "http/custom_headers.h"
+#include "version.h"
 
 
 /*!
@@ -56,7 +57,10 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_prevGivenHandlerID(0),
     m_postedTranCount(0),
     m_asyncReadScheduled(false),
-    m_remoteIdentityTime(0)
+    m_remoteIdentityTime(0),
+    m_incomingConnection(socket),
+    m_incomingTunnelOpened(false),
+    m_incomingTunnelOpenRequestRead(false)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
@@ -89,6 +93,16 @@ void QnTransactionTransport::addData(QByteArray&& data)
 {
     QMutexLocker lock(&m_mutex);
     m_dataToSend.push_back( std::move( data ) );
+    if( (m_dataToSend.size() == 1) && m_socket )
+        serializeAndSendNextDataBuffer();
+}
+
+void QnTransactionTransport::addEncodedData(QByteArray&& data)
+{
+    QMutexLocker lock(&m_mutex);
+    DataToSend dataToSend;
+    dataToSend.encodedSourceData = std::move( data );
+    m_dataToSend.push_back( std::move( dataToSend ) );
     if( (m_dataToSend.size() == 1) && m_socket )
         serializeAndSendNextDataBuffer();
 }
@@ -376,8 +390,20 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
     assert( m_state == ReadyForStreaming );
 
+    //if incoming connection then expecting POST request
+    if( m_incomingConnection && !m_incomingTunnelOpened )
+    {
+        readCreateIncomingTunnelMessage();
+        if( !m_incomingTunnelOpened )
+        {
+            //reading futher
+            scheduleAsyncRead();
+            return;
+        }
+    }
+
     //TODO #ak it makes sense to use here some chunk parser class. At this moment http chunk parsing logic is implemented 
-    //3 times in different parts of our code (async http client, sync http server and here)
+        //3 times in different parts of our code (async http client, sync http server and here)
     for( size_t readBufPos = 0;; )
     {
         //processing available data: we can have zero or more chunks in m_readBuffer
@@ -414,7 +440,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
             break;
         }
 
-        int payloadLen = m_chunkLen - 4;
+        const int payloadLen = m_chunkLen - 4;
         if (payloadLen > 0) {
             QByteArray serializedTran;
             QnTransactionTransportHeader transportHeader;
@@ -445,17 +471,8 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     if( m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME )
         return; //not reading futher while that much transactions are not processed yet
 
-    using namespace std::placeholders;
     m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
-    if( m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
-    {
-        m_asyncReadScheduled = true;
-        m_lastReceiveTimer.restart();
-    }
-    else
-    {
-        setStateNoLock( State::Error );
-    }
+    scheduleAsyncRead();
 }
 
 bool QnTransactionTransport::hasUnsendData() const
@@ -478,17 +495,8 @@ void QnTransactionTransport::transactionProcessed()
 
     assert( m_socket );
 
-    using namespace std::placeholders;
     m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
-    if( m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
-    {
-        m_asyncReadScheduled = true;
-        m_lastReceiveTimer.restart();
-    }
-    else
-    {
-        setStateNoLock( State::Error );
-    }
+    scheduleAsyncRead();
 }
 
 void QnTransactionTransport::sendHttpKeepAlive()
@@ -640,6 +648,18 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         m_httpClient.reset();
         if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
             setExtraDataBuffer(data);
+
+            //opening forward tunnel: sending POST with infinite body
+            nx_http::Request request;
+            request.requestLine.method = nx_http::Method::POST;
+            request.requestLine.url = client->url();
+            request.requestLine.version = nx_http::http_1_1;
+            request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME" "QN_PRODUCT_NAME" "QN_APPLICATION_VERSION );
+            request.headers.emplace( "Content-Type", "application/octet-stream" );
+            request.headers.emplace( "Transfer-Encoding", "chunked" );
+            request.headers.emplace( "Host", request.requestLine.url.host().toLatin1() );
+            addEncodedData( request.serialized() );
+
             setState(QnTransactionTransport::Connected);
         }
         else {
@@ -672,7 +692,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
         const size_t fullChunkLen = m_chunkHeaderLen + m_chunkLen + sizeof("\r\n")-1;
         if (bufferLen >= fullChunkLen)
         {
-            int payloadLen = m_chunkLen - 4;
+            const int payloadLen = m_chunkLen - 4;
             if (payloadLen > 0) {
                 QByteArray serializedTran;
                 QnTransactionTransportHeader transportHeader;
@@ -848,6 +868,63 @@ bool QnTransactionTransport::skipTransactionForMobileClient(ApiCommand::Value co
         break;
     }
     return true;
+}
+
+void QnTransactionTransport::scheduleAsyncRead()
+{
+    using namespace std::placeholders;
+    if( m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
+    {
+        m_asyncReadScheduled = true;
+        m_lastReceiveTimer.restart();
+    }
+    else
+    {
+        setStateNoLock( State::Error );
+    }
+}
+
+void QnTransactionTransport::readCreateIncomingTunnelMessage()
+{
+    if( !m_incomingTunnelOpenRequestRead )
+    {
+        //skipping data up to empty line
+        size_t pos = 0;
+        for( ; pos < m_readBuffer.size(); )
+        {
+            size_t lineBytesRead = 0;
+            QnByteArrayConstRef lineBuffer;
+            if( !m_lineSplitter.parseByLines(
+                    QnByteArrayConstRef(m_readBuffer, pos),
+                    &lineBuffer,
+                    &lineBytesRead ) )
+            {
+                //no line yet
+                pos += lineBytesRead;
+                break;
+            }
+
+            pos += lineBytesRead;
+
+            //read line
+            if( !lineBuffer.isEmpty() )
+                continue;
+
+            //found empty line
+            m_incomingTunnelOpenRequestRead = true;
+            break;
+        }
+        m_readBuffer.remove( 0, pos );
+    }
+
+    if( m_incomingTunnelOpenRequestRead && !m_readBuffer.isEmpty() )
+    {
+        //removing trailing line feed
+        size_t lineBytesRead = 0;
+        m_lineSplitter.finishCurrentLineEnding( m_readBuffer, &lineBytesRead );
+        m_readBuffer.remove( 0, lineBytesRead );
+        m_incomingTunnelOpened = true;
+    }
 }
 
 }
