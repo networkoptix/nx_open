@@ -214,7 +214,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem) 
     if (it == m_moduleItemById.end())
         return;
 
-    if (!it->addresses.remove(address.address.toString()))
+    if (!it->addresses.remove(address))
         return;
 
     QnModuleInformation &moduleInformation = it->moduleInformation;
