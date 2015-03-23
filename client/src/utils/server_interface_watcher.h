@@ -7,9 +7,6 @@
 #include <utils/common/uuid.h>
 #include "utils/network/module_information.h"
 
-
-class QnRouter;
-
 class QnServerInterfaceWatcher : public QObject {
     Q_OBJECT
 public:
