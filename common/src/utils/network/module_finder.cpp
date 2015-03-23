@@ -18,6 +18,19 @@ namespace {
     const int pingTimeout = 15 * 1000;
     const int checkInterval = 3000;
     const int noticeableConflictCount = 5;
+
+    bool isLocalAddress(const HostAddress &address) {
+        if (address.toString().isNull())
+            return false;
+
+        quint8 hi = address.ipv4() >> 24;
+
+        return address == HostAddress::localhost || hi == 10 || hi == 192 || hi == 172;
+    }
+
+    bool isBetterAddress(const HostAddress &address, const HostAddress &other) {
+        return !isLocalAddress(other) && isLocalAddress(address);
+    }
 }
 
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
@@ -175,6 +188,11 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     item.addresses.insert(address);
     m_idByAddress[address] = moduleInformation.id;
     if (count < item.addresses.size()) {
+        if (isBetterAddress(address.address, item.primaryAddress.address)) {
+            item.primaryAddress = address;
+            sendModuleInformation(moduleInformation, address, true);
+        }
+
         NX_LOG(lit("QnModuleFinder: New module URL: %1 %2")
                .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
 
@@ -225,7 +243,15 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem) 
 
     if (!it->addresses.isEmpty()) {
         if (it->primaryAddress == address) {
-            it->primaryAddress = *it->addresses.cbegin();
+            it->primaryAddress.port = 0;
+            for (const SocketAddress &address: it->addresses) {
+                if (isLocalAddress(address.address)) {
+                    it->primaryAddress = address;
+                    break;
+                }
+            }
+            if (it->primaryAddress.port == 0)
+                it->primaryAddress = *it->addresses.cbegin();
             sendModuleInformation(moduleInformation, it->primaryAddress, true);
         }
 
