@@ -33,14 +33,14 @@ namespace ec2
         virtual QString authInfo() const override;
 
         bool initialized() const;
+
+        Ec2StaticticsReporter* getStaticticsReporter();
     
     private:
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;
-
-        // TODO: do not construct this object if statictics are disabled
-        Ec2StaticticsReporter m_staticticsReporter;
+        std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;
     };
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
 }

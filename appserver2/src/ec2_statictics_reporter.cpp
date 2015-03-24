@@ -6,143 +6,187 @@ static const QString REPORT_ALLOWED = "reportAllowed";
 static const QString REPORT_LAST_TIME = "reportLastTime";
 
 // Paramitrize
-static const uint REPORT_CYCLE = 30*24*60*60;
-static const QString REPORT_SERVER = "http;//localhost/reportSystemStatistics";
+static const uint REPORT_CYCLE = 30*24*60*60; /* about a month */
+static const uint REPORT_MAX_DELAY = REPORT_CYCLE / 4; /* about a week */
+static const QString REPORT_SERVER = "http://localhost:5000/api/reportStatistics";
 
 namespace ec2
 {
     Ec2StaticticsReporter::Ec2StaticticsReporter(AbstractECConnection& connection)
         : m_connection(connection)
         , m_admin(getAdmin())
-        , m_thread(nullptr)
-        , m_destoy(false)
+        , m_desktopCamera(getResourceTypeIdByName(QnResourceTypePool::desktopCameraTypeName))
     {
-        if (!m_admin)
-        {
-            // TODO: log the error
-            return;
-        }
-
         if (m_admin->getProperty(REPORT_ALLOWED).toInt() == 0)
         {
-            // Report system is disabled
+            NX_LOG(lit("Ec2StaticticsReporter. Automatic peport system is disabled"),
+                   cl_logDEBUG1);
             return;
         }
 
-        checkForReportTime();
+        if (m_desktopCamera.isNull())
+            NX_LOG(lit("Ec2StaticticsReporter. Can not get %1 resouce type, using null")
+                   .arg(QnResourceTypePool::desktopCameraTypeName), cl_logWARNING);
+
+        const auto now = QDateTime::currentDateTime().toTime_t();
+        const auto lastReport = m_admin->getProperty(REPORT_LAST_TIME).toUInt();
+        const auto plannedReport = lastReport + REPORT_CYCLE;
+
+        setUpTimer(std::max(now, plannedReport));
     }
 
     Ec2StaticticsReporter::~Ec2StaticticsReporter()
     {
+        {
+            QMutexLocker lk(&m_mutex);
+            if (m_timerId)
+                TimerManager::instance()->joinAndDeleteTimer(*m_timerId);
+        }
+
+        if (m_httpClient)
+            m_httpClient.get()->terminate();
+    }
+
+    ErrorCode Ec2StaticticsReporter::collectReportData(
+            std::nullptr_t, ApiSystemStatistics* const outData)
+    {
+        if( !QnDbManager::instance() )
+            return ErrorCode::ioError;
+
+        {
+            ApiMediaServerDataExList mediaservers;
+            auto res = QnDbManager::instance()->doQuery(nullptr, mediaservers);
+            if (res != ErrorCode::ok)
+                return res;
+
+            for (auto& ms : mediaservers)
+                outData->mediaservers.push_back(ms);
+        }
+        {
+            ApiCameraDataExList cameras;
+            auto res = QnDbManager::instance()->doQuery(nullptr, cameras);
+            if (res != ErrorCode::ok)
+                return res;
+
+            for (ApiCameraDataEx& cam : cameras)
+                if (cam.typeId == m_desktopCamera)
+                    outData->clients.push_back(cam);
+                else
+                    outData->cameras.push_back(cam);
+        }
+
+        NX_LOG(lit("Ec2StaticticsReporter. Collected: "
+                   "%1 mediaservers, %2 cameras and %3 clients")
+               .arg(outData->mediaservers.size())
+               .arg(outData->cameras.size())
+               .arg(outData->clients.size()), cl_logDEBUG1);
+        return ErrorCode::ok;
+    }
+
+    ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(
+            std::nullptr_t, ApiStatisticsServerInfo* const outData)
+    {
+        outData->url = REPORT_SERVER;
+        NX_LOG(lit("Ec2StaticticsReporter. Request for statistics report to %1")
+               .arg(REPORT_SERVER), cl_logDEBUG1);
+
+        {
+            QMutexLocker lk(&m_mutex);
+            if (m_timerId)
+                TimerManager::instance()->joinAndDeleteTimer(*m_timerId);
+        }
+
+        if (m_httpClient) return ErrorCode::ok; // already in progress
+
+        return initiateReport();
+    }
+
+    void Ec2StaticticsReporter::setUpTimer(uint reportTime)
+    {
+        static std::once_flag flag;
+        std::call_once(flag, [](){ qsrand((uint)QTime::currentTime().msec()); });
+
+        const uint randomDelay = static_cast<uint>(qrand()) % REPORT_MAX_DELAY;
+        const uint plannedTime = reportTime + randomDelay;
+
+        NX_LOG(lit("Ec2StaticticsReporter. Planned statistics report time is %1")
+               .arg(QDateTime::fromTime_t(plannedTime).toString()), cl_logDEBUG1);
+
         QMutexLocker lk(&m_mutex);
-        m_destoy = true;
-
-        if (m_timer)
-        {
-            lk.unlock();
-            TimerManager::instance()->joinAndDeleteTimer(*m_timer);
-            lk.relock();
-        }
-
-        if (m_thread)
-        {
-            lk.unlock();
-            m_thread->wait();
-            delete m_thread;
-            lk.relock();
-        }
+        m_timerId = TimerManager::instance()->addTimer(
+                std::bind(&Ec2StaticticsReporter::initiateReport, this), plannedTime);
     }
 
-    Ec2StaticticsReporter::ReportThread::ReportThread(Ec2StaticticsReporter& reporter)
-        : m_reporter(reporter)
+    ErrorCode Ec2StaticticsReporter::initiateReport()
     {
+        ApiSystemStatistics data;
+        auto res = collectReportData(nullptr, &data);
+        if (res != ErrorCode::ok)
+        {
+            NX_LOG(lit("Ec2StaticticsReporter. Could not collect data: %1")
+                   .arg(toString(res)), cl_logWARNING);
+            return res;
+        }
+
+        m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        connect(m_httpClient.get().get(), &nx_http::AsyncHttpClient::done,
+                this, &Ec2StaticticsReporter::finishReport, Qt::DirectConnection);
+
+        const auto format = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        if (!m_httpClient.get()->doPost(QUrl(REPORT_SERVER), format, QJson::serialized(data)))
+        {
+            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1")
+                   .arg(REPORT_SERVER), cl_logWARNING);
+            return ErrorCode::failure;
+        }
+
+        NX_LOG(lit("Ec2StaticticsReporter. Sending statistics async"), cl_logDEBUG1);
+        return ErrorCode::ok;
     }
 
-    void Ec2StaticticsReporter::ReportThread::sendJsonReport(QJsonValue array)
+    void Ec2StaticticsReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient)
     {
-        nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-        connect(*httpClient, &nx_http::AsyncHttpClient::done,
-                this, &Ec2StaticticsReporter::ReportThread::done, Qt::DirectConnection);
+        m_httpClient = boost::none;
 
-        auto format = Qn::serializationFormatToHttpContentType(JsonFormat);
-        if (!httpClient->doPost(QUrl(REPORT_SERVER), format, QJson::serialized(array)))
+        const auto now = QDateTime::currentDateTime().toTime_t();
+        if( httpClient->state() == nx_http::AsyncHttpClient::sFailed )
         {
-            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1").
-                   arg(url.toString()), cl_logWARNING);
+            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1")
+                   .arg(REPORT_SERVER), cl_logWARNING);
+
+            // retry after randome dalay
+            setUpTimer(now);
+        }
+        else
+        {
+            NX_LOG(lit("Ec2StaticticsReporter. Statistics report sucessfuly sent to %1")
+                   .arg(REPORT_SERVER), cl_logINFO);
+
+            // plan for a next report
+            m_admin->setProperty(REPORT_LAST_TIME, QString::number(now));
+            setUpTimer(now + REPORT_CYCLE);
         }
     }
 
-    void Ec2StaticticsReporter::ReportThread::run()
-    {
-        QJsonArray jsonServers;
-        QnMediaServerResourceList serverList;
-        m_reporter.m_connection.getMediaServerManager()->getServersSync(QnUuid(), &serverList);
-        for(QnMediaServerResource& server : serverList)
-        {
-            QJsonObject jsonServer;
-            jsonServer.insert("id", server.getId());
-            jsonServer.insert("system_id", server.getId());
-
-            jsonServer.
-        }
-
-        QJsonArray jsonCameras;
-        QJsonArray jsonClients;
-        QnVirtualCameraResourceList cameraList;
-        m_reporter.m_connection.getCameraManager()->getCamerasSync(QnUuid(), &cameraList);
-        for(QnVirtualCameraResource& camera : cameraList)
-        {
-            if (/* camera is client */)
-            jsonServerMap[camera.getParentId()]
-        }
-
-        sendJsonReport(array);
-    }
-
-    void Ec2StaticticsReporter::ReportThread::done(nx_http::AsyncHttpClientPtr httpClient)
-    {
-        auto now = QDateTime::currentDateTime().toTime_t();
-        m_reporter.m_admin.setProperty(REPORT_LAST_TIME, QString::number(now));
-        m_reporter.checkForReportTime();
-    }
-
-    QnUserResource Ec2StaticticsReporter::getAdmin()
+    QnUserResourcePtr Ec2StaticticsReporter::getAdmin()
     {
         QnUserResourceList userList;
-        connection.getUserManager()->getUsersSync(QnUuid(), &userList);
+        m_connection.getUserManager()->getUsersSync(QnUuid(), &userList);
         for (auto& user : userList)
-            if (user.isAdmin())
+            if (user->isAdmin())
                 return user;
 
         qFatal("Can not get user admin");
     }
 
-    void Ec2StaticticsReporter::checkForReportTime(qint64 /*timerId*/)
+    QnUuid Ec2StaticticsReporter::getResourceTypeIdByName(const QString& name)
     {
-        {
-            QMutexLocker lk(&m_mutex);
-            if (destroy) return;
-        }
+        QnResourceTypeList typesList;
+        m_connection.getResourceManager()->getResourceTypesSync(&typesList);
+        for (auto& rType : typesList)
+            if (rType->getName() == name)
+                return rType->getId();
 
-        auto now = QDateTime::currentDateTime().toTime_t();
-        auto lastReport = m_admin->getProperty(REPORT_LAST_TIME).toUInt();
-        if (now >= lastReport + REPORT_CYCLE)
-        {
-            QMutexLocker lk(&m_mutex);
-            m_timer = boost::none;
-
-            // Statistics shouldnt be in process right now
-            Q_ASSERT(!(m_thread && m_thread->isRunning()));
-
-            m_thread = new ReportThread(m_connection);
-            m_thread->start();
-        }
-        else
-        {
-            QMutexLocker lk(&m_mutex);
-            m_timer = TimerManager::instance()->addTimer(
-                std::bind(this, Ec2StaticticsReporter::checkForReportTime),
-                lastReport + REPORT_CYCLE < now);
-        }
+        return QnUuid(); // null
     }
 }

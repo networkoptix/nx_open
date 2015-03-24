@@ -144,6 +144,9 @@ namespace ec2
             REGISTER_COMMAND(markLicenseOverflow),
             REGISTER_COMMAND(getSettings),
 
+            REGISTER_COMMAND(getStatisticsReport),
+            REGISTER_COMMAND(triggerStatisticsReport),
+
             REGISTER_COMMAND(getTransactionLog)
         };
 

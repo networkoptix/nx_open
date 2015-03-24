@@ -157,7 +157,7 @@
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
 #endif
-#include "common/src/platform/hardware_information.h"
+#include "platform/hardware_information.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
@@ -1739,24 +1739,24 @@ void QnMain::run()
         if (settingsAuthKey != authKey)
             encodeAndStoreAuthKey(authKey);
 
-        auto cpuArchitecture = QSysInfo::currentCpuArchitecture();
-        if (server->getProperty(CPU_ARCHITECTURE) != cpuArchitecture)
+        auto hwInfo = HardwareInformation::instance();
+        if (server->getProperty(CPU_ARCHITECTURE) != hwInfo.cpuArchitecture)
         {
-            server->setProperty(CPU_ARCHITECTURE, cpuArchitecture);
+            server->setProperty(CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
             isModified = true;
         }
 
-        auto cpuCoreCount = QString::number(HardwareInformation::getCpuCoreCount());
+        auto cpuCoreCount = QString::number(hwInfo.cpuCoreCount);
         if (server->getProperty(CPU_CORE_COUNT) != cpuCoreCount)
         {
             server->setProperty(CPU_CORE_COUNT, cpuCoreCount);
             isModified = true;
         }
 
-        auto memory = QString::number(HardwareInformation::getInstalledMemory());
-        if (server->getProperty(MEMORY) != memory)
+        auto phisicalMemory = QString::number(hwInfo.phisicalMemory);
+        if (server->getProperty(MEMORY) != phisicalMemory)
         {
-            server->setProperty(MEMORY, memory);
+            server->setProperty(MEMORY, phisicalMemory);
             isModified = true;
         }
 

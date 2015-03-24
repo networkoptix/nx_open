@@ -68,7 +68,6 @@ namespace ec2
     };
 #define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields_Short (status)(addParams) (storages)
 
-
 } // namespace ec2
 
 #endif //MSERVER_DATA_H

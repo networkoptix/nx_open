@@ -279,6 +279,13 @@ namespace ec2
 
         registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
             std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
+
+        auto reporter = m_directConnection->getStaticticsReporter();
+        registerFunctorHandler<std::nullptr_t, ApiSystemStatistics>( restProcessorPool, ApiCommand::getStatisticsReport,
+            std::bind( &Ec2StaticticsReporter::collectReportData, reporter, _1, _2 ) );
+        registerFunctorHandler<std::nullptr_t, ApiStatisticsServerInfo>( restProcessorPool, ApiCommand::triggerStatisticsReport,
+            std::bind( &Ec2StaticticsReporter::triggerStatisticsReport, reporter, _1, _2 ) );
+
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )

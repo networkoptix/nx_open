@@ -150,6 +150,10 @@ namespace ec2
             markLicenseOverflow         = 2006,  /*< ApiLicenseOverflowData */
             getSettings                 = 2007,  /*< ApiResourceParamDataList */
 
+            /* Statistics */
+            getStatisticsReport         = 3001,  /*< ApiSystemStatistics */
+            triggerStatisticsReport     = 3002,  /*< ApiStatisticsServerInfo */
+
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
             dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */

@@ -18,6 +18,8 @@ namespace ec2 {
     struct ApiCameraData;
     struct ApiCameraAttributesData;
     struct ApiCameraDataEx;
+    struct ApiCameraDataStatistics;
+    struct ApiClientDataStatistics;
     struct ApiCameraServerItemDataOld;
     struct ApiCameraServerItemData;
     struct ApiEmailData;
@@ -35,6 +37,7 @@ namespace ec2 {
     struct ApiMediaServerData;
     struct ApiMediaServerUserAttributesData;
     struct ApiMediaServerDataEx;
+    struct ApiMediaServerDataStatistics;
     struct ApiPropertyTypeData;
     struct ApiResetBusinessRuleData;
     struct ApiResourceData;
@@ -75,6 +78,8 @@ namespace ec2 {
     struct ApiConnectionData;
     struct ApiSystemNameData;
     struct ApiTransactionData;
+    struct ApiSystemStatistics;
+    struct ApiStatisticsServerInfo;
 
     struct ApiTimeData;
     struct ApiPeerSystemTimeData;
@@ -92,6 +97,8 @@ namespace ec2 {
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraAttributesData> ApiCameraAttributesDataList;
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
+    typedef std::vector<ApiCameraDataStatistics> ApiCameraDataStatisticsList;
+    typedef std::vector<ApiClientDataStatistics> ApiClientDataStatisticsList;
     typedef std::vector<ApiCameraServerItemDataOld> ApiCameraServerItemDataOldList;
     typedef std::vector<ApiCameraServerItemData> ApiCameraServerItemDataList;
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
@@ -99,6 +106,7 @@ namespace ec2 {
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
     typedef std::vector<ApiMediaServerUserAttributesData> ApiMediaServerUserAttributesDataList;
     typedef std::vector<ApiMediaServerDataEx> ApiMediaServerDataExList;
+    typedef std::vector<ApiMediaServerDataStatistics> ApiMediaServerDataStatisticsList;
     typedef std::vector<ApiPropertyTypeData> ApiPropertyTypeDataList;
     typedef std::vector<ApiResourceData> ApiResourceDataList;
     typedef std::vector<ApiResourceParamData> ApiResourceParamDataList;
@@ -121,6 +129,8 @@ namespace ec2 {
     (ApiCameraData)\
     (ApiCameraAttributesData)\
     (ApiCameraDataEx)\
+    (ApiCameraDataStatistics)\
+    (ApiClientDataStatistics)\
     (ApiCameraServerItemDataOld)\
     (ApiCameraServerItemData)\
     (ApiEmailData)\
@@ -138,6 +148,7 @@ namespace ec2 {
     (ApiMediaServerData)\
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\
+    (ApiMediaServerDataStatistics)\
     (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
@@ -183,6 +194,8 @@ namespace ec2 {
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\
     (ApiLicenseOverflowData)\
+    (ApiSystemStatistics)\
+    (ApiStatisticsServerInfo)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

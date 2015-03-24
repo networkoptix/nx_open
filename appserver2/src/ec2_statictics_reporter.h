@@ -3,52 +3,47 @@
 
 #include <QtCore/QMutex>
 
+#include "core/resource/user_resource.h"
 #include "utils/common/timermanager.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "nx_ec/ec_api.h"
+#include "nx_ec/data/api_statistics.h"
 
 namespace ec2
 {
-    // Forward
-    class Ec2DirectConnection;
 
     class Ec2StaticticsReporter
+            : public QObject
     {
     public:
         Ec2StaticticsReporter(AbstractECConnection& connection);
+        ~Ec2StaticticsReporter();
 
-    private slots:
-        void resetTimer();
+        /** Collects \class ApiSystemStatistics in the entire system */
+        ErrorCode collectReportData(std::nullptr_t, ApiSystemStatistics* const outData);
+
+        /** Collects \class ApiSystemStatistics and sends it to the statistics server */
+        ErrorCode triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData);
 
     private:
-        class ReportThread
-            : QThread
-        {
-        public:
-            ReportThread(AbstractECConnection& connection);
-            virtual void run();
+        void setUpTimer(uint reportTime);
+        ErrorCode initiateReport();
 
-        private slots:
-            void sendJsonReport(QUrl url, QJsonValue array);
-            void done(nx_http::AsyncHttpClientPtr httpClient);
+    private slots:
+        void finishReport(nx_http::AsyncHttpClientPtr httpClient);
 
-        private:
-            Ec2StaticticsReporter& m_reporter;
-        };
-
-        void checkForReportTime(qint64 timerId = 0);
-
-        QnUserResource getAdmin();
+    private:
+        QnUserResourcePtr getAdmin();
+        QnUuid getResourceTypeIdByName(const QString& name);
 
         AbstractECConnection& m_connection;
+        QnUserResourcePtr m_admin;
+        QnUuid m_desktopCamera;
+
         QMutex m_mutex;
-
-        QnUserResource m_admin;
-        boost::optional<qint64> m_timer;
-        ReportThread* m_thread;
+        boost::optional<qint64> m_timerId;
+        boost::optional<nx_http::AsyncHttpClientPtr> m_httpClient;
     };
-
-
 }
 
 #endif // EC2_STATICTICS_REPORTER_H

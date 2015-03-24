@@ -6,8 +6,14 @@
 class HardwareInformation
 {
 public:
-    static qint64 getInstalledMemory();
-    static qint64 getCpuCoreCount();
+    static const HardwareInformation& instance();
+
+    qint64    phisicalMemory;
+    QString   cpuArchitecture;
+    qint64    cpuCoreCount;
+
+private:
+    HardwareInformation();
 };
 
 #endif // HARDWARE_INFORMATION_H
