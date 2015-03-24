@@ -96,7 +96,7 @@ kill_ms_if_high_mem_usage() {
     fi
 }
 
-KILL_IF_HIGH_MEM_USAGE=
+KILL_IF_HIGH_MEM_USAGE=1
 
 run_watchdog() {
     while true
