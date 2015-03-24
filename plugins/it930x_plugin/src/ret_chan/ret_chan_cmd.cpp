@@ -1,5 +1,4 @@
 #include "ret_chan_cmd.h"
-#include "ret_chan_user.h"
 
 /**
  * The type defination of 32-bits signed type.
@@ -24,54 +23,43 @@ static void shortToSWord(short num, unsigned short * SWordNum)
     (* SWordNum) = outSWord;
 }
 
-unsigned Cmd_StringReset(const Byte* buf , unsigned bufferLength, RCString* dstStr)
-{
-    unsigned error = ReturnChannelError::NO_ERROR;
-	error = Cmd_StringClear(dstStr);
-    if (error)
-        return error;
-	Cmd_StringSet(buf, bufferLength, dstStr);
-	return error;
-}
+//
 
-unsigned Cmd_StringResetCopy(const RCString* srcStr , RCString* dstStr)		//clear str and read data form str and assign to str (String structure)
+unsigned RCString::copy(const RCString * srcStr)
 {
-    unsigned error = ReturnChannelError::NO_ERROR;
-	error = Cmd_StringClear(dstStr);
-    if (error)
-        return error;
-	error = Cmd_StringCopy(srcStr, dstStr);
-	return error;
-}
+    clear();
 
-unsigned Cmd_StringCopy(const RCString* srcStr , RCString* dstStr)		//read data form str and assign to str (String structure)
-{
-	dstStr->stringLength = srcStr->stringLength;
-	dstStr->stringData = (Byte*)User_memory_allocate( dstStr->stringLength* sizeof(Byte));
+    stringLength = srcStr->stringLength;
+    stringData = new Byte[stringLength];
 
-	User_memory_copy(dstStr->stringData, srcStr->stringData, dstStr->stringLength);
+    memcpy(stringData, srcStr->stringData, stringLength);
 
     return ReturnChannelError::NO_ERROR;
 }
 
-unsigned Cmd_StringSet(const Byte* buf , unsigned bufferLength, RCString* str)		//read data form buf and assign to str (String structure)
+unsigned RCString::set(const Byte * buf, unsigned bufferLength)
 {
-	str->stringLength = bufferLength;
-    str->stringData = (Byte*)User_memory_allocate( bufferLength* sizeof(Byte));
-    User_memory_copy( str->stringData, buf, bufferLength);
+    clear();
+
+    stringLength = bufferLength;
+    stringData = new Byte[stringLength];
+
+    memcpy(stringData, buf, bufferLength);
 
     return ReturnChannelError::NO_ERROR;
 }
 
-unsigned Cmd_StringClear(RCString* str)				//clear str (String structure)
+unsigned RCString::clear()
 {
-    if(str->stringData!= NULL)
-        User_memory_free(str->stringData) ;
-    str->stringLength = 0;
-    str->stringData = NULL;
+    if (stringData != NULL)
+        delete [] stringData;
+    stringLength = 0;
+    stringData = NULL;
 
     return ReturnChannelError::NO_ERROR;
 }
+
+//
 
 unsigned Cmd_BytesRead(const Byte* buf , unsigned bufferLength, unsigned* index, Byte* bufDst, unsigned dstLength)
 {
@@ -83,13 +71,13 @@ unsigned Cmd_BytesRead(const Byte* buf , unsigned bufferLength, unsigned* index,
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
 
-		User_memory_set( bufDst, 0xFF, dstLength);
+        memset( bufDst, 0xFF, dstLength);
 #if Debug_check_error
         printf("BytesRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
 #endif
 	}else
 	{
-		User_memory_copy( bufDst, buf + tempIndex, dstLength);
+        memcpy( bufDst, buf + tempIndex, dstLength);
 
 		(* index) = (* index) +dstLength;
 	}
@@ -271,37 +259,29 @@ unsigned Cmd_QwordRead(const Byte* buf , unsigned bufferLength, unsigned* index,
 	return error;
 }
 
-unsigned Cmd_StringRead(const Byte* buf , unsigned bufferLength, unsigned* index, RCString* str)
+unsigned Cmd_StringRead(const Byte * buf, unsigned bufferLength, unsigned * index, RCString * str)
 {
-	unsigned tempIndex = 0;
     unsigned error = ReturnChannelError::NO_ERROR;
-	unsigned strLength = 0;
-	tempIndex = (* index);
+    unsigned tempIndex = *index;
 
     if (bufferLength < tempIndex + 4)
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
-		str->stringLength = 0;
-		str->stringData = NULL;
-#if Debug_check_error
-        printf("StringRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
-#endif
-	}else
+        str->clear();
+    }
+    else
 	{
-		strLength = (buf[tempIndex]<<24) | (buf[tempIndex+1]<<16) | (buf[tempIndex+2]<<8) | buf[tempIndex+3] ;
+        unsigned strLength = (buf[tempIndex]<<24) | (buf[tempIndex+1]<<16) | (buf[tempIndex+2]<<8) | buf[tempIndex+3] ;
 		tempIndex = tempIndex + 4;
 
-		if(bufferLength < tempIndex + strLength)
+        if (bufferLength < tempIndex + strLength)
 		{
             error = ReturnChannelError::CMD_READ_FAIL;
-			str->stringLength = 0;
-			str->stringData = NULL;
-		}else
+            str->clear();
+        }
+        else
 		{
-			str->stringLength = strLength;
-			str->stringData = (Byte*) User_memory_allocate(strLength * sizeof(Byte));
-
-			User_memory_copy( str->stringData, buf + tempIndex, strLength);
+            str->set(buf + tempIndex, strLength);
 
 			tempIndex = tempIndex + str->stringLength;
 			(* index) = tempIndex;
@@ -358,7 +338,7 @@ void Cmd_StringAssign(Byte* buf,const RCString* str,unsigned* length)
 
 	tempLength = tempLength + 4;
 
-	User_memory_copy( buf + tempLength, str->stringData, strLength);
+    memcpy( buf + tempLength, str->stringData, strLength);
 
 	tempLength = tempLength + strLength;
 	(*length) = tempLength;

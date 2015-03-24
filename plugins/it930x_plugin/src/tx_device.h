@@ -153,7 +153,6 @@ namespace ite
         }
 
         TxDevice(unsigned short txID, unsigned freq);
-        ~TxDevice();
 
         SendInfo& sendInfo() { return m_device; }
         uint16_t txID() const { return m_device.txID; }
@@ -194,8 +193,6 @@ namespace ite
             return conf;
         }
 
-        //bool setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf);
-
         //
 
         uint16_t getWanted();
@@ -204,6 +201,8 @@ namespace ite
         void parse(RcPacket& pkt);              // RcPacket -> RcCommand -> TxDevice
         RcCommand * mkRcCmd(uint16_t command);  // TxDevice -> RcCommand
         RcCommand * mkSetChannel(unsigned channel);
+        RcCommand * mkSetBitrate(unsigned streamNo, unsigned bitrateKbps);
+        RcCommand * mkSetFramerate(unsigned streamNo, unsigned fps);
 
         // -- RC
         static uint8_t checksum(const uint8_t * buffer, unsigned length) { return RcPacket::checksum(buffer, length); }
@@ -220,11 +219,14 @@ namespace ite
         RcCommand m_cmdSend;
         Security m_recvSecurity;
         std::atomic_ushort m_wantedCmd;
-        std::set<uint16_t> m_cmdReceived;
+        std::set<uint16_t> m_responses;
 
         static std::string rcStr2str(const RCString& s) { return std::string((const char *)s.stringData, s.stringLength); }
 
         uint16_t id4update();
+        bool hasResponses(const uint16_t * cmdInputIDs, unsigned size) const;
+
+        bool prepareVideoEncoderParams(unsigned streamNo);
 
         TxDevice(const TxDevice& );
         TxDevice& operator = (const TxDevice& );

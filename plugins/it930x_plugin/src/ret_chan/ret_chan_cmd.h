@@ -295,19 +295,33 @@ typedef enum {
 
 //------------------General-----------------
 
-#if 0
-typedef struct RcCmdInfo{
-	Byte buffer_Cmd[RcCmdMaxSize];
-	unsigned cmdSize;
-	Byte cmdState;
-	struct RcCmdInfo *next;
-}RcCmd;
-#endif
-
-typedef struct {
+struct RCString
+{
 	unsigned stringLength;
-	Byte* stringData;
-} RCString;
+    Byte * stringData;
+
+    RCString()
+    :   stringLength(0),
+        stringData(nullptr)
+    {}
+
+    unsigned set(const Byte * buf, unsigned bufferLength);
+    unsigned clear();
+    unsigned copy(const RCString * srcStr);
+
+#if 0
+    ~RCString()
+    {
+        clear();
+    }
+
+private:
+    RCString(const RCString&);
+    RCString& operator = (const RCString&);
+#endif
+};
+
+//
 
 typedef struct {
 	RCString userName;
@@ -1383,11 +1397,5 @@ void Cmd_QwordAssign(IN Byte * buf, IN unsigned long long var, IN unsigned * len
 void Cmd_StringAssign(IN Byte * buf, IN const RCString * str, IN unsigned * length);
 void Cmd_FloatAssign(IN Byte * buf, IN float var, IN unsigned * length);
 void Cmd_ShortAssign(IN Byte * buf, IN short var, IN unsigned * length);
-
-unsigned Cmd_StringReset(IN const Byte * buf, IN unsigned bufferLength, OUT RCString * dstStr);
-unsigned Cmd_StringResetCopy(IN const RCString * srcStr, OUT RCString * dstStr);
-unsigned Cmd_StringCopy(IN const RCString * srcStr, OUT RCString * dstStr);
-unsigned Cmd_StringSet(IN const Byte * buf, IN unsigned bufferLength, OUT RCString * str);
-unsigned Cmd_StringClear(IN RCString * str);
 
 #endif

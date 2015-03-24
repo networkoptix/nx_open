@@ -57,6 +57,7 @@ namespace ite
         // for StreamReader
 
         DevReader * devReader() const;
+        std::weak_ptr<RxDevice> rxDevice() const { return m_rxDevice; }
         void minorWork();
 
         void openStream(unsigned encNo);

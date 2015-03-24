@@ -1,13 +1,21 @@
 #include <sys/time.h>
 
 #include "ret_chan/ret_chan_user_host.h"
-#include "ret_chan/ret_chan_user.h"
 
 #include "tx_device.h"
 
 // ret_chan/ret_chan_cmd_host.cpp
 unsigned makeRcCommand(ite::TxDevice * tx, unsigned short command);
 unsigned parseRC(ite::TxDevice * tx, unsigned short cmdID, const Byte * Buffer, unsigned bufferLength);
+
+static void User_askUserSecurity(Security * security)
+{
+    Byte userName[20] = "userName";
+    Byte password[20] = "password";
+
+    security->userName.set(userName, 20);
+    security->password.set(password, 20);
+}
 
 #if 0
         CMD_GetTxDeviceAddressIDInput
@@ -124,7 +132,6 @@ namespace ite
     :   m_device(txID),
         m_wantedCmd(0)
     {
-        User_Host_init(this);
         User_askUserSecurity(&security);
 
         setFrequency(freq);
@@ -133,14 +140,6 @@ namespace ite
         m_recvSecurity.userName.stringLength = 0;
         m_recvSecurity.password.stringData = nullptr;
         m_recvSecurity.password.stringLength = 0;
-    }
-
-    TxDevice::~TxDevice()
-    {
-        User_Host_uninit(this);
-
-        Cmd_StringClear(&m_recvSecurity.userName);
-        Cmd_StringClear(&m_recvSecurity.password);
     }
 
     void TxDevice::parse(RcPacket& pkt)
@@ -196,107 +195,107 @@ namespace ite
         if (cmd)
         {
             if (m_wantedCmd.compare_exchange_strong(cmd, 0))
-                m_cmdReceived.insert(cmd);
+            {
+                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+                m_responses.insert(cmd);
+            }
         }
         else
             m_wantedCmd.store(0);
     }
 
+    bool TxDevice::hasResponses(const uint16_t * cmdInputIDs, unsigned size) const
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        for (unsigned i = 0; i < size; ++i)
+        {
+            uint16_t outCmd = RcCommand::in2outID(cmdInputIDs[i]);
+            if (m_responses.find(outCmd) == m_responses.end())
+                return false;
+        }
+
+        return true;
+    }
+
     // TODO: updates
     uint16_t TxDevice::id4update()
     {
-        static const uint16_t interested[] = {
+        static const uint16_t cmdIDs[] = {
             CMD_GetTransmissionParameterCapabilitiesInput,
             CMD_GetTransmissionParametersInput,
             CMD_GetDeviceInformationInput,
             CMD_GetVideoSourcesInput,
             CMD_GetVideoSourceConfigurationsInput,
-            CMD_GetVideoEncoderConfigurationsInput
+            CMD_GetVideoEncoderConfigurationsInput,
+            //
+            CMD_GetProfilesInput
+            //CMD_GetVideoEncoderConfigurationOptionsInput
         };
 
         if (m_wantedCmd)
             return 0;
 
-        for (size_t i = 0; i < sizeof(interested); ++i)
+        for (size_t i = 0; i < sizeof(cmdIDs); ++i)
         {
-            uint16_t outCmd = RcCommand::in2outID(interested[i]);
-            if (m_cmdReceived.find(outCmd) == m_cmdReceived.end())
-                return interested[i];
+            if (! hasResponses(&cmdIDs[i], 1))
+            {
+#if 0
+                if (cmdIDs[i] == CMD_GetVideoEncoderConfigurationOptionsInput)
+                {
+                    MediaProfilesParam * profile = &mediaProfiles.mediaProfilesParam[0];
+                    VideoEncConfigParam * enc = &videoEncConfig.configList[0];
+
+                    videoEncConfigOptions.profileToken.copy(&profile->videoEncToken);
+                    videoEncConfigOptions.videoEncConfigToken.copy(&enc->token);
+                }
+#endif
+                return cmdIDs[i];
+            }
         }
 
         return 0;
     }
 
-    RcCommand * TxDevice::mkSetChannel(unsigned channel)
+
+    bool TxDevice::prepareVideoEncoderParams(unsigned streamNo)
     {
-        unsigned freq = freq4chan(channel);
+        static const uint16_t cmdIDs[] = {
+            CMD_GetVideoEncoderConfigurationsInput
+        };
 
-        if (transmissionParameterCapabilities.frequencyMin == 0 ||
-            transmissionParameterCapabilities.frequencyMax == 0)
-            return nullptr;
-
-        if (freq < transmissionParameterCapabilities.frequencyMin ||
-            freq > transmissionParameterCapabilities.frequencyMax)
-            return nullptr;
-
-        transmissionParameter.frequency = freq;
-
-        return mkRcCmd(CMD_SetTransmissionParametersInput);
-    }
-
-
-#if 0
-    bool TxDevice::setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf)
-    {
-#if 0
-        getVideoEncoderConfigurations();
-        if (! wait())
-            return false;
-#endif
-        if (info_.videoEncConfig.configListSize < streamNo)
+        if (! hasResponses(cmdIDs, sizeof(cmdIDs)))
             return false;
 
-        Cmd_StringClear(&info_.videoEncConfigSetParam.name);
-        Cmd_StringClear(&info_.videoEncConfigSetParam.token);
+        //
 
-        Cmd_StringSet(info_.videoEncConfig.configList[streamNo].name.stringData,
-                      info_.videoEncConfig.configList[streamNo].name.stringLength,
-                      &info_.videoEncConfigSetParam.name);
-        Cmd_StringSet(info_.videoEncConfig.configList[streamNo].token.stringData,
-                      info_.videoEncConfig.configList[streamNo].token.stringLength,
-                      &info_.videoEncConfigSetParam.token);
-
-        info_.videoEncConfigSetParam.useCount           = info_.videoEncConfig.configList[streamNo].useCount;
-        info_.videoEncConfigSetParam.encoding           = info_.videoEncConfig.configList[streamNo].encoding;
-        info_.videoEncConfigSetParam.width              = info_.videoEncConfig.configList[streamNo].width;
-        info_.videoEncConfigSetParam.height             = info_.videoEncConfig.configList[streamNo].height;
-        info_.videoEncConfigSetParam.quality            = info_.videoEncConfig.configList[streamNo].quality;
-        info_.videoEncConfigSetParam.frameRateLimit     = info_.videoEncConfig.configList[streamNo].frameRateLimit;
-        info_.videoEncConfigSetParam.encodingInterval   = info_.videoEncConfig.configList[streamNo].encodingInterval;
-        info_.videoEncConfigSetParam.bitrateLimit       = info_.videoEncConfig.configList[streamNo].bitrateLimit;
-        info_.videoEncConfigSetParam.rateControlType    = info_.videoEncConfig.configList[streamNo].rateControlType;
-        info_.videoEncConfigSetParam.govLength          = info_.videoEncConfig.configList[streamNo].govLength;
-        info_.videoEncConfigSetParam.profile            = info_.videoEncConfig.configList[streamNo].profile;
-        info_.videoEncConfigSetParam.extensionFlag      = info_.videoEncConfig.configList[streamNo].extensionFlag;
-        info_.videoEncConfigSetParam.targetBitrateLimit = info_.videoEncConfig.configList[streamNo].targetBitrateLimit;
-        info_.videoEncConfigSetParam.aspectRatio        = info_.videoEncConfig.configList[streamNo].aspectRatio;
-        info_.videoEncConfigSetParam.forcePersistence   = info_.videoEncConfig.configList[streamNo].forcePersistence;
-
-        if (conf.width)
-            info_.videoEncConfigSetParam.width = conf.width;
-        if (conf.height)
-            info_.videoEncConfigSetParam.height = conf.height;
-        if (conf.bitrateLimit)
-            info_.videoEncConfigSetParam.bitrateLimit = conf.bitrateLimit;
-        if (conf.frameRateLimit)
-            info_.videoEncConfigSetParam.frameRateLimit = conf.frameRateLimit;
-
-        setVideoEncoderConfiguration();
-        if (! wait())
+        if (videoEncConfig.configListSize < streamNo)
             return false;
+
+        VideoEncConfigParam * enc = &videoEncConfig.configList[streamNo];
+
+        videoEncConfigSetParam.name.copy(&enc->name);
+        videoEncConfigSetParam.token.copy(&enc->token);
+
+        videoEncConfigSetParam.useCount           = enc->useCount;
+        videoEncConfigSetParam.encoding           = enc->encoding;
+        videoEncConfigSetParam.width              = enc->width;
+        videoEncConfigSetParam.height             = enc->height;
+        videoEncConfigSetParam.quality            = enc->quality;
+        videoEncConfigSetParam.frameRateLimit     = enc->frameRateLimit;
+        videoEncConfigSetParam.encodingInterval   = enc->encodingInterval;
+        videoEncConfigSetParam.bitrateLimit       = enc->bitrateLimit;
+        videoEncConfigSetParam.rateControlType    = enc->rateControlType;
+        videoEncConfigSetParam.govLength          = enc->govLength;
+        videoEncConfigSetParam.profile            = enc->profile;
+        videoEncConfigSetParam.extensionFlag      = enc->extensionFlag;
+        videoEncConfigSetParam.targetBitrateLimit = enc->targetBitrateLimit;
+        videoEncConfigSetParam.aspectRatio        = enc->aspectRatio;
+        videoEncConfigSetParam.forcePersistence   = enc->forcePersistence;
+
         return true;
     }
-#endif
 
     void TxDevice::print() const
     {
@@ -317,6 +316,59 @@ namespace ite
         printf("One-Seg Constellation (ex: 0: QPSK, 1: 16QAM, 2: 64QAM ): %d\n", transmissionParameter.oneSeg_Constellation);
         printf("One-Seg Code Rate (ex: 0: 1/2, 1: 2/3, 2: 3/4, 3: 5/6, 4: 7/8 ): %d\n", transmissionParameter.oneSeg_CodeRate);
 #endif
+    }
+
+    //
+
+    RcCommand * TxDevice::mkSetChannel(unsigned channel)
+    {
+        static const uint16_t cmdIDs[] = {
+            CMD_GetTransmissionParameterCapabilitiesInput,
+            CMD_GetTransmissionParametersInput
+        };
+
+        if (! hasResponses(cmdIDs, sizeof(cmdIDs)))
+            return nullptr;
+
+        //
+
+        unsigned freq = freq4chan(channel);
+
+        if (transmissionParameterCapabilities.frequencyMin == 0 ||
+            transmissionParameterCapabilities.frequencyMax == 0)
+            return nullptr;
+
+        if (freq < transmissionParameterCapabilities.frequencyMin ||
+            freq > transmissionParameterCapabilities.frequencyMax)
+            return nullptr;
+
+        transmissionParameter.frequency = freq;
+
+        return mkRcCmd(CMD_SetTransmissionParametersInput);
+    }
+
+    RcCommand * TxDevice::mkSetBitrate(unsigned streamNo, unsigned bitrateKbps)
+    {
+        if (! prepareVideoEncoderParams(streamNo))
+            return nullptr;
+
+        // TODO: min/max
+
+        videoEncConfigSetParam.bitrateLimit = bitrateKbps;
+
+        return mkRcCmd(CMD_SetVideoEncoderConfigurationInput);
+    }
+
+    RcCommand * TxDevice::mkSetFramerate(unsigned streamNo, unsigned fps)
+    {
+        if (! prepareVideoEncoderParams(streamNo))
+            return nullptr;
+
+        // TODO: min/max
+
+        videoEncConfigSetParam.frameRateLimit = fps;
+
+        return mkRcCmd(CMD_SetVideoEncoderConfigurationInput);
     }
 
     //
@@ -347,8 +399,8 @@ namespace ite
 
     Security& TxDevice::rc_security()
     {
-        Cmd_StringClear(&m_recvSecurity.userName);
-        Cmd_StringClear(&m_recvSecurity.password);
+        m_recvSecurity.userName.clear();
+        m_recvSecurity.password.clear();
 
         return m_recvSecurity;
     }

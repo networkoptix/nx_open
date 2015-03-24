@@ -5,6 +5,9 @@
 
 typedef struct TxRC
 {
+    TxRC();
+    ~TxRC();
+
 	//--------------General-------------------
 	Security								security;
 	//--------------General-------------------

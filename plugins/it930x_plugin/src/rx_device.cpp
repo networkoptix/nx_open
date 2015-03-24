@@ -244,10 +244,12 @@ namespace ite
 
             m_sync.searching.store(true);
         }
+#if 1
         else
         {
             printf("can't search, used. Rx: %d; frequency: %d\n", rxID(), TxDevice::freq4chan(channel));
         }
+#endif
     }
 
     void RxDevice::stopSearchTx(DevLink& devLink)
@@ -336,6 +338,29 @@ namespace ite
         }
     }
 
+    bool RxDevice::sendRC(RcCommand * cmd)
+    {
+        if (cmd && cmd->isValid() && m_txDev && m_device)
+        {
+            SendInfo& sinfo = m_txDev->sendInfo();
+
+            std::lock_guard<std::mutex> lock(sinfo.mutex); // LOCK
+
+            std::vector<RcPacketBuffer> pkts;
+            cmd->mkPackets(sinfo, m_rxID, pkts);
+
+            /// @warning possible troubles with 1-port devices if multipacket
+            for (auto itPkt = pkts.begin(); itPkt != pkts.end(); ++itPkt)
+                m_device->sendRcPacket(itPkt->packet());
+
+            return true;
+        }
+
+        return false;
+    }
+
+    //
+
     bool RxDevice::changeChannel(unsigned chan)
     {
         if (m_txDev)
@@ -347,28 +372,42 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::sendRC(RcCommand * cmd)
+    bool RxDevice::getMaxBitrate(unsigned streamNo, int& maxBitrate)
     {
-        if (cmd && cmd->isValid() && m_txDev && m_device)
-        {
-            std::vector<RcPacketBuffer> pkts;
-
-            {
-                SendInfo& sinfo = m_txDev->sendInfo();
-
-                std::lock_guard<std::mutex> lock(sinfo.mutex); // LOCK
-
-                cmd->mkPackets(sinfo, m_rxID, pkts);
-            }
-
-            for (auto itPkt = pkts.begin(); itPkt != pkts.end(); ++itPkt)
-                m_device->sendRcPacket(itPkt->packet());
-
-            return true;
-        }
+        // TODO
 
         return false;
     }
+
+    bool RxDevice::setBitrate(unsigned streamNo, int& bitrateKbps)
+    {
+        bool ok = false;
+        if (m_txDev)
+        {
+            RcCommand * pcmd = m_txDev->mkSetBitrate(streamNo, bitrateKbps);
+            ok = sendRC(pcmd);
+        }
+
+        // TODO: response
+
+        return ok;
+    }
+
+    bool RxDevice::setFramerate(unsigned streamNo, float& fps)
+    {
+        bool ok = false;
+        if (m_txDev)
+        {
+            RcCommand * pcmd = m_txDev->mkSetFramerate(streamNo, fps);
+            ok = sendRC(pcmd);
+        }
+
+        // TODO: response
+
+        return ok;
+    }
+
+    //
 
     unsigned RxDevice::dev2id(const std::string& nm)
     {

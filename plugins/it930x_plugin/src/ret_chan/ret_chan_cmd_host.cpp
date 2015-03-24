@@ -1,4 +1,3 @@
-#include "ret_chan_user.h"
 #include "ret_chan_user_host.h"
 
 //#include "ret_chan_cmd_host.h"
@@ -178,11 +177,11 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_GetHwRegisterValuesOutput://GetHwRegisterValues Reply
 				if(bufferLength >=18)
 				{
-					User_memory_free(deviceInfo->hwRegisterInfo.registerValues);
+                    delete [] deviceInfo->hwRegisterInfo.registerValues;
 					deviceInfo->hwRegisterInfo.registerValues = NULL;
 					check = Cmd_ByteRead(Buffer, checkByte, &index, &deviceInfo->hwRegisterInfo.valueListSize, 0);
-					User_memory_free(deviceInfo->hwRegisterInfo.registerValues);
-					deviceInfo->hwRegisterInfo.registerValues = (Byte*) User_memory_allocate(deviceInfo->hwRegisterInfo.valueListSize * sizeof(Byte));
+                    delete [] deviceInfo->hwRegisterInfo.registerValues;
+                    deviceInfo->hwRegisterInfo.registerValues = new Byte[deviceInfo->hwRegisterInfo.valueListSize];
 					check = Cmd_BytesRead(Buffer , checkByte,&index, deviceInfo->hwRegisterInfo.registerValues, deviceInfo->hwRegisterInfo.valueListSize);
 
 					User_getHwRegisterValuesReply(deviceInfo, command );
@@ -270,8 +269,8 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_GetSdtServiceOutput://GetSdtService Reply
 				if(bufferLength >=13)
 				{
-					check = Cmd_StringClear(&deviceInfo->serviceConfig.serviceName);
-					check = Cmd_StringClear(&deviceInfo->serviceConfig.provider);
+                    check = deviceInfo->serviceConfig.serviceName.clear();
+                    check = deviceInfo->serviceConfig.provider.clear();
 
 					check = Cmd_WordRead(Buffer, checkByte, &index, &deviceInfo->serviceConfig.serviceID, 0xFF);
 					check = Cmd_ByteRead(Buffer, checkByte, &index, &deviceInfo->serviceConfig.enable, 0xFF);
@@ -300,14 +299,14 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for(i = 0; i < deviceInfo->eitInfo.listSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->eitInfo.eitInfoParam[i].eventName);
-						check = Cmd_StringClear(&deviceInfo->eitInfo.eitInfoParam[i].eventText);
+                        check = deviceInfo->eitInfo.eitInfoParam[i].eventName.clear();
+                        check = deviceInfo->eitInfo.eitInfoParam[i].eventText.clear();
 					}
-					User_memory_free(deviceInfo->eitInfo.eitInfoParam);
+                    delete [] deviceInfo->eitInfo.eitInfoParam;
 					deviceInfo->eitInfo.eitInfoParam = NULL;
 
 					check = Cmd_ByteRead(Buffer, checkByte, &index, &deviceInfo->eitInfo.listSize, 0);
-					deviceInfo->eitInfo.eitInfoParam = (EITInfoParam*) User_memory_allocate(deviceInfo->eitInfo.listSize * sizeof(EITInfoParam));
+                    deviceInfo->eitInfo.eitInfoParam = new EITInfoParam[deviceInfo->eitInfo.listSize];
 					for(i = 0; i < deviceInfo->eitInfo.listSize; i ++)
 					{
 						check = Cmd_ByteRead(Buffer, checkByte, &index, &deviceInfo->eitInfo.eitInfoParam[i].enable, 0);
@@ -339,11 +338,11 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_GetDeviceInformationOutput:			//GetDeviceInformationReply
 				if(bufferLength >=8)
 				{
-					check = Cmd_StringClear(&deviceInfo->manufactureInfo.manufactureName);
-					check = Cmd_StringClear(&deviceInfo->manufactureInfo.modelName);
-					check = Cmd_StringClear(&deviceInfo->manufactureInfo.firmwareVersion);
-					check = Cmd_StringClear(&deviceInfo->manufactureInfo.serialNumber);
-					check = Cmd_StringClear(&deviceInfo->manufactureInfo.hardwareId);
+                    check = deviceInfo->manufactureInfo.manufactureName.clear();
+                    check = deviceInfo->manufactureInfo.modelName.clear();
+                    check = deviceInfo->manufactureInfo.firmwareVersion.clear();
+                    check = deviceInfo->manufactureInfo.serialNumber.clear();
+                    check = deviceInfo->manufactureInfo.hardwareId.clear();
 
 					check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->manufactureInfo.manufactureName );
 					check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->manufactureInfo.modelName );
@@ -360,8 +359,8 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_GetHostnameOutput:			//GetHostnameReply
 				if(bufferLength >=8)
 				{
-					check = Cmd_StringClear(&deviceInfo->hostInfo.hostName);
-					check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->hostInfo.hostName );
+                    check = deviceInfo->hostInfo.hostName.clear();
+                    check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->hostInfo.hostName);
 
 					User_getHostnameReply(deviceInfo, command );
 				}
@@ -401,7 +400,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_GetSystemLogOutput:	//GetSystemLogReply
 				if(bufferLength >=8)
 				{
-					check = Cmd_StringClear(&deviceInfo->systemLog.logData);
+                    check = deviceInfo->systemLog.logData.clear();
 					check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->systemLog.logData);
 
 					User_getSystemLogReply(deviceInfo, command );
@@ -428,7 +427,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.textEnable, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.textPosition, 0xFF);
 
-					check = Cmd_StringClear(&deviceInfo->osdInfo.text);
+                    check = deviceInfo->osdInfo.text.clear();
 					check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->osdInfo.text);
 
 					User_getOSDInfoReply(deviceInfo, command );
@@ -440,7 +439,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_SystemRebootOutput:	//SystemRebootReply
 				if(bufferLength >=8)
 				{
-					check = Cmd_StringClear(&deviceInfo->systemReboot.responseMessage);
+                    check = deviceInfo->systemReboot.responseMessage.clear();
 					check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->systemReboot.responseMessage);
 
 					User_systemRebootReply(deviceInfo, command );
@@ -452,7 +451,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_UpgradeSystemFirmwareOutput:
 				if(bufferLength >=8)
 				{
-					check = Cmd_StringClear(&deviceInfo->systemFirmware.message);
+                    check = deviceInfo->systemFirmware.message.clear();
 					check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->systemFirmware.message);
 
 					User_upgradeSystemFirmwareReply(deviceInfo, command );
@@ -467,14 +466,14 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for( i = 0; i < deviceInfo->digitalInputsInfo.listSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->digitalInputsInfo.tokenList[i]);
+                        check = deviceInfo->digitalInputsInfo.tokenList[i].clear();
 					}
-					User_memory_free(deviceInfo->digitalInputsInfo.tokenList);
+                    delete [] deviceInfo->digitalInputsInfo.tokenList;
 					deviceInfo->digitalInputsInfo.tokenList = NULL;
 					deviceInfo->digitalInputsInfo.listSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->digitalInputsInfo.listSize, 0);
-					deviceInfo->digitalInputsInfo.tokenList = (RCString*) User_memory_allocate( deviceInfo->digitalInputsInfo.listSize * sizeof(RCString));
+                    deviceInfo->digitalInputsInfo.tokenList = new RCString[deviceInfo->digitalInputsInfo.listSize];
 					for( i = 0; i < deviceInfo->digitalInputsInfo.listSize; i ++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->digitalInputsInfo.tokenList[i]);
@@ -491,14 +490,14 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for(i=0; i< deviceInfo->relayOutputs.listSize; i++)
 					{
-						check = Cmd_StringClear(&deviceInfo->relayOutputs.relayOutputsParam[i].token);
+                        check = deviceInfo->relayOutputs.relayOutputsParam[i].token.clear();
 					}
-					User_memory_free(deviceInfo->relayOutputs.relayOutputsParam);
+                    delete [] deviceInfo->relayOutputs.relayOutputsParam;
 					deviceInfo->relayOutputs.relayOutputsParam = NULL;
 					deviceInfo->relayOutputs.listSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->relayOutputs.listSize, 0);
-					deviceInfo->relayOutputs.relayOutputsParam = (RelayOutputsParam*)User_memory_allocate(deviceInfo->relayOutputs.listSize*sizeof(RelayOutputsParam));
+                    deviceInfo->relayOutputs.relayOutputsParam = new RelayOutputsParam[deviceInfo->relayOutputs.listSize];
 					for(i=0; i< deviceInfo->relayOutputs.listSize; i++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->relayOutputs.relayOutputsParam[i].token);
@@ -569,7 +568,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_IMG_GetStatusOutput:	//GetStatusReply
 				if(bufferLength >=13)
 				{
-					check = Cmd_StringClear(&deviceInfo->focusStatusInfo.error);
+                    check = deviceInfo->focusStatusInfo.error.clear();
 
 					check = Cmd_DwordRead(Buffer, checkByte,&index, &deviceInfo->focusStatusInfo.position , 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->focusStatusInfo.moveStatus , 0xFF);
@@ -652,7 +651,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_GetUserDefinedSettingsOutput:
 				if(bufferLength >=8)
 				{
-					check = Cmd_StringClear(&deviceInfo->userDefinedSettings.uerDefinedData);
+                    check = deviceInfo->userDefinedSettings.uerDefinedData.clear();
 					check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->userDefinedSettings.uerDefinedData);
 
 					User_getUserDefinedSettingsReply(deviceInfo, command );
@@ -668,30 +667,30 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for( i = 0; i < deviceInfo->mediaProfiles.profilesListSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].name);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].token);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcName);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcToken);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcSourceToken);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcName);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcToken);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcSourceToken);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncName);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncToken);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncName);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncToken);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputName);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputToken);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputOutputToken);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecName);
-						check = Cmd_StringClear(&deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecToken);
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].name.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].token.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcName.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcToken.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcSourceToken.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcName.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcToken.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcSourceToken.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncName.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncToken.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncName.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncToken.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputName.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputToken.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputOutputToken.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecName.clear();
+                        check = deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecToken.clear();
 					}
-					User_memory_free(deviceInfo->mediaProfiles.mediaProfilesParam);
+                    delete [] deviceInfo->mediaProfiles.mediaProfilesParam;
 					deviceInfo->mediaProfiles.mediaProfilesParam = NULL;
 					deviceInfo->mediaProfiles.profilesListSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->mediaProfiles.profilesListSize, 0);
-					deviceInfo->mediaProfiles.mediaProfilesParam = (MediaProfilesParam*) User_memory_allocate( deviceInfo->mediaProfiles.profilesListSize * sizeof(MediaProfilesParam));
+                    deviceInfo->mediaProfiles.mediaProfilesParam = new MediaProfilesParam[deviceInfo->mediaProfiles.profilesListSize];
 					for( i = 0; i < deviceInfo->mediaProfiles.profilesListSize; i ++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->mediaProfiles.mediaProfilesParam[i].name);
@@ -791,14 +790,14 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for( i = 0; i < deviceInfo->videoSrc.videoSrcListSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->videoSrc.srcList[i].token);
+                        check = deviceInfo->videoSrc.srcList[i].token.clear();
 					}
-					User_memory_free(deviceInfo->videoSrc.srcList);
+                    delete [] deviceInfo->videoSrc.srcList;
 					deviceInfo->videoSrc.srcList = NULL;
 					deviceInfo->videoSrc.videoSrcListSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoSrc.videoSrcListSize, 0);
-					deviceInfo->videoSrc.srcList = (VideoSrcParam*) User_memory_allocate( deviceInfo->videoSrc.videoSrcListSize * sizeof(VideoSrcParam));
+                    deviceInfo->videoSrc.srcList = new VideoSrcParam[deviceInfo->videoSrc.videoSrcListSize];
 					for( i = 0; i < deviceInfo->videoSrc.videoSrcListSize; i ++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->videoSrc.srcList[i].token);
@@ -818,16 +817,16 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for( i = 0; i < deviceInfo->videoSrcConfig.configListSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->videoSrcConfig.configList[i].name);
-						check = Cmd_StringClear(&deviceInfo->videoSrcConfig.configList[i].token);
-						check = Cmd_StringClear(&deviceInfo->videoSrcConfig.configList[i].srcToken);
+                        check = deviceInfo->videoSrcConfig.configList[i].name.clear();
+                        check = deviceInfo->videoSrcConfig.configList[i].token.clear();
+                        check = deviceInfo->videoSrcConfig.configList[i].srcToken.clear();
 					}
-					User_memory_free(deviceInfo->videoSrcConfig.configList);
+                    delete [] deviceInfo->videoSrcConfig.configList;
 					deviceInfo->videoSrcConfig.configList = NULL;
 					deviceInfo->videoSrcConfig.configListSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoSrcConfig.configListSize, 0);
-					deviceInfo->videoSrcConfig.configList = (VideoSrcConfigParam*) User_memory_allocate( deviceInfo->videoSrcConfig.configListSize * sizeof(VideoSrcConfigParam));
+                    deviceInfo->videoSrcConfig.configList = new VideoSrcConfigParam[deviceInfo->videoSrcConfig.configListSize];
 					for( i = 0; i < deviceInfo->videoSrcConfig.configListSize; i ++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->videoSrcConfig.configList[i].name);
@@ -907,15 +906,15 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for( i = 0; i < deviceInfo->videoEncConfig.configListSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->videoEncConfig.configList[i].name);
-						check = Cmd_StringClear(&deviceInfo->videoEncConfig.configList[i].token);
+                        check = deviceInfo->videoEncConfig.configList[i].name.clear();
+                        check = deviceInfo->videoEncConfig.configList[i].token.clear();
 					}
-					User_memory_free(deviceInfo->videoEncConfig.configList);
+                    delete [] deviceInfo->videoEncConfig.configList;
 					deviceInfo->videoEncConfig.configList = NULL;
 					deviceInfo->videoEncConfig.configListSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoEncConfig.configListSize, 0);
-					deviceInfo->videoEncConfig.configList = (VideoEncConfigParam*) User_memory_allocate( deviceInfo->videoEncConfig.configListSize * sizeof(VideoEncConfigParam));
+                    deviceInfo->videoEncConfig.configList = new VideoEncConfigParam[deviceInfo->videoEncConfig.configListSize];
 					for( i = 0; i < deviceInfo->videoEncConfig.configListSize; i ++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->videoEncConfig.configList[i].name);
@@ -987,14 +986,14 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for( i = 0; i < deviceInfo->audioSources.audioSourcesListSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->audioSources.audioSourcesList[i].audioSourcesToken);
+                        check = deviceInfo->audioSources.audioSourcesList[i].audioSourcesToken.clear();
 					}
-					User_memory_free(deviceInfo->audioSources.audioSourcesList);
+                    delete [] deviceInfo->audioSources.audioSourcesList;
 					deviceInfo->audioSources.audioSourcesList = NULL;
 					deviceInfo->audioSources.audioSourcesListSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->audioSources.audioSourcesListSize, 0);
-					deviceInfo->audioSources.audioSourcesList = (AudioSourcesParam*) User_memory_allocate( deviceInfo->audioSources.audioSourcesListSize * sizeof(AudioSourcesParam));
+                    deviceInfo->audioSources.audioSourcesList = new AudioSourcesParam[deviceInfo->audioSources.audioSourcesListSize];
 					for( i = 0; i < deviceInfo->audioSources.audioSourcesListSize; i ++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->audioSources.audioSourcesList[i].audioSourcesToken);
@@ -1012,16 +1011,16 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for( i = 0; i < deviceInfo->audioSrcConfig.configListSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->audioSrcConfig.audioSrcConfigList[i].name);
-						check = Cmd_StringClear(&deviceInfo->audioSrcConfig.audioSrcConfigList[i].token);
-						check = Cmd_StringClear(&deviceInfo->audioSrcConfig.audioSrcConfigList[i].sourceToken);
+                        check = deviceInfo->audioSrcConfig.audioSrcConfigList[i].name.clear();
+                        check = deviceInfo->audioSrcConfig.audioSrcConfigList[i].token.clear();
+                        check = deviceInfo->audioSrcConfig.audioSrcConfigList[i].sourceToken.clear();
 					}
-					User_memory_free(deviceInfo->audioSrcConfig.audioSrcConfigList);
+                    delete [] deviceInfo->audioSrcConfig.audioSrcConfigList;
 					deviceInfo->audioSrcConfig.audioSrcConfigList = NULL;
 					deviceInfo->audioSrcConfig.configListSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->audioSrcConfig.configListSize, 0);
-					deviceInfo->audioSrcConfig.audioSrcConfigList = (AudioSrcConfigParam*) User_memory_allocate( deviceInfo->audioSrcConfig.configListSize * sizeof(AudioSrcConfigParam));
+                    deviceInfo->audioSrcConfig.audioSrcConfigList = new AudioSrcConfigParam[deviceInfo->audioSrcConfig.configListSize];
 					for( i = 0; i < deviceInfo->audioSrcConfig.configListSize; i ++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->audioSrcConfig.audioSrcConfigList[i].name);
@@ -1041,15 +1040,15 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for( i = 0; i < deviceInfo->audioEncConfig.configListSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->audioEncConfig.configList[i].token);
-						check = Cmd_StringClear(&deviceInfo->audioEncConfig.configList[i].name);
+                        check = deviceInfo->audioEncConfig.configList[i].token.clear();
+                        check = deviceInfo->audioEncConfig.configList[i].name.clear();
 					}
-					User_memory_free(deviceInfo->audioEncConfig.configList);
+                    delete [] deviceInfo->audioEncConfig.configList;
 					deviceInfo->audioEncConfig.configList = NULL;
 					deviceInfo->audioEncConfig.configListSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->audioEncConfig.configListSize, 0);
-					deviceInfo->audioEncConfig.configList = (AudioEncConfigParam*) User_memory_allocate( deviceInfo->audioEncConfig.configListSize*sizeof(AudioEncConfigParam));
+                    deviceInfo->audioEncConfig.configList = new AudioEncConfigParam[deviceInfo->audioEncConfig.configListSize];
 					for( i = 0; i < deviceInfo->audioEncConfig.configListSize; i ++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->audioEncConfig.configList[i].token);
@@ -1071,9 +1070,9 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 					for( i = 0; i < deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize; i ++)
 					{
-						check = Cmd_StringClear(&deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList[i]);
+                        check = deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList[i].clear();
 					}
-					User_memory_free(deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList);
+                    delete [] deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList;
 					deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList = NULL;
 					deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize = 0;
 
@@ -1086,7 +1085,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 					check = Cmd_WordRead(Buffer, checkByte,&index, &deviceInfo->videoSrcConfigOptions.boundsRange_Height_Min, 0xFF);
 					check = Cmd_WordRead(Buffer, checkByte,&index, &deviceInfo->videoSrcConfigOptions.boundsRange_Heigh_Max, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize, 0);
-					deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList = (RCString*) User_memory_allocate( deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize * sizeof(RCString));
+                    deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList = new RCString[deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize];
 					for( i = 0; i < deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize; i++)
 					{
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList[i]);
@@ -1107,16 +1106,16 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				if(bufferLength >=8)
 				{
 					//----------------------------Modify
-					User_memory_free(deviceInfo->videoEncConfigOptions.resolutionsAvailableList);
+                    delete [] deviceInfo->videoEncConfigOptions.resolutionsAvailableList;
 					deviceInfo->videoEncConfigOptions.resolutionsAvailableList = NULL;
 					deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize = 0;
-					User_memory_free(deviceInfo->videoEncConfigOptions.aspectRatioList);
+                    delete [] deviceInfo->videoEncConfigOptions.aspectRatioList;
 					deviceInfo->videoEncConfigOptions.aspectRatioList = NULL;
 					deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize = 0;
 
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoEncConfigOptions.encodingOption, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize, 0);
-					deviceInfo->videoEncConfigOptions.resolutionsAvailableList = (ResolutionsAvailableList*) User_memory_allocate( deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize * sizeof(ResolutionsAvailableList));
+                    deviceInfo->videoEncConfigOptions.resolutionsAvailableList = new ResolutionsAvailableList[deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize];
 					for( i = 0; i < deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize; i ++)
 					{
 						check = Cmd_WordRead(Buffer, checkByte,&index, &deviceInfo->videoEncConfigOptions.resolutionsAvailableList[i].width, 0xFF);
@@ -1137,7 +1136,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 					check = Cmd_WordRead(Buffer, checkByte,&index, &deviceInfo->videoEncConfigOptions.targetBitrateRangeMin, 0xFF);
 					check = Cmd_WordRead(Buffer, checkByte,&index, &deviceInfo->videoEncConfigOptions.targetBitrateRangeMax, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize, 0);
-					deviceInfo->videoEncConfigOptions.aspectRatioList = (Word* ) User_memory_allocate( deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize * sizeof(Word));
+                    deviceInfo->videoEncConfigOptions.aspectRatioList = new Word[deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize];
 					for( i = 0; i < deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize; i ++)
 					{
 						check = Cmd_WordRead(Buffer, checkByte,&index, &deviceInfo->videoEncConfigOptions.aspectRatioList[i], 0xFF);
@@ -1154,14 +1153,14 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 						for( i = 0; i < deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize; i++)
 						{
-							check = Cmd_StringClear(&deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList[i]);
+                            check = deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList[i].clear();
 						}
-						User_memory_free(deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList);
+                        delete [] deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList;
 						deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList = NULL;
 						deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize = 0;
 
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize, 0);
-						deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList = (RCString*) User_memory_allocate( deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize * sizeof(RCString));
+                        deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList = new RCString[deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize];
 						for( i = 0; i < deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize; i++)
 						{
 							check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList[i]);
@@ -1177,20 +1176,20 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				if(bufferLength >=9)
 				{
 						for( i = 0; i < deviceInfo->audioEncConfigOptions.configListSize; i ++)
-							User_memory_free(deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList);
-						User_memory_free(deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam);
+                            delete [] deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList;
+                        delete [] deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam;
 						deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam = NULL;
 						deviceInfo->audioEncConfigOptions.configListSize = 0;
 
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->audioEncConfigOptions.configListSize, 0);
-						deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam = (AudioEncConfigOptionsParam*) User_memory_allocate( deviceInfo->audioEncConfigOptions.configListSize * sizeof(AudioEncConfigOptionsParam));
+                        deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam = new AudioEncConfigOptionsParam[deviceInfo->audioEncConfigOptions.configListSize];
 						for( i = 0; i < deviceInfo->audioEncConfigOptions.configListSize; i ++)
 						{
 							check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].encodingOption, 0xFF);
 							check = Cmd_WordRead(Buffer , checkByte, &index,  &deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].bitrateRangeMin, 0xFF);
 							check = Cmd_WordRead(Buffer , checkByte, &index,  &deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].bitrateRangeMax, 0xFF);
 							check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize, 0);
-							deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList = (Word*) User_memory_allocate( deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize * sizeof(Word));
+                            deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList = new Word[deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize];
 							for( j = 0; j < deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize; j ++)
 							{
 								check = Cmd_WordRead(Buffer , checkByte, &index,  &deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList[j], 0xFF);
@@ -1206,7 +1205,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_GetVideoOSDConfigurationOutput:	//GetVideoOSDConfiguration Reply
 				if(bufferLength >=22)
 				{
-						check = Cmd_StringClear(&deviceInfo->videoOSDConfig.text);
+                        check = deviceInfo->videoOSDConfig.text.clear();
 
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.dateEnable, 0xFF);
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.datePosition, 0xFF);
@@ -1233,12 +1232,12 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_GetVideoPrivateAreaOutput:	//GetVideoPrivateArea Reply
 				if(bufferLength >=10)
 				{
-						User_memory_free(deviceInfo->videoPrivateArea.privateAreaPolygon);
+                        delete [] deviceInfo->videoPrivateArea.privateAreaPolygon;
 						deviceInfo->videoPrivateArea.privateAreaPolygon = NULL;
 						deviceInfo->videoPrivateArea.polygonListSize = 0;
 
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoPrivateArea.polygonListSize, 0);
-						deviceInfo->videoPrivateArea.privateAreaPolygon = (PrivateAreaPolygon*) User_memory_allocate( deviceInfo->videoPrivateArea.polygonListSize * sizeof(PrivateAreaPolygon));
+                        deviceInfo->videoPrivateArea.privateAreaPolygon = new PrivateAreaPolygon[deviceInfo->videoPrivateArea.polygonListSize];
 						for( i = 0; i < deviceInfo->videoPrivateArea.polygonListSize; i ++)
 						{
 							check = Cmd_WordRead(Buffer , checkByte, &index,  &deviceInfo->videoPrivateArea.privateAreaPolygon[i].polygon_x, 0xFF);
@@ -1259,15 +1258,15 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 						for( i = 0; i < deviceInfo->ptzConfig.PTZConfigListSize; i ++)
 						{
-							check = Cmd_StringClear(&deviceInfo->ptzConfig.PTZConfigList[i].name);
-							check = Cmd_StringClear(&deviceInfo->ptzConfig.PTZConfigList[i].token);
-							check = Cmd_StringClear(&deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken);
+                            check = deviceInfo->ptzConfig.PTZConfigList[i].name.clear();
+                            check = deviceInfo->ptzConfig.PTZConfigList[i].token.clear();
+                            check = deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken.clear();
 						}
-						User_memory_free(deviceInfo->ptzConfig.PTZConfigList);
+                        delete [] deviceInfo->ptzConfig.PTZConfigList;
 						deviceInfo->ptzConfig.PTZConfigList = NULL;
 
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->ptzConfig.PTZConfigListSize, 0);
-						deviceInfo->ptzConfig.PTZConfigList = (PTZConfigParam*) User_memory_allocate( deviceInfo->ptzConfig.PTZConfigListSize *sizeof(PTZConfigParam));
+                        deviceInfo->ptzConfig.PTZConfigList = new PTZConfigParam[deviceInfo->ptzConfig.PTZConfigListSize];
 						for( i = 0; i < deviceInfo->ptzConfig.PTZConfigListSize; i ++)
 						{
 							check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->ptzConfig.PTZConfigList[i].name);
@@ -1336,7 +1335,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_PTZ_GetStatusOutput:	//GetStatus Reply
 				if(bufferLength >=23)
 				{
-						check = Cmd_StringClear(&deviceInfo->ptzStatus.error);
+                        check = deviceInfo->ptzStatus.error.clear();
 
 						Cmd_ShortRead(Buffer , checkByte, &index,  &deviceInfo->ptzStatus.panPosition, 0xFF);
 						Cmd_ShortRead(Buffer , checkByte, &index,  &deviceInfo->ptzStatus.tiltPosition, 0xFF);
@@ -1362,13 +1361,13 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 						for( i = 0 ; i < deviceInfo->ptzPresetsGet.configListSize; i ++)
 						{
-							check = Cmd_StringClear(&deviceInfo->ptzPresetsGet.configList[i].presetName);
-							check = Cmd_StringClear(&deviceInfo->ptzPresetsGet.configList[i].presetToken);
+                            check = deviceInfo->ptzPresetsGet.configList[i].presetName.clear();
+                            check = deviceInfo->ptzPresetsGet.configList[i].presetToken.clear();
 						}
-						User_memory_free(deviceInfo->ptzPresetsGet.configList);
+                        delete [] deviceInfo->ptzPresetsGet.configList;
 
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->ptzPresetsGet.configListSize, 0);
-						deviceInfo->ptzPresetsGet.configList = (PTZPresetsConfig* ) User_memory_allocate( deviceInfo->ptzPresetsGet.configListSize * sizeof(PTZPresetsConfig));
+                        deviceInfo->ptzPresetsGet.configList = new PTZPresetsConfig[deviceInfo->ptzPresetsGet.configListSize];
 						for( i = 0 ; i < deviceInfo->ptzPresetsGet.configListSize; i ++)
 						{
 							Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->ptzPresetsGet.configList[i].presetName);
@@ -1387,7 +1386,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_SetPresetOutput:	//SetPreset Reply
 				if(bufferLength >=8)
 				{
-						check = Cmd_StringClear(&deviceInfo->ptzPresetsSet.presetToken_set);
+                        check = deviceInfo->ptzPresetsSet.presetToken_set.clear();
 						check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->ptzPresetsSet.presetToken_set);
 
 						User_setPresetReply(deviceInfo, command );
@@ -1401,11 +1400,11 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 			case CMD_GetSupportedRulesOutput:	//GetSupportedRules Reply
 				if(bufferLength >=9)
 				{
-						User_memory_free(deviceInfo->supportedRules.ruleType);
+                        delete [] deviceInfo->supportedRules.ruleType;
 						deviceInfo->supportedRules.ruleType = NULL;
 
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->supportedRules.supportListSize, 0);
-						deviceInfo->supportedRules.ruleType = (Byte*) User_memory_allocate( deviceInfo->supportedRules.supportListSize*sizeof(Byte));
+                        deviceInfo->supportedRules.ruleType = new Byte[deviceInfo->supportedRules.supportListSize];
 						for( i = 0; i < deviceInfo->supportedRules.supportListSize; i ++)
 						{
 							check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->supportedRules.ruleType[i], 0xFF);
@@ -1422,62 +1421,62 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 				{
 						for( i = 0; i < deviceInfo->ruleList.ruleListSize; i ++)
 						{
-							check = Cmd_StringClear(&deviceInfo->ruleList.totalRuleList[i].ruleName);
-							check = Cmd_StringClear(&deviceInfo->ruleList.totalRuleList[i].ruleToken);
-							check = Cmd_StringClear(&deviceInfo->ruleList.totalRuleList[i].videoSrcToken);
+                            check = deviceInfo->ruleList.totalRuleList[i].ruleName.clear();
+                            check = deviceInfo->ruleList.totalRuleList[i].ruleToken.clear();
+                            check = deviceInfo->ruleList.totalRuleList[i].videoSrcToken.clear();
 
 							if(deviceInfo->ruleList.totalRuleList[i].type == 0x10)
 							{
 								ptrRule_LineDetector = (Rule_LineDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
-								User_memory_free( ptrRule_LineDetector->detectPolygon);
+                                delete [] ptrRule_LineDetector->detectPolygon;
 								ptrRule_LineDetector->detectPolygon = NULL;
-								User_memory_free( ptrRule_LineDetector);
+                                delete [] ptrRule_LineDetector;
 								deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 								deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 								ptrRule_LineDetector = NULL;
 							}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x11)
 							{
 								ptrRule_FieldDetector = (Rule_FieldDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
-								User_memory_free( ptrRule_FieldDetector->detectPolygon);
+                                delete [] ptrRule_FieldDetector->detectPolygon;
 								ptrRule_FieldDetector->detectPolygon = NULL;
-								User_memory_free( ptrRule_FieldDetector);
+                                delete [] ptrRule_FieldDetector;
 								deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 								deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 								ptrRule_FieldDetector = NULL;
 							}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x12)
 							{
 								ptrRule_MotionDetector = (Rule_MotionDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
-								User_memory_free( ptrRule_MotionDetector->detectPolygon);
+                                delete [] ptrRule_MotionDetector->detectPolygon;
 								ptrRule_MotionDetector->detectPolygon = NULL;
-								User_memory_free( ptrRule_MotionDetector);
+                                delete [] ptrRule_MotionDetector;
 								deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 								deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 								ptrRule_MotionDetector = NULL;
 							}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x13)
 							{
 								ptrRule_Counting = (Rule_Counting*) deviceInfo->ruleList.totalRuleList[i].rule;
-								User_memory_free( ptrRule_Counting->detectPolygon);
+                                delete [] ptrRule_Counting->detectPolygon;
 								ptrRule_Counting->detectPolygon = NULL;
-								User_memory_free( ptrRule_Counting);
+                                delete [] ptrRule_Counting;
 								deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 								deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 								ptrRule_Counting = NULL;
 							}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x14)
 							{
 								ptrRule_CellMotion = (Rule_CellMotion*) deviceInfo->ruleList.totalRuleList[i].rule;
-								check = Cmd_StringClear(&ptrRule_CellMotion->activeCells);
-								User_memory_free( ptrRule_CellMotion);
+                                check = ptrRule_CellMotion->activeCells.clear();
+                                delete [] ptrRule_CellMotion;
 								deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 								deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 								ptrRule_CellMotion = NULL;
 							}
 
 						}
-						User_memory_free(deviceInfo->ruleList.totalRuleList);
+                        delete [] deviceInfo->ruleList.totalRuleList;
 						deviceInfo->ruleList.totalRuleList = NULL;
 
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->ruleList.ruleListSize, 0);
-						deviceInfo->ruleList.totalRuleList = (TotalRule*) User_memory_allocate( deviceInfo->ruleList.ruleListSize*sizeof(TotalRule));
+                        deviceInfo->ruleList.totalRuleList = new TotalRule[deviceInfo->ruleList.ruleListSize];
 						for( i = 0; i <  deviceInfo->ruleList.ruleListSize; i ++)
 						{
 							check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->ruleList.totalRuleList[i].ruleName);
@@ -1486,11 +1485,11 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 
 							if(deviceInfo->ruleList.totalRuleList[i].type == 0x10)
 							{
-								deviceInfo->ruleList.totalRuleList[i].rule = (Rule_LineDetector*) User_memory_allocate(sizeof(Rule_LineDetector));
+                                deviceInfo->ruleList.totalRuleList[i].rule = new Rule_LineDetector[1];
 								ptrRule_LineDetector = (Rule_LineDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
 								check = Cmd_WordRead(Buffer , checkByte, &index, &ptrRule_LineDetector->direction, 0xFF);
 								check = Cmd_ByteRead(Buffer , checkByte, &index, &ptrRule_LineDetector->polygonListSize, 0);
-								ptrRule_LineDetector->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_LineDetector->polygonListSize * sizeof(DetectPolygon));
+                                ptrRule_LineDetector->detectPolygon = new DetectPolygon[ptrRule_LineDetector->polygonListSize];
 								for(j = 0; j < ptrRule_LineDetector->polygonListSize; j ++)
 								{
 									check = Cmd_WordRead(Buffer , checkByte, &index, &ptrRule_LineDetector->detectPolygon[j].polygon_x, 0xFF);
@@ -1501,10 +1500,10 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 								ptrRule_LineDetector = NULL;
 							}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x11)
 							{
-								deviceInfo->ruleList.totalRuleList[i].rule = (Rule_FieldDetector*) User_memory_allocate(sizeof(Rule_FieldDetector));
+                                deviceInfo->ruleList.totalRuleList[i].rule = new Rule_FieldDetector[1];
 								ptrRule_FieldDetector = (Rule_FieldDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
 								check = Cmd_ByteRead(Buffer , checkByte, &index, &ptrRule_FieldDetector->polygonListSize, 0);
-								ptrRule_FieldDetector->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_FieldDetector->polygonListSize * sizeof(DetectPolygon));
+                                ptrRule_FieldDetector->detectPolygon = new DetectPolygon[ptrRule_FieldDetector->polygonListSize];
 								for(j = 0; j < ptrRule_FieldDetector->polygonListSize; j ++)
 								{
 									check = Cmd_WordRead(Buffer , checkByte, &index, &ptrRule_FieldDetector->detectPolygon[j].polygon_x, 0xFF);
@@ -1515,11 +1514,11 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 								ptrRule_FieldDetector = NULL;
 							}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x12)
 							{
-								deviceInfo->ruleList.totalRuleList[i].rule = (Rule_MotionDetector*) User_memory_allocate(sizeof(Rule_MotionDetector));
+                                deviceInfo->ruleList.totalRuleList[i].rule = new Rule_MotionDetector[1];
 								ptrRule_MotionDetector = (Rule_MotionDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
 								check = Cmd_ByteRead(Buffer , checkByte, &index, &ptrRule_MotionDetector->motionExpression, 0xFF);
 								check = Cmd_ByteRead(Buffer , checkByte, &index, &ptrRule_MotionDetector->polygonListSize, 0);
-								ptrRule_MotionDetector->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_MotionDetector->polygonListSize * sizeof(DetectPolygon));
+                                ptrRule_MotionDetector->detectPolygon = new DetectPolygon[ptrRule_MotionDetector->polygonListSize];
 								for(j = 0; j < ptrRule_MotionDetector->polygonListSize; j ++)
 								{
 									check = Cmd_WordRead(Buffer , checkByte, &index, &ptrRule_MotionDetector->detectPolygon[j].polygon_x, 0xFF);
@@ -1530,13 +1529,13 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 								ptrRule_MotionDetector = NULL;
 							}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x13)
 							{
-								deviceInfo->ruleList.totalRuleList[i].rule = (Rule_Counting*) User_memory_allocate(sizeof(Rule_Counting));
+                                deviceInfo->ruleList.totalRuleList[i].rule = new Rule_Counting[1];
 								ptrRule_Counting = (Rule_Counting*) deviceInfo->ruleList.totalRuleList[i].rule;
 								check = Cmd_DwordRead(Buffer , checkByte, &index, &ptrRule_Counting->reportTimeInterval, 0xFF);
 								check = Cmd_DwordRead(Buffer , checkByte, &index, &ptrRule_Counting->resetTimeInterval, 0xFF);
 								check = Cmd_WordRead(Buffer , checkByte, &index, &ptrRule_Counting->direction, 0xFF);
 								check = Cmd_ByteRead(Buffer , checkByte, &index, &ptrRule_Counting->polygonListSize, 0);
-								ptrRule_Counting->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_Counting->polygonListSize * sizeof(DetectPolygon));
+                                ptrRule_Counting->detectPolygon = new DetectPolygon[ptrRule_Counting->polygonListSize];
 								for(j = 0; j < ptrRule_Counting->polygonListSize; j ++)
 								{
 									check = Cmd_WordRead(Buffer , checkByte, &index, &ptrRule_Counting->detectPolygon[j].polygon_x, 0xFF);
@@ -1547,7 +1546,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 								ptrRule_Counting = NULL;
 							}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x14)
 							{
-								deviceInfo->ruleList.totalRuleList[i].rule = (Rule_CellMotion*) User_memory_allocate(sizeof(Rule_CellMotion));
+                                deviceInfo->ruleList.totalRuleList[i].rule = new Rule_CellMotion[1];
 								ptrRule_CellMotion = (Rule_CellMotion*) deviceInfo->ruleList.totalRuleList[i].rule;
 								check = Cmd_WordRead(Buffer , checkByte, &index, &ptrRule_CellMotion->minCount, 0xFF);
 								check = Cmd_DwordRead(Buffer , checkByte, &index, &ptrRule_CellMotion->alarmOnDelay, 0xFF);
@@ -1634,7 +1633,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 
 						if(deviceInfo->metadataStreamInfo.type == 0x01)
 						{
-							check = Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Device.textInformation);
+                            check = deviceInfo->metadataStreamInfo.metadata_Device.textInformation.clear();
 
 							check = Cmd_WordRead(Buffer , checkByte,&index, &deviceInfo->metadataStreamInfo.metadata_Device.deviceVendorID, 0xFF);
 							check = Cmd_WordRead(Buffer , checkByte,&index, &deviceInfo->metadataStreamInfo.metadata_Device.deviceModelID, 0xFF);
@@ -1651,13 +1650,13 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 						}else if(deviceInfo->metadataStreamInfo.type == 0x02)
 						{
 							for( i = 0; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; i ++)
-								check = Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken);
-							User_memory_free(deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList);
+                                check = deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken.clear();
+                            delete [] deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList;
 							deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList = NULL;
 							deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize = 0;
 
 							check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize, 0);
-							deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList = (Metadata_StreamParam*) User_memory_allocate( deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize * sizeof(Metadata_StreamParam));
+                            deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList = new Metadata_StreamParam[deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize];
 							for( i = 0; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; i ++)
 							{
 								check = Cmd_WordRead(Buffer , checkByte,&index, &deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoPID, 0xFF);
@@ -1716,8 +1715,8 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 							User_metadataStreamInfoReply(deviceInfo, command );
 						}else if(deviceInfo->metadataStreamInfo.type == 0x10)
 						{
-							check = Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
-							check = Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken);
+                            check = deviceInfo->metadataStreamInfo.metadata_Event.ruleToken.clear();
+                            check = deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.clear();
 
 							check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
 							check = Cmd_DwordRead(Buffer , checkByte,&index, &deviceInfo->metadataStreamInfo.metadata_Event.objectID, 0xFF);
@@ -1740,7 +1739,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 							User_metadataStreamLineEventReply(deviceInfo, command );
 						}else if(deviceInfo->metadataStreamInfo.type == 0x11)
 						{
-							check = Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
+                            check = deviceInfo->metadataStreamInfo.metadata_Event.ruleToken.clear();
 
 							check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
 							check = Cmd_DwordRead(Buffer , checkByte,&index, &deviceInfo->metadataStreamInfo.metadata_Event.objectID, 0xFF);
@@ -1764,7 +1763,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 							User_metadataStreamFieldEventReply(deviceInfo, command );
 						}else if(deviceInfo->metadataStreamInfo.type == 0x12)
 						{
-							check = Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
+                            check = deviceInfo->metadataStreamInfo.metadata_Event.ruleToken.clear();
 
 							check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
 							check = Cmd_DwordRead(Buffer , checkByte,&index, &deviceInfo->metadataStreamInfo.metadata_Event.objectID, 0xFF);
@@ -1787,7 +1786,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 							User_metadataStreamMotionEventReply(deviceInfo, command );
 						}else if(deviceInfo->metadataStreamInfo.type == 0x13)
 						{
-							check = Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
+                            check = deviceInfo->metadataStreamInfo.metadata_Event.ruleToken.clear();
 
 							check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
 							check = Cmd_DwordRead(Buffer , checkByte,&index, &deviceInfo->metadataStreamInfo.metadata_Event.objectID, 0xFF);
@@ -1811,7 +1810,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 							User_metadataStreamCountingEventReply(deviceInfo, command );
 						}else if(deviceInfo->metadataStreamInfo.type == 0x14)
 						{
-							check = Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
+                            check = deviceInfo->metadataStreamInfo.metadata_Event.ruleToken.clear();
 
 							check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
 							check = Cmd_ByteRead(Buffer , checkByte,&index, &deviceInfo->metadataStreamInfo.metadata_Event.IsMotion, 0xFF);

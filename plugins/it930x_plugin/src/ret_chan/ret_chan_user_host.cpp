@@ -1,19 +1,17 @@
 #include "ret_chan_cmd.h"
 #include "ret_chan_cmd_host.h"
 #include "ret_chan_user_host.h"
-#include "ret_chan_user.h"
 
 #define USER_REPLY  1
 
-#define Ref_BufferSize 64
 #define RC_USER_DEFINE_INIT_VALUE 0
 
-typedef TxRC RCHostInfo;
-
-//*******************User Define Init********************
-
-void User_Host_init(RCHostInfo* deviceInfo)
+TxRC::TxRC()
 {
+    static const unsigned Ref_BufferSize = 64; // FIXME
+
+    TxRC * deviceInfo = this;
+
 	Rule_LineDetector* ptrRule_LineDetector = NULL;
 	Rule_FieldDetector* ptrRule_FieldDetector = NULL;
 	Rule_MotionDetector* ptrRule_MotionDetector = NULL;
@@ -25,8 +23,8 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	Byte byActiveCellsBuffer[4] = {0xFF, 0xFF, 0xFF, 0xFF};
 
 	//---------------------init_security-----------------------
-	Cmd_StringSet(byRefStringBuffer, Ref_BufferSize, &deviceInfo->security.userName);
-	Cmd_StringSet(byRefStringBuffer, Ref_BufferSize, &deviceInfo->security.password);
+    deviceInfo->security.userName.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->security.password.set(byRefStringBuffer, Ref_BufferSize);
 	//---------------------init_security-----------------------
 	//---------------------init_NewTxDevice-----------------------
 	deviceInfo->newTxDevice.deviceAddressID = RC_USER_DEFINE_INIT_VALUE;
@@ -77,7 +75,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->hwRegisterInfo.processor = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->hwRegisterInfo.registerAddress = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->hwRegisterInfo.valueListSize = RC_USER_DEFINE_INIT_VALUE;
-	deviceInfo->hwRegisterInfo.registerValues = (Byte*) User_memory_allocate(0);
+    deviceInfo->hwRegisterInfo.registerValues = new Byte[1];
 	//------------------init_HwRegisterValues-----------------------
 	//-------------------init_AdvanceOptions-----------------------
 	deviceInfo->advanceOptions.PTS_PCR_delayTime = RC_USER_DEFINE_INIT_VALUE;
@@ -124,8 +122,8 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->serviceConfig.serviceID = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->serviceConfig.enable = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->serviceConfig.LCN = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->serviceConfig.serviceName);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->serviceConfig.provider);
+    deviceInfo->serviceConfig.serviceName.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->serviceConfig.provider.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->serviceConfig.extensionFlag = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->serviceConfig.IDAssignationMode = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->serviceConfig.ISDBT_RegionID = RC_USER_DEFINE_INIT_VALUE;
@@ -138,34 +136,34 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//-------------------init_CalibrationTable------------------------
 	deviceInfo->calibrationTable.accessOption = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->calibrationTable.tableType = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->calibrationTable.tableData);
+    deviceInfo->calibrationTable.tableData.set(byRefStringBuffer, Ref_BufferSize);
 	//------------------init_CalibrationTable------------------------
 	//------------------init_EITInfo------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->eitInfo.videoEncConfigToken);
+    deviceInfo->eitInfo.videoEncConfigToken.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->eitInfo.listSize = 2;
-	deviceInfo->eitInfo.eitInfoParam = (EITInfoParam*) User_memory_allocate( deviceInfo->eitInfo.listSize *sizeof(EITInfoParam));
+    deviceInfo->eitInfo.eitInfoParam = new EITInfoParam[deviceInfo->eitInfo.listSize];
     for (Byte i = 0; i < deviceInfo->eitInfo.listSize; ++i)
 	{
 		deviceInfo->eitInfo.eitInfoParam[i].enable = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->eitInfo.eitInfoParam[i].startDate = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->eitInfo.eitInfoParam[i].startTime = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->eitInfo.eitInfoParam[i].duration = RC_USER_DEFINE_INIT_VALUE;
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->eitInfo.eitInfoParam[i].eventName);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->eitInfo.eitInfoParam[i].eventText);
+        deviceInfo->eitInfo.eitInfoParam[i].eventName.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->eitInfo.eitInfoParam[i].eventText.set(byRefStringBuffer, Ref_BufferSize);
 	}
 	//------------------init_EITInfo------------------------
 	//-------------------init_DeviceCapability------------------------
 	deviceInfo->deviceCapability.supportedFeatures = RC_USER_DEFINE_INIT_VALUE;
 	//-------------------init_DeviceCapability------------------------
 	//----------------------init_DeviceInfo---------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->manufactureInfo.manufactureName);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->manufactureInfo.modelName);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->manufactureInfo.firmwareVersion);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->manufactureInfo.serialNumber);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->manufactureInfo.hardwareId);
+    deviceInfo->manufactureInfo.manufactureName.set( byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->manufactureInfo.modelName.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->manufactureInfo.firmwareVersion.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->manufactureInfo.serialNumber.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->manufactureInfo.hardwareId.set(byRefStringBuffer, Ref_BufferSize);
 	//----------------------init_DeviceInfo---------------------------
 	//-----------------------init_Hostname---------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->hostInfo.hostName);
+    deviceInfo->hostInfo.hostName.set(byRefStringBuffer, Ref_BufferSize);
 	//-----------------------init_Hostname---------------------------
 	//------------------init_SystemDateAndTime---------------------
 	deviceInfo->systemTime.countryCode[0] = RC_USER_DEFINE_INIT_VALUE;
@@ -192,7 +190,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//------------------init_SystemDateAndTime---------------------
 	//-----------------------init_SystemLog--------------------------
 	deviceInfo->systemLog.logType = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->systemLog.logData);
+    deviceInfo->systemLog.logData.set(byRefStringBuffer, Ref_BufferSize);
 	//-----------------------init_SystemLog--------------------------
 	//------------------------init_OSDInfo---------------------------
 	deviceInfo->osdInfo.dateEnable = RC_USER_DEFINE_INIT_VALUE;
@@ -209,36 +207,36 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->osdInfo.detailInfooption = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->osdInfo.textEnable = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->osdInfo.textPosition = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->osdInfo.text);
+    deviceInfo->osdInfo.text.set(byRefStringBuffer, Ref_BufferSize);
 	//------------------------init_OSDInfo---------------------------
 	//----------------------init_SystemDefault------------------------
 	deviceInfo->systemDefault.factoryDefault = RC_USER_DEFINE_INIT_VALUE;
 	//----------------------init_SystemDefault------------------------
 	//-----------------init_SystemRebootMessage--------------------
 	deviceInfo->systemReboot.rebootType = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->systemReboot.responseMessage);
+    deviceInfo->systemReboot.responseMessage.set(byRefStringBuffer, Ref_BufferSize);
 	//-----------------init_SystemRebootMessage--------------------
 	//-----------------init_SystemFirmware--------------------
 	deviceInfo->systemFirmware.firmwareType = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->systemFirmware.data);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->systemFirmware.message);
+    deviceInfo->systemFirmware.data.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->systemFirmware.message.set(byRefStringBuffer, Ref_BufferSize);
 	//-----------------init_SystemFirmware--------------------
 	//----------------------init_DigitalInputs--------------------------
 	deviceInfo->digitalInputsInfo.listSize = 2;
-	deviceInfo->digitalInputsInfo.tokenList = (RCString*)User_memory_allocate( deviceInfo->digitalInputsInfo.listSize*sizeof(RCString));
+    deviceInfo->digitalInputsInfo.tokenList = new RCString[deviceInfo->digitalInputsInfo.listSize];
     for (Byte i = 0; i < deviceInfo->digitalInputsInfo.listSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->digitalInputsInfo.tokenList[i]);
+        deviceInfo->digitalInputsInfo.tokenList[i].set(byRefStringBuffer, Ref_BufferSize);
 	}
 	//----------------------init_DigitalInputs--------------------------
 	//-----------------------init_RelayOutputs------------------------
 	deviceInfo->relayOutputs.listSize = 2;
 
-	deviceInfo->relayOutputs.relayOutputsParam = (RelayOutputsParam*) User_memory_allocate( deviceInfo->relayOutputs.listSize * sizeof(RelayOutputsParam));
+    deviceInfo->relayOutputs.relayOutputsParam = new RelayOutputsParam[deviceInfo->relayOutputs.listSize];
 
     for (Byte i = 0; i < deviceInfo->relayOutputs.listSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->relayOutputs.relayOutputsParam[i].token);
+        deviceInfo->relayOutputs.relayOutputsParam[i].token.set(byRefStringBuffer, Ref_BufferSize);
 
 		deviceInfo->relayOutputs.relayOutputsParam[i].mode = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->relayOutputs.relayOutputsParam[i].delayTime = RC_USER_DEFINE_INIT_VALUE;
@@ -246,7 +244,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	}
 	//-----------------------init_RelayOutputs------------------------
 	//------------------init_RelayOutputsSetParam-------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->relayOutputsSetParam.token);
+    deviceInfo->relayOutputsSetParam.token.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->relayOutputsSetParam.mode = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->relayOutputsSetParam.delayTime = RC_USER_DEFINE_INIT_VALUE;
@@ -254,10 +252,10 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//------------------init_RelayOutputsSetParam-------------------
 	//---------------------init_RelayOutputState----------------------
 	deviceInfo->relayOutputState.logicalState = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->relayOutputState.token);
+    deviceInfo->relayOutputState.token.set(byRefStringBuffer, Ref_BufferSize);
 	//---------------------init_RelayOutputState----------------------
 	//----------------------init_ImagingSettings-----------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->imageConfig.videoSourceToken);
+    deviceInfo->imageConfig.videoSourceToken.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->imageConfig.backlightCompensationMode  = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->imageConfig.backlightCompensationLevel = (float)RC_USER_DEFINE_INIT_VALUE;
@@ -302,14 +300,14 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->imageConfig.forcePersistence = RC_USER_DEFINE_INIT_VALUE;
 	//----------------------init_ImagingSettings-----------------------
 	//--------------------------init_Status----------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->focusStatusInfo.videoSourceToken);
+    deviceInfo->focusStatusInfo.videoSourceToken.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->focusStatusInfo.position = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->focusStatusInfo.moveStatus = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->focusStatusInfo.error);
+    deviceInfo->focusStatusInfo.error.set(byRefStringBuffer, Ref_BufferSize);
 	//--------------------------init_Status----------------------------
 	//----------------------init_ImagingSettingsOption-----------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->imageConfigOption.videoSourceToken);
+    deviceInfo->imageConfigOption.videoSourceToken.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->imageConfigOption.backlightCompensationMode = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->imageConfigOption.backlightCompensationLevelMin = (float)RC_USER_DEFINE_INIT_VALUE;
@@ -371,7 +369,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->imageConfigOption.backLightControlStrengthMax = (float)RC_USER_DEFINE_INIT_VALUE;
 	//----------------------init_ImagingSettingsOption-----------------------
 	//--------------------------init_Move----------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->focusMoveInfo.videoSourceToken);
+    deviceInfo->focusMoveInfo.videoSourceToken.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->focusMoveInfo.absolutePosition = (float)RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->focusMoveInfo.absoluteSpeed = (float)RC_USER_DEFINE_INIT_VALUE;
@@ -380,20 +378,20 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->focusMoveInfo.continuousSpeed = (float)RC_USER_DEFINE_INIT_VALUE;
 	//--------------------------init_Move----------------------------
 	//---------------------------init_Stop----------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->focusStopInfo.videoSourceToken);
+    deviceInfo->focusStopInfo.videoSourceToken.set(byRefStringBuffer, Ref_BufferSize);
 	//---------------------------init_Stop----------------------------
 	//---------------------------init_UserDefinedSettings----------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->userDefinedSettings.videoSourceToken);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->userDefinedSettings.uerDefinedData);
+    deviceInfo->userDefinedSettings.videoSourceToken.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->userDefinedSettings.uerDefinedData.set(byRefStringBuffer, Ref_BufferSize);
 	//---------------------------init_UserDefinedSettings----------------------------
 	//--------------------init_AudioEncConfig-----------------------
 	deviceInfo->audioEncConfig.configListSize = 1;
-	deviceInfo->audioEncConfig.configList = (AudioEncConfigParam*) User_memory_allocate( deviceInfo->audioEncConfig.configListSize * sizeof(AudioEncConfigParam));
+    deviceInfo->audioEncConfig.configList = new AudioEncConfigParam[deviceInfo->audioEncConfig.configListSize];
 
     for (Byte i = 0; i < deviceInfo->audioEncConfig.configListSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioEncConfig.configList[i].token);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioEncConfig.configList[i].name);
+        deviceInfo->audioEncConfig.configList[i].token.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->audioEncConfig.configList[i].name.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->audioEncConfig.configList[i].useCount = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->audioEncConfig.configList[i].encoding = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->audioEncConfig.configList[i].bitrate = RC_USER_DEFINE_INIT_VALUE;
@@ -403,27 +401,27 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//--------------------init_AudioEncConfig-----------------------
 	//-------------------init_AudioSourceConfig---------------------
 	deviceInfo->audioSrcConfig.configListSize = 1;
-	deviceInfo->audioSrcConfig.audioSrcConfigList = (AudioSrcConfigParam*) User_memory_allocate( deviceInfo->audioSrcConfig.configListSize * sizeof(AudioSrcConfigParam));
+    deviceInfo->audioSrcConfig.audioSrcConfigList = new AudioSrcConfigParam[deviceInfo->audioSrcConfig.configListSize];
     for (Byte i = 0; i < deviceInfo->audioSrcConfig.configListSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioSrcConfig.audioSrcConfigList[i].name);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioSrcConfig.audioSrcConfigList[i].token);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioSrcConfig.audioSrcConfigList[i].sourceToken);
+        deviceInfo->audioSrcConfig.audioSrcConfigList[i].name.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->audioSrcConfig.audioSrcConfigList[i].token.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->audioSrcConfig.audioSrcConfigList[i].sourceToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->audioSrcConfig.audioSrcConfigList[i].useCount = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->audioSrcConfig.audioSrcConfigList[i].forcePersistence = RC_USER_DEFINE_INIT_VALUE;
 	}
 	//-------------------init_AudioSourceConfig---------------------
 	//----------------------init_AudioSources------------------------
 	deviceInfo->audioSources.audioSourcesListSize = 2;
-	deviceInfo->audioSources.audioSourcesList = (AudioSourcesParam*) User_memory_allocate( deviceInfo->audioSources.audioSourcesListSize * sizeof(AudioSourcesParam));
+    deviceInfo->audioSources.audioSourcesList = new AudioSourcesParam[deviceInfo->audioSources.audioSourcesListSize];
     for (Byte i = 0; i < deviceInfo->audioSources.audioSourcesListSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->audioSources.audioSourcesList[i].audioSourcesToken);
+        deviceInfo->audioSources.audioSourcesList[i].audioSourcesToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->audioSources.audioSourcesList[i].channels = RC_USER_DEFINE_INIT_VALUE;
 	}
 	//----------------------init_AudioSources------------------------
 	//---------------------init_GuaranteedEncs-----------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->guaranteedEncs.configurationToken);
+    deviceInfo->guaranteedEncs.configurationToken.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->guaranteedEncs.TotallNum = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->guaranteedEncs.JPEGNum = RC_USER_DEFINE_INIT_VALUE;
@@ -433,15 +431,15 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//---------------------init_GuaranteedEncs-----------------------
 	//-------------------------init_Profiles----------------------------
 	deviceInfo->mediaProfiles.profilesListSize = 2;
-	deviceInfo->mediaProfiles.mediaProfilesParam = (MediaProfilesParam*) User_memory_allocate( deviceInfo->mediaProfiles.profilesListSize * sizeof(MediaProfilesParam));
+    deviceInfo->mediaProfiles.mediaProfilesParam = new MediaProfilesParam[deviceInfo->mediaProfiles.profilesListSize];
 
     for (Byte i = 0; i < deviceInfo->mediaProfiles.profilesListSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->mediaProfiles.mediaProfilesParam[i].name);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->mediaProfiles.mediaProfilesParam[i].token);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcName);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcToken);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcSourceToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].name.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].token.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcName.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcToken.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcSourceToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcUseCount = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcBounds_x = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcBounds_y = RC_USER_DEFINE_INIT_VALUE;
@@ -451,13 +449,13 @@ void User_Host_init(RCHostInfo* deviceInfo)
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcRotateDegree = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcMirrorMode = RC_USER_DEFINE_INIT_VALUE;
 
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcName);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcToken);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcSourceToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcName.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcToken.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcSourceToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcUseCount = RC_USER_DEFINE_INIT_VALUE;
 
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncName);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncName.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncUseCount = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncEncodingMode = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncResolutionWidth = RC_USER_DEFINE_INIT_VALUE;
@@ -470,22 +468,22 @@ void User_Host_init(RCHostInfo* deviceInfo)
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncGovLength = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncProfile = RC_USER_DEFINE_INIT_VALUE;
 
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncName);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncName.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncUseCount = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncEncoding = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncBitrate = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncSampleRate = RC_USER_DEFINE_INIT_VALUE;
 
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputName);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputToken);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputOutputToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputName.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputToken.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputOutputToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputUseCount = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputSendPrimacy = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputOutputLevel = RC_USER_DEFINE_INIT_VALUE;
 
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecName);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecName.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecUseCount = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncConfigRateControlTargetBitrateLimit = RC_USER_DEFINE_INIT_VALUE;
 	}
@@ -493,11 +491,11 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//-------------------------init_Profiles----------------------------
 	//--------------------init_VideoEncConfig------------------------
 	deviceInfo->videoEncConfig.configListSize = 1;
-	deviceInfo->videoEncConfig.configList = (VideoEncConfigParam*) User_memory_allocate( deviceInfo->videoEncConfig.configListSize * sizeof(VideoEncConfigParam));
+    deviceInfo->videoEncConfig.configList = new VideoEncConfigParam[deviceInfo->videoEncConfig.configListSize];
     for (Byte i = 0; i < deviceInfo->videoEncConfig.configListSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoEncConfig.configList[i].name);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoEncConfig.configList[i].token);
+        deviceInfo->videoEncConfig.configList[i].name.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->videoEncConfig.configList[i].token.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->videoEncConfig.configList[i].useCount = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->videoEncConfig.configList[i].encoding = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->videoEncConfig.configList[i].width = RC_USER_DEFINE_INIT_VALUE;
@@ -517,12 +515,12 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//--------------------init_VideoEncConfig------------------------
 	//--------------------init_VideoSrcConfig------------------------
 	deviceInfo->videoSrcConfig.configListSize = 1;
-	deviceInfo->videoSrcConfig.configList = (VideoSrcConfigParam*) User_memory_allocate( deviceInfo->videoSrcConfig.configListSize * sizeof(VideoSrcConfigParam));
+    deviceInfo->videoSrcConfig.configList = new VideoSrcConfigParam[deviceInfo->videoSrcConfig.configListSize];
     for (Byte i = 0; i < deviceInfo->videoSrcConfig.configListSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfig.configList[i].name);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfig.configList[i].token);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfig.configList[i].srcToken);
+        deviceInfo->videoSrcConfig.configList[i].name.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->videoSrcConfig.configList[i].token.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->videoSrcConfig.configList[i].srcToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->videoSrcConfig.configList[i].useCount = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->videoSrcConfig.configList[i].bounds_x = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->videoSrcConfig.configList[i].bounds_y = RC_USER_DEFINE_INIT_VALUE;
@@ -538,18 +536,18 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	//--------------------init_VideoSrcConfig------------------------
 	//------------------------init_VideoSrc---------------------------
 	deviceInfo->videoSrc.videoSrcListSize = 1;
-	deviceInfo->videoSrc.srcList = (VideoSrcParam*) User_memory_allocate( deviceInfo->videoSrc.videoSrcListSize * sizeof(VideoSrcParam));
+    deviceInfo->videoSrc.srcList = new VideoSrcParam[deviceInfo->videoSrc.videoSrcListSize];
     for (Byte i = 0; i < deviceInfo->videoSrc.videoSrcListSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrc.srcList[i].token);
+        deviceInfo->videoSrc.srcList[i].token.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->videoSrc.srcList[i].frameRate =RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->videoSrc.srcList[i].resolutionWidth = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->videoSrc.srcList[i].resolutionHeight = RC_USER_DEFINE_INIT_VALUE;
 	}
 	//------------------------init_VideoSrc---------------------------
 	//------------------------init_VideoSrcConfigOptions---------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfigOptions.videoSrcConfigToken);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfigOptions.profileToken);
+    deviceInfo->videoSrcConfigOptions.videoSrcConfigToken.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->videoSrcConfigOptions.profileToken.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->videoSrcConfigOptions.boundsRange_X_Min = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoSrcConfigOptions.boundsRange_X_Max = RC_USER_DEFINE_INIT_VALUE;
@@ -560,21 +558,21 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->videoSrcConfigOptions.boundsRange_Height_Min = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoSrcConfigOptions.boundsRange_Heigh_Max = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize = 2;
-	deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList = (RCString*) User_memory_allocate( deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize * sizeof(RCString));
+    deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList = new RCString[deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize];
     for (Byte i = 0; i < deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize; ++i)
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList[i]);
+        deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList[i].set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->videoSrcConfigOptions.rotateModeOptions = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoSrcConfigOptions.rotateDegreeMinOption = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoSrcConfigOptions. mirrorModeOptions = RC_USER_DEFINE_INIT_VALUE;
 
 	//------------------------init_VideoSrcConfigOptions---------------------------
 	//------------------------init_VideoEncConfigOptions---------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoEncConfigOptions.videoEncConfigToken);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoEncConfigOptions.profileToken);
+    deviceInfo->videoEncConfigOptions.videoEncConfigToken.set( byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->videoEncConfigOptions.profileToken.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->videoEncConfigOptions.encodingOption = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize = 2;
-	deviceInfo->videoEncConfigOptions.resolutionsAvailableList = ( ResolutionsAvailableList* ) User_memory_allocate( deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize * sizeof(ResolutionsAvailableList));
+    deviceInfo->videoEncConfigOptions.resolutionsAvailableList = new ResolutionsAvailableList[deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize];
     for (Byte i = 0; i < deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize; ++i)
 	{
         deviceInfo->videoEncConfigOptions.resolutionsAvailableList[i].width = RC_USER_DEFINE_INIT_VALUE + i;
@@ -595,7 +593,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->videoEncConfigOptions.targetBitrateRangeMin = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoEncConfigOptions.targetBitrateRangeMax = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize = 2;
-	deviceInfo->videoEncConfigOptions.aspectRatioList = (Word*) User_memory_allocate( deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize * sizeof(Word));
+    deviceInfo->videoEncConfigOptions.aspectRatioList = new Word[deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize];
     for (Byte i = 0; i < deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize; ++i)
 	{
 		deviceInfo->videoEncConfigOptions.aspectRatioList[i] = RC_USER_DEFINE_INIT_VALUE;
@@ -603,26 +601,26 @@ void User_Host_init(RCHostInfo* deviceInfo)
 
 	//------------------------init_VideoEncConfigOptions---------------------------
 	//------------------------init_AudioSrcConfigOptions---------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioSrcConfigOptions.audioSrcConfigToken);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioSrcConfigOptions.profileToken);
+    deviceInfo->audioSrcConfigOptions.audioSrcConfigToken.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->audioSrcConfigOptions.profileToken.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize = 2;
-	deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList = (RCString*) User_memory_allocate(deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize * sizeof(RCString));
+    deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList = new RCString[deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize];
     for (Byte i = 0; i < deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize; ++i)
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList[i]);
+        deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList[i].set(byRefStringBuffer, Ref_BufferSize);
 	//------------------------init_AudioSrcConfigOptions---------------------------
 	//------------------------init_AudioEncConfigOptions---------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioEncConfigOptions.audioEncConfigToken);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioEncConfigOptions.profileToken);
+    deviceInfo->audioEncConfigOptions.audioEncConfigToken.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->audioEncConfigOptions.profileToken.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->audioEncConfigOptions.configListSize = 2;
-	deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam = ( AudioEncConfigOptionsParam* ) User_memory_allocate( deviceInfo->audioEncConfigOptions.configListSize * sizeof(AudioEncConfigOptionsParam));
+    deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam = new AudioEncConfigOptionsParam[deviceInfo->audioEncConfigOptions.configListSize];
     for (Byte i = 0; i < deviceInfo->audioEncConfigOptions.configListSize; ++i)
 	{
 		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].encodingOption = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].bitrateRangeMin = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].bitrateRangeMax = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize = 2;
-		deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList = (Word*) User_memory_allocate( deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize * sizeof(Word));
+        deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList = new Word[deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize];
         for (Byte j = 0; j < deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableListSize; ++j)
 		{
 			deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList[j] = RC_USER_DEFINE_INIT_VALUE;
@@ -630,8 +628,8 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	}
 	//------------------------init_AudioEncConfigOptions---------------------------
 	//----------------init_AudioEncConfigSetParam------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioEncConfigSetParam.name);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioEncConfigSetParam.token);
+    deviceInfo->audioEncConfigSetParam.name.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->audioEncConfigSetParam.token.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->audioEncConfigSetParam.useCount =RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->audioEncConfigSetParam.encoding = RC_USER_DEFINE_INIT_VALUE;
@@ -640,15 +638,15 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->audioEncConfigSetParam.forcePersistence = RC_USER_DEFINE_INIT_VALUE;
 	//----------------init_AudioEncConfigSetParam------------------
 	//----------------init_AudioSrcConfigSetParam------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioSrcConfigSetParam.name);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioSrcConfigSetParam.token);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->audioSrcConfigSetParam.sourceToken);
+    deviceInfo->audioSrcConfigSetParam.name.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->audioSrcConfigSetParam.token.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->audioSrcConfigSetParam.sourceToken.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->audioSrcConfigSetParam.useCount = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->audioSrcConfigSetParam.forcePersistence = RC_USER_DEFINE_INIT_VALUE;
 	//----------------init_AudioSrcConfigSetParam------------------
 	//----------------init_VideoEncConfigSetParam------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoEncConfigSetParam.name);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoEncConfigSetParam.token);
+    deviceInfo->videoEncConfigSetParam.name.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->videoEncConfigSetParam.token.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->videoEncConfigSetParam.useCount = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoEncConfigSetParam.encoding = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoEncConfigSetParam.width = RC_USER_DEFINE_INIT_VALUE;
@@ -666,9 +664,9 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->videoEncConfigSetParam.aspectRatio = RC_USER_DEFINE_INIT_VALUE;
 	//----------------init_VideoEncConfigSetParam------------------
 	//----------------init_VideoSrcConfigSetParam------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfigSetParam.name);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfigSetParam.token);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcConfigSetParam.srcToken);
+    deviceInfo->videoSrcConfigSetParam.name.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->videoSrcConfigSetParam.token.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->videoSrcConfigSetParam.srcToken.set(byRefStringBuffer, Ref_BufferSize);
 
 	deviceInfo->videoSrcConfigSetParam.useCount = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoSrcConfigSetParam.bounds_x = RC_USER_DEFINE_INIT_VALUE;
@@ -683,7 +681,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->videoSrcConfigSetParam.forcePersistence = RC_USER_DEFINE_INIT_VALUE;
 	//----------------init_VideoSrcConfigSetParam------------------
 	//----------------init_VideoOSDConfig------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoOSDConfig.videoSrcToken);
+    deviceInfo->videoOSDConfig.videoSrcToken.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->videoOSDConfig.dateEnable = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoOSDConfig.datePosition = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoOSDConfig.dateFormat = RC_USER_DEFINE_INIT_VALUE;
@@ -698,12 +696,12 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->videoOSDConfig.detailInfoOption = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoOSDConfig.textEnable = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoOSDConfig.textPosition = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoOSDConfig.text);
+    deviceInfo->videoOSDConfig.text.set(byRefStringBuffer, Ref_BufferSize);
 	//----------------init_VideoOSDConfig------------------
 	//------------------------init_VideoPrivateArea--------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoPrivateArea.videoSrcToken);
+    deviceInfo->videoPrivateArea.videoSrcToken.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->videoPrivateArea.polygonListSize = 2;
-	deviceInfo->videoPrivateArea.privateAreaPolygon = ( PrivateAreaPolygon* ) User_memory_allocate( deviceInfo->videoPrivateArea.polygonListSize * sizeof(PrivateAreaPolygon));
+    deviceInfo->videoPrivateArea.privateAreaPolygon = new PrivateAreaPolygon[deviceInfo->videoPrivateArea.polygonListSize];
     for (Byte i = 0; i < deviceInfo->videoPrivateArea.polygonListSize; ++i)
 	{
 		deviceInfo->videoPrivateArea.privateAreaPolygon[i].polygon_x = RC_USER_DEFINE_INIT_VALUE;
@@ -712,20 +710,20 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->videoPrivateArea.privateAreaEnable = RC_USER_DEFINE_INIT_VALUE;
 	//------------------------init_VideoPrivateArea--------------------------
 	//------------------------init_SyncPoint--------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->syncPoint.profileToken);
+    deviceInfo->syncPoint.profileToken.set(byRefStringBuffer, Ref_BufferSize);
 	//------------------------init_SyncPoint--------------------------
 	//------------------------init_VideoSrcControl--------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->videoSrcControl.videoSrcToken);
+    deviceInfo->videoSrcControl.videoSrcToken.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->videoSrcControl.controlCommand =  RC_USER_DEFINE_INIT_VALUE;
 	//------------------------init_VideoSrcControl--------------------------
 	//------------------------init_PTZConfig--------------------------
 	deviceInfo->ptzConfig.PTZConfigListSize = 2;
-	deviceInfo->ptzConfig.PTZConfigList = (PTZConfigParam*) User_memory_allocate( deviceInfo->ptzConfig.PTZConfigListSize * sizeof(PTZConfigParam));
+    deviceInfo->ptzConfig.PTZConfigList = new PTZConfigParam[deviceInfo->ptzConfig.PTZConfigListSize];
     for (Byte i = 0; i < deviceInfo->ptzConfig.PTZConfigListSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzConfig.PTZConfigList[i].name);
+        deviceInfo->ptzConfig.PTZConfigList[i].name.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->ptzConfig.PTZConfigList[i].useCount = RC_USER_DEFINE_INIT_VALUE;
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzConfig.PTZConfigList[i].token);
+        deviceInfo->ptzConfig.PTZConfigList[i].token.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->ptzConfig.PTZConfigList[i].defaultPanSpeed = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->ptzConfig.PTZConfigList[i].defaultTiltSpeed = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->ptzConfig.PTZConfigList[i].defaultZoomSpeed = RC_USER_DEFINE_INIT_VALUE;
@@ -738,18 +736,18 @@ void User_Host_init(RCHostInfo* deviceInfo)
 		deviceInfo->ptzConfig.PTZConfigList[i].zoomLimitMax = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->ptzConfig.PTZConfigList[i].eFlipMode = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->ptzConfig.PTZConfigList[i].reverseMode = RC_USER_DEFINE_INIT_VALUE;
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken);
+        deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken.set(byRefStringBuffer, Ref_BufferSize);
 	}
 	deviceInfo->ptzConfig.extensionFlag = RC_USER_DEFINE_INIT_VALUE;
 	//------------------------init_PTZConfig--------------------------
 	//------------------------init_PTZStatus--------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzStatus.token);
+    deviceInfo->ptzStatus.token.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->ptzStatus.panPosition = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzStatus.tiltPosition = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzStatus.zoomPosition = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzStatus.panTiltMoveStatus  = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzStatus.zoomMoveStatus = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzStatus.error);
+    deviceInfo->ptzStatus.error.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->ptzStatus.UTCHour = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzStatus.UTCMinute = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzStatus.UTCSecond = RC_USER_DEFINE_INIT_VALUE;
@@ -758,13 +756,13 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->ptzStatus.UTCDay = RC_USER_DEFINE_INIT_VALUE;
 	//------------------------init_PTZStatus--------------------------
 	//-----------------------init_PTZPresetsGet--------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsGet.token);
+    deviceInfo->ptzPresetsGet.token.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->ptzPresetsGet.configListSize = 1;
-	deviceInfo->ptzPresetsGet.configList = (PTZPresetsConfig*) User_memory_allocate( deviceInfo->ptzPresetsGet.configListSize * sizeof(PTZPresetsConfig));
+    deviceInfo->ptzPresetsGet.configList = new PTZPresetsConfig[deviceInfo->ptzPresetsGet.configListSize];
     for (Byte i = 0; i < deviceInfo->ptzPresetsGet.configListSize; ++i)
 	{
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsGet.configList[i].presetName);
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsGet.configList[i].presetToken);
+        deviceInfo->ptzPresetsGet.configList[i].presetName.set(byRefStringBuffer, Ref_BufferSize);
+        deviceInfo->ptzPresetsGet.configList[i].presetToken.set(byRefStringBuffer, Ref_BufferSize);
 		deviceInfo->ptzPresetsGet.configList[i].panPosition = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->ptzPresetsGet.configList[i].tiltPosition = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->ptzPresetsGet.configList[i].zoomPosition = RC_USER_DEFINE_INIT_VALUE;
@@ -774,24 +772,24 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	}
 	//-----------------------init_PTZPresetsGet--------------------------
 	//-----------------------init_PTZPresetsParam--------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsSet.token);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsSet.presetName);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsSet.presetToken);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzPresetsSet.presetToken_set);
+    deviceInfo->ptzPresetsSet.token.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->ptzPresetsSet.presetName.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->ptzPresetsSet.presetToken.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->ptzPresetsSet.presetToken_set.set(byRefStringBuffer, Ref_BufferSize);
 	//-----------------------init_PTZPresetsParam--------------------------
 	//-----------------------init_PTZGotoParam----------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzGotoParam.token);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzGotoParam.presetToken);
+    deviceInfo->ptzGotoParam.token.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->ptzGotoParam.presetToken.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->ptzGotoParam.panSpeed = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzGotoParam.tiltSpeed = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzGotoParam.zoomSpeed = RC_USER_DEFINE_INIT_VALUE;
 	//-----------------------init_PTZGotoParam----------------------
 	//---------------------init_PTZRemoveParam---------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzRemoveParam.token);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzRemoveParam.presetToken);
+    deviceInfo->ptzRemoveParam.token.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->ptzRemoveParam.presetToken.set(byRefStringBuffer, Ref_BufferSize);
 	//---------------------init_PTZRemoveParam---------------------
 	//---------------------init_PTZAbsoluteMove---------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzAbsoluteMove.token);
+    deviceInfo->ptzAbsoluteMove.token.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->ptzAbsoluteMove.panPosition = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzAbsoluteMove.tiltPosition = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzAbsoluteMove.zoomPosition = RC_USER_DEFINE_INIT_VALUE;
@@ -800,7 +798,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->ptzAbsoluteMove.zoomSpeed = RC_USER_DEFINE_INIT_VALUE;
 	//---------------------init_PTZAbsoluteMove---------------------
 	//----------------------init_PTZRelativeMove---------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzRelativeMove.token);
+    deviceInfo->ptzRelativeMove.token.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->ptzRelativeMove.panTranslation = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzRelativeMove.tiltTranslation = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzRelativeMove.zoomTranslation = RC_USER_DEFINE_INIT_VALUE;
@@ -809,14 +807,14 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->ptzRelativeMove.zoomSpeed = RC_USER_DEFINE_INIT_VALUE;
 	//----------------------init_PTZRelativeMove---------------------
 	//--------------------init_PTZContinuousMove-------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzContinuousMove.token);
+    deviceInfo->ptzContinuousMove.token.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->ptzContinuousMove.panVelocity = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzContinuousMove.tiltVelocity = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzContinuousMove.zoomVelocity = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzContinuousMove.timeout = RC_USER_DEFINE_INIT_VALUE;
 	//--------------------init_PTZContinuousMove-------------------
 	//---------------------init_PTZHomePosition---------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzHomePosition.token);
+    deviceInfo->ptzHomePosition.token.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->ptzHomePosition.panSpeed = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzHomePosition.tiltSpeed = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->ptzHomePosition.zoomSpeed = RC_USER_DEFINE_INIT_VALUE;
@@ -825,29 +823,29 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->ptzHomePosition.zoomPosition = RC_USER_DEFINE_INIT_VALUE;
 	//---------------------init_PTZHomePosition---------------------
 	//--------------------------init_PTZStop-------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ptzStop.token);
+    deviceInfo->ptzStop.token.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->ptzStop.panTiltZoom = RC_USER_DEFINE_INIT_VALUE;
 	//--------------------------init_PTZStop-------------------------
 	//----------------------init_SupportedRules-----------------------
 	deviceInfo->supportedRules.supportListSize = 5;
-	deviceInfo->supportedRules.ruleType = (Byte*) User_memory_allocate( deviceInfo->supportedRules.supportListSize * sizeof(Byte));
+    deviceInfo->supportedRules.ruleType = new Byte[deviceInfo->supportedRules.supportListSize];
     for (Byte i = 0; i < deviceInfo->supportedRules.supportListSize; ++i)
 		deviceInfo->supportedRules.ruleType[i] = i + 0x10;
 	//----------------------init_SupportedRules-----------------------
 	//------------------------init_DeleteRule--------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->deleteRule.ruleToken);
+    deviceInfo->deleteRule.ruleToken.set(byRefStringBuffer, Ref_BufferSize);
 	//------------------------init_DeleteRule--------------------------
 	//-------------------------init_totalRule--------------------------
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->totalRule.ruleName);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->totalRule.ruleToken);
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->totalRule.videoSrcToken);
+    deviceInfo->totalRule.ruleName.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->totalRule.ruleToken.set(byRefStringBuffer, Ref_BufferSize);
+    deviceInfo->totalRule.videoSrcToken.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->totalRule.type = 0;
 	deviceInfo->totalRule.rule = NULL;
 	//-------------------------init_totalRule---------------------------
 	//--------------------------init_ruleList----------------------------
 	deviceInfo->ruleList.maxListSize = 10;
 	deviceInfo->ruleList.ruleListSize = 5;
-	deviceInfo->ruleList.totalRuleList = (TotalRule* )User_memory_allocate(deviceInfo->ruleList.maxListSize * sizeof(TotalRule));
+    deviceInfo->ruleList.totalRuleList = new TotalRule[deviceInfo->ruleList.maxListSize];
     for (Byte i = 0; i < deviceInfo->ruleList.maxListSize; ++i)
 	{
 
@@ -862,20 +860,20 @@ void User_Host_init(RCHostInfo* deviceInfo)
 
 		if((deviceInfo->ruleList.totalRuleList[i].type >= 0x10) && (deviceInfo->ruleList.totalRuleList[i].type <= 0x14))
 		{
-			Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ruleList.totalRuleList[i].ruleName);
-			Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ruleList.totalRuleList[i].ruleToken);
-			Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->ruleList.totalRuleList[i].videoSrcToken);
+            deviceInfo->ruleList.totalRuleList[i].ruleName.set(byRefStringBuffer, Ref_BufferSize);
+            deviceInfo->ruleList.totalRuleList[i].ruleToken.set(byRefStringBuffer, Ref_BufferSize);
+            deviceInfo->ruleList.totalRuleList[i].videoSrcToken.set(byRefStringBuffer, Ref_BufferSize);
 		}else{
 			continue;
 		}
 		if(deviceInfo->ruleList.totalRuleList[i].type == 0x10 )
 		{
-			deviceInfo->ruleList.totalRuleList[i].rule = (Rule_LineDetector*) User_memory_allocate(sizeof(Rule_LineDetector));
+            deviceInfo->ruleList.totalRuleList[i].rule = new Rule_LineDetector[1];
 			ptrRule_LineDetector = (Rule_LineDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
 
 			ptrRule_LineDetector->direction = RC_USER_DEFINE_INIT_VALUE;
 			ptrRule_LineDetector->polygonListSize = 2;
-			ptrRule_LineDetector->detectPolygon = (DetectPolygon*) User_memory_allocate( ptrRule_LineDetector->polygonListSize * sizeof(DetectPolygon));
+            ptrRule_LineDetector->detectPolygon = new DetectPolygon[ptrRule_LineDetector->polygonListSize];
 
             for (Byte j = 0; j < ptrRule_LineDetector->polygonListSize; ++j)
 			{
@@ -886,11 +884,11 @@ void User_Host_init(RCHostInfo* deviceInfo)
 			ptrRule_LineDetector = NULL;
 		}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x11 )
 		{
-			deviceInfo->ruleList.totalRuleList[i].rule = (Rule_FieldDetector*) User_memory_allocate(sizeof(Rule_FieldDetector));
+            deviceInfo->ruleList.totalRuleList[i].rule = new Rule_FieldDetector[1];
 			ptrRule_FieldDetector = (Rule_FieldDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
 
 			ptrRule_FieldDetector->polygonListSize = 2;
-			ptrRule_FieldDetector->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_FieldDetector->polygonListSize * sizeof(DetectPolygon));
+            ptrRule_FieldDetector->detectPolygon = new DetectPolygon[ptrRule_FieldDetector->polygonListSize];
             for (Byte j = 0; j < ptrRule_FieldDetector->polygonListSize; ++j)
 			{
 				ptrRule_FieldDetector->detectPolygon[j].polygon_x = RC_USER_DEFINE_INIT_VALUE;
@@ -900,12 +898,12 @@ void User_Host_init(RCHostInfo* deviceInfo)
 			ptrRule_FieldDetector = NULL;
 		}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x12 )
 		{
-			deviceInfo->ruleList.totalRuleList[i].rule = (Rule_MotionDetector*) User_memory_allocate(sizeof(Rule_MotionDetector));
+            deviceInfo->ruleList.totalRuleList[i].rule = new Rule_MotionDetector[1];
 			ptrRule_MotionDetector = (Rule_MotionDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
 
 			ptrRule_MotionDetector->motionExpression = RC_USER_DEFINE_INIT_VALUE;
 			ptrRule_MotionDetector->polygonListSize = 2 ;
-			ptrRule_MotionDetector->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_MotionDetector->polygonListSize * sizeof(DetectPolygon));
+            ptrRule_MotionDetector->detectPolygon = new DetectPolygon[ptrRule_MotionDetector->polygonListSize];
 
             for (Byte j = 0; j < ptrRule_MotionDetector->polygonListSize; ++j)
 			{
@@ -917,7 +915,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 		}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x13 )
 		{
 
-			deviceInfo->ruleList.totalRuleList[i].rule = (Rule_Counting*) User_memory_allocate(sizeof(Rule_Counting));
+            deviceInfo->ruleList.totalRuleList[i].rule = new Rule_Counting[1];
 			ptrRule_Counting = (Rule_Counting*) deviceInfo->ruleList.totalRuleList[i].rule;
 
 			ptrRule_Counting->reportTimeInterval = RC_USER_DEFINE_INIT_VALUE;
@@ -925,7 +923,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 			ptrRule_Counting->direction = RC_USER_DEFINE_INIT_VALUE;
 
 			ptrRule_Counting->polygonListSize = 2;
-			ptrRule_Counting->detectPolygon = (DetectPolygon*) User_memory_allocate(ptrRule_Counting->polygonListSize * sizeof(DetectPolygon));
+            ptrRule_Counting->detectPolygon = new DetectPolygon[ptrRule_Counting->polygonListSize];
 
             for (Byte j = 0; j < ptrRule_Counting->polygonListSize; ++j)
 			{
@@ -936,14 +934,14 @@ void User_Host_init(RCHostInfo* deviceInfo)
 			ptrRule_Counting = NULL;
 		}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x14 )
 		{
-			deviceInfo->ruleList.totalRuleList[i].rule = (Rule_CellMotion*) User_memory_allocate(sizeof(Rule_CellMotion));
+            deviceInfo->ruleList.totalRuleList[i].rule = new Rule_CellMotion[1];
 			ptrRule_CellMotion = (Rule_CellMotion*) deviceInfo->ruleList.totalRuleList[i].rule;
 
 			ptrRule_CellMotion->minCount = RC_USER_DEFINE_INIT_VALUE;
 			ptrRule_CellMotion->alarmOnDelay = RC_USER_DEFINE_INIT_VALUE;
 			ptrRule_CellMotion->alarmOffDelay = RC_USER_DEFINE_INIT_VALUE;
 			ptrRule_CellMotion->activeCellsSize = RC_USER_DEFINE_INIT_VALUE;
-			Cmd_StringSet( byActiveCellsBuffer, sizeof(byActiveCellsBuffer),  &ptrRule_CellMotion->activeCells);
+            ptrRule_CellMotion->activeCells.set( byActiveCellsBuffer, sizeof(byActiveCellsBuffer));
 			ptrRule_CellMotion->sensitivity = RC_USER_DEFINE_INIT_VALUE;
 			ptrRule_CellMotion->layoutBounds_x = RC_USER_DEFINE_INIT_VALUE;
 			ptrRule_CellMotion->layoutBounds_y = RC_USER_DEFINE_INIT_VALUE;
@@ -964,12 +962,12 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->metadataStreamInfo.metadata_Device.deviceModelID = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->metadataStreamInfo.metadata_Device.HWVersionCode = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->metadataStreamInfo.metadata_Device.SWVersionCode = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->metadataStreamInfo.metadata_Device.textInformation);
+    deviceInfo->metadataStreamInfo.metadata_Device.textInformation.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->metadataStreamInfo.metadata_Device.extensionFlag = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->metadataStreamInfo.metadata_Device.baudRate = RETURN_CHANNEL_BAUDRATE;
 
 	deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize = 1;
-	deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList = (Metadata_StreamParam*) User_memory_allocate( deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize * sizeof(Metadata_StreamParam));
+    deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList = new Metadata_StreamParam[deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize];
     for (Byte i = 0; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; ++i)
 	{
 		deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoPID = RC_USER_DEFINE_INIT_VALUE;
@@ -983,12 +981,12 @@ void User_Host_init(RCHostInfo* deviceInfo)
 		deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].audioBitrate = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].audioSampleRate = RC_USER_DEFINE_INIT_VALUE;
 		deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].PCRPID = RC_USER_DEFINE_INIT_VALUE;
-		Cmd_StringSet( byRefStringBuffer, Ref_BufferSize,  &deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken);
+        deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken.set(byRefStringBuffer, Ref_BufferSize);
 	}
 	deviceInfo->metadataStreamInfo.metadata_Stream.extensionFlag = RC_USER_DEFINE_INIT_VALUE;
 
 	//******************init_metadata_Event******************
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
+    deviceInfo->metadataStreamInfo.metadata_Event.ruleToken.set(byRefStringBuffer, Ref_BufferSize);
 	deviceInfo->metadataStreamInfo.metadata_Event.objectID = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->metadataStreamInfo.metadata_Event.UTCHour = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->metadataStreamInfo.metadata_Event.UTCMinute = RC_USER_DEFINE_INIT_VALUE;
@@ -996,7 +994,7 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->metadataStreamInfo.metadata_Event.UTCYear = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->metadataStreamInfo.metadata_Event.UTCMonth = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->metadataStreamInfo.metadata_Event.UTCDay = RC_USER_DEFINE_INIT_VALUE;
-	Cmd_StringSet( byRefStringBuffer, Ref_BufferSize, &deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken);
+    deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.set(byRefStringBuffer, Ref_BufferSize);
 	//******************init_metadata_Event******************
 	//--------------------init_MetaDataStream----------------------
 	//--------------------init_MetadataSettings----------------------
@@ -1008,11 +1006,11 @@ void User_Host_init(RCHostInfo* deviceInfo)
 	deviceInfo->metadataSettings.motionDetectorPeriod = 1000;
 	//--------------------init_MetadataSettings----------------------
 }
-//*******************User Define Init********************
 
-//*******************User Define UnInit********************
-void User_Host_uninit(RCHostInfo* deviceInfo)
+TxRC::~TxRC()
 {
+    TxRC * deviceInfo = this;
+
 	Rule_LineDetector* ptrRule_LineDetector = NULL;
 	Rule_FieldDetector* ptrRule_FieldDetector = NULL;
 	Rule_MotionDetector* ptrRule_MotionDetector = NULL;
@@ -1020,363 +1018,363 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	Rule_CellMotion* ptrRule_CellMotion = NULL;
 
 	//---------------------uninit_security-----------------------
-	Cmd_StringClear( &deviceInfo->security.userName);
-	Cmd_StringClear( &deviceInfo->security.password);
+    deviceInfo->security.userName.clear();
+    deviceInfo->security.password.clear();
 	//---------------------uninit_security-----------------------
 	//------------------uninit_HwRegisterValues-----------------------
-	User_memory_free( deviceInfo->hwRegisterInfo.registerValues);
+    delete [] deviceInfo->hwRegisterInfo.registerValues;
 	//------------------uninit_HwRegisterValues-----------------------
 	//------------------uninit_SdtServiceConfig------------------------
-	Cmd_StringClear(&deviceInfo->serviceConfig.serviceName);
-	Cmd_StringClear(&deviceInfo->serviceConfig.provider);
+    deviceInfo->serviceConfig.serviceName.clear();
+    deviceInfo->serviceConfig.provider.clear();
 	//------------------uninit_SdtServiceConfig------------------------
     //-------------------uninit_CalibrationTable------------------------
-    Cmd_StringClear(&deviceInfo->calibrationTable.tableData);
+    deviceInfo->calibrationTable.tableData.clear();
     //------------------init_CalibrationTable------------------------
 	//-----------------uninit_EITInfo-----------------
-	Cmd_StringClear(&deviceInfo->eitInfo.videoEncConfigToken);
+    deviceInfo->eitInfo.videoEncConfigToken.clear();
     for (Byte i = 0; i < deviceInfo->eitInfo.listSize; ++i)
 	{
-		Cmd_StringClear(&deviceInfo->eitInfo.eitInfoParam[i].eventName);
-		Cmd_StringClear(&deviceInfo->eitInfo.eitInfoParam[i].eventText);
+        deviceInfo->eitInfo.eitInfoParam[i].eventName.clear();
+        deviceInfo->eitInfo.eitInfoParam[i].eventText.clear();
 	}
-	User_memory_free(deviceInfo->eitInfo.eitInfoParam);
+    delete [] deviceInfo->eitInfo.eitInfoParam;
 	deviceInfo->eitInfo.eitInfoParam = NULL;
 	deviceInfo->eitInfo.listSize = 0;
 	//-----------------uninit_EITInfo-----------------
 	//-----------------uninit_DeviceInfo-----------------
-	Cmd_StringClear(&deviceInfo->manufactureInfo.manufactureName);
-	Cmd_StringClear(&deviceInfo->manufactureInfo.modelName);
-	Cmd_StringClear(&deviceInfo->manufactureInfo.firmwareVersion);
-	Cmd_StringClear(&deviceInfo->manufactureInfo.serialNumber);
-	Cmd_StringClear(&deviceInfo->manufactureInfo.hardwareId);
+    deviceInfo->manufactureInfo.manufactureName.clear();
+    deviceInfo->manufactureInfo.modelName.clear();
+    deviceInfo->manufactureInfo.firmwareVersion.clear();
+    deviceInfo->manufactureInfo.serialNumber.clear();
+    deviceInfo->manufactureInfo.hardwareId.clear();
 	//-----------------uninit_DeviceInfo-----------------
 	//-----------------uninit_Hostname------------------
-	Cmd_StringClear(&deviceInfo->hostInfo.hostName);
+    deviceInfo->hostInfo.hostName.clear();
 	//-----------------uninit_Hostname------------------
 	//-----------------uninit_SystemLog-----------------
-	Cmd_StringClear(&deviceInfo->systemLog.logData);
+    deviceInfo->systemLog.logData.clear();
 	//-----------------uninit_SystemLog-----------------
 	//------------------uninit_OSDInfo------------------
-	Cmd_StringClear(&deviceInfo->osdInfo.text);
+    deviceInfo->osdInfo.text.clear();
 	//------------------uninit_OSDInfo------------------
 	//-----------uninit_SystemRebootMessage----------
-	Cmd_StringClear(&deviceInfo->systemReboot.responseMessage);
+    deviceInfo->systemReboot.responseMessage.clear();
 	//-----------uninit_SystemRebootMessage----------
 	//-----------------uninit_SystemFirmware--------------------
-	Cmd_StringClear(&deviceInfo->systemFirmware.data);
-	Cmd_StringClear(&deviceInfo->systemFirmware.message);
+    deviceInfo->systemFirmware.data.clear();
+    deviceInfo->systemFirmware.message.clear();
 	//-----------------uninit_SystemFirmware--------------------
 	//-----------------uninit_DigitalInputs----------------
     for (Byte i = 0; i < deviceInfo->digitalInputsInfo.listSize; ++i)
 	{
-		Cmd_StringClear(&deviceInfo->digitalInputsInfo.tokenList[i]);
+        deviceInfo->digitalInputsInfo.tokenList[i].clear();
 	}
-	User_memory_free(deviceInfo->digitalInputsInfo.tokenList);
+    delete [] deviceInfo->digitalInputsInfo.tokenList;
 	deviceInfo->digitalInputsInfo.tokenList = NULL;
 	deviceInfo->digitalInputsInfo.listSize = 0;
 	//-----------------uninit_DigitalInputs----------------
 	//-----------------uninit_RelayOutputs---------------
     for (Byte i = 0; i < deviceInfo->relayOutputs.listSize; ++i)
 	{
-		Cmd_StringClear( &deviceInfo->relayOutputs.relayOutputsParam[i].token);
+        deviceInfo->relayOutputs.relayOutputsParam[i].token.clear();
 	}
-	User_memory_free(deviceInfo->relayOutputs.relayOutputsParam);
+    delete [] deviceInfo->relayOutputs.relayOutputsParam;
 	deviceInfo->relayOutputs.relayOutputsParam = NULL;
 	deviceInfo->relayOutputs.listSize = 0;
 	//-----------------uninit_RelayOutputs---------------
 	//------------uninit_RelayOutputsSetParam----------
-	Cmd_StringClear( &deviceInfo->relayOutputsSetParam.token);
+    deviceInfo->relayOutputsSetParam.token.clear();
 	//------------uninit_RelayOutputsSetParam----------
 	//---------------uninit_RelayOutputState-------------
-	Cmd_StringClear( &deviceInfo->relayOutputState.token);
+    deviceInfo->relayOutputState.token.clear();
 	//---------------uninit_RelayOutputState-------------
 	//---------------uninit_ImagingSettings---------------
-	Cmd_StringClear( &deviceInfo->imageConfig.videoSourceToken);
+    deviceInfo->imageConfig.videoSourceToken.clear();
 	//---------------uninit_ImagingSettings---------------
 	//--------------------uninit_Status--------------------
-	Cmd_StringClear( &deviceInfo->focusStatusInfo.videoSourceToken);
-	Cmd_StringClear( &deviceInfo->focusStatusInfo.error);
+    deviceInfo->focusStatusInfo.videoSourceToken.clear();
+    deviceInfo->focusStatusInfo.error.clear();
 	//--------------------uninit_Status--------------------
 	//--------------------uninit_ImagingSettingsOption--------------------
-	Cmd_StringClear( &deviceInfo->imageConfigOption.videoSourceToken);
+    deviceInfo->imageConfigOption.videoSourceToken.clear();
 	//--------------------uninit_ImagingSettingsOption--------------------
 	//--------------------uninit_Move--------------------
-	Cmd_StringClear( &deviceInfo->focusMoveInfo.videoSourceToken);
+    deviceInfo->focusMoveInfo.videoSourceToken.clear();
 	//--------------------uninit_Move--------------------
 	//---------------------------uninit_Stop----------------------------
-	Cmd_StringClear( &deviceInfo->focusStopInfo.videoSourceToken);
+    deviceInfo->focusStopInfo.videoSourceToken.clear();
 	//---------------------------uninit_Stop----------------------------
 	//---------------------------uninit_UserDefinedSettings----------------------------
-	Cmd_StringClear( &deviceInfo->userDefinedSettings.videoSourceToken);
-	Cmd_StringClear( &deviceInfo->userDefinedSettings.uerDefinedData);
+    deviceInfo->userDefinedSettings.videoSourceToken.clear();
+    deviceInfo->userDefinedSettings.uerDefinedData.clear();
 	//---------------------------uninit_UserDefinedSettings----------------------------
 	//--------------uninit_AudioEncConfig---------------
     for (Byte i = 0; i < deviceInfo->audioEncConfig.configListSize; ++i)
 	{
-		Cmd_StringClear( &deviceInfo->audioEncConfig.configList[i].token);
-		Cmd_StringClear( &deviceInfo->audioEncConfig.configList[i].name);
+        deviceInfo->audioEncConfig.configList[i].token.clear();
+        deviceInfo->audioEncConfig.configList[i].name.clear();
 	}
-	User_memory_free(deviceInfo->audioEncConfig.configList);
+    delete [] deviceInfo->audioEncConfig.configList;
 	deviceInfo->audioEncConfig.configList = NULL;
 	deviceInfo->audioEncConfig.configListSize = 0;
 	//--------------uninit_AudioEncConfig---------------
 	//------------uninit_AudioSourceConfig--------------
     for (Byte i = 0; i < deviceInfo->audioSrcConfig.configListSize; ++i)
 	{
-		Cmd_StringClear( &deviceInfo->audioSrcConfig.audioSrcConfigList[i].name);
-		Cmd_StringClear( &deviceInfo->audioSrcConfig.audioSrcConfigList[i].token);
-		Cmd_StringClear( &deviceInfo->audioSrcConfig.audioSrcConfigList[i].sourceToken);
+        deviceInfo->audioSrcConfig.audioSrcConfigList[i].name.clear();
+        deviceInfo->audioSrcConfig.audioSrcConfigList[i].token.clear();
+        deviceInfo->audioSrcConfig.audioSrcConfigList[i].sourceToken.clear();
 	}
-	User_memory_free(deviceInfo->audioSrcConfig.audioSrcConfigList);
+    delete [] deviceInfo->audioSrcConfig.audioSrcConfigList;
 	deviceInfo->audioSrcConfig.audioSrcConfigList = NULL;
 	deviceInfo->audioSrcConfig.configListSize = 0;
 	//------------uninit_AudioSourceConfig--------------
 	//---------------uninit_AudioSources-----------------
     for (Byte i = 0; i < deviceInfo->audioSources.audioSourcesListSize; ++i)
 	{
-		Cmd_StringClear( &deviceInfo->audioSources.audioSourcesList[i].audioSourcesToken);
+        deviceInfo->audioSources.audioSourcesList[i].audioSourcesToken.clear();
 	}
-	User_memory_free(deviceInfo->audioSources.audioSourcesList);
+    delete [] deviceInfo->audioSources.audioSourcesList;
 	deviceInfo->audioSources.audioSourcesList = NULL;
 	deviceInfo->audioSources.audioSourcesListSize = 0;
 	//---------------uninit_AudioSources-----------------
 	//---------------uninit_GuaranteedEncs-----------------
-	Cmd_StringClear( &deviceInfo->guaranteedEncs.configurationToken);
+    deviceInfo->guaranteedEncs.configurationToken.clear();
 	//---------------uninit_GuaranteedEncs-----------------
 	//--------------------uninit_Profiles---------------------
     for (Byte i = 0; i < deviceInfo->mediaProfiles.profilesListSize; ++i)
 	{
-		Cmd_StringClear( &deviceInfo->mediaProfiles.mediaProfilesParam[i].name);
-		Cmd_StringClear( &deviceInfo->mediaProfiles.mediaProfilesParam[i].token);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcName);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcToken);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcSourceToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].name.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].token.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcName.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcToken.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoSrcSourceToken.clear();
 
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcName);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcToken);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcSourceToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcName.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcToken.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioSrcSourceToken.clear();
 
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncName);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncName.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].videoEncToken.clear();
 
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncName);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncName.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioEncToken.clear();
 
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputName);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputToken);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputOutputToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputName.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputToken.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioOutputOutputToken.clear();
 
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecName);
-		Cmd_StringClear(  &deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecToken);
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecName.clear();
+        deviceInfo->mediaProfiles.mediaProfilesParam[i].audioDecToken.clear();
 	}
-	User_memory_free(deviceInfo->mediaProfiles.mediaProfilesParam);
+    delete [] deviceInfo->mediaProfiles.mediaProfilesParam;
 	deviceInfo->mediaProfiles.mediaProfilesParam = NULL;
 	deviceInfo->mediaProfiles.profilesListSize = 0;
 	//--------------------uninit_Profiles---------------------
 	//---------------uninit_VideoEncConfig-----------------
     for (Byte i = 0; i < deviceInfo->videoEncConfig.configListSize; ++i)
 	{
-		Cmd_StringClear(  &deviceInfo->videoEncConfig.configList[i].name);
-		Cmd_StringClear(  &deviceInfo->videoEncConfig.configList[i].token);
+        deviceInfo->videoEncConfig.configList[i].name.clear();
+        deviceInfo->videoEncConfig.configList[i].token.clear();
 	}
-	User_memory_free(deviceInfo->videoEncConfig.configList);
+    delete [] deviceInfo->videoEncConfig.configList;
 	deviceInfo->videoEncConfig.configList = NULL;
 	deviceInfo->videoEncConfig.configListSize = 0;
 	//---------------uninit_VideoEncConfig-----------------
 	//---------------uninit_VideoSrcConfig-----------------
     for (Byte i = 0; i < deviceInfo->videoSrcConfig.configListSize; ++i)
 	{
-		Cmd_StringClear(  &deviceInfo->videoSrcConfig.configList[i].name);
-		Cmd_StringClear(  &deviceInfo->videoSrcConfig.configList[i].token);
-		Cmd_StringClear(  &deviceInfo->videoSrcConfig.configList[i].srcToken);
+        deviceInfo->videoSrcConfig.configList[i].name.clear();
+        deviceInfo->videoSrcConfig.configList[i].token.clear();
+        deviceInfo->videoSrcConfig.configList[i].srcToken.clear();
 	}
-	User_memory_free(deviceInfo->videoSrcConfig.configList);
+    delete [] deviceInfo->videoSrcConfig.configList;
 	deviceInfo->videoSrcConfig.configList = NULL;
 	deviceInfo->videoSrcConfig.configListSize = 0;
 	//---------------uninit_VideoSrcConfig-----------------
 	//------------------uninit_VideoSrc---------------------
     for (Byte i = 0; i < deviceInfo->videoSrc.videoSrcListSize; ++i)
 	{
-		Cmd_StringClear(  &deviceInfo->videoSrc.srcList[i].token);
+        deviceInfo->videoSrc.srcList[i].token.clear();
 	}
-	User_memory_free(deviceInfo->videoSrc.srcList);
+    delete [] deviceInfo->videoSrc.srcList;
 	deviceInfo->videoSrc.srcList = NULL;
 	deviceInfo->videoSrc.videoSrcListSize = 0;
 	//------------------uninit_VideoSrc---------------------
 	//------------------------uninit_VideoSrcConfigOptions---------------------------
-	Cmd_StringClear(  &deviceInfo->videoSrcConfigOptions.videoSrcConfigToken);
-	Cmd_StringClear(  &deviceInfo->videoSrcConfigOptions.profileToken);
+    deviceInfo->videoSrcConfigOptions.videoSrcConfigToken.clear();
+    deviceInfo->videoSrcConfigOptions.profileToken.clear();
     for (Byte i = 0; i < deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize; ++i)
-		Cmd_StringClear( &deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList[i]);
-	User_memory_free(deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList);
+        deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList[i].clear();
+    delete [] deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList;
 	deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableList = NULL;
 	deviceInfo->videoSrcConfigOptions.videoSrcTokensAvailableListSize = 0;
 	//------------------------uninit_VideoSrcConfigOptions---------------------------
 	//------------------------uninit_VideoEncConfigOptions---------------------------
-	Cmd_StringClear(  &deviceInfo->videoEncConfigOptions.videoEncConfigToken);
-	Cmd_StringClear(  &deviceInfo->videoEncConfigOptions.profileToken);
-	User_memory_free( deviceInfo->videoEncConfigOptions.resolutionsAvailableList);
-	User_memory_free( deviceInfo->videoEncConfigOptions.aspectRatioList);
+    deviceInfo->videoEncConfigOptions.videoEncConfigToken.clear();
+    deviceInfo->videoEncConfigOptions.profileToken.clear();
+    delete [] deviceInfo->videoEncConfigOptions.resolutionsAvailableList;
+    delete [] deviceInfo->videoEncConfigOptions.aspectRatioList;
 	deviceInfo->videoEncConfigOptions.resolutionsAvailableList = NULL;
 	deviceInfo->videoEncConfigOptions.aspectRatioList = NULL;
 	deviceInfo->videoEncConfigOptions.resolutionsAvailableListSize = 0;
 	deviceInfo->videoEncConfigOptions.aspectRatioAvailableListSize = 0;
 	//------------------------uninit_VideoEncConfigOptions---------------------------
 	//------------------------uninit_AudioSrcConfigOptions---------------------------
-	Cmd_StringClear(  &deviceInfo->audioSrcConfigOptions.audioSrcConfigToken);
-	Cmd_StringClear(  &deviceInfo->audioSrcConfigOptions.profileToken);
+    deviceInfo->audioSrcConfigOptions.audioSrcConfigToken.clear();
+    deviceInfo->audioSrcConfigOptions.profileToken.clear();
     for (Byte i = 0; i < deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize; ++i)
-        Cmd_StringClear(&deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList[i]);
-	User_memory_free(deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList);
+        deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList[i].clear();
+    delete [] deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList;
 	deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableList = NULL;
 	deviceInfo->audioSrcConfigOptions.audioSrcTokensAvailableListSize = 0;
 	//------------------------uninit_AudioSrcConfigOptions---------------------------
 	//------------------------uninit_AudioEncConfigOptions---------------------------
-	Cmd_StringClear(  &deviceInfo->audioEncConfigOptions.audioEncConfigToken);
-	Cmd_StringClear(  &deviceInfo->audioEncConfigOptions.profileToken);
+    deviceInfo->audioEncConfigOptions.audioEncConfigToken.clear();
+    deviceInfo->audioEncConfigOptions.profileToken.clear();
     for (Byte i = 0; i < deviceInfo->audioEncConfigOptions.configListSize; ++i)
-		User_memory_free(deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList);
-	User_memory_free(deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam);
+        delete [] deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam[i].sampleRateAvailableList;
+    delete [] deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam;
 	deviceInfo->audioEncConfigOptions.audioEncConfigOptionsParam = NULL;
 	deviceInfo->audioEncConfigOptions.configListSize = 0;
 	//------------------------uninit_AudioEncConfigOptions---------------------------
 	//----------uninit_AudioEncConfigSetParam------------
-	Cmd_StringClear(  &deviceInfo->audioEncConfigSetParam.name);
-	Cmd_StringClear(  &deviceInfo->audioEncConfigSetParam.token);
+    deviceInfo->audioEncConfigSetParam.name.clear();
+    deviceInfo->audioEncConfigSetParam.token.clear();
 	//----------uninit_AudioEncConfigSetParam------------
 	//----------uninit_AudioSrcConfigSetParam------------
-	Cmd_StringClear(  &deviceInfo->audioSrcConfigSetParam.name);
-	Cmd_StringClear(  &deviceInfo->audioSrcConfigSetParam.token);
-	Cmd_StringClear(  &deviceInfo->audioSrcConfigSetParam.sourceToken);
+    deviceInfo->audioSrcConfigSetParam.name.clear();
+    deviceInfo->audioSrcConfigSetParam.token.clear();
+    deviceInfo->audioSrcConfigSetParam.sourceToken.clear();
 	//----------uninit_AudioSrcConfigSetParam------------
 	//----------uninit_VideoEncConfigSetParam------------
-	Cmd_StringClear(   &deviceInfo->videoEncConfigSetParam.name);
-	Cmd_StringClear(  &deviceInfo->videoEncConfigSetParam.token);
+    deviceInfo->videoEncConfigSetParam.name.clear();
+    deviceInfo->videoEncConfigSetParam.token.clear();
 	//----------uninit_VideoEncConfigSetParam------------
 	//----------uninit_VideoSrcConfigSetParam------------
-	Cmd_StringClear(  &deviceInfo->videoSrcConfigSetParam.name);
-	Cmd_StringClear(  &deviceInfo->videoSrcConfigSetParam.token);
-	Cmd_StringClear(   &deviceInfo->videoSrcConfigSetParam.srcToken);
+    deviceInfo->videoSrcConfigSetParam.name.clear();
+    deviceInfo->videoSrcConfigSetParam.token.clear();
+    deviceInfo->videoSrcConfigSetParam.srcToken.clear();
 	//----------uninit_VideoSrcConfigSetParam------------
 	//----------------uninit_VideoOSDConfig------------------
-	Cmd_StringClear(  &deviceInfo->videoOSDConfig.videoSrcToken);
-	Cmd_StringClear(  &deviceInfo->videoOSDConfig.text);
+    deviceInfo->videoOSDConfig.videoSrcToken.clear();
+    deviceInfo->videoOSDConfig.text.clear();
 	//----------------uninit_VideoOSDConfig------------------
 	//------------------------uninit_VideoPrivateArea--------------------------
-	Cmd_StringClear(  &deviceInfo->videoPrivateArea.videoSrcToken);
-	User_memory_free(deviceInfo->videoPrivateArea.privateAreaPolygon);
+    deviceInfo->videoPrivateArea.videoSrcToken.clear();
+    delete [] deviceInfo->videoPrivateArea.privateAreaPolygon;
 	deviceInfo->videoPrivateArea.privateAreaPolygon = NULL;
 	deviceInfo->videoPrivateArea.polygonListSize = 0;
 	//------------------------uninit_VideoPrivateArea--------------------------
 	//-------------------uninit_SyncPoint---------------------
-	Cmd_StringClear( &deviceInfo->syncPoint.profileToken);
+    deviceInfo->syncPoint.profileToken.clear();
 	//-------------------uninit_SyncPoint---------------------
 	//------------------------uninit_VideoSrcControl--------------------------
-	Cmd_StringClear( &deviceInfo->videoSrcControl.videoSrcToken);
+    deviceInfo->videoSrcControl.videoSrcToken.clear();
 	//------------------------uninit_VideoSrcControl--------------------------
 	//-------------------uninit_PTZConfig--------------------
     for (Byte i = 0; i < deviceInfo->ptzConfig.PTZConfigListSize; ++i)
 	{
-		Cmd_StringClear(&deviceInfo->ptzConfig.PTZConfigList[i].name);
-		Cmd_StringClear(&deviceInfo->ptzConfig.PTZConfigList[i].token);
-		Cmd_StringClear(&deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken);
+        deviceInfo->ptzConfig.PTZConfigList[i].name.clear();
+        deviceInfo->ptzConfig.PTZConfigList[i].token.clear();
+        deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken.clear();
 	}
-	User_memory_free(deviceInfo->ptzConfig.PTZConfigList);
+    delete [] deviceInfo->ptzConfig.PTZConfigList;
 	deviceInfo->ptzConfig.PTZConfigList = NULL;
 	deviceInfo->ptzConfig.PTZConfigListSize = 0;
 	//-------------------uninit_PTZConfig--------------------
 	//-------------------uninit_PTZStatus---------------------
-	Cmd_StringClear( &deviceInfo->ptzStatus.token);
-	Cmd_StringClear( &deviceInfo->ptzStatus.error);
+    deviceInfo->ptzStatus.token.clear();
+    deviceInfo->ptzStatus.error.clear();
 	//-------------------uninit_PTZStatus---------------------
 	//------------------uninit_PTZPresetsGet---------------------
     for (Byte i = 0; i < deviceInfo->ptzPresetsGet.configListSize; ++i)
 	{
-		Cmd_StringClear( &deviceInfo->ptzPresetsGet.configList[i].presetName);
-		Cmd_StringClear( &deviceInfo->ptzPresetsGet.configList[i].presetToken);
+        deviceInfo->ptzPresetsGet.configList[i].presetName.clear();
+        deviceInfo->ptzPresetsGet.configList[i].presetToken.clear();
 	}
-	User_memory_free(deviceInfo->ptzPresetsGet.configList);
+    delete [] deviceInfo->ptzPresetsGet.configList;
 	deviceInfo->ptzPresetsGet.configList = NULL;
 	deviceInfo->ptzPresetsGet.configListSize = 0;
-	Cmd_StringClear( &deviceInfo->ptzPresetsGet.token);
+    deviceInfo->ptzPresetsGet.token.clear();
 	//------------------uninit_PTZPresetsGet---------------------
 	//-----------------------uninit_PTZPresetsParam--------------------------
-	Cmd_StringClear( &deviceInfo->ptzPresetsSet.token);
-	Cmd_StringClear( &deviceInfo->ptzPresetsSet.presetName);
-	Cmd_StringClear( &deviceInfo->ptzPresetsSet.presetToken);
-	Cmd_StringClear( &deviceInfo->ptzPresetsSet.presetToken_set);
+    deviceInfo->ptzPresetsSet.token.clear();
+    deviceInfo->ptzPresetsSet.presetName.clear();
+    deviceInfo->ptzPresetsSet.presetToken.clear();
+    deviceInfo->ptzPresetsSet.presetToken_set.clear();
 	//-----------------------uninit_PTZPresetsParam--------------------------
 	//----------------uninit_PTZGotoParam-------------------
-	Cmd_StringClear(&deviceInfo->ptzGotoParam.token);
-	Cmd_StringClear(&deviceInfo->ptzGotoParam.presetToken);
+    deviceInfo->ptzGotoParam.token.clear();
+    deviceInfo->ptzGotoParam.presetToken.clear();
 	//----------------uninit_PTZGotoParam-------------------
 	//----------------uninit_PTZRemoveParam----------------
-	Cmd_StringClear(&deviceInfo->ptzRemoveParam.token);
-	Cmd_StringClear(&deviceInfo->ptzRemoveParam.presetToken);
+    deviceInfo->ptzRemoveParam.token.clear();
+    deviceInfo->ptzRemoveParam.presetToken.clear();
 	//----------------uninit_PTZRemoveParam----------------
 	//----------------uninit_PTZAbsoluteMove----------------
-	Cmd_StringClear(&deviceInfo->ptzAbsoluteMove.token);
+    deviceInfo->ptzAbsoluteMove.token.clear();
 	//----------------uninit_PTZAbsoluteMove----------------
 	//----------------------uninit_PTZRelativeMove---------------------
-	Cmd_StringClear(&deviceInfo->ptzRelativeMove.token);
+    deviceInfo->ptzRelativeMove.token.clear();
 	//----------------------uninit_PTZRelativeMove---------------------
 	//----------------uninit_PTZContinuousMove--------------
-	Cmd_StringClear(&deviceInfo->ptzContinuousMove.token);
+    deviceInfo->ptzContinuousMove.token.clear();
 	//----------------uninit_PTZContinuousMove--------------
 	//-----------------uninit_PTZHomePosition----------------
-	Cmd_StringClear( &deviceInfo->ptzHomePosition.token);
+    deviceInfo->ptzHomePosition.token.clear();
 	//-----------------uninit_PTZHomePosition----------------
 	//----------------------uninit_PTZStop---------------------
-	Cmd_StringClear( &deviceInfo->ptzStop.token);
+    deviceInfo->ptzStop.token.clear();
 	//----------------------uninit_PTZStop---------------------
 	//-----------------uninit_SupportedRules-----------------
-	User_memory_free(deviceInfo->supportedRules.ruleType);
+    delete [] deviceInfo->supportedRules.ruleType;
 	//-----------------uninit_SupportedRules-----------------
 	//------------------------init_DeleteRule--------------------------
-	Cmd_StringClear(&deviceInfo->deleteRule.ruleToken);
+    deviceInfo->deleteRule.ruleToken.clear();
 	//------------------------init_DeleteRule--------------------------
 	//--------------------uninit_totalRule----------------------
-	Cmd_StringClear(   &deviceInfo->totalRule.ruleToken);
-	Cmd_StringClear(   &deviceInfo->totalRule.ruleName);
-	Cmd_StringClear(   &deviceInfo->totalRule.videoSrcToken);
+    deviceInfo->totalRule.ruleToken.clear();
+    deviceInfo->totalRule.ruleName.clear();
+    deviceInfo->totalRule.videoSrcToken.clear();
 	if(deviceInfo->totalRule.type == 0x10)
 	{
 		ptrRule_LineDetector = (Rule_LineDetector*) deviceInfo->totalRule.rule;
-		User_memory_free( ptrRule_LineDetector->detectPolygon);
-		User_memory_free( ptrRule_LineDetector);
+        delete [] ptrRule_LineDetector->detectPolygon;
+        delete [] ptrRule_LineDetector;
 		deviceInfo->totalRule.type = 0x00;
 		deviceInfo->totalRule.rule = NULL;
 		ptrRule_LineDetector = NULL;
 	}else if(deviceInfo->totalRule.type == 0x11)
 	{
 		ptrRule_FieldDetector = (Rule_FieldDetector*) deviceInfo->totalRule.rule;
-		User_memory_free( ptrRule_FieldDetector->detectPolygon);
-		User_memory_free( ptrRule_FieldDetector);
+        delete [] ptrRule_FieldDetector->detectPolygon;
+        delete [] ptrRule_FieldDetector;
 		deviceInfo->totalRule.type = 0x00;
 		deviceInfo->totalRule.rule = NULL;
 		ptrRule_FieldDetector = NULL;
 	}else if(deviceInfo->totalRule.type == 0x12)
 	{
 		ptrRule_MotionDetector = (Rule_MotionDetector*) deviceInfo->totalRule.rule;
-		User_memory_free( ptrRule_MotionDetector->detectPolygon);
-		User_memory_free( ptrRule_MotionDetector);
+        delete [] ptrRule_MotionDetector->detectPolygon;
+        delete [] ptrRule_MotionDetector;
 		deviceInfo->totalRule.type = 0x00;
 		deviceInfo->totalRule.rule = NULL;
 		ptrRule_MotionDetector = NULL;
 	}else if(deviceInfo->totalRule.type == 0x13)
 	{
 		ptrRule_Counting = (Rule_Counting*) deviceInfo->totalRule.rule;
-		User_memory_free( ptrRule_Counting->detectPolygon);
-		User_memory_free( ptrRule_Counting);
+        delete [] ptrRule_Counting->detectPolygon;
+        delete [] ptrRule_Counting;
 		deviceInfo->totalRule.type = 0x00;
 		deviceInfo->totalRule.rule = NULL;
 		ptrRule_Counting = NULL;
 	}else if(deviceInfo->totalRule.type == 0x14)
 	{
 		ptrRule_CellMotion = (Rule_CellMotion*) deviceInfo->totalRule.rule;
-		Cmd_StringClear(&ptrRule_CellMotion->activeCells);
-		User_memory_free( ptrRule_CellMotion);
+        ptrRule_CellMotion->activeCells.clear();
+        delete [] ptrRule_CellMotion;
 		deviceInfo->totalRule.type = 0x00;
 		deviceInfo->totalRule.rule = NULL;
 		ptrRule_CellMotion = NULL;
@@ -1387,9 +1385,9 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 	{
 		if((deviceInfo->ruleList.totalRuleList[i].type >= 0x10) && (deviceInfo->ruleList.totalRuleList[i].type <= 0x14))
 		{
-			Cmd_StringClear(&deviceInfo->ruleList.totalRuleList[i].ruleName);
-			Cmd_StringClear(&deviceInfo->ruleList.totalRuleList[i].ruleToken);
-			Cmd_StringClear(&deviceInfo->ruleList.totalRuleList[i].videoSrcToken);
+            deviceInfo->ruleList.totalRuleList[i].ruleName.clear();
+            deviceInfo->ruleList.totalRuleList[i].ruleToken.clear();
+            deviceInfo->ruleList.totalRuleList[i].videoSrcToken.clear();
 		}else{
 			continue;
 		}
@@ -1397,68 +1395,67 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 		if(deviceInfo->ruleList.totalRuleList[i].type == 0x10)
 		{
 			ptrRule_LineDetector = (Rule_LineDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
-			User_memory_free( ptrRule_LineDetector->detectPolygon);
+            delete [] ptrRule_LineDetector->detectPolygon;
 			ptrRule_LineDetector->detectPolygon = NULL;
-			User_memory_free( ptrRule_LineDetector);
+            delete [] ptrRule_LineDetector;
 			deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 			deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 			ptrRule_LineDetector = NULL;
 		}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x11)
 		{
 			ptrRule_FieldDetector = (Rule_FieldDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
-			User_memory_free( ptrRule_FieldDetector->detectPolygon);
+            delete [] ptrRule_FieldDetector->detectPolygon;
 			ptrRule_FieldDetector->detectPolygon = NULL;
-			User_memory_free( ptrRule_FieldDetector);
+            delete [] ptrRule_FieldDetector;
 			deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 			deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 			ptrRule_FieldDetector = NULL;
 		}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x12)
 		{
 			ptrRule_MotionDetector = (Rule_MotionDetector*) deviceInfo->ruleList.totalRuleList[i].rule;
-			User_memory_free( ptrRule_MotionDetector->detectPolygon);
+            delete [] ptrRule_MotionDetector->detectPolygon;
 			ptrRule_MotionDetector->detectPolygon = NULL;
-			User_memory_free( ptrRule_MotionDetector);
+            delete [] ptrRule_MotionDetector;
 			deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 			deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 			ptrRule_MotionDetector = NULL;
 		}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x13)
 		{
 			ptrRule_Counting = (Rule_Counting*) deviceInfo->ruleList.totalRuleList[i].rule;
-			User_memory_free( ptrRule_Counting->detectPolygon);
+            delete [] ptrRule_Counting->detectPolygon;
 			ptrRule_Counting->detectPolygon = NULL;
-			User_memory_free( ptrRule_Counting);
+            delete [] ptrRule_Counting;
 			deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 			deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 			ptrRule_Counting = NULL;
 		}else if(deviceInfo->ruleList.totalRuleList[i].type == 0x14)
 		{
 			ptrRule_CellMotion = (Rule_CellMotion*) deviceInfo->ruleList.totalRuleList[i].rule;
-			Cmd_StringClear(&ptrRule_CellMotion->activeCells);
-			User_memory_free( ptrRule_CellMotion);
+            ptrRule_CellMotion->activeCells.clear();
+            delete [] ptrRule_CellMotion;
 			deviceInfo->ruleList.totalRuleList[i].type = 0x00;
 			deviceInfo->ruleList.totalRuleList[i].rule = NULL;
 			ptrRule_CellMotion = NULL;
 		}
 	}
-	User_memory_free(deviceInfo->ruleList.totalRuleList);
+    delete [] deviceInfo->ruleList.totalRuleList;
 	deviceInfo->ruleList.totalRuleList = NULL;
 
 	//-------------------uninit_ruleList----------------------
 	//--------------uninit_MetaDataStream-----------------
 	//*************uninit_metadata_Event*************
-	Cmd_StringClear( &deviceInfo->metadataStreamInfo.metadata_Event.ruleToken);
-	Cmd_StringClear( &deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken);
+    deviceInfo->metadataStreamInfo.metadata_Event.ruleToken.clear();
+    deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.clear();
 	//*************uninit_metadata_Event*************
-	Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Device.textInformation);
+    deviceInfo->metadataStreamInfo.metadata_Device.textInformation.clear();
     for (Byte i = 0; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; ++i)
-		Cmd_StringClear(&deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken);
-	User_memory_free(deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList);
+        deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken.clear();
+    delete [] deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList;
 	deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList = NULL;
 	deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize = 0;
 	//--------------uninit_MetaDataStream-----------------
 }
 
-//*******************User Define UnInit********************
 
 #if USER_REPLY
 
@@ -1467,9 +1464,7 @@ void User_Host_uninit(RCHostInfo* deviceInfo)
 
 void User_getGeneralReply(RCHostInfo* /*deviceInfo*/, Word command)
 {
-	printf("=== Cmd=0x%04x: ===\n\n", command);
-	printf("\n >>>Set Command OK <<<!!!!\n\n");
-	printf("=== Cmd=0x%04x: ===\n\n", command);
+    printf("[RC] cmd 0x%04x OK!\n", command);
 }
 
 #if 0

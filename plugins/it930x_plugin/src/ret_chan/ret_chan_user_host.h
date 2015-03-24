@@ -3,9 +3,6 @@
 
 #include "ret_chan_cmd_host.h"
 
-void User_Host_init(RCHostInfo* deviceInfo);
-void User_Host_uninit(RCHostInfo* deviceInfo);
-
 //*******************User Define Reply********************
 
 //--------------------------General-------------------------------

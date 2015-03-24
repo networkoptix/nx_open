@@ -140,6 +140,14 @@ namespace ite
 
         static std::string id2str(unsigned id);
 
+        // Encoder stuff
+
+        // TODO: getResolutions(), setResolution()
+
+        bool getMaxBitrate(unsigned streamNo, int& maxBitrate);
+        bool setBitrate(unsigned streamNo, int& bitrateKbps);
+        bool setFramerate(unsigned streamNo, float& fps);
+
         // TX stuff
 
         void setTx(unsigned channel, uint16_t txID = 0)
