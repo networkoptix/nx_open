@@ -11,16 +11,32 @@
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/app_info.h"
 #include "api/runtime_info_manager.h"
+#include "api/app_server_connection.h"
+#include "nx_ec/dummy_handler.h"
 
 namespace {
     const int pingTimeout = 15 * 1000;
     const int checkInterval = 3000;
     const int noticeableConflictCount = 5;
+
+    bool isLocalAddress(const HostAddress &address) {
+        if (address.toString().isNull())
+            return false;
+
+        quint8 hi = address.ipv4() >> 24;
+
+        return address == HostAddress::localhost || hi == 10 || hi == 192 || hi == 172;
+    }
+
+    bool isBetterAddress(const HostAddress &address, const HostAddress &other) {
+        return !isLocalAddress(other) && isLocalAddress(address);
+    }
 }
 
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_elapsedTimer(),
     m_timer(new QTimer(this)),
+    m_clientOnly(clientOnly),
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_helper(new QnDirectModuleFinderHelper(this))
@@ -142,8 +158,9 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             return;
         }
 
-        foreach (const QString &address, item.addresses)
-            removeAddress(SocketAddress(address, item.moduleInformation.port), true);
+        item.primaryAddress = SocketAddress();
+        foreach (const SocketAddress &address, item.addresses)
+            removeAddress(address, true);
     }
 
     if (item.moduleInformation != moduleInformation) {
@@ -151,19 +168,31 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         emit moduleChanged(moduleInformation);
 
         if (item.moduleInformation.port != moduleInformation.port) {
-            foreach (const QString &address, item.addresses)
-                removeAddress(SocketAddress(address, item.moduleInformation.port), true);
+            item.primaryAddress = SocketAddress();
+            foreach (const SocketAddress &address, item.addresses) {
+                if (address.port == item.moduleInformation.port)
+                    removeAddress(address, true);
+            }
         }
 
         item.moduleInformation = moduleInformation;
+        if (item.primaryAddress.port == 0)
+            item.primaryAddress = address;
+
+        sendModuleInformation(moduleInformation, address, true);
     }
 
     item.lastResponse = currentTime;
 
     int count = item.addresses.size();
-    item.addresses.insert(address.address.toString());
+    item.addresses.insert(address);
     m_idByAddress[address] = moduleInformation.id;
     if (count < item.addresses.size()) {
+        if (isBetterAddress(address.address, item.primaryAddress.address)) {
+            item.primaryAddress = address;
+            sendModuleInformation(moduleInformation, address, true);
+        }
+
         NX_LOG(lit("QnModuleFinder: New module URL: %1 %2")
                .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
 
@@ -186,8 +215,12 @@ void QnModuleFinder::at_timer_timeout() {
         removeAddress(address, false);
 }
 
-QSet<QString> QnModuleFinder::moduleAddresses(const QnUuid &id) const {
+QSet<SocketAddress> QnModuleFinder::moduleAddresses(const QnUuid &id) const {
     return m_moduleItemById.value(id).addresses;
+}
+
+SocketAddress QnModuleFinder::primaryAddress(const QnUuid &id) const {
+    return m_moduleItemById.value(id).primaryAddress;
 }
 
 void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem) {
@@ -199,7 +232,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem) 
     if (it == m_moduleItemById.end())
         return;
 
-    if (!it->addresses.remove(address.address.toString()))
+    if (!it->addresses.remove(address))
         return;
 
     QnModuleInformation &moduleInformation = it->moduleInformation;
@@ -208,12 +241,27 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem) 
            .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG1);
     emit moduleAddressLost(moduleInformation, address);
 
-    if (!it->addresses.isEmpty())
+    if (!it->addresses.isEmpty()) {
+        if (it->primaryAddress == address) {
+            it->primaryAddress.port = 0;
+            for (const SocketAddress &address: it->addresses) {
+                if (isLocalAddress(address.address)) {
+                    it->primaryAddress = address;
+                    break;
+                }
+            }
+            if (it->primaryAddress.port == 0)
+                it->primaryAddress = *it->addresses.cbegin();
+            sendModuleInformation(moduleInformation, it->primaryAddress, true);
+        }
+
         return;
+    }
 
     NX_LOG(lit("QnModuleFinder: Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
 
     QnModuleInformation moduleInformationCopy = moduleInformation;
+    SocketAddress primaryAddress = it->primaryAddress;
 
     if (holdItem)
         moduleInformation.id = QnUuid();
@@ -221,6 +269,8 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem) 
         m_moduleItemById.erase(it);
 
     emit moduleLost(moduleInformationCopy);
+
+    sendModuleInformation(moduleInformationCopy, primaryAddress, false);
 }
 
 void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
@@ -239,4 +289,16 @@ void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInforma
 
     if (m_selfConflictCount >= noticeableConflictCount && m_selfConflictCount % noticeableConflictCount == 0)
         emit moduleConflict(moduleInformation, address);
+}
+
+void QnModuleFinder::sendModuleInformation(const QnModuleInformation &moduleInformation, const SocketAddress &address, bool isAlive) {
+    if (m_clientOnly)
+        return;
+
+    QnModuleInformationWithAddresses moduleInformationWithAddresses(moduleInformation);
+    moduleInformationWithAddresses.remoteAddresses.insert(address.address.toString());
+    moduleInformationWithAddresses.port = address.port;
+    QnAppServerConnectionFactory::getConnection2()->getMiscManager()->sendModuleInformation(
+                std::move(moduleInformationWithAddresses), isAlive,
+                ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }

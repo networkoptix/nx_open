@@ -52,11 +52,11 @@ void QnServerConnector::at_moduleFinder_moduleAddressLost(const QnModuleInformat
 
 void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     if (moduleInformation.isCompatibleToCurrentSystem()) {
-        for (const QString &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
-            addConnection(moduleInformation, SocketAddress(address, moduleInformation.port));
+        for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
+            addConnection(moduleInformation, address);
     } else {
-        for (const QString &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
-            removeConnection(moduleInformation, SocketAddress(address, moduleInformation.port));
+        for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
+            removeConnection(moduleInformation, address);
     }
 }
 
@@ -112,8 +112,8 @@ void QnServerConnector::start() {
         if (!moduleInformation.isCompatibleToCurrentSystem())
             continue;
 
-        for (const QString &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
-            addConnection(moduleInformation, SocketAddress(address, moduleInformation.port));
+        for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
+            addConnection(moduleInformation, address);
     }
 }
 

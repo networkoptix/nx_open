@@ -43,6 +43,6 @@ struct QnModuleInformationWithAddresses : QnModuleInformation {
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(metatype)(eq))
 
-QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformationWithAddresses, (xml)(json)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformationWithAddresses, (ubjson)(xml)(json)(metatype)(eq))
 
 #endif // MODULE_INFORMATION_H

@@ -11,7 +11,6 @@
 #include <update/task/wait_compatible_servers_peer_task.h>
 #include <update/media_server_update_tool.h>
 
-#include <utils/network/global_module_finder.h>
 #include <utils/common/software_version.h>
 
 

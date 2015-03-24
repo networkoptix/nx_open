@@ -242,6 +242,13 @@ namespace ec2
             transactionLog->setTransactionLogTime(value);
     }
 
+    template<class T>
+    QnUuid ec2::BaseEc2Connection<T>::routeToPeerVia(const QnUuid& dstPeer) const
+    {
+        return qnTransactionBus ? qnTransactionBus->routeToPeerVia(dstPeer) : QnUuid();
+    }
+
+
 
     template class BaseEc2Connection<FixedUrlClientQueryProcessor>;
     template class BaseEc2Connection<ServerQueryProcessor>;

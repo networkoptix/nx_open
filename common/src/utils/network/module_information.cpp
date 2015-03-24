@@ -37,4 +37,4 @@ void QnModuleInformation::fixRuntimeId()
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(eq), QnModuleInformation_Fields)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformationWithAddresses, (xml)(json)(eq), QnModuleInformationWithAddresses_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformationWithAddresses, (ubjson)(xml)(json)(eq), QnModuleInformationWithAddresses_Fields)
