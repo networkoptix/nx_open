@@ -498,7 +498,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         QMutexLocker lock(&m_mutexStorages);
         m_storagesStatisticsReady = false;
     
-        NX_LOG(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getPath()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+        NX_LOG(QString("Adding storage. Path: %1").arg(storage->getPath()), cl_logINFO);
 
         removeStorage(storage); // remove existing storage record if exists
         //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
@@ -961,6 +961,9 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 {
     //QMutexLocker lock(&m_mutexStorages);
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
+        NX_LOG(QString("Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB").
+            arg(fileStorage->getPath()).arg(fileStorage->getSpaceLimit() / 1024 / 1024).arg(fileStorage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+
         // add data before storage goes to the writable state
         doMigrateCSVCatalog(fileStorage);
         addDataFromDatabase(fileStorage);
