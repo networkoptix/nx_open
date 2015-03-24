@@ -5,6 +5,7 @@
 #include <utils/common/warnings.h>
 #include <utils/serialization/json_functions.h>
 #include <core/resource/camera_resource.h>
+#include "utils/match/wildcard.h"
 
 struct QnResourceDataPoolChunk {
     QList<QString> keys;
@@ -52,15 +53,16 @@ QnResourceData QnResourceDataPool::data(const QnSecurityCamResourcePtr &camera) 
     QnResourceData result;
     if (!m_cachedResultByKey.contains(key1)) {
         for(auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr) {
-            QRegExp regExpr(itr.key(), Qt::CaseInsensitive, QRegExp::Wildcard);
-            if (regExpr.exactMatch(key1))
+			if (wildcardMatch(itr.key(), key1))
                 result.add(itr.value());
         }
         m_cachedResultByKey.insert(key1, result);
     } else {
         result = m_cachedResultByKey[key1];
     }
-    result.add(m_dataByKey.value(key1 + lit("|") + camera->getFirmware().toLower()));
+    auto additionData = m_dataByKey.find(key1 + lit("|") + camera->getFirmware().toLower());
+    if (additionData != m_dataByKey.end())
+        result.add(additionData.value());
     return result;
 }
 

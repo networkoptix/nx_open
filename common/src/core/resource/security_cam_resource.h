@@ -306,9 +306,8 @@ private:
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
-
+    mutable Qn::LicenseType m_cachedLicenseType;
     Qn::MotionTypes calculateSupportedMotionType() const;
-    Qn::MotionType calculateMotionType() const;
 
 private slots:
     void atResourceChanged();
