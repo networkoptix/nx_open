@@ -301,6 +301,8 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
 
     remoteAddr.setQuery(q);
     m_remoteAddr = remoteAddr;
+    m_httpClient->removeAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME );
+    m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
     if (!m_httpClient->doGet(remoteAddr)) {
         qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
         setState(Error);
@@ -367,6 +369,8 @@ void QnTransactionTransport::connectDone(const QnUuid& id)
 
 void QnTransactionTransport::repeatDoGet()
 {
+    m_httpClient->removeAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME );
+    m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
     if (!m_httpClient->doGet(m_remoteAddr))
         cancelConnecting();
 }
