@@ -59,7 +59,7 @@ void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, qint64 onscreenDateOf
 
 bool QnImageFilterHelper::isEmpty() const
 {
-    if (m_customAR)
+    if (!qFuzzyIsNull(m_customAR))
         return false;
     if (m_layout && m_layout->channelCount() > 1)
         return false;
@@ -89,7 +89,7 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
 {
     QList<QnAbstractImageFilterPtr> result;
 
-    if (m_customAR != 0.0) {
+    if (!qFuzzyIsNull(m_customAR)) {
         QSize newSize;
         newSize.setHeight(srcResolution.height());
         newSize.setWidth(srcResolution.height() * m_customAR + 0.5);
