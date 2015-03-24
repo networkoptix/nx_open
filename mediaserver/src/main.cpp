@@ -519,29 +519,6 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
         }
     }
 
-    qint64 bigStorageThreshold = 0;
-    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages()) {
-        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
-        if (!storage)
-            continue;
-        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
-        bigStorageThreshold = qMax(bigStorageThreshold, available);
-    }
-    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
-
-    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages()) {
-        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
-        if (!storage)
-            continue;
-        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
-        if (available < bigStorageThreshold) {
-            if (storage->isUsedForWriting()) {
-                storage->setUsedForWriting(false);
-                result.insert(storage->getId(), storage);
-                qWarning() << "Disable writing to storage" << storage->getPath() << "because of low storage size";
-            }
-        }
-    }
     return result.values();
 }
 

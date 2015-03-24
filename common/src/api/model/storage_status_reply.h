@@ -7,6 +7,7 @@
 #include <utils/common/id.h>
 
 struct QnStorageSpaceData {
+    QnStorageSpaceData() : totalSpace(-1), freeSpace(-1), reservedSpace(0), isExternal(false), isWritable(false), isUsedForWriting(false) {}
     QString url;
     QnUuid storageId;
     qint64 totalSpace;
