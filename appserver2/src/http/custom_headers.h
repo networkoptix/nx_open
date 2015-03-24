@@ -12,6 +12,7 @@
 namespace nx_ec
 {
     static const QByteArray EC2_SYSTEM_NAME_HEADER_NAME = "NX-EC-SYSTEM-NAME";
+    static const QByteArray EC2_CONNECTION_STATE_HEADER_NAME = "NX-EC-SYSTEM-NAME";
 }
 
 #endif  //CUSTOM_HEADERS_H
