@@ -171,6 +171,8 @@ public:
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
         }
+        m_owner->testStoragesDone();
+
     }
 private:
     QnStorageManager* m_owner;
@@ -190,7 +192,8 @@ QnStorageManager::QnStorageManager():
     m_warnSended(false),
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
-    m_rebuildArchiveThread(0)
+    m_rebuildArchiveThread(0),
+    m_firstStorageTestDone(false)
 {
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
@@ -957,6 +960,11 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
+void QnStorageManager::testStoragesDone()
+{
+    m_firstStorageTestDone = true;
+}
+
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
     //QMutexLocker lock(&m_mutexStorages);
@@ -1069,8 +1077,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
     }
     else {
-        qDebug() << "No storage available for recording";
-        if (!m_warnSended) {
+        if (!m_warnSended && m_firstStorageTestDone) {
+            qWarning() << "No storage available for recording";
             emit noStoragesAvailable();
             m_warnSended = true;
         }

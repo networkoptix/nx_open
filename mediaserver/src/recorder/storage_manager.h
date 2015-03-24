@@ -151,6 +151,7 @@ private:
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
+    void testStoragesDone();
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
@@ -189,6 +190,7 @@ private:
     mutable QMutex m_sdbMutex;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
     mutable QMutex m_csvMigrationMutex;
+    bool m_firstStorageTestDone;
 };
 
 #define qnStorageMan QnStorageManager::instance()
