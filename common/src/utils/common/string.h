@@ -42,7 +42,7 @@ inline QString replaceNonFileNameCharacters(const QString &string, const QChar &
  * \returns                             Return string dateTime suggestion for saving dialogs
  */
 inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
-    return dt.toString(lit("yyyy-MMM-dd_hh.mm.ss"));
+    return dt.toString(lit("yyyy-MMM-dd_hh_mm_ss"));
 }
 
 /**
@@ -78,5 +78,6 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
 
 void trimInPlace( QString* const str, const QString& symbols = QLatin1String(" ") );
 
+QString htmlBold(const QString &source);
 
 #endif // QN_STRING_H

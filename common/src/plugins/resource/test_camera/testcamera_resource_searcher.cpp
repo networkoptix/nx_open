@@ -48,7 +48,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
     for (const DiscoveryInfo& info: m_sockList)
-        info.sock->sendTo(TestCamConst::TEST_CAMERA_FIND_MSG, strlen(TestCamConst::TEST_CAMERA_FIND_MSG), BROADCAST_ADDRESS, TestCamConst::DISCOVERY_PORT);
+        info.sock->sendTo(TestCamConst::TEST_CAMERA_FIND_MSG, static_cast<unsigned int>(strlen(TestCamConst::TEST_CAMERA_FIND_MSG)), BROADCAST_ADDRESS, TestCamConst::DISCOVERY_PORT);
 }
 
 QnResourceList QnTestCameraResourceSearcher::findResources(void)
@@ -71,10 +71,8 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
             QByteArray responseData;
             responseData.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-
-            QString sender;
-            quint16 senderPort;
-            int readed = sock->recvFrom(responseData.data(), responseData.size(), sender, senderPort);
+            SocketAddress remoteEndpoint;
+            int readed = sock->recvFrom(responseData.data(), responseData.size(), &remoteEndpoint);
             if (readed < 1)
                 continue;
             QList<QByteArray> params = responseData.left(readed).split(';');
@@ -102,7 +100,9 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 processedMac << mac;
 
                 resource->setMAC(QnMacAddress(mac));
-                resource->setUrl(QLatin1String("tcp://") + sender + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]));
+                resource->setUrl(
+                    QLatin1String("tcp://") + remoteEndpoint.address.toString() + QLatin1Char(':') +
+                    QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]) );
                 resources.insert(mac, resource);
             }
         }

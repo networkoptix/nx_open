@@ -58,6 +58,7 @@ Qn::ResourceStatus QnAbstractArchiveResource::getStatus() const
 
 void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
+    Q_UNUSED(silenceMode)
     m_localStatus = newStatus;
 }
 

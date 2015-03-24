@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <map>
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
@@ -19,6 +21,14 @@ static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
 //#define DESIRED_SECOND_STREAM_FPS (7)
 //#define MIN_SECOND_STREAM_FPS (2)
 
+class QnLiveStreamProvider;
+
+class QnAbstractVideoCamera
+{
+public:
+    virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() = 0;
+    virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() = 0;
+};
 
 class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
 {
@@ -66,6 +76,8 @@ public:
     virtual bool isCameraControlRequired() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
     void updateSoftwareMotionStreamNum();
+
+    void setOwner(QnAbstractVideoCamera* owner);
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -110,8 +122,17 @@ private:
     int m_framesSincePrevMediaStreamCheck;
 
     void updateStreamResolution( int channelNumber, const QSize& newResolution );
-    void extractCodedPictureResolution( const QnCompressedVideoDataPtr& videoData, QSize* const newResolution );
+    void extractMediaStreamParams(
+        const QnCompressedVideoDataPtr& videoData,
+        QSize* const newResolution,
+        std::map<QString, QString>* const customStreamParams = nullptr );
     void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
+    void extractSpsPps(
+        const QnCompressedVideoDataPtr& videoData,
+        std::map<QString, QString>* const customStreamParams );
+
+private:
+    QnAbstractVideoCamera* m_owner;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

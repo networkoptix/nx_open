@@ -15,17 +15,10 @@
  */
 class QnNetworkProxyFactory : public QNetworkProxyFactory, public Singleton<QnNetworkProxyFactory> {
 public:
-    enum WhereToPlaceProxyCredentials {
-        noCredentials,
-        placeCredentialsToUrl,
-        placeCredentialsToHttpMessage
-    };
-
     QnNetworkProxyFactory();
     virtual ~QnNetworkProxyFactory();
 
-    QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource,
-                       WhereToPlaceProxyCredentials credentialsBehavior = placeCredentialsToUrl);
+    QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName = QString());
 
     QNetworkProxy proxyToResource(const QnResourcePtr &resource);
 

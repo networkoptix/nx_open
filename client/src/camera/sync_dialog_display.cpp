@@ -67,11 +67,11 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (reader)
         m_reader = reader;
 
-    QnEmptyMediaDataPtr eofPacket = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
+    QnEmptyMediaDataPtr eofPacket = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
     
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-    QnCompressedAudioDataPtr audio = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
+    QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
+    QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
+    QnCompressedAudioDataPtr audio = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
     if (m_prevSpeed != m_speed) 
     {
         processNewSpeed(m_speed);
@@ -100,7 +100,8 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         // update digest from current frame
         if (media && media->dataSize() > 4) {
             const quint8* data = (const quint8*) media->data();
-            QnSignHelper::updateDigest(media->context->ctx(), m_mdctx, data, media->dataSize());
+            AVCodecContext* avCtx = media->context ? media->context->ctx() : 0;
+            QnSignHelper::updateDigest(avCtx, m_mdctx, data, media->dataSize());
         }
 #else
         // update digest from previous frames because of last frame it is sign frame itself

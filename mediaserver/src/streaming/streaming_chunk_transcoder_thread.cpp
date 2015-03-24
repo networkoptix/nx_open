@@ -174,7 +174,7 @@ void StreamingChunkTranscoderThread::run()
             continue;
         }
 
-        QnAbstractMediaDataPtr srcMediaData = srcPacket.dynamicCast<QnAbstractMediaData>();
+        QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
         Q_ASSERT( srcMediaData );
 
         QnByteArray resultStream( 1, RESERVED_TRANSCODED_PACKET_SIZE );

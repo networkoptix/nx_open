@@ -249,7 +249,7 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
 void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageSize, int plane, qreal aspectRatio)
 {
     qreal kx = 2.0*tan(m_itemDewarping.fov/2.0);
-    qreal ky = kx/aspectRatio;
+    // qreal ky = kx/aspectRatio;
 
     float fovRot = sin(m_itemDewarping.xAngle)*qDegreesToRadians(m_mediaDewarping.fovRot);
     qreal xShift, yShift, yPos;

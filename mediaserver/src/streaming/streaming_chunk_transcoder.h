@@ -14,7 +14,6 @@
 #include <QtCore/QThread>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
-#include <core/resource/media_resource.h>
 #include <streaming/ondemand_media_data_provider.h>
 #include <utils/common/timermanager.h>
 

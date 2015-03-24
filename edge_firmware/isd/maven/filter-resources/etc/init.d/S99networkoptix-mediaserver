@@ -25,6 +25,12 @@ start() {
        return 0
     fi
 
+    grep "$STORAGE_PATH" /proc/mounts &> /dev/null
+    if [ $? -ne 0 ] || [ ! -d "$STORAGE_PATH" ]; then
+        echo "SD card not inserted"
+        return 1
+    fi
+
     touch $STORAGE_PATH 2>/dev/null 1>&2
     if [ $? -ne 0 ]; then
         #echo "RO"
@@ -99,6 +105,12 @@ case "$1" in
         ;;
 
     start_console)
+        grep "$STORAGE_PATH" /proc/mounts &> /dev/null
+        if [ $? -ne 0 ] || [ ! -d "$STORAGE_PATH" ]; then
+            echo "SD card not inserted"
+            return 1
+        fi
+
         $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=$LOG_LEVEL --msg-log-level=$HTTP_LOG_LEVEL
         ;;
 

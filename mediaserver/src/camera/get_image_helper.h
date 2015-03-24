@@ -1,11 +1,11 @@
 #ifndef __GET_IMAGE_HELPER_H__
 #define __GET_IMAGE_HELPER_H__
 
-#include "core/resource/camera_resource.h"
 #include <QByteArray>
 
+#include <core/resource/resource_fwd.h>
+
 class CLVideoDecoderOutput;
-class QnVirtualCameraResource;
 class QnServerArchiveDelegate;
 
 class QnGetImageHelper

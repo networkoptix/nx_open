@@ -20,6 +20,7 @@ QnActiResourceSearcher::QnActiResourceSearcher():
     QObject(), QnUpnpResourceSearcher()
 {
     QnMdnsListener::instance()->registerConsumer((long) this);
+    m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
 }
 
 QnActiResourceSearcher::~QnActiResourceSearcher()
@@ -142,9 +143,9 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     QString devUrl = QString(lit("http://%1:%2")).arg(url.host()).arg(url.port(80));
     CashedDevInfo devInfo = m_cashedDevInfo.value(devUrl);
 
-    QnMacAddress cameraMAC;
     if (devInfo.info.presentationUrl.isEmpty() || devInfo.timer.elapsed() > CACHE_UPDATE_TIME)
     {
+        QnMacAddress cameraMAC;
         CLHttpStatus status;
         QByteArray serverReport = actiRes->makeActiRequest(QLatin1String("system"), QLatin1String("SYSTEM_INFO"), status, true);
         if (status != CL_HTTP_SUCCESS)
@@ -167,7 +168,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         devInfo.timer.restart();
         m_cashedDevInfo[devUrl] = devInfo;
     }
-    createResource( devInfo.info, cameraMAC, auth, result );
+    createResource( devInfo.info, QnMacAddress(devInfo.info.serialNumber), auth, result );
 
     return result;
 }
@@ -181,7 +182,7 @@ static QString serialNumberToPhysicalID( const QString& serialNumber )
 
 void QnActiResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
-    const QString& /*host*/,
+    const HostAddress& /*host*/,
     const UpnpDeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/,
     const QAuthenticator& auth,
@@ -222,13 +223,12 @@ void QnActiResourceSearcher::createResource(
     const QAuthenticator& auth,
     QnResourceList& result )
 {
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
-    if (rt.isNull())
+    if (m_resTypeId.isNull())
         return;
 
     QnActiResourcePtr resource( new QnActiResource() );
 
-    resource->setTypeId(rt);
+    resource->setTypeId(m_resTypeId);
     resource->setName(QString(QLatin1String("ACTi-")) + devInfo.modelName);
     resource->setModel(devInfo.modelName);
     resource->setUrl(devInfo.presentationUrl);

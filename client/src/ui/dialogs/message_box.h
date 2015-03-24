@@ -30,6 +30,8 @@ public:
      */
     QPushButton *addCustomButton(const QString &text, QMessageBox::ButtonRole role);
 
+    virtual int exec() override;
+
 signals:
     void defaultButtonClicked(QAbstractButton* button);
 

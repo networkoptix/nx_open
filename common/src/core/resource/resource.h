@@ -235,7 +235,7 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(const QSharedPointer<QnResourceCommand> &command);
+    static void addCommandToProc(const QnResourceCommandPtr &command);
     static int commandProcQueueSize();
 #endif
 
@@ -352,7 +352,6 @@ private:
     bool m_initialized;    
     QMutex m_initAsyncMutex;
 
-    static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
     CameraDiagnostics::Result m_prevInitializationResult;
     CameraDiagnostics::Result m_lastMediaIssue;
@@ -360,6 +359,7 @@ private:
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
     bool m_removedFromPool;
+    bool m_initInProgress;
 };
 
 template<class Resource>

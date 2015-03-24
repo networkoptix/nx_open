@@ -313,8 +313,11 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
     execBusinessActionInternal(action);
 }
 
-// todo: ec2 relate logic. remove from this class
-void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
+//TODO: #rvasilenko ec2 relate logic. remove from this class
+void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) 
+{
+    Q_UNUSED(id)
+    /*
     for(const QnBusinessEventRulePtr& bRule: m_rules.values())
     {
         if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
@@ -324,6 +327,7 @@ void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
             emit businessRuleChanged(updatedRule);
         }
     }
+    */
 }
 
 
@@ -370,9 +374,11 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 }
 
 void QnCommonMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+    Q_UNUSED(data)
 }
 
 void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {  
+    Q_UNUSED(data)
 }
 
 
@@ -472,9 +478,4 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
 }
 
 void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) {
-    if (resource->getId() == qnCommon->moduleGUID()) {
-        QnModuleInformation moduleInformation = qnCommon->moduleInformation();
-        moduleInformation.name = resource->getName();
-        qnCommon->setModuleInformation(moduleInformation);
-    }
 }

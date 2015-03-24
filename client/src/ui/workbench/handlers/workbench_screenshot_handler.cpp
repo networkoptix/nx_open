@@ -34,6 +34,9 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include <utils/common/string.h>
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
@@ -393,6 +396,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
     dialog->addWidget(tr("Timestamp:"), comboBox);
+    setHelpTopic(dialog.data(), Qn::MainWindow_MediaItem_Screenshot_Help);
 
     QString fileName;
 
@@ -462,36 +466,42 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         return;
     loader->deleteLater();
 
-    if (m_canceled)
-        return;
-
     hideProgressDelayed();
 
-    QnScreenshotParameters parameters = loader->parameters();
-    qint64 timeMsec = parameters.time == latestScreenshotTime 
-        ? QDateTime::currentMSecsSinceEpoch()
-        : parameters.time / 1000;
-    
-    QnImageFilterHelper transcodeParams;
-    // Doing heavy filters only. This filters doesn't supported on server side for screenshots
-    transcodeParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
-    transcodeParams.setContrastParams(parameters.imageCorrectionParams);
-    transcodeParams.setTimeCorner(parameters.timestampPosition, 0, timeMsec);
-    transcodeParams.setRotation(parameters.rotationAngle);
-    transcodeParams.setSrcRect(parameters.zoomRect);
-    QList<QnAbstractImageFilterPtr> filters = transcodeParams.createFilterChain(image.size());
-    QImage result = image;
-    if (!filters.isEmpty()) {
-        QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
-        frame->pts = parameters.time;
-        for(auto filter: filters)
-            frame = filter->updateImage(frame);
-        result = frame->toImage();
+    if (m_canceled) {
+        hideProgress();
+        return;
     }
 
-    QString filename = loader->parameters().filename;
+    QnScreenshotParameters parameters = loader->parameters();
+    QImage result = image;
 
-    if (!result.save(filename)) {
+    if (!result.isNull()) {
+        qint64 timeMsec = parameters.time == latestScreenshotTime 
+            ? QDateTime::currentMSecsSinceEpoch()
+            : parameters.adjustedTime / 1000;
+
+        QnImageFilterHelper transcodeParams;
+        // Doing heavy filters only. This filters doesn't supported on server side for screenshots
+        transcodeParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
+        transcodeParams.setContrastParams(parameters.imageCorrectionParams);
+        transcodeParams.setTimeCorner(parameters.timestampPosition, 0, timeMsec);
+        transcodeParams.setRotation(parameters.rotationAngle);
+        transcodeParams.setSrcRect(parameters.zoomRect);
+        QList<QnAbstractImageFilterPtr> filters = transcodeParams.createFilterChain(result.size());
+
+        if (!filters.isEmpty()) {
+            QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
+            frame->pts = parameters.time;
+            for(auto filter: filters)
+                frame = filter->updateImage(frame);
+            result = frame->toImage();
+        }
+    }
+
+    QString filename = parameters.filename;
+
+    if (result.isNull() || !result.save(filename)) {
         hideProgress();
 
         QMessageBox::critical(

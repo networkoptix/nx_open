@@ -12,6 +12,8 @@
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
+#include "recorder/recording_manager.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 
 static_assert(AV_NOPTS_VALUE == DATETIME_INVALID, "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
 
@@ -31,31 +33,37 @@ QMutex QnRtspDataConsumer::m_allConsumersMutex(QMutex::Recursive);
 
 
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
-  QnAbstractDataConsumer(MAX_QUEUE_SIZE),
-  m_owner(owner),
-  m_lastSendTime(0),
-  m_rtStartTime(AV_NOPTS_VALUE),
-  m_lastRtTime(0),
-  m_lastMediaTime(0),
-  m_waitSCeq(-1),
-  m_liveMode(false),
-  m_pauseNetwork(false),
-  m_singleShotMode(false),
-  m_packetSended(false),
-  m_prefferedProvider(0),
-  m_currentDP(0),
-  m_liveQuality(MEDIA_Quality_High),
-  m_newLiveQuality(MEDIA_Quality_None),
-  m_realtimeMode(false),
-  m_multiChannelVideo(false),
-  m_adaptiveSleep(MAX_FRAME_DURATION*1000),
-  m_useUTCTime(true),
-  m_fastChannelZappingSize(0),
-  m_firstLiveTime(AV_NOPTS_VALUE),
-  m_lastLiveTime(AV_NOPTS_VALUE),
-  m_allowAdaptiveStreaming(true),
-  m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
-  m_someDataIsDropped(false)
+    QnAbstractDataConsumer(MAX_QUEUE_SIZE),
+    m_owner(owner),
+    m_lastSendTime(0),
+    m_rtStartTime(AV_NOPTS_VALUE),
+    m_lastRtTime(0),
+    m_lastMediaTime(0),
+    m_waitSCeq(-1),
+    m_liveMode(false),
+    m_pauseNetwork(false),
+    m_singleShotMode(false),
+    m_packetSended(false),
+    m_prefferedProvider(0),
+    m_currentDP(0),
+    m_liveQuality(MEDIA_Quality_High),
+    m_newLiveQuality(MEDIA_Quality_None),
+    m_streamingSpeed(MAX_STREAMING_SPEED),
+    m_multiChannelVideo(false),
+    m_adaptiveSleep(MAX_FRAME_DURATION*1000),
+    m_useUTCTime(true),
+    m_fastChannelZappingSize(0),
+    m_firstLiveTime(AV_NOPTS_VALUE),
+    m_lastLiveTime(AV_NOPTS_VALUE),
+    m_allowAdaptiveStreaming(true),
+    m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
+    m_someDataIsDropped(false),
+    m_previousRtpTimestamp(-1),
+    m_previousScaledRtpTimestamp(-1),
+    m_framesSinceRangeCheck(0),
+    m_prevStartTime(AV_NOPTS_VALUE),
+    m_prevEndTime(AV_NOPTS_VALUE)
+
 {
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
@@ -115,7 +123,7 @@ qint64 QnRtspDataConsumer::getExternalTime() const
 
 bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
 {
-    return !(qSharedPointerDynamicCast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
+    return !(std::dynamic_pointer_cast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
 }
 
 bool QnRtspDataConsumer::isMediaTimingsSlow() const
@@ -134,7 +142,7 @@ void QnRtspDataConsumer::getEdgePackets(qint64& firstVTime, qint64& lastVTime, b
 {
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
-        const QnConstCompressedVideoDataPtr& video = m_dataQueue.atUnsafe(i).dynamicCast<const QnCompressedVideoData>();
+        const QnConstCompressedVideoDataPtr& video = std::dynamic_pointer_cast<const QnCompressedVideoData>(m_dataQueue.atUnsafe(i));
         if (video && video->isLQ() == checkLQ) {
             firstVTime = video->timestamp;
             break;
@@ -143,7 +151,7 @@ void QnRtspDataConsumer::getEdgePackets(qint64& firstVTime, qint64& lastVTime, b
 
     for (int i = m_dataQueue.size()-1; i >=0; --i)
     {
-        const QnConstCompressedVideoDataPtr& video = m_dataQueue.atUnsafe(i).dynamicCast<const QnCompressedVideoData>();
+        const QnConstCompressedVideoDataPtr& video = std::dynamic_pointer_cast<const QnCompressedVideoData>(m_dataQueue.atUnsafe(i));
         if (video && video->isLQ() == checkLQ) {
             lastVTime = video->timestamp;
             break;
@@ -198,7 +206,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         bool somethingDeleted = false;
         for (int i = m_dataQueue.size()-1; i >=0; --i)
         {
-            const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).data() );
+            const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).get() );
             if (media->flags & AV_PKT_FLAG_KEY) 
             {
                 bool isHiQ = !(media->flags & QnAbstractMediaData::MediaFlags_LowQuality);
@@ -216,7 +224,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         {
             for (int i = m_dataQueue.size()-1; i >=0; --i)
             {
-                const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).data() );
+                const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).get() );
                 if (media->flags & AV_PKT_FLAG_KEY)
                 {
                     m_dataQueue.removeFirst(i);
@@ -228,7 +236,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         if (somethingDeleted) 
         {
             // clone packet. Put to queue new copy because data is modified
-            QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(m_dataQueue.front().dynamicCast<const QnAbstractMediaData>()->clone());
+            QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(std::dynamic_pointer_cast<const QnAbstractMediaData>(m_dataQueue.front())->clone());
             media->flags |= QnAbstractMediaData::MediaFlags_AfterDrop;
             m_dataQueue.setAt(media, 0);
             m_someDataIsDropped = true;
@@ -241,7 +249,6 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);
     }
-
 }
 
 bool QnRtspDataConsumer::canAcceptData() const
@@ -388,9 +395,10 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
 }
 */
 
-void QnRtspDataConsumer::setUseRealTimeStreamingMode(bool value)
+void QnRtspDataConsumer::setStreamingSpeed(int speed)
 {
-    m_realtimeMode = value;
+    Q_ASSERT( speed > 0 );
+    m_streamingSpeed = speed <= 0 ? 1 : speed;
 }
 
 void QnRtspDataConsumer::setMultiChannelVideo(bool value)
@@ -413,7 +421,7 @@ void QnRtspDataConsumer::doRealtimeDelay(QnConstAbstractMediaDataPtr media)
 
 void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
 {
-    RtspServerTrackInfoPtr metadataTrack = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
+    RtspServerTrackInfo* metadataTrack = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
     if (metadataTrack && metadataTrack->clientPort != -1)
     {
         m_sendBuffer.resize(16);
@@ -437,6 +445,26 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     }
 }
 
+QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged(const QnConstAbstractMediaDataPtr& media)
+{
+    QnArchiveStreamReader* archiveDP = dynamic_cast<QnArchiveStreamReader*>(media->dataProvider);
+    if (!archiveDP)
+        return QByteArray();
+
+    qint64 endTime = archiveDP->endTime();
+    if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
+        endTime = DATETIME_NOW;
+
+    if (archiveDP->startTime() != m_prevStartTime || endTime != m_prevEndTime) {
+        m_prevStartTime = archiveDP->startTime();
+        m_prevEndTime = endTime;
+        return m_owner->getRangeStr(archiveDP);
+    }
+    else {
+        return QByteArray();
+    }
+};
+
 bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
@@ -446,12 +474,21 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     //msleep(500);
 
-    QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
+    QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
     if (!media)
         return true;
 
+    if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
+    {
+        Q_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
+        //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
+            //Introduce safe solution
+        if( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) )
+            (static_cast<QnAbstractMediaData*>(nonConstData.get()))->timestamp /= m_streamingSpeed;
+    }
+
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(data.data());
+    const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(data.get());
     if (metadata == 0)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
@@ -481,11 +518,11 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     int trackNum = media->channelNumber;
     if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
         trackNum = 0; // multichannel video is going to be transcoded to a single track
-    RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(trackNum);
+    RtspServerTrackInfo* trackInfo = m_owner->getTrackInfo(trackNum);
 
-    if (trackInfo == 0 || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
+    if (trackInfo == nullptr || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
-    QnRtspEncoderPtr codecEncoder = trackInfo->encoder;
+    const QnRtspEncoderPtr& codecEncoder = trackInfo->encoder;
     {
         QMutexLocker lock(&m_mutex);
         int cseq = media->opaque;
@@ -512,7 +549,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         m_someDataIsDropped = false;
     }
 
-    if (m_realtimeMode && !isLive)
+    if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (!isLive) )
         doRealtimeDelay(media);
 
     if (isLive && media->dataType == QnAbstractMediaData::VIDEO) 
@@ -543,8 +580,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     static AVRational r = {1, 1000000};
     AVRational time_base = {1, (int)codecEncoder->getFrequency() };
 
-    qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
-
     m_sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && codecEncoder->getNextPacket(m_sendBuffer))
     {
@@ -566,6 +601,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             }
         }
         else {
+            const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
             QnRtspEncoder::buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 
         }
         
@@ -586,9 +622,14 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     }
     m_sendBuffer.clear();
 
-    QByteArray newRange = m_owner->getRangeHeaderIfChanged().toUtf8();
-    if (!newRange.isEmpty())
-        sendMetadata(newRange);
+    static const int FRAMES_BETWEEN_PLAY_RANGE_CHECK = 20;
+    if( (++m_framesSinceRangeCheck) > FRAMES_BETWEEN_PLAY_RANGE_CHECK )
+    {
+        m_framesSinceRangeCheck = 0;
+        const QByteArray& newRange = getRangeHeaderIfChanged(media);
+        if (!newRange.isEmpty())
+            sendMetadata(newRange);
+    }
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
@@ -649,7 +690,7 @@ qint64 QnRtspDataConsumer::lastQueuedTime()
     if (m_dataQueue.size() == 0)
         return m_lastMediaTime;
     else {
-        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.last().data() );
+        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.last().get() );
         if (media)
             return media->timestamp;
         else

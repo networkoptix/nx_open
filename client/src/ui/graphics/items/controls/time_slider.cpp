@@ -29,6 +29,8 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 
+#include <ui/help/help_topics.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
@@ -528,8 +530,8 @@ QnTimeSlider::~QnTimeSlider() {
 
 void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTimeStep> *relativeSteps) {
     //: Translate this into 'none' or 'forced' if you want to switch off automatic detection of
-    //: AM/PM usage based on user's system locale. Do not translate this string unless you know what you're doing.
-    QString ampmUsage = tr("auto"); // TODO: #Elric #tr AM_PM_USAGE as 2nd param
+    //: Do not translate this string unless you know what you're doing.
+    QString ampmUsage = tr("auto", "AM/PM usage based on user's system locale.");
     
     bool ampm;
     if(ampmUsage == lit("forced")) {
@@ -540,58 +542,58 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTim
         ampm = QLocale::system().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
     }
 
-    //: Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you're doing.
-    QString msSuffix = tr("ms");
+    //: Do not translate this string unless you know what you're doing.
+    QString msSuffix = tr("ms", "Suffix for displaying milliseconds on timeline.");
 
-    //: Suffix for displaying seconds on timeline. Do not translate this string unless you know what you're doing.
-    QString sSuffix = tr("s");
+    //: Do not translate this string unless you know what you're doing.
+    QString sSuffix = tr("s", "Suffix for displaying seconds on timeline.");
 
-    //: Suffix for displaying minutes on timeline. Do not translate this string unless you know what you're doing.
-    QString mSuffix = tr("m");
+    //: Do not translate this string unless you know what you're doing.
+    QString mSuffix = tr("m", "Suffix for displaying minutes on timeline.");
 
-    //: Suffix for displaying hours on timeline. Do not translate this string unless you know what you're doing.
-    QString hSuffix = tr("h");
+    //: Do not translate this string unless you know what you're doing.
+    QString hSuffix = tr("h", "Suffix for displaying hours on timeline.");
 
-    //: Suffix for displaying days on timeline. Do not translate this string unless you know what you're doing.
-    QString dSuffix = tr("d");
+    //: Do not translate this string unless you know what you're doing.
+    QString dSuffix = tr("d", "Suffix for displaying days on timeline.");
 
-    //: Suffix for displaying months on timeline. Do not translate this string unless you know what you're doing.
-    QString moSuffix = tr("M");
+    //: Do not translate this string unless you know what you're doing.
+    QString moSuffix = tr("M", "Suffix for displaying months on timeline.");
 
-    //: Suffix for displaying years on timeline. Do not translate this string unless you know what you're doing.
-    QString ySuffix = tr("y");
-
-
-    //: Format for displaying days on timeline. Do not translate this string unless you know what you're doing.
-    QString dFormat = tr("dd MMMM");
-
-    //: Format for displaying months on timeline. Do not translate this string unless you know what you're doing.
-    QString moFormat = tr("MMMM");
-
-    //: Format for displaying years on timeline. Do not translate this string unless you know what you're doing.
-    QString yFormat = tr("yyyy"); // TODO: #Elric #TR duplicate with dateYearsFormat
+    //: Do not translate this string unless you know what you're doing.
+    QString ySuffix = tr("y", "Suffix for displaying years on timeline.");
 
 
-    //: Format for displaying minute caption in timeline's header, without am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateMinsFormat = tr("dd MMMM yyyy hh:mm", "MINUTES");
+    //: Do not translate this string unless you know what you're doing.
+    QString dFormat = tr("dd MMMM", "Format for displaying days on timeline.");
 
-    //: Format for displaying minute caption in timeline's header, with am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateMinsApFormat = tr("dd MMMM yyyy hh:mm ap");
+    //: Do not translate this string unless you know what you're doing.
+    QString moFormat = tr("MMMM", "Format for displaying months on timeline.");
 
-    //: Format for displaying hour caption in timeline's header, without am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateHoursFormat = tr("dd MMMM yyyy hh:mm", "HOURS");
+    //: Do not translate this string unless you know what you're doing.
+    QString yFormat = tr("yyyy", "Format for displaying years on timeline");
 
-    //: Format for displaying hour caption in timeline's header, with am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateHoursApFormat = tr("dd MMMM yyyy h ap");
 
-    //: Format for displaying day caption in timeline's header. Do not translate this string unless you know what you're doing.
-    QString dateDaysFormat = tr("dd MMMM yyyy");
+    //: Do not translate this string unless you know what you're doing.
+    QString dateMinsFormat = tr("dd MMMM yyyy hh:mm", "Format for displaying minute caption in timeline's header, without am/pm indicator.");
 
-    //: Format for displaying month caption in timeline's header. Do not translate this string unless you know what you're doing.
-    QString dateMonthsFormat = tr("MMMM yyyy");
+    //: Do not translate this string unless you know what you're doing.
+    QString dateMinsApFormat = tr("dd MMMM yyyy hh:mm ap", "Format for displaying minute caption in timeline's header, with am/pm indicator.");
 
-    //: Format for displaying year caption in timeline's header. Do not translate this string unless you know what you're doing.
-    QString dateYearsFormat = tr("yyyy");
+    //: Do not translate this string unless you know what you're doing.
+    QString dateHoursFormat = tr("dd MMMM yyyy hh:mm", "Format for displaying hour caption in timeline's header, without am/pm indicator.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString dateHoursApFormat = tr("dd MMMM yyyy h ap", "Format for displaying hour caption in timeline's header, with am/pm indicator.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString dateDaysFormat = tr("dd MMMM yyyy", "Format for displaying day caption in timeline's header.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString dateMonthsFormat = tr("MMMM yyyy", "Format for displaying month caption in timeline's header.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString dateYearsFormat = tr("yyyy", "Format for displaying year caption in timeline's header");
 
     *absoluteSteps <<
         QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   msSuffix,       QString(),          false) <<
@@ -1242,6 +1244,24 @@ bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
     return m_lastMinuteIndicatorVisible[line];
 }
 
+int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
+    if (thumbnailsRect().contains(pos))
+        return Qn::MainWindow_Thumbnails_Help;
+
+    bool hasMotion = false;
+    for (int i = 0; i < m_lineCount; i++) {
+        if (!timePeriods(i, Qn::MotionContent).isEmpty()) {
+            hasMotion = true;
+            break;
+        }
+    }
+
+    if (hasMotion)
+        return Qn::MainWindow_MediaItem_SmartSearch_Help;
+
+    return Qn::MainWindow_Slider_Timeline_Help;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
@@ -1249,7 +1269,7 @@ bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
 void QnTimeSlider::updatePixmapCache() {
     m_pixmapCache->setFont(font());
     m_pixmapCache->setColor(palette().color(QPalette::WindowText));
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16); 
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16); 
 
     updateLineCommentPixmaps();
     updateTickmarkTextSteps();

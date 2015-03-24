@@ -65,7 +65,10 @@ extern "C"
 #include "plugins/plugin_manager.h"
 #include "core/resource/resource_directory_browser.h"
 
+#ifdef _DEBUG
 #include "tests/auto_tester.h"
+#endif
+
 #include "plugins/resource/d-link/dlink_resource_searcher.h"
 #include "api/session_manager.h"
 #include "plugins/resource/droid/droid_resource_searcher.h"
@@ -322,6 +325,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #include <iostream>
 
 #ifndef API_TEST_MAIN
+#define ENABLE_DYNAMIC_CUSTOMIZATION
 
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // these functions should be called in every thread that wants to use rand() and qrand()
@@ -333,7 +337,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     /* Parse command line. */
+#ifdef _DEBUG
     QnAutoTester autoTester(argc, argv);
+#endif
 
     QnSyncTime syncTime;
 
@@ -530,15 +536,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 	ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
-    QObject::connect( qnResPool, &QnResourcePool::resourceAdded, application, []( const QnResourcePtr& resource ){
-        if( resource->hasFlags(Qn::foreigner) )
-            return;
-        QnMediaServerResource* mediaServerRes = dynamic_cast<QnMediaServerResource*>(resource.data());
-        ec2::AbstractECConnectionPtr ecConnection = QnAppServerConnectionFactory::getConnection2();
-        if( mediaServerRes && ecConnection && (mediaServerRes->getSystemName() == ecConnection->connectionInfo().systemName) )
-            mediaServerRes->determineOptimalNetIF();
-    } );
-
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
@@ -628,11 +625,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
 
-    if(screen != -1) {
+    if (screen != -1) {
         QDesktopWidget *desktop = qApp->desktop();
-        if(screen >= 0 && screen < desktop->screenCount()) {
+        if (screen >= 0 && screen < desktop->screenCount()) {
             QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-
             mainWindow->move(desktop->screenGeometry(screen).topLeft() + screenDelta);
         }
     }
@@ -668,10 +664,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     addTestData();
 #endif
 
+#ifdef _DEBUG
     if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
         QObject::connect(&autoTester, SIGNAL(finished()), application, SLOT(quit()));
         autoTester.start();
     }
+#endif
 
     /* Process pending events before executing actions. */
     qApp->processEvents();
@@ -756,12 +754,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     result = application->exec();
 
+#ifdef _DEBUG
     if(autoTester.state() == QnAutoTester::Finished) {
         if(!autoTester.succeeded())
             result = 1;
 
         cl_log.log(autoTester.message(), cl_logALWAYS);
     }
+#endif
 
     QnSessionManager::instance()->stop();
 

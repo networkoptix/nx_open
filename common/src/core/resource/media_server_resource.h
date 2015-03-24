@@ -6,6 +6,7 @@
 
 #include <api/media_server_connection.h>
 
+#include <utils/common/value_cache.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 
@@ -21,8 +22,6 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
 public:
-    static const QString USE_PROXY;
-
     QnMediaServerResource(const QnResourceTypePool* resTypePool);
     virtual ~QnMediaServerResource();
 
@@ -59,12 +58,7 @@ public:
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
-    /*!
-        \return If there is route to mediaserver, ip address of mediaserver. If there is no route, string \a USE_PROXY
-    */
-    QString getPrimaryIF() const;
 
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
@@ -105,9 +99,9 @@ public:
     */
     QPair<int, int> saveUpdatedStorages();
 private slots:
-    void at_httpClientDone( const nx_http::AsyncHttpClientPtr& client );
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
+    void atResourceChanged();
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
@@ -121,13 +115,11 @@ signals:
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
-    QString m_primaryIf;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
     //QnAbstractStorageResourceList m_storages;
-    bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
@@ -140,7 +132,11 @@ private:
     QnAbstractStorageResourceList m_storagesToUpdate;
     ec2::ApiIdDataList m_storagesToRemove;
 
+    CachedValue<Qn::PanicMode> m_panicModeCache;
+
     mutable QnResourcePtr m_firstCamera;
+
+    Qn::PanicMode calculatePanicMode() const;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

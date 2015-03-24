@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <media_server/server_update_tool.h>
 #include <media_server/settings.h>
@@ -39,8 +40,9 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     const bool isUser = dynamic_cast<const QnUserResource*>(resource.data()) != nullptr;
     const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
     const bool isStorage = dynamic_cast<const QnAbstractStorageResource*>(resource.data()) != nullptr;
+    const bool isLayout = !resource.dynamicCast<QnLayoutResource>().isNull();
 
-    if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage)
+    if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage && !isLayout)
         return;
 
     //storing all servers' cameras too
@@ -113,7 +115,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
     connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-        this, [this](const QString &systemName, qint64 sysIdTime) { changeSystemName(systemName, sysIdTime); });
+        this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) { changeSystemName(systemName, sysIdTime, tranLogTime); });
 }
 
 void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {

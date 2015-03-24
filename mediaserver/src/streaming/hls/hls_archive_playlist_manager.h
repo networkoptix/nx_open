@@ -8,6 +8,7 @@
 #include "hls_playlist_manager.h"
 
 #include <deque>
+#include <memory>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>
@@ -49,7 +50,8 @@ namespace nx_hls
         const QnSecurityCamResourcePtr m_camResource;
         qint64 m_startTimestamp;
         unsigned int m_maxChunkNumberInPlaylist;
-        qint64 m_targetDurationUsec;
+        const qint64 m_targetDurationUsec;
+        const qint64 m_getNextIFrameLoopMaxSize;
         MediaQuality m_streamQuality;
         mutable QMutex m_mutex;
         std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
@@ -57,7 +59,7 @@ namespace nx_hls
         qint64 m_prevChunkEndTimestamp;
         bool m_eof;
         int m_chunkMediaSequence;
-        QnThumbnailsArchiveDelegate* m_delegate;
+        std::unique_ptr<QnThumbnailsArchiveDelegate> m_delegate;
         QElapsedTimer m_playlistUpdateTimer;
         qint64 m_timerCorrection;
         bool m_initialPlaylistCreated;

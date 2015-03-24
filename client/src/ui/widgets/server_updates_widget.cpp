@@ -7,6 +7,7 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
 
+#include <api/global_settings.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
@@ -21,6 +22,10 @@
 #include <ui/delegates/update_status_item_delegate.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
+
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <update/media_server_update_tool.h>
 
@@ -52,6 +57,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setHelpTopic(this, Qn::Administration_Update_Help);
+
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);
 
@@ -67,14 +74,23 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionsClickable(false);
     setPaletteColor(ui->tableView, QPalette::Highlight, Qt::transparent);
 
-    connect(ui->cancelButton,           &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::cancelUpdate);
+    connect(ui->cancelButton,           &QPushButton::clicked,      this, [this] {
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+            return;
+        m_updateTool->cancelUpdate();
+    });
+
     connect(ui->internetUpdateButton,   &QPushButton::clicked,      this, [this] {
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+            return;
         m_updateTool->startUpdate(m_targetVersion, !m_targetVersion.isNull());
     });
     ui->internetUpdateButton->setEnabled(false);
     ui->internetDetailLabel->setVisible(false);
 
     connect(ui->localUpdateButton,      &QPushButton::clicked,      this, [this] {
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+            return;
         m_updateTool->startUpdate(ui->filenameLineEdit->text());
     });
     ui->localUpdateButton->setEnabled(false);
@@ -115,6 +131,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->dayWarningLabel->setVisible(false);
     ui->connectionProblemLabel->setVisible(false);
     ui->longUpdateWarning->setVisible(false);
+
+    ui->releaseNotesLabel->setText(lit("<a href='notes'>%1</a>").arg(tr("Release notes")));
+    ui->specificBuildLabel->setText(lit("<a href='spec'>%1</a>").arg(tr("Get a specific build")));
+    ui->latestBuildLabel->setText(lit("<a href='latest'>%1</a>").arg(tr("Get the latest version")));
 
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
@@ -265,7 +285,7 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
 }
 
 void QnServerUpdatesWidget::updateFromSettings() {
-    //do nothing
+    ui->updatesNotificationCheckbox->setChecked(QnGlobalSettings::instance()->isUpdateNotificationsEnabled());
 }
 
 bool QnServerUpdatesWidget::confirm() {
@@ -274,12 +294,13 @@ bool QnServerUpdatesWidget::confirm() {
         return false;
     }
 
+    QnGlobalSettings::instance()->setUpdateNotificationsEnabled(ui->updatesNotificationCheckbox->isChecked());
     return true;
 }
 
 bool QnServerUpdatesWidget::discard() {
     if(!cancelUpdate()) {
-        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.\nPlease wait until update is finished"));
+        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.") + L'\n' + tr("Please wait until update is finished"));
         return false;
     }
 
@@ -319,8 +340,8 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                         unholdConnection = true;
                         QMessageBox::critical(this,
                             tr("Launcher process is not found"),
-                            tr("Cannot restart the client.\n"
-                            "Please close the application and start it again using the shortcut in the start menu."));
+                            tr("Cannot restart the client.") + L'\n' 
+                          + tr("Please close the application and start it again using the shortcut in the start menu."));
                     } else {
                         qApp->exit(0);
                         applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
@@ -403,6 +424,9 @@ void QnServerUpdatesWidget::autoCheckForUpdatesInternet() {
 }
 
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoStart) {
+    if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+        return;
+
     if (m_checkingInternet || !m_updateTool->idle())
         return;
     m_checkingInternet = true;
@@ -492,6 +516,9 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
 }
 
 void QnServerUpdatesWidget::checkForUpdatesLocal() {
+    if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+        return;
+
     if (m_checkingLocal)
         return;
     m_checkingLocal = true;

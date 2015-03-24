@@ -16,8 +16,9 @@
 #include <common/common_globals.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_peer_system_time_data.h>
+#include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
-#include <utils/network/daytime_nist_fetcher.h>
+#include <utils/network/time/abstract_accurate_time_fetcher.h>
 #include <utils/network/http/httptypes.h>
 
 #include "nx_ec/data/api_data.h"
@@ -104,7 +105,8 @@ namespace ec2
     class TimeSynchronizationManager
     :
         public QObject,
-        public QnStoppable
+        public QnStoppable,
+        public EnableMultiThreadDirectConnection<TimeSynchronizationManager>
     {
         Q_OBJECT
 
@@ -203,7 +205,7 @@ namespace ec2
         */
         std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
         const Qn::PeerType m_peerType;
-        std::unique_ptr<DaytimeNISTFetcher> m_timeSynchronizer;
+        std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
         size_t m_internetTimeSynchronizationPeriod;
         bool m_timeSynchronized;
         int m_internetSynchronizationFailureCount;

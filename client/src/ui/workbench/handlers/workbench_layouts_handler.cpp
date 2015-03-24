@@ -364,6 +364,7 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         dialog->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel);
         dialog->setReadOnly(false);
         dialog->showIgnoreCheckbox();
+        setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
         dialog->exec();
         QDialogButtonBox::StandardButton button = dialog->clickedButton();
 

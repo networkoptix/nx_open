@@ -820,6 +820,9 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
 // Handlers
 // -------------------------------------------------------------------------- //
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
+    if (action(Qn::ToggleTourModeAction)->isChecked())
+        return Qn::MainWindow_Scene_TourInProgress_Help;
+
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
 
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
@@ -943,8 +946,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         
     }
 
-    //TODO: #Elric #TR are you sure this string must be translatable???
-    return tr("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
+    return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
         .arg(size.width())
         .arg(size.height())
         .arg(fps, 0, 'f', 2)
@@ -994,11 +996,16 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         && item()->layout() 
         && snapshotManager()->isFile(item()->layout()->resource());
 
+    bool isPreviewSearchLayout = item() 
+        && item()->layout() 
+        && item()->layout()->data().contains(Qn::LayoutSearchStateRole);
+
     if(m_camera
         && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
         && !m_camera->hasPtzCapabilities(Qn::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
         && !isExportedLayout
+        && !isPreviewSearchLayout
     ) {
         result |= PtzButton;
     }

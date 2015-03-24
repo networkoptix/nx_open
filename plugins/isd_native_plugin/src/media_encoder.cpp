@@ -197,8 +197,15 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
         bitrateKbps = (int64_t)bitrateKbps * MAX_FPS / m_currentFps;
     }
 #endif
+
     //std::cout<<"MediaEncoder::setBitrate "<<bitrateKbps<<" Kbps"<<std::endl;
-    return setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.BitRate=%2\r\n").arg(m_encoderNum+1).arg(bitrateKbps) );
+    QString result;
+    QTextStream t(&result);
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateControl=vbr\r\n";
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMin=" << (bitrateKbps / 5) << "\r\n";
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMax=" << (bitrateKbps / 5 * 6) << "\r\n";    //*1.2
+    t.flush();
+    return setCameraParam( result );
 }
 
 nxcip::StreamReader* MediaEncoder::getLiveStreamReader()

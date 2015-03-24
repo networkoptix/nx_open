@@ -121,6 +121,12 @@ void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resou
     qnBusinessRuleProcessor->processBusinessEvent(conflictEvent);
 }
 
+void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr &resource, qint64 timeStamp, const QnModuleInformation &conflictModule, const QUrl &url)
+{
+    QnMServerConflictBusinessEventPtr conflictEvent(new QnMServerConflictBusinessEvent(resource, timeStamp, conflictModule, url));
+    qnBusinessRuleProcessor->processBusinessEvent(conflictEvent);
+}
+
 void QnBusinessEventConnector::at_NoStorages(const QnResourcePtr& resource)
 {
     QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::StoragesNotConfigured, resource->getId()));

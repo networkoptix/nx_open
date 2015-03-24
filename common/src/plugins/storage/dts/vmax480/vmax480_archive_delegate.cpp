@@ -154,7 +154,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
     getTimer.restart();
     while (m_isOpened) {
         QnAbstractDataPacketPtr tmp = m_maxStream->getNextData(this);
-        result = tmp.dynamicCast<QnAbstractMediaData>();
+        result = std::dynamic_pointer_cast<QnAbstractMediaData>(tmp);
 
         if (result)
             break;

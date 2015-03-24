@@ -188,9 +188,9 @@
      <widget class="QWidget" name="finalPage">
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="successLabel">
          <property name="text">
-          <string>Success!
+          <string notr="true" extracomment="Text is set in the source file.">Success!
 
 The system was configured successfully.
 The servers from the remote system should appear in your system soon.</string>

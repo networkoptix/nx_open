@@ -16,6 +16,9 @@ public:
     QnEmulatedFrameWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnEmulatedFrameWidget();
 
+    void showFullScreen();
+    void showNormal();
+
 protected:
     /**
      * This function is to be overridden in derived class to provide information

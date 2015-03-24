@@ -6,7 +6,6 @@
 
 #include "utils/common/util.h"
 #include "common/common_module.h"
-#include "managers/impl/license_manager_impl.h"
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_discovery_data.h"
@@ -36,6 +35,7 @@
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "restype_xml_parser.h"
+#include "business/business_event_rule.h"
 
 using std::nullptr_t;
 
@@ -241,7 +241,7 @@ bool QnDbManager::QnDbTransactionExt::commit()
         m_mutex.unlock();
     }
     else {
-        qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
+        qWarning() << "Commit failed to database" << m_database.databaseName() << "error:"  << m_database.lastError(); // do not unlock mutex. Rollback is expected
     }
     return rez;
 }
@@ -272,6 +272,7 @@ QnDbManager::QnDbManager()
     m_needResyncLog(false),
     m_needResyncLicenses(false),
     m_needResyncFiles(false),
+    m_needResyncCameraUserAttributes(false),
     m_dbJustCreated(false),
     m_isBackupRestore(false)
 {
@@ -302,6 +303,36 @@ bool QnDbManager::migrateServerGUID(const QString& table, const QString& field)
     return true;
 }
 
+static std::array<QString, 3> DB_POSTFIX_LIST = 
+{
+    QLatin1String(""),
+    QLatin1String("-shm"),
+    QLatin1String("-wal")
+};
+
+bool removeDbFile(const QString& dbFileName)
+{
+    for(const QString& postfix: DB_POSTFIX_LIST) {
+        if (!removeFile(dbFileName + postfix))
+            return false;
+    }
+    return true;
+}
+
+bool createCorruptedDbBackup(const QString& dbFileName)
+{
+    QString newFileName = dbFileName.left(dbFileName.lastIndexOf(L'.') + 1) + lit("corrupted.sqlite");
+    if (!removeDbFile(newFileName))
+        return false;
+    for(const QString& postfix: DB_POSTFIX_LIST)
+    {
+        if (QFile::exists(dbFileName + postfix) && !QFile::copy(dbFileName + postfix, newFileName + postfix))
+            return false;
+    }
+
+    return true;
+}
+
 bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 {
     m_resourceFactory = factory;
@@ -316,11 +347,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");
     if (QFile::exists(backupDbFileName) || needCleanup) 
     {
-        if (!removeFile(dbFileName))
-            return false;
-        if (!removeFile(dbFileName + lit("-shm")))
-            return false;
-        if (!removeFile(dbFileName + lit("-wal")))
+        if (!removeDbFile(dbFileName))
             return false;
         if (QFile::exists(backupDbFileName)) 
         {
@@ -345,6 +372,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 
 
     QSqlQuery identityTimeQuery(m_sdb);
+    identityTimeQuery.setForwardOnly(true);
     identityTimeQuery.prepare("SELECT data FROM misc_data WHERE key = ?");
     identityTimeQuery.addBindValue("gotDbDumpTime");
     if (identityTimeQuery.exec() && identityTimeQuery.next()) 
@@ -372,8 +400,18 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     }
 
     //tuning DB
-    if( !tuneDBAfterOpen() )
+    if( !tuneDBAfterOpen() ) 
+    {
+        m_sdb.close();
+        qWarning() << "Corrupted database file " << m_sdb.databaseName() << "!";
+        if (!createCorruptedDbBackup(dbFileName)) {
+            qWarning() << "Can't create database backup before removing file";
+            return false;
+        }
+        if (!removeDbFile(dbFileName))
+            qWarning() << "Can't delete corrupted database file " << m_sdb.databaseName();
         return false;
+    }
 
     if( !createDatabase() )
     {
@@ -463,6 +501,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 
     // read license overflow time
     QSqlQuery query( m_sdb );
+    query.setForwardOnly(true);
     query.prepare( "SELECT data from misc_data where key = ?" );
     query.addBindValue( LICENSE_EXPIRED_TIME_KEY );
     qint64 licenseOverflowTime = 0;
@@ -516,6 +555,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         }
         if (m_needResyncFiles) {
             if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+                return false;
+        }
+        if (m_needResyncCameraUserAttributes) {
+            if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
                 return false;
         }
     }
@@ -974,6 +1017,7 @@ bool QnDbManager::migrateBusinessEvents()
 bool QnDbManager::applyUpdates()
 {
     QSqlQuery existsUpdatesQuery(m_sdb);
+    existsUpdatesQuery.setForwardOnly(true);
     existsUpdatesQuery.prepare("SELECT migration from south_migrationhistory");
     if (!existsUpdatesQuery.exec())
         return false;
@@ -1141,6 +1185,18 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/27_remove_server_status.sql")) {
         return removeServerStatusFromTransactionLog();
     }
+    else if (updateName == lit(":/updates/31_move_group_name_to_user_attrs.sql")) {
+        m_needResyncCameraUserAttributes = true;
+    }
+    else if (updateName == lit(":/updates/32_default_business_rules.sql")) {
+        for(const auto& bRule: QnBusinessEventRule::getSystemRules())
+        {
+            ApiBusinessRuleData bRuleData;
+            fromResourceToApi(bRule, bRuleData);
+            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+                return false;
+        }
+    }
 
     return true;
 }
@@ -1196,6 +1252,7 @@ bool QnDbManager::createDatabase()
     // move license table to static DB
     ec2::ApiLicenseDataList licenses;
     QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
     query.prepare(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
     if (!query.exec())
     {
@@ -1390,6 +1447,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     {
         // keep current digest value if exists
         QSqlQuery digestQuery(m_sdb);
+        digestQuery.setForwardOnly(true);
         digestQuery.prepare("SELECT digest FROM vms_userprofile WHERE user_id = ?");
         digestQuery.addBindValue(internalId);
         if (!digestQuery.exec()) {
@@ -1437,6 +1495,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
         INSERT OR REPLACE INTO vms_camera_user_attributes ( \
             camera_guid,                    \
             camera_name,                    \
+            group_name,                     \
             audio_enabled,                  \
             control_enabled,                \
             region,                         \
@@ -1450,6 +1509,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
          VALUES (                           \
             :cameraID,                      \
             :cameraName,                    \
+            :userDefinedGroupName,          \
             :audioEnabled,                  \
             :controlEnabled,                \
             :motionMask,                    \
@@ -1495,6 +1555,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
     if (data.authKey.isEmpty())
     {
         QSqlQuery selQuery(m_sdb);
+        selQuery.setForwardOnly(true);
         selQuery.prepare("SELECT auth_key from vms_server where resource_ptr_id = ?");
         selQuery.addBindValue(internalId);
         if (selQuery.exec() && selQuery.next())
@@ -2171,6 +2232,10 @@ ErrorCode QnDbManager::removeCamera(const QnUuid& guid)
 {
     qint32 id = getResourceInternalId(guid);
 
+    // todo: #rvasilenko Do not delete references to the camera. All child object should be deleted with separated transactions
+    // It's not big issue now because we keep a lot of camera data after deleting camera object. So, it should be refactored in 1.4 after we introduce full data cleanup
+    // for removing camera
+    /*
     ErrorCode err = deleteTableRecord(guid, "vms_businessrule_action_resources", "resource_guid");
     if (err != ErrorCode::ok)
         return err;
@@ -2184,10 +2249,12 @@ ErrorCode QnDbManager::removeCamera(const QnUuid& guid)
         return err;
 
     err = deleteCameraServerItemTable(id);
+
     if (err != ErrorCode::ok)
         return err;
-
-    err = deleteTableRecord(id, "vms_camera", "resource_ptr_id");
+    */
+    
+    ErrorCode err = deleteTableRecord(id, "vms_camera", "resource_ptr_id");
     if (err != ErrorCode::ok)
         return err;
 
@@ -2405,6 +2472,7 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
     QReadLocker lock(&m_mutex); //locking it here since this method is public
 
     QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
     query.prepare("SELECT data from misc_data where key = ?");
     query.addBindValue(name);
     if( query.exec() && query.next() ) {
@@ -2755,6 +2823,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
         SELECT                                           \
             camera_guid as cameraID,                     \
             camera_name as cameraName,                   \
+            group_name as userDefinedGroupName,          \
             audio_enabled as audioEnabled,               \
             control_enabled as controlEnabled,           \
             region as motionMask,                        \
@@ -2809,7 +2878,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList
             coalesce(nullif(cu.camera_name, \"\"), r.name) as name, r.url, \
             coalesce(rs.status, 0) as status, \
             c.vendor, c.manually_added as manuallyAdded, \
-            c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
+            coalesce(nullif(cu.group_name, \"\"), c.group_name) as groupName, \
+            c.group_id as groupId, c.mac, c.model, \
             c.status_flags as statusFlags, c.physical_id as physicalId, \
             cu.audio_enabled as audioEnabled,                  \
             cu.control_enabled as controlEnabled,              \

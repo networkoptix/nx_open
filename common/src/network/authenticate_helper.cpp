@@ -105,13 +105,6 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     if( allowedAuthMethods & AuthMethod::noAuth )
         return true;
 
-    if( allowedAuthMethods & AuthMethod::cookie )
-    {
-        const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
-        int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
-        if (customAuthInfoPos >= 0)
-            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId);
-    }
 
     if( allowedAuthMethods & AuthMethod::videowall )
     {
@@ -134,6 +127,14 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
                     return true;
             }
         }
+    }
+
+    if( allowedAuthMethods & AuthMethod::cookie )
+    {
+        const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
+        int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
+        if (customAuthInfoPos >= 0)
+            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId);
     }
 
     if( allowedAuthMethods & AuthMethod::http )
@@ -418,17 +419,17 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     int pos = digest.indexOf(':');
     if (pos == -1)
         return false;
-    QByteArray userName = digest.left(pos).toLower();
-    QByteArray password = digest.mid(pos+1);
-
+    QString userName = QUrl::fromPercentEncoding(digest.left(pos)).toLower();
+    QString password = QUrl::fromPercentEncoding(digest.mid(pos+1));
+     
     for(const QnUserResourcePtr& user: m_users)
     {
-        if (user->getName().toUtf8().toLower() == userName)
+        if (user->getName().toLower() == userName)
         {
-            if (user->checkPassword(QString::fromUtf8(password)))
+            if (user->checkPassword(password))
             {
                 if (user->getDigest().isEmpty())
-                    emit emptyDigestDetected(user, QString::fromUtf8(userName), QString::fromUtf8(password));
+                    emit emptyDigestDetected(user, userName, password);
                 if (authUserId)
                     *authUserId = user->getId();
                 return true;
@@ -439,9 +440,9 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     // authenticate by media server auth_key
     for(const QnMediaServerResourcePtr& server: m_servers)
     {
-        if (server->getId().toString().toUtf8().toLower() == userName)
+        if (server->getId().toString().toLower() == userName)
         {
-            if (server->getAuthKey().toUtf8() == password)
+            if (server->getAuthKey() == password)
                 return true;
         }
     }
@@ -494,7 +495,8 @@ bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteAr
             nx_http::HttpHeader("Set-Cookie", lit("realm=%1; Path=/").arg(REALM).toUtf8() ));
 
         QDateTime dt = qnSyncTime->currentDateTime().addSecs(COOKIE_EXPERATION_PERIOD);
-        QString nonce = lit("nonce=%1; Expires=%2; Path=/").arg(QLatin1String(getNonce())).arg(dateTimeToHTTPFormat(dt)); // Qt::RFC2822Date
+        //QString nonce = lit("nonce=%1; Expires=%2; Path=/").arg(QLatin1String(getNonce())).arg(dateTimeToHTTPFormat(dt)); // Qt::RFC2822Date
+        QString nonce = lit("nonce=%1; Path=/").arg(QLatin1String(getNonce()));
         nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", nonce.toUtf8()));
     }
     return rez;

@@ -281,7 +281,7 @@ const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo
 #ifdef ONVIF_DEBUG
         qDebug() << "SoapErrorHelper::fetchDescription: fault info is null";
 #endif
-        return lit("unknown_error"); // TODO: #Elric #TR
+        return lit("unknown_error");
     }
 
     QByteArray result("Fault Info. ");

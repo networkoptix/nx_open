@@ -182,6 +182,7 @@ public:
     //!Requests name of system, mediaserver is currently connected to
     /*!
         \param slot Slot MUST have signature (int, QString, int)
+        \returns Request handle. -1 In case of failure to start async request
     */
     int getSystemNameAsync( QObject* target, const char* slot );
     //!Request server to run camera \a cameraID diagnostics step following \a previousStep
@@ -194,8 +195,8 @@ public:
         QObject* target, const char* slot );
 
     /**
-        \param slot Slot MUST have signature (int, QnRebuildArchiveReply, int)
-        \returns Request handle
+        \param slot Slot MUST have signature (int, QnStorageScanData, int)
+        \returns Request handle. -1 In case of failure to start async request
      */
     int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 

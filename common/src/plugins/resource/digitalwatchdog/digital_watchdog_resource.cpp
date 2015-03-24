@@ -1,6 +1,7 @@
 #ifdef ENABLE_ONVIF
 
 #include "digital_watchdog_resource.h"
+
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"
@@ -24,9 +25,7 @@ QString getIdSuffixByModel(const QString& cameraModel)
 }
 
 QnPlWatchDogResource::QnPlWatchDogResource():
-    QnPlOnvifResource(),
-    m_hasZoom(false),
-    m_additionalSettings()
+    m_hasZoom(false)
 {
     setVendor(lit("Digital Watchdog"));
 }
@@ -103,6 +102,7 @@ void QnPlWatchDogResource::enableOnvifSecondStream()
     // camera rebooting ....
 }
 
+/*
 int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
@@ -122,6 +122,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
 
     return qMax(1024,result);
 }
+*/
 
 QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() 
 {
@@ -164,6 +165,8 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
     }
 
     QMutexLocker lock(&m_physicalParamsMutex);
+
+    m_additionalSettings.clear();
 
     //Put base model in list
     m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
@@ -269,7 +272,6 @@ QnPlWatchDogResourceAdditionalSettings::QnPlWatchDogResourceAdditionalSettings(c
 
 QnPlWatchDogResourceAdditionalSettings::~QnPlWatchDogResourceAdditionalSettings()
 {
-    delete m_cameraProxy;
 }
 
 bool QnPlWatchDogResourceAdditionalSettings::refreshValsFromCamera()

@@ -68,6 +68,8 @@ private slots:
     void onJumpCanceled(qint64 time);
 
 private:
+    void onConsumerBlocksReaderInternal(QnAbstractArchiveReader* reader, bool value);
+private:
     friend class QnSyncPlayArchiveDelegate;
 
     qint64 minTime() const;

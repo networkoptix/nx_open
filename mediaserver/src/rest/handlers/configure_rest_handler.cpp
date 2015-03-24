@@ -36,10 +36,11 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     QByteArray passwordHash = params.value(lit("passwordHash")).toLatin1();
     QByteArray passwordDigest = params.value(lit("passwordDigest")).toLatin1();
     qint64 sysIdTime = params.value(lit("sysIdTime")).toLongLong();
+    qint64 tranLogTime = params.value(lit("tranLogTime")).toLongLong();
     int port = params.value(lit("port")).toInt();
 
     /* set system name */
-    int changeSystemNameResult = changeSystemName(systemName, sysIdTime, wholeSystem);
+    int changeSystemNameResult = changeSystemName(systemName, sysIdTime, wholeSystem, tranLogTime);
     if (changeSystemNameResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("SYSTEM_NAME"));
@@ -69,18 +70,18 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     return CODE_OK;
 }
 
-int QnConfigureRestHandler::changeSystemName(const QString &systemName, qint64 sysIdTime, bool wholeSystem) {
+int QnConfigureRestHandler::changeSystemName(const QString &systemName, qint64 sysIdTime, bool wholeSystem, qint64 remoteTranLogTime) {
     if (systemName.isEmpty() || systemName == qnCommon->localSystemName())
         return ResultSkip;
 
     if (!backupDatabase())
         return ResultFail;
 
-    if (!::changeSystemName(systemName, sysIdTime))
+    if (!::changeSystemName(systemName, sysIdTime, remoteTranLogTime))
         return ResultFail;
 
     if (wholeSystem)
-        QnAppServerConnectionFactory::getConnection2()->getMiscManager()->changeSystemName(systemName, sysIdTime, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        QnAppServerConnectionFactory::getConnection2()->getMiscManager()->changeSystemName(systemName, sysIdTime, remoteTranLogTime, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return ResultOk;
 }

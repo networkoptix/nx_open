@@ -13,6 +13,7 @@
 #include "camera_list_reply.h"
 #include "configure_reply.h"
 #include "upload_update_reply.h"
+#include "rebuild_archive_reply.h"
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
@@ -26,6 +27,7 @@
     (QnStatisticsDataItem)\
     (QnStatisticsReply)\
     (QnTimeReply)\
+    (QnStorageScanData)\
     (QnTestEmailSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\

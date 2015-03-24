@@ -1,0 +1,180 @@
+/*
+    Webadmin uses bootstrap (getbootstrap.com) styles, so you can customize it and override styles in this file
+
+Right choice is to open configurator: http://getbootstrap.com/customize/#less-variables, set brand-color and generate css
+Easy variant - just customize colors in this example file
+
+For fast compilation - you can use http://sasstocss.appspot.com/ and use construction like this:
+
+
+$brand-primary:         rgba(0,174,239,1) !default;
+$btn-primary-color:             $brand-primary;
+$btn-primary-border:             darken($brand-primary-color, 5%) !default;
+
+#top{
+    background-color: $brand-primary;
+}
+
+#top a{
+    color:white;
+}
+
+#top a:hover{
+    background-color: darken($brand-primary, 5%)
+}
+
+
+#top a.navbar-brand:hover{
+    background-color: transparent;
+}
+
+
+
+.btn-primary {
+    color: rgb(255, 255, 255);
+    background-color: $btn-primary-color;
+    border-color: $btn-primary-border
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active {
+    color: white;
+    background-color: $btn-primary-border;
+    border-color: darken($btn-primary-border, 5%)
+}
+
+
+.btn-primary.disabled,
+.btn-primary.disabled:hover,
+.btn-primary.disabled:focus,
+.btn-primary.disabled:active,
+.btn-primary.disabled.active,
+.btn-primary[disabled],
+.btn-primary[disabled]:hover,
+.btn-primary[disabled]:focus,
+.btn-primary[disabled]:active,
+.btn-primary[disabled].active,
+fieldset[disabled] .btn-primary,
+fieldset[disabled] .btn-primary:hover,
+fieldset[disabled] .btn-primary:focus,
+fieldset[disabled] .btn-primary:active,
+fieldset[disabled] .btn-primary.active {
+    background-color: $btn-primary-color;
+    border-color: $btn-primary-border;
+    opacity:0.65
+}
+
+
+
+
+#top.navbar-default .navbar-nav > .active > a,
+#top.navbar-default .navbar-nav > .active > a:hover,
+#top.navbar-default .navbar-nav > .active > a:focus {
+  background-color:  darken($btn-primary-color, 6.5%) ;
+}
+
+
+#top.navbar-default .navbar-toggle:hover,
+#top.navbar-default .navbar-toggle:focus {
+    background-color: $btn-primary-border;
+}
+
+
+#top.navbar-default .navbar-toggle {
+    border-color: $btn-primary-border;
+}
+
+
+
+#top.navbar-default .navbar-toggle:hover,
+#top.navbar-default .navbar-toggle:focus {
+    background-color: $btn-primary-border;
+}
+
+
+#top.navbar-default .navbar-toggle {
+    border-color: $btn-primary-border;
+}
+
+#top.navbar-default .navbar-toggle .icon-bar {
+    background-color: $btn-primary-border;
+}
+
+
+
+
+
+In better world we should set up grunt on build server and set SASS variables in customization - instead of creating css rules/
+Or, maybe, we should get primary color from some base cusomization configuration
+
+
+rgba(0,174,239,1)  - NX
+rgba(243,111,33,1)  - DW
+rgba(166,206,57,1)  - Vista
+
+*/
+
+
+#top {
+    background-color: #00aeef; }
+
+#top a {
+    color: white; }
+
+#top a:hover {
+    background-color: #009bd5; }
+
+#top a.navbar-brand:hover {
+    background-color: transparent; }
+
+.btn-primary {
+    color: white;
+    background-color: #00aeef;
+    border-color: #009bd5; }
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active {
+    color: white;
+    background-color: #009bd5;
+    border-color: #0089bc; }
+
+.btn-primary.disabled,
+.btn-primary.disabled:hover,
+.btn-primary.disabled:focus,
+.btn-primary.disabled:active,
+.btn-primary.disabled.active,
+.btn-primary[disabled],
+.btn-primary[disabled]:hover,
+.btn-primary[disabled]:focus,
+.btn-primary[disabled]:active,
+.btn-primary[disabled].active,
+fieldset[disabled] .btn-primary,
+fieldset[disabled] .btn-primary:hover,
+fieldset[disabled] .btn-primary:focus,
+fieldset[disabled] .btn-primary:active,
+fieldset[disabled] .btn-primary.active {
+    background-color: #00aeef;
+    border-color: #009bd5;
+    opacity: 0.65; }
+
+#top.navbar-default .navbar-nav > .active > a,
+#top.navbar-default .navbar-nav > .active > a:hover,
+#top.navbar-default .navbar-nav > .active > a:focus {
+    background-color: #0096ce; }
+
+#top.navbar-default .navbar-toggle:hover,
+#top.navbar-default .navbar-toggle:focus {
+    background-color: #009bd5; }
+
+#top.navbar-default .navbar-toggle {
+    border-color: #009bd5; }
+
+#top.navbar-default .navbar-toggle:hover,
+#top.navbar-default .navbar-toggle:focus {
+    background-color: #009bd5; }
+
+#top.navbar-default .navbar-toggle {
+    border-color: #009bd5; }
+
+#top.navbar-default .navbar-toggle .icon-bar {
+    background-color: #009bd5; }
+
+

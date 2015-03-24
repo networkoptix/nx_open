@@ -29,8 +29,8 @@
 #include "../resource_management/status_dictionary.h"
 
 bool QnResource::m_appStopping = false;
-QnInitResPool QnResource::m_initAsyncPool;
-
+// TODO: #rvasilenko move it to QnResourcePool
+Q_GLOBAL_STATIC(QnInitResPool, initResPool)
 
 static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
@@ -64,7 +64,7 @@ private:
     QString m_name;
 };
 
-typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
+typedef std::shared_ptr<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
 #endif // ENABLE_DATA_PROVIDERS
 
 // -------------------------------------------------------------------------- //
@@ -96,7 +96,7 @@ private:
     QString m_name;
     QVariant m_val;
 };
-typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+typedef std::shared_ptr<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 
 #endif // ENABLE_DATA_PROVIDERS
@@ -114,7 +114,8 @@ QnResource::QnResource():
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
-    m_removedFromPool(false)
+    m_removedFromPool(false),
+    m_initInProgress(false)
 {
 }
 
@@ -192,6 +193,10 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     }
 
     m_locallySavedProperties = other->m_locallySavedProperties;
+    if (m_id.isNull() && !other->m_id.isNull()) {
+        for (const auto& p: other->getProperties())
+            m_locallySavedProperties.emplace(p.name, LocalPropertyValue(p.value, true, true));
+    }
 }
 
 void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
@@ -745,9 +750,8 @@ void QnResource::emitModificationSignals( const QSet<QByteArray>& modifiedFields
 
 QnInitResPool* QnResource::initAsyncPoolInstance()
 {
-    return &m_initAsyncPool;
+    return initResPool();
 }
-
 // -----------------------------------------------------------------------------
 
 #ifdef ENABLE_DATA_PROVIDERS
@@ -779,15 +783,18 @@ bool QnResource::init()
     if(m_appStopping)
         return false;
 
-    if(!m_initMutex.tryLock())
-        return false; /* Skip request if init is already running. */
-
-    if(m_initialized) {
-        m_initMutex.unlock();
-        return true; /* Nothing to do. */
+    {
+        QMutexLocker lock(&m_initMutex);
+        if(m_initialized)
+            return true; /* Nothing to do. */
+        if (m_initInProgress)
+            return false; /* Skip request if init is already running. */
+        m_initInProgress = true;
     }
 
     CameraDiagnostics::Result initResult = initInternal();
+    m_initMutex.lock();
+    m_initInProgress = false;
     m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
     {
         QMutexLocker lk( &m_mutex );
@@ -852,7 +859,7 @@ private:
 void QnResource::stopAsyncTasks()
 {
     m_appStopping = true;
-    m_initAsyncPool.waitForDone();
+    initResPool()->waitForDone();
 }
 
 void QnResource::pleaseStopAsyncTasks()
@@ -877,7 +884,7 @@ void QnResource::initAsync(bool optional)
 
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (optional) {
-        if (m_initAsyncPool.tryStart(task))
+        if (initResPool()->tryStart(task))
             m_lastInitTime = t;
         else
             delete task;
@@ -885,7 +892,7 @@ void QnResource::initAsync(bool optional)
     else {
         m_lastInitTime = t;
         lock.unlock();
-        m_initAsyncPool.start(task);
+        initResPool()->start(task);
     }
 }
 

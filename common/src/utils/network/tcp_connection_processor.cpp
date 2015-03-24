@@ -320,7 +320,8 @@ bool QnTCPConnectionProcessor::readRequest()
             }
             else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
             {
-                qWarning() << "Too large HTTP client request. Ignoring";
+                qWarning() << "Too large HTTP client request ("<<d->clientRequest.size()<<" bytes"
+                    ", "<<MAX_REQUEST_SIZE<<" allowed). Ignoring...";
                 return false;
             }
             if( fullHttpMessageSize )

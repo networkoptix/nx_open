@@ -297,6 +297,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     context()->setUserName(appServerUrl.userName());
 
     QnGlobalModuleFinder::instance()->setConnection(result.connection());
+    QnRouter::instance()->setEnforcedConnection(QnRoutePoint(connectionInfo.ecsGuid, connectionInfo.ecUrl.host(), connectionInfo.ecUrl.port()));
 
     return ec2::ErrorCode::ok;
 }
@@ -312,6 +313,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 
     hideMessageBox();
 
+    QnRouter::instance()->setEnforcedConnection(QnRoutePoint());
     QnGlobalModuleFinder::instance()->setConnection(NULL);
     QnClientMessageProcessor::instance()->init(NULL);
     QnAppServerConnectionFactory::setEc2Connection(NULL);

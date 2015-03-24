@@ -212,12 +212,13 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     const int sepPos = cameraFirmwareVersion.indexOf('=');
     setFirmware( QLatin1String( sepPos != -1 ? cameraFirmwareVersion.mid( sepPos+1 ) : cameraFirmwareVersion ) );
 
-
+    /*
     CameraMediaStreams mediaStreams;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_resolution1, CODEC_ID_H264 ) );
     if( m_resolution2.width() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_resolution2, CODEC_ID_H264 ) );
-    saveResolutionList( mediaStreams );
+    saveMediaStreamInfoIfNeeded( mediaStreams );
+    */
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     //setMotionType( Qn::MT_SoftwareGrid );

@@ -24,14 +24,6 @@ class DeviceFileCatalog: public QObject
 {
     Q_OBJECT
 public:
-    // TODO: #Elric #enum
-    enum RebuildMethod {
-        Rebuild_None,    // do not rebuild chunk's database
-        Rebuild_Canceled,
-        Rebuild_LQ,      // rebuild LQ chunks only
-        Rebuild_HQ,      // rebuild HQ chunks only
-        Rebuild_All      // rebuild whole chunks
-    };
 
     struct Chunk
     {
@@ -114,7 +106,6 @@ public:
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 
-    static void setRebuildArchive(RebuildMethod value);
     static void cancelRebuildArchive();
     static bool needRebuildPause();
     static void rebuildPause(void*);
@@ -144,7 +135,7 @@ public:
     QnServer::ChunksCatalog getRole() const;
 private:
 
-    bool csvMigrationCheckFile(const Chunk& chunk, bool checkDirOnly);
+    bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, const QnStorageResourcePtr &storage);
     QSet<QDate> recordedMonthList();
@@ -180,7 +171,6 @@ private:
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
     QMutex m_IOMutex;
-    static RebuildMethod m_rebuildArchive;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

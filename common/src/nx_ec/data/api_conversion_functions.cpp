@@ -167,7 +167,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.manuallyAdded = src->isManuallyAdded();
     dst.model = src->getModel();
     dst.groupId = src->getGroupId();
-    dst.groupName = src->getGroupName();
+    dst.groupName = src->getDefaultGroupName();
     dst.statusFlags = src->statusFlags();
     dst.vendor = src->getVendor();
 }
@@ -226,6 +226,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
 {
     dst->cameraID = src.cameraID;
     dst->name = src.cameraName;
+    dst->groupName = src.userDefinedGroupName;
     dst->scheduleDisabled = !src.scheduleEnabled;
     dst->motionType = src.motionType;
 
@@ -255,6 +256,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
 {
     dst.cameraID = src->cameraID;
     dst.cameraName = src->name;
+    dst.userDefinedGroupName = src->groupName;
     dst.scheduleEnabled = !src->scheduleDisabled;
     dst.motionType = src->motionType;
 
@@ -278,7 +280,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
 {
-    dst.reserve( dst.size()+src.size() );
+    dst.reserve( dst.size() + static_cast<int>(src.size()) );
     for( const ApiCameraAttributesData& cameraAttrs: src )
     {
         QnCameraUserAttributesPtr dstElement( new QnCameraUserAttributes() );
@@ -677,7 +679,7 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
 }
 
 void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {
-    dst.reserve( dst.size()+src.size() );
+    dst.reserve( dst.size() + static_cast<int>(src.size()) );
     for( const ApiMediaServerUserAttributesData& serverAttrs: src )
     {
         QnMediaServerUserAttributesPtr dstElement( new QnMediaServerUserAttributes() );

@@ -36,8 +36,9 @@ namespace SystemError
     static const ErrorCode notConnected = WSAENOTCONN;
     static const ErrorCode interrupted = WSAEINTR;
     static const ErrorCode again = EAGAIN;
-    static const ErrorCode nomem = ENOMEM;
-    static const ErrorCode notImplemented = ENOSYS;
+    static const ErrorCode nomem = ERROR_NOT_ENOUGH_MEMORY;
+    static const ErrorCode notImplemented = ERROR_CALL_NOT_IMPLEMENTED;
+    static const ErrorCode invalidData = ERROR_INVALID_DATA;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
@@ -51,6 +52,7 @@ namespace SystemError
     static const ErrorCode again = EAGAIN;
     static const ErrorCode nomem = ENOMEM;
     static const ErrorCode notImplemented = ENOSYS;
+    static const ErrorCode invalidData = EINVAL;
 #endif
 
     //!Returns error code of previous system call

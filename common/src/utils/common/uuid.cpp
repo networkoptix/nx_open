@@ -12,7 +12,7 @@ QnUuid::QnUuid()
 
 QnUuid::QnUuid( const char* text )
 :
-    m_uuid( text ? QByteArray::fromRawData( text, strlen(text) ) : QByteArray() )
+    m_uuid( text ? QByteArray::fromRawData( text, static_cast<int>(strlen(text)) ) : QByteArray() )
 {
 }
 
@@ -24,7 +24,7 @@ QnUuid::QnUuid( const QString& text )
     {
         if (text.size() == 38)
             m_stringRepresentation = text;
-        assert(
+        Q_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
             text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
@@ -38,7 +38,7 @@ QnUuid::QnUuid( const QByteArray& text )
     {
         if (text.size() == 38)
             m_byteArrayRepresentation = text;
-        assert(
+        Q_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
             text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
@@ -75,8 +75,6 @@ QnUuid QnUuid::fromRfc4122( const QByteArray& bytes )
 {
     QnUuid _uuid;
     _uuid.m_uuid = QUuid::fromRfc4122( bytes );
-    if( !bytes.isEmpty() )
-        _uuid.m_rfc4122Representation = bytes;
     return _uuid;
 }
 

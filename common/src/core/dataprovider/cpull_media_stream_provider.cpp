@@ -97,7 +97,7 @@ void QnClientPullMediaStreamProvider::run()
                 getResource()->setStatus(Qn::Online);
         }
 
-        QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
         
 
         if (mFramesLost>0) // we are alive again
@@ -136,7 +136,7 @@ void QnClientPullMediaStreamProvider::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(videoData->dataSize());
+            m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(videoData->dataSize()));
             if (lp)
                 lp->onGotVideoFrame(videoData);
         }

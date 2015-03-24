@@ -150,6 +150,14 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             while( msgBody.size() < MAX_FRAME_SIZE )
             {
                 const nx_http::BufferType& msgBodyBuf = localHttpClientPtr->fetchMessageBodyBuffer();
+                {
+                    QMutexLocker lk( &m_mutex );
+                    if( m_terminated )
+                    {
+                        m_terminated = false;
+                        return nxcip::NX_INTERRUPTED;
+                    }
+                }
                 if( localHttpClientPtr->eof() )
                 {
                     gotJpegFrame( msgBody.isEmpty() ? msgBodyBuf : (msgBody + msgBodyBuf) );
@@ -167,7 +175,17 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         case mjpg:
             //reading mjpg picture
             while( !m_videoPacket.get() && !localHttpClientPtr->eof() )
+            {
                 m_multipartContentParser.processData( localHttpClientPtr->fetchMessageBodyBuffer() );
+                {
+                    QMutexLocker lk( &m_mutex );
+                    if( m_terminated )
+                    {
+                        m_terminated = false;
+                        return nxcip::NX_INTERRUPTED;
+                    }
+                }
+            }
             break;
 
         default:
@@ -198,7 +216,10 @@ void StreamReader::interrupt()
 
     //closing connection
     if( m_httpClient )
+    {
+        m_httpClient->pleaseStop();
         m_httpClient.reset();
+    }
 }
 
 void StreamReader::setFps( float fps )
