@@ -6,8 +6,6 @@ angular.module('webadminApp')
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
 
-        ipCookie('Authorization','Digest', { path: '/' });
-
         function getSettings(){
             return $http.get('/api/moduleInformation?salt=' + (new Date()).getTime());
         }
