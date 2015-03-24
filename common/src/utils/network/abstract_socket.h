@@ -50,10 +50,8 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) = 0;
-    //!Get socket address
+    //!Get local address, socket is bound to
     virtual SocketAddress getLocalAddress() const = 0;
-    //!Get peer address
-    virtual SocketAddress getPeerAddress() const = 0;
     //!Close socket
     virtual void close() = 0;
     //!Returns true, if socket has been closed previously with \a AbstractSocket::close call
