@@ -13,26 +13,20 @@ angular.module('webadminApp')
                 var pair = params[i].split("=");
                 if(pair[0] === 'proxy'){
                     proxy = '/proxy/' + pair[1];
-                    console.log(proxy);
                     break;
                 }
             }
         }
 
-
-
-
         ipCookie('Authorization','Digest', { path: '/' });
 
         function getSettings(){
-            return $http.get(proxy + '/api/moduleInformation?salt=' + (new Date()).getTime());
+            return $http.get(proxy + '/api/moduleInformation?showAddresses=true');
         }
 
         var offlineDialog = null;
         var loginDialog = null;
         function offlineHandler(error){
-
-            //console.log(error);
 
             // Check 401 against offline
 
@@ -105,7 +99,8 @@ angular.module('webadminApp')
                     // on error - clear object to reload next time
                     return cacheModuleInfo;
                 }
-                return $http.get(url + '/api/moduleInformation',{
+                //Some another server
+                return $http.get(url + '/api/moduleInformation?showAddresses=true',{
                     timeout: 3*1000
                 });
             },

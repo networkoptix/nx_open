@@ -143,9 +143,9 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     QString devUrl = QString(lit("http://%1:%2")).arg(url.host()).arg(url.port(80));
     CashedDevInfo devInfo = m_cashedDevInfo.value(devUrl);
 
-    QnMacAddress cameraMAC;
     if (devInfo.info.presentationUrl.isEmpty() || devInfo.timer.elapsed() > CACHE_UPDATE_TIME)
     {
+        QnMacAddress cameraMAC;
         CLHttpStatus status;
         QByteArray serverReport = actiRes->makeActiRequest(QLatin1String("system"), QLatin1String("SYSTEM_INFO"), status, true);
         if (status != CL_HTTP_SUCCESS)
@@ -168,7 +168,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         devInfo.timer.restart();
         m_cashedDevInfo[devUrl] = devInfo;
     }
-    createResource( devInfo.info, cameraMAC, auth, result );
+    createResource( devInfo.info, QnMacAddress(devInfo.info.serialNumber), auth, result );
 
     return result;
 }
