@@ -267,15 +267,19 @@ void initAppServerConnection(const QnUuid &videowallGuid, const QnUuid &videowal
 
 /** Initialize log. */
 void initLog(
-    const QString &logLevel,
+    QString logLevel,
     const QString fileNameSuffix,
-    const QString& ec2TranLogLevel)
+    QString ec2TranLogLevel)
 {
     static const int DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
     static const int DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 
-    QnLog::initLog(logLevel);
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+
+    if( logLevel.isEmpty() )
+        logLevel = qnSettings->logLevel();
+
+    QnLog::initLog(logLevel);
     QString logFileLocation = dataLocation + QLatin1String("/log");
     QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
@@ -284,6 +288,8 @@ void initLog(
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
 
+    if( ec2TranLogLevel.isEmpty() )
+        ec2TranLogLevel = qnSettings->ec2TranLogLevel();
 
     //preparing transaction log
     if( ec2TranLogLevel != lit("none") )
@@ -349,7 +355,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noSingleApplication = false;
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
-    QString ec2TranLogLevel = lit("none");
+    QString ec2TranLogLevel;
     QString translationPath;
     
     bool skipMediaFolderScan = false;
