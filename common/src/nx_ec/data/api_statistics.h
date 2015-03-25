@@ -18,7 +18,10 @@ namespace ec2
 
         ApiResourceParamDataList extraParams;
     };
-#define ApiCameraDataStatistics_Fields (id)(parentId)(model)(statusFlags)(vendor)(audioEnabled)(secondaryStreamQuality)(extraParams)
+#define ApiCameraDataStatistics_Fields (id)(parentId)(status)(extraParams) \
+    (manuallyAdded)(model)(statusFlags)(vendor) \
+    (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
+        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
 
     struct ApiClientDataStatistics
     :
@@ -31,6 +34,15 @@ namespace ec2
     };
 #define ApiClientDataStatistics_Fields (id)(parentId)(extraParams)
 
+    struct ApiStorageDataStatistics
+    :
+        ApiStorageData
+    {
+        ApiStorageDataStatistics();
+        ApiStorageDataStatistics(const ApiStorageData& data);
+    };
+#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)
+
     struct ApiMediaServerDataStatistics
     :
         ApiMediaServerDataEx
@@ -40,21 +52,27 @@ namespace ec2
 
         ApiResourceParamDataList extraParams;
     };
-#define ApiMediaServerDataStatistics_Fields (id)(parentId)(extraParams)
+#define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(extraParams) \
+    (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)
 
     struct ApiSystemStatistics
     {
+        QnUuid systemId;
+
         ApiMediaServerDataStatisticsList    mediaservers;
         ApiCameraDataStatisticsList         cameras;
         ApiClientDataStatisticsList         clients;
+        ApiStorageDataStatisticsList        storages;
     };
-#define ApiSystemStatistics_Fields (mediaservers)(cameras)(clients)
+#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(storages)
 
     struct ApiStatisticsServerInfo
     {
+        QnUuid systemId;
         QString url;
+        QString status;
     };
-#define ApiStatisticsServerInfo_Fields (url)
+#define ApiStatisticsServerInfo_Fields (systemId)(url)(status)
 }
 
 #endif // API_STATISTICS_H

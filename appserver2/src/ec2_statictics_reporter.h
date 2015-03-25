@@ -26,7 +26,8 @@ namespace ec2
         ErrorCode triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData);
 
     private:
-        void setUpTimer(uint reportTime);
+        void setupTimer(uint delay = 0);
+        void timerEvent();
         ErrorCode initiateReport();
 
     private slots:
@@ -35,11 +36,11 @@ namespace ec2
     private:
         QnUserResourcePtr getAdmin();
         QnUuid getResourceTypeIdByName(const QString& name);
+        QnUuid getOrCreateSystemId();
 
         AbstractECConnection& m_connection;
         QnUserResourcePtr m_admin;
         QnUuid m_desktopCamera;
-
         QMutex m_mutex;
         boost::optional<qint64> m_timerId;
         boost::optional<nx_http::AsyncHttpClientPtr> m_httpClient;

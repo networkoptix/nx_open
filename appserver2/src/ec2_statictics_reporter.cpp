@@ -1,9 +1,14 @@
 #include "ec2_statictics_reporter.h"
 
 #include "ec2_connection.h"
+#include "core/resource_management/resource_properties.h"
 
 static const QString REPORT_ALLOWED = "reportAllowed";
 static const QString REPORT_LAST_TIME = "reportLastTime";
+static const QString SYSTEM_ID = "systemId";
+
+static const QString ALREADY_IN_PROGRESS = "already in progress";
+static const QString JUST_INITIATED = "just innitiated";
 
 // Paramitrize
 static const uint REPORT_CYCLE = 30*24*60*60; /* about a month */
@@ -28,11 +33,7 @@ namespace ec2
             NX_LOG(lit("Ec2StaticticsReporter. Can not get %1 resouce type, using null")
                    .arg(QnResourceTypePool::desktopCameraTypeName), cl_logWARNING);
 
-        const auto now = QDateTime::currentDateTime().toTime_t();
-        const auto lastReport = m_admin->getProperty(REPORT_LAST_TIME).toUInt();
-        const auto plannedReport = lastReport + REPORT_CYCLE;
-
-        setUpTimer(std::max(now, plannedReport));
+        setupTimer();
     }
 
     Ec2StaticticsReporter::~Ec2StaticticsReporter()
@@ -53,6 +54,7 @@ namespace ec2
         if( !QnDbManager::instance() )
             return ErrorCode::ioError;
 
+        outData->systemId = getOrCreateSystemId();
         {
             ApiMediaServerDataExList mediaservers;
             auto res = QnDbManager::instance()->doQuery(nullptr, mediaservers);
@@ -60,7 +62,11 @@ namespace ec2
                 return res;
 
             for (auto& ms : mediaservers)
+            {
                 outData->mediaservers.push_back(ms);
+                for (auto& storage : ms.storages)
+                    outData->storages.push_back(storage);
+            }
         }
         {
             ApiCameraDataExList cameras;
@@ -75,20 +81,25 @@ namespace ec2
                     outData->cameras.push_back(cam);
         }
 
-        NX_LOG(lit("Ec2StaticticsReporter. Collected: "
-                   "%1 mediaservers, %2 cameras and %3 clients")
+        NX_LOG(lit("Ec2StaticticsReporter. Collected: %1 mediaserver(s)"
+                   ", %2 camera(s) and %3 client(s) in with systemId=%4")
                .arg(outData->mediaservers.size())
                .arg(outData->cameras.size())
-               .arg(outData->clients.size()), cl_logDEBUG1);
+               .arg(outData->clients.size())
+               .arg(outData->systemId.toString()), cl_logDEBUG1);
         return ErrorCode::ok;
     }
 
     ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(
             std::nullptr_t, ApiStatisticsServerInfo* const outData)
     {
+        outData->systemId = getOrCreateSystemId();
         outData->url = REPORT_SERVER;
-        NX_LOG(lit("Ec2StaticticsReporter. Request for statistics report to %1")
-               .arg(REPORT_SERVER), cl_logDEBUG1);
+
+        NX_LOG(lit("Ec2StaticticsReporter. Request for statistics report to %1"
+                   ", for systemId=%2")
+               .arg(REPORT_SERVER)
+               .arg(outData->systemId.toString()), cl_logDEBUG1);
 
         {
             QMutexLocker lk(&m_mutex);
@@ -96,25 +107,65 @@ namespace ec2
                 TimerManager::instance()->joinAndDeleteTimer(*m_timerId);
         }
 
-        if (m_httpClient) return ErrorCode::ok; // already in progress
-
-        return initiateReport();
+        if (m_httpClient)
+        {
+            outData->status = ALREADY_IN_PROGRESS;
+            return ErrorCode::ok;
+        }
+        else
+        {
+            outData->status = JUST_INITIATED;
+            return initiateReport();
+        }
     }
 
-    void Ec2StaticticsReporter::setUpTimer(uint reportTime)
+    void Ec2StaticticsReporter::setupTimer(uint delay)
     {
         static std::once_flag flag;
         std::call_once(flag, [](){ qsrand((uint)QTime::currentTime().msec()); });
 
-        const uint randomDelay = static_cast<uint>(qrand()) % REPORT_MAX_DELAY;
-        const uint plannedTime = reportTime + randomDelay;
-
+        // Add randome delay
+        delay += static_cast<uint>(qrand()) % REPORT_MAX_DELAY;
         NX_LOG(lit("Ec2StaticticsReporter. Planned statistics report time is %1")
-               .arg(QDateTime::fromTime_t(plannedTime).toString()), cl_logDEBUG1);
+               .arg(QDateTime::currentDateTime().addSecs(delay).toString(Qt::ISODate)),
+               cl_logDEBUG1);
 
         QMutexLocker lk(&m_mutex);
         m_timerId = TimerManager::instance()->addTimer(
-                std::bind(&Ec2StaticticsReporter::initiateReport, this), plannedTime);
+                std::bind(&Ec2StaticticsReporter::timerEvent, this), delay);
+    }
+
+    void Ec2StaticticsReporter::timerEvent()
+    {
+        const auto last = m_admin->getProperty(REPORT_LAST_TIME);
+        if (!last.isEmpty())
+        {
+            const auto now = QDateTime::currentDateTime().toTime_t();
+            const auto plan = QDateTime::fromString(last, Qt::ISODate)
+                    .addSecs(REPORT_CYCLE).toTime_t();
+
+            if (plan > now)
+            {
+                setupTimer(plan - now);
+                return;
+            }
+        }
+
+        NX_LOG(lit("Ec2StaticticsReporter. Last report had been executed %1"
+                   "initiating it now %2")
+               .arg(last.isEmpty() ? "NEWER" : last)
+               .arg(QDateTime::currentDateTime().toString(Qt::ISODate)),
+               cl_logDEBUG2);
+
+        if (initiateReport() != ErrorCode::ok)
+        {
+            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1, "
+                       "retry after randome delay...")
+                   .arg(REPORT_SERVER), cl_logWARNING);
+
+            setupTimer();
+        }
+
     }
 
     ErrorCode Ec2StaticticsReporter::initiateReport()
@@ -148,23 +199,23 @@ namespace ec2
     {
         m_httpClient = boost::none;
 
-        const auto now = QDateTime::currentDateTime().toTime_t();
         if( httpClient->state() == nx_http::AsyncHttpClient::sFailed )
         {
-            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1")
+            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1, "
+                       "retry after randome delay...")
                    .arg(REPORT_SERVER), cl_logWARNING);
 
-            // retry after randome dalay
-            setUpTimer(now);
+            setupTimer();
         }
         else
         {
             NX_LOG(lit("Ec2StaticticsReporter. Statistics report sucessfuly sent to %1")
                    .arg(REPORT_SERVER), cl_logINFO);
 
-            // plan for a next report
-            m_admin->setProperty(REPORT_LAST_TIME, QString::number(now));
-            setUpTimer(now + REPORT_CYCLE);
+            const auto now = QDateTime::currentDateTime();
+            m_admin->setProperty(REPORT_LAST_TIME, now.toString(Qt::ISODate));
+            propertyDictionary->saveParams(m_admin->getId());
+            setupTimer(REPORT_CYCLE);
         }
     }
 
@@ -188,5 +239,17 @@ namespace ec2
                 return rType->getId();
 
         return QnUuid(); // null
+    }
+
+    QnUuid Ec2StaticticsReporter::getOrCreateSystemId()
+    {
+        auto systemId = m_admin->getProperty(SYSTEM_ID);
+        if (!systemId.isEmpty())
+            return QnUuid(systemId);
+
+        auto newId = QnUuid::createUuid();
+        m_admin->setProperty(SYSTEM_ID, newId.toString());
+        propertyDictionary->saveParams(m_admin->getId());
+        return newId;
     }
 }

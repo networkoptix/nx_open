@@ -12,15 +12,15 @@ const HardwareInformation& HardwareInformation::instance()
     return hwInfo;
 }
 
-constexpr const QString& gccCpuArchicture()
+constexpr const QString& compileCpuArchicture()
 {
-    #if defined(__i386__)
+    #if defined(__i386__) || defined(_M_IX86)
         return CPU_X86;
-    #elif defined(__x86_64__)
+    #elif defined(__x86_64__) || defined(_M_AMD64)
         return CPU_X86_64;
-    #elif defined(__ia64__)
+    #elif defined(__ia64__) || defined(_M_IX86)
         return CPU_IA64;
-    #elif defined(__arm__) || defined(__aarch64__)
+    #elif defined(__arm__) || defined(_M_ARM)
         return CPU_ARM;
     #else
         return CPU_UNKNOWN;
@@ -31,55 +31,50 @@ constexpr const QString& gccCpuArchicture()
 
     #include <windows.h>
 
+    static const auto REG_CPU_KEY = "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\";
+    static const auto REG_CPU_VALUE = "ProcessorNameString";
+
     HardwareInformation::HardwareInformation()
     {
         MEMORYSTATUSEX stat;
         statex.dwLength = sizeof(stat);
-        if (GlobalMemoryStatusEx(&stat))
-            phisicalMemory = stat.ullAvailPhys;
-        else
-            phisicalMemory = 0;
+        phisicalMemory = GlobalMemoryStatusEx(&stat) ? stat.ullAvailPhys : 0;
+        cpuArchitecture = compileCpuArchicture();
 
-        SYSTEM_INFO cpu;
-        GetSystemInfo(&cpu);
-        switch(cpu)
+        HKEY key;
+        if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, REG_CPU_KEY, 0, KEY_READ, &key)
+                == ERROR_SUCCESS)
         {
-            case PROCESSOR_ARCHITECTURE_INTEL:
-                cpuArchitecture = CPU_X86;
-                break;
-            case PROCESSOR_ARCHITECTURE_AMD64:
-                cpuArchitecture = CPU_X86_64;
-                break;
-            case PROCESSOR_ARCHITECTURE_IA64:
-                cpuArchitecture = CPU_IA64;
-                break;
-            case PROCESSOR_ARCHITECTURE_AMD64:
-                cpuArchitecture = CPU_ARM;
-                break;
-            default:
-                cpuArchitecture = CPU_UNKNOWN;
-                break;
+            WCHAR buffer[512];
+            DWORD size = sizeof(buffer);
+            if (RegQueryValueExW(key, REG_CPU_VALUE, 0, NULL, (LPBYTE)buffer, &size)
+                    == ERROR_SUCCESS)
+                cpuModelName = QString::fromWCharArray(buffer);
+            RegCloseKey(key);
         }
-        cpuCoreCount = cpu.dwNumberOfProcessors;
     }
 
 #elif defined(Q_OS_LINUX)
 
     #include <sys/sysinfo.h>
     #include <unistd.h>
+    #include <fstream>
 
     HardwareInformation::HardwareInformation()
     {
-        struct sysinfo info;
-        if (sysinfo(&info) == 0)
-            phisicalMemory = info.totalram;
-        else
-            phisicalMemory = 0;
+        struct sysinfo sys;
+        phisicalMemory = (sysinfo(&sys) == 0) ? sys.totalram : 0;
+        cpuArchitecture = compileCpuArchicture();
 
-        cpuArchitecture = gccCpuArchicture();
-
-        if ((cpuCoreCount = sysconf(_SC_NPROCESSORS_ONLN)) == -1)
-            cpuCoreCount = 0; // error
+        std::ifstream cpu("/proc/cpuinfo");
+        std::string line;
+        while(std::getline(cpu, line))
+            if (line.find("model name") == 0)
+            {
+                auto model = line.substr(line.find(":") + 2);
+                cpuModelName = QString::fromStdString(model);
+                break;
+            }
     }
 
 #elif defined(Q_OS_OSX)
@@ -94,12 +89,12 @@ constexpr const QString& gccCpuArchicture()
         if (sysctl(mibMem, 2, &phisicalMemory, &length, NULL, 0) == -1)
             phisicalMemory = 0;
 
-        cpuArchitecture = gccCpuArchicture();
+        cpuArchitecture = compileCpuArchicture();
 
-        int mibCpuN[2] = { CTL_HW, HW_NCPU };
-        size_t length = sizeof(int64);
-        if (sysctl(mibCpuN, 2, &memory, &cpuCoreCount, NULL, 0) == -1)
-            cpuCoreCount = 0;
+        char buffer[512];
+        size_t size = sizeof(buffer);
+        if (sysctlbyname("machdep.cpu.brand_string", &bufer, &size, NULL, 0) != -1)
+            cpuModelName = QString::fromLatin1(buffer);
     }
 
 #else

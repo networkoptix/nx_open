@@ -54,6 +54,7 @@ namespace ec2 {
     struct ApiPeerAliveData;
     struct ApiResourceStatusData;
     struct ApiStorageData;
+    struct ApiStorageDataStatistics;
     struct ApiStoredFileData;
     struct ApiStoredFilePath;
     struct ApiUserData;
@@ -112,6 +113,7 @@ namespace ec2 {
     typedef std::vector<ApiResourceParamData> ApiResourceParamDataList;
     typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
     typedef std::vector<ApiStorageData> ApiStorageDataList;
+    typedef std::vector<ApiStorageDataStatistics> ApiStorageDataStatisticsList;
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
@@ -167,6 +169,7 @@ namespace ec2 {
     (ApiResourceStatusData)\
     (ApiStoredFilePath)\
     (ApiStorageData)\
+    (ApiStorageDataStatistics)\
     (ApiStoredFileData)\
     (ApiUserData)\
     (ApiVideowallControlMessageData)\

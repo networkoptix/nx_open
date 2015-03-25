@@ -194,8 +194,8 @@ static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QString CPU_ARCHITECTURE = "cpuArchitecture";
-static const QString CPU_CORE_COUNT = "cpuCoreCount";
-static const QString MEMORY = "memory";
+static const QString CPU_MODEL_NAME = "cpuModelName";
+static const QString PHISICAL_MEMORY = "phisicalMemory";
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -1739,31 +1739,23 @@ void QnMain::run()
         if (settingsAuthKey != authKey)
             encodeAndStoreAuthKey(authKey);
 
-        auto hwInfo = HardwareInformation::instance();
-        if (server->getProperty(CPU_ARCHITECTURE) != hwInfo.cpuArchitecture)
-        {
-            server->setProperty(CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
-            isModified = true;
-        }
-
-        auto cpuCoreCount = QString::number(hwInfo.cpuCoreCount);
-        if (server->getProperty(CPU_CORE_COUNT) != cpuCoreCount)
-        {
-            server->setProperty(CPU_CORE_COUNT, cpuCoreCount);
-            isModified = true;
-        }
-
-        auto phisicalMemory = QString::number(hwInfo.phisicalMemory);
-        if (server->getProperty(MEMORY) != phisicalMemory)
-        {
-            server->setProperty(MEMORY, phisicalMemory);
-            isModified = true;
-        }
-
         if (isModified)
             m_mediaServer = registerServer(ec2Connection, server);
         else
             m_mediaServer = server;
+
+        auto hwInfo = HardwareInformation::instance();
+        if (server->getProperty(CPU_ARCHITECTURE) != hwInfo.cpuArchitecture)
+            server->setProperty(CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+
+        if (server->getProperty(CPU_MODEL_NAME) != hwInfo.cpuModelName)
+            server->setProperty(CPU_MODEL_NAME, hwInfo.cpuModelName);
+
+        auto phisicalMemory = QString::number(hwInfo.phisicalMemory);
+        if (server->getProperty(PHISICAL_MEMORY) != phisicalMemory)
+            server->setProperty(PHISICAL_MEMORY, QVariant(hwInfo.phisicalMemory));
+
+        propertyDictionary->saveParams(server->getId());
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);

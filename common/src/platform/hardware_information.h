@@ -10,7 +10,7 @@ public:
 
     qint64    phisicalMemory;
     QString   cpuArchitecture;
-    qint64    cpuCoreCount;
+    QString   cpuModelName;
 
 private:
     HardwareInformation();

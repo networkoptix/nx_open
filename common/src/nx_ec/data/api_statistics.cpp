@@ -15,18 +15,20 @@ namespace std
 }
 
 const static std::unordered_set<QString> CAMERA_EXTRA_PARAMS = {
-    lit("MaxFPS"), lit("firmware"), lit("hasDualStreaming"), lit("isAudioSupported")
+    lit("MaxFPS"), lit("cameraSettingsId"), lit("firmware"), lit("hasDualStreaming"),
+    lit("isAudioSupported"), lit("mediaStreams"), lit("ptzCapabilities"),
 };
 const static std::unordered_set<QString> CLIENT_EXTRA_PARAMS = {
-    lit("cpuArchitecture"), lit("cpuCoreCount"), lit("memory"), lit("videoChipset"), lit("videoMemory")
+    lit("cpuArchitecture"), lit("cpuModelName"), lit("phisicalMemory"), lit("videoCard"), lit("videoDriver")
 };
 const static std::unordered_set<QString> MEDIASERVER_EXTRA_PARAMS = {
-    lit("cpuArchitecture"), lit("cpuCoreCount"), lit("memory")
+    lit("cpuArchitecture"), lit("cpuModelName"), lit("phisicalMemory")
 };
 
 namespace ec2 {
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
-            (ApiCameraDataStatistics)(ApiClientDataStatistics)(ApiMediaServerDataStatistics) \
+            (ApiCameraDataStatistics)(ApiClientDataStatistics) \
+            (ApiStorageDataStatistics)(ApiMediaServerDataStatistics) \
             (ApiSystemStatistics)(ApiStatisticsServerInfo), \
             (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
 
@@ -52,6 +54,11 @@ namespace ec2 {
     ApiClientDataStatistics::ApiClientDataStatistics(const ApiCameraDataEx& data)
         : ApiCameraDataEx(data)
         , extraParams(getExtraParams(addParams, CLIENT_EXTRA_PARAMS)) {}
+
+    ApiStorageDataStatistics::ApiStorageDataStatistics() {}
+
+    ApiStorageDataStatistics::ApiStorageDataStatistics(const ApiStorageData& data)
+        : ApiStorageData(data) {}
 
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics() {}
 
