@@ -71,7 +71,8 @@ QnFfmpegTranscoder::QnFfmpegTranscoder()
     m_formatCtx(0),
     m_ioContext(0),
     m_baseTime(AV_NOPTS_VALUE),
-    m_inMiddleOfStream(false)
+    m_inMiddleOfStream(false),
+    m_startTimeOffset(0)
 {
     NX_LOG( lit("Created new ffmpeg transcoder. Total transcoder count %1").
         arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
@@ -344,7 +345,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 {
     Q_UNUSED(result)
     if ((quint64)m_baseTime == AV_NOPTS_VALUE)
-        m_baseTime = media->timestamp;
+        m_baseTime = media->timestamp - m_startTimeOffset;
 
     if (m_audioCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
         return 0;
