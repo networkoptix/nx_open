@@ -52,7 +52,7 @@ bool QnAbstractStorageResource::isUsedForWriting() const
 
 QString QnAbstractStorageResource::getUniqueId() const
 {
-    return QLatin1String("storage://") + getUrl();
+    return getId().toString();
 }
 
 #ifdef ENABLE_DATA_PROVIDERS

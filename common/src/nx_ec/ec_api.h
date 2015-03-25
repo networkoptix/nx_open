@@ -1005,12 +1005,12 @@ namespace ec2
     class AbstractMiscManager : public QObject {
         Q_OBJECT
     public:
-        template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive, TargetType *target, HandlerType handler) {
             return sendModuleInformation(moduleInformation, isAlive, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int sendModuleInformationList(const QList<QnModuleInformationWithAddresses> &moduleInformationList, TargetType *target, HandlerType handler) {
             return sendModuleInformation(moduleInformationList, std::static_pointer_cast<impl::SimpleHandler>(
                  std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -1040,12 +1040,12 @@ namespace ec2
 
 
     signals:
-        void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive);
+        void moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive);
         void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
 
     protected:
-        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendModuleInformation(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendModuleInformationList(const QList<QnModuleInformationWithAddresses> &moduleInformationList, impl::SimpleHandlerPtr handler) = 0;
         virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     };
@@ -1093,6 +1093,7 @@ namespace ec2
         virtual AbstractMiscManagerPtr getMiscManager() = 0;
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
         virtual AbstractTimeManagerPtr getTimeManager() = 0;
+        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer) const = 0;
 
         /*!
             \param handler Functor with params: (requestID, ErrorCode, QByteArray dbFile)

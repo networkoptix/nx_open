@@ -19,6 +19,14 @@ HostAddress::HostAddress()
     memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
 }
 
+HostAddress::HostAddress( const HostAddress& rhs )
+:
+    m_addrStr( rhs.m_addrStr ),
+    m_sinAddr( rhs.m_sinAddr ),
+    m_addressResolved( rhs.m_addressResolved )
+{
+}
+
 HostAddress::HostAddress( HostAddress&& rhs )
 :
     m_addrStr( std::move(rhs.m_addrStr) ),
@@ -97,6 +105,15 @@ QString HostAddress::toString() const
         m_addrStr = QLatin1String(inet_ntoa(m_sinAddr));
     }
     return m_addrStr.get();
+}
+
+HostAddress& HostAddress::operator=( const HostAddress& rhs )
+{
+    m_addrStr = rhs.m_addrStr;
+    m_sinAddr = rhs.m_sinAddr;
+    m_addressResolved = rhs.m_addressResolved;
+
+    return *this;
 }
 
 HostAddress& HostAddress::operator=( HostAddress&& rhs )

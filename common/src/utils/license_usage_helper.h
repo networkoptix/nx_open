@@ -21,12 +21,12 @@ signals:
     void licenseUsageChanged();
 };
 
+typedef std::array<int, Qn::LC_Count> licensesArray;
+
 class QnLicenseUsageHelper: public Connective<QObject>
 {
     Q_OBJECT
     typedef  Connective<QObject> base_type;
-
-    typedef std::array<int, Qn::LC_Count> licensesArray;
 public:
     QnLicenseUsageHelper(QObject *parent = NULL);
 
@@ -93,7 +93,7 @@ public:
     /** Mark data as invalid and needs to be recalculated. */
     void invalidate();
 protected:
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const = 0;
+    virtual void calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
 
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
@@ -139,22 +139,10 @@ public:
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const override;
-    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const override;
+    virtual void calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
     void init();
-
-    bool cameraRequiresLicense(const QnVirtualCameraResourcePtr &camera, Qn::LicenseType licenseType, bool countProposed) const;
-
-    /** 
-     *  Utility function to get sets of analog cameras numbers, distributed by the following rules:
-     *  - Each set must contain cameras from the same encoder
-     *  - Each set must contain no more than QnLicensePool::camerasPerAnalogEncoder cameras
-     *  Camera sets then reduced to just number of cameras in the set.
-     *  Result is sorted in reversed order (from biggest sets to smallest).
-     */
-    QList<int> analogEncoderCameraSets(bool countProposed) const;
 
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
@@ -180,8 +168,7 @@ public:
     static int licensesForScreens(int screens);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const override;
-
+    virtual void calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 private:
     int m_proposed;
 };

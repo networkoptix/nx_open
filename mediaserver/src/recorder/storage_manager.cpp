@@ -171,6 +171,8 @@ public:
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
         }
+        m_owner->testStoragesDone();
+
     }
 private:
     QnStorageManager* m_owner;
@@ -190,7 +192,8 @@ QnStorageManager::QnStorageManager():
     m_warnSended(false),
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
-    m_rebuildArchiveThread(0)
+    m_rebuildArchiveThread(0),
+    m_firstStorageTestDone(false)
 {
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
@@ -498,7 +501,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         QMutexLocker lock(&m_mutexStorages);
         m_storagesStatisticsReady = false;
     
-        NX_LOG(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getPath()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+        NX_LOG(QString("Adding storage. Path: %1").arg(storage->getPath()), cl_logINFO);
 
         removeStorage(storage); // remove existing storage record if exists
         //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
@@ -957,10 +960,18 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
+void QnStorageManager::testStoragesDone()
+{
+    m_firstStorageTestDone = true;
+}
+
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
     //QMutexLocker lock(&m_mutexStorages);
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
+        NX_LOG(QString("Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB").
+            arg(fileStorage->getPath()).arg(fileStorage->getSpaceLimit() / 1024 / 1024).arg(fileStorage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+
         // add data before storage goes to the writable state
         doMigrateCSVCatalog(fileStorage);
         addDataFromDatabase(fileStorage);
@@ -1066,8 +1077,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
     }
     else {
-        qDebug() << "No storage available for recording";
-        if (!m_warnSended) {
+        if (!m_warnSended && m_firstStorageTestDone) {
+            qWarning() << "No storage available for recording";
             emit noStoragesAvailable();
             m_warnSended = true;
         }

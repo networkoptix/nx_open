@@ -5,6 +5,7 @@ import fnmatch
 import subprocess
 import shutil
 import sys
+import plistlib
 
 from os.path import join
 
@@ -38,6 +39,8 @@ def prepare(binary, sbindir, tlibdir):
 
     os.mkdir(tlibdir)
 
+    tresdir = join(os.path.dirname(tbindir), 'Resources')
+
     shutil.copyfile(join(sbindir, 'client'), binary)
     os.chmod(binary, 0755)
     yield binary
@@ -51,7 +54,7 @@ def prepare(binary, sbindir, tlibdir):
             os.chmod(dep, 0644)
             yield dep
 
-    shutil.copytree(join(sbindir, 'vox'), join(tbindir, 'vox'))
+    shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
 
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
@@ -77,7 +80,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
             change_dep_path(binary, full_name, name)
         elif name.startswith('Q'):
             # name: QtCore
-            # 
+            #
             # QtCore.framework
             framework_name = '{name}.framework'.format(name=name)
             if framework_name in qframeworks:
@@ -89,7 +92,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
                 if not os.path.exists(join(tlibdir, folder, name)):
                     # <source>/QtCore.framework/Versions/5/QtCore
                     fpath = join(qlibdir, folder, name)
-                    
+
                     # <target>/QtCore.framework
                     troot = join(tlibdir, framework_name)
 
@@ -108,7 +111,10 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
 
                     info_plist_path = join(qlibdir, framework_name, 'Contents', 'Info.plist')
                     info_plist = open(info_plist_path).read().replace('_debug', '')
-                    open(join(resources_dir, 'Info.plist'), 'w').write(info_plist)
+                    plist_obj = plistlib.readPlistFromString(info_plist)
+                    plist_obj['CFBundleIdentifier'] = 'org.qt-project.{}'.format(name)
+                    plist_obj['CFBundleVersion'] = '5.2.1'
+                    plistlib.writePlist(plist_obj, join(resources_dir, 'Info.plist'))
 
                     os.symlink(join('Versions/Current', name), join(troot, name))
                     os.symlink('Versions/Current/Resources', join(troot, 'Resources'))
@@ -129,7 +135,7 @@ def main(app_path, bindir, libdir, helpdir):
     for binary in prepare(client_binary, bindir, tlibdir):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir)
 
-    shutil.copytree(helpdir, "{app_path}/Contents/MacOS/help".format(app_path=app_path))
+    shutil.copytree(helpdir, "{app_path}/Contents/Resources/help".format(app_path=app_path))
 
 if __name__ == '__main__':
     _, appdir, bindir, libdir, helpdir = sys.argv

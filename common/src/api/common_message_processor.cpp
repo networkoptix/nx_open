@@ -337,9 +337,6 @@ void QnCommonMessageProcessor::resetResources(const QnResourceList& resources) {
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
     
-    /* Remove all incompatible resources - they will be added if exist. */
-    qnResPool->removeResources(qnResPool->getAllIncompatibleResources());
-
     /* Packet adding. */
     qnResPool->beginTran();
     for (const QnResourcePtr& resource: resources) {

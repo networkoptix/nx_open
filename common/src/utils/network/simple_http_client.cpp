@@ -230,8 +230,6 @@ int CLSimpleHTTPClient::readHeaders()
     while (eofPos == 0)
     {
         int readed = m_sock->recv(curPtr, left);
-        if( readed == 0 )
-            return CL_NOT_HTTP; //connection closed before we could read some http header(s)
         if (readed < 1)
             return CL_TRANSPORT_ERROR;
         curPtr += readed;
@@ -347,7 +345,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         //got following status line: http/1.1 401 n/a, and this method returned CL_TRANSPORT_ERROR
         nx_http::StatusLine statusLine;
         if( !statusLine.parse( m_responseLine ) )
-            return CL_NOT_HTTP;
+            return CL_TRANSPORT_ERROR;
 
         //if (!m_responseLine.contains("200 ok") && !m_responseLine.contains("204 no content"))// not ok
         if( statusLine.statusCode != nx_http::StatusCode::ok && statusLine.statusCode != nx_http::StatusCode::noContent )
