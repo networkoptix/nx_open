@@ -471,6 +471,7 @@ namespace ec2
         QnUuid getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
     protected: 
+        virtual bool beforeInstallUpdate(const QString& updateName) override;
         virtual bool afterInstallUpdate(const QString& updateName) override;
 
     private:
@@ -498,9 +499,7 @@ namespace ec2
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        bool applyUpdates();
 
-        bool beforeInstallUpdate(const QString& updateName);
         ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
@@ -532,6 +531,7 @@ namespace ec2
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
+        bool m_needResyncCameraUserAttributes;
         bool m_dbJustCreated;
         bool m_isBackupRestore;
     };

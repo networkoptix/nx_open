@@ -30,8 +30,12 @@ static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
 
 static RtpTransport::Value defaultTransportToUse( RtpTransport::_auto );
 
-QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
+QnMulticodecRtpReader::QnMulticodecRtpReader(
+    const QnResourcePtr& res,
+    std::unique_ptr<AbstractStreamSocket> tcpSock )
+:
     QnResourceConsumer(res),
+    m_RtpSession(std::move(tcpSock)),
     m_timeHelper(res->getUniqueId()),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
@@ -373,7 +377,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     }
     
     if (result)
-        connect(result, SIGNAL(packetLostDetected(quint32, quint32)), this, SLOT(at_packetLost(quint32, quint32)));
+        connect(result, &QnRtpStreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost, Qt::DirectConnection);
     return result;
 }
 
@@ -583,6 +587,11 @@ QnConstResourceVideoLayoutPtr QnMulticodecRtpReader::getVideoLayout() const
 {
     QMutexLocker lock(&m_layoutMutex);
     return m_customVideoLayout;
+}
+
+void QnMulticodecRtpReader::setUserAgent(const QString& value)
+{
+    m_RtpSession.setUserAgent(value);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

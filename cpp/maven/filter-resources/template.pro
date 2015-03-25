@@ -155,7 +155,11 @@ unix:!mac {
     QMAKE_CXXFLAGS += ${compiler.arguments}
     QMAKE_CFLAGS += ${compiler.arguments}
     QMAKE_LFLAGS += ${compiler.arguments}
-    QMAKE_CXXFLAGS += -msse2
+    !clang: {
+        QMAKE_CXXFLAGS += -msse2
+    } else {
+        QMAKE_CXXFLAGS += -msse4.1
+    }
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
   } else {
     LIBS -= -lssl

@@ -6,7 +6,7 @@
         "custom_red":               "#C10505",
         "custom_grey":              "#D4D4D4",
         "custom_green":             "#8ABF22",
-        "darkGrey":                 "#231F20",
+        "dark_grey":                "#231F20",
         "opaqueSelection":          "custom_blue",
         "ptz":                      "opaqueSelection",
         "selection":                "opaqueSelection.setAlpha(110)",
@@ -260,6 +260,8 @@
             "selection": "selection.setAlpha(192)",
             "primaryRecording": "#208020ff",
             "secondaryRecording": "#20ff20ff",
+            "primaryBookmark": "#3775C4ff",
+            "secondaryBookmark": "#69A4F0ff",
             "primaryMotion": "#800000ff",
             "secondaryMotion": "#ff0000ff",
             "separator": "#000000ff"

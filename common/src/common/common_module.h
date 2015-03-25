@@ -93,6 +93,7 @@ public:
     inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 signals:
     void systemNameChanged(const QString &systemName);
+    void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
 protected:
@@ -101,7 +102,6 @@ protected:
 private:
     QnSessionManager *m_sessionManager;
     QnResourceDataPool *m_dataPool;
-    QString m_localSystemName;
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;

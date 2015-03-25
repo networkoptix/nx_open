@@ -21,7 +21,7 @@
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <link rel="stylesheet" href="styles/29403685.vendor.css"/>
 
-                <link rel="stylesheet" href="styles/5ec712d0.main.css"/>
+                <link rel="stylesheet" href="styles/84c3fe2d.main.css"/>
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
@@ -30,7 +30,7 @@
                     <div class="container">
                         <div class="navbar-header">
                             <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" >
-                                <img src="customization/hdw_logo.png" height="48"/>
+                                <img src="customization/webadmin_logo.png" height="48"/>
                                 API Reference
                             </a>
                         </div>

@@ -219,23 +219,27 @@ signals:
     //!Emitted on completion of every async get started with getParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
-        \param result true, if param successfully read, false otherwise
+        \param success true, if param successfully read, false otherwise
     */
-    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result) const;
+    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QString &paramValue, bool success) const;
+
+    void asyncParamsGetDone(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values) const;
     
     //!Emitted on completion of every async set started with setParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
-        \param result true, if param successfully set, false otherwise
+        \param success true, if param successfully set, false otherwise
     */
-    void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
+    void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QString &paramValue, bool success);
+
+    void asyncParamsSetDone(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values) const;
 
 public:
 #ifdef ENABLE_DATA_PROVIDERS
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(const QSharedPointer<QnResourceCommand> &command);
+    static void addCommandToProc(const QnResourceCommandPtr &command);
     static int commandProcQueueSize();
 #endif
 
@@ -248,11 +252,15 @@ public:
 
     QnResourcePtr toSharedPointer() const;
 
-    virtual bool getParamPhysical(const QString &name, QVariant &val);
-    virtual bool setParamPhysical(const QString& name, const QVariant& value);
     // should just do physical job ( network or so ) do not care about memory domain
-    void setParamPhysicalAsync(const QString &name, const QVariant &val);
-    void getParamPhysicalAsync(const QString &name);
+    virtual bool getParamPhysical(const QString &id, QString &value);
+    virtual bool setParamPhysical(const QString &id, const QString &value);
+
+    void getParamPhysicalAsync(const QString &id);
+    void setParamPhysicalAsync(const QString &id, const QString &value);
+    
+    void getParamsPhysicalAsync(const QSet<QString> &ids);
+    void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
@@ -352,7 +360,6 @@ private:
     bool m_initialized;    
     QMutex m_initAsyncMutex;
 
-    static QnInitResPool m_initAsyncPool;
     qint64 m_lastInitTime;
     CameraDiagnostics::Result m_prevInitializationResult;
     CameraDiagnostics::Result m_lastMediaIssue;

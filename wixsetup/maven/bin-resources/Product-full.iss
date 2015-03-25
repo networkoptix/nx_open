@@ -18,6 +18,8 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "cn"; MessagesFile: "Languages\ChineseSimplified.isl"
 #elif Lang == "zh-TW"
 Name: "tr_cn"; MessagesFile: "Languages\ChineseTraditional.isl"
+#elif Lang == "ko-kr"
+Name: "ko"; MessagesFile: "Languages\korean.isl"
 #else
 Name: "en"; MessagesFile: "compiler:Default.isl"
 #endif
@@ -44,6 +46,13 @@ tr_cn.LaunchBoth=啟動伺服器與客戶端安裝程序
 tr_cn.LaunchClient=啟動客戶端安裝程序
 tr_cn.LaunchServer=啟動伺服器安裝程序
 tr_cn.NewerVersionAlreadyInstalled=您已安裝較新的版本, 程序即將結束.
+#elif Lang == "ko-kr"
+ko.ClientIsAlreadyInstalled=클라이언트가 이미 설치되었습니다
+ko.ServerIsAlreadyInstalled=서버가 이미 설치되었습니다
+ko.LaunchBoth=서버와 클리아언트 설치 시작
+ko.LaunchClient=클라이언트 설치 시작
+ko.LaunchServer=서버 설치 시작
+ko.NewerVersionAlreadyInstalled=새로운 소프트웨어가 설치 되었습니다. 종료.
 #else
 en.ClientIsAlreadyInstalled=Client is already installed
 en.ServerIsAlreadyInstalled=Server is already installed

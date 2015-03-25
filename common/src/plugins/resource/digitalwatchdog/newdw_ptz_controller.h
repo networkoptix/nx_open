@@ -13,7 +13,7 @@ class QnNewDWPtzController: public QnBasicPtzController {
     typedef QnBasicPtzController base_type;
 
 public:
-    QnNewDWPtzController(const QnPlWatchDogResourcePtr &resource);
+    QnNewDWPtzController(const QnDigitalWatchdogResourcePtr &resource);
     virtual ~QnNewDWPtzController();
 
     virtual Qn::PtzCapabilities getCapabilities() override;
@@ -29,7 +29,7 @@ private:
     QString toInternalID(const QString& externalId);
     QString fromExtarnalID(const QString& externalId);
 private:
-    QSharedPointer<QnPlWatchDogResource> m_resource;
+    QnDigitalWatchdogResourcePtr m_resource;
     QMap<QString, QString> m_extIdToIntId;
     mutable QMutex m_mutex;
     QMap<QString, QString> m_cachedData;

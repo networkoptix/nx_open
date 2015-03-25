@@ -93,6 +93,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->advancedTab,                                           Qn::CameraSettings_Properties_Help);
     setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Dewarping_Help);
     setHelpTopic(ui->forceArCheckBox, ui->forceArComboBox,                  Qn::CameraSettings_AspectRatio_Help);
+    setHelpTopic(ui->forceRotationCheckBox, ui->forceRotationComboBox,      Qn::CameraSettings_Rotation_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -765,11 +766,11 @@ void QnSingleCameraSettingsWidget::updateWebPageText() {
                 webPageAddress += QLatin1Char(':') + QString::number(url.port());
         }
 
-        ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+        ui->webPageLabel->setText(lit("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
 
         if (!m_camera->isDtsBased()) {
             // TODO #Elric: wrong, need to get camera-specific web page
-            ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+            ui->motionWebPageLabel->setText(lit("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         } else {
             ui->motionWebPageLabel->clear();
         }
@@ -782,8 +783,7 @@ void QnSingleCameraSettingsWidget::updateWebPageText() {
 void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked() {
     if (QMessageBox::warning(this,
         tr("Confirm motion regions reset"),
-        tr("Are you sure you want to reset motion regions to the defaults?\n"\
-        "This action CANNOT be undone!"),
+        tr("Are you sure you want to reset motion regions to the defaults?") + L'\n' + tr("This action CANNOT be undone!"),
         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
         QMessageBox::Cancel) == QMessageBox::Cancel)
         return;

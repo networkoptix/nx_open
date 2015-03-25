@@ -47,13 +47,16 @@ QnBackgroundColors::QnBackgroundColors() {
     panic = QColor(255, 0, 0, 255);
 }
 
-QnCalendarColors::QnCalendarColors() {
-    selection = QColor(0, 150, 255, 192);
-    primaryRecording = QColor(32, 128, 32, 255);
-    secondaryRecording = QColor(32, 255, 32, 255);
-    primaryMotion = QColor(128, 0, 0, 255);
-    secondaryMotion = QColor(255, 0, 0, 255);
-    separator = QColor(0, 0, 0, 255);
+QnCalendarColors::QnCalendarColors()
+    : selection(0, 150, 255, 192)
+    , primaryRecording(32, 128, 32, 255)
+    , secondaryRecording(32, 255, 32, 255)
+    , primaryBookmark(55, 117, 196, 255)
+    , secondaryBookmark(105, 164, 240, 255)
+    , primaryMotion(128, 0, 0, 255)
+    , secondaryMotion(255, 0, 0, 255)
+    , separator(0, 0, 0, 255)
+{
 }
 
 QnStatisticsColors::QnStatisticsColors() {
@@ -85,6 +88,10 @@ QnScheduleGridColors::QnScheduleGridColors() {
     weekendLabel =  QColor(255, 128, 128, 255);
     selectedLabel = QColor(64,  128, 192, 255);
     disabledLabel = QColor(183, 183, 183, 255);
+
+    recordNever =   QColor(64,  64,  64);
+    recordAlways =  QColor(0,   100, 0);
+    recordMotion =  QColor(100, 0,   0);
 }
 
 QnGridColors::QnGridColors() {

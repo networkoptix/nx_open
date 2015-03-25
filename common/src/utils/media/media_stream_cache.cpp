@@ -102,7 +102,7 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 {
     QMutexLocker lk( &m_mutex );
 
-    const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.data());
+    const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.get());
     const bool isKeyFrame = mediaPacket && (mediaPacket->flags & QnAbstractMediaData::MediaFlags_AVKey);
     if( m_packetsByTimestamp.empty() && !isKeyFrame )
         return; //cache data MUST start with key frame
@@ -197,7 +197,7 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
             it != lastItToRemove;
             ++it )
         {
-            const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(it->packet.data());
+            const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(it->packet.get());
             if( mediaPacket )
                 m_cacheSizeInBytes -= mediaPacket->dataSize();
         }
@@ -252,6 +252,7 @@ int MediaStreamCache::getMaxBitrate() const
     const qint64 durationUSec = m_packetsByTimestamp.empty() ? 0 : (m_packetsByTimestamp.rbegin()->timestamp - m_packetsByTimestamp.begin()->timestamp);
     if( durationUSec == 0 )
         return -1;
+    //TODO: #ak is is normal to make calculations in 64 bit and return 32 bit?
     return ((qint64)m_cacheSizeInBytes) * USEC_PER_SEC / durationUSec * CHAR_BIT;
 }
 

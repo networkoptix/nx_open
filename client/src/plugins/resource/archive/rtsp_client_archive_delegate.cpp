@@ -236,8 +236,12 @@ bool QnRtspClientArchiveDelegate::openInternal() {
    
     if (!m_fixedServer) {
         m_server = getServerOnTime(m_position); // try to update server
-        if (m_server == 0 || m_server->getStatus() == Qn::Offline)
+        if (m_server == 0 || m_server->getStatus() == Qn::Offline) 
+        {
+            if (m_isMultiserverAllowed && m_globalMinArchiveTime == AV_NOPTS_VALUE)
+                checkMinTimeFromOtherServer(m_camera);
             return false;
+        }
     }
 
     setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);
@@ -246,7 +250,8 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
-        checkMinTimeFromOtherServer(m_camera);
+        if (m_isMultiserverAllowed)
+            checkMinTimeFromOtherServer(m_camera);
 
         qint64 endTime = m_position;
         if (m_forcedEndTime)
@@ -464,7 +469,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
         }
         else if (format == QLatin1String("ffmpeg")) {
-            result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2, &parserPosition));
+            result = std::dynamic_pointer_cast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2, &parserPosition));
             if (!result && m_frameCnt == 0 && receiveTimer.elapsed() > 4000)
                 emit dataDropped(m_reader); // if client can't receive first frame too long inform that stream is slow
         }
@@ -475,7 +480,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
 
         if (result && m_sendedCSec != result->opaque)
-            result.clear(); // ignore old archive data
+            result.reset(); // ignore old archive data
         if (result && parserPosition != AV_NOPTS_VALUE)
             m_position = parserPosition;
         /*

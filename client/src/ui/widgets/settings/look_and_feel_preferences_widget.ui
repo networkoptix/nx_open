@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>419</width>
-    <height>469</height>
+    <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -164,12 +164,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLabel" name="timeModeWarningLabel">
-        <property name="text">
-         <string>This option will not affect Recording Schedule.
-Recording Schedule is always based on Server Time.</string>
-        </property>
-       </widget>
+       <widget class="QnWordWrappedLabel" name="timeModeWarningLabel" native="true"/>
       </item>
      </layout>
     </widget>
@@ -432,6 +427,14 @@ Recording Schedule is always based on Server Time.</string>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>languageComboBox</tabstop>
   <tabstop>skinComboBox</tabstop>

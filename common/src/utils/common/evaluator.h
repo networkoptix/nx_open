@@ -182,28 +182,28 @@ namespace Qee {
 
         QVariant get(int index) const { 
             if(index < 0 || index >= m_size)
-                throw IllegalArgumentException(tr("Parameter %2 is not specified for function '%1'.").arg(m_name).arg(index));
+                throw IllegalArgumentException(lit("Parameter %2 is not specified for function '%1'.").arg(m_name).arg(index));
             return ref(index);
         }
 
         template<class T>
         T get(int index) const {
             if(index < 0 || index >= m_size)
-                throw IllegalArgumentException(tr("Parameter %2 is not specified for function '%1'.").arg(m_name).arg(index));
+                throw IllegalArgumentException(lit("Parameter %2 is not specified for function '%1'.").arg(m_name).arg(index));
             const QVariant &param = ref(index);
             if(!param.canConvert<T>())
-                throw IllegalArgumentException(tr("Parameter %2 of function '%1' is of type '%3', but type '%4' was expected.").arg(m_name).arg(index).arg(QLatin1String(param.typeName())).arg(QLatin1String(QMetaType::typeName(qMetaTypeId<T>()))));
+                throw IllegalArgumentException(lit("Parameter %2 of function '%1' is of type '%3', but type '%4' was expected.").arg(m_name).arg(index).arg(QLatin1String(param.typeName())).arg(QLatin1String(QMetaType::typeName(qMetaTypeId<T>()))));
             return param.value<T>();
         }
 
         void requireSize(int size) const {
             if(m_size != size)
-                throw IllegalArgumentException(tr("Function '%1' is expected to have %3 arguments, %2 provided.").arg(m_name).arg(m_size).arg(size));
+                throw IllegalArgumentException(lit("Function '%1' is expected to have %3 arguments, %2 provided.").arg(m_name).arg(m_size).arg(size));
         }
 
         void requireSize(int minSize, int maxSize) const {
             if(m_size < minSize || m_size > maxSize)
-                throw IllegalArgumentException(tr("Function '%1' is expected to have %3-%4 arguments, %2 provided.").arg(m_name).arg(m_size).arg(minSize).arg(maxSize));
+                throw IllegalArgumentException(lit("Function '%1' is expected to have %3-%4 arguments, %2 provided.").arg(m_name).arg(m_size).arg(minSize).arg(maxSize));
         }
 
     private:

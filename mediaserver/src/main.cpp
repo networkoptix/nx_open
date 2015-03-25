@@ -42,6 +42,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -97,6 +98,7 @@
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
 #include <rest/handlers/camera_bookmarks_rest_handler.h>
+#include <rest/handlers/crash_server_handler.h>
 #include <rest/handlers/external_business_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
 #include <rest/handlers/image_rest_handler.h>
@@ -241,8 +243,7 @@ public:
 #else
             lit("INFO")
 #endif
-        ),
-        msgLogLevel( lit("none") )
+        )
     {
     }
 };
@@ -681,6 +682,8 @@ int serverMain(int argc, char *argv[])
 
 
     const QString& dataLocation = getDataDirectory();
+    const QString& logDir = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
+
     QDir::setCurrent(qApp->applicationDirPath());
 
     if (cmdLineArguments.rebuildArchive.isEmpty()) {
@@ -690,11 +693,16 @@ int serverMain(int argc, char *argv[])
 
     initLog(cmdLineArguments.logLevel);
 
+    if( cmdLineArguments.msgLogLevel.isEmpty() )
+        cmdLineArguments.msgLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::HTTP_MSG_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL ).toString();
+
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
-            dataLocation + QLatin1String("/log/http_log"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            logDir + QLatin1String("/http_log"),
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
 
     //preparing transaction log
@@ -706,9 +714,9 @@ int serverMain(int argc, char *argv[])
     if( cmdLineArguments.ec2TranLogLevel != lit("none") )
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            dataLocation + QLatin1String("/log/ec2_tran"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            logDir + QLatin1String("/ec2_tran"),
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
@@ -718,13 +726,6 @@ int serverMain(int argc, char *argv[])
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(argv[0])), cl_logALWAYS);
     }
-
-    if (cmdLineArguments.rebuildArchive == "all")
-        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
-    else if (cmdLineArguments.rebuildArchive == "hq")
-        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_HQ);
-    else if (cmdLineArguments.rebuildArchive == "lq")
-        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
 
     NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
     NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
@@ -787,7 +788,7 @@ void initAppServerConnection(QSettings &settings)
         QString staticDBPath = settings.value("staticDataDir").toString();
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
-		}
+        }
         if (MSSettings::roSettings()->value(REMOVE_DB_PARAM_NAME).toBool())
             params.addQueryItem("cleanupDb", QString());
     }
@@ -993,6 +994,17 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             messageProcessor->updateResource(mediaServer);
         }
 
+        // read resource status
+        ec2::ApiResourceStatusDataList statusList;
+        while ((rez = ec2Connection->getResourceManager()->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
+        {
+            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->resetStatusList( statusList );
+
         //reading server attributes
         QnMediaServerUserAttributesList mediaServerUserAttributesList;
         while ((rez = ec2Connection->getMediaServerManager()->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
@@ -1061,16 +1073,6 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
 
-        // read resource status
-        ec2::ApiResourceStatusDataList statusList;
-        while ((rez = ec2Connection->getResourceManager()->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetStatusList( statusList );
     }
 
     {
@@ -1115,6 +1117,21 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 
         for(const QnVideoWallResourcePtr &videowall: videowalls)
             messageProcessor->updateResource(videowall);
+    }
+
+    {
+        //loading layouts
+        QnLayoutResourceList layouts;
+        while(( rez = ec2Connection->getLayoutManager()->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+
+        for(const auto &layout: layouts)
+            messageProcessor->updateResource(layout);
     }
 
     {
@@ -1231,15 +1248,29 @@ void QnMain::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
+void QnMain::at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address)
+{
+    qnBusinessRuleConnector->at_mediaServerConflict(
+                qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(),
+                qnSyncTime->currentUSecsSinceEpoch(),
+                moduleInformation,
+                QUrl(lit("http://%1").arg(address.toString())));
+}
+
 void QnMain::at_timer()
 {
     if (isStopping())
         return;
 
+    //TODO: #2.4 #GDM This timer make two totally different functions. Split it.
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    for(const QnVirtualCameraResourcePtr& camera: qnResPool->getAllCameras(mServer))
-        camera->noCameraIssues(); // decrease issue counter
+    if (!mServer)
+        return;
+
+    for(const auto& camera: qnResPool->getAllCameras(mServer, true))
+        camera->cleanCameraIssues();
 }
 
 void QnMain::at_storageManager_noStoragesAvailable() {
@@ -1279,8 +1310,8 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/statistics", new QnStatisticsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/getCameraParam", new QnGetCameraParamRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/setCameraParam", new QnSetCameraParamRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/getCameraParam", new QnCameraSettingsRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/setCameraParam", new QnCameraSettingsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/manualCamera", new QnManualCameraAdditionRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ptz", new QnPtzRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/image", new QnImageRestHandler());
@@ -1313,6 +1344,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(
         QHostAddress::Any,
@@ -1322,7 +1354,7 @@ bool QnMain::initTcpListener()
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
-    QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile(m_universalTcpListener->defaultPage()));
+    QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"));
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
@@ -1410,8 +1442,8 @@ void QnMain::run()
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
-    // Create SessionManager
-    QnSessionManager::instance()->start();
+    // todo: #rvasilenko this class doesn't used any more on the server side
+    //QnSessionManager::instance()->start();
 
 #ifdef ENABLE_ONVIF
     QnSoapServer soapServer;    //starting soap server to accept event notifications from onvif cameras
@@ -1498,8 +1530,8 @@ void QnMain::run()
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
     int guidCompatibility = 0;
-    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
-    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
+    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
+    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     MediaServerStatusWatcher mediaServerStatusWatcher;
@@ -1553,7 +1585,7 @@ void QnMain::run()
     }
     settings->remove(ADMIN_PSWD_HASH);
     settings->remove(ADMIN_PSWD_DIGEST);
-    settings->remove(LOW_PRIORITY_ADMIN_PASSWORD);
+    settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
@@ -1774,8 +1806,10 @@ void QnMain::run()
     selfInformation.id = serverGuid();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    selfInformation.runtimeId = qnCommon->runningInstanceGUID();
 
     qnCommon->setModuleInformation(selfInformation);
+    updateModuleInfo();
 
     m_moduleFinder = new QnModuleFinder( false );
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
@@ -1790,6 +1824,8 @@ void QnMain::run()
         }
         qnCommon->setAllowedPeers(allowedPeers);
     }
+
+    connect(m_moduleFinder, &QnModuleFinder::moduleConflict, this, &QnMain::at_serverModuleConflict);
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
 
@@ -1898,6 +1934,9 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+    if (adminUser)
+        connect(adminUser.data(), &QnResource::resourceChanged, this, &QnMain::updateModuleInfo);
 
     QnAbstractStorageResourceList storages = m_mediaServer->getStorages();
     QnAbstractStorageResourceList modifiedStorages = createStorages(m_mediaServer);
@@ -1906,9 +1945,7 @@ void QnMain::run()
     for(const QnAbstractStorageResourcePtr &storage: modifiedStorages)
         messageProcessor->updateResource(storage);
 
-    qnStorageMan->doMigrateCSVCatalog();
     qnStorageMan->initDone();
-
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
     updateAllowCameraCHangesIfNeed();
@@ -1946,13 +1983,12 @@ void QnMain::run()
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
-    at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    timer.start(QnVirtualCameraResource::issuesTimeoutMs());
+    at_timer();
+
     QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
-    timer.start(60 * 1000);
-
-
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
 
 
@@ -1963,7 +1999,7 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     QnMServerResourceSearcher::instance()->start();
     m_universalTcpListener->start();
-	serverConnector->start();
+    serverConnector->start();
 #if 1
     if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
@@ -1991,6 +2027,8 @@ void QnMain::run()
     stopObjects();
 
     QnResource::stopCommandProc();
+    // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
+    TimerManager::instance()->stop();
 
     hlsSessionPool.reset();
 
@@ -2123,6 +2161,21 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
     }
 }
 
+void QnMain::updateModuleInfo()
+{
+    QnModuleInformation moduleInformationCopy = qnCommon->moduleInformation();
+    if (qnResPool) {
+        QnUserResourcePtr admin = qnResPool->getAdministrator();
+        if (admin) {
+            QCryptographicHash md5(QCryptographicHash::Md5);
+            md5.addData(admin->getHash());
+            md5.addData(moduleInformationCopy.systemName.toUtf8());
+            moduleInformationCopy.authHash = md5.result();
+        }
+        qnCommon->setModuleInformation(moduleInformationCopy);
+    }
+}
+
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {
 public:
@@ -2208,7 +2261,7 @@ private:
     }
 
     QString hardwareIdAsGuid() {
-        QString hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+        QString hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false, MSSettings::roSettings())).toString();
         std::cout << "Got hwID \"" << hwID.toStdString() << "\"" << std::endl;
         return hwID;
     }
@@ -2222,14 +2275,18 @@ private:
         QString hwidGuid = hardwareIdAsGuid();
 
         if (guidIsHWID == YES) {
-            MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            if (serverGuid.isEmpty())
+                MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            else if (serverGuid != hwidGuid)
+                MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
+
             MSSettings::roSettings()->remove(SERVER_GUID2);
         } else if (guidIsHWID == NO) {
             if (serverGuid.isEmpty()) {
                 // serverGuid remove from settings manually?
                 MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
                 MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
-            }
+            }                                            
 
             MSSettings::roSettings()->remove(SERVER_GUID2);
         } else if (guidIsHWID.isEmpty()) {

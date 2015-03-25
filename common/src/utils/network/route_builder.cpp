@@ -74,6 +74,14 @@ QHash<QnUuid, QnRoute> QnRouteBuilder::routes() const {
     return m_routes;
 }
 
+QnRoutePoint QnRouteBuilder::enforcedConnection() const {
+    return m_enforcedConnection;
+}
+
+void QnRouteBuilder::setEnforcedConnection(const QnRoutePoint &enforcedConnection) {
+    m_enforcedConnection = enforcedConnection;
+}
+
 QnRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId, const QnUuid &from) {
     QHash<QnUuid, QnUuid> trace;
     QHash<QPair<QnUuid, QnUuid>, WeightedPoint> usedPoints;
@@ -87,7 +95,20 @@ QnRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId, const QnUuid &from) {
     while (!points.isEmpty()) {
         QnUuid current = points.dequeue();
 
-        for (const WeightedPoint &point: m_connections.values(current)) {
+        QList<WeightedPoint> connections = m_connections.values(current);
+        if (current == m_startId && !m_enforcedConnection.peerId.isNull()) {
+            bool contains = false;
+            for (const WeightedPoint &point: connections) {
+                if (point.first == m_enforcedConnection) {
+                    contains = true;
+                    break;
+                }
+            }
+            if (!contains)
+                connections.append(WeightedPoint(m_enforcedConnection, DEFAULT_ROUTE_POINT_WEIGHT));
+        }
+
+        for (const WeightedPoint &point: connections) {
             QnUuid id = point.first.peerId;
             if (checkedPoints.contains(id))
                 continue;

@@ -24,14 +24,14 @@ namespace ec2 {
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) override;
         virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, impl::SimpleHandlerPtr handler) override;
-        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, impl::SimpleHandlerPtr handler) override;
+        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiModuleData> prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const;
         QnTransaction<ApiModuleDataList> prepareTransaction(const QList<QnModuleInformation> &moduleInformationList) const;
-        QnTransaction<ApiSystemNameData> prepareTransaction(const QString &systemName, qint64 sysIdTime) const;
+        QnTransaction<ApiSystemNameData> prepareTransaction(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) const;
     };
 
 } // namespace ec2

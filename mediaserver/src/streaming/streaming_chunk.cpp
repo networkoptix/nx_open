@@ -161,8 +161,11 @@ StreamingChunkInputStream::StreamingChunkInputStream( StreamingChunk* chunk )
 
 bool StreamingChunkInputStream::tryRead( nx::Buffer* const dataBuffer )
 {
-    if( !m_range || m_range.get().full(m_chunk->sizeInBytes()) )
+    if( (!m_range) ||     //no range specified
+        ((m_range.get().rangeSpec.start == 0) && (m_range.get().rangeLength() == m_chunk->sizeInBytes())) ) //full entity requested
+    {
         return m_chunk->tryRead( &m_readCtx, dataBuffer );
+    }
 
     assert( m_chunk->isClosed() && m_chunk->sizeInBytes() > 0 );
     //supporting byte range only on closed chunk
@@ -170,17 +173,14 @@ bool StreamingChunkInputStream::tryRead( nx::Buffer* const dataBuffer )
         return false;
 
     const nx::Buffer& chunkData = m_chunk->data();
-    for( const nx_http::header::Range::RangeSpec& rangeSpec: m_range.get().rangeSpecList )
-    {
-        dataBuffer->append( chunkData.mid(
-            rangeSpec.start,
-            rangeSpec.end ? (rangeSpec.end.get() - rangeSpec.start) : -1 ) );
-    }
+    dataBuffer->append( chunkData.mid(
+        m_range.get().rangeSpec.start,
+        m_range.get().rangeSpec.end ? (m_range.get().rangeSpec.end.get() - m_range.get().rangeSpec.start) : -1 ) );
 
     return true;
 }
 
-void StreamingChunkInputStream::setByteRange( const nx_http::header::Range& range )
+void StreamingChunkInputStream::setByteRange( const nx_http::header::ContentRange& range )
 {
     m_range = range;
 }

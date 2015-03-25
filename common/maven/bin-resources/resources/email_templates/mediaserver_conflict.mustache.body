@@ -5,7 +5,7 @@
         <table class="details">
             <tr>
                 <th>Number</th>
-                <th>ECS IP</th>
+                <th>Server IP</th>
                 <th>Camera Physical ID</th>
             </tr>
                 {{#msConflicts}}

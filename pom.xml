@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.3.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -65,7 +65,7 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>        
-        <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -352,9 +352,9 @@
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
+                <box>windows</box>
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
-                <box>win78</box>
                 <force_x86>false</force_x86>
                 <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
                 <!-- <qt.spec>win32-msvc2012</qt.spec>
@@ -430,6 +430,7 @@
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
+                <module>plugins/it930x_plugin</module>
             </modules>            
         </profile>  
         <profile>
@@ -576,6 +577,7 @@
             </properties>
             <modules>
                 <module>edge_firmware/rpi</module>
+                <module>plugins/rpi_cam</module>
             </modules>             
         </profile>
 
@@ -623,6 +625,7 @@
             <properties>
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
+		<target.arch>amd64</target.arch>
             </properties>
         </profile>
         <profile>
@@ -641,6 +644,7 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
+		<target.arch>i386</target.arch>
             </properties>
         </profile>  
         <profile>
@@ -659,7 +663,8 @@
             <properties>
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
-                <arch.dir>/usr/lib/i386-linux-gnu/</arch.dir>
+                <arch.dir>i386-linux-gnu/</arch.dir>
+		<target.arch>i386</target.arch>
             </properties>
         </profile>          
         <profile>

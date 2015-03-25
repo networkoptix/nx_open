@@ -41,23 +41,35 @@ public:
 
     static void clearLocalCache();
 
+    static qint64 maximumFileSize();
+
+    enum class OperationResult {
+        ok,
+        disconnected,
+        serverError,
+        fileSystemError,
+        sizeLimitExceeded,
+        invalidOperation
+        
+    };
+
 protected:
     void ensureCacheFolder();
     QString folderName() const;
 
     bool isConnectedToServer() const;
 signals:
-    void fileDownloaded(const QString& filename, bool ok);
-    void delayedFileDownloaded(const QString& filename, bool ok);
+    void fileDownloaded(const QString& filename, OperationResult status);
+    void delayedFileDownloaded(const QString& filename, OperationResult status);
 
-    void fileUploaded(const QString& filename, bool ok);
-    void delayedFileUploaded(const QString& filename, bool ok);
+    void fileUploaded(const QString& filename, OperationResult status);
+    void delayedFileUploaded(const QString& filename, OperationResult status);
 
-    void fileDeleted(const QString& filename, bool ok);
-    void delayedFileDeleted(const QString& filename, bool ok);
+    void fileDeleted(const QString& filename, OperationResult status);
+    void delayedFileDeleted(const QString& filename, OperationResult status);
 
-    void fileListReceived(const QStringList& filenames, bool ok);
-    void delayedFileListReceived(const QStringList& filenames, bool ok);
+    void fileListReceived(const QStringList& filenames, OperationResult status);
+    void delayedFileListReceived(const QStringList& filenames, OperationResult status);
 private slots:
     void at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data );
     void at_fileUploaded(int handle, ec2::ErrorCode errorCode);
@@ -68,5 +80,7 @@ private:
     QHash<int, QString> m_uploading;
     QHash<int, QString> m_deleting;
 };
+
+Q_DECLARE_METATYPE(QnAppServerFileCache::OperationResult)
 
 #endif // APP_SERVER_FILE_CACHE_H

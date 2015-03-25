@@ -418,18 +418,18 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    QVariant mdresult;
-    if (!getResource()->getParamPhysical(QLatin1String("mdresult"), mdresult))
+    QString mdresult;
+    if (!getResource()->getParamPhysical(lit("mdresult"), mdresult))
         return QnMetaDataV1Ptr(0);
 
-    if (mdresult.toString() == QLatin1String("no motion"))
+    if (mdresult == lit("no motion"))
         return motion; // no motion detected
 
 
     const QnPlAreconVisionResource* avRes = dynamic_cast<QnPlAreconVisionResource*>(getResource().data());
     int zones = avRes->totalMdZones() == 1024 ? 32 : 8;
 
-    QStringList md = mdresult.toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
+    QStringList md = mdresult.split(L' ', QString::SkipEmptyParts);
     if (md.size() < zones*zones)
         return QnMetaDataV1Ptr(0);
 
@@ -451,7 +451,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
             QString m = md.at(index) ;
 
 
-            if (m == QLatin1String("00") || m == QLatin1String("0"))
+            if (m == lit("00") || m == lit("0"))
                 continue;
 
             QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);

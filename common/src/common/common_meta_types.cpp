@@ -3,6 +3,7 @@
 #include <QtCore/QMetaType>
 
 #include <utils/network/mac_address.h>
+#include <utils/network/socket_common.h>
 #include <utils/common/request_param.h>
 #include <utils/common/uuid.h>
 #include <utils/serialization/json_functions.h>
@@ -26,6 +27,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attributes.h>
 #include <core/resource/user_resource.h>
@@ -88,6 +90,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnMacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
+    qRegisterMetaType<SocketAddress>();
 
     //qRegisterMetaType<QnParam>();
     
@@ -151,10 +154,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnSystemInformation>();
 
     qRegisterMetaType<TypeSpecificParamMap>();
-    qRegisterMetaType<QnStringBoolPairList>("QnStringBoolPairList");
-    qRegisterMetaType<QnStringBoolPairList>("QList<QPair<QString,bool> >");
-    qRegisterMetaType<QnStringVariantPairList>("QnStringVariantPairList");
-    qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
+    qRegisterMetaType<QnCameraAdvancedParamValue>();
+	qRegisterMetaType<QnCameraAdvancedParamValueList>();
+
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
 #ifdef ENABLE_DATA_PROVIDERS
@@ -176,7 +178,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
-    qRegisterMetaType<QnRebuildArchiveReply>();
+    qRegisterMetaType<QnStorageScanData>();
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
@@ -202,13 +204,13 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
+    qRegisterMetaType<Qn::RebuildState>();
 
+    qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QList<QnModuleInformation>>();
 
     qRegisterMetaType<Qn::CameraDataType>();
-
-    qRegisterMetaType<QnNetworkAddress>();
 
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();

@@ -48,6 +48,7 @@ private slots:
     void at_storageManager_rebuildFinished();
     void at_timer();
     void at_connectionOpened();
+    void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
@@ -55,6 +56,7 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIP);
+    void updateModuleInfo();
 private:
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();

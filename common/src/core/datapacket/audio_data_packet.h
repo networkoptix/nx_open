@@ -8,6 +8,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <memory>
+
 #include "media_data_packet.h"
 
 class QnCodecAudioFormat
@@ -45,8 +47,8 @@ public:
     void assign(const QnCompressedAudioData* other);
 };
 
-typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
-typedef QSharedPointer<const QnCompressedAudioData> QnConstCompressedAudioDataPtr;
+typedef std::shared_ptr<QnCompressedAudioData> QnCompressedAudioDataPtr;
+typedef std::shared_ptr<const QnCompressedAudioData> QnConstCompressedAudioDataPtr;
 
 
 //!Stores video data buffer using \a QnByteArray
@@ -78,8 +80,8 @@ private:
     void assign(const QnWritableCompressedAudioData* other);
 };
 
-typedef QSharedPointer<QnWritableCompressedAudioData> QnWritableCompressedAudioDataPtr;
-typedef QSharedPointer<const QnWritableCompressedAudioData> QnConstWritableCompressedAudioDataPtr;
+typedef std::shared_ptr<QnWritableCompressedAudioData> QnWritableCompressedAudioDataPtr;
+typedef std::shared_ptr<const QnWritableCompressedAudioData> QnConstWritableCompressedAudioDataPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
 

@@ -41,10 +41,8 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
             QByteArray responseData;
             responseData.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-            QString sender;
-            quint16 senderPort;
-
-            int readed = m_socketList[i]->recvFrom(responseData.data(), responseData.size(),  sender, senderPort);
+            SocketAddress senderEndpoint;
+            int readed = m_socketList[i]->recvFrom(responseData.data(), responseData.size(), &senderEndpoint);
             if (readed < 1)
                 continue;
             QString response = QLatin1String(responseData.left(readed));

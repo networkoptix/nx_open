@@ -1,45 +1,65 @@
 ----------------------------------------------2.3.0.xxxx-------------------------------------------
 Known Issues:
-#4452
-#4453
+
+Client cannot run on Windows 2003/XP x64.
+Server can’t be installed at some assemblies of windows Server 2008 and Windows Vista right from the box. It is necessary to download and install this package:
+ - http://www.microsoft.com/en-us/download/details.aspx?id=29 for x86 version
+ - http://www.microsoft.com/en-us/download/details.aspx?id=15336 for x64 version
 
 Features:
 
-Video Wall. Allows users to control unlimited number of monitors in the realtime mode. Requires Video Wall Licenses. To activate the feature it is necessary to have 5 licenses. Each license allows one operator to cotrol VW.
+Video Wall. Allows users to control unlimited number of monitors in the realtime mode. Requires Video Wall Licenses. To activate the feature it is necessary to have 5 licenses. Each license allows one operator to cotrol VW. To control Video Wall a user should have appropriate permissions
 
-No Single Point of Failure. Previous versions the database was stored on Enterprise Controller. In case of EC failure the whole system was down. Now database is being replicated to each server, so there are no central component. If a server is down, the system continues working. Servers seamlessly synchronizing with each other.
+No Single Point of Failure. Previous versions the database was stored on Enterprise Controller. In case of EC failure the whole system was down. Now database is being replicated to each server, so there are no central component. If a server is down, the system continues working. Servers seamlessly synchronizing with each other. In this case the client will be reconnected to a different server that is currently alive (3247).
 
 Failover. In case of server failure the cameras will be transferred to other servers (793 Automatic cameras move to reserve servers)
 
+Server web page introduced. Unlike traytool, it allows users to manage server from a remote computer. Moreover it provides additional functionality to control Server: start/stop, change System ID, port, login and password, join to other systems, configure storages, gain server information
+
 Server API & SDK. SDK provides an easy way to easily integrate various devices into VMS and API allows integrating third-party application with Server. API and SDK are available on the web page of Server.
 
-Edge (SWARM). Due to decent architectural changes Server can be run on potentially any ARM device, including cameras that support EDGE technology. This allows running Server on a small low-cost boxes, or even without any dedicated server!
+Edge support. Due to decent architectural changes Server can be run on potentially any ARM device, including cameras that support EDGE technology. This allows running Server on a small low-cost boxes, or even without any dedicated server!
 
 Universal Fisheye Dewarping. Now all type of fish-eye lenses are supported.
 
 Max/Min Recording Time per Camera. Ability to specify the minimum and maximum amount of footage according to recording policies. This setting is per-camera. For instance, one camera can store only 3 days of storage and another-one at least 5 days.
 
-One-Click System-Wide Upgrades. It is possible to upgrade the whole system(all servers even on different paltforms) to a newer version or to a specific build from a single machine Client is rinning on (Administrative privilege required). If the system is in a isolated network, then the special file is created. If run this file, it will download the upgrade package to a jumpdrive. This jumpdrive should pe plugged in the computer Client is running on. After that the system can be updated in one click.
+One-Click System-Wide Upgrades. It is possible to upgrade the whole system(all servers even on different platforms) to a newer version or to a specific build from a single machine Client is rinning on (Administrative privilege required). If the system is in a isolated network, then the special file is created. If run this file, it will download the upgrade package to a jumpdrive. This jumpdrive should pe plugged in the computer Client is running on. After that the system can be updated in one click. If a client tries to connect to a different version of server, client will be updated automatically (3744)
 
 Web Based Camera Settings. Ability to display camera's web page inside VMS to be able to fully control cameras. 
-remove Paxton ACS Integration Plug-In. 
-Camera Groups via Views - ????????????
+
+Access Control System (ACS) Integration: It is possible to display videos, related to a specific event, within ACS.
 
 Web Client Removal. Redesigned web client will be introduced in the upcoming version. Mobile clients are still included.
 
-#3738 Joining Systems and server to system (Other systems in resource tree). Now it is possible to join different systems. In this case the licenses will be combined (3246).  In order to joing/merge servers/systems into one system - there is no need to go to each server separately. Servers/system could be merged with few clicks form the client or web admin interface.             (Ability to view and operate several systems from a single client (other systems are displayed in Resource Tree)  <= I do not think so ).
+#3738 Joining/Merging Systems and server to system (Other systems in resource tree). Now it is possible to join different systems. In this case the licenses will be combined (3246).  In order to join/merge servers/systems into one system - there is no need to go to each server separately. Servers/system could be merged with few clicks form the client or web admin interface.             
 
 #3839 Simplified and flexible network setup between servers (Routing management). It is possible to specify IP addresses that can be used for accessing Servers (like public/internal IP addresses, domain names etc)
-Server web page introduced. Unlike traytool, it allows users to manage server from a remote computer. Moreover it provides additional functionality to control Server: start/stop, change System ID, port, login and password, join to other systems, configure storages, gain server information, 
 
-3593 System Administration - All system-related settings are combined in te single form to simplify setup and user experience.
+3593 System Administration - All system-related settings are combined in the single form to simplify setup and user experience.
+
+Local Settings - All client-related settings are combined in the single form to simplify setup and user experience.
+
+3334 Smart time synchronization. Servers can get the current time from the Internet. In offline mode it is possible to specify a "Master" server to synchronize time with (3826).
 
 Improvements:
+4269 It wasn't possible to drop camera to another server that does not physically see it. No it is and the camera will be displayed as "offline" until the new server is able to connect to it.
 
-Video playback on live is smoother
-3881 3568 Main Menu and Context Menu reorganized
+4139 It is possible to load images as a background
+It is possible to change background color
 3539 ctrl + alt + t to disable background animation
+4641 Shadows removed from Scene's items
+
+New localizations added
+
+3687 Analog Encoder license
+Video playback on live is smoother
+3636 If user searches cameras on admin's layout, they appears on the Scene, but there was no way to save a new layout based on these cameras. "Save Layout As..." is added to the context menu.
+2681 Storage index is located next to archive. That makes server startup much faster and the archive more redundant (rebuild is not needed when swapping drives as it used to be)
+3881 3568 Main Menu and Context Menu reorganized
+
 3569 Preview Search simplified
+Introduced Ability to monitor all servers on a single layout
 3496 In multi-server system the version of servers may be different as they are cross-compatible. However it is strongly recommended to have exact same builds to avoid issues and to simplify investigations in case of a problem. Thus, if there is Servers of other versions, they are displayed in red in the About dialog
 3280 Mouse wheel zoom behavior changed when viewing several videos (used to be Mouse Wheel or ALT+Mouse Wheel)
 3492 Now it is possible to set up E-Mail notifications template (System Settings).
@@ -48,17 +68,17 @@ Video playback on live is smoother
 3672 Add possibility to delete invalid and expired licenses
 3525 Ability to save camera rotation ("Force rotation" option on "Camera settings -> Default")
 2466 Media server conflicts notification improved. Now message contains the specific list of cameras that are used by both servers.
+
 3019 More default event rules are added: Event "Media server started" Action "Write to log" and E-mail Notification
 3578 If connection to Server is lost, the appropriate message is displayed (used to be the notification in the right panel)
 3258 Support streaming without transcoding to mobile devices (HLS). This may greatly reduce Server load
 3629 Error messages when activating licenses improved
 3353 Current version is displayed in the login dialog and the "beta version" form (used to be "About" form)
-3582 It is possibile to delete online cameras from resource tree. In this case camera may be discovered again after some time. To prevent it from re-discovering change the server auto-discovery setting
-2269 If Login dialog is active it is possible to perform other actions with the interfact (in previous version it was not allowed to interact with the client as soon as this dialog was active)
-* 3636 User It is possible for  to use and change layouts administrators'. It is possible to save such layouts with different names. Clairify ...............
+3582 It is possible to delete online cameras from resource tree. In this case camera may be discovered again after some time. To prevent it from re-discovering change the server auto-discovery setting
+2269 If Login dialog is active it is possible to perform other actions with the interface (in previous version it was not allowed to interact with the client as soon as this dialog was active)
 3551 3668 3687 3669 3688 License types reorganized: VMAX (DW only), SWarm (for ARM devices), Analog Encoder, Video Wall 
 3486 Licenses information is moved to the separate database. This allows cleaning Server database without losing the license information
-3575 It is possible to adjust rtsp transport per-acmera (used to be per-server). 
+3575 It is possible to adjust rtsp transport per-camera (used to be per-server). 
 3666 "Do not archive primary stream" option added. See expert camera settings
 2694 Adjusted aspect ratios for some cameras to display them correctly
 3137: Multi-video export dialog improved
@@ -66,7 +86,6 @@ Video playback on live is smoother
 3167: Windows XP support
 External storage support improved: Added external Storage support for Linux (1779), improved "Add external storage" for windows (#1779). Added ability to use password-protected external storage
 #3595 Server logs contain memory and cpu usage
-Archive is more redundant: archive index is stored in Server database (used to be stored on the file system).
 #3917 Added a new event "License issue". 
 3423 Auto-discovery improved
 Improved PTZ control
@@ -74,11 +93,9 @@ Onvif improvements
 In 2.2 and early versions the number of servers were restricted (about 20). Now it is not
 2900: Cameras with the same name are sorted by IP in Resources Tree
 3160, 3110 3673 UI Animation is improved (especially if using E-Mapping 3023)
+3883 If a user had unsaved layout, Client always asked to save them before exit. Now it is possible to disable such notification.
 
 +++++++++++++ Clairify +++++++++++++
-
-3667 Added ability to send support e-mail in the About dialog - ???
-3883 Never suggest to save layout 
 
 BUGS
 Fisheye fixes:

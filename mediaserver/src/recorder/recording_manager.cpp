@@ -209,7 +209,9 @@ void QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
     const QnVirtualCameraResourcePtr netRes = res.dynamicCast<QnVirtualCameraResource>();
 
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    QnMediaServerResourcePtr currentServer = QnCameraHistoryPool::instance()->getMediaServerOnTime(netRes, currentTime, true);
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(netRes);
+    QnMediaServerResourcePtr currentServer = history ? history->getMediaServerOnTime(currentTime, true) : QnMediaServerResourcePtr();
+
     if (currentServer && currentServer->getId() == qnCommon->moduleGUID())
         return; // camera history already inserted. skip
 
@@ -579,10 +581,6 @@ void QnRecordingManager::onTimer()
     }
 
     QnStorageManager* storageMan = QnStorageManager::instance();
-    if (!someRecordingIsPresent && storageMan->rebuildState() == QnStorageManager::RebuildState_WaitForRecordersStopped)
-    {
-        storageMan->setRebuildState(QnStorageManager::RebuildState_Started);
-    }
 
     QMap<QnSecurityCamResourcePtr, qint64> stopList = m_delayedStop;
     for (QMap<QnSecurityCamResourcePtr, qint64>::iterator itrDelayedStop = stopList.begin(); itrDelayedStop != stopList.end(); ++itrDelayedStop)

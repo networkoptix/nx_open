@@ -9,6 +9,8 @@
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+typedef QVector<QnUuid> IDList;
+
 class QnSelectResourcesDialogButton: public QPushButton {
     Q_OBJECT
 
@@ -17,7 +19,7 @@ class QnSelectResourcesDialogButton: public QPushButton {
 public:
     explicit QnSelectResourcesDialogButton(QWidget* parent=NULL);
 
-    QnResourceList resources() const;
+    IDList resourceIds() const;
     void setResources(QnResourceList resources);
 
     QnResourceSelectionDialogDelegate* dialogDelegate() const;

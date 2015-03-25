@@ -71,7 +71,7 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 
 bool QnMutexCameraDataHandler::checkUserData(const QString& name, const QByteArray& data)
 {
-    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX)) {
+    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX) || name.startsWith(CAM_HISTORY_PREFIX)) {
         return data.isEmpty() || data == qnCommon->moduleGUID().toRfc4122();
     }
     return true;

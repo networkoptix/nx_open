@@ -10,16 +10,16 @@ class QnDwPtzController: public QnOnvifPtzController {
     typedef QnOnvifPtzController base_type;
 
 public:
-    QnDwPtzController(const QnPlWatchDogResourcePtr &resource);
+    QnDwPtzController(const QnDigitalWatchdogResourcePtr &resource);
     virtual ~QnDwPtzController();
 
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 private slots:
-    void at_physicalParamChanged(const QString& name, const QString& value);
+    void at_physicalParamChanged(const QString& id, const QString& value);
     void updateFlipState();
 private:
-    QnPlWatchDogResourcePtr m_resource;
+    QnDigitalWatchdogResourcePtr m_resource;
     Qt::Orientations m_flip;
 };
 

@@ -243,10 +243,15 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+    
+    QRectF imageRect(rect);
+    if (!m_imageMargins.isNull())
+        imageRect = QnGeometry::eroded(imageRect, m_imageMargins);
+        
     if (!m_initialized) 
-        initializeVao(rect);
+        initializeVao(imageRect);
     else if (m_dynamic)
-        updateVao(rect);
+        updateVao(imageRect);
 
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);
@@ -549,6 +554,18 @@ void QnImageButtonWidget::setFixedSize(qreal width, qreal height) {
 void QnImageButtonWidget::setFixedSize(const QSizeF &size) {
     setMinimumSize(size);
     setMaximumSize(size);
+}
+
+MarginsF QnImageButtonWidget::imageMargins() const {
+    return m_imageMargins;
+}
+
+void QnImageButtonWidget::setImageMargins(const MarginsF &margins) {
+    if (m_imageMargins == margins)
+        return;
+
+    m_imageMargins = margins;
+    update();
 }
 
 void QnImageButtonWidget::ensurePixmapCache() const {

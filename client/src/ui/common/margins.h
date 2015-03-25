@@ -22,7 +22,7 @@ public:
     {}
 
     bool isNull() const {
-        return m_left == 0.0 && m_top == 0.0 && m_right == 0.0 && m_bottom == 0.0;
+        return qFuzzyIsNull(m_left) && qFuzzyIsNull(m_top) && qFuzzyIsNull(m_right) && qFuzzyIsNull(m_bottom);
     }
 
     qreal left() const {

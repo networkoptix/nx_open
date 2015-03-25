@@ -276,6 +276,7 @@ QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manu
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& model, 
     const QString& mac, const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const
 {
+    Q_UNUSED(discoveryIp)
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
 
@@ -336,11 +337,11 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
 {
     QnPlOnvifResourcePtr resource;
     if (manufacture.toLower().contains(QLatin1String("digital watchdog")))
-        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+        resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
     else if (manufacture.toLower() == QLatin1String("panoramic"))
-        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+        resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
     else if (manufacture.toLower() == QLatin1String("ipnc"))   // new dw panoramic cameras
-        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+        resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
     else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
     else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))

@@ -6,11 +6,12 @@ angular.module('webadminApp')
             isAdmin: true
         };
 
-        mediaserver.getCurrentUser().then(function(result){
+        mediaserver.checkAdmin().then(function(isAdmin){
             $scope.user = {
-                isAdmin: result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions)
+                isAdmin: isAdmin
             };
         });
+
 
         mediaserver.getSettings().then(function (r) {
             $scope.settings = r.data.reply;
@@ -28,5 +29,9 @@ angular.module('webadminApp')
             ipCookie.remove('realm',{ path: '/' });
             ipCookie.remove('username',{ path: '/' });
             window.location.reload();
+        };
+        $scope.alertVisible = true;
+        $scope.closeAlert = function(){
+            $scope.alertVisible = false;
         }
     });

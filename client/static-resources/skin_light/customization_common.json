@@ -6,7 +6,7 @@
         "custom_red":               "#C10505",
         "custom_grey":              "#D4D4D4",
         "custom_green":             "#8ABF22",
-        "darkGrey":                 "#231F20",
+        "dark_grey":                 "#231F20",
         "opaqueSelection":          "custom_blue",
         "ptz":                      "opaqueSelection",
         "selection":                "opaqueSelection.setAlpha(110)",
@@ -150,7 +150,7 @@
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, title bar, notifications panel).",
         
-        "colors": ["custom_grey.setAlpha(128)", "darkGrey.setAlpha(32)"],
+        "colors": ["custom_grey.setAlpha(128)", "dark_grey.setAlpha(32)"],
         "frameColor": "#80808080",
         "frameWidth": 1.0
     },
@@ -231,7 +231,7 @@
 
     "QnGridItem": {
         "colors": {
-            "grid": "darkGrey.setAlpha(64)",
+            "grid": "dark_grey.setAlpha(64)",
             "allowed": "#00ff00.setAlpha(64)",
             "disallowed": "#ff0000.setAlpha(64)"
         }
@@ -253,6 +253,8 @@
             "selection": "selection.setAlpha(192)",
             "primaryRecording": "#80B080ff",
             "secondaryRecording": "#80ff80ff",
+            "primaryBookmark": "#3775C4ff",
+            "secondaryBookmark": "#69A4F0ff",
             "primaryMotion": "#B06060ff",
             "secondaryMotion": "#ff8080ff",
             "separator": "#808080ff"
@@ -347,23 +349,19 @@
             "target": "#FF9966",
             "error": "#CC0000"
         }    
+    },
+
+    "QnScheduleGridWidget": {
+        "colors": {
+            "normalLabel": "#000000",
+            "weekendLabel": "custom_red",
+            "selectedLabel": "custom_blue",
+            "disabledLabel": "dark_grey",
+
+            "recordAlways": "#00aa00",
+            "recordNever": "#a0a0a0",
+            "recordMotion": "#be3938"
+        }
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

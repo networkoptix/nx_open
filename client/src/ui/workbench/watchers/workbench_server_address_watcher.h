@@ -5,23 +5,17 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 struct QnModuleInformation;
-class QnDirectModuleFinder;
-class QnModuleFinderHelper;
+class SocketAddress;
 
 class QnWorkbenchServerAddressWatcher : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     explicit QnWorkbenchServerAddressWatcher(QObject *parent = 0);
 
-    void setDirectModuleFinder(QnDirectModuleFinder *directModuleFinder);
-    void setDirectModuleFinderHelper(QnModuleFinderHelper *directModuleFinderHelper);
-
 private slots:
-    void at_directModuleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 private:
-    QnDirectModuleFinder *m_directModuleFinder;
-    QnModuleFinderHelper *m_directModuleFinderHelper;
     QSet<QUrl> m_urls;
 };
 

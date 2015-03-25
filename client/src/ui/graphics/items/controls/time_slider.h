@@ -18,6 +18,7 @@
 #include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/animation/animated.h>
+#include <ui/common/help_topic_queryable.h>
 
 #include "time_step.h"
 
@@ -27,8 +28,9 @@ class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 class QnTimePeriodList;
+class QnBookmarksViewer;
 
-class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
+class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart)
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd)
@@ -154,6 +156,7 @@ public:
     Q_SLOT void finishAnimations();
     Q_SLOT void hurryKineticAnimations();
 
+    bool m_boomarksHovered;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
@@ -179,7 +182,12 @@ public:
     void setLastMinuteIndicatorVisible(int line, bool visible);
     bool isLastMinuteIndicatorVisible(int line) const;
 
+    virtual int helpTopicAt(const QPointF &pos) const override;
+
+    QnBookmarksViewer *bookmarksViewer();
+
 signals:
+    void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
@@ -187,6 +195,8 @@ signals:
     void selectionReleased();
     void thumbnailsVisibilityChanged();
     void thumbnailClicked();
+
+    void bookmarksUnderCursorUpdated(const QPointF &position);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -400,6 +410,11 @@ private:
     qint64 m_localOffset;
 
     QLocale m_locale;
+
+    QPointF m_lastLineBarMousePos;
+    qreal m_lastLineBarValue;
+
+    QnBookmarksViewer *m_bookmarksViewer;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

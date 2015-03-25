@@ -101,7 +101,7 @@ extern "C" {
 
 int workaround_av_write_trailer(AVFormatContext *s)
 {
-    int ret = 0, i = 0;
+    int ret = 0;
     /*
     for(;;){
         AVPacket pkt;
@@ -131,7 +131,7 @@ fail:
         avio_flush(s->pb);
     if(ret == 0)
         ret = s->pb ? s->pb->error : 0;
-    for(i=0;i<s->nb_streams;i++) {
+    for(unsigned int i=0 ; i<s->nb_streams;i++) {
         av_freep(&s->streams[i]->priv_data);
         av_freep(&s->streams[i]->index_entries);
     }
@@ -344,7 +344,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 {
     Q_UNUSED(result)
     if ((quint64)m_baseTime == AV_NOPTS_VALUE)
-        m_baseTime = media->timestamp - 1000*100;
+        m_baseTime = media->timestamp;
 
     if (m_audioCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
         return 0;
@@ -363,7 +363,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     QnAbstractMediaDataPtr transcodedData;
     
     QnCodecTranscoderPtr transcoder;
-    if (dynamic_cast<const QnCompressedVideoData*>(media.data()))
+    if (dynamic_cast<const QnCompressedVideoData*>(media.get()))
         transcoder = m_vTranscoder;
     else
         transcoder = m_aTranscoder;
@@ -382,7 +382,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
             if (transcodedData) {
                 packet.data = const_cast<quint8*>((const quint8*) transcodedData->data());  //const_cast is here because av_write_frame accepts 
                                                                                             //non-const pointer, but does not modifiy packet buffer
-                packet.size = transcodedData->dataSize();
+                packet.size = static_cast<int>(transcodedData->dataSize());
                 packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
                 if(transcodedData->flags & AV_PKT_FLAG_KEY)
                     packet.flags |= AV_PKT_FLAG_KEY;
@@ -392,7 +392,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
             // direct stream copy
             packet.pts = av_rescale_q(media->timestamp - m_baseTime, srcRate, stream->time_base);
             packet.data = const_cast<quint8*>((const quint8*) media->data());
-            packet.size = media->dataSize();
+            packet.size = static_cast<int>(media->dataSize());
             if((media->dataType == QnAbstractMediaData::AUDIO) || (media->flags & AV_PKT_FLAG_KEY))
                 packet.flags |= AV_PKT_FLAG_KEY;
         }

@@ -172,7 +172,7 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
                     m_position = m_nextDataPacket->timestamp;
             }
             m_mediaData = m_nextDataPacket;
-            m_nextDataPacket.clear(); // EOF video frame reached
+            m_nextDataPacket.reset(); // EOF video frame reached
             m_nextDataPacketBuffer = nullptr;
             gotData = true;
         }

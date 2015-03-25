@@ -668,7 +668,7 @@ template <class T>
 void QnCamDisplay::markIgnoreBefore(const T& queue, qint64 time)
 {
     for (int i = 0; i < queue.size(); ++i) {
-        QnAbstractMediaDataPtr media = queue.at(i).template dynamicCast<QnAbstractMediaData>();
+        QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(queue.at(i));
         if (media) {
             if (m_speed >= 0 && media->timestamp < time)
                 media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
@@ -804,7 +804,7 @@ void QnCamDisplay::onJumpCanceled(qint64 /*time*/)
 
 void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
 {
-    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
+    QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
     //cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString(), cl_logWARNING);
 
     clearVideoQueue();
@@ -848,7 +848,8 @@ void QnCamDisplay::onReaderResumed()
 
 void QnCamDisplay::onPrevFrameOccured()
 {
-    m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
+    if (getDisplayedTime() != DATETIME_NOW)
+        m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
     QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->clearDeviceBuffer();
 }
@@ -967,7 +968,7 @@ bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 
 void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
 {
-    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+    QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (video)
     {
         if ((video->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0 && video->timestamp - m_lastVideoPacketTime > m_liveBufferSize)
@@ -1035,11 +1036,11 @@ void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
 
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!media)
         return true;
 
-    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
+    QnMetaDataV1Ptr metadata = std::dynamic_pointer_cast<QnMetaDataV1>(data);
     if (metadata) {
         int ch = metadata->channelNumber;
         m_lastMetadata[ch][metadata->timestamp] = metadata;
@@ -1048,8 +1049,8 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         return true;
     }
 
-    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-    QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
+    QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
+    QnCompressedAudioDataPtr ad = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
 
     m_processedPackets++;
 
@@ -1137,7 +1138,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         m_fpsStat.updateFpsStatistics(vd);
 
 
-    QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
+    QnEmptyMediaDataPtr emptyData = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
 
     bool flushCurrentBuffer = false;
     int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;

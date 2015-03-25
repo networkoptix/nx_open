@@ -22,8 +22,8 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
     m_runtimeDataUpdateTimer(new QTimer(this)),
     m_runtimeDataElapsedTimer(new QElapsedTimer())
 {
-    connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
-    connect(moduleFinder,       &QnModuleFinder::moduleUrlLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
+    connect(moduleFinder,       &QnModuleFinder::moduleAddressFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
+    connect(moduleFinder,       &QnModuleFinder::moduleAddressLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
 
     QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnRouter::at_runtimeInfoManager_runtimeInfoAdded);
@@ -81,8 +81,18 @@ QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
     return QnUuid();
 }
 
-void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
-    Endpoint endpoint(moduleInformation.id, url.host(), url.port());
+QnRoutePoint QnRouter::enforcedConnection() const {
+    QMutexLocker lk(&m_mutex);
+    return m_routeBuilder->enforcedConnection();
+}
+
+void QnRouter::setEnforcedConnection(const QnRoutePoint &enforcedConnection) {
+    QMutexLocker lk(&m_mutex);
+    m_routeBuilder->setEnforcedConnection(enforcedConnection);
+}
+
+void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+    Endpoint endpoint(moduleInformation.id, address.address.toString(), address.port);
 
     if (endpoint.id.isNull())
         return;
@@ -96,8 +106,8 @@ void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleI
     emit connectionAdded(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }
 
-void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url) {
-    Endpoint endpoint(moduleInformation.id, url.host(), url.port());
+void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+    Endpoint endpoint(moduleInformation.id, address.address.toString(), address.port);
 
     if (!removeConnection(qnCommon->moduleGUID(), endpoint))
         return;
@@ -124,10 +134,7 @@ void QnRouter::at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo 
     QList<Endpoint> connections = m_connections.values(data.uuid);
     m_mutex.unlock();
 
-    QList<ec2::ApiConnectionData> newConnections = data.data.availableConnections;
-
-    while (!newConnections.isEmpty()) {
-        ec2::ApiConnectionData connection = newConnections.takeFirst();
+    for(const auto& connection: data.data.availableConnections) {
         Endpoint endpoint(connection.peerId, connection.host, connection.port);
         bool isNew = !connections.removeOne(endpoint);
         if (isNew)
@@ -192,7 +199,7 @@ void QnRouter::updateRuntimeData(bool force) {
 
     m_runtimeDataUpdateTimer->stop();
 
-    QList<ec2::ApiConnectionData> connections;
+    QVector<ec2::ApiConnectionData> connections;
     for (const Endpoint &endpoint: m_connections.values(qnCommon->moduleGUID())) {
         ec2::ApiConnectionData connection;
         connection.peerId = endpoint.id;
@@ -202,6 +209,11 @@ void QnRouter::updateRuntimeData(bool force) {
     }
 
     QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
+    if (localInfo.data.availableConnections == connections) {
+        m_runtimeDataElapsedTimer->start();
+        return;
+    }
+
     localInfo.data.availableConnections = connections;
     runtimeInfoManager->updateLocalItem(localInfo);
 

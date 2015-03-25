@@ -3,13 +3,12 @@
 angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
 
-        mediaserver.getCurrentUser().then(function(result){
-            if(!result.data.reply.isAdmin && !(result.data.reply.permissions & Config.globalEditServersPermissions)){
+        mediaserver.checkAdmin().then(function(isAdmin){
+            if(!isAdmin){
                 $location.path('/info'); //no admin rights - redirect
                 return;
             }
         });
-
 
         mediaserver.getSettings().then(function (r) {
             $scope.settings = {

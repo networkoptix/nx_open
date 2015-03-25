@@ -139,7 +139,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Version précédente a été détectée</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Type d'installation</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Votre système va être mis à jour</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Votre base de données a été corrompue et ne peut pas être récupérée. La nouvelle base de données a été installée. Pour accéder au système, utilisez l’identifiant «admin» et le mot de passe «admin». S.V.P. modifiez les informations après la première connexion.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Votre base de données a été corrompue et ne peut pas être récupérée. La nouvelle base de données a été installée. Pour accéder au système, utilisez l’identifiant «admin» et le mot de passe «123». S.V.P. modifiez les informations après la première connexion.</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Ne peut pas se connecter sur le pare-feu Windows.  ([2]   [3]   [4]   [5])</String>    

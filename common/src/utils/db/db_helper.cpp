@@ -43,7 +43,7 @@ bool QnDbHelper::QnDbTransaction::commit()
     if (rez)
         m_mutex.unlock();
     else
-        qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
+        qWarning() << m_database.databaseName()<< ". Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
     return rez;
 }
 
@@ -188,7 +188,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
 
 
     QDir dir(dirName);
-    foreach(const QFileInfo& entry, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
+    for(const QFileInfo& entry: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
     {
         QString fileName = entry.absoluteFilePath();
         if (!existUpdates.contains(fileName)) 

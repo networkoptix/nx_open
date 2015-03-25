@@ -105,13 +105,6 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     if( allowedAuthMethods & AuthMethod::noAuth )
         return true;
 
-    if( allowedAuthMethods & AuthMethod::cookie )
-    {
-        const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
-        int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
-        if (customAuthInfoPos >= 0)
-            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId);
-    }
 
     if( allowedAuthMethods & AuthMethod::videowall )
     {
@@ -134,6 +127,14 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
                     return true;
             }
         }
+    }
+
+    if( allowedAuthMethods & AuthMethod::cookie )
+    {
+        const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
+        int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
+        if (customAuthInfoPos >= 0)
+            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId);
     }
 
     if( allowedAuthMethods & AuthMethod::http )
@@ -494,7 +495,8 @@ bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteAr
             nx_http::HttpHeader("Set-Cookie", lit("realm=%1; Path=/").arg(REALM).toUtf8() ));
 
         QDateTime dt = qnSyncTime->currentDateTime().addSecs(COOKIE_EXPERATION_PERIOD);
-        QString nonce = lit("nonce=%1; Expires=%2; Path=/").arg(QLatin1String(getNonce())).arg(dateTimeToHTTPFormat(dt)); // Qt::RFC2822Date
+        //QString nonce = lit("nonce=%1; Expires=%2; Path=/").arg(QLatin1String(getNonce())).arg(dateTimeToHTTPFormat(dt)); // Qt::RFC2822Date
+        QString nonce = lit("nonce=%1; Path=/").arg(QLatin1String(getNonce()));
         nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", nonce.toUtf8()));
     }
     return rez;

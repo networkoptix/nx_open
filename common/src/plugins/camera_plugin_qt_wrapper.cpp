@@ -302,7 +302,7 @@ namespace nxcip_qt
             return nxcip::NX_UNDEFINED_BEHAVOUR;
 
         for( int i = 0; i < idNum; ++i )
-            ids->push_back( QString::fromUtf8(m_idsList[i], std::min<size_t>(strlen(m_idsList[i]), nxcip::MAX_ID_LEN) ) );
+            ids->push_back( QString::fromUtf8(m_idsList[i], std::min<int>(static_cast<int>(strlen(m_idsList[i])), nxcip::MAX_ID_LEN) ) );
         return result;
     }
 
@@ -317,7 +317,7 @@ namespace nxcip_qt
             return nxcip::NX_UNDEFINED_BEHAVOUR;
 
         for( int i = 0; i < idNum; ++i )
-            ids->push_back( QString::fromUtf8(m_idsList[i], std::min<size_t>(strlen(m_idsList[i]), nxcip::MAX_ID_LEN) ) );
+            ids->push_back( QString::fromUtf8(m_idsList[i], std::min<int>(static_cast<int>(strlen(m_idsList[i])), nxcip::MAX_ID_LEN) ) );
         return result;
     }
 

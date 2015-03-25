@@ -41,6 +41,7 @@ static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML("\
 static const int CODE_OK = 200;
 static const int CODE_MOVED_PERMANENTLY = 301;
 static const int CODE_NOT_MODIFIED = 304;
+static const int CODE_BAD_REQUEST = 400;
 static const int CODE_AUTH_REQUIRED = 401;
 static const int CODE_NOT_FOUND = 404;
 static const int CODE_PROXY_AUTH_REQUIRED = 407;

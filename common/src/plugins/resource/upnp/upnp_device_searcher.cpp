@@ -159,20 +159,24 @@ void UPNPDeviceSearcher::cancelHandlerRegistration( UPNPSearchHandler* handler )
 void UPNPDeviceSearcher::saveDiscoveredDevicesSnapshot()
 {
     QMutexLocker lk( &m_mutex );
-    m_discoveredDevicesToProcess = m_discoveredDevices;
+    m_discoveredDevicesToProcess.swap( m_discoveredDevices );
     m_discoveredDevices.clear();
 }
 
 void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToUse )
 {
-    for( std::list<DiscoveredDeviceInfo>::iterator
+    for( std::map<HostAddress, DiscoveredDeviceInfo>::iterator
         it = m_discoveredDevicesToProcess.begin();
         it != m_discoveredDevicesToProcess.end();
          )
     {
         if( handlerToUse )
         {
-            if( handlerToUse->processPacket( it->localInterfaceAddress, it->deviceAddress, it->devInfo, it->xmlDevInfo ) )
+            if( handlerToUse->processPacket(
+                    it->second.localInterfaceAddress,
+                    it->second.deviceAddress,
+                    it->second.devInfo,
+                    it->second.xmlDevInfo ) )
             {
                 m_discoveredDevicesToProcess.erase( it++ );
                 continue;
@@ -233,9 +237,6 @@ void UPNPDeviceSearcher::onSomeBytesRead(
         return;
     }
 
-    nx_http::Request foundDeviceReply;
-    QString remoteHost;
-
     auto SCOPED_GUARD_FUNC = [this, readBuffer, sock]( UPNPDeviceSearcher* ){
         readBuffer->resize( 0 );
         using namespace std::placeholders;
@@ -243,10 +244,12 @@ void UPNPDeviceSearcher::onSomeBytesRead(
     };
     std::unique_ptr<UPNPDeviceSearcher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
+    HostAddress remoteHost;
+    nx_http::Request foundDeviceReply;
     {
         AbstractDatagramSocket* udpSock = static_cast<AbstractDatagramSocket*>(sock);
         //reading socket and parsing UPnP response packet
-        remoteHost = udpSock->lastDatagramSourceAddress().address.toString();
+        remoteHost = udpSock->lastDatagramSourceAddress().address;
         if( !foundDeviceReply.parse( *readBuffer ) )
             return;
     }
@@ -324,7 +327,10 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
     return sock;
 }
 
-void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const QUrl& descriptionUrl, const QString& remoteHost )
+void UPNPDeviceSearcher::startFetchDeviceXml(
+    const QByteArray& uuidStr,
+    const QUrl& descriptionUrl,
+    const HostAddress& remoteHost )
 {
     DiscoveredDeviceInfo info;
     info.deviceAddress = remoteHost;
@@ -344,7 +350,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
             //item present in cache, no need to request xml
             info.xmlDevInfo = cacheItem->xmlDevInfo;
             info.devInfo = cacheItem->devInfo;
-            m_discoveredDevices.push_back( info );
+            m_discoveredDevices.emplace( remoteHost, std::move(info) );
             return;
         }
 
@@ -359,18 +365,18 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
         }
 
         httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-        m_httpClients.insert( make_pair( httpClient, info ) );
+        m_httpClients[httpClient] = std::move(info);
     }
 
     QObject::connect(
-        httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
-        this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr)),
+        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone,
         Qt::DirectConnection );
     if( !httpClient->doGet( descriptionUrl ) )
     {
         QObject::disconnect(
-            httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
-            this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr)) );
+            httpClient.get(), &nx_http::AsyncHttpClient::done,
+            this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone );
 
         QMutexLocker lk( &m_mutex );
         httpClient->terminate();
@@ -399,20 +405,20 @@ void UPNPDeviceSearcher::processDeviceXml(
     devInfoFull.devInfo = xmlHandler.deviceInfo();
 
     QMutexLocker lk( &m_mutex );
-    m_discoveredDevices.push_back( devInfoFull );
+    m_discoveredDevices.emplace( devInfo.deviceAddress, devInfoFull );
     updateItemInCache( devInfoFull );
 }
 
-QHostAddress UPNPDeviceSearcher::findBestIface( const QString& host )
+QHostAddress UPNPDeviceSearcher::findBestIface( const HostAddress& host )
 {
-    QString oldAddress;
-    for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
+    QHostAddress oldAddress;
+    for(const QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
-        const QString& newAddress = iface.address.toString();
+        const QHostAddress& newAddress = iface.address;
         if( isNewDiscoveryAddressBetter(host, newAddress, oldAddress) )
             oldAddress = newAddress;
     }
-    return QHostAddress(oldAddress);
+    return oldAddress;
 }
 
 int UPNPDeviceSearcher::cacheTimeout()

@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>plugins</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>2.3.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>2.3.0-SNAPSHOT</version>
+    <artifactId>it930x_plugin</artifactId>
+	<packaging>pom</packaging>
+    <name>HD Witness ITE it930x DVB-T Receiver Plugin</name>
+
+	<properties>
+		<product.title>${project.name}</product.title>	
+		<!--Global libs-->
+		<qt.libs>core</qt.libs>
+		<global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil</global.libs>
+		<!--Specific os libs used-->
+        <windows.oslibs/>
+		<!--Global defines-->
+		<global.defines/>
+		<linux.defines/>
+		<mac.defines/>
+        <windows.defines/>
+    </properties>
+	<profiles>
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+				</os>
+			</activation>
+			<properties>
+				<buildLib>sharedlib</buildLib>
+			</properties>
+		</profile>	
+	</profiles>	
+</project>

@@ -43,9 +43,6 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 
         len_send = form_read_request(fn, buff_send);
 
-        QString temp_cam_addr;
-        unsigned short cam_dst_port;
-
         int oa = 1;
 
         m_curr_blk_size = m_wish_blk_size;
@@ -62,14 +59,15 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
             while(1)
             {
                 m_prevResult = CameraDiagnostics::NoErrorResult();
-                len_recv = m_sock->recvFrom(buff_recv, sizeof(buff_recv),temp_cam_addr, cam_dst_port);
+                SocketAddress datagrammSourceAddress;
+                len_recv = m_sock->recvFrom(buff_recv, sizeof(buff_recv), &datagrammSourceAddress);
                 if (len_recv < 0)
                 {
                     m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
                     m_status = time_out; 
                     break;
                 }
-                m_sock->setDestAddr(m_resolvedAddress, cam_dst_port);
+                m_sock->setDestAddr(m_resolvedAddress, datagrammSourceAddress.port);
 
                 if (len_recv<13) // unexpected answer
                     continue;

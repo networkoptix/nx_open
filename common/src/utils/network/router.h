@@ -13,6 +13,7 @@ class QnRouteBuilder;
 class QnModuleFinder;
 struct QnModuleInformation;
 class QElapsedTimer;
+class SocketAddress;
 
 class QnRouter : public QObject, public Singleton<QnRouter> {
     Q_OBJECT
@@ -37,13 +38,16 @@ public:
 
     QnUuid whoIs(const QString &host, quint16 port) const;
 
+    QnRoutePoint enforcedConnection() const;
+    void setEnforcedConnection(const QnRoutePoint &enforcedConnection);
+
 signals:
     void connectionAdded(const QnUuid &discovererId, const QnUuid &peerId, const QString &host, quint16 port);
     void connectionRemoved(const QnUuid &discovererId, const QnUuid &peerId, const QString &host, quint16 port);
 
 private slots:
-    void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
     void at_runtimeInfoManager_runtimeInfoAdded(const QnPeerRuntimeInfo &data);
     void at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo &data);

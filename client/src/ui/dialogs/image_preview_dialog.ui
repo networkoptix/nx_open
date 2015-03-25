@@ -42,7 +42,7 @@
            <item>
             <widget class="QLabel" name="imageLabel">
              <property name="text">
-              <string notr="true">&lt;No image&gt;</string>
+              <string>&lt;No image&gt;</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>

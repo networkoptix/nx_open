@@ -81,7 +81,8 @@ protected:
     bool deserializeFlags(const QString &value, int *target) const;
 
 private:
-    QHash<int, QString> m_nameByValue;
+    /* Map of text names of enum values, is used to serialize enum or flags value to string, MUST be ordered. */
+    QMap<int, QString> m_nameByValue;
     QHash<QString, int> m_valueByName;
     QHash<QString, int> m_valueByLowerName;
     QString m_enumName;

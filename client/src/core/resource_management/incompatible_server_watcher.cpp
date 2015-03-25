@@ -10,7 +10,7 @@
 
 namespace {
 
-void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformation &moduleInformation) {
+void updateServer(const QnMediaServerResourcePtr &server, const QnGlobalModuleInformation &moduleInformation) {
     QList<QHostAddress> addressList;
     foreach (const QString &address, moduleInformation.remoteAddresses)
         addressList.append(QHostAddress(address));
@@ -38,7 +38,7 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformat
     server->setProperty(lit("protoVersion"), QString::number(moduleInformation.protoVersion));
 }
 
-QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformation, Qn::ResourceStatus initialStatus) {
+QnMediaServerResourcePtr makeResource(const QnGlobalModuleInformation &moduleInformation, Qn::ResourceStatus initialStatus) {
     QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
 
     server->setId(QnUuid::createUuid());
@@ -73,7 +73,7 @@ void QnIncompatibleServerWatcher::start() {
     connect(qnResPool,                          &QnResourcePool::statusChanged,     this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
 
     /* fill resource pool with already found modules */
-    foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules())
+    foreach (const QnGlobalModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules())
         at_peerChanged(moduleInformation);
 }
 
@@ -98,7 +98,7 @@ void QnIncompatibleServerWatcher::stop() {
     }
 }
 
-void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &moduleInformation) {
+void QnIncompatibleServerWatcher::at_peerChanged(const QnGlobalModuleInformation &moduleInformation) {
     bool compatible = moduleInformation.isCompatibleToCurrentSystem();
     bool authorized = moduleInformation.authHash == qnCommon->moduleInformation().authHash;
 
@@ -131,7 +131,7 @@ void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &modu
     } else {
         // update the resource
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
+        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO); //TODO: #GDM Fix assert
         updateServer(server, moduleInformation);
 
 		NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
@@ -142,7 +142,7 @@ void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &modu
     }
 }
 
-void QnIncompatibleServerWatcher::at_peerLost(const QnModuleInformation &moduleInformation) {
+void QnIncompatibleServerWatcher::at_peerLost(const QnGlobalModuleInformation &moduleInformation) {
     removeResource(getFakeId(moduleInformation.id));
 }
 
@@ -164,7 +164,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
         removeResource(getFakeId(id));
     } else if (status == Qn::Offline) {
         if (QnGlobalModuleFinder::instance()) {
-            QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(id);
+            QnGlobalModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(id);
             if (!moduleInformation.id.isNull())
                 at_peerChanged(moduleInformation);
         }

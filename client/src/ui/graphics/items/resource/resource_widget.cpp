@@ -122,23 +122,57 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setFont(font);
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
-    /* Header overlay. */
-    m_headerLeftLabel = new GraphicsLabel();
-    m_headerLeftLabel->setAcceptedMouseButtons(0);
-    m_headerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    createButtons();
+    createHeaderOverlay();
+    createFooterOverlay();
 
-    m_headerRightLabel = new GraphicsLabel();
-    m_headerRightLabel->setAcceptedMouseButtons(0);
-    m_headerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    /* Custom overlays should be added below the status overlay. */
+    createCustomOverlays();
 
-    auto checkedButtons = static_cast<Buttons>(item->data(Qn::ItemCheckedButtonsRole).toInt());
+    /* Status overlay. */
+    m_statusOverlayWidget = new QnStatusOverlayWidget(this);
+    addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
+
+
+    /* Initialize resource. */
+    m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
+    setChannelLayout(qn_resourceWidget_defaultContentLayout);
+
+    m_aspectRatio = defaultAspectRatio();
+
+    connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
+
+    /* Videowall license changes helper */
+    QnLicenseUsageWatcher* videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(this);
+    connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this, &QnResourceWidget::updateStatusOverlay);
+
+    /* Run handlers. */
+    setInfoVisible(buttonBar()->button(InfoButton)->isChecked(), false);
+    updateTitleText();
+    updateButtonsVisibility();
+    updateCursor();
+
+    connect(this, &QnResourceWidget::rotationChanged, this, [this]() {
+        if (m_enclosingGeometry.isValid())
+            setGeometry(calculateGeometry(m_enclosingGeometry));
+    });
+}
+
+QnResourceWidget::~QnResourceWidget() {
+    ensureAboutToBeDestroyedEmitted();
+}
+
+
+void QnResourceWidget::createButtons() {
+    auto checkedButtons = static_cast<Buttons>(m_item->data(Qn::ItemCheckedButtonsRole).toInt());
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
-    connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
+    connect(accessController()->notifier(m_item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
     infoButton->setIcon(qnSkin->icon("item/info.png"));
@@ -147,7 +181,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
-    
+
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -168,6 +202,17 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_iconButton->setPreferredSize(24.0, 24.0);
     m_iconButton->setVisible(false);
     connect(m_iconButton, &QnImageButtonWidget::visibleChanged, this, &QnResourceWidget::at_iconButton_visibleChanged);
+}
+
+void QnResourceWidget::createHeaderOverlay() {
+    /* Header overlay. */
+    m_headerLeftLabel = new GraphicsLabel();
+    m_headerLeftLabel->setAcceptedMouseButtons(0);
+    m_headerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+
+    m_headerRightLabel = new GraphicsLabel();
+    m_headerRightLabel->setAcceptedMouseButtons(0);
+    m_headerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -193,8 +238,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
     addOverlayWidget(m_headerOverlayWidget, AutoVisible, true, true, true, true);
+}
 
-
+void QnResourceWidget::createFooterOverlay() {
     /* Footer overlay. */
     m_footerLeftLabel = new GraphicsLabel();
     m_footerLeftLabel->setAcceptedMouseButtons(0);
@@ -227,41 +273,12 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_footerOverlayWidget->setAcceptedMouseButtons(0);
     m_footerOverlayWidget->setOpacity(0.0);
     addOverlayWidget(m_footerOverlayWidget, AutoVisible, true, true, true);
-
-
-    /* Status overlay. */
-    m_statusOverlayWidget = new QnStatusOverlayWidget(this);
-    addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
-
-
-    /* Initialize resource. */
-    m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
-    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
-    setChannelLayout(qn_resourceWidget_defaultContentLayout);
-
-    m_aspectRatio = defaultAspectRatio();
-
-    connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
-
-    /* Videowall license changes helper */
-    QnLicenseUsageWatcher* videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(this);
-    connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this, &QnResourceWidget::updateStatusOverlay);
-
-    /* Run handlers. */
-    setInfoVisible(infoButton->isChecked(), false);
-    updateTitleText();
-    updateButtonsVisibility();
-    updateCursor();
-
-    connect(this, &QnResourceWidget::rotationChanged, this, [this]() {
-        if (m_enclosingGeometry.isValid())
-            setGeometry(calculateGeometry(m_enclosingGeometry));
-    });
 }
 
-QnResourceWidget::~QnResourceWidget() {
-    ensureAboutToBeDestroyedEmitted();
+void QnResourceWidget::createCustomOverlays() {
+    //no custom overlays in the base widget
 }
+
 
 const QnResourcePtr &QnResourceWidget::resource() const {
     return m_resource;

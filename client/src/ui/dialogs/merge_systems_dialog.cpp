@@ -10,6 +10,8 @@
 #include "core/resource/media_server_resource.h"
 #include "ui/common/ui_resource_name.h"
 #include "ui/style/warning_style.h"
+#include "ui/help/help_topics.h"
+#include "ui/help/help_topic_accessor.h"
 #include "utils/merge_systems_tool.h"
 #include "utils/common/util.h"
 
@@ -20,11 +22,23 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     m_mergeTool(new QnMergeSystemsTool(this))
 {
     ui->setupUi(this);
+
+    QStringList successMessage;
+    successMessage 
+        << tr("Success!") 
+        << QString() 
+        << QString() 
+        << tr("The system was configured successfully.") 
+        << tr("The servers from the remote system should appear in your system soon.");
+    ui->successLabel->setText(successMessage.join(L'\n'));
+
     ui->urlComboBox->lineEdit()->setPlaceholderText(tr("http(s)://host:port"));
     m_mergeButton = ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
     setWarningStyle(ui->errorLabel);
     m_mergeButton->hide();
     ui->buttonBox->button(QDialogButtonBox::Close)->hide();
+
+    setHelpTopic(this, Qn::Systems_MergeSystems_Help);
 
     QButtonGroup *buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->currentSystemRadioButton);

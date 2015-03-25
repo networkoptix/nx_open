@@ -141,7 +141,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">移除先前的版本</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">安裝類型</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">您的系統即將升級</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">您的資料庫已損毀且無法復原. 新資料庫已安裝. 登入帳號及密碼皆為 "admin". 第一次登入後請變更您的密碼.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">您的資料庫已損毀且無法復原. 新資料庫已安裝. 登入帳號 “admin” 及密碼 “123”. 第一次登入後請變>更您的密碼</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">無法連線至 Windows 防火牆.  ([2]   [3]   [4]   [5])</String>    
