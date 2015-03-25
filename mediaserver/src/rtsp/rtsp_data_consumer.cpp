@@ -622,7 +622,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     }
     m_sendBuffer.clear();
 
-	const QByteArray& newRange = m_owner->getRangeHeaderIfChanged();
+	const QByteArray& newRange = getRangeHeaderIfChanged(media);
     if (!newRange.isEmpty())
         sendMetadata(newRange);
 
