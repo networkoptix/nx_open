@@ -140,6 +140,8 @@ angular.module('webadminApp')
                 return cacheCurrentUser;
             },
             getRecords:function(serverUrl,physicalId,startTime,endTime,detail,periodsType){
+
+                //console.log("getRecords",serverUrl,physicalId,startTime,endTime,detail,periodsType);
                 var d = new Date();
                 if(typeof(startTime)==='undefined'){
                     startTime = d.getTime() - 30*24*60*60*1000;
@@ -159,7 +161,7 @@ angular.module('webadminApp')
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
                 //RecordedTimePeriods
-                return wrapRequest($http.get(serverUrl + 'api/RecordedTimePeriods' +
+                return  wrapRequest($http.get(serverUrl + 'api/RecordedTimePeriods' +
                     '?physicalId=' + physicalId +
                     '&startTime=' + startTime +
                     '&endTime=' + endTime +

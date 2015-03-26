@@ -43,13 +43,18 @@ angular.module('webadminApp')
                     evenColor: 'rgb(200,200,255)',
                     oddColor: 'white',
 
-
                     chunkTopMargin:5,
-                    chunkHeight:10,
-                    exactChunkColor:'rgb(128,128,128)',
+                    chunkHeight:20,
+                    exactChunkColor:'rgba(192,192,192,0.65)',
+                    hightlightChunkColor:'rgb(192,192,192)',
                     loadingChunkColor:'rgb(200,200,200)'
-
                 };
+
+
+                var chunksVertStart = timelineConfig.topLabelHeight +
+                    5 * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize
+                    + timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * 3
+                    + timelineConfig.chunkTopMargin;
 
                 animateScope.setDuration(timelineConfig.animationDuration);
                 animateScope.setScope(scope);
@@ -156,6 +161,22 @@ angular.module('webadminApp')
 
                 });
 
+
+                var mouseDate = null;
+                var mouseCoordinate = null;
+                var highlightchunk = false;
+                scroll.mousemove(function(event){
+                    //Check if we are in the events row
+                    mouseCoordinate = (event.offsetX - scroll.scrollLeft());
+                    mouseDate = screenRelativePositionToDate(mouseCoordinate / viewportWidth);
+                    highlightchunk = (event.offsetY >= chunksVertStart && event.offsetY <= chunksVertStart + timelineConfig.chunkHeight);
+                });
+                scroll.mouseout(function(event){
+                    mouseDate = null;
+                    mouseCoordinate = null;
+                    highlightchunk = false;
+                });
+
                 function maxZoomLevel(){
                     var maxLevel = RulerModel.levels[RulerModel.levels.length-1];
                     var targetSecPerPixel =  maxLevel.interval.getSeconds()/maxLevel.width;
@@ -246,8 +267,6 @@ angular.module('webadminApp')
                     }else if(oldLabelLevel > scope.visibleLabelsLevel){
                         animateScope.progress(scope,'labelDisappearance');
                     }
-
-
                 }
 
 
@@ -277,23 +296,14 @@ angular.module('webadminApp')
                     var screenStartRelativePos = startPosition / (scope.frameWidth-viewportWidth);
                     return screenStartRelativePos;
                 }
-
-
                 function drawChunk(context,startCoordinate, endCoordinate, exactChunk){
-
-                    console.log("drawChunk",startCoordinate, endCoordinate, exactChunk);
-
-                    var vertStart = timelineConfig.topLabelHeight +
-                        5 * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize
-                        + timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * 3
-                        + timelineConfig.chunkTopMargin;
-
-                    vertStart = 0;
-                    timelineConfig.chunkHeight= 100;
-
                     context.fillStyle = exactChunk? timelineConfig.exactChunkColor:timelineConfig.loadingChunkColor;
 
-                    context.fillRect(startCoordinate, vertStart , Math.max(1,endCoordinate - startCoordinate), timelineConfig.chunkHeight);
+                    if(highlightchunk && startCoordinate <= mouseCoordinate && endCoordinate >= mouseCoordinate){
+                        context.fillStyle = timelineConfig.hightlightChunkColor;
+                    }
+
+                    context.fillRect(startCoordinate, chunksVertStart , Math.max(1,endCoordinate - startCoordinate), timelineConfig.chunkHeight);
                     context.stroke();
                 }
 
@@ -303,31 +313,24 @@ angular.module('webadminApp')
 
                     var context = canvas.getContext('2d');
                     var level = RulerModel.levels[scope.actualLevel];
-                    var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
                     var start = level.interval.alignToFuture(screenRelativePositionToDate(0));
-
-                    console.log('Set interval for events', new Date(start), new Date(end), scope.actualLevel);
+                    var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
 
                     if(!!scope.records) {
                         // 1. Splice events
-                        var events = scope.records.setInterval(  start, end, scope.actualLevel);
+                        var events = scope.records.setInterval(start, end, scope.actualLevel);
 
                         // 2. Draw em!
-                        console.log("splice",scope.actualLevel,events);
-
                         for(var i=0;i<events.length;i++){
                             var chunk = events[i];
-                            var startCoordinate =  dateToScreenPosition(chunk.start);
-                            var endCoordinate =  dateToScreenPosition(chunk.end);
-
+                            var startCoordinate = dateToScreenPosition(chunk.start);
+                            var endCoordinate = dateToScreenPosition(chunk.end);
                             drawChunk(context,startCoordinate, endCoordinate,chunk.level);
                         }
                     }
                 }
 
-
                 function drawMark(context, coordinate, level, labelLevel, label){
-
                     if(coordinate<0) {
                         return;
                     }
@@ -352,11 +355,9 @@ angular.module('webadminApp')
                         size = (Math.min(level, 4) + animationModifier ) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize;
                     }
 
-
                     if(size <= 0){
                         return;
                     }
-
 
                     var color = blurColor(timelineConfig.rulerColor,colorBlur);
                     context.strokeStyle = color;
@@ -366,7 +367,6 @@ angular.module('webadminApp')
                     context.stroke();
 
                     if(typeof(label)!=='undefined'){
-
                         var fontSize = timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * Math.min(level,3);
 
                         if(scope.labelAppearance < 1 && labelLevel === 0) {
@@ -475,7 +475,6 @@ angular.module('webadminApp')
 
                         if(scope.levelDisappearance<1){
                             var smallposition = position;
-
                             var nextposition =level.interval.addToDate(position );
                             var smallLevel = RulerModel.levels[scope.actualLevel+1];
                             while(smallposition < nextposition ){
@@ -533,8 +532,6 @@ angular.module('webadminApp')
                     scope.end = now;
                     scope.maxZoomLevel = maxZoomLevel();
 
-
-                    console.log('initTimeline',scope.start,new Date(scope.start),scope.maxZoomLevel );
                     updateView();
                 }
 

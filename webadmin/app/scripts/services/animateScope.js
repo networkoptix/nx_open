@@ -5,7 +5,7 @@ angular.module('webadminApp')
 
         var animations = [];
 
-        var updationLimit = 100;//null;//
+        var updationLimit = null;// Limit animations to stop process at some point
         var defaultDuration = 1000;
         var defaultScope = null;
         function Animation(scope,value,target,duration){
@@ -52,6 +52,7 @@ angular.module('webadminApp')
 
             this.deferred.notify(this.scope[this.value]);
             this.isFinished = time > this.duration;
+
             if(this.isFinished){
                 this.deferred.resolve(this.scope[this.value]);
             }
@@ -77,6 +78,7 @@ angular.module('webadminApp')
             var finished = [];
 
             var scopes = [];
+
             _.forEach(animations,function(animation){
                 animation.update();
                 if(scopes.indexOf(animation.scope)<0 && animation.scope !== defaultScope) {
@@ -126,6 +128,7 @@ angular.module('webadminApp')
                 animationRunning = false;
             },
             animate:function(scope,value,target,duration){
+
                 if(typeof(duration) === 'undefined')
                 {
                     duration = defaultDuration;

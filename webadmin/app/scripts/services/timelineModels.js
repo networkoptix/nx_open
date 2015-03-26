@@ -11,7 +11,7 @@ function Chunk(boundaries,start,end,level,title,extension){
     var format = 'dd.mm.yyyy HH:MM';
     this.title = (typeof(title) === 'undefined' || title === null) ? dateFormat(start,format) + ' - ' + dateFormat(end,format):title ;
 
-    console.log("create chunk ",this.level, this.title);
+    //console.log("create chunk ",this.level, this.title);
 
     this.children = [];
 
@@ -201,16 +201,13 @@ CameraRecordsProvider.prototype.updateSplice = function(){
     //console.log("send message to timeline for updating, or timeline should just get updated splice himself every redrawing")
 };
 
-
+var requestCounter = 0;
 CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     var deferred = this.$q.defer();
     this.start = start;
     this.end = end;
     this.level = level;
     var detailization = RulerModel.levels[level].interval.getSeconds()*1000;
-
-
-    console.log("requestInterval",this.chunksTree,start,end,level,detailization);
 
     var self = this;
     //1. Request records for interval
@@ -223,10 +220,11 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                 if(data.data[i][1] === -1){
                     endChunk = (new Date()).getTime();// some date in future
                 }
-                //console.error('this is wrong, but why?',level);
-                self.addChunk(new Chunk(null,data.data[i][0],endChunk,level));
-            }
+                var addchunk = new Chunk(null,data.data[i][0],endChunk,level);
 
+                // console.log("read chunk",addchunk);
+                self.addChunk(addchunk );
+            }
 
             //2. Splice cache for existing interval, store it as local cache
             self.updateSplice();
@@ -260,8 +258,8 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
     }
 
     // Splice existing intervals and check, if we need an update from server
-    console.log("--------------------------------------------------");
-    console.log("setInterval",new Date(start),new Date(end),level);
+    //console.log("--------------------------------------------------");
+    //console.log("setInterval",new Date(start),new Date(end),level);
     var result = [];
     var noNeedUpdate = this.splice(result,start,end,level);
     if(!noNeedUpdate){ // Request update
@@ -271,6 +269,21 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
     return result;
 };
 
+
+CameraRecordsProvider.prototype.debug = function(currentNode,level){
+    if(!currentNode){
+        console.log("Chunks tree:")
+    }
+    level = level||0;
+    currentNode = currentNode || this.chunksTree;
+
+    if(currentNode) {
+        console.log(Array(level + 1).join(" "), currentNode.title, currentNode.level,  currentNode.children.length);
+        for (var i = 0; i < currentNode.children.length; i++) {
+            this.debug(currentNode.children[i], level + 1);
+        }
+    }
+};
 /**
  * Add chunk to tree - find or create good position for it
  * @param chunk
@@ -278,7 +291,6 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
  */
 CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
     if(this.chunksTree === null){
-        console.log("init chunksTree" , chunk);
         this.chunksTree = chunk;
         return;
     }
@@ -286,7 +298,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
     // Go through tree, find good place for chunk
 
     if(parent.children.length === 0){ // no children yet
-        if(parent.level === chunk.level + 1){ //
+        if(parent.level === chunk.level - 1){ //
             parent.children.push(chunk);
             return;
         }
@@ -298,7 +310,11 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
             if (currentChunk.end < chunk.start) {
                 continue;
             }
-            if (currentChunk.level === chunk.level) {
+            if(currentChunk.level == chunk.level && currentChunk.end == chunk.end && currentChunk.start == chunk.start){
+                return; //Skip the dublicate
+            }
+
+            if (currentChunk.level == chunk.level) {
                 //we are on right position - place chunk before current
                 parent.children.splice(i, 0, chunk);
             } else {
@@ -307,6 +323,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
             }
             return;
         }
+        parent.children.splice(i, 0, chunk);
     }
 
     if(chunk.level === this.level && chunk.start >= this.start && chunk.end <= this.end){
@@ -331,6 +348,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
  * @param result - heap for recursive call
  */
 CameraRecordsProvider.prototype.splice = function(result, start, end, level, parent){
+
     parent = parent || this.chunksTree;
 
     var noNeedForUpdate = true;
@@ -339,25 +357,21 @@ CameraRecordsProvider.prototype.splice = function(result, start, end, level, par
         return false;
     }
 
-    if (!!parent.children) {
+    if (parent.children.length > 0) {
         for (var i = 0; i < parent.children.length; i++) {
             var currentChunk = parent.children[i];
             if (currentChunk.end <= start || currentChunk.start >= end || currentChunk.level === level) {
                 currentChunk.expand = false;
-                console.log("add",currentChunk.title,currentChunk.end <= start ,currentChunk.start, end , currentChunk.start - end);
                 result.push(currentChunk);
-                continue;
+            } else {
+                currentChunk.expand = true;
+                noNeedForUpdate = noNeedForUpdate && this.splice(result, start, end, level, currentChunk);
             }
-
-            currentChunk.expand = true;
-            noNeedForUpdate &= this.splice(result, start, end, level, currentChunk);
         }
-    }
-    else {
+    } else {
         // Try to go deeper
         result.push(parent);
-        console.log("we must update", parent);
-        return false; //Ne need to update
+        noNeedForUpdate = false; //Ne need to update
     }
 
     return noNeedForUpdate;
