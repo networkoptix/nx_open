@@ -21,7 +21,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>${release.version}</string>
 	<key>CFBundleVersion</key>
-	<string>${release.version}</string>
+	<string>${buildNumber}</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.7</string>
     <key>LSApplicationCategoryType</key>

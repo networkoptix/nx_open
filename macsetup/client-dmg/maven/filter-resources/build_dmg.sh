@@ -25,7 +25,25 @@ cp -a "$SRC/${display.product.name}.app" "$AS_SRC"
 
 if [ '${mac.skip.sign}' == 'false'  ]
 then
-    codesign -f -v --deep --entitlements entitlements.plist -s "${mac.app.sign.identity}" "$AS_SRC/${display.product.name}.app"
+    for f in $AS_SRC/Qulu.app/Contents/Frameworks/Q*
+    do
+        name=$(basename $f .framework)
+        codesign -f -v -s "${mac.app.sign.identity}" $f/Versions/5/$name
+    done
+
+    for f in $AS_SRC/Qulu.app/Contents/Frameworks/lib*
+    do
+        codesign -f -v -s "${mac.app.sign.identity}" "$f"
+    done
+
+    for f in $AS_SRC/Qulu.app/Contents/MacOS/{imageformats,platforms,styles}/*.dylib
+    do
+        codesign -f -v -s "${mac.app.sign.identity}" "$f"
+    done
+
+    codesign -f -v --entitlements entitlements.plist -s "${mac.app.sign.identity}" "$AS_SRC/Qulu.app/Contents/MacOS/${display.product.name}"
+
+#    codesign -f -v --deep --entitlements entitlements.plist -s "${mac.app.sign.identity}" "$AS_SRC/${display.product.name}.app"
     productbuild --component "$AS_SRC/${display.product.name}.app" /Applications --sign "${mac.pkg.sign.identity}" --product "$AS_SRC/${display.product.name}.app/Contents/Info.plist" "$PKG_FILE"
     # End
 fi

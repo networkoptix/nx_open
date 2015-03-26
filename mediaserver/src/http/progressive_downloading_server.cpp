@@ -503,6 +503,7 @@ void QnProgressiveDownloadingConsumer::run()
             extraParams.setCustomAR(customAR);
             
             d->transcoder.setExtraTranscodeParams(extraParams);
+            d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 
         if (d->transcoder.setVideoCodec(
