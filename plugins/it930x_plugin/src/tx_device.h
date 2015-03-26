@@ -3,12 +3,13 @@
 
 #include <string>
 #include <vector>
-#include <set>
+#include <map>
 #include <mutex>
 #include <atomic>
 
 #include "ret_chan/ret_chan_cmd_host.h"
 #include "rc_command.h"
+#include "timer.h"
 
 
 namespace ite
@@ -30,6 +31,20 @@ namespace ite
 
     struct TxManufactureInfo
     {
+        static std::string rcStr2str(const RCString& s)
+        {
+            return std::string((const char *)s.stringData, s.stringLength);
+        }
+
+        TxManufactureInfo(TxRC& txrc)
+        {
+            companyName = rcStr2str(txrc.manufactureInfo.manufactureName);
+            modelName = rcStr2str(txrc.manufactureInfo.modelName);
+            firmwareVersion = rcStr2str(txrc.manufactureInfo.firmwareVersion);
+            serialNumber = rcStr2str(txrc.manufactureInfo.serialNumber);
+            hardwareId = rcStr2str(txrc.manufactureInfo.hardwareId);
+        }
+
         std::string companyName;
         std::string modelName;
         std::string firmwareVersion;
@@ -37,24 +52,8 @@ namespace ite
         std::string hardwareId;
     };
 
-    struct TxVideoEncConfig
-    {
-        uint16_t width;
-        uint16_t height;
-        uint16_t bitrateLimit;
-        uint8_t  frameRateLimit;
-        uint8_t  quality;
-
-        TxVideoEncConfig()
-        :   width(0),
-            height(0),
-            bitrateLimit(0),
-            frameRateLimit(0),
-            quality(0)
-        {}
-    };
-
-    struct SendInfo
+    ///
+    struct SendSequence
     {
         std::mutex mutex;
         uint16_t txID;
@@ -62,7 +61,7 @@ namespace ite
         uint8_t tsSeq;
         bool tsMode;
 
-        SendInfo(uint16_t tx)
+        SendSequence(uint16_t tx)
         :   txID(tx),
             rcSeq(0),
             tsSeq(0),
@@ -71,9 +70,8 @@ namespace ite
     };
 
     ///
-    class TxDevice : public TxRC
+    struct TxChannels
     {
-    public:
         enum
         {
             CHANNELS_NUM = 16
@@ -151,58 +149,54 @@ namespace ite
             }
             return 0xffff;
         }
+    };
 
+    ///
+    class TxDevice : public TxRC, public TxChannels
+    {
+    public:
         TxDevice(unsigned short txID, unsigned freq);
 
-        SendInfo& sendInfo() { return m_device; }
-        uint16_t txID() const { return m_device.txID; }
+        SendSequence& sendSequence() { return m_sequence; }
+        uint16_t txID() const { return m_sequence.txID; }
 
         unsigned frequency() const { return transmissionParameter.frequency; }
         void setFrequency(unsigned freq) { transmissionParameter.frequency = freq; }
 
-        void print() const;
-
-        // info
-
-        TxManufactureInfo txDeviceInfo() const
+        void open()
         {
-            TxManufactureInfo mInfo;
-            mInfo.companyName = rcStr2str(manufactureInfo.manufactureName);
-            mInfo.modelName = rcStr2str(manufactureInfo.modelName);
-            mInfo.firmwareVersion = rcStr2str(manufactureInfo.firmwareVersion);
-            mInfo.serialNumber = rcStr2str(manufactureInfo.serialNumber);
-            mInfo.hardwareId = rcStr2str(manufactureInfo.hardwareId);
-            return mInfo;
+            resetWanted();
+            m_responses.clear();
+            m_ready.store(false);
         }
 
-        // encoder
-
-        uint8_t encodersCount() const { return videoEncConfig.configListSize; }
-
-        TxVideoEncConfig txVideoEncConfig(uint8_t encoderNo)
+        void close()
         {
-            if (encoderNo >= encodersCount())
-                return TxVideoEncConfig();
-
-            TxVideoEncConfig conf;
-            conf.width = videoEncConfig.configList[encoderNo].width;
-            conf.height = videoEncConfig.configList[encoderNo].height;
-            conf.bitrateLimit = videoEncConfig.configList[encoderNo].bitrateLimit;
-            conf.frameRateLimit = videoEncConfig.configList[encoderNo].frameRateLimit;
-            conf.quality = videoEncConfig.configList[encoderNo].quality;
-            return conf;
+            resetWanted();
+            m_ready.store(false);
         }
+
+        bool ready() const { return m_ready; }
 
         //
 
-        uint16_t getWanted();
-        void resetWanted(uint16_t cmd = 0);
+        uint8_t encodersCount() const { return videoEncConfig.configListSize; }
+        bool videoSourceCfg(unsigned stream, int& width, int& height, float& fps);
+        bool videoEncoderCfg(unsigned stream, int& width, int& height, float& fps, int& bitrate);
 
-        void parse(RcPacket& pkt);              // RcPacket -> RcCommand -> TxDevice
-        RcCommand * mkRcCmd(uint16_t command);  // TxDevice -> RcCommand
+        //
+
+        uint16_t cmd2update() const;
+        bool setWanted(uint16_t cmd);
+        uint16_t wantedCmd() { return m_wantedCmd; }
+
+        bool responseCode(uint16_t cmd, uint8_t& outCode);
+        void clearResponse(uint16_t cmd);
+
+        void parse(RcPacket& pkt);              // recv: DevReader -> Demux -> (some thread) -> RcPacket -> RcCommand -> TxDevice
+        RcCommand * mkRcCmd(uint16_t command);  // send: RxDevice -> TxDevice -> RcCommand -> RxDevice -> It930x
         RcCommand * mkSetChannel(unsigned channel);
-        RcCommand * mkSetBitrate(unsigned streamNo, unsigned bitrateKbps);
-        RcCommand * mkSetFramerate(unsigned streamNo, unsigned fps);
+        RcCommand * mkSetEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps);
 
         // -- RC
         static uint8_t checksum(const uint8_t * buffer, unsigned length) { return RcPacket::checksum(buffer, length); }
@@ -214,18 +208,20 @@ namespace ite
 
     private:
         mutable std::mutex m_mutex;
-        SendInfo m_device;
+        mutable std::atomic_bool m_ready;
+        std::atomic_ushort m_wantedCmd;
+        SendSequence m_sequence;
         RcCommand m_cmdRecv;
         RcCommand m_cmdSend;
         Security m_recvSecurity;
-        std::atomic_ushort m_wantedCmd;
-        std::set<uint16_t> m_responses;
+        std::map<uint16_t, uint8_t> m_responses; // {cmdID, RetCode}
+        Timer m_timer;
 
-        static std::string rcStr2str(const RCString& s) { return std::string((const char *)s.stringData, s.stringLength); }
+        void resetWanted(uint16_t cmd = 0, uint8_t code = 0);
 
-        uint16_t id4update();
         bool hasResponses(const uint16_t * cmdInputIDs, unsigned size) const;
 
+        bool prepareTransmissionParams();
         bool prepareVideoEncoderParams(unsigned streamNo);
 
         TxDevice(const TxDevice& );

@@ -28,7 +28,9 @@ namespace ite
     :   m_refManager(this),
         m_cameraManager(cameraManager),
         m_encoderNumber(encoderNumber),
-        m_resolution(res)
+        m_resolution(res),
+        m_fpsToSet(0.0f),
+        m_bitrateToSet(0)
     {
     }
 
@@ -73,42 +75,70 @@ namespace ite
 
     int MediaEncoder::getMaxBitrate(int * maxBitrate) const
     {
-        RxDevicePtr rxDev = m_cameraManager->rxDevice().lock();
-        if (rxDev && rxDev->getMaxBitrate(m_encoderNumber, *maxBitrate))
-            return nxcip::NX_NO_ERROR;
+        static const unsigned MAX_BITRATE_KBPS = 12000; // default value from videoEncConfig[0].targetBitrateLimit
 
-        *maxBitrate = 0;
+        *maxBitrate = MAX_BITRATE_KBPS;
         return nxcip::NX_NO_ERROR;
     }
 
-    int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
+    int MediaEncoder::setResolution(const nxcip::Resolution& resolution)
     {
         if (resolution.height != m_resolution.resolution.height || resolution.width != m_resolution.resolution.width)
             return nxcip::NX_UNSUPPORTED_RESOLUTION;
         return nxcip::NX_NO_ERROR;
     }
 
-    int MediaEncoder::setFps(const float& fps, float * outFps)
+    int MediaEncoder::setFps(const float& fps, float *)
     {
-        *outFps = fps;
-        RxDevicePtr rxDev = m_cameraManager->rxDevice().lock();
-        if (rxDev && rxDev->setFramerate(m_encoderNumber, *outFps))
-            return nxcip::NX_NO_ERROR;
-
-        *outFps = m_resolution.maxFps;
-        return nxcip::NX_NO_ERROR; // FIXME
+        m_fpsToSet = fps;
+        return nxcip::NX_NO_ERROR;
+        //return commit();
     }
 
-    int MediaEncoder::setBitrate(int bitrateKbps, int * outBitrateKbps)
+    int MediaEncoder::setBitrate(int bitrateKbps, int * selectedBitrateKbps)
     {
-        RxDevicePtr rxDev = m_cameraManager->rxDevice().lock();
-        if (rxDev && rxDev->setBitrate(m_encoderNumber, bitrateKbps))
+        static const unsigned MIN_BITRATE_KBPS = 200;
+
+        m_bitrateToSet = bitrateKbps;
+        if (m_bitrateToSet < MIN_BITRATE_KBPS)
+            m_bitrateToSet = MIN_BITRATE_KBPS;
+
+        *selectedBitrateKbps = m_bitrateToSet;
+        //return nxcip::NX_NO_ERROR;
+        return commit();
+    }
+
+    int MediaEncoder::commit()
+    {
+        if (m_fpsToSet != 0.0f && m_bitrateToSet)
         {
-            *outBitrateKbps = bitrateKbps;
+            RxDevicePtr rxDev = m_cameraManager->rxDevice().lock();
+            if (! rxDev)
+                return nxcip::NX_OTHER_ERROR;
+
+            TxDevicePtr txDev = rxDev->txDevice();
+            if (txDev)
+            {
+                int width, height, bitrate;
+                float fps;
+                txDev->videoEncoderCfg(m_encoderNumber, width, height, fps, bitrate);
+                if (bitrate == (int)m_bitrateToSet && fps == m_fpsToSet)
+                {
+                    m_fpsToSet = 0.0f;
+                    m_bitrateToSet = 0;
+                    return nxcip::NX_NO_ERROR;
+                }
+            }
+
+            if (! rxDev->setEncoderParams(m_encoderNumber, m_fpsToSet, m_bitrateToSet))
+                return nxcip::NX_INVALID_PARAM_VALUE;
+
+            m_fpsToSet = 0.0f;
+            m_bitrateToSet = 0;
             return nxcip::NX_NO_ERROR;
         }
 
-        return nxcip::NX_NO_ERROR; // FIXME
+        return nxcip::NX_NO_ERROR;
     }
 
     nxcip::StreamReader* MediaEncoder::getLiveStreamReader()

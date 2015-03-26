@@ -39,8 +39,6 @@ namespace ite
             NOT_A_CHANNEL = 16 // TxDevice::CHANNELS_NUM
         };
 
-        static constexpr unsigned streamsCount() { return 2; }
-
         static uint16_t stream2pid(unsigned stream)
         {
             switch (stream)
@@ -63,34 +61,11 @@ namespace ite
             }
         }
 #endif
-        static void resolution(unsigned stream, int& width, int& height, float& fps)
-        {
-            uint16_t pid = stream2pid(stream);
+        static constexpr unsigned streamsCountPassive() { return 2; }
+        unsigned streamsCount();
 
-            fps = 30.0f;
-            switch (pid)
-            {
-            case Pacidal::PID_VIDEO_FHD:
-                width = 1920;
-                height = 1080;
-                break;
-
-            case Pacidal::PID_VIDEO_HD:
-                width = 1280;
-                height = 720;
-                break;
-
-            case Pacidal::PID_VIDEO_SD:
-                width = 640;
-                height = 360;
-                break;
-
-            case Pacidal::PID_VIDEO_CIF:
-                width = 0;
-                height = 0;
-                break;
-            }
-        }
+        static void resolutionPassive(unsigned stream, int& width, int& height, float& fps);
+        void resolution(unsigned stream, int& width, int& height, float& fps);
 
         //
 
@@ -119,6 +94,7 @@ namespace ite
         void startSearchLost(unsigned lostNum);
         void stopSearchTx(DevLink& outDevLink);
 
+        void processRcQueue();
         void updateTxParams();
 
         const IteDriverInfo rxDriverInfo() const { return m_rxInfo; }
@@ -142,11 +118,8 @@ namespace ite
 
         // Encoder stuff
 
-        // TODO: getResolutions(), setResolution()
-
-        bool getMaxBitrate(unsigned streamNo, int& maxBitrate);
-        bool setBitrate(unsigned streamNo, int& bitrateKbps);
-        bool setFramerate(unsigned streamNo, float& fps);
+        // TODO: getResolutions(), setResolution(), getMaxBitrate()
+        bool setEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps);
 
         // TX stuff
 
@@ -284,6 +257,7 @@ namespace ite
         std::unique_ptr<DevReader> m_devReader;
         TxDevicePtr m_txDev;                    // locked Tx device (as camera)
         const uint16_t m_rxID;
+        bool m_passive;
         unsigned m_channel;
         Sync m_sync;
         std::vector<TxPresence> m_txs;

@@ -245,7 +245,7 @@ namespace ite
                         "<param id=\"{rxAPIVer}\" name=\"API Version\" dataType=\"String\" readOnly=\"true\" /> "
                         "<param id=\"{rxFWVer}\" name=\"Firmware Version\" dataType=\"String\" readOnly=\"true\" /> "
                     "</group> "
-#if 0
+#if 1
                     "<group name=\"Camera\"> "
                         "<param id=\"{txID}\" name=\"Camera ID\" dataType=\"Number\" readOnly=\"true\" range=\"0,65535\" /> "
                         "<param id=\"{txHwID}\" name=\"Camera HWID\" dataType=\"String\" readOnly=\"true\" /> "
@@ -503,27 +503,9 @@ namespace ite
 
     //
 
-    int CameraManager::getEncoderCount( int* encoderCount ) const
+    int CameraManager::getEncoderCount(int * encoderCount) const
     {
-#if 0
-        State state = checkState();
-        switch (state)
-        {
-            case STATE_NO_CAMERA:
-            case STATE_NO_FREQUENCY:
-            case STATE_NO_RECEIVER:
-            case STATE_DEVICE_READY:
-            case STATE_STREAM_LOADING:
-            case STATE_STREAM_LOST:
-                *encoderCount = 0;
-                return nxcip::NX_TRY_AGAIN;
-
-            case STATE_STREAM_READY:
-            case STATE_STREAM_READING:
-                break;
-        }
-#endif
-        *encoderCount = RxDevice::streamsCount();
+        *encoderCount = RxDevice::streamsCountPassive();
         return nxcip::NX_NO_ERROR;
     }
 
@@ -533,22 +515,21 @@ namespace ite
         switch (state)
         {
             case STATE_NO_CAMERA:
-            case STATE_NO_CHANNEL:
             case STATE_NO_RECEIVER:
-            case STATE_DEVICE_READY:
-            case STATE_STREAM_LOADING:
-            case STATE_STREAM_LOST:
+            case STATE_NOT_LOCKED:
+            case STATE_NOT_CONFIGURED:
+            case STATE_NO_ENCODERS:
                 return nxcip::NX_TRY_AGAIN;
 
-            case STATE_STREAM_READY:
-            case STATE_STREAM_READING:
+            case STATE_READY:
+            case STATE_READING:
                 break;
         }
 
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-        if (m_encoders.empty())
-            return nxcip::NX_TRY_AGAIN;
+        //if (m_encoders.empty())
+        //    return nxcip::NX_TRY_AGAIN;
 
         if (static_cast<unsigned>(encoderIndex) >= m_encoders.size())
             return nxcip::NX_INVALID_ENCODER_NUMBER;
@@ -625,28 +606,25 @@ namespace ite
 
     CameraManager::State CameraManager::checkState() const
     {
-        if (! txID())
+        if (! m_txDev)
             return STATE_NO_CAMERA;
 
         if (! m_rxDevice)
             return STATE_NO_RECEIVER;
 
-        if (m_rxDevice->channel() == RxDevice::NOT_A_CHANNEL)
-            return STATE_NO_CHANNEL;
+        if (! m_rxDevice->isLocked() || ! m_rxDevice->isReading())
+            return STATE_NOT_LOCKED;
 
-        if (m_rxDevice && ! m_rxDevice->isLocked())
-            return STATE_DEVICE_READY;
+        if (m_rxDevice->isLocked() && m_rxDevice->isReading() && ! m_txDev->ready())
+            return STATE_NOT_CONFIGURED;
 
-        //if (m_loading)
-        //    return STATE_STREAM_LOADING;
+        if (m_txDev->ready() && m_encoders.size() == 0)
+            return STATE_NO_ENCODERS;
 
-        if (m_rxDevice->isLocked() && ! m_rxDevice->isReading())
-            return STATE_STREAM_LOST;
+        if (m_openedStreams.empty())
+            return STATE_READY;
 
-        if (m_rxDevice->isReading() && m_openedStreams.empty())
-            return STATE_STREAM_READY;
-
-        return STATE_STREAM_READING;
+        return STATE_READING;
     }
 
     CameraManager::State CameraManager::tryLoad()
@@ -657,31 +635,56 @@ namespace ite
         switch (state)
         {
             case STATE_NO_CAMERA:
-            case STATE_NO_CHANNEL:
                 return state; // can do nothing
 
             case STATE_NO_RECEIVER:
+            case STATE_NOT_LOCKED:
             {
-                bool ok = captureAnyRxDevice();
-                if (! ok)
+                if (! captureAnyRxDevice())
                     break;
-                // no break
+                //break;
             }
 
-            case STATE_DEVICE_READY:
-            case STATE_STREAM_LOST:
+            case STATE_NOT_CONFIGURED:
+            {
+                if (! configureTx())
+                    break;
+                //break;
+            }
+
+            case STATE_NO_ENCODERS:
             {
                 reloadMedia();
                 break;
             }
 
-            case STATE_STREAM_LOADING:
-            case STATE_STREAM_READY:
-            case STATE_STREAM_READING:
-                break;
+            case STATE_READY:
+            case STATE_READING:
+                return state;
         }
 
         return checkState();
+    }
+
+    bool CameraManager::configureTx()
+    {
+        static const unsigned WAIT_MS = 60000;
+
+        Timer timer(true);
+        while (! m_txDev->ready())
+        {
+            processRC();
+
+            if (timer.elapsedMS() > WAIT_MS)
+            {
+                printf("Camera configuration is too long. Break\n");
+                break;
+            }
+        }
+
+        // TODO: passive mode
+
+        return m_txDev->ready();
     }
 
     void CameraManager::reloadMedia()
@@ -820,17 +823,15 @@ namespace ite
     // from StreamReader thread
 
     /// @hack reading RC in StreamReader thread
-    void CameraManager::minorWork()
+    void CameraManager::processRC()
     {
-        RxDevicePtr dev;
-        {
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            dev = m_rxDevice;
-        }
-
+        RxDevicePtr dev = m_rxDevice;
         if (dev)
-            dev->updateTxParams();
+        {
+            dev->processRcQueue();
+            if (! m_txDev->ready())
+                dev->updateTxParams();
+        }
     }
 
     DevReader * CameraManager::devReader() const

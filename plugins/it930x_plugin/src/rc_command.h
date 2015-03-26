@@ -140,7 +140,7 @@ namespace ite
         uint8_t m_buffer[BUF_SIZE];
     };
 
-    struct SendInfo;
+    struct SendSequence;
 
     ///
     class RcCommand
@@ -150,6 +150,16 @@ namespace ite
         {
             MIN_SIZE = 7,   // size (4) + ID (2) + checksum (1)
             MAX_SIZE = 255
+        };
+
+        enum
+        {
+            CODE_SUCCESS = 0,
+            CODE_USERNAME_ERR = 0xFB,
+            CODE_PASSWORD_ERR = 0xFC,
+            CODE_UNSUPPORTED = 0xFD,
+            CODE_CRC_ERR = 0xFE,
+            CODE_FAIL = 0xFF
         };
 
         static uint16_t in2outID(uint16_t cmdID);
@@ -179,6 +189,7 @@ namespace ite
 
         uint16_t commandID() const { return (m_buffer[4]<<8) | m_buffer[5]; }
         uint8_t returnCode() const { return m_buffer[6]; }
+        void setReturnCode(uint8_t val) { m_buffer[6] = val; }
 
         uint8_t calcChecksum() const { return RcPacket::checksum(&m_buffer[0], cmdLength()); }
         uint8_t checksumValue() const { return m_buffer[cmdLength()]; }
@@ -187,7 +198,7 @@ namespace ite
         bool validLength() const { return m_buffer.size() >= MIN_SIZE && m_buffer.size() == cmdLength() + 1; }
         bool isValid() const { return checksumOK(); }
 
-        void mkPackets(SendInfo& sinfo, uint16_t rxID, std::vector<RcPacketBuffer>& pkts) const;
+        void mkPackets(SendSequence& sseq, uint16_t rxID, std::vector<RcPacketBuffer>& pkts) const;
 
     private:
         std::vector<uint8_t> m_buffer;

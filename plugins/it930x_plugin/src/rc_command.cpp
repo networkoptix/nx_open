@@ -123,7 +123,7 @@ bool RcCommand::addPacket(const RcPacket& pkt)
     return true;
 }
 
-void RcCommand::mkPackets(SendInfo& sinfo, uint16_t rxID, std::vector<RcPacketBuffer>& pkts) const
+void RcCommand::mkPackets(SendSequence& sseq, uint16_t rxID, std::vector<RcPacketBuffer>& pkts) const
 {
     if (! isValid())
         return;
@@ -154,12 +154,12 @@ void RcCommand::mkPackets(SendInfo& sinfo, uint16_t rxID, std::vector<RcPacketBu
 
         RcPacket pkt = pkts[i].packet();
 
-        ++sinfo.rcSeq;
+        ++sseq.rcSeq;
         pkt.setRxID(rxID);
-        pkt.setTxID(sinfo.txID);
+        pkt.setTxID(sseq.txID);
         pkt.setTotalPktNum(total_pktCount);
         pkt.setPaketNum(i + 1);
-        pkt.setSequenceNum(sinfo.rcSeq);
+        pkt.setSequenceNum(sseq.rcSeq);
 
         pkt.setPktLength(length);
         pkt.setContent(ptr, length);

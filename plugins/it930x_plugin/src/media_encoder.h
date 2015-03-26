@@ -36,6 +36,10 @@ namespace ite
 
         //
 
+        virtual int commit(); // override
+
+        //
+
         //static void fakeFree(MediaEncoder * ) {}
         void updateResolution(const nxcip::ResolutionInfo& res) { m_resolution = res; }
 
@@ -43,6 +47,8 @@ namespace ite
         CameraManager * m_cameraManager;
         int m_encoderNumber;
         nxcip::ResolutionInfo m_resolution;
+        float m_fpsToSet;
+        unsigned m_bitrateToSet;
     };
 }
 

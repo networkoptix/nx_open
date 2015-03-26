@@ -129,8 +129,9 @@ static void User_askUserSecurity(Security * security)
 namespace ite
 {
     TxDevice::TxDevice(unsigned short txID, unsigned freq)
-    :   m_device(txID),
-        m_wantedCmd(0)
+    :   m_ready(false),
+        m_wantedCmd(0),
+        m_sequence(txID)
     {
         User_askUserSecurity(&security);
 
@@ -158,16 +159,14 @@ namespace ite
 
                 error = ::parseRC(this, cmdID, m_cmdRecv.data(), m_cmdRecv.size());
             }
-
-            if (error != ReturnChannelError::NO_ERROR)
-            {
 #if 1
-                printf("[RC] can't parse command %d, err: %d, code: %d\n", cmdID, error, code);
+            if (error || code)
+                printf("[RC] cmd 0x%x, error: %d, ret code: %d\n", cmdID, error, code);
 #endif
+            if (error != ReturnChannelError::NO_ERROR)
                 return;
-            }
 
-            resetWanted(cmdID);
+            resetWanted(cmdID, code);
         }
 #if 1
         else
@@ -175,22 +174,26 @@ namespace ite
 #endif
     }
 
-    // TODO: reset wanted by timer (if no response)
-    uint16_t TxDevice::getWanted()
+    bool TxDevice::setWanted(uint16_t cmd)
     {
-        uint16_t cmd = id4update();
-        if (cmd)
+        static const unsigned TIMER_MS = 4000;
+
+        uint16_t outCmd = RcCommand::in2outID(cmd);
+        uint16_t expected = 0;
+        if (m_wantedCmd.compare_exchange_strong(expected, outCmd))
         {
-            uint16_t outCmd = RcCommand::in2outID(cmd);
-            uint16_t expected = 0;
-            if (m_wantedCmd.compare_exchange_strong(expected, outCmd))
-               return cmd;
+            m_timer.restart();
+            return true;
         }
 
-        return 0;
+        // FIXME: not thread safe!!!
+        if (m_timer.elapsedMS() > TIMER_MS)
+            m_wantedCmd.store(0);
+
+        return false;
     }
 
-    void TxDevice::resetWanted(uint16_t cmd)
+    void TxDevice::resetWanted(uint16_t cmd, uint8_t code)
     {
         if (cmd)
         {
@@ -198,11 +201,35 @@ namespace ite
             {
                 std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-                m_responses.insert(cmd);
+                m_responses[cmd] = code;
             }
         }
         else
             m_wantedCmd.store(0);
+    }
+
+    bool TxDevice::responseCode(uint16_t cmd, uint8_t& code)
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        uint16_t outCmd = RcCommand::in2outID(cmd);
+
+        auto it = m_responses.find(outCmd);
+        if (it != m_responses.end())
+        {
+            code = it->second;
+            return true;
+        }
+
+        return false;
+    }
+
+    void TxDevice::clearResponse(uint16_t cmd)
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        uint16_t outCmd = RcCommand::in2outID(cmd);
+        m_responses.erase(outCmd);
     }
 
     bool TxDevice::hasResponses(const uint16_t * cmdInputIDs, unsigned size) const
@@ -219,42 +246,26 @@ namespace ite
         return true;
     }
 
-    // TODO: updates
-    uint16_t TxDevice::id4update()
+    uint16_t TxDevice::cmd2update() const
     {
+        static const unsigned num = 7;
         static const uint16_t cmdIDs[] = {
             CMD_GetTransmissionParameterCapabilitiesInput,
             CMD_GetTransmissionParametersInput,
             CMD_GetDeviceInformationInput,
+            CMD_GetProfilesInput,
             CMD_GetVideoSourcesInput,
             CMD_GetVideoSourceConfigurationsInput,
-            CMD_GetVideoEncoderConfigurationsInput,
-            //
-            CMD_GetProfilesInput
-            //CMD_GetVideoEncoderConfigurationOptionsInput
+            CMD_GetVideoEncoderConfigurationsInput
         };
 
-        if (m_wantedCmd)
-            return 0;
-
-        for (size_t i = 0; i < sizeof(cmdIDs); ++i)
+        for (size_t i = 0; i < num; ++i)
         {
             if (! hasResponses(&cmdIDs[i], 1))
-            {
-#if 0
-                if (cmdIDs[i] == CMD_GetVideoEncoderConfigurationOptionsInput)
-                {
-                    MediaProfilesParam * profile = &mediaProfiles.mediaProfilesParam[0];
-                    VideoEncConfigParam * enc = &videoEncConfig.configList[0];
-
-                    videoEncConfigOptions.profileToken.copy(&profile->videoEncToken);
-                    videoEncConfigOptions.videoEncConfigToken.copy(&enc->token);
-                }
-#endif
                 return cmdIDs[i];
-            }
         }
 
+        m_ready.store(true);
         return 0;
     }
 
@@ -265,7 +276,7 @@ namespace ite
             CMD_GetVideoEncoderConfigurationsInput
         };
 
-        if (! hasResponses(cmdIDs, sizeof(cmdIDs)))
+        if (! hasResponses(cmdIDs, 1))
             return false;
 
         //
@@ -297,40 +308,50 @@ namespace ite
         return true;
     }
 
-    void TxDevice::print() const
-    {
-        printf("TX ID: %04x\n", m_device.txID);
-        printf("Frequency in KHz (ex. 666000): %u\n", transmissionParameter.frequency);
-        printf("Bandwidth in MHz (ex. 1~8): %d\n", transmissionParameter.bandwidth);
-#if 0
-        printf("Constellation (0: QPSK, 1: 16QAM, 2: 64QAM): %d\n", transmissionParameter.constellation);
-        printf("Transmission Mode (0: 2K, 1: 8K 2: 4K): %d\n", transmissionParameter.FFT);
-        printf("Code Rate (0: 1/2, 1: 2/3, 2: 3/4, 3:5/6, 4: 7/8): %d\n", transmissionParameter.codeRate);
-        printf("Guard Interval (0: 1/32, 1: 1/16, 2: 1/8, 3: 1/4): %d\n", transmissionParameter.interval);
-        printf("Attenuation (ex: -100~100): %d\n", transmissionParameter.attenuation_signed);
-        printf("TPS Cell ID : %d\n", transmissionParameter.TPSCellID);
-        printf("Channel Number (ex: 0~255): %d\n", transmissionParameter.channelNum);
-        printf("Bandwidth Strapping (ex: 0:7+8MHz, 1:6MHz, 2:7MHz, 3:8MHz): %d\n", transmissionParameter.bandwidthStrapping);
-        printf("TV Standard (ex: 0: DVB-T 1: ISDB-T): %d\n", transmissionParameter.TVStandard);
-        printf("Segmentation Mode (ex: 0: ISDB-T Full segmentation mode 1: ISDB-T 1+12 segmentation mode): %d\n", transmissionParameter.segmentationMode);
-        printf("One-Seg Constellation (ex: 0: QPSK, 1: 16QAM, 2: 64QAM ): %d\n", transmissionParameter.oneSeg_Constellation);
-        printf("One-Seg Code Rate (ex: 0: 1/2, 1: 2/3, 2: 3/4, 3: 5/6, 4: 7/8 ): %d\n", transmissionParameter.oneSeg_CodeRate);
-#endif
-    }
-
-    //
-
-    RcCommand * TxDevice::mkSetChannel(unsigned channel)
+    bool TxDevice::prepareTransmissionParams()
     {
         static const uint16_t cmdIDs[] = {
             CMD_GetTransmissionParameterCapabilitiesInput,
             CMD_GetTransmissionParametersInput
         };
 
-        if (! hasResponses(cmdIDs, sizeof(cmdIDs)))
-            return nullptr;
+        if (! hasResponses(cmdIDs, 2))
+            return false;
 
-        //
+        return true;
+    }
+
+    //
+
+    bool TxDevice::videoSourceCfg(unsigned encNo, int& width, int& height, float& fps)
+    {
+        if (encNo >= videoSrcConfig.configListSize)
+            return false;
+
+        width = videoSrcConfig.configList[encNo].boundsWidth;
+        height = videoSrcConfig.configList[encNo].boundsHeight;
+        fps = videoSrcConfig.configList[encNo].maxFrameRate;
+        return true;
+    }
+
+    bool TxDevice::videoEncoderCfg(unsigned encNo, int& width, int& height, float& fps, int& bitrate)
+    {
+        if (encNo >= videoEncConfig.configListSize)
+            return false;
+
+        width = videoEncConfig.configList[encNo].width;
+        height = videoEncConfig.configList[encNo].height;
+        fps = videoEncConfig.configList[encNo].frameRateLimit;
+        bitrate = videoEncConfig.configList[encNo].bitrateLimit;
+        return true;
+    }
+
+    //
+
+    RcCommand * TxDevice::mkSetChannel(unsigned channel)
+    {
+        if (! prepareTransmissionParams())
+            return nullptr;
 
         unsigned freq = freq4chan(channel);
 
@@ -347,19 +368,7 @@ namespace ite
         return mkRcCmd(CMD_SetTransmissionParametersInput);
     }
 
-    RcCommand * TxDevice::mkSetBitrate(unsigned streamNo, unsigned bitrateKbps)
-    {
-        if (! prepareVideoEncoderParams(streamNo))
-            return nullptr;
-
-        // TODO: min/max
-
-        videoEncConfigSetParam.bitrateLimit = bitrateKbps;
-
-        return mkRcCmd(CMD_SetVideoEncoderConfigurationInput);
-    }
-
-    RcCommand * TxDevice::mkSetFramerate(unsigned streamNo, unsigned fps)
+    RcCommand * TxDevice::mkSetEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps)
     {
         if (! prepareVideoEncoderParams(streamNo))
             return nullptr;
@@ -367,6 +376,7 @@ namespace ite
         // TODO: min/max
 
         videoEncConfigSetParam.frameRateLimit = fps;
+        videoEncConfigSetParam.bitrateLimit = bitrateKbps;
 
         return mkRcCmd(CMD_SetVideoEncoderConfigurationInput);
     }
@@ -409,4 +419,28 @@ namespace ite
     {
         return Valid;
     }
+
+    //
+
+#if 0
+    void TxDevice::print() const
+    {
+        printf("TX ID: %04x\n", m_device.txID);
+        printf("Frequency in KHz (ex. 666000): %u\n", transmissionParameter.frequency);
+        printf("Bandwidth in MHz (ex. 1~8): %d\n", transmissionParameter.bandwidth);
+        //
+        printf("Constellation (0: QPSK, 1: 16QAM, 2: 64QAM): %d\n", transmissionParameter.constellation);
+        printf("Transmission Mode (0: 2K, 1: 8K 2: 4K): %d\n", transmissionParameter.FFT);
+        printf("Code Rate (0: 1/2, 1: 2/3, 2: 3/4, 3:5/6, 4: 7/8): %d\n", transmissionParameter.codeRate);
+        printf("Guard Interval (0: 1/32, 1: 1/16, 2: 1/8, 3: 1/4): %d\n", transmissionParameter.interval);
+        printf("Attenuation (ex: -100~100): %d\n", transmissionParameter.attenuation_signed);
+        printf("TPS Cell ID : %d\n", transmissionParameter.TPSCellID);
+        printf("Channel Number (ex: 0~255): %d\n", transmissionParameter.channelNum);
+        printf("Bandwidth Strapping (ex: 0:7+8MHz, 1:6MHz, 2:7MHz, 3:8MHz): %d\n", transmissionParameter.bandwidthStrapping);
+        printf("TV Standard (ex: 0: DVB-T 1: ISDB-T): %d\n", transmissionParameter.TVStandard);
+        printf("Segmentation Mode (ex: 0: ISDB-T Full segmentation mode 1: ISDB-T 1+12 segmentation mode): %d\n", transmissionParameter.segmentationMode);
+        printf("One-Seg Constellation (ex: 0: QPSK, 1: 16QAM, 2: 64QAM ): %d\n", transmissionParameter.oneSeg_Constellation);
+        printf("One-Seg Code Rate (ex: 0: 1/2, 1: 2/3, 2: 3/4, 3: 5/6, 4: 7/8 ): %d\n", transmissionParameter.oneSeg_CodeRate);
+    }
+#endif
 }

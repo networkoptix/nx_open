@@ -58,7 +58,7 @@ namespace ite
 
         DevReader * devReader() const;
         std::weak_ptr<RxDevice> rxDevice() const { return m_rxDevice; }
-        void minorWork();
+        void processRC();
 
         void openStream(unsigned encNo);
         void closeStream(unsigned encNo);
@@ -90,12 +90,11 @@ namespace ite
 
         const DeviceMapper * m_devMapper;
         TxDevicePtr m_txDev;
+        RxDevicePtr m_rxDevice;
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders; // FIXME: do not use smart ptr for ref-counted object
 
         std::set<unsigned> m_openedStreams;
         Timer m_stopTimer;
-
-        RxDevicePtr m_rxDevice;
 
         mutable const char * m_errorStr;
         nxcip::CameraInfo m_info;
@@ -107,6 +106,7 @@ namespace ite
         void initEncoders();
         void stopEncoders();
 
+        bool configureTx();
         void reloadMedia();
 
         bool stopStreams(bool force = false);
@@ -114,13 +114,12 @@ namespace ite
         typedef enum
         {
             STATE_NO_CAMERA,        // no Tx
-            STATE_NO_CHANNEL,       // channel not set
             STATE_NO_RECEIVER,      // no Rx for Tx
-            STATE_DEVICE_READY,     // got Rx for Tx
-            STATE_STREAM_LOADING,   // loading data streams
-            STATE_STREAM_READY,     // got data streams, no readers
-            STATE_STREAM_LOST,      //
-            STATE_STREAM_READING    // got readers
+            STATE_NOT_LOCKED,       // got Rx for Tx
+            STATE_NOT_CONFIGURED,   // reading Tx configuration
+            STATE_NO_ENCODERS,      //
+            STATE_READY,            // got data streams, no readers
+            STATE_READING           // got readers
         } State;
 
         State checkState() const;
@@ -148,11 +147,11 @@ namespace ite
             }
         }
 
-        void getParamStr_TxHwID(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().hardwareId; }
-        void getParamStr_TxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().companyName; }
-        void getParamStr_TxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().modelName; }
-        void getParamStr_TxSerial(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().serialNumber; }
-        void getParamStr_TxFwVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDevice()->txDeviceInfo().firmwareVersion; }
+        void getParamStr_TxHwID(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).hardwareId; }
+        void getParamStr_TxCompany(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).companyName; }
+        void getParamStr_TxModel(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).modelName; }
+        void getParamStr_TxSerial(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).serialNumber; }
+        void getParamStr_TxFwVer(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).firmwareVersion; }
 
         bool setParam_Channel(std::string& s);
     };

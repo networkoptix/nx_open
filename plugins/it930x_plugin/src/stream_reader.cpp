@@ -223,7 +223,7 @@ namespace ite
             if (pkt)
                 return pkt;
 
-            m_cameraManager->minorWork();
+            m_cameraManager->processRC();
         }
 
         m_interrupted = false;

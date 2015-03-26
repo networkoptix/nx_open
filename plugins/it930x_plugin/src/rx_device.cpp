@@ -31,6 +31,7 @@ namespace ite
     RxDevice::RxDevice(unsigned id)
     :   m_devReader( new DevReader() ),
         m_rxID(id),
+        m_passive(false),
         m_channel(NOT_A_CHANNEL),
         m_txs(TxDevice::CHANNELS_NUM),
         m_signalQuality(0),
@@ -98,6 +99,7 @@ namespace ite
                         m_devReader->start(m_device.get());
 
                     m_txDev = txDev;
+                    m_txDev->open();
                     return true;
                 }
 
@@ -173,6 +175,8 @@ namespace ite
         if (m_device)
             m_device->unlockFrequency();
 
+        if (m_txDev)
+            m_txDev->close();
         m_txDev.reset();
         m_channel = NOT_A_CHANNEL;
 
@@ -304,17 +308,16 @@ namespace ite
         m_sync.searching.store(false);
     }
 
-    void RxDevice::updateTxParams()
+    //
+
+    void RxDevice::processRcQueue()
     {
         if (! m_txDev)
             return;
 
-        for (;;)
+        RcPacketBuffer pktBuf;
+        while (m_devReader->getRcPacket(pktBuf))
         {
-            RcPacketBuffer pktBuf;
-            if (! m_devReader->getRcPacket(pktBuf))
-                break;
-
             RcPacket pkt = pktBuf.packet();
             if (! pkt.isOK())
             {
@@ -323,40 +326,48 @@ namespace ite
             }
 
             m_txDev->parse(pkt);
-            return; ///< @note for better latency
         }
+    }
 
-        uint16_t id = m_txDev->getWanted();
+    void RxDevice::updateTxParams()
+    {
+        if (! m_txDev)
+            return;
+
+        uint16_t id = m_txDev->cmd2update();
         if (id)
         {
             RcCommand * pcmd = m_txDev->mkRcCmd(id);
             if (pcmd && pcmd->isValid())
-            {
-                if (! sendRC(pcmd))
-                    m_txDev->resetWanted();
-            }
+                sendRC(pcmd);
         }
     }
 
     bool RxDevice::sendRC(RcCommand * cmd)
     {
-        if (cmd && cmd->isValid() && m_txDev && m_device)
-        {
-            SendInfo& sinfo = m_txDev->sendInfo();
+        TxDevicePtr txDev = m_txDev;
 
-            std::lock_guard<std::mutex> lock(sinfo.mutex); // LOCK
+        bool ok = cmd && cmd->isValid() && txDev && m_device;
+        if (!ok)
+            return false;
 
-            std::vector<RcPacketBuffer> pkts;
-            cmd->mkPackets(sinfo, m_rxID, pkts);
+        uint16_t cmdID = cmd->commandID();
 
-            /// @warning possible troubles with 1-port devices if multipacket
-            for (auto itPkt = pkts.begin(); itPkt != pkts.end(); ++itPkt)
-                m_device->sendRcPacket(itPkt->packet());
+        if (! txDev->setWanted(cmdID))
+            return false; // can't send, waiting for response
 
-            return true;
-        }
+        SendSequence& sseq = txDev->sendSequence();
 
-        return false;
+        std::lock_guard<std::mutex> lock(sseq.mutex); // LOCK
+
+        std::vector<RcPacketBuffer> pkts;
+        cmd->mkPackets(sseq, m_rxID, pkts);
+
+        /// @warning possible troubles with 1-port devices if multipacket
+        for (auto itPkt = pkts.begin(); itPkt != pkts.end(); ++itPkt)
+            m_device->sendRcPacket(itPkt->packet());
+
+        return true;
     }
 
     //
@@ -372,39 +383,85 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::getMaxBitrate(unsigned streamNo, int& maxBitrate)
+    bool RxDevice::setEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps)
     {
-        // TODO
+        static const unsigned ATTEMPTS_COUNT = 10;
+        static const unsigned DELAY_MS = 200;
+
+        if (m_txDev)
+        {
+            RcCommand * pcmd = m_txDev->mkSetEncoderParams(streamNo, fps, bitrateKbps);
+
+            for (unsigned i = 0; i < ATTEMPTS_COUNT; ++i)
+            {
+                if (sendRC(pcmd))
+                    return true;
+                Timer::sleep(DELAY_MS);
+            }
+
+            return false;
+        }
 
         return false;
     }
 
-    bool RxDevice::setBitrate(unsigned streamNo, int& bitrateKbps)
+    //
+
+    void RxDevice::resolutionPassive(unsigned stream, int& width, int& height, float& fps)
     {
-        bool ok = false;
-        if (m_txDev)
+        uint16_t pid = stream2pid(stream);
+
+        fps = 30.0f;
+        switch (pid)
         {
-            RcCommand * pcmd = m_txDev->mkSetBitrate(streamNo, bitrateKbps);
-            ok = sendRC(pcmd);
+        case Pacidal::PID_VIDEO_FHD:
+            width = 1920;
+            height = 1080;
+            break;
+
+        case Pacidal::PID_VIDEO_HD:
+            width = 1280;
+            height = 720;
+            break;
+
+        case Pacidal::PID_VIDEO_SD:
+            width = 640;
+            height = 360;
+            break;
+
+        case Pacidal::PID_VIDEO_CIF:
+            width = 0;
+            height = 0;
+            break;
         }
-
-        // TODO: response
-
-        return ok;
     }
 
-    bool RxDevice::setFramerate(unsigned streamNo, float& fps)
+    void RxDevice::resolution(unsigned stream, int& width, int& height, float& fps)
     {
-        bool ok = false;
-        if (m_txDev)
+        if (m_passive)
         {
-            RcCommand * pcmd = m_txDev->mkSetFramerate(streamNo, fps);
-            ok = sendRC(pcmd);
+            resolutionPassive(stream, width, height, fps);
+            return;
         }
 
-        // TODO: response
+        if (! m_txDev)
+        {
+            resolutionPassive(stream, width, height, fps);
+            return;
+        }
 
-        return ok;
+        if (! m_txDev->videoSourceCfg(stream, width, height, fps))
+            resolutionPassive(stream, width, height, fps);
+    }
+
+    unsigned RxDevice::streamsCount()
+    {
+        if (m_passive)
+            return streamsCountPassive();
+
+        if (m_txDev)
+            return m_txDev->encodersCount();
+        return 0;
     }
 
     //
