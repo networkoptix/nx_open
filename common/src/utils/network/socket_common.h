@@ -30,6 +30,8 @@ class HostAddress
 public:
     //!Creates 0.0.0.0 address
     HostAddress();
+    HostAddress( const HostAddress& rhs );
+    HostAddress( HostAddress&& rhs );
     HostAddress( const struct in_addr& sinAddr );
     /*!
         \param _ipv4 ipv4 address in local byte order
@@ -42,7 +44,11 @@ public:
     uint32_t ipv4() const;
     QString toString() const;
 
+    HostAddress& operator=( const HostAddress& rhs );
+    HostAddress& operator=( HostAddress&& rhs );
+
     bool operator==( const HostAddress& right ) const;
+    bool operator<( const HostAddress& right ) const;
 
     struct in_addr inAddr(bool* ok = nullptr) const;
 
@@ -99,7 +105,13 @@ public:
     {
         return address == rhs.address && port == rhs.port;
     }
+
+    bool isNull() const { return address == HostAddress() && port == 0; }
 };
+
+inline uint qHash(const SocketAddress &address) {
+    return qHash(address.address.toString(), address.port);
+}
 
 class SocketGlobalRuntimeInternal;
 
@@ -115,5 +127,7 @@ public:
 private:
     SocketGlobalRuntimeInternal* m_data;
 };
+
+Q_DECLARE_METATYPE(SocketAddress)
 
 #endif  //SOCKET_COMMON_H

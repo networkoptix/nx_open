@@ -1630,12 +1630,6 @@ SocketAddress QnSSLSocket::getLocalAddress() const
     return d->wrappedSocket->getLocalAddress();
 }
 
-SocketAddress QnSSLSocket::getPeerAddress() const
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getPeerAddress();
-}
-
 void QnSSLSocket::close()
 {
     Q_D(const QnSSLSocket);

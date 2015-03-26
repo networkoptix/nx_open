@@ -191,6 +191,7 @@ public:
     int desiredSecondStreamFps() const;
     Qn::StreamQuality getSecondaryStreamQuality() const;
 
+    //TODO: #2.4 #rvasilenko #High Move to runtime data
     Qn::CameraStatusFlags statusFlags() const;
     bool hasStatusFlags(Qn::CameraStatusFlag value) const;
     void setStatusFlags(Qn::CameraStatusFlags value);
@@ -244,6 +245,7 @@ signals:
     void groupIdChanged(const QnResourcePtr &resource);
     void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
+    void statusFlagsChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
@@ -299,12 +301,12 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
+    mutable Qn::LicenseType m_cachedLicenseType;
     CachedValue<bool> m_cachedHasDualStreaming2;
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
-
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
 

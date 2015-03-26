@@ -49,14 +49,16 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         QnStorageSpaceData data;
         data.url = storage->getUrl();
         data.storageId = storage->getId();
-        data.totalSpace = storage->getTotalSpace();
-        data.freeSpace = storage->getFreeSpace();
+        if (storage->getStatus() == Qn::Online) {
+            data.totalSpace = storage->getTotalSpace();
+            data.freeSpace = storage->getFreeSpace();
+            data.isWritable = storage->isStorageAvailableForWriting();
+        }
         data.reservedSpace = storage->getSpaceLimit();
         data.isExternal = storage->isExternal();
-        data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 
-        if( data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() )
+        if( data.totalSpace != -1 && data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() )
             continue;
 
         // TODO: #Elric remove once UnknownSize is dropped.

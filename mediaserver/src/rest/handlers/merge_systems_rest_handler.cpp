@@ -86,7 +86,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     auth.setPassword(password);
 
     CLSimpleHTTPClient client(url, 10000, auth);
-    CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated"));
+    CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated?showAddresses=true"));
 
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
@@ -103,7 +103,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
 
     QnJsonRestResult json;
     QJson::deserialize(data, &json);
-    QnModuleInformation moduleInformation;
+    QnModuleInformationWithAddresses moduleInformation;
     QJson::deserialize(json.reply(), &moduleInformation);
 
     if (moduleInformation.systemName.isEmpty()) {
@@ -159,7 +159,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
 
     /* Connect to server if it is compatible */
     if (compatible && QnServerConnector::instance())
-        QnServerConnector::instance()->addConnection(moduleInformation, url);
+        QnServerConnector::instance()->addConnection(moduleInformation, SocketAddress(url.host(), moduleInformation.port));
 
     result.setReply(moduleInformation);
 

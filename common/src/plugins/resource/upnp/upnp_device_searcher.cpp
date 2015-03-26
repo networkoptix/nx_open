@@ -165,14 +165,18 @@ void UPNPDeviceSearcher::saveDiscoveredDevicesSnapshot()
 
 void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToUse )
 {
-    for( std::list<DiscoveredDeviceInfo>::iterator
+    for( std::map<HostAddress, DiscoveredDeviceInfo>::iterator
         it = m_discoveredDevicesToProcess.begin();
         it != m_discoveredDevicesToProcess.end();
          )
     {
         if( handlerToUse )
         {
-            if( handlerToUse->processPacket( it->localInterfaceAddress, it->deviceAddress, it->devInfo, it->xmlDevInfo ) )
+            if( handlerToUse->processPacket(
+                    it->second.localInterfaceAddress,
+                    it->second.deviceAddress,
+                    it->second.devInfo,
+                    it->second.xmlDevInfo ) )
             {
                 m_discoveredDevicesToProcess.erase( it++ );
                 continue;
@@ -346,7 +350,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml(
             //item present in cache, no need to request xml
             info.xmlDevInfo = cacheItem->xmlDevInfo;
             info.devInfo = cacheItem->devInfo;
-            m_discoveredDevices.push_back( info );
+            m_discoveredDevices.emplace( remoteHost, std::move(info) );
             return;
         }
 
@@ -361,18 +365,18 @@ void UPNPDeviceSearcher::startFetchDeviceXml(
         }
 
         httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-        m_httpClients.insert( make_pair( httpClient, info ) );
+        m_httpClients[httpClient] = std::move(info);
     }
 
     QObject::connect(
-        httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
-        this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr)),
+        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone,
         Qt::DirectConnection );
     if( !httpClient->doGet( descriptionUrl ) )
     {
         QObject::disconnect(
-            httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
-            this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr)) );
+            httpClient.get(), &nx_http::AsyncHttpClient::done,
+            this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone );
 
         QMutexLocker lk( &m_mutex );
         httpClient->terminate();
@@ -401,7 +405,7 @@ void UPNPDeviceSearcher::processDeviceXml(
     devInfoFull.devInfo = xmlHandler.deviceInfo();
 
     QMutexLocker lk( &m_mutex );
-    m_discoveredDevices.push_back( devInfoFull );
+    m_discoveredDevices.emplace( devInfo.deviceAddress, devInfoFull );
     updateItemInCache( devInfoFull );
 }
 

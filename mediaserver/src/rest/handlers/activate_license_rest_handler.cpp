@@ -35,8 +35,8 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     QLocale locale;
     params.addQueryItem(QLatin1String("lang"), QLocale::languageToString(locale.language()));
 
-    const QList<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
-    const QList<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
+    const QVector<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
+    const QVector<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
     int hw = 0;
     for (const QByteArray& hwid: mainHardwareIds) {
         QString name;

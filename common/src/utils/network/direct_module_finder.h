@@ -7,7 +7,8 @@
 
 class QTimer;
 class QnAsyncHttpClientReply;
-struct QnModuleInformationEx;
+class SocketAddress;
+struct QnModuleInformation;
 
 class QnDirectModuleFinder : public QObject {
     Q_OBJECT
@@ -28,7 +29,7 @@ public:
     void pleaseStop();
 
 signals:
-    void responseReceived(const QnModuleInformationEx &moduleInformation, const QUrl &url);
+    void responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 private:
     void enqueRequest(const QUrl &url);

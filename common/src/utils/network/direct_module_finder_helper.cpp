@@ -134,9 +134,9 @@ void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &
     at_resourceAdded(resource);
 }
 
-void QnDirectModuleFinderHelper::at_responseReceived(const QnModuleInformation &moduleInformation, const QUrl &url) {
+void QnDirectModuleFinderHelper::at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
     Q_UNUSED(moduleInformation)
-    m_multicastedUrlLastPing[url] = m_elapsedTimer.elapsed();
+    m_multicastedUrlLastPing[makeUrl(address.address.toString(), address.port)] = m_elapsedTimer.elapsed();
 }
 
 void QnDirectModuleFinderHelper::at_timer_timeout() {

@@ -71,6 +71,7 @@ public:
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
+    void setUserAgent(const QString& value);
 signals:
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 

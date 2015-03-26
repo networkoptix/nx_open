@@ -3,6 +3,7 @@
 #include <QtCore/QMetaType>
 
 #include <utils/network/mac_address.h>
+#include <utils/network/socket_common.h>
 #include <utils/common/request_param.h>
 #include <utils/common/uuid.h>
 #include <utils/serialization/json_functions.h>
@@ -88,6 +89,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnMacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
+    qRegisterMetaType<SocketAddress>();
 
     //qRegisterMetaType<QnParam>();
     
@@ -205,7 +207,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::RebuildState>();
 
     qRegisterMetaType<QnModuleInformation>();
-    qRegisterMetaType<QnModuleInformationEx>();
+    qRegisterMetaType<QnModuleInformationWithAddresses>();
     qRegisterMetaType<QList<QnModuleInformation>>();
 
     qRegisterMetaType<Qn::CameraDataType>();

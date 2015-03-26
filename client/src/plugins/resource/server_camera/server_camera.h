@@ -25,6 +25,8 @@ public:
 
     virtual Qn::ResourceFlags flags() const override;
     virtual void setParentId(const QnUuid& parent) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 

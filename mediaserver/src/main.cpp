@@ -98,6 +98,7 @@
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
 #include <rest/handlers/camera_bookmarks_rest_handler.h>
+#include <rest/handlers/crash_server_handler.h>
 #include <rest/handlers/external_business_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
 #include <rest/handlers/image_rest_handler.h>
@@ -118,7 +119,6 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
-#include <rest/handlers/routing_information_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
 #include <rest/handlers/current_user_rest_handler.h>
@@ -142,7 +142,6 @@
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
 #include <utils/network/module_finder.h>
-#include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include <utils/common/ssl_gen_cert.h>
 
@@ -520,29 +519,6 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
         }
     }
 
-    qint64 bigStorageThreshold = 0;
-    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages()) {
-        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
-        if (!storage)
-            continue;
-        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
-        bigStorageThreshold = qMax(bigStorageThreshold, available);
-    }
-    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
-
-    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages()) {
-        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
-        if (!storage)
-            continue;
-        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
-        if (available < bigStorageThreshold) {
-            if (storage->isUsedForWriting()) {
-                storage->setUsedForWriting(false);
-                result.insert(storage->getId(), storage);
-                qWarning() << "Disable writing to storage" << storage->getPath() << "because of low storage size";
-            }
-        }
-    }
     return result.values();
 }
 
@@ -700,8 +676,8 @@ int serverMain(int argc, char *argv[])
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
             logDir + QLatin1String("/http_log"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
 
     //preparing transaction log
@@ -714,8 +690,8 @@ int serverMain(int argc, char *argv[])
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
             logDir + QLatin1String("/ec2_tran"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
@@ -1247,9 +1223,13 @@ void QnMain::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
-void QnMain::at_serverModuleConflict(const QnModuleInformationEx &moduleInformation, const QUrl &url)
+void QnMain::at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address)
 {
-    qnBusinessRuleConnector->at_mediaServerConflict(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch(), moduleInformation, url);
+    qnBusinessRuleConnector->at_mediaServerConflict(
+                qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(),
+                qnSyncTime->currentUSecsSinceEpoch(),
+                moduleInformation,
+                QUrl(lit("http://%1").arg(address.toString())));
 }
 
 void QnMain::at_timer()
@@ -1257,10 +1237,15 @@ void QnMain::at_timer()
     if (isStopping())
         return;
 
+    //TODO: #2.4 #GDM This timer make two totally different functions. Split it.
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    for(const QnVirtualCameraResourcePtr& camera: qnResPool->getAllCameras(mServer))
-        camera->noCameraIssues(); // decrease issue counter
+    if (!mServer)
+        return;
+
+    for(const auto& camera: qnResPool->getAllCameras(mServer, true))
+        camera->cleanCameraIssues();
 }
 
 void QnMain::at_storageManager_noStoragesAvailable() {
@@ -1323,7 +1308,6 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
@@ -1336,6 +1320,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(
         QHostAddress::Any,
@@ -1521,8 +1506,8 @@ void QnMain::run()
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
     int guidCompatibility = 0;
-    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings());
-    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings());
+    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
+    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     MediaServerStatusWatcher mediaServerStatusWatcher;
@@ -1784,7 +1769,7 @@ void QnMain::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformationEx selfInformation;
+    QnModuleInformation selfInformation;
     selfInformation.type = moduleName;
     if (!compatibilityMode)
         selfInformation.customization = QnAppInfo::customizationName();
@@ -1822,10 +1807,7 @@ void QnMain::run()
 
     // ------------------------------------------
 
-    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
-
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
-    globalModuleFinder->setConnection(ec2Connection);
+    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 
@@ -1925,8 +1907,6 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
-    connect(m_mediaServer.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnMain::updateModuleInfo);
-    connect(m_mediaServer.data(), &QnMediaServerResource::resourceChanged, this, &QnMain::updateModuleInfo);
     QnUserResourcePtr adminUser = qnResPool->getAdministrator();
     if (adminUser)
         connect(adminUser.data(), &QnResource::resourceChanged, this, &QnMain::updateModuleInfo);
@@ -1976,13 +1956,12 @@ void QnMain::run()
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
-    at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    timer.start(QnVirtualCameraResource::issuesTimeoutMs());
+    at_timer();
+
     QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
-    timer.start(60 * 1000);
-
-
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
 
 
@@ -2157,28 +2136,8 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
 
 void QnMain::updateModuleInfo()
 {
-    QnModuleInformationEx moduleInformationCopy = qnCommon->moduleInformation();
+    QnModuleInformation moduleInformationCopy = qnCommon->moduleInformation();
     if (qnResPool) {
-        moduleInformationCopy.remoteAddresses.clear();
-        const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-        if (server) {
-            QSet<QString> ignoredHosts;
-            for (const QUrl &url: server->getIgnoredUrls())
-                ignoredHosts.insert(url.host());
-
-            for(const QHostAddress &address: server->getNetAddrList()) {
-                QString addressString = address.toString();
-                if (!ignoredHosts.contains(addressString))
-                    moduleInformationCopy.remoteAddresses.insert(addressString);
-            }
-            for(const QUrl &url: server->getAdditionalUrls()) {
-                if (!ignoredHosts.contains(url.host()))
-                    moduleInformationCopy.remoteAddresses.insert(url.host());
-            }
-            moduleInformationCopy.port = server->getPort();
-            moduleInformationCopy.name = server->getName();
-        }
-
         QnUserResourcePtr admin = qnResPool->getAdministrator();
         if (admin) {
             QCryptographicHash md5(QCryptographicHash::Md5);

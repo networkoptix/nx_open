@@ -15,12 +15,17 @@ QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(QObject *parent
 
     m_urls = QSet<QUrl>::fromList(qnSettings->knownServerUrls());
 
-    connect(moduleFinder, &QnModuleFinder::moduleUrlFound, this, &QnWorkbenchServerAddressWatcher::at_moduleFinder_moduleUrlFound);
+    connect(moduleFinder, &QnModuleFinder::moduleAddressFound, this, &QnWorkbenchServerAddressWatcher::at_moduleFinder_moduleUrlFound);
     moduleFinder->directModuleFinderHelper()->setForcedUrls(m_urls);
 }
 
-void QnWorkbenchServerAddressWatcher::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
+void QnWorkbenchServerAddressWatcher::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
     Q_UNUSED(moduleInformation)
+
+    QUrl url;
+    url.setScheme(lit("http"));
+    url.setHost(address.address.toString());
+    url.setPort(address.port);
 
     if (m_urls.contains(url))
         return;
