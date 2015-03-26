@@ -16,7 +16,8 @@ namespace ec2
             : public QObject
     {
     public:
-        Ec2StaticticsReporter(AbstractECConnection& connection);
+        Ec2StaticticsReporter(const AbstractUserManagerPtr& userManager,
+                              const AbstractResourceManagerPtr& resourceManager);
         ~Ec2StaticticsReporter();
 
         /** Collects \class ApiSystemStatistics in the entire system */
@@ -34,16 +35,15 @@ namespace ec2
         void finishReport(nx_http::AsyncHttpClientPtr httpClient);
 
     private:
-        QnUserResourcePtr getAdmin();
-        QnUuid getResourceTypeIdByName(const QString& name);
         QnUuid getOrCreateSystemId();
 
-        AbstractECConnection& m_connection;
         QnUserResourcePtr m_admin;
-        QnUuid m_desktopCamera;
+        QnUuid m_desktopCameraTypeId;
+        nx_http::AsyncHttpClientPtr m_httpClient;
+
         QMutex m_mutex;
+        bool m_timerDisabled;
         boost::optional<qint64> m_timerId;
-        boost::optional<nx_http::AsyncHttpClientPtr> m_httpClient;
     };
 }
 

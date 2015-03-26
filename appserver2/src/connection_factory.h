@@ -99,6 +99,9 @@ namespace ec2
                 QnRestProcessorPool* const restProcessorPool,
                 ApiCommand::Value cmd,
                 HandlerType handler );
+
+        template<class Function>
+            void statisticsCall(const Function& function);
     };
 }
 

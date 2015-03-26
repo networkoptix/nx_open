@@ -47,13 +47,13 @@ namespace ec2 {
 
     ApiCameraDataStatistics::ApiCameraDataStatistics(const ApiCameraDataEx& data)
         : ApiCameraDataEx(data)
-        , extraParams(getExtraParams(addParams, CAMERA_EXTRA_PARAMS)) {}
+        , addParams(getExtraParams(ApiCameraDataEx::addParams, CAMERA_EXTRA_PARAMS)) {}
 
     ApiClientDataStatistics::ApiClientDataStatistics() {}
 
     ApiClientDataStatistics::ApiClientDataStatistics(const ApiCameraDataEx& data)
         : ApiCameraDataEx(data)
-        , extraParams(getExtraParams(addParams, CLIENT_EXTRA_PARAMS)) {}
+        , addParams(getExtraParams(ApiCameraDataEx::addParams, CLIENT_EXTRA_PARAMS)) {}
 
     ApiStorageDataStatistics::ApiStorageDataStatistics() {}
 
@@ -64,6 +64,10 @@ namespace ec2 {
 
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(const ApiMediaServerDataEx& data)
         : ApiMediaServerDataEx(data)
-        , extraParams(getExtraParams(addParams, MEDIASERVER_EXTRA_PARAMS)) {}
+        , addParams(getExtraParams(ApiMediaServerDataEx::addParams, MEDIASERVER_EXTRA_PARAMS))
+    {
+        for (auto s : ApiMediaServerDataEx::storages)
+            storages.push_back(s);
+    }
 
 } // namespace ec2

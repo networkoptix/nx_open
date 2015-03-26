@@ -16,9 +16,9 @@ namespace ec2
         ApiCameraDataStatistics();
         ApiCameraDataStatistics(const ApiCameraDataEx& data);
 
-        ApiResourceParamDataList extraParams;
+        ApiResourceParamDataList addParams;
     };
-#define ApiCameraDataStatistics_Fields (id)(parentId)(status)(extraParams) \
+#define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
     (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
         (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
@@ -30,9 +30,9 @@ namespace ec2
         ApiClientDataStatistics();
         ApiClientDataStatistics(const ApiCameraDataEx& data);
 
-        ApiResourceParamDataList extraParams;
+        ApiResourceParamDataList addParams;
     };
-#define ApiClientDataStatistics_Fields (id)(parentId)(extraParams)
+#define ApiClientDataStatistics_Fields (id)(parentId)(addParams)
 
     struct ApiStorageDataStatistics
     :
@@ -50,9 +50,10 @@ namespace ec2
         ApiMediaServerDataStatistics();
         ApiMediaServerDataStatistics(const ApiMediaServerDataEx& data);
 
-        ApiResourceParamDataList extraParams;
+        ApiStorageDataStatisticsList    storages;
+        ApiResourceParamDataList        addParams;
     };
-#define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(extraParams) \
+#define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
     (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)
 
     struct ApiSystemStatistics
@@ -62,9 +63,8 @@ namespace ec2
         ApiMediaServerDataStatisticsList    mediaservers;
         ApiCameraDataStatisticsList         cameras;
         ApiClientDataStatisticsList         clients;
-        ApiStorageDataStatisticsList        storages;
     };
-#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(storages)
+#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)
 
     struct ApiStatisticsServerInfo
     {
