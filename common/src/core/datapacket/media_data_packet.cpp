@@ -38,6 +38,7 @@ QnMediaContext::QnMediaContext(CodecID codecId)
         {
             m_ctx = avcodec_alloc_context3(codec);
             m_ctx->codec_id = codecId;
+            m_ctx->codec_type = codec->type;
         }
         else
         {
