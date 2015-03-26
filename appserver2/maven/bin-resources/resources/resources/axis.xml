@@ -34,6 +34,12 @@
                 default_value ="60"/>
             </params>
         </resource>
+        <resource name = "AXISQ6044" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="30"/>
+            </params>
+        </resource>
         <resource name = "AXISQ8414" public = "AXIS_COMMON">
             <params>
                 <param name = "MaxFPS"
