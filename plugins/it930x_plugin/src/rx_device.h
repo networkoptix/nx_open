@@ -39,6 +39,9 @@ namespace ite
             NOT_A_CHANNEL = 16 // TxDevice::CHANNELS_NUM
         };
 
+        static constexpr unsigned MIN_STRENGTH() { return 60; }
+        static constexpr unsigned MIN_QUALITY() { return 60; }
+
         static uint16_t stream2pid(unsigned stream)
         {
             switch (stream)
@@ -104,7 +107,7 @@ namespace ite
         uint8_t strength() const { return m_signalStrength; }
         uint8_t quality() const { return m_signalQuality; }
         bool present() const { return m_signalPresent; }
-        bool good() const { return present() && (strength() > 0); }
+        bool good() const { return present() && strength() > MIN_STRENGTH() /*&& quality() > MIN_QUALITY()*/; }
 
         static unsigned dev2id(const std::string& devName);
         static unsigned str2id(const std::string& devName);

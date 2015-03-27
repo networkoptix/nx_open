@@ -148,8 +148,12 @@ namespace ite
 
         try
         {
+            //static const unsigned QUALITY_TIMEOUT_MS = 1000;
+
             m_device->lockFrequency( TxDevice::freq4chan(channel) );
             m_channel = channel;
+
+            //Timer::sleep(QUALITY_TIMEOUT_MS);
             stats();
 
             //if (good())
