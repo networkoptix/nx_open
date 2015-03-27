@@ -56,7 +56,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_isMultiserverAllowed(true),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_lockedTime(AV_NOPTS_VALUE)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -250,6 +251,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
+        lockTime(startTime());
         if (m_isMultiserverAllowed)
             checkMinTimeFromOtherServer(m_camera);
 
@@ -263,6 +265,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
             m_rtpData = trackInfo[0]->ioDevice;
         if (!m_rtpData)
             m_rtspSession.stop();
+        unlockTime();
     }
     else {
         m_rtspSession.stop();
@@ -323,9 +326,23 @@ void QnRtspClientArchiveDelegate::close()
     m_parsers.clear();
 }
 
+void QnRtspClientArchiveDelegate::lockTime(qint64 value)
+{
+    QMutexLocker lock(&m_timeMutex);
+    m_lockedTime = value;
+}
+
+void QnRtspClientArchiveDelegate::unlockTime()
+{
+    QMutexLocker lock(&m_timeMutex);
+    m_lockedTime = AV_NOPTS_VALUE;
+}
+
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
     QMutexLocker lock(&m_timeMutex);
+    if(m_lockedTime != AV_NOPTS_VALUE)
+        return m_lockedTime;
     qint64 result = m_globalMinArchiveTime != AV_NOPTS_VALUE ? m_globalMinArchiveTime : m_rtspSession.startTime();
 
     if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
