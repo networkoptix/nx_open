@@ -301,12 +301,12 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
+    mutable Qn::LicenseType m_cachedLicenseType;
     CachedValue<bool> m_cachedHasDualStreaming2;
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
-
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
 
