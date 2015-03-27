@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Drawing;
 using Newtonsoft.Json;
-using AxInterop.hdwitness;
+using NxInterface;
 
 namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
     namespace Api {
@@ -19,11 +19,22 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             public string name { get; set; }
             public string model { get; set; }
         }
+
+        class ConnectInfo {
+            public string brand { get; set; }
+            public string systemName { get; set; }
+            public string version { get; set; }
+        }
     }
 
     public class NetworkOptixMiniDriver : IOemDvrMiniDriver {
         private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static AxAxHDWitness axAxHDWitness1;
+
+        private static IPlugin axHDWitness;
+        private static Control axHDWitnessForm;
+
+//        private static AppDomain domain;
+
         private Panel m_surface;
         private OemDvrCamera[] _cameras;
 
@@ -71,9 +82,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                     port = url.Port;
 
                 WebRequest request = HttpWebRequest.Create(String.Format("http://{0}:{1}/ec2/getCamerasEx?format=json", url.Host, port));
-
                 request.Credentials = new NetworkCredential(connectionInfo.UserId, connectionInfo.Password);
-
                 response = request.GetResponse();
 
                 StreamReader reader = new StreamReader(response.GetResponseStream());
@@ -101,17 +110,8 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             return OemDvrStatus.FailedToListCameras;
         }
 
-        /// <summary>
-        /// Request the playback of footage according to the required speed, direction and cameras using the supplied credentials on the OEM dll.
-        ///     The image is to be rendered on the playback surface supplied.
-        /// </summary>
-        /// <param name="cnInfo">The user credentials structure.</param>
-        /// <param name="pbInfo">The structure that holds the details of the footage and the cameras required.</param>
-        /// <param name="pbSurface">A reference to the panel on to which the image is to be rendered.</param>
-        /// <returns>The completion status of the request.</returns>
         public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
             try {
-                //DateTime dt = new DateTime( 2014 ,5, 21 , 19 ,30 , 30);
                 _tick = (long)((pbInfo.StartTimeUtc.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds);
                 Uri hostUrl = new Uri(cnInfo.HostName);
                 Uri url = new Uri(String.Format("http://{0}:{1}@{2}:{3}", cnInfo.UserId, cnInfo.Password, hostUrl.Host, hostUrl.Port));
@@ -125,20 +125,53 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                     return OemDvrStatus.NumberOfCamerasUnsupported;
                 }
 
-                Load(pbSurface, url);
-
-                _cameras = pbInfo.DvrCameras;
-
                 switch (pbInfo.PlaybackFunction) {
                     case OemDvrPlaybackFunction.Start: {
-                            axAxHDWitness1.play();
+                            WebRequest request = HttpWebRequest.Create(url.ToString() + "ec2/connect");
+                            request.Credentials = new NetworkCredential(cnInfo.UserId, cnInfo.Password);
+                            WebResponse response = request.GetResponse();
+
+                            StreamReader reader = new StreamReader(response.GetResponseStream());
+                            Api.ConnectInfo connectInfo = JsonConvert.DeserializeObject<Api.ConnectInfo>(reader.ReadToEnd());
+
+                            Version serverVersion = Util.shortenVersion(connectInfo.version);
+                            Version ourVersion = Util.shortenVersion(Properties.version);
+
+                            if (Properties.brand != connectInfo.brand) {
+                                MessageBox.Show("Incompatible brand", "Error", MessageBoxButtons.OK);
+                                return OemDvrStatus.FootagePlaybackFailed;
+                            }
+
+                            if (ourVersion < serverVersion) {
+                                MessageBox.Show("Incompatible version. Please update... blah-blah-blah", "Error", MessageBoxButtons.OK);
+                                return OemDvrStatus.FootagePlaybackFailed;
+                            }
+
+                            String assemblyName = String.Format("NxControl.{0}.{1}", serverVersion.Major, serverVersion.Minor);
+                            try {
+                                axHDWitness = LoadAssembly(assemblyName);
+                                axHDWitnessForm = (Control)axHDWitness;
+                            }
+                            catch (Exception) {
+                                MessageBox.Show("Ask to download old package", "Error", MessageBoxButtons.OK);
+                                return OemDvrStatus.FootagePlaybackFailed;
+                            }
+
+                            Load(pbSurface, url);
+
+                            _cameras = pbInfo.DvrCameras;
+                            axHDWitness.play();
                             break;
                         }
                     case OemDvrPlaybackFunction.Forward:
                     case OemDvrPlaybackFunction.Backward:
-                    case OemDvrPlaybackFunction.Pause:
-                    case OemDvrPlaybackFunction.Stop: {
+                    case OemDvrPlaybackFunction.Pause: {
                             break;
+                        }
+
+                    case OemDvrPlaybackFunction.Stop: {
+//                        AppDomain.Unload(domain);
+                        break;
                         }
 
                     default: {
@@ -167,28 +200,28 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                 bool controlOk = false;
                 switch (pbFunction) {
                     case OemDvrPlaybackFunction.Pause: {
-                            axAxHDWitness1.pause();
+                            axHDWitness.pause();
                             controlOk = true;
                             break;
                         }
 
                     case OemDvrPlaybackFunction.Forward: {
                             _logger.DebugFormat("Setting speed {0}", speed);
-                            axAxHDWitness1.setSpeed(1 + speed / 1000.0);
+                            axHDWitness.setSpeed(1 + speed / 1000.0);
                             controlOk = true;
                             break;
                         }
 
                     case OemDvrPlaybackFunction.Backward: {
                             _logger.DebugFormat("Setting speed -{0}", speed);
-                            axAxHDWitness1.setSpeed(-1 - speed / 1000.0);
+                            axHDWitness.setSpeed(-1 - speed / 1000.0);
                             controlOk = true;
                             break;
                         }
 
                     // Close down the session, such that the next actions can be closing the application or starting new session.
                     case OemDvrPlaybackFunction.Stop: {
-                            axAxHDWitness1.pause();
+                            axHDWitness.pause();
                             controlOk = true;
                             break;
                         }
@@ -210,43 +243,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         }
         #endregion
 
-        private void PbSurfaceResize(object sender, EventArgs e) {
-            updateControlSize();
-        }
-
-        private void updateControlSize() {
-            short vidWidth = Convert.ToInt16(m_surface.Width);
-            short vidHeight = Convert.ToInt16(m_surface.Height);
-            axAxHDWitness1.SetBounds(0, 0, vidWidth, vidHeight);
-        }
-
-        private void Load(Panel pbSurface, Uri url) {
-            m_surface = pbSurface;
-            pbSurface.SizeChanged += PbSurfaceResize;
-
-            axAxHDWitness1 = new AxAxHDWitness();
-            ((System.ComponentModel.ISupportInitialize)(axAxHDWitness1)).BeginInit();
-            pbSurface.SuspendLayout();
-
-            axAxHDWitness1.Enabled = true;
-            axAxHDWitness1.Location = new System.Drawing.Point(10, 10);
-            axAxHDWitness1.Name = "axAxHDWitness1";
-            axAxHDWitness1.Size = new System.Drawing.Size(831, 509);
-            axAxHDWitness1.TabIndex = 0;
-
-            pbSurface.ClientSize = new System.Drawing.Size(1251, 829);
-            pbSurface.Controls.Add(axAxHDWitness1);
-            pbSurface.Name = "Form1";
-            pbSurface.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(axAxHDWitness1)).EndInit();
-            pbSurface.ResumeLayout(false);
-
-            axAxHDWitness1.connectionProcessed += axAxHDWitness1_connectedProcessed;
-
-            axAxHDWitness1.reconnect(url.ToString());
-        }
-
-        void axAxHDWitness1_connectedProcessed(object sender, IAxHDWitnessEvents_connectionProcessedEvent e) {
+        void axAxHDWitness1_connectedProcessed(object sender, ConnectionProcessedEvent e) {
             updateControlSize();
 
             if (e.p_status != 0)
@@ -258,7 +255,59 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             }
 
             string timestamp = _tick.ToString();
-            axAxHDWitness1.addResourcesToLayout(String.Join("|", cameraIds), timestamp);
+            axHDWitness.addResourcesToLayout(String.Join("|", cameraIds), timestamp);
+        }
+
+        private void PbSurfaceResize(object sender, EventArgs e) {
+            updateControlSize();
+        }
+
+        private void updateControlSize() {
+            short vidWidth = Convert.ToInt16(m_surface.Width);
+            short vidHeight = Convert.ToInt16(m_surface.Height);
+            axHDWitnessForm.SetBounds(0, 0, vidWidth, vidHeight);
+        }
+
+        private IPlugin LoadAssembly(string assemblyName) {
+            string assemblyPath = Path.GetFullPath(assemblyName + ".dll");
+
+            Assembly ptrAssembly = Assembly.Load(assemblyName);
+
+            Type ti = typeof(IPlugin);
+            foreach (Type item in ptrAssembly.GetTypes()) {
+                if (!item.IsClass) continue;
+
+                if (Array.Exists(item.GetInterfaces(), t => ti.IsAssignableFrom(t) )) {
+                    return (IPlugin)Activator.CreateInstance(item);
+                }
+            }
+
+            throw new Exception("Invalid DLL, Interface not found!");
+        }
+
+        private void Load(Panel pbSurface, Uri url) {
+            m_surface = pbSurface;
+            pbSurface.SizeChanged += PbSurfaceResize;
+
+            ((System.ComponentModel.ISupportInitialize)(axHDWitness)).BeginInit();
+            pbSurface.SuspendLayout();
+
+            axHDWitnessForm.Enabled = true;
+            axHDWitnessForm.Location = new System.Drawing.Point(10, 10);
+            axHDWitnessForm.Name = "axHDWitness";
+            axHDWitnessForm.Size = new System.Drawing.Size(831, 509);
+            axHDWitnessForm.TabIndex = 0;
+
+            pbSurface.ClientSize = new System.Drawing.Size(1251, 829);
+            pbSurface.Controls.Add(axHDWitnessForm);
+            pbSurface.Name = "Form1";
+            pbSurface.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(axHDWitness)).EndInit();
+            pbSurface.ResumeLayout(false);
+
+            axHDWitness.connectProcessed += axAxHDWitness1_connectedProcessed;
+
+            axHDWitness.reconnect(url.ToString());
         }
 
         /*
