@@ -2,6 +2,8 @@
 
 import json
 
+from pygal import HorizontalStackedBar
+
 class SqlAdapter(object):
     '''SQL adapter to interact with statistics
     '''
@@ -25,28 +27,42 @@ class SqlAdapter(object):
         for c in data['cameras']: self._save('cameras', c)
         return 'Success'
 
-    def sqlQuery(self, query):
+    def sqlQuery(self, query, columns=[]):
         '''Performs SQL [query], returns result
         '''
+        for table in self._table_names():
+            query = query.replace(table + '_latest',
+                "(%s) as %s_latest" % (self._select_latest(table), table))
         self._cursor.execute(query)
-        columns = self._cursor.description
+        for desc in self._cursor.description:
+            columns.append(desc[0])
         result = []
         for row in self._cursor.fetchall():
             rowDict = {}
             for index, value in enumerate(row):
-                name = columns[index][0]
+                name = columns[index]
                 if name == 'timestamp': value = str(value)
                 rowDict[name] = value
             result.append(rowDict)
         return result
 
+    def sqlChart(self, query, x=None, y=None):
+        '''Makes pygal HorisontalStackedBar from [query]
+        '''
+        columns = []
+        rows = self.sqlQuery(query, columns)
+        x, y = x or columns[0], y or columns[1]
+        chart = HorizontalStackedBar()
+        chart.title = query
+        chart.x_labels = map(str, (r[x] for r in rows))
+        chart.add(y, map(float, (r[y] for r in rows)))
+        return chart
+
     def deleteAll(self):
         '''Removes all records from all tables in database
         '''
         self._log.warning("Removind all data in all tables!");
-        self._cursor.execute("SHOW TABLES")
-        tableList = list(opt[0] for opt in self._cursor)
-        for table in tableList:
+        for table in self._table_names():
             self._cursor.execute("DELETE FROM %s" % table)
         return 'Clear'
 
@@ -68,7 +84,14 @@ class SqlAdapter(object):
         self._cursor.execute(query, data)
         self._db.commit()
 
+    def _table_names(self):
+        self._cursor.execute("SHOW TABLES")
+        return list(opt[0] for opt in self._cursor)
+
     def _field_names(self, table):
         self._cursor.execute("SHOW COLUMNS FROM %s" % table)
         return list(opt[0] for opt in self._cursor)
 
+    def _select_latest(self, table):
+        inner = "SELECT * FROM %s ORDER BY timestamp DESC" % table
+        return "SELECT * FROM (%s) AS __sorted GROUP BY id" % inner
