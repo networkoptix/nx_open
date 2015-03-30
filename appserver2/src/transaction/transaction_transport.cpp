@@ -30,6 +30,8 @@
 */
 static const int MAX_TRANS_TO_POST_AT_A_TIME = 16;
 
+//#define SEND_4BYTE_TRANSACTION_SIZE
+
 namespace ec2
 {
 
@@ -435,8 +437,12 @@ void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tra
     //calling processChunkExtensions
     processChunkExtensions( m_contentParser.prevFrameHeaders() );
 
+#ifdef SEND_4BYTE_TRANSACTION_SIZE
     //skipping transaction size
-    const QnByteArrayConstRef tranData = tranDataWithHeader.mid( sizeof(uint32_t) );
+    const QnByteArrayConstRef& tranData = tranDataWithHeader.mid( sizeof(uint32_t) );
+#else
+    const QnByteArrayConstRef& tranData = tranDataWithHeader;
+#endif
 
     QByteArray serializedTran;
     QnTransactionTransportHeader transportHeader;
@@ -505,18 +511,27 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     DataToSend& dataCtx = m_dataToSend.front();
     if( dataCtx.encodedSourceData.isEmpty() )
     {
+#ifdef SEND_4BYTE_TRANSACTION_SIZE
         const uint32_t tranSize = htonl(dataCtx.sourceData.size());
+#endif
 
         nx_http::HttpHeaders headers;
         headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
-        headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size() + sizeof(tranSize))) );
+        headers.emplace( "Content-Length",
+            nx_http::BufferType::number((int)(dataCtx.sourceData.size()
+#ifdef SEND_4BYTE_TRANSACTION_SIZE
+            + sizeof(tranSize)
+#endif
+            )) );
         addHttpChunkExtensions( &headers );
 
         dataCtx.encodedSourceData.clear();
         dataCtx.encodedSourceData += QByteArray("--")+TUNNEL_MULTIPART_BOUNDARY+"\r\n"; //TODO #ak move to some variable
         nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
         dataCtx.encodedSourceData += "\r\n";
+#ifdef SEND_4BYTE_TRANSACTION_SIZE
         dataCtx.encodedSourceData += QByteArray::fromRawData( reinterpret_cast<const char*>(&tranSize), sizeof(tranSize) );
+#endif
         dataCtx.encodedSourceData += dataCtx.sourceData;
     }
     using namespace std::placeholders;
