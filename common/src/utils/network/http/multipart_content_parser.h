@@ -12,6 +12,10 @@
 
 namespace nx_http
 {
+    /*!
+        Input: http multipart content stream.
+        Output: separate content frames
+    */
     class MultipartContentParser
     :
         public AbstractByteStreamConverter
@@ -25,6 +29,10 @@ namespace nx_http
         //!Implementation of AbstractByteStreamFilter::flush
         virtual size_t flush() override;
 
+        /*!
+            \return \a false, if \a contentType does not specify multipart content
+            \note After this method has been called, no \a MultipartContentParser::setBoundary call is needed
+        */
         bool setContentType( const StringType& contentType );
         void setBoundary( const StringType& boundary );
 

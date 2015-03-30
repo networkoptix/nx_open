@@ -17,11 +17,14 @@
 #include <utils/common/uuid.h>
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
+#include "utils/network/http/multipart_content_parser.h"
 #include "utils/common/id.h"
 
 #ifdef _DEBUG
 #include <common/common_module.h>
 #endif
+#define USE_MULTIPART_CONTENT
+
 
 namespace ec2
 {
@@ -48,8 +51,10 @@ public:
     };
     static QString toString( State state );
 
-    QnTransactionTransport(const ApiPeerData &localPeer,
-        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>());
+    QnTransactionTransport(
+        const ApiPeerData &localPeer,
+        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>(),
+        const QByteArray& contentType = QByteArray() );
     ~QnTransactionTransport();
 
 signals:
@@ -207,6 +212,10 @@ private:
     int m_postedTranCount;
     bool m_asyncReadScheduled;
     qint64 m_remoteIdentityTime;
+#ifdef USE_MULTIPART_CONTENT
+    nx_http::MultipartContentParser m_contentParser;
+#endif
+
 private:
     void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
@@ -228,6 +237,10 @@ private:
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
     void fillAuthInfo();
+#ifdef USE_MULTIPART_CONTENT
+    void receivedTransaction( const QnByteArrayConstRef& tranData );
+#endif
+
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );

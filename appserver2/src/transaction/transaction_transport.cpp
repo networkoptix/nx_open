@@ -6,6 +6,7 @@
 #include <QtCore/QTimer>
 
 #include <nx_ec/ec_proto_version.h>
+#include <utils/media/custom_output_stream.h>
 
 #include "transaction_message_bus.h"
 #include "utils/common/log.h"
@@ -39,7 +40,11 @@ QSet<QnUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
 QMutex QnTransactionTransport::m_staticMutex;
 
-QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, const QSharedPointer<AbstractStreamSocket>& socket):
+QnTransactionTransport::QnTransactionTransport(
+    const ApiPeerData &localPeer,
+    const QSharedPointer<AbstractStreamSocket>& socket,
+    const QByteArray& contentType )
+:
     m_localPeer(localPeer),
     m_lastConnectTime(0), 
     m_readSync(false), 
@@ -63,6 +68,14 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_emptyChunkData = QnChunkedTransferEncoder::serializedTransaction(QByteArray(), std::vector<nx_http::ChunkExtension>());
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+
+    auto processTranFunc = std::bind(
+        &QnTransactionTransport::receivedTransaction,
+        this,
+        std::placeholders::_1 );
+    m_contentParser.setNextFilter( std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(std::move(processTranFunc)) );
+    if( !contentType.isEmpty() )
+        m_contentParser.setContentType( contentType );  //TODO #ak check error code
 }
 
 
@@ -381,6 +394,10 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
     assert( m_state == ReadyForStreaming );
 
+#ifdef USE_MULTIPART_CONTENT
+    m_contentParser.processData( m_readBuffer );
+    m_readBuffer.resize(0);
+#else
     //TODO #ak it makes sense to use here some chunk parser class. At this moment http chunk parsing logic is implemented 
     //3 times in different parts of our code (async http client, sync http server and here)
     for( size_t readBufPos = 0;; )
@@ -446,6 +463,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
             break;  //processed all data
         }
     }
+#endif
 
     if( m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME )
         return; //not reading futher while that much transactions are not processed yet
@@ -461,6 +479,25 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     {
         setStateNoLock( State::Error );
     }
+}
+
+void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tranData )
+{
+    QByteArray serializedTran;
+    QnTransactionTransportHeader transportHeader;
+    if( !QnUbjsonTransactionSerializer::deserializeTran(
+            reinterpret_cast<const quint8*>(tranData.constData()),
+            tranData.size(),
+            transportHeader,
+            serializedTran ) )
+    {
+        assert( false );
+    }
+    assert( !transportHeader.processedPeers.empty() );
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::receivedTransaction. Got transaction with seq %1 from %2").
+        arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
+    emit gotTransaction(serializedTran, transportHeader);
+    ++m_postedTranCount;
 }
 
 bool QnTransactionTransport::hasUnsendData() const
@@ -522,11 +559,24 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     DataToSend& dataCtx = m_dataToSend.front();
     if( dataCtx.encodedSourceData.isEmpty() )
     {
+#ifdef USE_MULTIPART_CONTENT
+        nx_http::HttpHeaders headers;
+        headers.emplace( "Content-Type", "application/ubjson" );
+        headers.emplace( "Content-Length", nx_http::BufferType::number(dataCtx.sourceData.size()) );
+        //addHttpChunkExtensions( &headers );
+
+        dataCtx.encodedSourceData.clear();
+        dataCtx.encodedSourceData += "--myboundary\r\n";    //TODO #ak move to some static const
+        nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
+        dataCtx.encodedSourceData += "\r\n";
+        dataCtx.encodedSourceData += dataCtx.sourceData;
+#else
         std::vector<nx_http::ChunkExtension> chunkExtensions;
         addHttpChunkExtensions( &chunkExtensions );
         dataCtx.encodedSourceData = QnChunkedTransferEncoder::serializedTransaction(
             dataCtx.sourceData,
             chunkExtensions );
+#endif
     }
 
     using namespace std::placeholders;
@@ -628,6 +678,23 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
+    nx_http::HttpHeaders::const_iterator contentTypeIter = client->response()->headers.find("Content-Type");
+    if( contentTypeIter == client->response()->headers.end() )
+    {
+        NX_LOG( lit("Remote transaction server (%1) did not specify Content-Type in response. Aborting connecion...")
+            .arg(client->url().toString()), cl_logWARNING );
+        cancelConnecting();
+        return;
+    }
+
+    if( !m_contentParser.setContentType( contentTypeIter->second ) )
+    {
+        NX_LOG( lit("Remote transaction server (%1) specified Content-Type (%2) which does not define multipart HTTP content")
+            .arg(client->url().toString()).arg(QLatin1String(contentTypeIter->second)), cl_logWARNING );
+        cancelConnecting();
+        return;
+    }
+
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
 
     if (getState() == ConnectingStage1) {
@@ -670,6 +737,9 @@ void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPt
 
 void QnTransactionTransport::processTransactionData(const QByteArray& data)
 {
+#ifdef USE_MULTIPART_CONTENT
+    m_contentParser.processData( data );
+#else
     m_chunkHeaderLen = 0;
 
     const quint8* buffer = (const quint8*) data.constData();
@@ -713,6 +783,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
             m_readBuffer.resize(bufferLen);
         memcpy(m_readBuffer.data(), buffer, bufferLen);
     }
+#endif
 }
 
 bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const

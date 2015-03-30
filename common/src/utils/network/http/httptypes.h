@@ -283,6 +283,8 @@ namespace nx_http
         void serialize( BufferType* const dstBuffer ) const;
     };
 
+    void serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer );
+
     class Request
     {
     public:

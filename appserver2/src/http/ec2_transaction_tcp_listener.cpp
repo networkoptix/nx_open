@@ -42,6 +42,12 @@ QnTransactionTcpProcessor::~QnTransactionTcpProcessor()
     stop();
 }
 
+#ifdef USE_MULTIPART_CONTENT
+static const char* CONTENT_TYPE = "multipart/x-mixed-replace; boundary=myboundary";
+#else
+static const char* CONTENT_TYPE = "application/octet-stream";
+#endif
+
 void QnTransactionTcpProcessor::run()
 {
     Q_D(QnTransactionTcpProcessor);
@@ -90,7 +96,7 @@ void QnTransactionTcpProcessor::run()
         (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, nx_ec::EC2_SYSTEM_NAME_HEADER_NAME)) != 
             QnCommonModule::instance()->localSystemName()) )
     {
-        sendResponse(nx_http::StatusCode::forbidden, "application/octet-stream");
+        sendResponse(nx_http::StatusCode::forbidden, CONTENT_TYPE);
         return;
     }
 
@@ -100,7 +106,7 @@ void QnTransactionTcpProcessor::run()
 
         // 1-st stage
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
-        sendResponse(lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
+        sendResponse(lockOK ? CODE_OK : CODE_INVALID_PARAMETER , CONTENT_TYPE);
         if (!lockOK)
             return;
 
@@ -126,7 +132,7 @@ void QnTransactionTcpProcessor::run()
             (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, nx_ec::EC2_SYSTEM_NAME_HEADER_NAME)) != 
                 QnCommonModule::instance()->localSystemName()) )
         {
-            sendResponse(nx_http::StatusCode::forbidden, "application/octet-stream");
+            sendResponse(nx_http::StatusCode::forbidden, CONTENT_TYPE);
             return;
         }
     }
@@ -138,12 +144,16 @@ void QnTransactionTcpProcessor::run()
         fail = true; // accept only allowed peers
 
     d->chunkedMode = true;
-    sendResponse(fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
+    sendResponse(fail ? CODE_INVALID_PARAMETER : CODE_OK, CONTENT_TYPE);
     if (fail) {
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
     else {
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer, remoteSystemIdentityTime);
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
+            d->socket,
+            remotePeer,
+            remoteSystemIdentityTime,
+            nx_http::getHeaderValue( d->request.headers, "Content-Type" ) );
         d->socket.clear();
     }
 }
