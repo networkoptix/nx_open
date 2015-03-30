@@ -33,7 +33,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     };
 
     ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
-    ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log")));
+    ui->eventLogLabel->setText(shortcutString(Qn::OpenBusinessLogAction, tr("Open Event Log")));
+    ui->bookmarksLabel->setText(shortcutString(Qn::OpenBookmarksSearchAction, tr("Open Bookmarks")));
     ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open Camera List")));
 
     setHelpTopic(ui->businessRulesButton,   Qn::EventsActions_Help);
@@ -43,8 +44,9 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
     connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );
-    connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::BusinessEventsLogAction); } );
+    connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenBusinessLogAction); } );
     connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); } );
+    connect(ui->bookmarksButton,      &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenBookmarksSearchAction); });
 }
 
 void QnGeneralSystemAdministrationWidget::updateFromSettings() {
@@ -69,6 +71,7 @@ void QnGeneralSystemAdministrationWidget::resizeEvent(QResizeEvent *event) {
         << ui->businessRulesButton
         << ui->cameraListButton
         << ui->eventLogButton
+        << ui->bookmarksButton
         << ui->healthMonitorButton;
 
     int maxWidht = (*std::max_element(buttons.cbegin(), buttons.cend(), [](QPushButton* l, QPushButton* r){

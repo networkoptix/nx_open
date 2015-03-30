@@ -80,7 +80,7 @@ void QnSearchQueryStrategy::Impl::changeQuery(const QString &query
 void QnSearchQueryStrategy::Impl::updateQuery(const QString &query
     , bool forcibly)
 {
-    if (forcibly || (m_currentQuery.size() >= m_minSymbolsCount))
+    if (forcibly || (m_currentQuery.size() >= m_minSymbolsCount) || m_currentQuery.trimmed().isEmpty())
     {
         m_owner.queryUpdated(query);
     }
