@@ -35,6 +35,8 @@ namespace nx_http
         */
         bool setContentType( const StringType& contentType );
         void setBoundary( const StringType& boundary );
+        //!Returns headers of last read frame
+        const nx_http::HttpHeaders& prevFrameHeaders() const;
 
     private:
         enum ParsingState

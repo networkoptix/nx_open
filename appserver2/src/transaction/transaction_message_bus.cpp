@@ -1215,8 +1215,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     const QSharedPointer<AbstractStreamSocket>& socket,
     const ApiPeerData &remotePeer,
-    qint64 remoteSystemIdentityTime,
-    const QByteArray& contentType )
+    qint64 remoteSystemIdentityTime )
 {
     if (!dbManager)
     {
@@ -1227,10 +1226,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     if (m_restartPending)
         return; // reject incoming connection because of media server is about to restart
 
-    QnTransactionTransport* transport = new QnTransactionTransport(
-        m_localPeer,
-        socket,
-        contentType );
+    QnTransactionTransport* transport = new QnTransactionTransport( m_localPeer, socket );
     transport->setRemotePeer(remotePeer);
     transport->setRemoteIdentityTime(remoteSystemIdentityTime);
     connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);

@@ -17,14 +17,13 @@
 #include <utils/common/uuid.h>
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
+#include "utils/network/http/httpstreamreader.h"
 #include "utils/network/http/multipart_content_parser.h"
-#include "utils/network/http/linesplitter.h"
 #include "utils/common/id.h"
 
 #ifdef _DEBUG
 #include <common/common_module.h>
 #endif
-#define USE_MULTIPART_CONTENT
 
 
 namespace ec2
@@ -36,9 +35,12 @@ class QnTransactionTransport
 {
     Q_OBJECT
 public:
+    static const char* TUNNEL_MULTIPART_BOUNDARY;
+    static const char* TUNNEL_CONTENT_TYPE;
+
     //not using Qt signal/slot because it is undefined in what thread this object lives and in what thread TimerSynchronizationManager lives
-    typedef std::function<void(QnTransactionTransport*, const std::vector<nx_http::ChunkExtension>&)> HttpChunkExtensonHandler;
-    typedef std::function<void(QnTransactionTransport*, std::vector<nx_http::ChunkExtension>*)> BeforeSendingChunkHandler;
+    typedef std::function<void(QnTransactionTransport*, const nx_http::HttpHeaders&)> HttpChunkExtensonHandler;
+    typedef std::function<void(QnTransactionTransport*, nx_http::HttpHeaders*)> BeforeSendingChunkHandler;
 
     enum State {
         NotDefined,
@@ -54,8 +56,7 @@ public:
 
     QnTransactionTransport(
         const ApiPeerData &localPeer,
-        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>(),
-        const QByteArray& contentType = QByteArray() );
+        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>() );
     ~QnTransactionTransport();
 
 signals:
@@ -210,8 +211,8 @@ private:
 #endif
     bool m_incomingConnection;
     bool m_incomingTunnelOpened;
-    bool m_incomingTunnelOpenRequestRead;
-    nx_http::LineSplitter m_lineSplitter;
+    nx_http::HttpStreamReader m_httpStreamReader;
+    nx_http::MultipartContentParser m_contentParser;
 
 private:
     void sendHttpKeepAlive();
@@ -229,8 +230,8 @@ private:
     void setStateNoLock(State state);
     void cancelConnecting();
     static void connectingCanceledNoLock(const QnUuid& remoteGuid, bool isOriginator);
-    void addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions );
-    void processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader );
+    void addHttpChunkExtensions( nx_http::HttpHeaders* const transactionHeaders );
+    void processChunkExtensions( const nx_http::HttpHeaders& httpChunkHeader );
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
@@ -243,7 +244,8 @@ private:
         \note MUST be called with \a m_mutex locked
     */
     void scheduleAsyncRead();
-    void readCreateIncomingTunnelMessage();
+    bool readCreateIncomingTunnelMessage();
+    void receivedTransaction( const QnByteArrayConstRef& tranData );
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );

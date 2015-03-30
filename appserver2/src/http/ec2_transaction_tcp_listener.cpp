@@ -42,12 +42,6 @@ QnTransactionTcpProcessor::~QnTransactionTcpProcessor()
     stop();
 }
 
-#ifdef USE_MULTIPART_CONTENT
-static const char* CONTENT_TYPE = "multipart/x-mixed-replace; boundary=myboundary";
-#else
-static const char* CONTENT_TYPE = "application/octet-stream";
-#endif
-
 void QnTransactionTcpProcessor::run()
 {
     Q_D(QnTransactionTcpProcessor);
@@ -96,7 +90,7 @@ void QnTransactionTcpProcessor::run()
         (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, nx_ec::EC2_SYSTEM_NAME_HEADER_NAME)) != 
             QnCommonModule::instance()->localSystemName()) )
     {
-        sendResponse(nx_http::StatusCode::forbidden, CONTENT_TYPE);
+        sendResponse(nx_http::StatusCode::forbidden, QnTransactionTransport::TUNNEL_CONTENT_TYPE);
         return;
     }
 
@@ -106,7 +100,7 @@ void QnTransactionTcpProcessor::run()
 
         // 1-st stage
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
-        sendResponse(lockOK ? CODE_OK : CODE_INVALID_PARAMETER , CONTENT_TYPE);
+        sendResponse(lockOK ? CODE_OK : CODE_INVALID_PARAMETER , QnTransactionTransport::TUNNEL_CONTENT_TYPE);
         if (!lockOK)
             return;
 
@@ -132,7 +126,7 @@ void QnTransactionTcpProcessor::run()
             (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, nx_ec::EC2_SYSTEM_NAME_HEADER_NAME)) != 
                 QnCommonModule::instance()->localSystemName()) )
         {
-            sendResponse(nx_http::StatusCode::forbidden, CONTENT_TYPE);
+            sendResponse(nx_http::StatusCode::forbidden, QnTransactionTransport::TUNNEL_CONTENT_TYPE);
             return;
         }
     }
@@ -143,8 +137,9 @@ void QnTransactionTcpProcessor::run()
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id) && !isClient)
         fail = true; // accept only allowed peers
 
-    d->chunkedMode = true;
-    sendResponse(fail ? CODE_INVALID_PARAMETER : CODE_OK, CONTENT_TYPE);
+    d->chunkedMode = false;
+    d->response.headers.emplace( "Connection", "close" );
+    sendResponse(fail ? CODE_INVALID_PARAMETER : CODE_OK, QnTransactionTransport::TUNNEL_CONTENT_TYPE);
     if (fail) {
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
@@ -152,8 +147,7 @@ void QnTransactionTcpProcessor::run()
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             d->socket,
             remotePeer,
-            remoteSystemIdentityTime,
-            nx_http::getHeaderValue( d->request.headers, "Content-Type" ) );
+            remoteSystemIdentityTime );
         d->socket.clear();
     }
 }
