@@ -691,10 +691,8 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
         }
     }
 
-    // TODO: #vasilenko avoid using deprecated methods
-    if (avcodec_open(ctx, codec) < 0)
-        goto error_label;
-
+    ctx->codec_id = codecId;
+	ctx->codec_type = codec->type;
     return ctx;
 
 error_label:

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
+    <width>494</width>
     <height>495</height>
    </rect>
   </property>
@@ -295,33 +295,40 @@
          </layout>
         </widget>
         <widget class="QWidget" name="rebuildProgressPage">
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QLabel" name="rebuildLabel">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Rebuild progress</string>
-            </property>
-           </widget>
+           <widget class="QnWordWrappedLabel" name="rebuildStatusLabel" native="true"/>
           </item>
           <item>
-           <widget class="QProgressBar" name="rebuildProgressBar">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="rebuildStopButton">
-            <property name="text">
-             <string>Cancel</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QLabel" name="rebuildLabel">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Rebuild progress</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QProgressBar" name="rebuildProgressBar">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="rebuildStopButton">
+              <property name="text">
+               <string>Cancel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -345,6 +352,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>nameLineEdit</tabstop>
   <tabstop>maxCamerasSpinBox</tabstop>
@@ -353,7 +368,6 @@
   <tabstop>storagesTable</tabstop>
   <tabstop>rebuildStartButton</tabstop>
   <tabstop>buttonBox</tabstop>
-  <tabstop>rebuildStopButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>
