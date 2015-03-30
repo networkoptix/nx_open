@@ -735,7 +735,8 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
         return; // all dstPeers already processed
     }
 
-    QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
+    // do not put clients peers to processed list in case if client just reconnected to other server and previous server hasn't got update yet.
+    QnPeerSet processedPeers = transportHeader.processedPeers + connectedServerPeers(tran.command);
     processedPeers << m_localPeer.id;
     QnTransactionTransportHeader newHeader(transportHeader);
     newHeader.processedPeers = processedPeers;
@@ -1349,13 +1350,13 @@ QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() con
     return m_alivePeers;
 }
 
-QnPeerSet QnTransactionMessageBus::connectedPeers(ApiCommand::Value command) const
+QnPeerSet QnTransactionMessageBus::connectedServerPeers(ApiCommand::Value command) const
 {
     QnPeerSet result;
     for(QnConnectionMap::const_iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransport* transport = *itr;
-        if (transport->isReadyToSend(command))
+        if (!transport->remotePeer().isClient() && transport->isReadyToSend(command))
             result << transport->remotePeer().id;
     }
 
