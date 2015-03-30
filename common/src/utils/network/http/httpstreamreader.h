@@ -69,13 +69,16 @@ namespace nx_http
         void resetState();
         //!Flush all internal buffers (if any), so that all data is available through public API
         void flush();
-        /*!
+        /*! 
             By default \a true.
             \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
         */
         void setDecodeChunkedMessageBody( bool val );
         //!Returns sequential HTTP message number
         int currentMessageNumber() const;
+
+        //!If \a true, then \a parseBytes always returns after reading http headers and trailing CRLF have been read
+        void setBreakAfterReadingHeaders( bool val );
 
     private:
         // TODO: #Elric #enum
@@ -109,6 +112,7 @@ namespace nx_http
         int m_lineEndingOffset;
         bool m_decodeChunked;
         int m_currentMessageNumber;
+        bool m_breakAfterReadingHeaders;
 
         LineSplitter m_lineSplitter;
         mutable std::mutex m_mutex;

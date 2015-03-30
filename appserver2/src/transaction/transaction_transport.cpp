@@ -36,6 +36,8 @@ namespace ec2
 static const int DEFAULT_READ_BUFFER_SIZE = 4 * 1024;
 static const int SOCKET_TIMEOUT = 1000 * 1000;
 static const int TCP_KEEPALIVE_TIMEOUT = 1000 * 5;
+const char* QnTransactionTransport::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
+const char* QnTransactionTransport::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
 QSet<QnUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
@@ -43,8 +45,7 @@ QMutex QnTransactionTransport::m_staticMutex;
 
 QnTransactionTransport::QnTransactionTransport(
     const ApiPeerData &localPeer,
-    const QSharedPointer<AbstractStreamSocket>& socket,
-    const QByteArray& contentType )
+    const QSharedPointer<AbstractStreamSocket>& socket )
 :
     m_localPeer(localPeer),
     m_lastConnectTime(0), 
@@ -64,8 +65,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_asyncReadScheduled(false),
     m_remoteIdentityTime(0),
     m_incomingConnection(socket),
-    m_incomingTunnelOpened(false),
-    m_incomingTunnelOpenRequestRead(false)
+    m_incomingTunnelOpened(false)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
@@ -78,8 +78,6 @@ QnTransactionTransport::QnTransactionTransport(
         this,
         std::placeholders::_1 );
     m_contentParser.setNextFilter( std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(std::move(processTranFunc)) );
-    if( !contentType.isEmpty() )
-        m_contentParser.setContentType( contentType );  //TODO #ak check error code
 }
 
 
@@ -155,6 +153,7 @@ void QnTransactionTransport::startListening()
     QMutexLocker lock(&m_mutex);
 
     assert( m_socket );
+    m_httpStreamReader.resetState();
 
     if( m_socket )
     {
@@ -412,10 +411,15 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
     assert( m_state == ReadyForStreaming );
 
-    //if incoming connection then expecting POST request
+    //if incoming connection then expecting POST request to open incoming tunnel
     if( m_incomingConnection && !m_incomingTunnelOpened )
     {
-        readCreateIncomingTunnelMessage();
+        if( !readCreateIncomingTunnelMessage() )
+        {
+            NX_LOG( lit("Error parsing open tunnel request from peer %1. Disconnecting...").
+                arg(m_remotePeer.id.toString()), cl_logWARNING );
+            return setStateNoLock( State::Error );
+        }
         if( !m_incomingTunnelOpened )
         {
             //reading futher
@@ -424,76 +428,9 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
         }
     }
 
-#ifdef USE_MULTIPART_CONTENT
+    //parsing and processing input data
     m_contentParser.processData( m_readBuffer );
     m_readBuffer.resize(0);
-#else
-    //TODO #ak it makes sense to use here some chunk parser class. At this moment http chunk parsing logic is implemented 
-        //3 times in different parts of our code (async http client, sync http server and here)
-    for( size_t readBufPos = 0;; )
-    {
-        //processing available data: we can have zero or more chunks in m_readBuffer
-        if( m_chunkHeaderLen == 0 )  //chunk header has not been read yet
-        {
-            nx_http::ChunkHeader httpChunkHeader;
-            //reading chunk header
-            m_chunkHeaderLen = readChunkHeader(
-                reinterpret_cast<const quint8*>(m_readBuffer.constData()) + readBufPos,
-                m_readBuffer.size() - readBufPos,
-                &httpChunkHeader );
-            if( m_chunkHeaderLen == 0 )
-            {
-                if( readBufPos > 0 )
-                    m_readBuffer.remove( 0, readBufPos );  //pop_front(readBufPos)
-                break;  //not enough data in m_readBuffer to read http chunk header
-            }
-            m_chunkLen = httpChunkHeader.chunkSize;
-            processChunkExtensions( httpChunkHeader );  //processing chunk extensions even before receiving whole transaction
-        }
-
-        assert( m_chunkHeaderLen > 0 );
-
-        //have just read http chunk
-        const size_t fullChunkSize = m_chunkHeaderLen + m_chunkLen + sizeof( "\r\n" ) - 1;
-        if( (size_t)m_readBuffer.capacity() < fullChunkSize )
-            m_readBuffer.reserve( fullChunkSize );
-
-        if( (m_readBuffer.size() - readBufPos) < fullChunkSize )
-        {
-            //not enough data in m_readBuffer
-            if( readBufPos > 0 )
-                m_readBuffer.remove( 0, readBufPos );  //pop_front(readBufPos)
-            break;
-        }
-
-        const int payloadLen = m_chunkLen - 4;
-        if (payloadLen > 0) {
-            QByteArray serializedTran;
-            QnTransactionTransportHeader transportHeader;
-            if( !QnUbjsonTransactionSerializer::deserializeTran(
-                    reinterpret_cast<const quint8*>(m_readBuffer.constData()) + readBufPos + m_chunkHeaderLen + 4,
-                    m_chunkLen - 4,
-                    transportHeader,
-                    serializedTran ) )
-            {
-                assert( false );
-            }
-            assert( !transportHeader.processedPeers.empty() );
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::onSomeBytesRead. Got transaction with seq %1 from %2").
-                arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
-            emit gotTransaction(serializedTran, transportHeader);
-            ++m_postedTranCount;
-        }
-        readBufPos += fullChunkSize;
-        m_chunkHeaderLen = 0;
-
-        if( readBufPos == (size_t)m_readBuffer.size() )
-        {
-            m_readBuffer.resize(0);
-            break;  //processed all data
-        }
-    }
-#endif
 
     if( m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME )
         return; //not reading futher while that much transactions are not processed yet
@@ -502,8 +439,14 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     scheduleAsyncRead();
 }
 
-void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tranData )
+void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tranDataWithHeader )
 {
+    //calling processChunkExtensions
+    processChunkExtensions( m_contentParser.prevFrameHeaders() );
+
+    //skipping transaction size
+    const QnByteArrayConstRef tranData = tranDataWithHeader.mid( sizeof(uint32_t) );
+
     QByteArray serializedTran;
     QnTransactionTransportHeader transportHeader;
     if( !QnUbjsonTransactionSerializer::deserializeTran(
@@ -512,9 +455,10 @@ void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tra
             transportHeader,
             serializedTran ) )
     {
-        assert( false );
+        Q_ASSERT( false );
+        return;
     }
-    assert( !transportHeader.processedPeers.empty() );
+    Q_ASSERT( !transportHeader.processedPeers.empty() );
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::receivedTransaction. Got transaction with seq %1 from %2").
         arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
     emit gotTransaction(serializedTran, transportHeader);
@@ -571,26 +515,20 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     DataToSend& dataCtx = m_dataToSend.front();
     if( dataCtx.encodedSourceData.isEmpty() )
     {
-#ifdef USE_MULTIPART_CONTENT
+        const uint32_t tranSize = htonl(dataCtx.sourceData.size());
+
         nx_http::HttpHeaders headers;
-        headers.emplace( "Content-Type", "application/ubjson" );
-        headers.emplace( "Content-Length", nx_http::BufferType::number(dataCtx.sourceData.size()) );
-        //addHttpChunkExtensions( &headers );
+        headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
+        headers.emplace( "Content-Length", nx_http::BufferType::number(dataCtx.sourceData.size() + sizeof(tranSize)) );
+        addHttpChunkExtensions( &headers );
 
         dataCtx.encodedSourceData.clear();
-        dataCtx.encodedSourceData += "--myboundary\r\n";    //TODO #ak move to some static const
+        dataCtx.encodedSourceData += QByteArray("--")+TUNNEL_MULTIPART_BOUNDARY+"\r\n"; //TODO #ak move to some variable
         nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
         dataCtx.encodedSourceData += "\r\n";
+        dataCtx.encodedSourceData += QByteArray::fromRawData( reinterpret_cast<const char*>(&tranSize), sizeof(tranSize) );
         dataCtx.encodedSourceData += dataCtx.sourceData;
-#else
-        std::vector<nx_http::ChunkExtension> chunkExtensions;
-        addHttpChunkExtensions( &chunkExtensions );
-        dataCtx.encodedSourceData = QnChunkedTransferEncoder::serializedTransaction(
-            dataCtx.sourceData,
-            chunkExtensions );
-#endif
     }
-
     using namespace std::placeholders;
     assert( !dataCtx.encodedSourceData.isEmpty() );
     NX_LOG( lit("Sending data buffer (%1 bytes) to the peer %2").
@@ -735,8 +673,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             request.requestLine.url = client->url();
             request.requestLine.version = nx_http::http_1_1;
             request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME" "QN_PRODUCT_NAME" "QN_APPLICATION_VERSION );
-            request.headers.emplace( "Content-Type", "application/octet-stream" );
-            request.headers.emplace( "Transfer-Encoding", "chunked" );
+            request.headers.emplace( "Content-Type", TUNNEL_CONTENT_TYPE );
             request.headers.emplace( "Host", request.requestLine.url.host().toLatin1() );
             addEncodedData( request.serialized() );
 
@@ -761,53 +698,7 @@ void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPt
 
 void QnTransactionTransport::processTransactionData(const QByteArray& data)
 {
-#ifdef USE_MULTIPART_CONTENT
     m_contentParser.processData( data );
-#else
-    m_chunkHeaderLen = 0;
-
-    const quint8* buffer = (const quint8*) data.constData();
-    size_t bufferLen = (size_t)data.size();
-    nx_http::ChunkHeader httpChunkHeader;
-    m_chunkHeaderLen = readChunkHeader(buffer, bufferLen, &httpChunkHeader);
-    m_chunkLen = httpChunkHeader.chunkSize;
-    while (m_chunkHeaderLen > 0) 
-    {
-        processChunkExtensions( httpChunkHeader );
-
-        const size_t fullChunkLen = m_chunkHeaderLen + m_chunkLen + sizeof("\r\n")-1;
-        if (bufferLen >= fullChunkLen)
-        {
-            const int payloadLen = m_chunkLen - 4;
-            if (payloadLen > 0) {
-                QByteArray serializedTran;
-                QnTransactionTransportHeader transportHeader;
-                QnUbjsonTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
-                assert( !transportHeader.processedPeers.empty() );
-                NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::processTransactionData. Got transaction with seq %1 from %2").
-                    arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
-                emit gotTransaction(serializedTran, transportHeader);
-                ++m_postedTranCount;
-            }
-            
-
-            buffer += fullChunkLen;
-            bufferLen -= fullChunkLen;
-        }
-        else {
-            break;
-        }
-        httpChunkHeader.clear();
-        m_chunkHeaderLen = readChunkHeader(buffer, bufferLen, &httpChunkHeader);
-        m_chunkLen = httpChunkHeader.chunkSize;
-    }
-
-    if (bufferLen > 0) {
-        if( (size_t)m_readBuffer.size() < bufferLen )
-            m_readBuffer.resize(bufferLen);
-        memcpy(m_readBuffer.data(), buffer, bufferLen);
-    }
-#endif
 }
 
 bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
@@ -857,19 +748,19 @@ QString QnTransactionTransport::toString( State state )
     }
 }
 
-void QnTransactionTransport::addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions )
+void QnTransactionTransport::addHttpChunkExtensions( nx_http::HttpHeaders* const headers )
 {
     for( auto val: m_beforeSendingChunkHandlers )
-        val.second( this, chunkExtensions );
+        val.second( this, headers );
 }
 
-void QnTransactionTransport::processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader )
+void QnTransactionTransport::processChunkExtensions( const nx_http::HttpHeaders& headers )
 {
-    if( httpChunkHeader.extensions.empty() )
+    if( headers.empty() )
         return;
 
     for( auto val: m_httpChunkExtensonHandlers )
-        val.second( this, httpChunkHeader.extensions );
+        val.second( this, headers );
 }
 
 void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data) 
@@ -971,47 +862,50 @@ void QnTransactionTransport::scheduleAsyncRead()
     }
 }
 
-void QnTransactionTransport::readCreateIncomingTunnelMessage()
+bool QnTransactionTransport::readCreateIncomingTunnelMessage()
 {
-    if( !m_incomingTunnelOpenRequestRead )
+    m_httpStreamReader.setBreakAfterReadingHeaders( true );
+
+    Q_ASSERT( !m_incomingTunnelOpened );
+
+    size_t bytesRead = 0;
+    if( !m_httpStreamReader.parseBytes(
+            m_readBuffer,
+            m_readBuffer.size(),
+            &bytesRead ) )
     {
-        //skipping data up to empty line
-        size_t pos = 0;
-        for( ; pos < m_readBuffer.size(); )
-        {
-            size_t lineBytesRead = 0;
-            QnByteArrayConstRef lineBuffer;
-            if( !m_lineSplitter.parseByLines(
-                    QnByteArrayConstRef(m_readBuffer, pos),
-                    &lineBuffer,
-                    &lineBytesRead ) )
+        return false;
+    }
+    m_readBuffer.remove( 0, bytesRead );
+
+    switch( m_httpStreamReader.state() )
+    {
+        case nx_http::HttpStreamReader::waitingMessageStart:
+        case nx_http::HttpStreamReader::readingMessageHeaders:
+        case nx_http::HttpStreamReader::pullingLineEndingBeforeMessageBody:
+            break;  //reading futher
+
+        case nx_http::HttpStreamReader::parseError:
+            return false;
+
+        case nx_http::HttpStreamReader::readingMessageBody:
+        case nx_http::HttpStreamReader::messageDone:
+            //read request and trailing CRLF
+            if( m_httpStreamReader.message().type != nx_http::MessageType::request )
+                return false;
+            if( m_httpStreamReader.message().request->requestLine.method != nx_http::Method::POST )
+                return false;
+            if( !m_contentParser.setContentType(
+                    nx_http::getHeaderValue(
+                        m_httpStreamReader.message().request->headers, "Content-Type" ) ) )
             {
-                //no line yet
-                pos += lineBytesRead;
-                break;
+                return false;
             }
-
-            pos += lineBytesRead;
-
-            //read line
-            if( !lineBuffer.isEmpty() )
-                continue;
-
-            //found empty line
-            m_incomingTunnelOpenRequestRead = true;
+            m_incomingTunnelOpened = true;
             break;
-        }
-        m_readBuffer.remove( 0, pos );
     }
 
-    if( m_incomingTunnelOpenRequestRead && !m_readBuffer.isEmpty() )
-    {
-        //removing trailing line feed
-        size_t lineBytesRead = 0;
-        m_lineSplitter.finishCurrentLineEnding( m_readBuffer, &lineBytesRead );
-        m_readBuffer.remove( 0, lineBytesRead );
-        m_incomingTunnelOpened = true;
-    }
+    return true;
 }
 
 }
