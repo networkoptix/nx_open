@@ -2503,10 +2503,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Calibrer le &apos;fisheye&apos;</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>Paramètres de l&apos;image ...</translation>
-    </message>
-    <message>
         <source>Zoom to Selection</source>
         <translation>Zoom sur la sélection</translation>
     </message>
@@ -2517,6 +2513,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Debug Control Panel</source>
         <translation>Panneau de configuration &apos;Debug&apos;</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4446,6 +4446,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Smart Search</source>
@@ -4872,21 +4887,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation type="unfinished">Attention</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>Paramètres de l&apos;image</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>L&apos;image n&apos;est pas chargée</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>Ceci est une lentille &apos;fisheye&apos;</translation>
     </message>
 </context>
 <context>
@@ -6950,10 +6950,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Coin inférieur droit (Transcodage nécessaire)</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>Transcode vidéo pour garantir &quot;WYSIWYG&quot;</translation>
-    </message>
-    <message>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
         <translation>Le format AVI n&apos;est pas recommandé pour l&apos;exportation d&apos;enregistrement &apos;non continu&apos; quand la piste audio est présente. Voulez-vous continuer?</translation>
     </message>
@@ -6987,6 +6983,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

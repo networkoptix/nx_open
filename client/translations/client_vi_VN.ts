@@ -2172,10 +2172,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>cài đặt camera...</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>màn hình Cài đặt…</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>Giao diện thiết lập...</translation>
     </message>
@@ -2518,6 +2514,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Hide Search Panel</source>
         <translation>Ẩn bảng điều khiển tìm kiếm</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4407,6 +4407,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Screenshot</source>
@@ -4825,21 +4840,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation>sự phản đối</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>Cài đặt hình ảnh</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>Hình ảnh không tải</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>Đây là một mắt cá (180 độ) camera</translation>
     </message>
 </context>
 <context>
@@ -6823,10 +6823,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Dấu thời gian:</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>Chuyển mã video để đảm bảo WYSIWYG</translation>
-    </message>
-    <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
         <translation>Bố trí hiện tại chứa các tập tin địa phương. File địa phương không được phép xuất khẩu Multi-Video.</translation>
     </message>
@@ -6917,6 +6913,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
         <translation>Bạn muốn xuất khẩu một số trình tự video với tổng chiều dài quá 30 phút.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

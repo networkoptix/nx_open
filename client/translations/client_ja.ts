@@ -2163,10 +2163,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>カメラ設定...</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>画像設定...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>レイアウト設定...</translation>
     </message>
@@ -2505,6 +2501,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Hide Search Panel</source>
         <translation>検索パネル非表示</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4395,6 +4395,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Screenshot</source>
@@ -4813,21 +4828,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation>警告</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>画像設定</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>イメージがロードされません</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>魚眼レンズイメージ</translation>
     </message>
 </context>
 <context>
@@ -6811,10 +6811,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>タイムスタンプ:</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>WYSIWYGを保障しているトランスコードビデオ</translation>
-    </message>
-    <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
         <translation>レイアウトにローカルファイルが含まれています　ローカルファイルは複数ビデオのエクスポートで許可されません.</translation>
     </message>
@@ -6905,6 +6901,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
         <translation>30分を超える幾つかのビデオシーケンスをエクスポートしようとしています.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -2237,10 +2237,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Установить как фон на раскладку</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>Настройки изображения...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>Настройки раскладки...</translation>
     </message>
@@ -2523,6 +2519,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>S</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3015,9 +3015,9 @@ Short for &quot;seconds&quot;</extracomment>
     <message numerus="yes">
         <source>Error while adding %n cameras.</source>
         <translation>
-            <numerusform>Ошибка при добавлении камеры</numerusform>
-            <numerusform>Ошибка при добавлении камер</numerusform>
-            <numerusform>Ошибка при добавлении камер</numerusform>
+            <numerusform>Ошибка при добавлении %n камеры.</numerusform>
+            <numerusform>Ошибка при добавлении %n камер.</numerusform>
+            <numerusform>Ошибка при добавлении %n камер.</numerusform>
         </translation>
     </message>
 </context>
@@ -4467,6 +4467,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Screenshot</source>
@@ -4888,21 +4903,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation>Предупреждение</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>Настройки изображения</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>Изображение не загружено</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>Это камера с объективом &quot;рыбий глаз&quot; (fish-eye)</translation>
     </message>
 </context>
 <context>
@@ -6926,10 +6926,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Нижний правый угол (требуется перекодирование)</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>Перекодировать видео для обеспечения WYSIWYG</translation>
-    </message>
-    <message>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
         <translation>Формат AVI не рекомендуется применять для экспорта камер с аудиотреком, в котором есть перерывы. Продолжить?</translation>
     </message>
@@ -7024,6 +7020,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
         <translation>Вы собираетесь экспортировать фрагменты общей длительностью более 30 минут.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

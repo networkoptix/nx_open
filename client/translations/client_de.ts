@@ -2169,10 +2169,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Kamera Einstellungen...</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>Bildeinstellungen...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>Layout Einstellungen...</translation>
     </message>
@@ -2531,6 +2527,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Merge to Currently Connected System...</source>
         <translation>Mit dem aktuellen System verschmelzen...</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4452,6 +4452,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Screenshot</source>
@@ -4871,21 +4886,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation>Warnung</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>Bildeinstellungen</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>Kein Bild geladen</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>verwendet Fischaugenobjektiv</translation>
     </message>
 </context>
 <context>
@@ -6895,10 +6895,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Zeitmarken:</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>Codieren Sie das Video um, damit WYSIWYG sichergestellt ist</translation>
-    </message>
-    <message>
         <source>AVI format is not recommended</source>
         <translation>Das AVI Format ist nicht empfehlenswert</translation>
     </message>
@@ -6989,6 +6985,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
         <translation>Sie versuchen mehrere Videosequenzen, die gemeinsam länger als 30 Minuten sind, zu exportieren.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

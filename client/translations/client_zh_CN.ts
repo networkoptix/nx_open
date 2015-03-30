@@ -2492,10 +2492,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>校准鱼眼图像</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>画面设置...</translation>
-    </message>
-    <message>
         <source>Zoom to Selection</source>
         <translation>放大选择</translation>
     </message>
@@ -2506,6 +2502,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Debug Control Panel</source>
         <translation>调试控制板面</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4395,6 +4395,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Smart Search</source>
@@ -4813,21 +4828,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation>警告</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>画面设置</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>图像无法上传</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>全景鱼眼摄像机</translation>
     </message>
 </context>
 <context>
@@ -6867,10 +6867,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>右下角((需转码)</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>视频进行转码中</translation>
-    </message>
-    <message>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
         <translation>不推荐带音频的摄像机使用AVI格式，将存在不连续记录?点击&apos;是&apos;导出或&apos;否&apos;选择其他格式.是否继续?</translation>
     </message>
@@ -6905,6 +6901,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
         <translation>将导出的录像片长超过30分钟.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

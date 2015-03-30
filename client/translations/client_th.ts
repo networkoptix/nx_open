@@ -2149,10 +2149,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>การตั้งค่ากล้อง...</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>การตั้งค่ารูปภาพ...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>การตั้งค่าเค้าโครง...</translation>
     </message>
@@ -2507,6 +2503,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Hide Search Panel</source>
         <translation>ซ่อนแผงค้นหา</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4397,6 +4397,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Screenshot</source>
@@ -4815,21 +4830,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation>การเตือน</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>การตั้งค่ารูปภาพ</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>ภาพไม่ได้โหลด</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>นี่คือภาพเลนส์ฟิชอาย</translation>
     </message>
 </context>
 <context>
@@ -6813,10 +6813,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Timestamps:</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>แปลงวิดีโอเพื่อรับประกัน WYSIWYG</translation>
-    </message>
-    <message>
         <source>AVI format is not recommended</source>
         <translation>รูปแบบ AVI ไม่แนะนำ</translation>
     </message>
@@ -6907,6 +6903,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
         <translation>คุณกำลังจะส่งออกลำดับวิดีโอหลายที่มีความยาวรวมเกิน 30 นาที.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
