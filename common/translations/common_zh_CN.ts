@@ -276,7 +276,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>不兼容服务器: %1</translation>
     </message>
 </context>
 <context>
@@ -319,95 +319,95 @@
     </message>
     <message>
         <source>Server %1 is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器 %1不可用.</translation>
     </message>
     <message>
         <source>Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>检查服务器是否启动并运行.</translation>
     </message>
     <message>
         <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器%1接收到错误: &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>请检查服务器版本是否正确.</translation>
     </message>
     <message>
         <source>Cannot connect to http port %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接到Http接口 %1.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>请确认摄像机在线.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法打开媒体流URL%1.未连接到流媒体端口 %2.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>请确保端口 %2可用,.尝试重启启动摄像机,并恢复出厂默认设置.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法打开媒体流 %1连接到端口 %2被意外关闭.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>请确保摄像机上线,若问题还在,请尝试重启摄像机.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>向摄像机请求无响应,URL %1,请求名称: %2.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>请尝试重新启动摄像机并恢复出厂设置.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>请尝试更新驱动,若问题仍然存在,请联系技术支持.</translation>
     </message>
     <message>
         <source>No supported media tracks at url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>不支持媒体流URL %1.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法打开媒体流 %1.不支持媒体协议%2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>配置参数 %1.失败.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>请尝试启用录像并且通过摄像机设置降低帧率.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>若问题仍存在，请联系技术支持.</translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机请求&quot;%1&quot;发生错误: &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown Camera Issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>未知的摄像机问题.</translation>
     </message>
     <message>
         <source>Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>请联系技术支持.</translation>
     </message>
     <message>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>发生I/O错误，系统信息为:&quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>参数:</translation>
     </message>
 </context>
 <context>
@@ -815,51 +815,51 @@
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation>选择时间同步服务器</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>重建录像索引完成</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>邮箱地址未设置.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>将无法通过电子邮件接收系统通知.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>邮件服务器未设置.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>用户未设置邮箱.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>将无法通过邮件接收系统通知.</translation>
     </message>
     <message>
         <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>以下服务器的存储空间已满:</translation>
     </message>
     <message>
         <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>以下服务器未进行存储配置:</translation>
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>未获得授权许可.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法对摄像机进行录像.</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>以下服务器已完成录像索引重建:</translation>
     </message>
 </context>
 <context>

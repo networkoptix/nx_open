@@ -278,7 +278,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Конфликтующий сервер: %1</translation>
     </message>
 </context>
 <context>
@@ -321,95 +321,95 @@
     </message>
     <message>
         <source>Server %1 is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер %1 недоступен.</translation>
     </message>
     <message>
         <source>Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь, что сервер запущен.</translation>
     </message>
     <message>
         <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Получен ошибочный ответ от сервера %1: &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь, что сервер запущен и имеет правильную версию.</translation>
     </message>
     <message>
         <source>Cannot connect to http port %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно подключиться к http порту %1.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь, что камера подключена к сети.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно открыть медиа ссылку %1. Ошибка подключения к медиа порту %2.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь, что порт %2 доступен (например, проброшен). Попробуйте перезагрузить камеру и сбросить её к заводским настройкам через web-интерфейс.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно открыть медиа ссылку %1. Подключение к порту %2 сброшено.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь, что камера подключена к сети. Попробуйте перезагрузить камеру.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно разобрать ответ камеры. Ссылка %1, имя запроса %2.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Попробуйте перезагрузить камеру и сбросить её к заводским настройкам через web-интерфейс.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Попробуйте обновить прошивку камеры. Если проблема останется, свяжитесь с технической поддержкой.</translation>
     </message>
     <message>
         <source>No supported media tracks at url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет поддерживаемых медиа треков по ссылке %1.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно открыть медиа ссылку %1. Неподдерживаемый протокол %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно настроить параметр %1.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сначала попробуйте включить запись (если она выключена) и уменьшить частоту кадров в настройках камеры.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Если это не помогло, сбросьте камеру к заводским настройкам через web-интерфейс. Если проблема останется, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос &quot;%1&quot; вернул ошибку &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown Camera Issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестная проблема с камерой.</translation>
     </message>
     <message>
         <source>Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, свяжитесь со службой технической поддержки.</translation>
     </message>
     <message>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка ввода-вывода. Сообщение ОС: &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметры:</translation>
     </message>
 </context>
 <context>
@@ -822,51 +822,51 @@
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите сервер по которому будет синхронизировано время</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Закончено восстановление архива</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Email не задан.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы не можете получать уведомления по email.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Email сервер не задан.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Некоторые пользователи не указали свой email.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Они не смогут получать уведомления по email.</translation>
     </message>
     <message>
         <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Хранилища заполнены на следующем сервере:</translation>
     </message>
     <message>
         <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Хранилища не настроены на следующем сервере:</translation>
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет лицензий.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы не можете записывать видео с камер.</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Восстановление индекса архива завершено на следующем сервере:</translation>
     </message>
 </context>
 <context>

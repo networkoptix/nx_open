@@ -9,11 +9,11 @@
     </message>
     <message>
         <source>There is no system tray on this system.</source>
-        <translation type="unfinished"></translation>
+        <translation>本系統無系統工作列圖示.</translation>
     </message>
     <message>
         <source>Application will now quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>程式即將結束.</translation>
     </message>
 </context>
 <context>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
-        <translation type="unfinished"></translation>
+        <translation>嘗試存取已安裝服務時發生錯誤:</translation>
     </message>
 </context>
 </TS>

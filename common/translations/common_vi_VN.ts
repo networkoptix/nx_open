@@ -272,7 +272,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mâu thuẫn Server: %1</translation>
     </message>
 </context>
 <context>
@@ -315,95 +315,95 @@
     </message>
     <message>
         <source>Server %1 is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ %1 là không có sẵn.</translation>
     </message>
     <message>
         <source>Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra máy chủ đó là lên và chạy.</translation>
     </message>
     <message>
         <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhận được phản ứng xấu từ Server %1: &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra xem máy chủ đang lên và có các phiên bản thích hợp.</translation>
     </message>
     <message>
         <source>Cannot connect to http port %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể kết nối với http cổng %1.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hãy chắc chắn rằng các camera được cắm vào mạng.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể mở phương tiện truyền thông url %1. Không thể kết nối với cổng truyền thông %2.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hãy chắc chắn rằng cổng%2 có thể truy cập (ví dụ chuyển tiếp). Hãy cố gắng để khởi động lại máy, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể mở phương tiện truyền thông url %1. Kết nối đến cổng %2 đã được đóng cửa đột xuất.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hãy chắc chắn rằng các camera được cắm vào mạng. Hãy thử khởi động lại máy ảnh.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể phân tích ứng của máy ảnh. Url %1, yêu cầu tên %2.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hãy cố gắng để khởi động lại máy, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cuối cùng, cố gắng cập nhật firmware. Nếu vấn đề vẫn còn tồn tại, xin vui lòng liên hệ với hỗ trợ.</translation>
     </message>
     <message>
         <source>No supported media tracks at url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không hỗ trợ các bài hát truyền thông tại url %1.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể mở phương tiện truyền thông url %1. Phương tiện truyền thông không được hỗ trợ giao thức %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể cấu hình tham số %1.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt camera.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên máy ảnh web-page. Nếu vấn đề vẫn còn tồn tại, xin vui lòng liên hệ với hỗ trợ.</translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Yêu cầu máy ảnh &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown Camera Issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>không rõ vấn đề camera.</translation>
     </message>
     <message>
         <source>Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vui lòng liên hệ hỗ trợ.</translation>
     </message>
     <message>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Một lỗi đầu vào / đầu ra đã xảy ra. OS nhắn: &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>tham số:</translation>
     </message>
 </context>
 <context>
@@ -808,51 +808,51 @@
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn máy chủ cho những người khác để đồng bộ thời gian với</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Địa chỉ email không được thiết lập.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn không thể nhận được các thông báo hệ thống thông qua email.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ email không được thiết lập.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Một số người dùng đã không được thiết lập địa chỉ email của họ.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Họ không thể nhận được các thông báo hệ thống thông qua email.</translation>
     </message>
     <message>
         <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kho có đầy đủ trên máy chủ sau đây:</translation>
     </message>
     <message>
         <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kho không được cấu hình trên máy chủ sau đây:</translation>
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn không có giấy phép.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn không có thể ghi lại video từ máy ảnh.</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành trên máy chủ sau đây:</translation>
     </message>
 </context>
 <context>

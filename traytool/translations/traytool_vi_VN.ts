@@ -9,11 +9,11 @@
     </message>
     <message>
         <source>There is no system tray on this system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có khay hệ thống trên hệ thống này.</translation>
     </message>
     <message>
         <source>Application will now quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ứng dụng bây giờ sẽ bỏ thuốc lá.</translation>
     </message>
 </context>
 <context>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
-        <translation type="unfinished"></translation>
+        <translation>Một lỗi đã xảy ra trong khi đang cố gắng truy cập các dịch vụ cài đặt:</translation>
     </message>
 </context>
 </TS>
