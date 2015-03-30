@@ -532,6 +532,7 @@ void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const
 
 void QnServerStreamRecorder::endOfRun()
 {
+    qnStorageMan->clearRecordingCache(m_device);
     updateMotionStateInternal(false, m_lastMediaTime, QnMetaDataV1Ptr());
 
     QnStreamRecorder::endOfRun();

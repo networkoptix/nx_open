@@ -111,6 +111,7 @@ public:
     void initDone();
     int getStorageIndex(const QnStorageResourcePtr& storage);
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
+    void clearRecordingCache(const QnResourcePtr& camera);
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
