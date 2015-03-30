@@ -45,9 +45,9 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
 };
 
-QnRecordingManager::LockData::LockData(const LockData& other)
+QnRecordingManager::LockData::LockData(const LockData& /*other*/)
 {
-    assert(0);
+    assert(false);
 }
 
 QnRecordingManager::LockData::LockData(LockData&& other): 
@@ -579,8 +579,6 @@ void QnRecordingManager::onTimer()
             recorders.recorderLowRes->updateScheduleInfo(time);
         someRecordingIsPresent |= startOrStopRecording(itrRec.key(), camera, recorders.recorderHiRes, recorders.recorderLowRes);
     }
-
-    QnStorageManager* storageMan = QnStorageManager::instance();
 
     QMap<QnSecurityCamResourcePtr, qint64> stopList = m_delayedStop;
     for (QMap<QnSecurityCamResourcePtr, qint64>::iterator itrDelayedStop = stopList.begin(); itrDelayedStop != stopList.end(); ++itrDelayedStop)
