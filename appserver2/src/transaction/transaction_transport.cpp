@@ -509,7 +509,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 
         nx_http::HttpHeaders headers;
         headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
-        headers.emplace( "Content-Length", nx_http::BufferType::number(dataCtx.sourceData.size() + sizeof(tranSize)) );
+        headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size() + sizeof(tranSize))) );
         addHttpChunkExtensions( &headers );
 
         dataCtx.encodedSourceData.clear();
@@ -658,7 +658,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             request.requestLine.method = nx_http::Method::POST;
             request.requestLine.url = client->url();
             request.requestLine.version = nx_http::http_1_1;
-            request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME" "QN_PRODUCT_NAME" "QN_APPLICATION_VERSION );
+            request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             request.headers.emplace( "Content-Type", TUNNEL_CONTENT_TYPE );
             request.headers.emplace( "Host", request.requestLine.url.host().toLatin1() );
             addEncodedData( request.serialized() );

@@ -107,7 +107,7 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResou
     currentParts[2] = fileDate.date().day();
     currentParts[3] = fileDate.time().hour();
 
-    bool sameDir = true;
+    //bool sameDir = true;
 
     IOCacheMap::iterator itr = m_prevPartsMap->find(chunk.storageIndex);
     if (itr == m_prevPartsMap->end()) {
@@ -125,7 +125,7 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResou
         }
         else 
         {
-            sameDir = false;
+            //sameDir = false;
             // new folder. check it
 
             for (int j = i; j < 4; ++j) {
@@ -822,7 +822,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
     if (headerLine.contains("timezone"))
         timeZoneExist = 1;
     QByteArray line;
-    bool checkDirOnly = false;
+    //bool checkDirOnly = false;
     do {
         line = file.readLine();
         QList<QByteArray> fields = line.split(';');

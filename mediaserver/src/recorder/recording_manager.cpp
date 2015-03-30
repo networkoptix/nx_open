@@ -45,9 +45,9 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
 };
 
-QnRecordingManager::LockData::LockData(const LockData& other)
+QnRecordingManager::LockData::LockData(const LockData& /*other*/)
 {
-    assert(0);
+    assert(false);
 }
 
 QnRecordingManager::LockData::LockData(LockData&& other): 
