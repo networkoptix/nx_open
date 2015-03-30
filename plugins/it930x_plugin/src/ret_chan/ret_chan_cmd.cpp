@@ -72,10 +72,8 @@ unsigned Cmd_BytesRead(const Byte* buf , unsigned bufferLength, unsigned* index,
         error = ReturnChannelError::CMD_READ_FAIL;
 
         memset( bufDst, 0xFF, dstLength);
-#if Debug_check_error
-        printf("BytesRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
-#endif
-	}else
+    }
+    else
 	{
         memcpy( bufDst, buf + tempIndex, dstLength);
 
@@ -94,9 +92,6 @@ unsigned Cmd_ByteRead(const Byte* buf , unsigned bufferLength, unsigned* index, 
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
 		(* var) = defaultValue;
-#if Debug_check_error
-        printf("ByteRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
-#endif
     }
     else
 	{
@@ -116,9 +111,6 @@ unsigned Cmd_WordRead(const Byte* buf , unsigned bufferLength, unsigned* index, 
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
 		(* var) = defaultValue;
-#if Debug_check_error
-        printf("WordRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
-#endif
     }
     else
 	{
@@ -138,10 +130,8 @@ unsigned Cmd_DwordRead(const Byte* buf , unsigned bufferLength, unsigned* index,
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
 		(* var) = defaultValue;
-#if Debug_check_error
-        printf("DwordRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
-#endif
-	}else
+    }
+    else
 	{
 		(* var) = (buf[tempIndex]<<24) | (buf[tempIndex+1]<<16) | (buf[tempIndex+2]<<8) | buf[tempIndex+3] ;
 		(* index) = (* index) + 4;
@@ -163,9 +153,6 @@ unsigned Cmd_FloatRead(const Byte* buf , unsigned bufferLength, unsigned* index,
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
 		(* var) = defaultValue;
-#if Debug_check_error
-        printf("FloatRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
-#endif
     }
     else
 	{
@@ -192,10 +179,8 @@ unsigned Cmd_ShortRead(const Byte* buf , unsigned bufferLength, unsigned* index,
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
 		(* var) = defaultValue;
-#if Debug_check_error
-        printf("ShortRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
-#endif
-	}else
+    }
+    else
 	{
 
 		tempSWord = (buf[tempIndex]<<8) | buf[tempIndex+1] ;
@@ -215,9 +200,6 @@ unsigned Cmd_CharRead(const Byte* buf , unsigned bufferLength, unsigned* index, 
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
 		(* var) = defaultValue;
-#if Debug_check_error
-        printf("CharRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
-#endif
     }
     else
 	{
@@ -243,9 +225,6 @@ unsigned Cmd_QwordRead(const Byte* buf , unsigned bufferLength, unsigned* index,
 	{
         error = ReturnChannelError::CMD_READ_FAIL;
 		(* var) = defaultValue;
-#if Debug_check_error
-        printf("QwordRead fail error = %lx\n", ReturnChannelError::CMD_READ_FAIL);
-#endif
     }
     else
 	{

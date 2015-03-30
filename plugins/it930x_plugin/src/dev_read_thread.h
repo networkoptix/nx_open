@@ -61,10 +61,9 @@ namespace ite
                 }
             }
 
-#if 1
-            printf("stop reading TS stream\n");
+            debug_printf("stop reading TS stream\n");
             printCouners();
-#endif
+
             m_devReader->setThreadObj(nullptr);
         }
 

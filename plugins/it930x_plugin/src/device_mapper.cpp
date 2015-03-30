@@ -135,9 +135,8 @@ namespace ite
             m_rxDevs.swap(rxDevs);
             numRx = m_rxDevs.size();
         }
-#if 1
-        printf("got RX devices: %ld\n", numRx);
-#endif
+
+        debug_printf("got RX devices: %ld\n", numRx);
     }
 
     void DeviceMapper::updateTxDevices()
@@ -201,7 +200,7 @@ namespace ite
 
             numTx = m_txDevs.size();
         }
-        printf("got TX devices: %ld\n", numTx);
+        debug_printf("got TX devices: %ld\n", numTx);
 #endif
     }
 
@@ -243,9 +242,7 @@ namespace ite
 
     void DeviceMapper::addTxDevice(const DevLink& link)
     {
-#if 1
-        printf("device link Rx: %d; Tx: %d; channel: %d\n", link.rxID, link.txID, link.channel);
-#endif
+        debug_printf("device link Rx: %d; Tx: %d; channel: %d\n", link.rxID, link.txID, link.channel);
 
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 

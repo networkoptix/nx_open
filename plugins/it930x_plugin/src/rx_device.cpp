@@ -120,9 +120,9 @@ namespace ite
                 m_sync.waiting = false;
             }
         }
-#if 1
-        printf("-- Can't lock channel for camera Tx: %d; Rx: %d (used: %d)\n", txID, m_rxID, m_sync.usedByCamera.load());
-#endif
+
+        debug_printf("-- Can't lock channel for camera Tx: %d; Rx: %d (used: %d)\n",
+                     txID, m_rxID, m_sync.usedByCamera.load());
         return false;
     }
 
@@ -240,10 +240,9 @@ namespace ite
     {
         if (tryLockC(channel, false))
         {
-#if 1
-            printf("searching Tx. Rx: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
+            debug_printf("searching Tx. Rx: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
                    rxID(), TxDevice::freq4chan(channel), quality(), strength(), present());
-#endif
+
             if (good())
             {
                 m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
@@ -252,12 +251,8 @@ namespace ite
 
             m_sync.searching.store(true);
         }
-#if 1
         else
-        {
-            printf("can't search, used. Rx: %d; frequency: %d\n", rxID(), TxDevice::freq4chan(channel));
-        }
-#endif
+            debug_printf("can't search, used. Rx: %d; frequency: %d\n", rxID(), TxDevice::freq4chan(channel));
     }
 
     void RxDevice::stopSearchTx(DevLink& devLink)
@@ -281,9 +276,7 @@ namespace ite
                     RcPacket pkt = pktBuf.packet();
                     if (! pkt.isOK())
                     {
-#if 1
-                        printf("[RC] bad packet\n");
-#endif
+                        debug_printf("[RC] bad packet\n");
                         continue;
                     }
 
@@ -295,12 +288,11 @@ namespace ite
 
                         setTx(m_channel, devLink.txID);
                     }
-#if 1
+
                     if (pkt.txID() != devLink.txID)
-                        printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, pkt.txID());
+                        debug_printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, pkt.txID());
                     if (! devLink.txID)
-                        printf("txID == 0\n");
-#endif
+                        debug_printf("txID == 0\n");
                 }
 
                 m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
@@ -325,7 +317,7 @@ namespace ite
             RcPacket pkt = pktBuf.packet();
             if (! pkt.isOK())
             {
-                printf("[RC] bad packet\n");
+                debug_printf("[RC] bad packet\n");
                 continue;
             }
 

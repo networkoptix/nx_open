@@ -10,6 +10,7 @@
 #include "ret_chan/ret_chan_cmd_host.h"
 #include "rc_command.h"
 #include "timer.h"
+#include "object_counter.h"
 
 
 namespace ite

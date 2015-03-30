@@ -159,10 +159,10 @@ namespace ite
 
                 error = ::parseRC(this, cmdID, m_cmdRecv.data(), m_cmdRecv.size());
             }
-#if 1
+
             if (error || code)
-                printf("[RC] cmd 0x%x, error: %d, ret code: %d\n", cmdID, error, code);
-#endif
+                debug_printf("[RC] cmd 0x%x, error: %d, ret code: %d\n", cmdID, error, code);
+
             if (error != ReturnChannelError::NO_ERROR)
                 return;
 

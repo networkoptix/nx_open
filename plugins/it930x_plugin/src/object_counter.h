@@ -1,6 +1,14 @@
 #ifndef OBJECT_COUNTER
 #define OBJECT_COUNTER
 
+#if 1
+#define debug_printf printf
+#else
+void debug_printf(const char * , ...)
+{
+}
+#endif
+
 #ifdef COUNT_OBJECTS
 
 #include <atomic>

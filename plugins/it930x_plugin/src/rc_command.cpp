@@ -38,29 +38,29 @@ void RcPacket::print() const
 {
     if (! hasData())
     {
-        printf("[RC] packet error: no data\n");
+        debug_printf("[RC] packet error: no data\n");
         return;
     }
 
     if (! hasTags())
     {
-        printf("[RC] packet error: no tag\n");
+        debug_printf("[RC] packet error: no tag\n");
         return;
     }
 
     if (! validLength())
     {
-        printf("[RC] packet error: wrong legth %d\n", pktLength());
+        debug_printf("[RC] packet error: wrong legth %d\n", pktLength());
         return;
     }
 
     if (! checksumOK())
     {
-        printf("[RC] packet error: wrong checksum\n");
+        debug_printf("[RC] packet error: wrong checksum\n");
         return;
     }
 
-    printf("[RC] rx: %d; tx: %d; total pktNum: %d; pktNum: %d; seqNum: %d; pktLength: %d\n",
+    debug_printf("[RC] rx: %d; tx: %d; total pktNum: %d; pktNum: %d; seqNum: %d; pktLength: %d\n",
            rxID(), txID(), totalPktNum(), paketNum(), sequenceNum(), pktLength());
 }
 

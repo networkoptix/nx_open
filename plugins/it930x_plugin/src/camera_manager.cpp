@@ -547,9 +547,7 @@ namespace ite
 
     int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
     {
-        *capabilitiesMask =
-                nxcip::BaseCameraManager::nativeMediaStreamCapability |
-                nxcip::BaseCameraManager::primaryStreamSoftMotionCapability;
+        *capabilitiesMask = nxcip::BaseCameraManager::nativeMediaStreamCapability;
         return nxcip::NX_NO_ERROR;
     }
 
@@ -677,7 +675,7 @@ namespace ite
 
             if (timer.elapsedMS() > WAIT_MS)
             {
-                printf("Camera configuration is too long. Break\n");
+                debug_printf("Camera configuration is too long. Break\n");
                 break;
             }
         }
@@ -763,18 +761,12 @@ namespace ite
                 if (dev)
                     dev->unlockC();
             }
-#if 1
             else
-            {
-                printf("-- Can't lock camera for Tx: %d\n", txID());
-            }
+                debug_printf("-- Can't lock camera for Tx: %d\n", txID());
         }
 
         if (supportedRxDevices.empty())
-            printf("-- No devices for Tx: %d\n", txID());
-#else
-        }
-#endif
+            debug_printf("-- No devices for Tx: %d\n", txID());
 
         return best;
     }

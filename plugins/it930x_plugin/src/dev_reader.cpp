@@ -32,15 +32,12 @@ namespace ite
 
         if (!shift)
         {
-#if 1
-            printf("Can't align device reading\n");
-#endif
+            debug_printf("Can't align device reading\n");
             return false;
         }
 
-#if 1
-        printf("Aligning device reading: %d\n", shift);
-#endif
+        debug_printf("Aligning device reading: %d\n", shift);
+
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
@@ -225,7 +222,7 @@ namespace ite
                     if (pkt->gotPES())
                     {
 #if 0
-                        printf("Skip packet (PID: 0x%x)\n", pid);
+                        debug_printf("Skip packet (PID: 0x%x)\n", pid);
 #endif
                         while (q->size() && ! q->front().packet().isPES())
                             q->pop_front();
@@ -241,9 +238,8 @@ namespace ite
 
         if (pkt && (pkt->tsErrors() || pkt->seqErrors()))
         {
-#if 1
-            printf("Skip packet (PID: 0x%x). TS errors: %d; sequence errors: %d\n", pid, pkt->tsErrors(), pkt->seqErrors());
-#endif
+            debug_printf("Skip packet (PID: 0x%x). TS errors: %d; sequence errors: %d\n",
+                         pid, pkt->tsErrors(), pkt->seqErrors());
             pkt.reset();
         }
 
@@ -344,7 +340,7 @@ namespace ite
         catch (const std::exception& e)
         {
             std::string s = e.what();
-            printf("%s\n", s.c_str());
+            debug_printf("%s\n", s.c_str());
         }
 
         m_buf.setDevice(nullptr);
@@ -401,7 +397,7 @@ namespace ite
             if (it == m_packetQueues.end())
             {
 #if 0
-                printf("Packet for unknown PID: %d\n", pid);
+                debug_printf("Packet for unknown PID: %d\n", pid);
 #endif
                 return;
             }

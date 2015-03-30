@@ -219,7 +219,7 @@ namespace ite
             // memory limit
             if (size() >= MAX_PACKET_SIZE())
             {
-                printf("Elementary stream packet is too big. Something goes wrong.\n");
+                debug_printf("Elementary stream packet is too big. Something goes wrong.\n");
                 return false;
             }
 
@@ -268,7 +268,7 @@ namespace ite
             }
 #if 0
             else
-                printf("TS empty: data %p; len %d\n", apData, dataSize);
+                debug_printf("TS empty: data %p; len %d\n", apData, dataSize);
 #endif
         }
     };

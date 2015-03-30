@@ -128,9 +128,8 @@ namespace ite
 
         void setTx(unsigned channel, uint16_t txID = 0)
         {
-#if 1
-            printf("Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
-#endif
+            debug_printf("Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
+
             if (channel >= m_txs.size())
                 return;
 
@@ -152,9 +151,8 @@ namespace ite
 
         void checkTx(unsigned channel, uint16_t txID)
         {
-#if 1
-            printf("restore Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
-#endif
+            debug_printf("restore Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
+
             if (channel >= m_txs.size())
                 return;
 
