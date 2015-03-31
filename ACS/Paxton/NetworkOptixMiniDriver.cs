@@ -43,7 +43,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         #region Implementation of IDvrMiniDriver
 
         public string GetSupplierIdentity() {
-            const string supplierIdentity = @"Network Optix DVR System";
+            const string supplierIdentity = @"NxWitness";
 
             _logger.InfoFormat("Queried supplier Oem DVR: {0}", supplierIdentity);
             return supplierIdentity;
@@ -111,6 +111,8 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         }
 
         public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
+            // MessageBox.Show("pe2");
+
             try {
                 _tick = (long)((pbInfo.StartTimeUtc.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds);
                 Uri hostUrl = new Uri(cnInfo.HostName);
@@ -120,6 +122,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                     _logger.Error("Playback request without cameras.");
                     return OemDvrStatus.CameraListMissing;
                 }
+
                 if (pbInfo.DvrCameras.Length > 16) {
                     _logger.ErrorFormat("Playback requesting {0} cameras.", pbInfo.DvrCameras.Length);
                     return OemDvrStatus.NumberOfCamerasUnsupported;
@@ -170,8 +173,8 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                         }
 
                     case OemDvrPlaybackFunction.Stop: {
-//                        AppDomain.Unload(domain);
-                        break;
+                            //                        AppDomain.Unload(domain);
+                            break;
                         }
 
                     default: {
@@ -182,8 +185,13 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
 
                 return OemDvrStatus.Succeeded;
             }
-            catch (Exception excp) {
-                _logger.Error(excp);
+            catch (WebException e) {
+                _logger.Error(e);
+                MessageBox.Show("Can't connect to the server. Verify server information in Camera Integration settings.");
+            }
+            catch (Exception e) {
+                MessageBox.Show("Generic error occured. Please try again later.");
+                _logger.Error(e);
             }
 
             return OemDvrStatus.FootagePlaybackFailed;

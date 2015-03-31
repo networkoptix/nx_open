@@ -91,21 +91,7 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Target Name="AfterBuild" Condition="$(ConfigurationName) == Release">
-    <PropertyGroup>
-      <ReferenceAssemblies>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0</ReferenceAssemblies>
-      <ILMergePath>C:\develop\netoptix_vms\ACS\Paxton\packages\ilmerge.2.14.1208\tools\ILMerge.exe</ILMergePath>
-      <SignKey>C:\develop\netoptix_vms\ACS\Paxton\Sign.snk</SignKey>
-    </PropertyGroup>
-    <CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(CopyLocal)'=='true' AND '%(Extension)'=='.dll'">
-      <Output TaskParameter="Include" ItemName="AssembliesToMerge" />
-    </CreateItem>
-    <Exec Command="&quot;$(ILMergePath)&quot; /keyfile:$(SignKey) /target:library /out:NetworkOptix.OemDvrMiniDriver.Merged.dll NetworkOptix.OemDvrMiniDriver.dll Newtonsoft.Json.dll" WorkingDirectory="$(OutputPath)" />
-    <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
-    <Delete Files="$(OutputPath)\NetworkOptix.OemDvrMiniDriver.dll" />
-    <Delete Files="$(OutputPath)\NetworkOptix.OemDvrMiniDriver.pdb" />
-  </Target>
-  <Target Name="AfterBuild" Condition="$(ConfigurationName) == Release">
+  <Target Name="AfterBuild">
     <PropertyGroup>
       <ReferenceAssemblies>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0</ReferenceAssemblies>
       <ILMergePath>C:\develop\netoptix_vms\ACS\Paxton\packages\ilmerge.2.14.1208\tools\ILMerge.exe</ILMergePath>

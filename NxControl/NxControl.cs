@@ -13,15 +13,6 @@ namespace NxControl
         public NxControl23() {
             base.connectionProcessed += axAxHDWitness1_connectedProcessed;
         }
-/*        void play() {
-
-        void pause();
-        double speed();
-        void setSpeed(double speed);
-        void reconnect(string url);
-        void addResourcesToLayout(string resourceIds, double timestamp);
-
-        event EventHandler connectProcessed; */
 
         public event ConnectionProcessedEventHandler connectProcessed;
         void axAxHDWitness1_connectedProcessed(object sender, IAxHDWitnessEvents_connectionProcessedEvent e) {
