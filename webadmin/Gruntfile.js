@@ -100,30 +100,26 @@ module.exports = function (grunt) {
                 //Total proxy
                 //{context: '/',host: '192.168.56.101',port: 7002},
 
-
                 //Cube
-                 {context: '/api/', host: '192.168.0.25', port: 7001},
-                 {context: '/ec2/', host: '192.168.0.25', port: 7001},
-                 {context: '/hls/', host: '192.168.0.25',port: 7001},
-                 {context: '/media/', host: '192.168.0.25', port: 7001},
-                 {context: '/proxy/', host: '192.168.0.25',port: 7001}
+/*                {context: '/api/',   host: '192.168.0.25', port: 7001},
+                {context: '/ec2/',   host: '192.168.0.25', port: 7001},
+                {context: '/hls/',   host: '192.168.0.25', port: 7001},
+                {context: '/media/', host: '192.168.0.25', port: 7001},
+                {context: '/proxy/', host: '192.168.0.25', port: 7001}/**/
 
-
-                    //demo.networkoptix.com
-                /*{context: '/api/', host: 'demo.networkoptix.com', port: 7001},
+                //demo.networkoptix.com
+                {context: '/api/', host: 'demo.networkoptix.com', port: 7001},
                 {context: '/ec2/', host: 'demo.networkoptix.com', port: 7001},
                 {context: '/hls/', host: 'demo.networkoptix.com',port: 7001},
                 {context: '/media/', host: 'demo.networkoptix.com', port: 7001},
-                {context: '/proxy/', host: 'demo.networkoptix.com',port: 7001}*/
-
-
+                {context: '/proxy/', host: 'demo.networkoptix.com',port: 7001}/**/
 
                 //Evgeniy
 /*                {context: '/api/', host: '192.168.56.101', port: 9000},
                 {context: '/ec2/', host: '192.168.56.101', port: 9000},
                 {context: '/hls/', host: '192.168.56.101',port: 9000},
-                 {context: '/media/', host: '192.168.56.101', port: 9000},
-                 {context: '/proxy/', host: '192.168.56.101',port: 9000}*/
+                {context: '/media/', host: '192.168.56.101', port: 9000},
+                {context: '/proxy/', host: '192.168.56.101',port: 9000}/**/
 
                 //Maria
                 /*{context: '/api/', host: '10.0.2.246', port: 7001},

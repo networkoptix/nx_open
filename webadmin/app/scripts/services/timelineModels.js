@@ -20,9 +20,6 @@ function Chunk(boundaries,start,end,level,title,extension){
 
 
 
-
-
-
 //Вспопомогательная мини-библиотека для декларации и использования настроек линейки
 function Interval (seconds,minutes,hours,days,months,years){
     this.seconds = seconds;
@@ -170,18 +167,22 @@ var RulerModel = {
 
 
 //Provider for records from mediaserver
-function CameraRecordsProvider(cameras,mediaserver,$q){
+function CameraRecordsProvider(cameras,mediaserver,$q) {
 
     this.cameras = cameras;
     this.mediaserver = mediaserver;
-    this.$q=$q;
+    this.$q = $q;
     this.chunksTree = null;
     var self = this;
     //1. request first detailization to get initial bounds
-    this.requestInterval(0,self.now(), 0).then(function(){
+
+    this.requestInterval(0, self.now(), 0).then(function () {
+        if(!self.chunksTree){
+            return; //No chunks for this camera
+        }
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex (self.now() - self.chunksTree.start);
-        console.log("record boundaries",self.chunksTree.title);
+        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start);
+        console.log("record boundaries", self.chunksTree.title);
         self.requestInterval(self.chunksTree.start, self.now(), nextLevel);
     });
 
@@ -212,28 +213,42 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     var self = this;
     //1. Request records for interval
     // And do we need to request it?
-    this.mediaserver.getRecords('/',this.cameras[0],start,end,detailization)
-        .then(function(data){
 
-            for(var i = 0; i <data.data.length;i++){
-                var endChunk = data.data[i][0] + data.data[i][1];
-                if(data.data[i][1] === -1){
-                    endChunk = (new Date()).getTime();// some date in future
+    if(!self.lockRequests) {
+        self.lockRequests = !this.chunksTree; // We may lock requests here
+        this.mediaserver.getRecords('/', this.cameras[0], start, end, detailization)
+            .then(function (data) {
+
+                if(data.data.length == 0){
+                    console.log("no chunks for this camera");
                 }
-                var addchunk = new Chunk(null,data.data[i][0],endChunk,level);
+                for (var i = 0; i < data.data.length; i++) {
+                    var endChunk = data.data[i][0] + data.data[i][1];
+                    if (data.data[i][1] < 0) {
+                        endChunk = (new Date()).getTime() + 100000;// some date in future
+                    }
+                    var addchunk = new Chunk(null, data.data[i][0], endChunk, level);
 
-                // console.log("read chunk",addchunk);
-                self.addChunk(addchunk );
-            }
 
-            //2. Splice cache for existing interval, store it as local cache
-            self.updateSplice();
+                    // console.log("read chunk",addchunk);
+                    self.addChunk(addchunk);
+                    self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
 
-            deferred.resolve(self.chunksTree);
-        },function(error){
-            deferred.reject(error);
-        });
+                }
 
+                //2. Splice cache for existing interval, store it as local cache
+                self.updateSplice();
+
+                console.log("resolved");
+                deferred.resolve(self.chunksTree);
+            }, function (error) {
+
+                console.log("rejected");
+                deferred.reject(error);
+            });
+    }else{
+        deferred.reject("request in progress");
+    }
     this.ready = deferred.promise;
     //3. return promise
     return this.ready;
@@ -262,8 +277,11 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
     //console.log("setInterval",new Date(start),new Date(end),level);
     var result = [];
     var noNeedUpdate = this.splice(result,start,end,level);
-    if(!noNeedUpdate){ // Request update
-        this.requestInterval(start,end,level);
+    if(!noNeedUpdate){ // Request update if we have a tree
+        if(this.chunksTree) {
+            this.debug();
+            this.requestInterval(start, end, level);
+        }
     }
     // Return splice
     return result;
@@ -272,7 +290,7 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
 
 CameraRecordsProvider.prototype.debug = function(currentNode,level){
     if(!currentNode){
-        console.log("Chunks tree:")
+        console.log("Chunks tree:" + (this.chunksTree?"":"empty"));
     }
     level = level||0;
     currentNode = currentNode || this.chunksTree;
@@ -290,14 +308,16 @@ CameraRecordsProvider.prototype.debug = function(currentNode,level){
  * @param parent - parent for recursive call
  */
 CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
-    if(this.chunksTree === null){
+    if(this.chunksTree === null || chunk.level === 0){
         this.chunksTree = chunk;
         return;
     }
+
     parent = parent || this.chunksTree;
     // Go through tree, find good place for chunk
+    parent.updating = false;
 
-    if(parent.children.length === 0){ // no children yet
+    if(parent.children.length === 0 ){ // no children yet
         if(parent.level === chunk.level - 1){ //
             parent.children.push(chunk);
             return;
@@ -319,11 +339,26 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
                 parent.children.splice(i, 0, chunk);
             } else {
                 //Here we should go deeper
-                this.addChunk(chunk, currentChunk);
+
+                if(currentChunk.start <= chunk.start){ // We may have a miss here
+                    this.addChunk(chunk, currentChunk);
+                }else{
+                    parent.children.splice(i, 0, new Chunk(parent, chunk.start, chunk.end, parent.level + 1));
+                    this.addChunk(chunk, parent.children[i]);
+                }
+
             }
             return;
         }
-        parent.children.splice(i, 0, chunk);
+
+        if(parent.level === chunk.level - 1){ //
+            parent.children.splice(i, 0, chunk);
+        }else {
+            parent.children.push(new Chunk(parent, chunk.start, chunk.end, parent.level + 1));
+            this.addChunk(chunk, parent.children[i]);
+        }
+
+
     }
 
     if(chunk.level === this.level && chunk.start >= this.start && chunk.end <= this.end){
@@ -371,7 +406,11 @@ CameraRecordsProvider.prototype.splice = function(result, start, end, level, par
     } else {
         // Try to go deeper
         result.push(parent);
-        noNeedForUpdate = false; //Ne need to update
+        if(!parent.updating ) { //prevent updating again
+            console.log("we need to update chunk",parent, "to level",level);
+            parent.updating = true;
+            noNeedForUpdate = false; //We need to update
+        }
     }
 
     return noNeedForUpdate;

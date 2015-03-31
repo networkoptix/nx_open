@@ -6,6 +6,7 @@ angular.module('webadminApp')
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
 
+
         var proxy = '';
         if(location.search.indexOf('proxy=')>0){
             var params = location.search.replace('?','').split('&');

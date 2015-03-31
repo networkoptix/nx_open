@@ -5,7 +5,10 @@ angular.module('webadminApp')
         return {
             restrict: 'E',
             scope: {
-                records: '='
+                records: '=',
+                ngClick: '&',
+                position: '=',
+                handler:'='
                 //start: '=',
                 //end:   '=',
             },
@@ -47,7 +50,9 @@ angular.module('webadminApp')
                     chunkHeight:20,
                     exactChunkColor:'rgba(192,192,192,0.65)',
                     hightlightChunkColor:'rgb(192,192,192)',
-                    loadingChunkColor:'rgb(200,200,200)'
+                    loadingChunkColor:'rgb(200,200,200)',
+
+                    timeMarkerColor:'blue'
                 };
 
 
@@ -175,6 +180,12 @@ angular.module('webadminApp')
                     mouseDate = null;
                     mouseCoordinate = null;
                     highlightchunk = false;
+                });
+
+                scroll.click(function(event){
+                    mouseCoordinate = (event.offsetX - scroll.scrollLeft());
+                    mouseDate = screenRelativePositionToDate(mouseCoordinate / viewportWidth);
+                    scope.handler(mouseDate);
                 });
 
                 function maxZoomLevel(){
@@ -316,7 +327,7 @@ angular.module('webadminApp')
                     var start = level.interval.alignToFuture(screenRelativePositionToDate(0));
                     var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
 
-                    if(!!scope.records) {
+                    if(scope.records && scope.records.chunksTree) {
                         // 1. Splice events
                         var events = scope.records.setInterval(start, end, scope.actualLevel);
 
@@ -417,6 +428,22 @@ angular.module('webadminApp')
 
                 }
 
+                function drawMarker(){
+                    var context = canvas.getContext('2d');
+
+
+                    context.strokeStyle = timelineConfig.timeMarkerColor;
+                    context.fillStyle = timelineConfig.timeMarkerColor;
+
+                    var position = dateToScreenPosition(scope.position);
+                    context.beginPath();
+                    context.moveTo(position, 0);
+                    context.lineTo(position, canvas.height);
+                    context.stroke();
+
+
+
+                }
                 function drawRuler(){
                     //1. Create context for drawing
                     var context = canvas.getContext('2d');
@@ -524,6 +551,7 @@ angular.module('webadminApp')
                     updateActualLevel();
                     drawRuler();
                     drawEvents();
+                    drawMarker();
                 }
 
                 function initTimeline(){

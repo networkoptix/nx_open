@@ -24,9 +24,12 @@
 </div>
 <div class="col-sm-8">
     <div style="width:640px;height:480px" class="videogular-container" ng-if="activeCamera!==null">
-        <videogular vg-theme="'bower_components/videogular-themes-default/videogular.css'" vg-autoplay="true" >
-            <vg-video vg-src="acitveVideoSource">
-            </vg-video>
+        <videogular
+                vg-player-ready="playerReady($API)"
+                vg-update-time="updateTime($currentTime, $duration)"
+                vg-theme="'bower_components/videogular-themes-default/videogular.css'"
+                vg-autoplay="true">
+            <vg-media vg-src="acitveVideoSource"></vg-media>
             <vg-controls>
                 <vg-play-pause-button></vg-play-pause-button>
                 <vg-quality current="activeResolution" list="availableResolutions" ></vg-quality>
@@ -34,6 +37,6 @@
             </vg-controls>
             <vg-buffering></vg-buffering>
         </videogular>
-        <timeline records="activeVideoRecords"></timeline>
+        <timeline records="activeVideoRecords" handler="switchPosition" position="playingPosition"></timeline>
     </div>
 </div>
