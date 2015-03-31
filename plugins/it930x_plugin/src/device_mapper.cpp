@@ -146,15 +146,29 @@ namespace ite
                 rxDevs[rxID] = std::make_shared<RxDevice>(rxID); // create RxDevice
         }
 
-        size_t numRx = 0;
+        debug_printf("got RX devices: %ld\n", rxDevs.size());
+#if 1
+        for (size_t i = 0; i < rxDevs.size(); ++i)
+        {
+            debug_printf("rx: %d tx:", rxDevs[i]->rxID());
+            for (unsigned ch = 0; ch < TxDevice::CHANNELS_NUM; ++ch)
+            {
+                unsigned txID = rxDevs[i]->getTx(ch);
+                if (txID)
+                    debug_printf(" %d", txID);
+            }
+            debug_printf("\n");
+        }
+#endif
+        size_t numTx = 0;
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             m_rxDevs.swap(rxDevs);
-            numRx = m_rxDevs.size();
+            numTx = m_txDevs.size();
         }
 
-        debug_printf("got RX devices: %ld\n", numRx);
+        debug_printf("got TX devices: %ld\n", numTx);
     }
 
     void DeviceMapper::updateTxDevices()
@@ -172,7 +186,7 @@ namespace ite
         }
 
         std::vector<DevLink> links;
-
+#if 0
         // restore lost
         for (unsigned lostN = 0; lostN < TxDevice::CHANNELS_NUM; ++lostN)
         {
@@ -191,7 +205,7 @@ namespace ite
                 addTxDevice(*it);
             links.clear();
         }
-
+#endif
         // normal channel search
         for (unsigned chan = 0; chan < TxDevice::CHANNELS_NUM; ++chan)
         {
@@ -210,16 +224,6 @@ namespace ite
                 addTxDevice(*it);
             links.clear();
         }
-
-#if 1
-        size_t numTx = 0;
-        {
-            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-            numTx = m_txDevs.size();
-        }
-        debug_printf("got TX devices: %ld\n", numTx);
-#endif
     }
 
     void DeviceMapper::restoreCamera(const nxcip::CameraInfo& info)

@@ -97,6 +97,8 @@ namespace ite
         It930x(uint16_t rxID)
         :   m_rxID(rxID)
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             m_handle = DTV_DeviceOpen(ENDEAVOUR, rxID);
             if (m_handle < 0)
                 throw "DTV_DeviceOpen";
@@ -104,10 +106,12 @@ namespace ite
 
         ~It930x()
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             m_devStream.reset();
             DTV_DeviceClose(m_handle);
         }
-
+#if 0
         void enable(Option opt)
         {
             switch (opt)
@@ -142,10 +146,12 @@ namespace ite
         bool pidFilterAdd(uint8_t idx, short programID) { return 0 == DTV_AddPID(m_handle, idx, programID); }
         bool pidFilterRemove(uint8_t idx, short programID) { return 0 == DTV_RemovePID(m_handle, idx, programID); }
         bool pidFilterReset() { return 0 == DTV_ResetPIDTable(m_handle); }
-
+#endif
         // both in KHz
         void lockFrequency(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             if (m_devStream)
                 throw "It930x.lockFrequency() already locked";
 
@@ -163,6 +169,8 @@ namespace ite
 
         void unlockFrequency()
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             m_devStream.reset();
         }
 #if 0
@@ -175,6 +183,8 @@ namespace ite
 #endif
         void statistic(uint8_t& quality, uint8_t& strength, bool& presented, bool& locked) const
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             DTVStatistic statisic;
             unsigned result = DTV_GetStatistic(m_handle, &statisic);
             if (result)
@@ -188,6 +198,8 @@ namespace ite
 
         void info(IteDriverInfo& info)
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             memset(&info, 0, sizeof(IteDriverInfo));
 
             DemodDriverInfo driverInfo;
@@ -237,7 +249,7 @@ namespace ite
             if (result)
                 throw "DTV_GetDeviceID";
         }
-#endif
+
         void setNullPacketFilter(bool flag)
         {
             PIDFilter pidFilter;
@@ -249,6 +261,7 @@ namespace ite
             if (result)
                 throw "NULL Packet Filter";
         }
+#endif
     };
 }
 
