@@ -32,7 +32,7 @@
 
 namespace LLUtil {
 
-void findMacAddresses(IWbemServices *pSvc, DevicesList& devices) {
+static void findMacAddresses(IWbemServices *pSvc, DevicesList& devices) {
     HRESULT hres;
     IEnumWbemClassObject* pEnumerator = NULL;
     hres = pSvc->ExecQuery(
@@ -105,20 +105,18 @@ void findMacAddresses(IWbemServices *pSvc, DevicesList& devices) {
 
 
 
-void getMacAddress(IWbemServices *pSvc, bstr_t& macAddress, QSettings *settings) {
+static QByteArray getMacAddress(IWbemServices *pSvc,  QSettings *settings) {
     DevicesList devices;
 
     findMacAddresses(pSvc, devices);
 
     if (devices.empty())
-        return;
+        return QByteArray();
 
-    QString result = getSaveMacAddress(devices, settings);
-
-    macAddress = SysAllocString(reinterpret_cast<const OLECHAR*>(result.utf16()));
+    return getSaveMacAddress(devices, settings).toUtf8();
 }
 
-void execQuery1(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName, bstr_t& rezStr)
+static void execQuery1(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName, bstr_t& rezStr)
 {
     rezStr = _T("");
 
@@ -172,7 +170,7 @@ void execQuery1(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName
     pEnumerator->Release();
 }
 
-void execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName, bstr_t& rezStr)
+static void execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName, bstr_t& rezStr)
 {
     rezStr = _T("");
 
@@ -236,13 +234,13 @@ void execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName
     }
 }
 
-unsigned short SwapShort(unsigned short a)
+static unsigned short SwapShort(unsigned short a)
 {
   a = ((a & 0x00FF) << 8) | ((a & 0xFF00) >> 8);
   return a;
 }
 
-unsigned int SwapWord(unsigned int a)
+static unsigned int SwapWord(unsigned int a)
 {
   a = ((a & 0x000000FF) << 24) |
       ((a & 0x0000FF00) <<  8) |
@@ -251,7 +249,7 @@ unsigned int SwapWord(unsigned int a)
   return a;
 }
 
-void changeGuidByteOrder(bstr_t& guid)
+static void changeGuidByteOrder(bstr_t& guid)
 {
     if (guid.length() != 36)
         return;
@@ -261,7 +259,7 @@ void changeGuidByteOrder(bstr_t& guid)
     guid = guid_str.c_str();
 }
 
-void calcHardwareId(QByteArray &hardwareId, IWbemServices *pSvc, int version, bool guidCompatibility, QSettings *settings)
+static void calcHardwareId(QByteArray &hardwareId, IWbemServices *pSvc, int version, bool guidCompatibility, QSettings *settings, const QByteArray& mac)
 {
     void (*execQuery)(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName, bstr_t& rezStr);
 
@@ -271,7 +269,6 @@ void calcHardwareId(QByteArray &hardwareId, IWbemServices *pSvc, int version, bo
     bstr_t biosID, biosManufacturer;
     bstr_t hddID, hddManufacturer;
     bstr_t memoryPartNumber, memorySerialNumber;
-    bstr_t mac;
 
     execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"), boardUUID);
 
@@ -289,8 +286,6 @@ void calcHardwareId(QByteArray &hardwareId, IWbemServices *pSvc, int version, bo
     execQuery(pSvc, _T("Manufacturer"), _T("Win32_PhysicalMedia"), hddManufacturer);
     execQuery(pSvc, _T("PartNumber"), _T("Win32_PhysicalMemory"), memoryPartNumber);
     execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"), memorySerialNumber);
-
-    getMacAddress(pSvc, mac, settings);
 
     if (boardID.length() || boardUUID.length() || biosID.length()) {
         hardwareId = (LPCSTR) (boardID + boardUUID + boardManufacturer + boardProduct + biosID + biosManufacturer);
@@ -439,9 +434,10 @@ void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings
         throw HardwareIdError(os.str());
     }
 
+    QByteArray mac = getMacAddress(pSvc, settings);
     for (int i = 0; i < LATEST_HWID_VERSION; i++) {
-        calcHardwareId(hardwareIds[i], pSvc, i + 1, false, settings);
-        calcHardwareId(hardwareIds[LATEST_HWID_VERSION + i], pSvc, i + 1, true, settings);
+        calcHardwareId(hardwareIds[i], pSvc, i + 1, false, settings, mac);
+        calcHardwareId(hardwareIds[LATEST_HWID_VERSION + i], pSvc, i + 1, true, settings, mac);
     }
 
     // Cleanup

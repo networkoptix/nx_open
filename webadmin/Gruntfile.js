@@ -121,20 +121,6 @@ module.exports = function (grunt) {
                 {context: '/media/', host: '192.168.56.101', port: 9000},
                 {context: '/proxy/', host: '192.168.56.101',port: 9000}/**/
 
-                //Maria
-                /*{context: '/api/', host: '10.0.2.246', port: 7001},
-                {context: '/ec2/', host: '10.0.2.246', port: 7001},
-                {context: '/hls/', host: '10.0.2.246',port: 7001},
-                {context: '/media/', host: '10.0.2.246', port: 7001},
-                {context: '/proxy/', host: '10.0.2.246',port: 7001}*/
-
-                    //Olga
-                /*{context: '/api/', host: '10.0.2.169', port: 7011},
-                {context: '/ec2/', host: '10.0.2.169', port: 7011},
-                {context: '/media/', host: '10.0.2.169', port: 7011},
-                {context: '/hls/', host: '10.0.2.169',port: 7011},
-                {context: '/proxy/', host: '10.0.2.169',port: 7011}
-*/
                 //Sergey Yuldashev
                /* {context: '/api/',      host: '10.0.2.203', port: 7221},
                 {context: '/ec2/',      host: '10.0.2.203', port: 7221},

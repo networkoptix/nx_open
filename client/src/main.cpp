@@ -48,6 +48,7 @@ extern "C"
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include "core/resource_management/resource_pool.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
 #include "plugins/resource/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include <plugins/resource/server_camera/server_camera.h>
@@ -118,7 +119,6 @@ extern "C"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
 #include <utils/network/module_finder.h>
-#include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
@@ -267,15 +267,19 @@ void initAppServerConnection(const QnUuid &videowallGuid, const QnUuid &videowal
 
 /** Initialize log. */
 void initLog(
-    const QString &logLevel,
+    QString logLevel,
     const QString fileNameSuffix,
-    const QString& ec2TranLogLevel)
+    QString ec2TranLogLevel)
 {
     static const int DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
     static const int DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 
-    QnLog::initLog(logLevel);
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+
+    if( logLevel.isEmpty() )
+        logLevel = qnSettings->logLevel();
+
+    QnLog::initLog(logLevel);
     QString logFileLocation = dataLocation + QLatin1String("/log");
     QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
@@ -284,6 +288,8 @@ void initLog(
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
 
+    if( ec2TranLogLevel.isEmpty() )
+        ec2TranLogLevel = qnSettings->ec2TranLogLevel();
 
     //preparing transaction log
     if( ec2TranLogLevel != lit("none") )
@@ -349,7 +355,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noSingleApplication = false;
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
-    QString ec2TranLogLevel = lit("none");
+    QString ec2TranLogLevel;
     QString translationPath;
     
     bool skipMediaFolderScan = false;
@@ -486,6 +492,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QnResourcePropertyDictionary dictionary;
     QnResourceStatusDictionary statusDictionary;
+    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
@@ -576,9 +583,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
     moduleFinder->start();
 
-    QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data(), true));
-
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
+    QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
 
     QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 

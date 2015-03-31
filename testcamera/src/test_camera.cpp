@@ -36,7 +36,7 @@ QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileNam
 
     while (media = aviDelegate.getNextData())
     {
-        QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
+        QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
         if (!video)
             continue;
         rez << video;

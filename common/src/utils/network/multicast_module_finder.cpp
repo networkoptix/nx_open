@@ -245,8 +245,9 @@ void QnMulticastModuleFinder::run() {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
                     //failed to send packet ???
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG(lit("QnMulticastModuleFinder. Failed to send packet to %1. %2").arg(socket->getPeerAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
-                    //TODO/IMPL if corresponding interface is down, should remove socket from set
+                    NX_LOG(lit("QnMulticastModuleFinder. Failed to send packet to %1. %2").
+                        arg(socket->getForeignAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
+                    //TODO #ak if corresponding interface is down, should remove socket from set
                 }
             }
             m_prevPingClock = currentClock;
