@@ -1110,7 +1110,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Image:</source>
-        <translation>Изображение</translation>
+        <translation>Изображение:</translation>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
@@ -2522,7 +2522,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>File Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки...</translation>
     </message>
 </context>
 <context>
@@ -4470,15 +4470,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <source>File Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки файла</translation>
     </message>
     <message>
         <source>Picture is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Изображение не загружено</translation>
     </message>
     <message>
         <source>This is a fish-eye lens file</source>
-        <translation type="unfinished"></translation>
+        <translation>Это файл записан с использованием линзы &quot;рыбий глаз&quot;</translation>
     </message>
 </context>
 <context>
@@ -7023,7 +7023,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Применить фильтры: Переворот, Развертка, Коррекция изображения, Соотношение сторон (требуется транскодирование)</translation>
     </message>
 </context>
 <context>
