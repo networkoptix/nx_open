@@ -74,7 +74,7 @@
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
-#include <ui/dialogs/picture_settings_dialog.h>
+#include <ui/dialogs/media_file_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
@@ -247,7 +247,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(action(Qn::PictureSettingsAction),                  SIGNAL(triggered()),    this,   SLOT(at_pictureSettingsAction_triggered()));
+    connect(action(Qn::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
     connect(action(Qn::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(Qn::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
@@ -1405,7 +1405,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->setCameras(cameras);
 }
 
-void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
+void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if (!resource)
         return;
@@ -1414,11 +1414,11 @@ void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
     if (!media)
         return;
 
-    QScopedPointer<QnPictureSettingsDialog> dialog;
+    QScopedPointer<QnMediaFileSettingsDialog> dialog;
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnWorkbenchStateDependentDialog<QnPictureSettingsDialog>(mainWindow()));
+        dialog.reset(new QnWorkbenchStateDependentDialog<QnMediaFileSettingsDialog>(mainWindow()));
     else
-        dialog.reset(new QnPictureSettingsDialog(mainWindow()));
+        dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
     
     dialog->updateFromResource(media);
     if (dialog->exec()) {

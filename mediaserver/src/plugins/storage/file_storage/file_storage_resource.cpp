@@ -301,8 +301,9 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
 
 bool QnFileStorageResource::isStorageDirMounted()
 {
+    const QString& notResolvedStoragePath = closeDirPath(getPath());
+    const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
     //on unix, checking that storage directory is mounted, if it is to be mounted
-    const QString& storagePath = QDir(closeDirPath(getPath())).canonicalPath();   //following symbolic link
 
     QStringList mountPoints;
     if( !readTabFile( lit("/etc/fstab"), &mountPoints ) )
@@ -337,6 +338,7 @@ bool QnFileStorageResource::isStorageDirMounted()
         }
     }
 
+    NX_LOG( lit("Storage %1 is mounted (mount point %2)").arg(storagePath).arg(storageMountPoint), cl_logDEBUG2 );
     return true;
 }
 #endif    // _WIN32

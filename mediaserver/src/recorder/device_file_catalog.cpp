@@ -317,7 +317,8 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
     if (avi->open(res) && avi->findStreams() && avi->endTime() != (qint64)AV_NOPTS_VALUE) {
         qint64 startTimeMs = avi->startTime()/1000;
         qint64 endTimeMs = avi->endTime()/1000;
-        int fileIndex = QnFile::baseName(fileName).toInt();
+        QString baseName = QnFile::baseName(fileName);
+        int fileIndex = baseName.length() <= 3 ? baseName.toInt() : Chunk::FILE_INDEX_NONE;
 
         if (startTimeMs < 1 || endTimeMs - startTimeMs < 1) {
             delete avi;
@@ -676,6 +677,12 @@ void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
         chunk.durationMs = itr->durationMs;
 }
 
+QString DeviceFileCatalog::Chunk::fileName() const
+{
+    QString baseName = fileIndex != FILE_INDEX_NONE ? strPadLeft(QString::number(fileIndex), 3, '0') : QString::number(startTimeMs);
+    return baseName + QString(".mkv");
+}
+
 QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 {
     QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
@@ -684,10 +691,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 
     QString root = rootFolder(storage, m_catalog);
     QString separator = getPathSeparator(root);
-    return root +
-                QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone, separator) + 
-                strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
-                QString(".mkv");
+    return root + QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone, separator) + chunk.fileName();
 }
 
 qint64 DeviceFileCatalog::minTime() const

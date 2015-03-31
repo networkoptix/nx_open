@@ -1301,10 +1301,10 @@ QnActionManager::QnActionManager(QObject *parent):
              new QnPreviewSearchModeCondition(true, this),
              this));
 
-    factory(Qn::PictureSettingsAction).
+    factory(Qn::MediaFileSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Picture Settings...")).
-        condition(new QnResourceActionCondition(hasFlags(Qn::still_image), Qn::Any, this));
+        text(tr("File Settings...")).
+        condition(new QnResourceActionCondition(hasFlags(Qn::local_media), Qn::Any, this));
 
     factory(Qn::LayoutSettingsAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).

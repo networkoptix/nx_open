@@ -9,11 +9,11 @@
     </message>
     <message>
         <source>There is no system tray on this system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt kein System Tray auf diesem System.</translation>
     </message>
     <message>
         <source>Application will now quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Anwendung beendet sich jetzt.</translation>
     </message>
 </context>
 <context>
@@ -114,7 +114,7 @@
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Fehler trat auf beim Versuch auf diese installierten Dienste zuzugreifen:</translation>
     </message>
 </context>
 </TS>

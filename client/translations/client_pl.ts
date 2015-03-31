@@ -2163,10 +2163,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2520,6 +2516,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Hide Search Panel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4464,6 +4464,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Screenshot</source>
@@ -4883,21 +4898,6 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6938,10 +6938,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>AVI format is not recommended</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7019,6 +7015,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not export video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

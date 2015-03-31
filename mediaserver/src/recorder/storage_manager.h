@@ -131,8 +131,6 @@ private:
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
 
-    int getFileNumFromCache(const QString& base, const QString& folder);
-    void putFileNumToCache(const QString& base, int fileNum);
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
     QSet<QnStorageResourcePtr> getWritableStorages() const;
@@ -165,9 +163,6 @@ private:
     bool m_storagesStatisticsReady;
     QTimer m_timer;
 
-    typedef QMap<QString, QPair<QString, int > > FileNumCache;
-    FileNumCache m_fileNumCache;
-    QMutex m_cacheMutex;
     bool m_warnSended;
     bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
