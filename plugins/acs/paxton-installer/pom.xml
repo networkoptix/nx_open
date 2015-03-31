@@ -35,11 +35,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>paxton-plugin</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
+            <systemPath>${root.dir}/acs/paxton/pom.xml</systemPath>
         </dependency>        
     </dependencies>  
     <build>
