@@ -11,6 +11,7 @@
 
 namespace ec2 {
     class QnMutexCameraDataHandler;
+    struct QnCameraUserAttributes;
 }
 
 class QnAppserverResourceProcessor : public QObject, public QnResourceProcessor
@@ -48,6 +49,9 @@ private:
 
     void at_mutexLocked();
     void at_mutexTimeout();
+    void readDefaultUserAttrs();
+private:
+    QnCameraUserAttributesPtr m_defaultUserAttrs;
 };
 
 #endif //_server_appserver_processor_h_

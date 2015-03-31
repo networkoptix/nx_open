@@ -14,12 +14,18 @@
 #include "api/common_message_processor.h"
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
+#include "nx_ec/data/api_camera_attributes_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
+#include "media_server/serverutil.h"
+#include "utils/common/util.h"
+#include "core/resource/camera_user_attribute_pool.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
     : m_serverId(serverId)
 {
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
     ec2::QnDistributedMutexManager::instance()->setUserDataHandler(m_cameraDataHandler);
+    readDefaultUserAttrs();
 }
 
 QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
@@ -133,6 +139,21 @@ void QnAppserverResourceProcessor::at_mutexLocked()
     mutex->deleteLater();
 }
 
+void QnAppserverResourceProcessor::readDefaultUserAttrs()
+{
+    
+    QFile f(closeDirPath(getDataDirectory()) + lit("default_rec.json"));
+    if (!f.open(QFile::ReadOnly))
+        return;
+    QByteArray data = f.readAll();
+    ec2::ApiCameraAttributesData userAttrsData;
+    if (!QJson::deserialize(data, &userAttrsData))
+        return;
+    userAttrsData.preferedServerId = qnCommon->moduleGUID();
+    m_defaultUserAttrs = QnCameraUserAttributesPtr(new QnCameraUserAttributes());
+    fromApiToResource(userAttrsData, m_defaultUserAttrs);
+}
+
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
@@ -151,6 +172,26 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId()) 
         qnResPool->removeResource(existCamRes);
     QnCommonMessageProcessor::instance()->updateResource(cameraResource);
+
+    if (!existCamRes && m_defaultUserAttrs) 
+    {
+        m_defaultUserAttrs->cameraID = cameraResource->getId();
+        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(QnCameraUserAttributesList() << m_defaultUserAttrs);
+        if (errCode != ec2::ErrorCode::ok)
+        {
+            NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+            return;
+        }
+        QSet<QByteArray> modifiedFields;
+        {
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), m_defaultUserAttrs->cameraID );
+            (*userAttributesLock)->assign( *m_defaultUserAttrs, &modifiedFields );
+        }
+        const QnResourcePtr& res = qnResPool->getResourceById(m_defaultUserAttrs->cameraID);
+        if( res )   //it is OK if resource is missing
+            res->emitModificationSignals( modifiedFields );
+    }
+
     QnResourcePtr rpRes = qnResPool->getResourceById(cameraResource->getId());
     rpRes->setStatus(Qn::Offline);
     rpRes->initAsync(true);
