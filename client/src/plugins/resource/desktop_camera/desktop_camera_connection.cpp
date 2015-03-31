@@ -246,9 +246,9 @@ void QnDesktopCameraConnection::run()
 			connection->addHeader("hw-cpuModelName", hw.cpuModelName.toUtf8());
 
 			auto gl = QnGlFunctions::openGLCachedInfo();
+			connection->addHeader("hw-openGLRenderer", gl.renderer);
 			connection->addHeader("hw-openGLVersion", gl.version);
 			connection->addHeader("hw-openGLVendor", gl.vendor);
-			connection->addHeader("hw-openGLRenderer", gl.renderer);
         }
 
         CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));

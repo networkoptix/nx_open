@@ -85,23 +85,29 @@ namespace ec2
         {
             ApiMediaServerDataExList mediaservers;
             auto res = QnDbManager::instance()->doQuery(nullptr, mediaservers);
-            if (res != ErrorCode::ok)
-                return res;
-
-            for (auto& ms : mediaservers)
-                outData->mediaservers.push_back(ms);
+            if (res != ErrorCode::ok) return res;
+            for (auto& ms : mediaservers) outData->mediaservers.push_back(ms);
         }
         {
             ApiCameraDataExList cameras;
             auto res = QnDbManager::instance()->doQuery(nullptr, cameras);
-            if (res != ErrorCode::ok)
-                return res;
+            if (res != ErrorCode::ok) return res;
 
             for (ApiCameraDataEx& cam : cameras)
                 if (cam.typeId == m_desktopCameraTypeId)
                     outData->clients.push_back(cam);
                 else
                     outData->cameras.push_back(cam);
+        }
+        {
+            ApiLicenseDataList licenses;
+            auto res = QnDbManager::instance()->doQuery(nullptr, licenses);
+            if (res != ErrorCode::ok) return res;
+            for (auto& lic : licenses) outData->licenses.push_back(lic);
+        }
+        {
+            auto res = QnDbManager::instance()->doQuery(nullptr, outData->businessRules);
+            if (res != ErrorCode::ok) return res;
         }
 
         NX_LOG(lit("Ec2StaticticsReporter. Collected: %1 mediaserver(s), %2 camera(s) and %3 client(s) in with systemId=%4")

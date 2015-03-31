@@ -1,6 +1,8 @@
 #include "api_statistics.h"
 #include "api_model_functions_impl.h"
 
+#include <unordered_map>
+
 const static QString __CAMERA_DATA[] = {
 	QLatin1String("MaxFPS"), QLatin1String("cameraSettingsId"), QLatin1String("firmware"),
 	QLatin1String("hasDualStreaming"), QLatin1String("isAudioSupported"), 
@@ -15,13 +17,13 @@ const static QString __MEDIASERVER_DATA[] = {
 };
 
 // TODO: remove this huck when VISUAL STUDIO supports init lists
-#define INIT_LIST(array) &array[0], &array[(sizeof(array)/sizeof(array[0]))-1]
+#define INIT_LIST(array) &array[0], &array[(sizeof(array)/sizeof(array[0]))]
 
 namespace ec2 {
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
             (ApiCameraDataStatistics)(ApiClientDataStatistics) \
             (ApiStorageDataStatistics)(ApiMediaServerDataStatistics) \
-            (ApiSystemStatistics)(ApiStatisticsServerInfo), \
+            (ApiLicenseStatistics)(ApiSystemStatistics)(ApiStatisticsServerInfo), \
             (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
 
     static ApiResourceParamDataList getExtraParams(
@@ -69,5 +71,24 @@ namespace ec2 {
     }
 	
 	const std::unordered_set<QString> ApiMediaServerDataStatistics::ADD_PARAMS(INIT_LIST(__MEDIASERVER_DATA));
+
+    ApiLicenseStatistics::ApiLicenseStatistics() {}
+
+    ApiLicenseStatistics::ApiLicenseStatistics(const ApiLicenseData& data)
+    {
+        QMap<QString, QString> parsed;
+        for (auto value : data.licenseBlock.split(' '))
+        {
+            auto pair = value.split('=');
+            if (pair.size() == 2) 
+                parsed.insert(QLatin1String(pair[0]), QLatin1String(pair[1]));
+        }
+
+        name        = parsed[lit("NAME")];
+        cameraCount = parsed[lit("COUNT")].toLongLong();
+        version     = parsed[lit("VERSION")];
+        brand       = parsed[lit("BRAND")];
+        expiration  = parsed[lit("EXPIRATION")];
+    }
 
 } // namespace ec2

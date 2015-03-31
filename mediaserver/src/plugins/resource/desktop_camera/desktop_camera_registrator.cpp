@@ -29,7 +29,7 @@ void QnDesktopCameraRegistrator::run()
     const QByteArray userId = nx_http::getHeaderValue(d->request.headers, "user-id");
     
 	QMap<QString, QString> params;
-	for (auto name : ec2::ApiClientDataStatistics::ADD_PARAMS)
+	for (const auto& name : ec2::ApiClientDataStatistics::ADD_PARAMS)
 		params[name] = nx_http::getHeaderValue(d->request.headers, ("hw-" + name).toUtf8());
 
 	if (QnDesktopCameraResourceSearcher::instance())

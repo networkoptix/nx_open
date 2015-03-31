@@ -5,6 +5,8 @@
 #include "api_resource_data.h"
 #include "api_media_server_data.h"
 #include "api_camera_data_ex.h"
+#include "api_license_data.h"
+#include "api_business_rule_data.h"
 
 #include <unordered_set>
 
@@ -74,6 +76,16 @@ namespace ec2
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
     (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)
 
+	struct ApiLicenseStatistics
+	{
+        ApiLicenseStatistics();
+        ApiLicenseStatistics(const ApiLicenseData& data);
+
+        QString name, licenseType, version, brand, expiration;
+        uint64_t cameraCount;
+	};
+#define ApiLicenseStatistics_Fields (name)(cameraCount)(licenseType)(version)(brand)(expiration)
+
     struct ApiSystemStatistics
     {
         QnUuid systemId;
@@ -81,8 +93,11 @@ namespace ec2
         ApiMediaServerDataStatisticsList    mediaservers;
         ApiCameraDataStatisticsList         cameras;
         ApiClientDataStatisticsList         clients;
+
+        ApiLicenseStatisticsList    licenses;
+        ApiBusinessRuleDataList     businessRules;
     };
-#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)
+#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)
 
     struct ApiStatisticsServerInfo
     {
