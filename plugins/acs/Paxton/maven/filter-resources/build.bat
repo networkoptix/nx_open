@@ -10,5 +10,6 @@ rem set CONFIG2=%2
 rem IF NOT [%1] == [] call msbuild common-${arch}.vcproj /t:Rebuild /consoleloggerparameters:ErrorsOnly /p:Configuration=%CONFIG1%
 rem IF NOT [%2] == [] call msbuild common-${arch}.vcproj /t:Rebuild /consoleloggerparameters:ErrorsOnly /p:Configuration=%CONFIG2%
 
+call nuget restore
 call msbuild ${basedir}\NetworkOptixMiniDriver.csproj /t:Build /consoleloggerparameters:Summary /p:Configuration=${build.configuration}
 rem call ${environment.dir}\bin\jom /S

@@ -39,7 +39,15 @@
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/nxinterface/pom.xml</systemPath>
+            <systemPath>${root.dir}/plugins/nxinterface/pom.xml</systemPath>
+        </dependency>        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>axhdwitness</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/axhdwitness/pom.xml</systemPath>
         </dependency>        
     </dependencies>  
     <build>

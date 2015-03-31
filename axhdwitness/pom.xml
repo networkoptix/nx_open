@@ -25,7 +25,7 @@
         <assembly-skip>true</assembly-skip>
         <rename-skip>true</rename-skip>
 
-	<qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
+    <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
         <!--Global libs-->
         <global.libs>-lcommon -lappserver2 -lclient -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
         <!--Specific os libs used-->
@@ -42,5 +42,34 @@
         <linux.defines/>
         <mac.defines/>          
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>appserver2</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
+        </dependency>           
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/client/pom.xml</systemPath>
+        </dependency>           
+    </dependencies> 
 
 </project>

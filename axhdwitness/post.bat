@@ -19,7 +19,7 @@ midl %bebin_path%\%CONFIG%\axhdwitness.idl /nologo /tlb %bebin_path%\%CONFIG%\ax
 %bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /tlb %bebin_path%\%CONFIG%\axhdwitness.tlb
 
 cd %bebin_path%\%CONFIG%
-tlbimp /keyfile:C:\develop\netoptix_vms\ACS\Paxton\SampleKey.snk /out:Interop.hdwitness.dll axhdwitness.dll 
-AxImp /keyfile:C:\develop\netoptix_vms\ACS\Paxton\SampleKey.snk /rcw:Interop.hdwitness.dll /out:AxInterop.hdwitness.dll axhdwitness.dll
+tlbimp /keyfile:%AXHDW%\%ARCH%\Sign.snk /out:Interop.hdwitness.dll axhdwitness.dll 
+AxImp /keyfile:%AXHDW%\%ARCH%\Sign.snk /rcw:Interop.hdwitness.dll /out:AxInterop.hdwitness.dll axhdwitness.dll
 
 ENDLOCAL
