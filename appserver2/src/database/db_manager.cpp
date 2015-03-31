@@ -2282,7 +2282,7 @@ ErrorCode QnDbManager::removeServer(const QnUuid& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(id, "vms_mserver_discovery", "server_id");
+    err = deleteTableRecord(guid, "vms_mserver_discovery", "server_id");
     if (err != ErrorCode::ok)
         return err;
 
