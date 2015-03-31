@@ -36,6 +36,7 @@ namespace ite
         static void parseInfo(const nxcip::CameraInfo& cameraInfo, unsigned short& txID, unsigned& frequency, std::vector<unsigned short>& outRxIDs);
 
         void getRx4Tx(unsigned short txID, std::vector<RxDevicePtr>& out) const;
+        void forgetTx(unsigned short txID);
         unsigned freq4Tx(unsigned short txID) const;
 
     private:

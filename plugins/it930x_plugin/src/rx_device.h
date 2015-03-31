@@ -167,6 +167,13 @@ namespace ite
             return NOT_A_CHANNEL;
         }
 
+        void forgetTx(uint16_t txID)
+        {
+            for (size_t i = 0; i < m_txs.size(); ++i)
+                if (m_txs[i].present == txID)
+                    m_txs[i].lose();
+        }
+
         void setChannel(unsigned channel)
         {
             if (channel >= m_txs.size())

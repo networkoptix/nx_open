@@ -158,7 +158,7 @@ namespace ite
     INIT_OBJECT_COUNTER(CameraManager)
     DEFAULT_REF_COUNTER(CameraManager)
 
-    CameraManager::CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper, TxDevicePtr txDev)
+    CameraManager::CameraManager(const nxcip::CameraInfo& info, DeviceMapper * devMapper, TxDevicePtr txDev)
     :   m_refManager(this),
         m_devMapper(devMapper),
         m_txDev(txDev),
@@ -491,11 +491,10 @@ namespace ite
             if (chan == m_rxDevice->channel())
                 return true;
 
-            // TODO: do we realy need it?
-            if (! stopStreams(true))
-                return false;
-
-            return m_rxDevice->changeChannel(chan);
+            m_rxDevice->changeChannel(chan);
+            stopStreams(true);
+            m_devMapper->forgetTx(txID());
+            return true;
         }
 
         return false;

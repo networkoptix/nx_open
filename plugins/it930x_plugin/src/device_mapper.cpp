@@ -92,6 +92,24 @@ namespace ite
         }
     }
 
+    void DeviceMapper::forgetTx(unsigned short txID)
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        for (auto it = m_rxDevs.begin(); it != m_rxDevs.end(); ++it)
+            it->second->forgetTx(txID);
+    }
+
+    unsigned DeviceMapper::freq4Tx(unsigned short txID) const
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        auto it = m_txDevs.find(txID);
+        if (it != m_txDevs.end())
+            return it->second->frequency();
+        return 0;
+    }
+
     void DeviceMapper::getRxDevNames(std::vector<std::string>& devs)
     {
         devs.clear();
@@ -264,16 +282,6 @@ namespace ite
         txDevs.reserve(m_txDevs.size());
         for (auto it = m_txDevs.begin(); it != m_txDevs.end(); ++it)
             txDevs.push_back(it->second);
-    }
-
-    unsigned DeviceMapper::freq4Tx(unsigned short txID) const
-    {
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        auto it = m_txDevs.find(txID);
-        if (it != m_txDevs.end())
-            return it->second->frequency();
-        return 0;
     }
 
     // CameraInfo stuff

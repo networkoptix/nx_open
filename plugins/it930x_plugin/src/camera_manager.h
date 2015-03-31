@@ -26,7 +26,7 @@ namespace ite
         DEF_REF_COUNTER
 
     public:
-        CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper, TxDevicePtr txDev);
+        CameraManager(const nxcip::CameraInfo& info, DeviceMapper * devMapper, TxDevicePtr txDev);
         virtual ~CameraManager();
 
         // nxcip::BaseCameraManager
@@ -88,7 +88,7 @@ namespace ite
     private:
         mutable std::mutex m_mutex;
 
-        const DeviceMapper * m_devMapper;
+        DeviceMapper * m_devMapper;
         TxDevicePtr m_txDev;
         RxDevicePtr m_rxDevice;
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders; // FIXME: do not use smart ptr for ref-counted object
