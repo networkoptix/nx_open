@@ -632,10 +632,6 @@ SocketAddress UdtStreamSocket::getLocalAddress() const {
     return impl_->GetLocalAddress();
 }
 
-SocketAddress UdtStreamSocket::getPeerAddress() const {
-    return impl_->GetPeerAddress();
-}
-
 void UdtStreamSocket::close() {
     impl_->Close();
 }
@@ -714,6 +710,10 @@ int UdtStreamSocket::recv( void* buffer, unsigned int bufferLen, int flags ) {
 
 int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen ) {
     return impl_->Send(buffer,bufferLen);
+}
+
+SocketAddress UdtStreamSocket::getForeignAddress() const {
+    return impl_->GetPeerAddress();
 }
 
 bool UdtStreamSocket::isConnected() const {
@@ -815,10 +815,6 @@ bool UdtStreamServerSocket::bind( const SocketAddress& localAddress ) {
 
 SocketAddress UdtStreamServerSocket::getLocalAddress() const {
     return impl_->GetLocalAddress();
-}
-
-SocketAddress UdtStreamServerSocket::getPeerAddress() const {
-    return impl_->GetPeerAddress();
 }
 
 void UdtStreamServerSocket::close() {

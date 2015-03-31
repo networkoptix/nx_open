@@ -33,8 +33,6 @@ public:
     virtual bool bind(const SocketAddress& localAddress) override;
     //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override;
-    //!Implementation of AbstractSocket::getPeerAddress
-    virtual SocketAddress getPeerAddress() const override;
     //!Implementation of AbstractSocket::close
     virtual void close() override;
     //!Implementation of AbstractSocket::isClosed

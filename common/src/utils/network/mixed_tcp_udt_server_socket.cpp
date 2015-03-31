@@ -64,11 +64,6 @@ SocketAddress MixedTcpUdtServerSocket::getLocalAddress() const
     return m_socketDelegates[0]->getLocalAddress();
 }
 
-SocketAddress MixedTcpUdtServerSocket::getPeerAddress() const
-{
-    return m_socketDelegates[0]->getPeerAddress();
-}
-
 void MixedTcpUdtServerSocket::close()
 {
     for( AbstractStreamServerSocket* serverSock : m_socketDelegates )
@@ -214,7 +209,7 @@ void MixedTcpUdtServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion
         m_acceptingFlags[i] = false;
 }
 
-void MixedTcpUdtServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+void MixedTcpUdtServerSocket::terminateAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
 {
     //TODO #ak
     assert( false );

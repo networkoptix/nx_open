@@ -32,8 +32,6 @@ public:
     virtual bool bind(const SocketAddress& localAddress) override { return m_abstractSocketProvider()->bind(localAddress); }
     //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override { return m_abstractSocketProvider()->getLocalAddress(); }
-    //!Implementation of AbstractSocket::getPeerAddress
-    virtual SocketAddress getPeerAddress() const override { return m_abstractSocketProvider()->getPeerAddress(); }
     //!Implementation of AbstractSocket::close
     virtual void close() override { return m_abstractSocketProvider()->close(); }
     //!Implementation of AbstractSocket::isClosed

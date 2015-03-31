@@ -75,7 +75,6 @@ public:
     // AbstractSocket --------------- interface
     virtual bool bind( const SocketAddress& localAddress ) override;
     virtual SocketAddress getLocalAddress() const override;
-    virtual SocketAddress getPeerAddress() const override;
     virtual void close() override;
     virtual bool isClosed() const override;
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;
@@ -100,9 +99,7 @@ public:
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
     //  What's difference between foreign address with peer address 
-    virtual SocketAddress getForeignAddress() const override {
-        return getPeerAddress();
-    }
+    virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
     virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion = true ) override;
     //!Implementation of AbstractSocket::terminateAsyncIO
@@ -163,7 +160,6 @@ public:
 
     virtual bool bind(const SocketAddress& localAddress);
     virtual SocketAddress getLocalAddress() const;
-    virtual SocketAddress getPeerAddress() const;
     virtual void close();
     virtual bool isClosed() const;
     virtual bool setReuseAddrFlag( bool reuseAddr );
