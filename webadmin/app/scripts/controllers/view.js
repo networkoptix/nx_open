@@ -58,14 +58,14 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.updateTime = function(currentTime, duration){
 
-            console.log("updateTime",currentTime, duration,this,arguments);
             currentTime = currentTime || 0;
             $scope.playingPosition = $scope.startPosition + currentTime*1000;
         };
 
         $scope.playerReady = function(API){
-            console.log("playerReady",API,this,arguments);
+            console.log("playerReady",API);
             $scope.playerAPI = API;
+            API.play();
         };
 
         $scope.selectCameraById = function (cameraId) {
