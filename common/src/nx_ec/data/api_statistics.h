@@ -6,15 +6,29 @@
 #include "api_media_server_data.h"
 #include "api_camera_data_ex.h"
 
+#include <unordered_set>
+
+namespace std
+{
+    template<> struct hash<QString>
+    {
+        std::size_t operator()(const QString& s) const
+        {
+            return qHash(s);
+        }
+    };
+}
+
 namespace ec2
 {
-
     struct ApiCameraDataStatistics
     :
         ApiCameraDataEx
     {
         ApiCameraDataStatistics();
         ApiCameraDataStatistics(const ApiCameraDataEx& data);
+
+		const static std::unordered_set<QString> ADD_PARAMS;
 
         ApiResourceParamDataList addParams;
     };
@@ -29,6 +43,8 @@ namespace ec2
     {
         ApiClientDataStatistics();
         ApiClientDataStatistics(const ApiCameraDataEx& data);
+
+		const static std::unordered_set<QString> ADD_PARAMS;
 
         ApiResourceParamDataList addParams;
     };
@@ -49,6 +65,8 @@ namespace ec2
     {
         ApiMediaServerDataStatistics();
         ApiMediaServerDataStatistics(const ApiMediaServerDataEx& data);
+
+		const static std::unordered_set<QString> ADD_PARAMS;
 
         ApiStorageDataStatisticsList    storages;
         ApiResourceParamDataList        addParams;

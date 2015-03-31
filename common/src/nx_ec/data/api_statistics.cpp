@@ -1,29 +1,21 @@
 #include "api_statistics.h"
 #include "api_model_functions_impl.h"
 
-#include <unordered_set>
+const static QString __CAMERA_DATA[] = {
+	QLatin1String("MaxFPS"), QLatin1String("cameraSettingsId"), QLatin1String("firmware"),
+	QLatin1String("hasDualStreaming"), QLatin1String("isAudioSupported"), 
+	QLatin1String("mediaStreams"), QLatin1String("ptzCapabilities"),
+};
+const static QString __CLIENT_DATA[] = {
+    QLatin1String("cpuArchitecture"), QLatin1String("cpuModelName"), QLatin1String("phisicalMemory"), 
+	QLatin1String("openGLVersion"), QLatin1String("openGLVendor"), QLatin1String("openGLRenderer")
+};
+const static QString __MEDIASERVER_DATA[] = {
+    QLatin1String("cpuArchitecture"), QLatin1String("cpuModelName"), QLatin1String("phisicalMemory")
+};
 
-namespace std
-{
-    template<> struct hash<QString>
-    {
-        std::size_t operator()(const QString& s) const
-        {
-            return qHash(s);
-        }
-    };
-}
-
-const static std::unordered_set<QString> CAMERA_EXTRA_PARAMS = {
-    lit("MaxFPS"), lit("cameraSettingsId"), lit("firmware"), lit("hasDualStreaming"),
-    lit("isAudioSupported"), lit("mediaStreams"), lit("ptzCapabilities"),
-};
-const static std::unordered_set<QString> CLIENT_EXTRA_PARAMS = {
-    lit("cpuArchitecture"), lit("cpuModelName"), lit("phisicalMemory"), lit("videoCard"), lit("videoDriver")
-};
-const static std::unordered_set<QString> MEDIASERVER_EXTRA_PARAMS = {
-    lit("cpuArchitecture"), lit("cpuModelName"), lit("phisicalMemory")
-};
+// TODO: remove this huck when VISUAL STUDIO supports init lists
+#define INIT_LIST(array) &array[0], &array[(sizeof(array)/sizeof(array[0]))-1]
 
 namespace ec2 {
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
@@ -47,13 +39,19 @@ namespace ec2 {
 
     ApiCameraDataStatistics::ApiCameraDataStatistics(const ApiCameraDataEx& data)
         : ApiCameraDataEx(data)
-        , addParams(getExtraParams(ApiCameraDataEx::addParams, CAMERA_EXTRA_PARAMS)) {}
+        , addParams(getExtraParams(ApiCameraDataEx::addParams, ADD_PARAMS)) {}
+
+	
+	const std::unordered_set<QString> ApiCameraDataStatistics::ADD_PARAMS(INIT_LIST(__CAMERA_DATA));
 
     ApiClientDataStatistics::ApiClientDataStatistics() {}
 
     ApiClientDataStatistics::ApiClientDataStatistics(const ApiCameraDataEx& data)
         : ApiCameraDataEx(data)
-        , addParams(getExtraParams(ApiCameraDataEx::addParams, CLIENT_EXTRA_PARAMS)) {}
+        , addParams(getExtraParams(ApiCameraDataEx::addParams, ADD_PARAMS)) {}
+
+	
+	const std::unordered_set<QString> ApiClientDataStatistics::ADD_PARAMS(INIT_LIST(__CLIENT_DATA));
 
     ApiStorageDataStatistics::ApiStorageDataStatistics() {}
 
@@ -64,10 +62,12 @@ namespace ec2 {
 
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(const ApiMediaServerDataEx& data)
         : ApiMediaServerDataEx(data)
-        , addParams(getExtraParams(ApiMediaServerDataEx::addParams, MEDIASERVER_EXTRA_PARAMS))
+        , addParams(getExtraParams(ApiMediaServerDataEx::addParams, ADD_PARAMS))
     {
         for (auto s : ApiMediaServerDataEx::storages)
             storages.push_back(s);
     }
+	
+	const std::unordered_set<QString> ApiMediaServerDataStatistics::ADD_PARAMS(INIT_LIST(__MEDIASERVER_DATA));
 
 } // namespace ec2

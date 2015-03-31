@@ -50,6 +50,21 @@ public:
      */
     Features features() const;
 
+	/**
+	 * \brief                           Set of OpenGL plain-text paramiters.
+	 */
+	struct OpenGLInfo { QByteArray version, vendor, renderer; };
+
+	/**
+     * \returns                         Actual \class OpenGLInfo setting.
+     */
+	const OpenGLInfo& openGLInfo() const;
+
+	/**
+     * \returns                         Returns last (cached) \class OpenGLInfo setting (might be empty).
+     */
+	static OpenGLInfo openGLCachedInfo();
+
     /**
      * \returns                         Set of features supported by the current OpenGL context. Estimated BEFORE context initializing.
      */

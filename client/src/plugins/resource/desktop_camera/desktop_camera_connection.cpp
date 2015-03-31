@@ -1,8 +1,10 @@
 #include "desktop_camera_connection.h"
+#include "platform/hardware_information.h"
 #include "core/resource/media_server_resource.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "api/app_server_connection.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
+#include "ui/graphics/opengl/gl_functions.h"
 
 #include <plugins/resource/desktop_win/desktop_resource.h>
 
@@ -233,9 +235,20 @@ void QnDesktopCameraConnection::run()
             QAuthenticator auth;
             auth.setUser(m_auth.username);
             auth.setPassword(m_auth.password);
+
             connection = new CLSimpleHTTPClient(m_server->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
             connection->addHeader("user-id", m_auth.clientGuid.toUtf8());
+
+			auto& hw = HardwareInformation::instance();
+			connection->addHeader("hw-phisicalMemory", QString::number(hw.phisicalMemory).toUtf8());
+			connection->addHeader("hw-cpuArchitecture", hw.cpuArchitecture.toUtf8());
+			connection->addHeader("hw-cpuModelName", hw.cpuModelName.toUtf8());
+
+			auto gl = QnGlFunctions::openGLCachedInfo();
+			connection->addHeader("hw-openGLVersion", gl.version);
+			connection->addHeader("hw-openGLVendor", gl.vendor);
+			connection->addHeader("hw-openGLRenderer", gl.renderer);
         }
 
         CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));

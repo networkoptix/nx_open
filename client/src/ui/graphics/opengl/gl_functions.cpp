@@ -93,10 +93,21 @@ public:
     {
         qn_glFunctionsGlobal()->initialize(context);
 
-        QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-        QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-        if (vendor.contains("Tungsten Graphics") && renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
+		m_openGLInfo.version = getGLString(GL_VERSION);
+		m_openGLInfo.vendor = getGLString(GL_VENDOR);
+		m_openGLInfo.renderer = getGLString(GL_RENDERER);
+		{
+			QMutexLocker lock(&m_mutex);
+			m_openGLInfoCache = m_openGLInfo;
+		}
+		m_openGLInfoCache = m_openGLInfo;
+
+        if (m_openGLInfo.vendor.contains("Tungsten Graphics") && 
+			m_openGLInfo.renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
+		{
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
+		}
+
 #ifdef Q_OS_MACX
         /* Intel HD 3000 driver handles textures with size > 4096 incorrectly (see bug #3141).
          * To fix that we have to override maximum texture size to 4096 for this graphics adapter. */
@@ -124,10 +135,35 @@ public:
     {
         return m_context;
     }
+
+	const QnGlFunctions::OpenGLInfo& openGLInfo() const
+	{
+		return m_openGLInfo;
+	}
+
+	static const QnGlFunctions::OpenGLInfo openGLCachedInfo()
+	{
+		QMutexLocker lock(&m_mutex);
+		return m_openGLInfoCache;
+	}
+
 private:
+	QByteArray getGLString(GLenum id)
+	{
+		return QByteArray(reinterpret_cast<const char *>(glGetString(id)));
+	}
+
     const QGLContext *m_context;
     QnGlFunctions::Features m_features;
+	QnGlFunctions::OpenGLInfo m_openGLInfo;
+
+	static QMutex m_mutex;
+	static QnGlFunctions::OpenGLInfo m_openGLInfoCache;
 };
+
+// static
+QMutex QnGlFunctionsPrivate::m_mutex;
+QnGlFunctions::OpenGLInfo QnGlFunctionsPrivate::m_openGLInfoCache;
 
 typedef QnGlContextData<QnGlFunctionsPrivate, QnGlContextDataForwardingFactory<QnGlFunctionsPrivate> > QnGlFunctionsPrivateStorage;
 Q_GLOBAL_STATIC(QnGlFunctionsPrivateStorage, qn_glFunctionsPrivateStorage);
@@ -154,6 +190,16 @@ const QGLContext* QnGlFunctions::context() const
 
 QnGlFunctions::Features QnGlFunctions::features() const {
     return d->features();
+}
+
+const QnGlFunctions::OpenGLInfo& QnGlFunctions::openGLInfo() const
+{
+	return d->openGLInfo();
+}
+
+QnGlFunctions::OpenGLInfo QnGlFunctions::openGLCachedInfo()
+{
+	return QnGlFunctionsPrivate::openGLCachedInfo();
 }
 
 void QnGlFunctions::setWarningsEnabled(bool enable) {

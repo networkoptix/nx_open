@@ -62,8 +62,9 @@ CREATE TABLE `clients` (
   `cpuArchitecture` varchar(45) DEFAULT NULL,
   `cpuModelName` varchar(45) DEFAULT NULL,
   `phisicalMemory` int(64) DEFAULT NULL,
-  `videoCard` varchar(45) DEFAULT NULL,
-  `videoDriver` varchar(45) DEFAULT NULL
+  `openGLVendor` varchar(45) DEFAULT NULL,
+  `openGLVersion` varchar(45) DEFAULT NULL
+  `phisicalMemory` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

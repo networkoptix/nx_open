@@ -26,6 +26,7 @@ namespace ec2
                 return user;
 
         qFatal("Can not get user admin");
+		return QnUserResourcePtr();
     }
 
     static QnUuid getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager)
@@ -103,8 +104,7 @@ namespace ec2
                     outData->cameras.push_back(cam);
         }
 
-        NX_LOG(lit("Ec2StaticticsReporter. Collected: %1 mediaserver(s)"
-                   ", %2 camera(s) and %3 client(s) in with systemId=%4")
+        NX_LOG(lit("Ec2StaticticsReporter. Collected: %1 mediaserver(s), %2 camera(s) and %3 client(s) in with systemId=%4")
                .arg(outData->mediaservers.size())
                .arg(outData->cameras.size())
                .arg(outData->clients.size())
@@ -127,8 +127,7 @@ namespace ec2
             }
         }
 
-        NX_LOG(lit("Ec2StaticticsReporter. Request for statistics report to %1"
-                   ", for systemId=%2")
+        NX_LOG(lit("Ec2StaticticsReporter. Request for statistics report to %1, for systemId=%2")
                .arg(REPORT_SERVER)
                .arg(outData->systemId.toString()), cl_logDEBUG1);
 
@@ -192,16 +191,14 @@ namespace ec2
             }
         }
 
-        NX_LOG(lit("Ec2StaticticsReporter. Last report had been executed %1"
-                   "initiating it now %2")
+        NX_LOG(lit("Ec2StaticticsReporter. Last report had been executed %1 initiating it now %2")
                .arg(last.isEmpty() ? "NEWER" : last)
                .arg(QDateTime::currentDateTime().toString(Qt::ISODate)),
                cl_logDEBUG2);
 
         if (initiateReport() != ErrorCode::ok)
         {
-            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1, "
-                       "retry after randome delay...")
+            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1, retry after randome delay...")
                    .arg(REPORT_SERVER), cl_logWARNING);
 
             setupTimer();
@@ -240,8 +237,7 @@ namespace ec2
     {
         if( httpClient->state() == nx_http::AsyncHttpClient::sFailed )
         {
-            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1, "
-                       "retry after randome delay...")
+            NX_LOG(lit("Ec2StaticticsReporter. Could not send report to %1, retry after randome delay...")
                    .arg(REPORT_SERVER), cl_logWARNING);
 
             setupTimer();

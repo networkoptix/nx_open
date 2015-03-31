@@ -12,7 +12,7 @@ const HardwareInformation& HardwareInformation::instance()
     return hwInfo;
 }
 
-constexpr const QString& compileCpuArchicture()
+const QString& compileCpuArchicture()
 {
     #if defined(__i386__) || defined(_M_IX86)
         return CPU_X86;
@@ -31,13 +31,13 @@ constexpr const QString& compileCpuArchicture()
 
     #include <windows.h>
 
-    static const auto REG_CPU_KEY = "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\";
-    static const auto REG_CPU_VALUE = "ProcessorNameString";
+    static const auto REG_CPU_KEY = L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0\\";
+    static const auto REG_CPU_VALUE = L"ProcessorNameString";
 
     HardwareInformation::HardwareInformation()
     {
         MEMORYSTATUSEX stat;
-        statex.dwLength = sizeof(stat);
+        stat.dwLength = sizeof(stat);
         phisicalMemory = GlobalMemoryStatusEx(&stat) ? stat.ullAvailPhys : 0;
         cpuArchitecture = compileCpuArchicture();
 
