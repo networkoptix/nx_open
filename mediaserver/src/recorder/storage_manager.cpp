@@ -1509,16 +1509,3 @@ bool QnStorageManager::getBookmarks(const QByteArray &cameraGuid, const QnCamera
     }
     return true;
 }
-
-void QnStorageManager::clearRecordingCache(const QnResourcePtr& camera)
-{
-    QMutexLocker lock(&m_mutexStorages);
-    for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
-    {
-        const QnStorageResourcePtr& storage = itr.value();
-        QString base = closeDirPath(storage->getPath());
-        QString postfix = camera->getUniqueId();
-        m_fileNumCache.remove(closeDirPath(base + DeviceFileCatalog::prefixByCatalog(QnServer::LowQualityCatalog)) + postfix);
-        m_fileNumCache.remove(closeDirPath(base + DeviceFileCatalog::prefixByCatalog(QnServer::HiQualityCatalog)) + postfix);
-    }
-}
