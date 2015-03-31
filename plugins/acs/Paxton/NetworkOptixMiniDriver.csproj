@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\Program Files %28x86%29\Paxton Access\Access Control\DvrMiniDrivers\</OutputPath>
+    <OutputPath>..\..\..\..\..\Program Files %28x86%29\Paxton Access\Access Control\DvrMiniDrivers\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -53,7 +53,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NxInterface.1">
-      <HintPath>..\..\..\build_environment\target\x86\bin\debug\NxInterface.1.dll</HintPath>
+      <HintPath>..\..\nxinterface\bin\Debug\NxInterface.1.dll</HintPath>
     </Reference>
     <Reference Include="Paxton.Net2.OemDvrInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=d6bad0497ee6d215, processorArchitecture=MSIL" />
     <Reference Include="System" />
