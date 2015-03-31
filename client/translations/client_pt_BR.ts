@@ -2083,10 +2083,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Iniciar Gravação de Pânico</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>Ajustes da Imagem...</translation>
-    </message>
-    <message>
         <source>Video Wall Settings...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2513,6 +2509,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Check Camera Issues...</source>
         <translation>Conferir erros de Câmera...</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4430,6 +4430,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>PTZ</source>
@@ -4850,21 +4865,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation type="unfinished">Aviso</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>Ajustes da Imagem</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>Imagem não foi carregada</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>Essa imagem é de lentes Fisheye</translation>
     </message>
 </context>
 <context>
@@ -6870,10 +6870,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Marca horário:</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6963,6 +6959,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

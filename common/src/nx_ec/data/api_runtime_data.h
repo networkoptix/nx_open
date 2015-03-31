@@ -36,7 +36,6 @@ namespace ec2
                    videoWallControlSession == other.videoWallControlSession &&
                    serverTimePriority == other.serverTimePriority &&
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate &&
-                   availableConnections == other.availableConnections &&
                    mainHardwareIds == other.mainHardwareIds &&
                    compatibleHardwareIds == other.compatibleHardwareIds &&
                    updateStarted == other.updateStarted;
@@ -59,9 +58,6 @@ namespace ec2
         /** Priority of this peer as the time synchronization server. */
         quint64 serverTimePriority;
 
-        /** A list of available connections to other peers. */
-        QVector<ApiConnectionData> availableConnections;
-
         QVector<QByteArray> mainHardwareIds;
         QVector<QByteArray> compatibleHardwareIds;
 
@@ -70,7 +66,7 @@ namespace ec2
 
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
-                                                        (availableConnections)(mainHardwareIds)(compatibleHardwareIds)(updateStarted)
+                                                        (mainHardwareIds)(compatibleHardwareIds)(updateStarted)
 
 
 } // namespace ec2

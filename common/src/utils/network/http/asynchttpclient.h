@@ -138,6 +138,7 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addRequestHeader(const StringType& key, const StringType& value);
+        void removeAdditionalHeader( const StringType& key );
         void setAuthType(AuthType value);
 
     signals:
@@ -184,6 +185,7 @@ namespace nx_http
         AuthType m_authType;
         HttpHeaders m_additionalHeaders;
         int m_awaitedMessageNumber;
+        SocketAddress m_remoteEndpoint;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );

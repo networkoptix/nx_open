@@ -2163,10 +2163,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>카메라 설정...</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>사진 설정...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>레이아웃 설정...</translation>
     </message>
@@ -2505,6 +2501,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Hide Search Panel</source>
         <translation>검색 판넬 숨기기</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4394,6 +4394,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
 </context>
 <context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>Screenshot</source>
@@ -4812,21 +4827,6 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Warning</source>
         <translation type="unfinished">주의</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>사진 설정</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>이미지를 업로드 할 수 없음</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>어안 렌즈 커메라 사용</translation>
     </message>
 </context>
 <context>
@@ -6810,10 +6810,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>타임스템프:</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>WYSIWYG에서 비디오 변환을 보장함</translation>
-    </message>
-    <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
         <translation>현재 레이아웃에는 내부 파일이 포함되어있습니다. 내부 파일은 다중 비디오 내보내기를 허용하지 않습니다.</translation>
     </message>
@@ -6903,6 +6899,10 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

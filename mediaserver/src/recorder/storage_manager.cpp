@@ -171,6 +171,8 @@ public:
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
         }
+        m_owner->testStoragesDone();
+
     }
 private:
     QnStorageManager* m_owner;
@@ -190,7 +192,8 @@ QnStorageManager::QnStorageManager():
     m_warnSended(false),
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
-    m_rebuildArchiveThread(0)
+    m_rebuildArchiveThread(0),
+    m_firstStorageTestDone(false)
 {
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
@@ -498,7 +501,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         QMutexLocker lock(&m_mutexStorages);
         m_storagesStatisticsReady = false;
     
-        NX_LOG(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getPath()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+        NX_LOG(QString("Adding storage. Path: %1").arg(storage->getPath()), cl_logINFO);
 
         removeStorage(storage); // remove existing storage record if exists
         //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
@@ -957,10 +960,18 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
+void QnStorageManager::testStoragesDone()
+{
+    m_firstStorageTestDone = true;
+}
+
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
     //QMutexLocker lock(&m_mutexStorages);
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
+        NX_LOG(QString("Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB").
+            arg(fileStorage->getPath()).arg(fileStorage->getSpaceLimit() / 1024 / 1024).arg(fileStorage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+
         // add data before storage goes to the writable state
         doMigrateCSVCatalog(fileStorage);
         addDataFromDatabase(fileStorage);
@@ -1066,33 +1077,14 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
     }
     else {
-        qDebug() << "No storage available for recording";
-        if (!m_warnSended) {
+        if (!m_warnSended && m_firstStorageTestDone) {
+            qWarning() << "No storage available for recording";
             emit noStoragesAvailable();
             m_warnSended = true;
         }
     }
 
     return result;
-}
-
-int QnStorageManager::getFileNumFromCache(const QString& base, const QString& folder)
-{
-    QMutexLocker lock(&m_cacheMutex);
-    FileNumCache::iterator itr = m_fileNumCache.find(base);
-    if (itr == m_fileNumCache.end())
-        itr = m_fileNumCache.insert(base, QPair<QString, int >());
-    if (itr.value().first != folder) {
-        itr.value().first = folder;
-        itr.value().second = -1;
-    }
-    return itr.value().second;
-}
-
-void QnStorageManager::putFileNumToCache(const QString& base, int fileNum)
-{
-    QMutexLocker lock(&m_cacheMutex);
-    m_fileNumCache[base].second = fileNum;
 }
 
 QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr &camera, const QString& prefix, const QnStorageResourcePtr& storage)
@@ -1115,23 +1107,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
     Q_ASSERT(!camera->getPhysicalId().isEmpty());
     QString text = base + separator + dateTimeStr(dateTime, timeZone, separator);
 
-    int fileNum = getFileNumFromCache(base, text);
-    if (fileNum == -1)
-    {
-        fileNum = 0;
-        QList<QFileInfo> list = storage->getFileList(text);
-        QList<QString> baseNameList;
-        for(const QFileInfo& info: list)
-            baseNameList << info.completeBaseName();
-        qSort(baseNameList.begin(), baseNameList.end());
-        if (!baseNameList.isEmpty()) 
-            fileNum = baseNameList.last().toInt() + 1;
-    }
-    else {
-        fileNum++; // using cached value
-    }
-    putFileNumToCache(base, fileNum);
-    return text + strPadLeft(QString::number(fileNum), 3, '0');
+    return text + QString::number(dateTime);
 }
 
 DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix)
@@ -1266,7 +1242,7 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     DeviceFileCatalogPtr catalog = getFileCatalog(mac.toUtf8(), quality);
     if (catalog == 0)
         return false;
-    DeviceFileCatalog::Chunk chunk(startDateMs, storageIndex, QnFile::baseName(fileName).toInt(), -1, (qint16) timeZone);
+    DeviceFileCatalog::Chunk chunk(startDateMs, storageIndex, DeviceFileCatalog::Chunk::FILE_INDEX_NONE, -1, (qint16) timeZone);
     catalog->addRecord(chunk);
     return true;
 }

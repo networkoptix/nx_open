@@ -28,6 +28,7 @@
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/fisheye_home_ptz_controller.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -36,6 +37,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
@@ -69,7 +71,10 @@
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
-namespace {
+namespace 
+{
+    enum { kInvalidTime = 0 };
+
     bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &object, QString *name) {
         switch(object.type) {
         case Qn::PresetPtzObject: {
@@ -108,19 +113,47 @@ namespace {
 } // anonymous namespace
 
 
-QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
-    QnResourceWidget(context, item, parent),
-    m_display(NULL),
-    m_renderer(NULL),
-    m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false),
-    m_homePtzController(NULL)
+QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent)
+    : QnResourceWidget(context, item, parent)
+    , m_resource(base_type::resource().dynamicCast<QnMediaResource>())
+    , m_camera(base_type::resource().dynamicCast<QnVirtualCameraResource>())
+    , m_display(nullptr)
+    , m_renderer(nullptr)
+    , m_motionSelection()
+    , m_motionSelectionPathCache()
+    , m_paintedChannels()
+    , m_motionSensitivity()
+    , m_motionSensitivityValid(false)
+    , m_binaryMotionMask()
+    , m_binaryMotionMaskValid(false)
+    , m_motionSelectionCacheValid(false)
+    , m_sensStaticText()
+    , m_ptzController(nullptr)
+    , m_homePtzController(nullptr)
+    , m_dewarpingParams()
+
+    , m_currentTime(kInvalidTime)
+    , m_bookmarks()
+    , m_bookmarksBeginPosition(m_bookmarks.cbegin())
+    , m_dataLoader(context->instance<QnCameraDataManager>()->loader(m_resource->toResourcePtr()))
 {
-    m_resource = base_type::resource().dynamicCast<QnMediaResource>();
+    updateBookmarks();
+    connect(m_dataLoader, &QnCachingCameraDataLoader::bookmarksChanged, this, &QnMediaResourceWidget::updateBookmarks);
+    connect(m_dataLoader, &QnCachingCameraDataLoader::loadingFailed, this, [this]()
+    {
+        m_bookmarks = QnCameraBookmarkList();
+        m_bookmarksBeginPosition = m_bookmarks.cbegin();
+    });
+    connect(m_dataLoader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type)
+    {
+        if (type == Qn::BookmarksContent)
+        {
+            updateBookmarks();
+        }
+    });
+
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
-    m_camera = base_type::resource().dynamicCast<QnVirtualCameraResource>();
-
 
     // TODO: #Elric
     // Strictly speaking, this is a hack.
@@ -615,7 +648,25 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
     if(isOverlayVisible() && isInfoVisible())
+    {
+        if (m_resource->toResource()->flags() & Qn::utc)
+        { 
+            // get timestamp from the first channel that was painted
+            int channel = std::distance(m_paintedChannels.cbegin(),
+                std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
+            if (channel >= channelCount())
+                channel = 0;
+            
+            enum { kFactor = 1000 };
+            updateCurrentTime(m_renderer->getTimestampOfNextFrameToRender(channel) / kFactor);
+        }
+        else
+        {
+            updateCurrentTime(kInvalidTime);
+        }
+
         updateInfoTextLater();
+    }
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
@@ -934,22 +985,12 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 #endif
 
     QString timeString;
-    if (m_resource->toResource()->flags() & Qn::utc) { /* Do not show time for regular media files. */
-
-        // get timestamp from the first channel that was painted
-        int channel = std::distance(m_paintedChannels.cbegin(),
-            std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
-        if (channel >= channelCount())
-            channel = 0;
-
-        qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(channel) / 1000;
-        if(qnSettings->timeMode() == Qn::ServerTimeMode)
-            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
-
+    if (m_resource->toResource()->flags() & Qn::utc)
+    { 
+        /* Do not show time for regular media files. */
         timeString = m_display->camDisplay()->isRealTimeSource() 
             ? tr("LIVE") 
-            : QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"));
-        
+            : QDateTime::fromMSecsSinceEpoch(m_currentTime).toString(lit("hh:mm:ss.zzz"));
     }
 
     return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
@@ -1280,4 +1321,43 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
+}
+
+void QnMediaResourceWidget::updateBookmarks()
+{
+    m_bookmarks = m_dataLoader->bookmarks();
+    m_bookmarksBeginPosition = m_bookmarks.cbegin();
+
+    if (m_currentTime != kInvalidTime)
+        updateCurrentTime(m_currentTime);
+}
+
+void QnMediaResourceWidget::updateCurrentTime(qreal timeMs)
+{
+    if (m_bookmarks.empty())
+    {
+        int i = 0;
+    }
+    if (timeMs < m_currentTime)
+        m_bookmarksBeginPosition = m_bookmarks.cbegin();
+
+    m_bookmarksBeginPosition = std::find_if(m_bookmarksBeginPosition, m_bookmarks.cend()
+        , [timeMs](const QnCameraBookmark &bookmark) -> bool
+    {
+        return (bookmark.endTimeMs() >= timeMs);
+    });
+
+    m_currentTime = timeMs;
+
+    static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
+
+    QString text;
+    auto itBookmark = m_bookmarksBeginPosition;
+    while((itBookmark != m_bookmarks.cend()) && (itBookmark->startTimeMs <= timeMs))
+    {
+        text += outputTemplate.arg(itBookmark->name, itBookmark->description);
+        ++itBookmark;
+    }
+
+    setBookmarksLabelText(text);
 }

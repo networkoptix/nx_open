@@ -342,9 +342,9 @@ namespace Qn {
         BusinessEventsAction,
 
         /**
-         * Opens business events log dialog.
+         * Opens bookmarks dialog.
          */
-        BusinessEventsLogAction,
+        OpenBookmarksSearchAction,
 
         /**
          * Opens camera list dialog.
@@ -532,7 +532,7 @@ namespace Qn {
         /**
          * Opens picture settings dialog.
          */
-        PictureSettingsAction,
+        MediaFileSettingsAction,
 
         /**
          * Opens videowall settings dialog.

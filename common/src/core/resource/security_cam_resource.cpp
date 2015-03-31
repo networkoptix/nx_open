@@ -42,6 +42,7 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_statusFlags(Qn::CSF_NoFlags),
     m_advancedWorking(false),
     m_manuallyAdded(false),
+	m_cachedLicenseType(Qn::LC_Count),
     m_cachedHasDualStreaming2(
         [this]()->bool{ return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse; },
         &m_mutex ),
@@ -306,17 +307,21 @@ bool QnSecurityCamResource::isEdge() const {
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const 
 {
-    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
-    if (resType && resType->getManufacture() == lit("VMAX"))
-        return Qn::LC_VMAX;
-    else if (isAnalogEncoder())
-        return Qn::LC_AnalogEncoder; // AnalogEncoder should have priority over Analog type because of analog type is deprecated (DW-CP04 has both analog and analogEncoder params)
-    else if (isAnalog())
-        return Qn::LC_Analog;
-    else if (isEdge())
-        return Qn::LC_Edge;
-    else
-        return Qn::LC_Professional;
+    if (m_cachedLicenseType == Qn::LC_Count) 
+    {
+        QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
+        if (resType && resType->getManufacture() == lit("VMAX"))
+            m_cachedLicenseType =  Qn::LC_VMAX;
+        else if (isAnalogEncoder())
+            m_cachedLicenseType =  Qn::LC_AnalogEncoder; // AnalogEncoder should have priority over Analog type because of analog type is deprecated (DW-CP04 has both analog and analogEncoder params)
+        else if (isAnalog())
+            m_cachedLicenseType = Qn::LC_Analog;
+        else if (isEdge())
+            m_cachedLicenseType =  Qn::LC_Edge;
+        else
+            m_cachedLicenseType = Qn::LC_Professional;
+    }
+    return m_cachedLicenseType;
 }
 
 

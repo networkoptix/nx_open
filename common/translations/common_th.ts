@@ -18,6 +18,7 @@
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Camera output</source>
+        <translatorcomment>การส่งออกกล้อง</translatorcomment>
         <translation>Camera output</translation>
     </message>
     <message>
@@ -272,7 +273,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ที่ขัดแย้ง:%1</translation>
     </message>
 </context>
 <context>
@@ -315,95 +316,95 @@
     </message>
     <message>
         <source>Server %1 is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ %1 ไม่สามารถใช้ได้.</translation>
     </message>
     <message>
         <source>Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบสถานะการทำงานของเซิร์ฟเวอร์.</translation>
     </message>
     <message>
         <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>ได้รับการตอบสนองที่ไม่ดีจากเซิร์ฟเวอร์ %1: &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบว่า เซิร์ฟเวอร์ ทำงานอยู่ และรุ่นที่เหมาะสม.</translation>
     </message>
     <message>
         <source>Cannot connect to http port %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเชื่อมต่อพอร์ต http. %1.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่ากล้องเชื่อมต่อเข้ากับเครือข่าย.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเปิดสื่อ url%1 ไม่สามารถเชื่อมต่อไปยังสื่อพอร์ต %2.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่าพอร์ต %2 เข้าถึงได้ (เช่นการส่งต่อไป) โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเปิดสื่อ url %1 การเชื่อมต่อกับพอร์ต %2 ถูกปิดโดยไม่ได้ตั้งใจ.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่ากล้องเสียบเข้ากับเครือข่าย ลองรีบูตกล้องอีกครั้ง.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถแยกการตอบสนองของกล้อง url %1 โปรดระบุชื่อ %2.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>สุดท้าย พยายามที่จะปรับปรุง เฟิร์มแวร์ หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน.</translation>
     </message>
     <message>
         <source>No supported media tracks at url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่มีการสนับสนุนสื่อที่แทร็ค url%1.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเปิดสื่อ url%1. ไม่สนับสนุนสื่อโพรโทคอล %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>การกำหนดค่าพารามิเตอร์ไม่ถูกต้อง %1.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>เริ่มแรก พยายามที่จะเปิดการบันทึก (ถ้าปิดอยู่) และลดเฟรมต่อวินาทีในการตั้งค่ากล้อง.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>ถ้ายังไม่ได้ ให้คืนค่าเริ่มต้นจากโรงงานในเว็บกล้อง หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน. </translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>คำขอกล้อง &quot;%1&quot; ล้มเหลวเกิดข้อผิดพลาด &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown Camera Issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่รู้จักกล้อง.</translation>
     </message>
     <message>
         <source>Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาติดต่อฝ่ายสนับสนุน.</translation>
     </message>
     <message>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>อินพุต / เอาต์พุต มีข้อผิดพลาดเกิดขึ้น ข้อความ OS: &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>พารามิเตอร์:</translation>
     </message>
 </context>
 <context>
@@ -808,51 +809,51 @@
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation>เลือกเซิร์ฟเวอร์สำหรับปรับเวลาให้ตรงกัน</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>ดัชนีเก็บสร้างใหม่เป็นที่เรียบร้อยแล้ว</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>ที่อยู่อีเมล์ไม่ได้ตั้งค่า.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล์.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์อีเมลไม่ได้ตั้งค่า.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมลของพวกเขา.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>พวกเขาไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล์.</translation>
     </message>
     <message>
         <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>พื้นที่หน่วยความจำเต็ม บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
     </message>
     <message>
         <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>หน่วยความจำไม่ได้กำหนดค่าบนเซิร์ฟเวอร์ต่อไปนี้:</translation>
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณไม่มีใบอนุญาต.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>ท่านไม่สามารถบันทึกวิดีโอจากกล้องได้.</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>ดัชนีเก็บสร้างใหม่เสร็จสมบูรณ์บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
     </message>
 </context>
 <context>

@@ -106,11 +106,11 @@
     </message>
     <message>
         <source>When</source>
-        <translation type="unfinished"></translation>
+        <translation>เมื่อ</translation>
     </message>
     <message>
         <source>Do</source>
-        <translation type="unfinished"></translation>
+        <translation>ทำ</translation>
     </message>
 </context>
 <context>
@@ -232,7 +232,7 @@
     </message>
     <message>
         <source>Discovered Cameras:</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้องที่ตรวจพบ:</translation>
     </message>
 </context>
 <context>
@@ -269,11 +269,11 @@
     <name>CameraDiagnosticsDialog</name>
     <message>
         <source>Camera Diagnostics</source>
-        <translation>การวินิจฉัยของกล้อง</translation>
+        <translation>การตรวจสอบกล้อง</translation>
     </message>
     <message>
         <source>Diagnostics for camera</source>
-        <translation>การวินิจฉัยสำหรับกล้อง</translation>
+        <translation>การตรวจสอบสำหรับกล้อง</translation>
     </message>
 </context>
 <context>
@@ -371,11 +371,11 @@
     </message>
     <message>
         <source>Warning! Low quality may result in low resolution image.</source>
-        <translation type="unfinished"></translation>
+        <translation>คำเตือน คุณภาพที่ตำ อาจจะทำให้ความละเอียดของภาพต่ำไปด้วย.</translation>
     </message>
     <message>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่ากล้อง&quot; ถูกปิดใช้งานในระบบการบริหาร.</translation>
     </message>
 </context>
 <context>
@@ -574,7 +574,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>ConnectionTestingDialog</name>
     <message>
         <source>Connection Test</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Testing connection...</source>
@@ -706,7 +706,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Restart required</source>
-        <translation type="unfinished"></translation>
+        <translation>มีความต้องการที่จะเริ่มต้นใหม่</translation>
     </message>
 </context>
 <context>
@@ -825,7 +825,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished">ไม่มีภาพ</translation>
+        <translation>ไม่มีภาพ</translation>
     </message>
 </context>
 <context>
@@ -1404,43 +1404,43 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Server at %2: v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ %2:v%1</translation>
     </message>
     <message>
         <source>%1 version %2 (%3).</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 เวอร์ชั่น %2 (%3).</translation>
     </message>
     <message>
         <source>Built for %1-%2 with %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>สร้าง สำหรับ %1-%2 กับ %3.</translation>
     </message>
     <message>
         <source>Client is not connected to any server</source>
-        <translation type="unfinished"></translation>
+        <translation>ผู้ใช้งานไม่สามารถติดต่อได้กับเซอร์ฟเวอร์</translation>
     </message>
     <message>
         <source>%1 uses the following external libraries:</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ใช้ปฏิบัติตามสิ่งต่อไปนี้:</translation>
     </message>
     <message>
         <source>OpenGL version</source>
-        <translation type="unfinished"></translation>
+        <translation>รุ่น OpenGL</translation>
     </message>
     <message>
         <source>OpenGL renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL renderer</translation>
     </message>
     <message>
         <source>OpenGL vendor</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL vendor</translation>
     </message>
     <message>
         <source>OpenGL max texture size</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิด OpenGL หน้าจอใหญ่</translation>
     </message>
     <message>
         <source>Support</source>
-        <translation type="unfinished">ทีมช่วยเหลือ</translation>
+        <translation>ทีมช่วยเหลือ</translation>
     </message>
 </context>
 <context>
@@ -2149,10 +2149,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>การตั้งค่ากล้อง...</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>การตั้งค่ารูปภาพ...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>การตั้งค่าเค้าโครง...</translation>
     </message>
@@ -2508,6 +2504,10 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Hide Search Panel</source>
         <translation>ซ่อนแผงค้นหา</translation>
     </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2810,11 +2810,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to reset rules to the defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณแน่ใจว่าคุณต้องการที่จะตั้งค่ากฎไปยังเริ่มต้น?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>การดำเนินการนี้ไม่สามารถยกเลิกได้!</translation>
     </message>
 </context>
 <context>
@@ -2952,30 +2952,30 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Examples:</source>
-        <translation type="unfinished"></translation>
+        <translation>ตัวอย่าง:</translation>
     </message>
     <message>
         <source>Server is offline.</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ ออฟไลน์.</translation>
     </message>
     <message>
         <source>Camera addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation>การเพิ่งเติมกล้องเป็นไปได้สำหรับเซิร์ฟเวอร์ออนไลน์เท่านั้น.</translation>
     </message>
     <message numerus="yes">
         <source>%n cameras added successfully.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n เพิ่มกล้องเรียบร้อยแล้ว.</numerusform>
         </translation>
     </message>
     <message>
         <source>It might take a few moments to populate them in the tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>อาจจะใช้เวลาสักครู่ในการเพื่อเติมพวกเขาในระบบ.</translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n cameras.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>เกิดข้อผิดพลาดในขณะที่มีการเพิ่ม %n กล้อง.</numerusform>
         </translation>
     </message>
 </context>
@@ -3005,11 +3005,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please wait while settings are being loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดรอสักครู่ในขณะที่โหลดการตั้งค่า.</translation>
     </message>
     <message>
         <source>This can take a lot of time.</source>
-        <translation type="unfinished"></translation>
+        <translation>การทำงานนี้อาจจะใช้เวลานาน.</translation>
     </message>
 </context>
 <context>
@@ -3414,87 +3414,87 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Connection to the Server could not be established.</source>
-        <translation type="unfinished"></translation>
+        <translation>การเชื่อมต่อไปยังเซิร์ฟเวอร์ไม่สามารถสร้างได้.</translation>
     </message>
     <message>
         <source>Connection details that you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>รายละเอียดการเชื่อมต่อที่คุณได้ป้อนไม่ถูกต้องโปรดลองอีกครั้ง.</translation>
     </message>
     <message>
         <source>If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>ถ้าข้อผิดพลาดนี้ยังคงอยู่โปรดติดต่อผู้ดูแลระบบ VMS ของคุณ.</translation>
     </message>
     <message>
         <source> - Client version: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation> - รุ่นผู้ใช้: %1.</translation>
     </message>
     <message>
         <source> - Server version: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation> - รุ่นของเซิร์ฟเวอร์: %1.</translation>
     </message>
     <message>
         <source>You are about to connect to Server which has a different version:</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณกำลังจะเชื่อมต่อไปยังเซิร์ฟเวอร์ซึ่งมีรุ่นที่แตกต่างกัน:</translation>
     </message>
     <message>
         <source>These versions are not compatible. Please update your %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>รุ่นนี้เข้ากันไม่ได้ โปรดอัปเดตรุ่นของคุณ %1.</translation>
     </message>
     <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>โหมดความเข้ากันไม่ได้สำหรับรุ่นที่ต่ำกว่า %1 ไม่ได้รับการสนับสนุน.</translation>
     </message>
     <message>
         <source>Selected Server has a different version:</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ที่เลือกไว้มีรุ่นที่แตกต่างกัน:</translation>
     </message>
     <message>
         <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>รุ่นอื่น ๆ ของผู้ใช้เป็นสิ่งจำเป็นในการที่จะสร้างการเชื่อมต่อไปยังเซิร์ฟเวอร์นี้.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะเริ่มต้นใหม่ในโหมดความเข้ากันได้.</translation>
     </message>
     <message>
         <source>Client version %1 is required to connect to this Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไคลเอ็นต์รุ่น %1 จะต้องเชื่อมต่อกับเซิร์ฟเวอร์นี้.</translation>
     </message>
     <message>
         <source>Download version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>ดาวน์โหลดเวอร์ชั่น %1?</translation>
     </message>
     <message>
         <source>Would you like to restart the Client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณต้องการที่จะเริ่มต้นไคลเอนต์ใหม่ในโหมดที่เข้ากันได้หรือไม่?</translation>
     </message>
     <message>
         <source>Cannot restart the Client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเริ่มไคลเอนต์ในโหมดความเข้ากันได้.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
     </message>
     <message>
         <source>Failed to launch compatibility version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>เกิดข้อผิดพลาดในรุ่นการทำงานร่วมกัน %1</translation>
     </message>
     <message>
         <source>Try to restore version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>ลองที่จะเรียกคืนรุ่นก่อนหน้านี้ %1?</translation>
     </message>
     <message>
         <source>Server has a different version:</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ มีรุ่นที่แตกต่างกัน:</translation>
     </message>
     <message>
         <source>You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณจะต้องรีสตาร์ทเครื่องไคลเอนต์ในโหมดความเข้ากันได้.</translation>
     </message>
     <message>
         <source>You will be asked to update your %1</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณจะถูกขอให้มีการอัปเดต %1</translation>
     </message>
 </context>
 <context>
@@ -3781,7 +3781,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 times</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 เวลา</translation>
     </message>
 </context>
 <context>
@@ -3846,22 +3846,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Disable only if the client takes too much CPU</source>
-        <translation type="unfinished"></translation>
+        <translation>ปิดการใช้งานเฉพาะในกรณีที่รุ่นผู้ใช้ มีการใช้งาน CPU มากเกินไป</translation>
     </message>
 </context>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
         <source>Open Alarm/Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิด การเตือน / การจัดการเหตุการณ์</translation>
     </message>
     <message>
         <source>Open Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดบันทึกเหตุการณ์</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดรายการ กล้อง</translation>
     </message>
 </context>
 <context>
@@ -3876,7 +3876,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Unsaved changes will be lost. Save the following pages?</source>
-        <translation type="unfinished"></translation>
+        <translation>การเปลี่ยนแปลงที่ไม่ได้บันทึกจะหายไป บันทึกหน้าต่อไปนี้หรือไม่?</translation>
     </message>
 </context>
 <context>
@@ -3959,7 +3959,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="unfinished">กำลังส่งออก &quot;%1&quot;...</translation>
+        <translation>กำลังส่งออก &quot;%1&quot;...</translation>
     </message>
 </context>
 <context>
@@ -3974,27 +3974,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;No picture&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;ไม่ มีรูป&gt;</translation>
     </message>
     <message>
         <source>&lt;Error while loading picture&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;ข้อผิดพลาด ในขณะที่โหลดภาพ&gt;</translation>
     </message>
     <message>
         <source>&lt;Error while uploading picture&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;ข้อผิดพลาด ในขณะที่การอัปโหลดภาพ&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture cannot be read&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;ภาพ ไม่สามารถอ่าน&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;รูปภาพ มีขนาดใหญ่เกินไป ขนาดสูงสุดคือ %1 Mb&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;ภาพ ไม่สามารถโหลด&gt;</translation>
     </message>
 </context>
 <context>
@@ -4002,7 +4002,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished">หน้าจอ %1 s</translation>
+        <translation>หน้าจอ %1 s</translation>
     </message>
 </context>
 <context>
@@ -4169,39 +4169,39 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 %2</source>
-        <translation type="unfinished">%1% {1 %2?}</translation>
+        <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %2 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>อย่างน้อย %n %2 ที่ต้องการ</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %2 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 มีใช้อยู่ในปัจจุบัน</numerusform>
         </translation>
     </message>
     <message>
         <source>You do not have a valid license installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณไม่ได้รับใบอนุญาตถูกต้องติดตั้ง.</translation>
     </message>
     <message>
         <source>Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาเปิดใช้งานใบอนุญาตการค้า หรือเปิดทดลองใช้งาน.</translation>
     </message>
     <message>
         <source>Please activate your commercial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาเปิดใช้งานใบอนุญาตการค้าของคุณ.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation.</source>
-        <translation type="unfinished"></translation>
+        <translation>มีข้อผิดพลาดของเครือข่ายที่เกิดขึ้นระหว่างการเปิดใช้ใบอนุญาตอัตโนมัติ.</translation>
     </message>
     <message>
         <source>Try to activate your license manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>ลองที่จะเปิดใช้งานใบอนุญาตของคุณด้วยตนเอง.</translation>
     </message>
 </context>
 <context>
@@ -4330,7 +4330,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณแน่ใจว่าคุณต้องการที่จะลบการเชื่อมต่อ:%1?</translation>
     </message>
 </context>
 <context>
@@ -4393,6 +4393,21 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
+        <translation>ตัวเลือกนี้จะไม่ส่งผลกระทบต่อตารางเวลาการบันทึก ตารางเวลาการบันทึกจะขึ้นอยู่กับเวลาของเซิร์ฟเวอร์.</translation>
+    </message>
+</context>
+<context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4535,15 +4550,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Success!</source>
-        <translation type="unfinished"></translation>
+        <translation>สำเร็จ!</translation>
     </message>
     <message>
         <source>The system was configured successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>ระบบที่ได้รับการกำหนดค่าเรียบร้อยแล้ว.</translation>
     </message>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์จากระบบระยะไกลควรจะปรากฏขึ้นในระบบของคุณเร็ว ๆ นี้.</translation>
     </message>
 </context>
 <context>
@@ -4634,15 +4649,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnNetworkSpeedStrings</name>
     <message>
         <source>b/s</source>
-        <translation type="unfinished">b/s</translation>
+        <translation>b/s</translation>
     </message>
     <message>
         <source>Kb/s</source>
-        <translation type="unfinished">Kb/s</translation>
+        <translation>Kb/s</translation>
     </message>
     <message>
         <source>Mb/s</source>
-        <translation type="unfinished">Mb/s</translation>
+        <translation>Mb/s</translation>
     </message>
 </context>
 <context>
@@ -4714,11 +4729,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation></translation>
+        <translation>คุณแน่ใจที่ต้องการจะลบ &apos;%1&apos;?</translation>
     </message>
     <message>
         <source>Custom title:</source>
-        <translation type="unfinished"></translation>
+        <translation>ชื่อที่กำหนดเอง:</translation>
     </message>
 </context>
 <context>
@@ -4744,11 +4759,11 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnNotificationToolTipWidget</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished">ปิด</translation>
+        <translation>ปิด</translation>
     </message>
     <message>
         <source>Right Click</source>
-        <translation type="unfinished"></translation>
+        <translation>คลิก ขวา</translation>
     </message>
 </context>
 <context>
@@ -4806,30 +4821,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnPerformanceTest</name>
     <message>
         <source>Performance of this computer allows running %1 in configuration mode only.</source>
-        <translation type="unfinished"></translation>
+        <translation>ประสิทธิภาพการทำงานของคอมพิวเตอร์เครื่องนี้จะทำงาน %1 ในโหมดการตั้งค่าเท่านั้น.</translation>
     </message>
     <message>
         <source>For full-featured mode please use another computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>สำหรับโหมดเต็มรูปแบบกรุณาใช้คอมพิวเตอร์เครื่องอื่น.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>การตั้งค่ารูปภาพ</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>ภาพไม่ได้โหลด</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>นี่คือภาพเลนส์ฟิชอาย</translation>
+        <translation>การเตือน</translation>
     </message>
 </context>
 <context>
@@ -4860,15 +4860,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Settings file is read-only. Please contact your system administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าแฟ้มแบบอ่านอย่างเดียว กรุณาติดต่อผู้ดูแลระบบของคุณ.</translation>
     </message>
     <message>
         <source>All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>การเปลี่ยนแปลงทั้งหมดจะหายไปหลังจากออกจากโปรแกรม.</translation>
     </message>
     <message>
         <source>Settings cannot be saved. Please contact your system administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าไม่สามารถบันทึกได้ กรุณาติดต่อผู้ดูแลระบบของคุณ.</translation>
     </message>
 </context>
 <context>
@@ -4910,23 +4910,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่จะได้รับตำแหน่งปัจจุบันจากกล้อง %1.</translation>
     </message>
     <message>
         <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดรอสักครู่ สำหรับการออนไลน์ของกล้อง.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบันสำหรับ กล้อง %1 </translation>
     </message>
     <message>
         <source>This preset is used in some tours.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตำแหน่งตั้งไว้นี้จะใช้ในบางทัวร์.</translation>
     </message>
     <message>
         <source>These tours will become invalid if you remove it.</source>
-        <translation type="unfinished"></translation>
+        <translation>ทัวร์เหล่านี้จะกลายเป็นที่ไม่ถูกต้องถ้าคุณเอามันออกไป.</translation>
     </message>
 </context>
 <context>
@@ -5396,27 +5396,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณกำลังจะเปิดอีกครั้งกับการเก็บข้อมูลให้ตรงกัน.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation type="unfinished"></translation>
+        <translation>สนใจ! การใช้งานบนฮาร์ดดิสก์ของคุณจะเพิ่มขึ้นในระหว่างขั้นตอนการประสานอีกครั้ง! ทั้งนี้ขึ้นอยู่กับขนาดของข้อมูลที่เก็บอาจจะใช้เวลาหลายชั่วโมง.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished"></translation>
+        <translation>ขั้นตอนนี้เป็นเพียงสิ่งที่จำเป็นถ้าโฟลเดอร์ที่เก็บถาวรของคุณได้ถูกย้ายเปลี่ยนชื่อหรือเปลี่ยน คุณสามารถยกเลิกการสร้างการดำเนินงานในช่วงเวลาใดโดยไม่สูญเสียข้อมูล.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณแน่ใจว่าต้องการที่จะทำต่อไปหรือไม่?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>สร้างดัชนีเก็บสำหรับการจัดเก็บ &apos;%1&apos; ในความคืบหน้า</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
-        <translation type="unfinished"></translation>
+        <translation>สแกนได้อย่างรวดเร็วสำหรับการจัดเก็บข้อมูล &apos;%1&apos; ในความคืบหน้า</translation>
     </message>
 </context>
 <context>
@@ -5702,23 +5702,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Cannot cancel update at this state.</source>
-        <translation type="unfinished">ไม่สามารถยกเลิกการปรับปรุงนี้ได้.</translation>
+        <translation>ไม่สามารถยกเลิกการปรับปรุงนี้ได้.</translation>
     </message>
     <message>
         <source>Please wait until update is finished</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดรอจนกว่าการปรับปรุงเสร็จสิ้น</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเริ่มการทำงานของ ผู้ใช้.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
     </message>
     <message>
         <source>Check for updates automatically</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจหาการปรับปรุงโดยอัตโนมัติ</translation>
     </message>
 </context>
 <context>
@@ -5792,11 +5792,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณแน่ใจว่าคุณต้องการรีเซ็ตการเคลื่อนไหวกลับไปค่าเริ่มต้น?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>การดำเนินการนี้ไม่สามารถยกเลิกได้!</translation>
     </message>
 </context>
 <context>
@@ -5935,19 +5935,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Windows Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation>เครือข่ายของ Windows ใช้งานทรัพทยากรร่วมกัน</translation>
     </message>
     <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>\\&lt;คอมพิวเตอร์ ชื่อ&gt;\&lt;โฟลเดอร์&gt;</translation>
     </message>
     <message>
         <source>Coldstore Network Storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Coldstore เครือข่ายเก็บข้อมูล</translation>
     </message>
     <message>
         <source>coldstore://&lt;Address&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>coldstore://&lt;ที่อยู่&gt;</translation>
     </message>
 </context>
 <context>
@@ -6031,115 +6031,115 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnTimeSlider</name>
     <message>
         <source>NO THUMBNAILS AVAILABLE</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่มีรูปขนาดย่อที่มีอยู่</translation>
     </message>
     <message>
         <source>auto</source>
         <comment>AM/PM usage based on user&apos;s system locale.</comment>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">อัตโนมัติ</translation>
+        <translation>อัตโนมัติ</translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">s</translation>
+        <translation>s</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">m</translation>
+        <translation>m</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">h</translation>
+        <translation>h</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">d</translation>
+        <translation>d</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">M</translation>
+        <translation>M</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">y</translation>
+        <translation>y</translation>
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">dd MMMM</translation>
+        <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">dd</translation>
+        <translation>dd</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">yyyy</translation>
+        <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
+        <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">dd MMMM yyyy h ap</translation>
+        <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
         <comment>Format for displaying day caption in timeline&apos;s header.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">dd MMMM yyyy</translation>
+        <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
         <comment>Format for displaying month caption in timeline&apos;s header.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">MMMM yyyy</translation>
+        <translation>MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">yyyy</translation>
+        <translation>yyyy</translation>
     </message>
 </context>
 <context>
@@ -6604,47 +6604,47 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message numerus="yes">
         <source>These %n cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>กล้อง %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ.</numerusform>
         </translation>
     </message>
     <message>
         <source>They may be auto-discovered again after removing.</source>
-        <translation type="unfinished"></translation>
+        <translation>พวกเขาอาจจะค้นพบอีกครั้งหลังจากที่ถอนการติดตั้ง.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณแน่ใจว่าคุณต้องการที่จะลบพวกเขา?</translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n ของเหล่านี้ %1 กล้องถูกค้นพบอัตโนมัติ.</numerusform>
         </translation>
     </message>
     <message>
         <source>An error has occurred while trying to delete a resource from Server. </source>
-        <translation type="unfinished"></translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามจะลบทรัพยากรจากเซิร์ฟเวอร์.</translation>
     </message>
     <message>
         <source>Error description: &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>คำอธิบายข้อผิดพลาด: &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเริ่มการทำงานของผู้ใช้ได้.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
     </message>
     <message>
         <source>Picture is too big. Maximum size is %1 Mb</source>
-        <translation type="unfinished"></translation>
+        <translation>รูปภาพมีขนาดใหญ่เกินไป ขนาดสูงสุดคือ%1 Mb</translation>
     </message>
     <message>
         <source>Error while uploading picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อผิดพลาดในขณะที่การอัปโหลดภาพ.</translation>
     </message>
 </context>
 <context>
@@ -6813,10 +6813,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Timestamps:</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>แปลงวิดีโอเพื่อรับประกัน WYSIWYG</translation>
-    </message>
-    <message>
         <source>AVI format is not recommended</source>
         <translation>รูปแบบ AVI ไม่แนะนำ</translation>
     </message>
@@ -6894,18 +6890,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณกำลังจะส่งออกลำดับวิดีโอที่มีความยาวกว่า 30 นาที.</translation>
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>มันอาจต้องการมากกว่ากิกะไบต์ของพื้นที่ฮาร์ดดิสก์และขึ้นอยู่กับความเร็วในการเชื่อมต่อของคุณ อาจต้องใช้เวลาหลายนาที.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณต้องการที่จะดำเนินการต่อหรือไม่?</translation>
     </message>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
+        <translation>คุณกำลังจะส่งออกลำดับวิดีโอหลายที่มีความยาวรวมเกิน 30 นาที.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6949,19 +6949,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Authentication failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>การตรวจสอบล้มเหลว.</translation>
     </message>
     <message>
         <source>Please, check the password you have entered.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาตรวจสอบรหัสผ่าน.</translation>
     </message>
     <message>
         <source>Could not update the selected servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถปรับปรุงเซิร์ฟเวอร์ที่เลือก.</translation>
     </message>
     <message>
         <source>You can try to update the servers again in the System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณสามารถที่จะปรับปรุงเซิร์ฟเวอร์อีกครั้งในระบบการบริหาร.</translation>
     </message>
 </context>
 <context>
@@ -7062,12 +7062,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>yyyy MMM dd</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>yyyy MMM dd</translation>
     </message>
     <message>
         <source>Live</source>
         <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>ช่วงเวลา</translation>
     </message>
 </context>
 <context>
@@ -7090,15 +7090,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่จะได้รับตำแหน่งปัจจุบันจากอกล้อง %1.</translation>
     </message>
     <message>
         <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดรอสักครู่สำหรับกล้องที่จะไออนไลน์.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบันสำหรับกล้อง %1.</translation>
     </message>
 </context>
 <context>
@@ -7204,11 +7204,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>New version %1 is available.</source>
-        <translation type="unfinished"></translation>
+        <translation>เวอร์ชั่นใหม่ %1 สามารถใช้ได้.</translation>
     </message>
     <message>
         <source>Please update %1 Client.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดอัปเดต %1 ไคลเอนต์.</translation>
     </message>
 </context>
 <context>
@@ -7337,19 +7337,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not start control session.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเริ่มเซสชันการควบคุม.</translation>
     </message>
     <message>
         <source>Another user is already controlling this screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>มีผู้ใช้อื่นทำการควบคุมหน้าจอนี้.</translation>
     </message>
     <message>
         <source>Are you sure you want to stop the Video Wall?</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณแน่ใจว่าคุณต้องการที่จะหยุด วีดีโอวอลล์ ?</translation>
     </message>
     <message>
         <source>You&apos;ll have to start it manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณจะต้องเริ่มต้นด้วยตนเอง.</translation>
     </message>
 </context>
 <context>
@@ -7727,7 +7727,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Use an analog license to view this camera</source>
-        <translation type="unfinished">ใช้ใบไลเซ็นส์อนาล๊อกเ พื่อดูกล้องนี้</translation>
+        <translation>ใช้ใบไลเซ็นส์อนาล๊อกเ พื่อดูกล้องนี้</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
@@ -7902,7 +7902,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>(recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>(แนะนำ)</translation>
     </message>
 </context>
 <context>

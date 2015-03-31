@@ -114,18 +114,6 @@ SocketAddress Socket::getLocalAddress() const
     return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 
-//!Implementation of AbstractSocket::getPeerAddress
-SocketAddress Socket::getPeerAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-        return SocketAddress();
-
-    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
-}
-
 //!Implementation of AbstractSocket::close
 void Socket::close()
 {
@@ -312,44 +300,6 @@ bool Socket::post( std::function<void()>&& handler )
 bool Socket::dispatch( std::function<void()>&& handler )
 {
     return m_baseAsyncHelper->dispatch( std::move(handler) );
-}
-
-
-QString Socket::getLocalHostAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getsockname(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        return QString();
-    }
-
-    return QLatin1String(inet_ntoa(addr.sin_addr));
-}
-
-QString Socket::getPeerHostAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        return QString();
-    }
-
-    return QLatin1String(inet_ntoa(addr.sin_addr));
-}
-
-quint32 Socket::getPeerAddressUint() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-        return 0;
-
-    return ntohl(addr.sin_addr.s_addr);
 }
 
 unsigned short Socket::getLocalPort() const
@@ -795,31 +745,6 @@ void CommunicatingSocket::shutdown()
 #else
     ::shutdown(m_fd, SHUT_RDWR);
 #endif
-}
-
-QString CommunicatingSocket::getForeignHostAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
-        qnWarning("Fetch of foreign address failed (getpeername()).");
-        return QString();
-    }
-    return QLatin1String(inet_ntoa(addr.sin_addr));
-}
-
-unsigned short CommunicatingSocket::getForeignPort() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        qWarning()<<"Fetch of foreign port failed (getpeername()). "<<SystemError::getLastOSErrorText();
-        return -1;
-    }
-    return ntohs(addr.sin_port);
 }
 
 void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )

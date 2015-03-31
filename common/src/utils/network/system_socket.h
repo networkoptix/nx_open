@@ -65,8 +65,6 @@ public:
     //bool bindToInterface( const QnInterfaceAndAddr& iface );
     //!Implementation of AbstractSocket::getLocalAddress
     SocketAddress getLocalAddress() const;
-    //!Implementation of AbstractSocket::getPeerAddress
-    SocketAddress getPeerAddress() const;
     //!Implementation of AbstractSocket::close
     virtual void close();
     //!Implementation of AbstractSocket::isClosed
@@ -99,20 +97,6 @@ public:
     bool post( std::function<void()>&& handler );
     //!Implementation of AbstractSocket::dispatchImpl
     bool dispatch( std::function<void()>&& handler );
-
-
-    /**
-     *   Get the local address
-     *   @return local address of socket
-     */
-    QString getLocalHostAddress() const;
-
-    /**
-     *   Get the peer address
-     *   @return remove address of socket
-     */
-    QString getPeerHostAddress() const;
-    quint32 getPeerAddressUint() const;
 
     /**
      *   Get the local port
@@ -213,19 +197,6 @@ public:
 
     void shutdown();
     virtual void close() override;
-
-
-    /**
-     *   Get the foreign address.  Call connect() before calling recv()
-     *   @return foreign address
-     */
-    QString getForeignHostAddress() const;
-
-    /**
-     *   Get the foreign port.  Call connect() before calling recv()
-     *   @return foreign port
-     */
-    unsigned short getForeignPort() const;
 
 private:
     AsyncSocketImplHelper<Pollable>* m_aioHelper;

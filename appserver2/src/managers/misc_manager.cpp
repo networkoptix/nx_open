@@ -29,7 +29,7 @@ template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::~QnMiscManager() {}
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformation, isAlive);
 
@@ -40,7 +40,7 @@ int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInfor
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnModuleInformationWithAddresses> &moduleInformationList, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformationList);
 
@@ -62,16 +62,17 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &systemNam
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const {
+QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive) const {
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo);
     transaction.params.moduleInformation = moduleInformation;
     transaction.params.isAlive = isAlive;
+    transaction.isLocal = true;
 
     return transaction;
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformation> &moduleInformationList) const {
+QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformationWithAddresses> &moduleInformationList) const {
     QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
     for (const QnModuleInformation &moduleInformation: moduleInformationList) {
@@ -80,6 +81,7 @@ QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTrans
         data.isAlive = true;
         transaction.params.push_back(data);
     }
+    transaction.isLocal = true;
 
     return transaction;
 }

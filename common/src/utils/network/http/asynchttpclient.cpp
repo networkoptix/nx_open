@@ -223,6 +223,7 @@ namespace nx_http
         if( errorCode == SystemError::noError )
         {
             //connect successful
+            m_remoteEndpoint = SocketAddress( m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT) );
             serializeRequest();
             m_state = sSendingRequest;
             lk.unlock();
@@ -407,7 +408,7 @@ namespace nx_http
                 if( m_terminated )
                     break;
 
-                //is message body follows?
+                //does message body follow?
                 if( !messageHasMessageBody )
                 {
                     //no message body: done
@@ -533,6 +534,7 @@ namespace nx_http
         }
 
         m_url = url;
+        const SocketAddress remoteEndpoint( url.host(), url.port(nx_http::DEFAULT_HTTP_PORT) );
 
         if( m_socket )
         {
@@ -541,17 +543,19 @@ namespace nx_http
 
             if( !m_connectionClosed &&
                 canUseExistingConnection &&
-                (m_socket->getForeignAddress() == SocketAddress(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT))) )
+                (m_remoteEndpoint == remoteEndpoint) )  //m_socket->getForeignAddress() returns ip address only, not host name
             {
                 ++m_awaitedMessageNumber;   //current message will be skipped
 
                 serializeRequest();
                 m_state = sSendingRequest;
 
-                if( !m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
+                if( !m_socket->sendAsync(
+                        m_requestBuffer,
+                        std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
                 {
-                    NX_LOG( lit("Failed to init async socket call (connecting to %1:%2) to aio service. %3").
-                        arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+                    NX_LOG( lit("Failed to init async socket call (connecting to %1) to aio service. %2").
+                        arg(remoteEndpoint.toString()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                     m_socket.clear();
                     return false;
                 }
@@ -688,7 +692,12 @@ namespace nx_http
 
     void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
     {
-        m_additionalHeaders.insert( make_pair(key, value) );
+        m_additionalHeaders.emplace( key, value );
+    }
+
+    void AsyncHttpClient::removeAdditionalHeader( const StringType& key )
+    {
+        m_additionalHeaders.erase( key );
     }
 
     void AsyncHttpClient::serializeRequest()

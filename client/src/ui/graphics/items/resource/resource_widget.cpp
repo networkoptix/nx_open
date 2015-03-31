@@ -31,6 +31,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
@@ -163,6 +164,11 @@ QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
 }
 
+void QnResourceWidget::setBookmarksLabelText(const QString &text)
+{
+    m_footerBookmarkDescriptionLabel->setText(text);
+    m_footerBookmarkDescriptionLabel->setVisible(!text.isEmpty());
+}
 
 void QnResourceWidget::createButtons() {
     auto checkedButtons = static_cast<Buttons>(m_item->data(Qn::ItemCheckedButtonsRole).toInt());
@@ -242,37 +248,61 @@ void QnResourceWidget::createHeaderOverlay() {
 
 void QnResourceWidget::createFooterOverlay() {
     /* Footer overlay. */
-    m_footerLeftLabel = new GraphicsLabel();
-    m_footerLeftLabel->setAcceptedMouseButtons(0);
-    m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    m_footerRightLabel = new GraphicsLabel();
-    m_footerRightLabel->setAcceptedMouseButtons(0);
-    m_footerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    footerLayout->addItem(m_footerLeftLabel);
-    footerLayout->addStretch(0x1000);
-    footerLayout->addItem(m_footerRightLabel);
-
-    m_footerWidget = new GraphicsWidget();
-    m_footerWidget->setLayout(footerLayout);
-    m_footerWidget->setAcceptedMouseButtons(0);
-    m_footerWidget->setAutoFillBackground(true);
-    setPaletteColor(m_footerWidget, QPalette::Window, overlayBackgroundColor);
-    m_footerWidget->setOpacity(0.0);
-
-    QGraphicsLinearLayout *footerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    footerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    footerOverlayLayout->addStretch(0x1000);
-    footerOverlayLayout->addItem(m_footerWidget);
 
     m_footerOverlayWidget = new QnViewportBoundWidget(this);
-    m_footerOverlayWidget->setLayout(footerOverlayLayout);
+    addOverlayWidget(m_footerOverlayWidget, AutoVisible, true, true, true);
     m_footerOverlayWidget->setAcceptedMouseButtons(0);
     m_footerOverlayWidget->setOpacity(0.0);
-    addOverlayWidget(m_footerOverlayWidget, AutoVisible, true, true, true);
+
+    QGraphicsLinearLayout *footerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical, m_footerOverlayWidget);
+    footerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    footerOverlayLayout->addStretch(0x1000);
+
+    {
+        /// Creates bookmarks descrition area
+        QGraphicsLinearLayout *bookmarksLayout = new QGraphicsLinearLayout(Qt::Horizontal, footerOverlayLayout);
+        footerOverlayLayout->addItem(bookmarksLayout);
+        
+        enum { kSpacerFactor = 3 , kBookmarkFactor = 2 };
+
+        m_footerBookmarkDescriptionLabel = new QnProxyLabel(m_footerOverlayWidget);
+        bookmarksLayout->addItem(m_footerBookmarkDescriptionLabel);
+        bookmarksLayout->setStretchFactor(m_footerBookmarkDescriptionLabel, kBookmarkFactor);
+        m_footerBookmarkDescriptionLabel->setVisible(false);
+        m_footerBookmarkDescriptionLabel->setWordWrap(true);
+        m_footerBookmarkDescriptionLabel->setOpacity(0.0);
+        m_footerBookmarkDescriptionLabel->setAcceptedMouseButtons(0);
+        setPaletteColor(m_footerBookmarkDescriptionLabel, QPalette::Window, overlayBackgroundColor);
+        
+        bookmarksLayout->addStretch(kSpacerFactor);
+    }
+
+    {
+        /// Makes status line at the bottom
+        m_footerWidget = new GraphicsWidget(m_footerOverlayWidget);
+        footerOverlayLayout->addItem(m_footerWidget);
+        m_footerWidget->setAcceptedMouseButtons(0);
+        m_footerWidget->setAutoFillBackground(true);
+        setPaletteColor(m_footerWidget, QPalette::Window, overlayBackgroundColor);
+        m_footerWidget->setOpacity(0.0);
+
+        {
+            QGraphicsLinearLayout *lowerLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_footerWidget);
+            lowerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+
+            m_footerLeftLabel = new GraphicsLabel();
+            lowerLayout->addItem(m_footerLeftLabel);
+            m_footerLeftLabel->setAcceptedMouseButtons(0);
+            m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+
+            lowerLayout->addStretch(0x1000);
+
+            m_footerRightLabel = new GraphicsLabel();
+            lowerLayout->addItem(m_footerRightLabel);
+            m_footerRightLabel->setAcceptedMouseButtons(0);
+            m_footerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+        }
+    }
 }
 
 void QnResourceWidget::createCustomOverlays() {
@@ -451,7 +481,7 @@ void QnResourceWidget::setInfoTextFormat(const QString &infoTextFormat) {
 
 void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
     QString leftText, rightText;
-    
+
     splitFormat(infoText, &leftText, &rightText);
 
     m_footerLeftLabel->setText(leftText);
@@ -732,10 +762,15 @@ void QnResourceWidget::updateInfoVisiblity(bool animate)
 
     qreal opacity = visible ? 1.0 : 0.0;
 
-    if(animate) {
+    if(animate) 
+    {
         opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
-    } else {
+        opacityAnimator(m_footerBookmarkDescriptionLabel, 1.0)->animateTo(opacity);
+    }
+    else 
+    {
         m_footerWidget->setOpacity(opacity);
+        m_footerBookmarkDescriptionLabel->setOpacity(opacity);
     }
 
     if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
