@@ -106,6 +106,7 @@ public:
             {
                 QMutexLocker lock(&m_mutex);
                 if (m_scanTasks.isEmpty()) {
+                    m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
                     m_waitCond.wait(&m_mutex, 100);
                     continue;
                 }
@@ -148,8 +149,6 @@ public:
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 1.0));
             }
             m_scanTasks.removeFirst(1);
-            if (m_scanTasks.isEmpty())
-                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
         }
     }
 };
@@ -349,7 +348,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         newCatalog->doRebuildArchive(storage, rebuildPeriod);
         
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
-        replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
+        if (!m_rebuildCancelled)
+            replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
 
         m_archiveRebuildInfo.progress += progressCoeff / (double) list.size();
     }

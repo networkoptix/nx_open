@@ -19,6 +19,7 @@
 #include "media_server/serverutil.h"
 #include "utils/common/util.h"
 #include "core/resource/camera_user_attribute_pool.h"
+#include "utils/license_usage_helper.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
     : m_serverId(serverId)
@@ -175,8 +176,16 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 
     if (!existCamRes && m_defaultUserAttrs) 
     {
-        m_defaultUserAttrs->cameraID = cameraResource->getId();
-        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(QnCameraUserAttributesList() << m_defaultUserAttrs);
+        QnCameraUserAttributesPtr userAttrCopy(new QnCameraUserAttributes(*m_defaultUserAttrs.data()));
+        if (!userAttrCopy->scheduleDisabled) {
+            QnCamLicenseUsageHelper helper;
+            helper.propose(QnVirtualCameraResourceList() << cameraResource, true);
+            if (!helper.isValid())
+                userAttrCopy->scheduleDisabled = true;
+        }
+        userAttrCopy->cameraID = cameraResource->getId();
+
+        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(QnCameraUserAttributesList() << userAttrCopy);
         if (errCode != ec2::ErrorCode::ok)
         {
             NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
