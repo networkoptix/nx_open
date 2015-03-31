@@ -16,7 +16,7 @@
 
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>2.3.0-SNAPSHOT</version>
-    <artifactId>paxton-plugin</artifactId>
+    <artifactId>paxton-installer</artifactId>
     <packaging>pom</packaging>
     <name>HD Witness Generic RTSP plugin</name> 
 
@@ -59,8 +59,8 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${project.build.directory}/build.bat</executable>
-                            <workingDirectory>${project.basedir}</workingDirectory>     
+                            <executable>${project.build.directory}/build-installer.bat</executable>
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
                         </configuration>
                     </execution>
                 </executions>
