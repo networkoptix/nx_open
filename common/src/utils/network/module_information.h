@@ -30,6 +30,8 @@ struct QnModuleInformation {
     bool isLocal() const; //!< true if at least one address from \a remoteHostAddress is a local address
 
     static QString nxMediaServerId();
+    static QString nxECId();
+    static QString nxClientId();
 };
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(remoteAddresses)(id)(sslAllowed)(authHash)(protoVersion)
 

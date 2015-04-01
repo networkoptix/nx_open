@@ -23,14 +23,6 @@ namespace {
 
     const QHostAddress defaultModuleRevealMulticastGroup(lit("239.255.11.11"));
     const quint16 defaultModuleRevealMulticastGroupPort = 5007;
-
-    /*!
-        This string represents client during search with NetworkOptixModuleFinder class.
-        It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
-    */
-    const QString nxClientId = lit("client.exe");
-    const QString nxECId = lit("Enterprise Controller");
-
 } // anonymous namespace
 
 QnMulticastModuleFinder::QnMulticastModuleFinder(
@@ -221,7 +213,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (response.seed == qnCommon->moduleGUID().toString())
         return true; // ignore requests to himself
 
-    if (response.type != QnModuleInformation::nxMediaServerId() && response.type != nxECId)
+    if (response.type != QnModuleInformation::nxMediaServerId() && response.type != QnModuleInformation::nxECId())
         return true;
 
     if (!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower()) { // TODO: #2.1 #Elric #AK check for "default" VS "Vms"

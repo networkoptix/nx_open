@@ -7,6 +7,12 @@
 #include <nx_ec/ec_proto_version.h>
 
 namespace {
+    /*!
+        This string represents client during search with NetworkOptixModuleFinder class.
+        It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
+    */
+    const QString nxClientId = lit("client.exe");
+    const QString nxECId = lit("Enterprise Controller");
     const QString nxMediaServerId = lit("Media Server");
 }
 
@@ -29,6 +35,14 @@ bool QnModuleInformation::isLocal() const {
 
 QString QnModuleInformation::nxMediaServerId() {
     return ::nxMediaServerId;
+}
+
+QString QnModuleInformation::nxECId() {
+    return ::nxECId;
+}
+
+QString QnModuleInformation::nxClientId() {
+    return ::nxClientId;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation, (json)(eq), QnModuleInformation_Fields)
