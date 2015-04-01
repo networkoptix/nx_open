@@ -1,4 +1,59 @@
-----------------------------------------------2.3.0.xxxx-------------------------------------------
+----------------------------------------------2.3.1.xxxx-------------------------------------------
+Features:
+5389 - Edge Introduced
+
+Improvements:
+5255 - "Disable automatic update popup." check box should be introduced on Syestem administration -> general next to 2 existing check box.
+5318 - Dewarping on local files
+2201 - Combine all settings that require transcoding
+4978(5336) - Peer-to-peer synchronization algorithm is greatly improved. This will greatly reduce network and memory usage in multi-server environments.
+5221,5284,5321,5348 - Memory usage optimized (less than 2.2.1)
+4766 - If global setting "Allow system to optimize camera settings" is disabled, the Cameras' "Keep Camera Streams" flag is disabled too (used to work independently)
+4782 - Each time a user used "Push my Screen" in a video Wall mode, new layout was always created. Now it isn't
+5225 - If a camera went offline/online during PTZ Tour it was switched to Home Position. Now Tour continues
+3252 - New version notification is displayed to administrators only
+5303 - API has been improved. Check the API documentation for more details
+5340 - Server startup speeded up
+4544 - IQ Cameras compatibility improved
+5355 - Axis Cameras compatibility improved
+5216 - Cameras start displaying faster if opened up
+5369 - NAS storages support improved
+5276 - ?
+
+Bug Fixes:
+4763 - If a camera was being recorded and deleted, then if it discovered again recording was set automatically. Now it isn't
+3268 - Fixed the issue when sometimes empty lines appeared in layouts if deleting cameras
+3872,5337 - Sometimes the cameras that was recorded on a failover server didn't come back if the primary server was online. Fixed
+5200 - Screenshot from panoramic camera showed picture from only one sensor. Fixed
+5213 - Windows OS resizing issue - if double clicking on the application frame in computers running Windows the client does not always display properly. 
+5218 - If an external storage was mounted after Server start, archive from it wasn't available till restart
+5270 - Sometimes the "Camera Disconnect" didn't show up for cameras that wasn't recording. Fixed
+5297 - Sometimes the "Network Issue" icon in Tree didn't disappear for camera after 2 minutes of correct work. Fixed
+5306 - If Failover occurred and camera was moved several times between servers, its status could be displayed incorrectly. Fixed
+5307 - Server could not open RTSP Link streamed by another Server. Fixed
+5332 - Fixed Acti searcher bug: sometimes MAC address switched to 00-00-00-00-00-00
+5383 - Event log filter by cameras did not work properly. Fixed
+5214 - MAC OS - Update notification popped up even if all components were of the same latest version. Fixed
+5327 - Anti-Virus (BitDefender) fix
+5341 - In rare cases Split/Merge Systems worked incorrectly if servers were accessing each other via Public IP (Client could not reconnect). Fixed
+5357 - Sometimes incorrect firmware versions was displayed (if a firmware was upgraded after the camera was discovered). Fixed
+
+----------------------------------------------2.3.0.8344-------------------------------------------
+March 30, 2015
+Since the release of v2.3 the we have been closely monitoring ongoing support issues and have found a few consistent bugs that we've decided to address in the form of an updated patch - Build 8344.
+
+BUG FIXES IN 8344 BUILD
+ - Android App update - slight update to the server and fixed display issues on Nexus 6 devices. The latest app is available for download now on Google Play.
+ - Timeline recorded video fix - green segments for recorded video on the timeline were occasionally not displaying properly. This issue has been fixed.
+ - Rare System Freeze - Two branches of code in v2.3 were conflicting and this resulted in the some users experienced a stoppage of recording, system merge failures, and slow camera loading. This issue has been fixed.
+ - Non-IP Server Address Issue - the server hive environment worked incorrectly if servers  were set to address each other by DNS (rather than IP). This could lead to various intermittent problems.This issue has been fixed.
+ - NAS storage issue - if NAS was in a system and then removed or unable to be discovered after an upgrade the Server pointed at that NAS address would take up to 10 minutes to start.
+
+KNOWN ISSUES WITH BUILD 8344
+ - This version does not contain Anti-Virus (BitDefender) fix. We're still working on it. As soon as we're done, we'll give you a patched version for installations using BitDefender.
+ - Windows OS resizing issue - if double clicking on the application frame in computers running Windows the client does not always display properly. Still an issue - fix coming soon.
+
+----------------------------------------------2.3.0.8212-------------------------------------------
 Known Issues:
 
 Client cannot run on Windows 2003/XP x64.
