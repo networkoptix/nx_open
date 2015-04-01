@@ -106,6 +106,7 @@ public:
             {
                 QMutexLocker lock(&m_mutex);
                 if (m_scanTasks.isEmpty()) {
+                    m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
                     m_waitCond.wait(&m_mutex, 100);
                     continue;
                 }
@@ -148,8 +149,6 @@ public:
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 1.0));
             }
             m_scanTasks.removeFirst(1);
-            if (m_scanTasks.isEmpty())
-                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
         }
     }
 };
@@ -349,7 +348,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         newCatalog->doRebuildArchive(storage, rebuildPeriod);
         
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
-        replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
+        if (!m_rebuildCancelled)
+            replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
 
         m_archiveRebuildInfo.progress += progressCoeff / (double) list.size();
     }
@@ -1087,25 +1087,6 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     return result;
 }
 
-int QnStorageManager::getFileNumFromCache(const QString& base, const QString& folder)
-{
-    QMutexLocker lock(&m_cacheMutex);
-    FileNumCache::iterator itr = m_fileNumCache.find(base);
-    if (itr == m_fileNumCache.end())
-        itr = m_fileNumCache.insert(base, QPair<QString, int >());
-    if (itr.value().first != folder) {
-        itr.value().first = folder;
-        itr.value().second = -1;
-    }
-    return itr.value().second;
-}
-
-void QnStorageManager::putFileNumToCache(const QString& base, int fileNum)
-{
-    QMutexLocker lock(&m_cacheMutex);
-    m_fileNumCache[base].second = fileNum;
-}
-
 QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr &camera, const QString& prefix, const QnStorageResourcePtr& storage)
 {
     if (!storage) {
@@ -1126,23 +1107,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
     Q_ASSERT(!camera->getPhysicalId().isEmpty());
     QString text = base + separator + dateTimeStr(dateTime, timeZone, separator);
 
-    int fileNum = getFileNumFromCache(base, text);
-    if (fileNum == -1)
-    {
-        fileNum = 0;
-        QList<QFileInfo> list = storage->getFileList(text);
-        QList<QString> baseNameList;
-        for(const QFileInfo& info: list)
-            baseNameList << info.completeBaseName();
-        qSort(baseNameList.begin(), baseNameList.end());
-        if (!baseNameList.isEmpty()) 
-            fileNum = baseNameList.last().toInt() + 1;
-    }
-    else {
-        fileNum++; // using cached value
-    }
-    putFileNumToCache(base, fileNum);
-    return text + strPadLeft(QString::number(fileNum), 3, '0');
+    return text + QString::number(dateTime);
 }
 
 DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix)
@@ -1277,7 +1242,7 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     DeviceFileCatalogPtr catalog = getFileCatalog(mac.toUtf8(), quality);
     if (catalog == 0)
         return false;
-    DeviceFileCatalog::Chunk chunk(startDateMs, storageIndex, QnFile::baseName(fileName).toInt(), -1, (qint16) timeZone);
+    DeviceFileCatalog::Chunk chunk(startDateMs, storageIndex, DeviceFileCatalog::Chunk::FILE_INDEX_NONE, -1, (qint16) timeZone);
     catalog->addRecord(chunk);
     return true;
 }

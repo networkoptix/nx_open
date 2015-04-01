@@ -272,7 +272,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>重複サーバー: %1</translation>
     </message>
 </context>
 <context>
@@ -315,95 +315,95 @@
     </message>
     <message>
         <source>Server %1 is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー %1 は無効です.</translation>
     </message>
     <message>
         <source>Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーが起動しているか確認してください.</translation>
     </message>
     <message>
         <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー %1: &quot;%2&quot;から不具合応答を受信.</translation>
     </message>
     <message>
         <source>Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーが起動していて適切なバージョンであるか確認してください.</translation>
     </message>
     <message>
         <source>Cannot connect to http port %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>httpポート%1.に接続できません.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラがネットワークに接続されているか確認してください.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアurl%1.を開けません　メディアポート%2.への接続失敗.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>ポート%2にアクセスできるか確認してください　カメラを再起動してwebページより初期設定に戻してください.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアurl %1を開けません　ポート%2が閉じられました.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラがネットワークに接続されているか確認してください　カメラの再起動を行ってください.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラレスポンスを解析できません　url %1　リクエスト名 %2.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラを再起動してwebページより初期設定に戻してください.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファームウェアの更新を行ってください　問題が継続する場合はサポートにお問合せください.</translation>
     </message>
     <message>
         <source>No supported media tracks at url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>サポートされないメディアトラック　url%1.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアurl%1が開けません　サポートされないメディアプロトコル %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>パラメーター %1.設定失敗.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>録画を開始してFPSを減らしてください.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>解決しない場合はカメラのwebページより初期設定に戻してください　問題が解決しない場合はサポートにお問合せください.</translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラリクエスト&quot;%1&quot;はエラー&quot;%2&quot;で失敗しました.</translation>
     </message>
     <message>
         <source>Unknown Camera Issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>不明なカメラ問題.</translation>
     </message>
     <message>
         <source>Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>サポートにお問合せください.</translation>
     </message>
     <message>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>インプット/アウトプットエラー発生　OSメッセージ&quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>パラメーター:</translation>
     </message>
 </context>
 <context>
@@ -808,51 +808,51 @@
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation>時刻同期を行うサーバー</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブインデックスのリビルド終了</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailアドレスが設定されていません.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailでのシステム通知を受信できません.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailサーバーが設定されていません.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailアドレスが設定されていないユーザーがいます.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailでのシステム通知を受信できません.</translation>
     </message>
     <message>
         <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>ストレージが一杯のサーバー:</translation>
     </message>
     <message>
         <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>ストレージが設定されていないサーバー:</translation>
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンス無し.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラを録画できません.</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブインデックスリビルド終了サーバー:</translation>
     </message>
 </context>
 <context>

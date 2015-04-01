@@ -41,22 +41,16 @@ namespace ec2
         }
     };
 
-    class CommonRequestsProcessor
-    {
-    public:
-        static ErrorCode getCurrentTime( std::nullptr_t, qint64* curTime )
-        {
-            *curTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-            return ErrorCode::ok;
-        }
-    };
-
-
     class ServerQueryProcessor
     {
     public:
         virtual ~ServerQueryProcessor() {}
 
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
         template<class QueryDataType, class HandlerType>
         void processUpdateAsync( QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
         {
@@ -69,6 +63,197 @@ namespace ec2
                 } );
         }
 
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiIdDataList>& tran, HandlerType handler )
+        {
+            if (tran.command == ApiCommand::removeStorages)             {
+                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeStorage);
+            }
+            else if (tran.command == ApiCommand::removeResources) 
+            {
+                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeResource);
+            }
+            else {
+                Q_ASSERT_X(0, "Not implemented", Q_FUNC_INFO);
+            }
+        }
+
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
+        template<class HandlerType>
+        void processUpdateAsync( QnTransaction<ApiIdData>& tran, HandlerType handler )
+        {
+            //TODO #ak there is processUpdateSync with same switch. Remove switch from here!
+
+            switch (tran.command)
+            {
+            case ApiCommand::removeMediaServer:
+                return removeResourceAsync( tran, ApiObject_Server, handler );
+            case ApiCommand::removeUser:
+                return removeResourceAsync( tran, ApiObject_User, handler );
+            case ApiCommand::removeResource:
+            {
+                QnTransaction<ApiIdData> updatedTran = tran;
+                switch(dbManager->getObjectType(tran.params.id))
+                {
+                case ApiObject_Server:
+                    updatedTran.command = ApiCommand::removeMediaServer;
+                    break;
+                case ApiObject_Camera:
+                    updatedTran.command = ApiCommand::removeCamera;
+                    break;
+                case ApiObject_Storage:
+                    updatedTran.command = ApiCommand::removeStorage;
+                    break;
+                case ApiObject_User:
+                    updatedTran.command = ApiCommand::removeUser;
+                    break;
+                case ApiObject_Layout:
+                    updatedTran.command = ApiCommand::removeLayout;
+                    break;
+                case ApiObject_Videowall:
+                    updatedTran.command = ApiCommand::removeVideowall;
+                    break;
+                case ApiObject_BusinessRule:
+                    updatedTran.command = ApiCommand::removeBusinessRule;
+                    break;
+                default:
+                    return processUpdateAsync(tran, handler, 0); // call default handler
+                }
+                return processUpdateAsync(updatedTran, handler);
+            }
+            default:
+                return processUpdateAsync(tran, handler, 0); // call default handler
+            }
+        }
+
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiLicenseDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::addLicenses);
+            return processMultiUpdateAsync<ApiLicenseDataList, ApiLicenseData>(tran, handler, ApiCommand::addLicense);
+        }
+
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiLayoutDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveLayouts);
+            return processMultiUpdateAsync<ApiLayoutDataList, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
+        }
+
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiCameraDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveCameras);
+            return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
+        }
+
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiStorageDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveStorages);
+            return processMultiUpdateAsync<ApiStorageDataList, ApiStorageData>(tran, handler, ApiCommand::saveStorage);
+        }
+
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiCameraAttributesDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);
+            return processMultiUpdateAsync<ApiCameraAttributesDataList, ApiCameraAttributesData>(tran, handler, ApiCommand::saveCameraUserAttributes);
+        }
+
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiMediaServerUserAttributesDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
+            return processMultiUpdateAsync<ApiMediaServerUserAttributesDataList, ApiMediaServerUserAttributesData>(tran, handler, ApiCommand::saveServerUserAttributes);
+        }
+
+        //!Execute transaction
+        /*!
+            Transaction executed locally and broadcasted through the whole cluster
+            \param handler Called upon request completion. Functor( ErrorCode )
+        */
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiResourceParamWithRefDataList>& tran, HandlerType handler )
+        {
+            if(tran.command == ApiCommand::setResourceParams)
+                return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::setResourceParam);
+            else if(tran.command == ApiCommand::removeResourceParams)
+                return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::removeResourceParam);
+            else
+                Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
+        }
+
+        //!Asynchronously fetches data from DB
+        /*!
+            \param handler Functor ( ErrorCode, OutputData )
+            TODO #ak let compiler guess template params
+        */
+        template<class InputData, class OutputData, class HandlerType>
+            void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler )
+        {
+            QnConcurrent::run( Ec2ThreadPool::instance(), [input, handler]() {
+                OutputData output;
+                const ErrorCode errorCode = dbManager->doQuery( input, output );
+                handler( errorCode, output );
+            } );
+        }
+
+        //!Asynchronously fetches data from DB
+        /*!
+            \param handler Functor ( ErrorCode, OutputData )
+            TODO #ak let compiler guess template params
+        */
+        template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
+            void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2, HandlerType handler )
+        {
+            QnConcurrent::run( Ec2ThreadPool::instance(), [input1, input2, handler]() {
+                OutputData output;
+                const ErrorCode errorCode = dbManager->doQuery( input1, input2, output );
+                handler( errorCode, output );
+            } );
+        }
+
+    private:
         /*!
             \param syncFunction ErrorCode( QnTransaction<QueryDataType>& , std::list<std::function<void()>>* )
         */
@@ -242,149 +427,6 @@ namespace ec2
                 } );
         }
 
-        template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiIdDataList>& tran, HandlerType handler )
-        {
-            if (tran.command == ApiCommand::removeStorages)             {
-                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeStorage);
-            }
-            else if (tran.command == ApiCommand::removeResources) 
-            {
-                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeResource);
-            }
-            else {
-                Q_ASSERT_X(0, "Not implemented", Q_FUNC_INFO);
-            }
-        }
-
-
-        template<class HandlerType>
-        void processUpdateAsync( QnTransaction<ApiIdData>& tran, HandlerType handler )
-        {
-            //TODO #ak there is processUpdateSync with same switch. Remove switch from here!
-
-            switch (tran.command)
-            {
-            case ApiCommand::removeMediaServer:
-                return removeResourceAsync( tran, ApiObject_Server, handler );
-            case ApiCommand::removeUser:
-                return removeResourceAsync( tran, ApiObject_User, handler );
-            case ApiCommand::removeResource:
-            {
-                QnTransaction<ApiIdData> updatedTran = tran;
-                switch(dbManager->getObjectType(tran.params.id))
-                {
-                case ApiObject_Server:
-                    updatedTran.command = ApiCommand::removeMediaServer;
-                    break;
-                case ApiObject_Camera:
-                    updatedTran.command = ApiCommand::removeCamera;
-                    break;
-                case ApiObject_Storage:
-                    updatedTran.command = ApiCommand::removeStorage;
-                    break;
-                case ApiObject_User:
-                    updatedTran.command = ApiCommand::removeUser;
-                    break;
-                case ApiObject_Layout:
-                    updatedTran.command = ApiCommand::removeLayout;
-                    break;
-                case ApiObject_Videowall:
-                    updatedTran.command = ApiCommand::removeVideowall;
-                    break;
-                case ApiObject_BusinessRule:
-                    updatedTran.command = ApiCommand::removeBusinessRule;
-                    break;
-                default:
-                    return processUpdateAsync(tran, handler, 0); // call default handler
-                }
-                return processUpdateAsync(updatedTran, handler);
-            }
-            default:
-                return processUpdateAsync(tran, handler, 0); // call default handler
-            }
-        }
-
-        template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiLicenseDataList>& tran, HandlerType handler )
-        {
-            Q_ASSERT(tran.command == ApiCommand::addLicenses);
-            return processMultiUpdateAsync<ApiLicenseDataList, ApiLicenseData>(tran, handler, ApiCommand::addLicense);
-        }
-
-        template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiLayoutDataList>& tran, HandlerType handler )
-        {
-            Q_ASSERT(tran.command == ApiCommand::saveLayouts);
-            return processMultiUpdateAsync<ApiLayoutDataList, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
-        }
-
-        template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiCameraDataList>& tran, HandlerType handler )
-        {
-            Q_ASSERT(tran.command == ApiCommand::saveCameras);
-            return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
-        }
-
-        template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiStorageDataList>& tran, HandlerType handler )
-        {
-            Q_ASSERT(tran.command == ApiCommand::saveStorages);
-            return processMultiUpdateAsync<ApiStorageDataList, ApiStorageData>(tran, handler, ApiCommand::saveStorage);
-        }
-
-        template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiCameraAttributesDataList>& tran, HandlerType handler )
-        {
-            Q_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);
-            return processMultiUpdateAsync<ApiCameraAttributesDataList, ApiCameraAttributesData>(tran, handler, ApiCommand::saveCameraUserAttributes);
-        }
-
-        template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiMediaServerUserAttributesDataList>& tran, HandlerType handler )
-        {
-            Q_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
-            return processMultiUpdateAsync<ApiMediaServerUserAttributesDataList, ApiMediaServerUserAttributesData>(tran, handler, ApiCommand::saveServerUserAttributes);
-        }
-
-        template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiResourceParamWithRefDataList>& tran, HandlerType handler )
-        {
-            if(tran.command == ApiCommand::setResourceParams)
-                return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::setResourceParam);
-            else if(tran.command == ApiCommand::removeResourceParams)
-                return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::removeResourceParam);
-            else
-                Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
-        }
-
-        /*!
-            \param handler Functor ( ErrorCode, OutputData )
-            TODO let compiler guess template params
-        */
-        template<class InputData, class OutputData, class HandlerType>
-            void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler )
-        {
-            QnConcurrent::run( Ec2ThreadPool::instance(), [input, handler]() {
-                OutputData output;
-                const ErrorCode errorCode = dbManager->doQuery( input, output );
-                handler( errorCode, output );
-            } );
-        }
-
-        /*!
-            \param handler Functor ( ErrorCode, OutputData )
-            TODO let compiler guess template params
-        */
-        template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
-            void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2, HandlerType handler )
-        {
-            QnConcurrent::run( Ec2ThreadPool::instance(), [input1, input2, handler]() {
-                OutputData output;
-                const ErrorCode errorCode = dbManager->doQuery( input1, input2, output );
-                handler( errorCode, output );
-            } );
-        }
         private:
             static QMutex m_updateDataMutex;
     };

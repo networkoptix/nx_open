@@ -296,7 +296,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         bool doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
         if (doTranscode) 
         {
-            dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement (requires transcoding)"), &doTranscode, delegate);
+            dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)"), &doTranscode, delegate);
         }
 
         if (!dialog->exec())

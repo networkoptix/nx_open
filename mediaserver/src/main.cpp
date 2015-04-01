@@ -41,6 +41,7 @@
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
@@ -989,7 +990,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );
+        messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );        
 
         //read server's storages
         QnResourceList storages;
@@ -1521,6 +1522,7 @@ void QnMain::run()
     QnConnectionInfo connectInfo;
     QnResourcePropertyDictionary dictionary;
     QnResourceStatusDictionary statusDict;
+    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
 
     while (!needToStop())
     {
