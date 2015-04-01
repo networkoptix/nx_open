@@ -273,6 +273,7 @@ void AxHDWitness::setSpeed(double speed)
     if(!m_mainWindow)
         return;
 
+    qDebug() << "set speed to" << speed;
     m_context->navigator()->setSpeed(speed);
 }
 
@@ -566,13 +567,15 @@ void AxHDWitness::doFinalize()
 {
 	qApp->processEvents();
 
+    if (m_context)
+        disconnect(m_context->navigator(), NULL, this, NULL);
+
     if (m_mainWindow) {
         delete m_mainWindow;
         m_mainWindow = 0;
     }
 
-	m_ec2ConnectionFactory.reset(NULL);
-
+	m_ec2ConnectionFactory.reset(NULL);   
 	m_context.reset(NULL);
 
     m_serverInterfaceWatcher.reset(NULL);
@@ -662,4 +665,21 @@ void AxHDWitness::createMainWindow() {
     /* Show FPS in debug. */
     m_context->menu()->trigger(Qn::ShowFpsAction);
 #endif
+
+    connect(m_context->navigator(), &QnWorkbenchNavigator::playingChanged, this, [this] {
+         if (m_context->navigator()->isPlaying()) {
+             qDebug() << "setPlaying";
+//             emit started();
+         }
+         else {
+             qDebug() <<"paused";
+//             emit paused();
+         }
+    });
+
+    connect(m_context->navigator(), &QnWorkbenchNavigator::speedChanged, this, [this] {
+        qreal speed = m_context->navigator()->speed();
+        qDebug() << "speedChanged to" << speed;
+//        emit speedChanged(speed);
+    });
 }

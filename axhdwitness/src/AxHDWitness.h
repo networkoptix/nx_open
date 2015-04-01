@@ -78,6 +78,10 @@ public slots:
     QString resourceListXml();
 
 signals:
+//     void started();
+//     void paused();
+//     void speedChanged(double speed);
+
     void connectionProcessed(int status, const QString &message);
 
 protected:
