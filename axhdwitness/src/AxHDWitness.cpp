@@ -439,6 +439,7 @@ void AxHDWitness::slidePanelsOut() {
 
 bool AxHDWitness::doInitialize()
 {
+    
 	AllowSetForegroundWindow(ASFW_ANY);
 
 	int argc = 0;
@@ -490,21 +491,10 @@ bool AxHDWitness::doInitialize()
     ec2::ResourceContext resCtx(QnServerCameraFactory::instance(), qnResPool, qnResTypePool);
 	m_ec2ConnectionFactory->setContext( resCtx );
 	QnAppServerConnectionFactory::setEC2ConnectionFactory( m_ec2ConnectionFactory.data() );
-
-    /* Initialize connections. */
-    // initAppServerConnection();
-    // qnSettings->save();
-
+    
     /* Initialize application instance. */
     QApplication::setStartDragDistance(20);
     
-
-//ax23    QnToolTip::instance();
-
-#if 0 // AXFIXME
-    QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
-#endif
-
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
         return false;
@@ -520,29 +510,25 @@ bool AxHDWitness::doInitialize()
     cl_log.log("Software version: ", QnAppInfo::applicationVersion(), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
-
+    
 	QnSessionManager::instance()->start();
-
+    
     ffmpegInit();
-
+    
+    /*
     m_moduleFinder.reset(new QnModuleFinder(true));
     m_moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
     m_moduleFinder->start();
-
+    */
+    /*
     m_router.reset(new QnRouter(m_moduleFinder.data(), true));
     m_globalModuleFinder.reset(new QnGlobalModuleFinder());
     m_serverInterfaceWatcher.reset(new QnServerInterfaceWatcher(m_router.data()));
+    */
 
     //===========================================================================
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
-
-
-//x    OpenSSL_add_all_digests(); // open SSL init
-
-    //===========================================================================
-
-//    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
@@ -559,13 +545,13 @@ bool AxHDWitness::doInitialize()
     connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
         emit connectionProcessed(0, QString());
     }, Qt::QueuedConnection);
-
+    
     return true;
 }
 
 void AxHDWitness::doFinalize()
 {
-	qApp->processEvents();
+    qApp->processEvents();
 
     if (m_context)
         disconnect(m_context->navigator(), NULL, this, NULL);
@@ -575,17 +561,15 @@ void AxHDWitness::doFinalize()
         m_mainWindow = 0;
     }
 
-	m_ec2ConnectionFactory.reset(NULL);   
-	m_context.reset(NULL);
+    m_ec2ConnectionFactory.reset(NULL);   
+    m_context.reset(NULL);
 
-    m_serverInterfaceWatcher.reset(NULL);
-    m_globalModuleFinder.reset(NULL);
-    m_router.reset(NULL);
-
-    m_moduleFinder->stop();
-    m_moduleFinder.reset(NULL);
-
-    // ffmpegInit(); deinit ?
+    //     m_serverInterfaceWatcher.reset(NULL);
+    //     m_globalModuleFinder.reset(NULL);
+    //     m_router.reset(NULL);
+    // 
+    //     m_moduleFinder->stop();
+    //     m_moduleFinder.reset(NULL);
 
     QnSessionManager::instance()->stop();
 
@@ -593,7 +577,7 @@ void AxHDWitness::doFinalize()
     customizer.reset(NULL);
 
     skin.reset(NULL);
-	m_serverCameraFactory.reset(NULL);
+    m_serverCameraFactory.reset(NULL);
     m_runtimeInfoManager.reset(NULL);
     m_clientMessageProcessor.reset(NULL);
     m_globalSettings.reset(NULL);
@@ -606,44 +590,13 @@ void AxHDWitness::doFinalize()
 
     QnResourcePool::initStaticInstance(NULL);
 
-	m_mediaServerUserAttributesPool.reset(NULL);
-	m_cameraUserAttributePool.reset(NULL);
+    m_mediaServerUserAttributesPool.reset(NULL);
+    m_cameraUserAttributePool.reset(NULL);
 
     m_syncTime.reset(NULL);
     m_clientModule.reset(NULL);
 
 	m_timerManager.reset(NULL);
-
-	// qApp->deleteLater();
-
-
-
-
-	/*
-	m_moduleFinder->stop();
-	QnSessionManager::instance()->stop();
-	delete QnCommonModule::instance();
-	m_clientModule.reset(0);
-
-
-    qInstallMessageHandler(defaultMsgHandler);
-
-	m_context.reset();
-
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL ); */
-
-	// qApp->deleteLater();
-
-    // QnClientMessageProcessor::instance()->stop();
-    //xQnSessionManager::instance()->stop();
-
-    // QnResource::stopCommandProc();
-    //QnResourceDiscoveryManager::instance().stop();
-    //xdelete QnResourcePool::instance();
-    //xQnResourcePool::initStaticInstance( NULL );
-
-	// QThread::msleep(1000);
 }
 
 void AxHDWitness::createMainWindow() {
