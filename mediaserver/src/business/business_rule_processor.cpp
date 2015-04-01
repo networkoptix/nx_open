@@ -674,7 +674,7 @@ void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& res
 {
     QMutexLocker lock(&m_mutex);
 
-    QnVirtualCameraResourcePtr camResource = resource.staticCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr camResource = resource.dynamicCast<QnVirtualCameraResource>();
     if(!camResource)
         return;
 
