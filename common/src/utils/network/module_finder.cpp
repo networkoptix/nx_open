@@ -23,9 +23,9 @@ QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_directModuleFinderHelper(new QnModuleFinderHelper(this))
 {
-    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
-    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
-    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleChanged,            this,       &QnModuleFinder::at_moduleChanged);
+//     connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
+//     connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
+//     connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleChanged,            this,       &QnModuleFinder::at_moduleChanged);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlFound,              this,       &QnModuleFinder::at_moduleUrlFound);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlLost,               this,       &QnModuleFinder::at_moduleUrlLost);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleChanged,               this,       &QnModuleFinder::at_moduleChanged);
@@ -36,7 +36,7 @@ QnModuleFinder::~QnModuleFinder() {
 }
 
 void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
-    m_multicastModuleFinder->setCompatibilityMode(compatibilityMode);
+//    m_multicastModuleFinder->setCompatibilityMode(compatibilityMode);
     m_directModuleFinder->setCompatibilityMode(compatibilityMode);
 }
 
@@ -66,12 +66,12 @@ QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
 }
 
 void QnModuleFinder::start() {
-    m_multicastModuleFinder->start();
+//    m_multicastModuleFinder->start();
     m_directModuleFinder->start();
 }
 
 void QnModuleFinder::pleaseStop() {
-    m_multicastModuleFinder->pleaseStop();
+//    m_multicastModuleFinder->pleaseStop();
     m_directModuleFinder->pleaseStop();
 }
 
@@ -164,7 +164,7 @@ void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformati
     if (sender() == m_multicastModuleFinder.get())
         updatedModuleInformation.remoteAddresses.unite(m_directModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
     else if (sender() == m_directModuleFinder)
-        updatedModuleInformation.remoteAddresses.unite(m_multicastModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
+    {}// updatedModuleInformation.remoteAddresses.unite(m_multicastModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
     else
         Q_ASSERT_X(0, "Invalid sender in slot", Q_FUNC_INFO);
 
@@ -186,7 +186,7 @@ void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformati
 }
 
 void QnModuleFinder::stop() {
-    m_multicastModuleFinder->stop();
+ //   m_multicastModuleFinder->stop();
     m_directModuleFinder->stop();
 }
 

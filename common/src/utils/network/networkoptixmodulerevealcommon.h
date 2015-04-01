@@ -11,17 +11,6 @@
 
 #include <utils/network/module_information.h>
 
-/*!
-    This string represents client during search with NetworkOptixModuleFinder class.
-    It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
-*/
-static const QString nxClientId = lit("client.exe");
-static const QString nxMediaServerId = lit("Media Server");
-static const QString nxECId = lit("Enterprise Controller");
-
-static const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(lit("239.255.11.11"));
-static const quint16 defaultModuleRevealMulticastGroupPort = 5007;
-
 //!This request is sent by host which tries to find other modules
 class RevealRequest
 {

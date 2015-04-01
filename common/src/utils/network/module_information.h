@@ -28,6 +28,8 @@ struct QnModuleInformation {
     bool isCompatibleToCurrentSystem() const;
     bool hasCompatibleVersion() const;
     bool isLocal() const; //!< true if at least one address from \a remoteHostAddress is a local address
+
+    static QString nxMediaServerId();
 };
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(remoteAddresses)(id)(sslAllowed)(authHash)(protoVersion)
 

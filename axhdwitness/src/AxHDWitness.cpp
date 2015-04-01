@@ -515,16 +515,15 @@ bool AxHDWitness::doInitialize()
     
     ffmpegInit();
     
-    /*
+    
     m_moduleFinder.reset(new QnModuleFinder(true));
-    m_moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    m_moduleFinder->setCompatibilityMode(qnSettings->isDevMode());  
     m_moduleFinder->start();
-    */
-    /*
+    
+    
     m_router.reset(new QnRouter(m_moduleFinder.data(), true));
     m_globalModuleFinder.reset(new QnGlobalModuleFinder());
     m_serverInterfaceWatcher.reset(new QnServerInterfaceWatcher(m_router.data()));
-    */
 
     //===========================================================================
 
@@ -564,12 +563,12 @@ void AxHDWitness::doFinalize()
     m_ec2ConnectionFactory.reset(NULL);   
     m_context.reset(NULL);
 
-    //     m_serverInterfaceWatcher.reset(NULL);
-    //     m_globalModuleFinder.reset(NULL);
-    //     m_router.reset(NULL);
-    // 
-    //     m_moduleFinder->stop();
-    //     m_moduleFinder.reset(NULL);
+    m_serverInterfaceWatcher.reset(NULL);
+    m_globalModuleFinder.reset(NULL);
+    m_router.reset(NULL);
+ 
+    m_moduleFinder->stop();
+    m_moduleFinder.reset(NULL);
 
     QnSessionManager::instance()->stop();
 

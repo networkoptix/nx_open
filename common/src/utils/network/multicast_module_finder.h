@@ -39,8 +39,8 @@ public:
     */
     QnMulticastModuleFinder(
         bool clientOnly,
-        const QHostAddress &multicastGroupAddress = defaultModuleRevealMulticastGroup,
-        const quint16 multicastGroupPort = defaultModuleRevealMulticastGroupPort,
+        const QHostAddress &multicastGroupAddress = QHostAddress(),
+        const quint16 multicastGroupPort = 0,
         const unsigned int pingTimeoutMillis = 0,
         const unsigned int keepAliveMultiply = 0);
 

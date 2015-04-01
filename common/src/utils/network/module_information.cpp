@@ -6,6 +6,9 @@
 #include <common/common_module.h>
 #include <nx_ec/ec_proto_version.h>
 
+namespace {
+    const QString nxMediaServerId = lit("Media Server");
+}
 
 bool QnModuleInformation::isCompatibleToCurrentSystem() const {
     return hasCompatibleVersion() && systemName == qnCommon->localSystemName();
@@ -22,6 +25,10 @@ bool QnModuleInformation::isLocal() const {
             return true;
     }
     return false;
+}
+
+QString QnModuleInformation::nxMediaServerId() {
+    return ::nxMediaServerId;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation, (json)(eq), QnModuleInformation_Fields)
