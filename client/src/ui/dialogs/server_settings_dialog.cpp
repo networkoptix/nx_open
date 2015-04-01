@@ -141,7 +141,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->installEventFilter(signalizer);
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
     connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
-    connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString)), this, SLOT(at_updateRebuildInfo()));
+    connect(m_server, &QnMediaServerResource::apiUrlChanged, this, &QnServerSettingsDialog::at_updateRebuildInfo);
     for (const auto& storage: m_server->getStorages())
         connect(storage.data(), &QnResource::statusChanged, this, &QnServerSettingsDialog::at_updateRebuildInfo);
 
