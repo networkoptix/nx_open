@@ -48,6 +48,7 @@ extern "C"
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include "core/resource_management/resource_pool.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
 #include "plugins/resource/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include <plugins/resource/server_camera/server_camera.h>
@@ -491,6 +492,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QnResourcePropertyDictionary dictionary;
     QnResourceStatusDictionary statusDictionary;
+    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());

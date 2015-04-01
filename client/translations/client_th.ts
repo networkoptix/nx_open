@@ -2506,7 +2506,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>File Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>ตั้งค่าแฟ้มข้อมูล...</translation>
     </message>
 </context>
 <context>
@@ -4400,15 +4400,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <source>File Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ตั้งค่าแฟ้มข้อมูล</translation>
     </message>
     <message>
         <source>Picture is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>ภาพไม่ได้โหลด</translation>
     </message>
     <message>
         <source>This is a fish-eye lens file</source>
-        <translation type="unfinished"></translation>
+        <translation>แฟ้มข้อมูลเลนส์ฟิชอาย</translation>
     </message>
 </context>
 <context>
@@ -4918,7 +4918,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบันสำหรับ กล้อง %1 </translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบันสำหรับ กล้อง %1.</translation>
     </message>
     <message>
         <source>This preset is used in some tours.</source>
@@ -6906,7 +6906,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>การกรอง: หมุน หหการเพิ่มประสิทธิภาพของภาพที่กำหนดเองอัตราส่วน (ต้องแปลง)</translation>
     </message>
 </context>
 <context>

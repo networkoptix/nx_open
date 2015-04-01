@@ -530,6 +530,7 @@ void QnServerSettingsDialog::updateRebuildUi(const QnStorageScanData& reply) {
      m_rebuildState = reply;
 
      ui->rebuildGroupBox->setEnabled(reply.state != Qn::RebuildState_Unknown);
+     //TODO: #TR #gdm remove trailing spaces from messages
      QString status;
      if (!reply.path.isEmpty()) {
          if (reply.state == Qn::RebuildState_FullScan)

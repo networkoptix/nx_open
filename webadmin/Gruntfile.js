@@ -83,12 +83,27 @@ module.exports = function (grunt) {
                 //Total proxy
                 //{context: '/',host: '192.168.56.101',port: 9000},
 
+
+                //Demoaserver
+                {context: '/api/',      host: 'demo.networkoptix.com', port: 7001},
+                 {context: '/ec2/',      host: 'demo.networkoptix.com', port: 7001},
+                 {context: '/hls/',      host: 'demo.networkoptix.com',port: 7001},
+                 {context: '/media/',    host: 'demo.networkoptix.com', port: 7001},
+                 {context: '/proxy/',    host: 'demo.networkoptix.com',port: 7001}/**/
+
+                //Cube
+                /*{context: '/api/',      host: '192.168.0.25', port: 7001},
+                {context: '/ec2/',      host: '192.168.0.25', port: 7001},
+                {context: '/hls/',      host: '192.168.0.25',port: 7001},
+                {context: '/media/',    host: '192.168.0.25', port: 7001},
+                {context: '/proxy/',    host: '192.168.0.25',port: 7001}*/
+
                 //Evgeniy
-                {context: '/api/',      host: '192.168.56.101', port: 9000},
+                /*{context: '/api/',      host: '192.168.56.101', port: 9000},
                 {context: '/ec2/',      host: '192.168.56.101', port: 9000},
                 {context: '/hls/',      host: '192.168.56.101',port: 9000},
                 {context: '/media/',    host: '192.168.56.101', port: 9000},
-                {context: '/proxy/',    host: '192.168.56.101',port: 9000}/**/
+                {context: '/proxy/',    host: '192.168.56.101',port: 9000}*/
 
 /*                //Sergey Yuldashev
                 {context: '/api/',      host: '10.0.2.203', port: 8901},
@@ -97,8 +112,8 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '10.0.2.203', port: 8901},
                 {context: '/proxy/',    host: '10.0.2.203', port: 8901}/**/
 
-/*                // Sasha
-                {context: '/api/',      host: '10.0.2.119', port: 7001},
+                // Sasha
+                /*{context: '/api/',      host: '10.0.2.119', port: 7001},
                 {context: '/ec2/',      host: '10.0.2.119', port: 7001},
                 {context: '/hls/',      host: '10.0.2.119', port: 7001},
                 {context: '/media/',    host: '10.0.2.119', port: 7001},

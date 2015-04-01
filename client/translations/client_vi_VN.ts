@@ -2517,7 +2517,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>File Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt tập tin ...</translation>
     </message>
 </context>
 <context>
@@ -4410,15 +4410,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <source>File Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt tập tin</translation>
     </message>
     <message>
         <source>Picture is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Hình ảnh không được tải</translation>
     </message>
     <message>
         <source>This is a fish-eye lens file</source>
-        <translation type="unfinished"></translation>
+        <translation>Đây là một tập tin ống kính mắt cá</translation>
     </message>
 </context>
 <context>
@@ -6916,7 +6916,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>áp dụng các bộ lọc: xoay, dewarping, nâng cao hình ảnh, tỉ lệ tùy chỉnh (yêu cầu chuyển mã)</translation>
     </message>
 </context>
 <context>
