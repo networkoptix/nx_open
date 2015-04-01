@@ -161,6 +161,8 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
 
     case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, &stream, transaction, function, fastFunction);
 
+    case ApiCommand::saveClientInfo:        return handleTransactionParams<ApiClientInfoData>       (serializedTransaction, &stream, transaction, function, fastFunction);
+
     case ApiCommand::lockRequest:
     case ApiCommand::lockResponse:
     case ApiCommand::unlockRequest:         return handleTransactionParams<ApiLockData>             (serializedTransaction, &stream, transaction, function, fastFunction); 

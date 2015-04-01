@@ -27,8 +27,7 @@ public:
     virtual QnResourceList findResources(void) override;
 
     void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, 
-		                const QString& userName, const QString &userId,
-						const QMap<QString, QString>& params);
+		                const QString& userName, const QString &userId);
 
     TCPSocketPtr getConnectionByUserId(const QString& userId);
     quint32 incCSeq(const TCPSocketPtr& socket);
@@ -41,12 +40,10 @@ public:
 private:
     struct ClientConnectionInfo
     {
-        ClientConnectionInfo(const TCPSocketPtr& socket, const QString &userName, const QString &userId, 
-			                 const QMap<QString, QString>& params):
+        ClientConnectionInfo(const TCPSocketPtr& socket, const QString &userName, const QString &userId):
             socket(socket),
             userName(userName),
-            userId(userId),
-			params(params)
+            userId(userId)
         {
             useCount = 0;
             cSeq = 0;
@@ -58,7 +55,6 @@ private:
         QElapsedTimer timer;
         QString userName;
         QString userId;
-		QMap<QString, QString> params;
     };
 
     QList<ClientConnectionInfo> m_connections;

@@ -1531,7 +1531,8 @@ void QnMain::run()
 
     while (!needToStop())
     {
-        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::url(), &ec2Connection );
+		const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
+			QnAppServerConnectionFactory::url(), ec2::ApiClientInfoData(), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {
             connectInfo = ec2Connection->connectionInfo();
@@ -2244,19 +2245,11 @@ protected:
     }
 
 private:
-    QnUuid hardwareIdToUuid(const QByteArray& hardwareId) {
-        if (hardwareId.length() != 34)
-            return QnUuid();
-
-        QString hwid(hardwareId);
-        QString uuidForm = QString("%1-%2-%3-%4-%5").arg(hwid.mid(2, 8)).arg(hwid.mid(10, 4)).arg(hwid.mid(14, 4)).arg(hwid.mid(18, 4)).arg(hwid.mid(22, 12));
-        return QnUuid(uuidForm);
-    }
-
     QString hardwareIdAsGuid() {
-        QString hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false, MSSettings::roSettings())).toString();
-        std::cout << "Got hwID \"" << hwID.toStdString() << "\"" << std::endl;
-        return hwID;
+		auto hwId = LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false, MSSettings::roSettings());
+		auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
+        std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
+        return hwIdString;
     }
 
     void updateGuidIfNeeded() {

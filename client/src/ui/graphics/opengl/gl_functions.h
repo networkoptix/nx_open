@@ -51,9 +51,9 @@ public:
     Features features() const;
 
 	/**
-	 * \brief                           Set of OpenGL plain-text paramiters.
+	 * \brief                           Set of OpenGL plain-text params.
 	 */
-	struct OpenGLInfo { QByteArray version, vendor, renderer; };
+	struct OpenGLInfo { QString version, vendor, renderer; };
 
 	/**
      * \returns                         Actual \class OpenGLInfo setting.

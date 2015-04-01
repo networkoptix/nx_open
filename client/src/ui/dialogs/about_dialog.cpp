@@ -156,9 +156,9 @@ void QnAboutDialog::retranslateUi()
     QStringList gpu;
      // TODO: #Elric same shit, OpenGL calls.
 	auto gl = QnGlFunctions::openGLCachedInfo();
-	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL version")).arg(QString::fromUtf8(gl.version));
-	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL renderer")).arg(QString::fromUtf8(gl.renderer));
-	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL vendor")).arg(QString::fromUtf8(gl.vendor));
+	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL version")).arg(gl.version);
+	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL renderer")).arg(gl.renderer);
+	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL vendor")).arg(gl.vendor);
     gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL max texture size")).arg(maxTextureSize);
     
     const QString lineSeparator = lit("<br>\n");

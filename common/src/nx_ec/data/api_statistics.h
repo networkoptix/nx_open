@@ -5,6 +5,7 @@
 #include "api_resource_data.h"
 #include "api_media_server_data.h"
 #include "api_camera_data_ex.h"
+#include "api_client_info_data.h"
 #include "api_license_data.h"
 #include "api_business_rule_data.h"
 
@@ -38,19 +39,6 @@ namespace ec2
     (manuallyAdded)(model)(statusFlags)(vendor) \
     (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
         (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
-
-    struct ApiClientDataStatistics
-    :
-        ApiCameraDataEx
-    {
-        ApiClientDataStatistics();
-        ApiClientDataStatistics(const ApiCameraDataEx& data);
-
-		const static std::unordered_set<QString> ADD_PARAMS;
-
-        ApiResourceParamDataList addParams;
-    };
-#define ApiClientDataStatistics_Fields (id)(parentId)(addParams)
 
     struct ApiStorageDataStatistics
     :
@@ -92,10 +80,9 @@ namespace ec2
 
         ApiMediaServerDataStatisticsList    mediaservers;
         ApiCameraDataStatisticsList         cameras;
-        ApiClientDataStatisticsList         clients;
-
-        ApiLicenseStatisticsList    licenses;
-        ApiBusinessRuleDataList     businessRules;
+        ApiClientInfoDataList               clients;
+        ApiLicenseStatisticsList            licenses;
+        ApiBusinessRuleDataList             businessRules;
     };
 #define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)
 

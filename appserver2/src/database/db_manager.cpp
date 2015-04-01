@@ -27,6 +27,7 @@
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_camera_server_item_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
+#include "nx_ec/data/api_client_info_data.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include <nx_ec/data/api_time_data.h>
@@ -1707,6 +1708,24 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?)");
+    query.addBindValue(tran.params.id.toRfc4122());
+    query.addBindValue(tran.params.cpuArchitecture);
+    query.addBindValue(tran.params.cpuModelName);
+    query.addBindValue(tran.params.phisicalMemory);
+    query.addBindValue(tran.params.openGLVersion);
+    query.addBindValue(tran.params.openGLVendor);
+    query.addBindValue(tran.params.openGLRenderer);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran)
 {
     QSqlQuery query(m_sdb);
@@ -3147,6 +3166,43 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataLi
             qWarning() << "Can' deserialize transaction from transaction log";
             return ErrorCode::dbError;
         }
+    }
+
+    return ErrorCode::ok;
+}
+
+// getClientInfos
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data)
+{
+	return doQueryNoLock(QnUuid(), data);
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data)
+{
+	QString filterStr;
+    if (!clientId.isNull())
+        filterStr = QString("WHERE guid = %1").arg(guidToSqlString(clientId));
+
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(lit("SELECT * FROM vms_client_infos %1 ORDER BY guid").arg(filterStr));
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    
+    while (query.next()) {
+        ApiClientInfoData info;
+
+		info.id = QnSql::deserialized_field<QnUuid>(query.value(0));
+		info.cpuArchitecture = query.value(1).toString();
+		info.cpuModelName = query.value(2).toString();
+		info.phisicalMemory = query.value(3).toLongLong();
+		info.openGLVersion = query.value(4).toString();
+		info.openGLVendor = query.value(5).toString();
+		info.openGLRenderer = query.value(6).toString();
+
+		data.push_back(std::move(info));
     }
 
     return ErrorCode::ok;

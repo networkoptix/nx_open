@@ -25,14 +25,13 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 
 
 void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, 
-													 const QString& userName, const QString &userId,
-													 const QMap<QString, QString>& params)
+													 const QString& userName, const QString &userId)
 {
     connection->setSendTimeout(1);
     QMutexLocker lock(&m_mutex);
-    m_connections << ClientConnectionInfo(connection, userName, userId, params);
+    m_connections << ClientConnectionInfo(connection, userName, userId);
 #ifdef DESKTOP_CAMERA_DEBUG
-    qDebug() << "register camera" << userName << userId << params;
+    qDebug() << "register camera" << userName << userId;
 #endif
 }
 
@@ -76,8 +75,6 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
         cam->setModel(lit("virtual desktop camera"));   //TODO: #GDM globalize the constant
         cam->setTypeId(rt->getId());
         cam->setPhysicalId(itr->userId);
-		for (auto name : itr->params.keys()) 
-			cam->setProperty(name, itr->params.value(name));
         result << cam;
 
 #ifdef DESKTOP_CAMERA_DEBUG

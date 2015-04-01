@@ -102,8 +102,8 @@ public:
 		}
 		m_openGLInfoCache = m_openGLInfo;
 
-        if (m_openGLInfo.vendor.contains("Tungsten Graphics") && 
-			m_openGLInfo.renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
+        if (m_openGLInfo.vendor.contains(lit("Tungsten Graphics")) && 
+			m_openGLInfo.renderer.contains(lit("Gallium 0.1, Poulsbo on EMGD")))
 		{
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
 		}
@@ -111,7 +111,7 @@ public:
 #ifdef Q_OS_MACX
         /* Intel HD 3000 driver handles textures with size > 4096 incorrectly (see bug #3141).
          * To fix that we have to override maximum texture size to 4096 for this graphics adapter. */
-        if (vendor.contains("Intel") && QRegExp(lit(".*Intel.+3000.*")).exactMatch(QString::fromLatin1(renderer)))
+        if (vendor.contains(lit("Intel")) && QRegExp(lit(".*Intel.+3000.*")).exactMatch(m_openGLInfo.renderer))
             qn_glFunctionsGlobal()->overrideMaxTextureSize(4096);
 #endif
 
@@ -148,9 +148,9 @@ public:
 	}
 
 private:
-	QByteArray getGLString(GLenum id)
+	QString getGLString(GLenum id)
 	{
-		return QByteArray(reinterpret_cast<const char *>(glGetString(id)));
+		return QLatin1String(reinterpret_cast<const char *>(glGetString(id)));
 	}
 
     const QGLContext *m_context;

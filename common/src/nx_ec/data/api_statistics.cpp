@@ -8,10 +8,6 @@ const static QString __CAMERA_DATA[] = {
 	QLatin1String("hasDualStreaming"), QLatin1String("isAudioSupported"), 
 	QLatin1String("mediaStreams"), QLatin1String("ptzCapabilities"),
 };
-const static QString __CLIENT_DATA[] = {
-    QLatin1String("cpuArchitecture"), QLatin1String("cpuModelName"), QLatin1String("phisicalMemory"), 
-	QLatin1String("openGLVersion"), QLatin1String("openGLVendor"), QLatin1String("openGLRenderer")
-};
 const static QString __MEDIASERVER_DATA[] = {
     QLatin1String("cpuArchitecture"), QLatin1String("cpuModelName"), QLatin1String("phisicalMemory")
 };
@@ -21,8 +17,7 @@ const static QString __MEDIASERVER_DATA[] = {
 
 namespace ec2 {
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
-            (ApiCameraDataStatistics)(ApiClientDataStatistics) \
-            (ApiStorageDataStatistics)(ApiMediaServerDataStatistics) \
+            (ApiCameraDataStatistics)(ApiStorageDataStatistics)(ApiMediaServerDataStatistics) \
             (ApiLicenseStatistics)(ApiSystemStatistics)(ApiStatisticsServerInfo), \
             (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
 
@@ -43,17 +38,7 @@ namespace ec2 {
         : ApiCameraDataEx(data)
         , addParams(getExtraParams(ApiCameraDataEx::addParams, ADD_PARAMS)) {}
 
-	
 	const std::unordered_set<QString> ApiCameraDataStatistics::ADD_PARAMS(INIT_LIST(__CAMERA_DATA));
-
-    ApiClientDataStatistics::ApiClientDataStatistics() {}
-
-    ApiClientDataStatistics::ApiClientDataStatistics(const ApiCameraDataEx& data)
-        : ApiCameraDataEx(data)
-        , addParams(getExtraParams(ApiCameraDataEx::addParams, ADD_PARAMS)) {}
-
-	
-	const std::unordered_set<QString> ApiClientDataStatistics::ADD_PARAMS(INIT_LIST(__CLIENT_DATA));
 
     ApiStorageDataStatistics::ApiStorageDataStatistics() {}
 

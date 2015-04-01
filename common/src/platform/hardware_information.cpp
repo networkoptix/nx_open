@@ -38,7 +38,7 @@ const QString& compileCpuArchicture()
     {
         MEMORYSTATUSEX stat;
         stat.dwLength = sizeof(stat);
-        phisicalMemory = GlobalMemoryStatusEx(&stat) ? stat.ullAvailPhys : 0;
+		phisicalMemory = GlobalMemoryStatusEx(&stat) ? stat.ullTotalPhys : 0;
         cpuArchitecture = compileCpuArchicture();
 
         HKEY key;

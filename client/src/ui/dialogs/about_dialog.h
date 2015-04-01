@@ -18,9 +18,6 @@ public:
     explicit QnAboutDialog(QWidget *parent = 0);
     virtual ~QnAboutDialog();
 
-	struct OpenGLInfo { QString version, vendor, render; };
-	static OpenGLInfo getOpenGLInfo();
-
 protected:
     virtual void changeEvent(QEvent *event) override;
 

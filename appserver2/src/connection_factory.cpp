@@ -96,7 +96,8 @@ namespace ec2
     }
 
     //!Implementation of AbstractECConnectionFactory::connectAsync
-    int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler )
+    int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo, 
+                                                  impl::ConnectHandlerPtr handler )
     {
         QUrl url = addr;
         url.setUserName(url.userName().toLower());
@@ -104,7 +105,7 @@ namespace ec2
         if (url.scheme() == "file")
             return establishDirectConnection(url, handler);
         else
-            return establishConnectionToRemoteServer(url, handler);
+            return establishConnectionToRemoteServer(url, handler, clientInfo);
     }
 
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
@@ -264,6 +265,9 @@ namespace ec2
             std::bind( &TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1 ) );
         //TODO #ak register AbstractTimeManager::getPeerTimeInfoList
 
+        //ApiClientInfoData
+        registerUpdateFuncHandler<ApiClientInfoData>(restProcessorPool, ApiCommand::saveClientInfo);
+        registerGetFuncHandler<std::nullptr_t, ApiClientInfoDataList>(restProcessorPool, ApiCommand::getClientInfos);
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
@@ -323,7 +327,7 @@ namespace ec2
         return reqID;
     }
 
-    int Ec2DirectConnectionFactory::establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler )
+    int Ec2DirectConnectionFactory::establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo )
     {
         const int reqID = generateRequestID();
 
@@ -338,6 +342,7 @@ namespace ec2
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
+        loginInfo.clientInfo = clientInfo;
         {
             QMutexLocker lk( &m_mutex );
             if( m_terminated )
@@ -507,7 +512,7 @@ namespace ec2
     }
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
-        const ApiLoginData& /*loginInfo*/,
+        const ApiLoginData& loginInfo,
         QnConnectionInfo* const connectionInfo )
     {
         connectionInfo->version = qnCommon->engineVersion();
@@ -519,6 +524,35 @@ namespace ec2
 #endif
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
+        
+		if (!loginInfo.clientInfo.id.isNull())
+        {
+			ApiClientInfoDataList infos;
+			auto result = dbManager->doQuery(loginInfo.clientInfo.id, infos);
+			if (result != ErrorCode::ok)
+				return result;
+
+			if (infos.size() && loginInfo.clientInfo == infos.front())
+			{
+				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registred with the same params"),
+					cl_logDEBUG2);
+				return ErrorCode::ok;
+			}
+
+            m_serverQueryProcessor.processUpdateAsync(
+				QnTransaction<ApiClientInfoData>(ApiCommand::saveClientInfo, loginInfo.clientInfo),
+				[&](ErrorCode result) {
+					if (result == ErrorCode::ok) {
+						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registred"),
+							cl_logINFO);
+					}
+					else {
+						NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
+							.arg(toString(result)), cl_logERROR);
+					}
+				});
+        }
+
         return ErrorCode::ok;
     }
 

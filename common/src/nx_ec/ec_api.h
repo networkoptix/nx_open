@@ -27,6 +27,7 @@
 #include <nx_ec/data/api_time_data.h>
 #include <nx_ec/data/api_license_overflow_data.h>
 #include <nx_ec/data/api_discovery_data.h>
+#include <nx_ec/data/api_client_info_data.h>
 
 #include "ec_api_fwd.h"
 
@@ -1206,11 +1207,14 @@ namespace ec2
             \param addr Empty url designates local Server ("local" means dll linked to executable, not Server running on local host)
             \param handler Functor with params: (ErrorCode, AbstractECConnectionPtr)
         */
-        template<class TargetType, class HandlerType> int connect( const QUrl& addr, TargetType* target, HandlerType handler ) {
-            return connectAsync( addr, std::static_pointer_cast<impl::ConnectHandler>(std::make_shared<impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> int connect( const QUrl& addr, const ApiClientInfoData& clientInfo,
+                                                                   TargetType* target, HandlerType handler ) {
+            auto cch = std::make_shared<impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler);
+            return connectAsync(addr, clientInfo, std::static_pointer_cast<impl::ConnectHandler>(cch));
         }
-        ErrorCode connectSync( const QUrl& addr, AbstractECConnectionPtr* const connection ) {
-            return impl::doSyncCall<impl::ConnectHandler>( std::bind(std::mem_fn(&AbstractECConnectionFactory::connectAsync), this, addr, std::placeholders::_1), connection );
+        ErrorCode connectSync( const QUrl& addr, const ApiClientInfoData& clientInfo, AbstractECConnectionPtr* const connection ) {
+            auto call = std::bind(std::mem_fn(&AbstractECConnectionFactory::connectAsync), this, addr, clientInfo, std::placeholders::_1);
+            return impl::doSyncCall<impl::ConnectHandler>(call, connection);
         }
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
@@ -1231,7 +1235,8 @@ namespace ec2
         }
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
-        virtual int connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) = 0;
+        virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,
+                                  impl::ConnectHandlerPtr handler ) = 0;
 
     private:
         bool m_compatibilityMode;
