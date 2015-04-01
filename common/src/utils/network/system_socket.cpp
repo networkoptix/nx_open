@@ -1329,7 +1329,7 @@ bool UDPSocket::sendTo(
     unsigned int bufferLen,
     const SocketAddress& foreignEndpoint )
 {
-    setDestAddr( foreignEndpoint );  //TODO #ak optimize: pass SocketAddress to setDestAddr
+    setDestAddr( foreignEndpoint );
     return sendTo( buffer, bufferLen );
 }
 
