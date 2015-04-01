@@ -89,6 +89,13 @@
 
 static QtMessageHandler defaultMsgHandler = 0;
 
+namespace {
+
+    /* After opening layout, set timeline window to 5 minutes. */
+    const qint64 displayWindowLengthMs = 5 * 60 * 1000;
+
+}
+
 static int lockmgr(void **mtx, enum AVLockOp op)
 {
     QMutex** qMutex = (QMutex**) mtx;
@@ -344,15 +351,13 @@ void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timest
         return;
 
     qint64 timeStampMs = timestamp.toLongLong();
-    const qint64 window = 20*1000; //20 seconds
-    QnTimePeriod period(timeStampMs - window/2, window);
+    QnTimePeriod period(timeStampMs - displayWindowLengthMs/2, displayWindowLengthMs);
 
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QnUuid::createUuid());
     layout->setParentId(m_context->user()->getId());
     layout->setCellSpacing(0, 0);
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, timeStampMs, 1.0)));
-    layout->setLocalRange(period);
     qnResPool->addResource(layout);  
 
     QnWorkbenchLayout *wlayout = new QnWorkbenchLayout(layout, this);
@@ -360,7 +365,6 @@ void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timest
     m_context->workbench()->setCurrentLayout(wlayout);
     
     m_context->menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resources).withArgument(Qn::ItemTimeRole, timeStampMs));
-    //m_context->navigator()->setPlaying(false);
 
     for (QnWorkbenchItem *item: wlayout->items())
         item->setData(Qn::ItemSliderWindowRole, qVariantFromValue(period));
