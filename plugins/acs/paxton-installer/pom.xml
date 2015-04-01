@@ -21,8 +21,9 @@
     <name>HD Witness Generic RTSP plugin</name> 
 
     <properties>
-        <product.title>Paxton Integration Module</product.title>    
+        <product.title>Paxton Integration Module Installer</product.title>    
         <root.dir>${basedir}/../../..</root.dir>
+        <finalName>${installer.name}-paxton-plugin.${release.version}.${buildNumber}.msi</finalName>
     </properties> 
     <dependencies>
         <dependency>
@@ -39,7 +40,7 @@
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/acs/paxton/pom.xml</systemPath>
+            <systemPath>${root.dir}/plugins/acs/paxton/pom.xml</systemPath>
         </dependency>        
     </dependencies>  
     <build>

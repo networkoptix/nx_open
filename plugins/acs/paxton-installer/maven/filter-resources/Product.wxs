@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="*" Name="ACS_Installer" Language="1033" Version="1.0.0.0" Manufacturer="Network Optix" UpgradeCode="318babc3-3332-41c8-aa2b-fe8b5989f008">
-        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+  <Product Id="*" Name="NxWintess Paxton Plugin" Language="1033" Version="1.0.0.0" Manufacturer="Network Optix" UpgradeCode="318babc3-3332-41c8-aa2b-fe8b5989f008">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
-        <Property Id="PAXTONINSTALLED">
-          <RegistrySearch Id="PaxtonInstalledSearch" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\{1C927CD7-BE59-4578-B990-50826AF7A762}" Name="Installed" Type="raw" />
-        </Property>
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="logo_493x58.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="logo_493x312.bmp" />
 
-        <Condition Message="You need to have Paxton Access installed">
-          <![CDATA[ PAXTONINSTALLED <> 1 ]]>
-        </Condition>
+    <Property Id="PAXTONINSTALLED">
+      <RegistrySearch Id="PaxtonInstalledSearch" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\{1C927CD7-BE59-4578-B990-50826AF7A762}" Name="Installed" Type="raw" />
+    </Property>
 
-        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-        <MediaTemplate EmbedCab="yes" />
+    <Condition Message="You need to have Paxton Access installed">
+      <![CDATA[ PAXTONINSTALLED <> 1 ]]>
+    </Condition>
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
 
     <Feature Id="ProductFeature" Title="ACS_Installer" Level="1">
       <ComponentGroupRef Id="AxClient23DirComponents"/>
@@ -20,50 +25,50 @@
       <ComponentGroupRef Id="OemDriverComponents"/>
     </Feature>
 
-      <UIRef Id="WixUI_Minimal" />
-    </Product>
+    <UIRef Id="WixUI_Minimal" />
+  </Product>
 
-    <Fragment>
-      <Directory Id="TARGETDIR" Name="SourceDir">
-        <Directory Id="ProgramFilesFolder">
-          <Directory Id="CompanyDir" Name="Network Optix">
-              <Directory Id="INSTALLDIR" Name="Nx Witness">
-                  <Directory Id="AxClientDir" Name="AxClient">
-                      <Directory Id="AxClient23Dir" Name="2.3">
-                      </Directory>
-                  </Directory>
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="CompanyDir" Name="Network Optix">
+          <Directory Id="INSTALLDIR" Name="Nx Witness">
+            <Directory Id="AxClientDir" Name="AxClient">
+              <Directory Id="AxClient23Dir" Name="2.3">
               </Directory>
-          </Directory>
-
-          <Directory Id="PaxtonDir" Name="Paxton Access">
-            <Directory Id="PaxtonAccessDir" Name="Access Control">
-              <Directory Id="DvrMiniDriversDir" Name="DvrMiniDrivers"/>
             </Directory>
+          </Directory>
         </Directory>
+
+        <Directory Id="PaxtonDir" Name="Paxton Access">
+          <Directory Id="PaxtonAccessDir" Name="Access Control">
+            <Directory Id="DvrMiniDriversDir" Name="DvrMiniDrivers"/>
+          </Directory>
         </Directory>
       </Directory>
-    </Fragment>
+    </Directory>
+  </Fragment>
 
-    <Fragment>
-        <ComponentGroup Id="RootComponents" Directory="PaxtonAccessDir">
-            <Component Id="InteropComponent" Guid="{C8EE6B7D-0817-4377-AB73-64DFB71339AC}">
-              <File Id="Interop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\Interop.hdwitness.dll" KeyPath="yes"/>
-            </Component>
-            <Component Id="AxInteropComponent" Guid="{7ABFBE76-6C66-426B-8B5F-86029A76BCBE}">
-              <File Id="AxInterop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\AxInterop.hdwitness.dll" KeyPath="yes"/>
-            </Component>
-            <Component Id="NxControlComponent" Guid="{768F007D-BE20-4585-847A-0D716E2F0DB4}">
-              <File Id="NxControl.2.3.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\NxControl.2.3.dll" KeyPath="yes"/>
-            </Component>
-            <Component Id="NxInterfaceComponent" Guid="{E38874D0-7F3D-47A7-932F-244E0649D955}">
-              <File Id="NxInterface.1.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\NxInterface.1.dll" KeyPath="yes"/>
-            </Component>
-        </ComponentGroup>
+  <Fragment>
+    <ComponentGroup Id="RootComponents" Directory="PaxtonAccessDir">
+      <Component Id="InteropComponent" Guid="{C8EE6B7D-0817-4377-AB73-64DFB71339AC}">
+        <File Id="Interop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\Interop.hdwitness.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="AxInteropComponent" Guid="{7ABFBE76-6C66-426B-8B5F-86029A76BCBE}">
+        <File Id="AxInterop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\AxInterop.hdwitness.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="NxControlComponent" Guid="{768F007D-BE20-4585-847A-0D716E2F0DB4}">
+        <File Id="NxControl.2.3.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\NxControl.2.3.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="NxInterfaceComponent" Guid="{E38874D0-7F3D-47A7-932F-244E0649D955}">
+        <File Id="NxInterface.1.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\NxInterface.1.dll" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
 
-        <ComponentGroup Id="OemDriverComponents" Directory="DvrMiniDriversDir">
-            <Component Id="OemMiniDriverComponent" Guid="{90B65067-978D-452a-B243-A16129BD13CE}">
-              <File Id="NetworkOptix.OemDvrMiniDriver.dll" Source="..\..\paxton\x86\bin\Release\NetworkOptix.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
-            </Component>
-        </ComponentGroup>
-    </Fragment>
+    <ComponentGroup Id="OemDriverComponents" Directory="DvrMiniDriversDir">
+      <Component Id="OemMiniDriverComponent" Guid="{90B65067-978D-452a-B243-A16129BD13CE}">
+        <File Id="NetworkOptix.OemDvrMiniDriver.dll" Source="..\..\paxton\x86\bin\Release\NetworkOptix.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
 </Wix>

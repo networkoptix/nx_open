@@ -1,2 +1,3 @@
 candle -dAxSourceDir=..\..\..\..\build_environment\target\x86\bin\Release Product.wxs AxClient.wxs
-light Product.wixobj AxClient.wixobj -ext WixUIExtension.dll -ext WixUtilExtension.dll -out ${installer.name}-paxton-plugin.${release.version}.${buildNumber}.msi
+light -ext WixUIExtension.dll -cultures:en-us Product.wixobj AxClient.wixobj -out ${finalName}
+sign 
