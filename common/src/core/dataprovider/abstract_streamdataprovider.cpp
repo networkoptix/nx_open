@@ -71,10 +71,14 @@ void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)
         return;
 
     QMutexLocker mutex(&m_mutex);
+    QnAbstractDataPacketPtr packetReplacement;
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataReceptor* dp = m_dataprocessors.at(i);
-        dp->putData(data);
+        QnAbstractDataPacketPtr outPacket;
+        dp->putData( packetReplacement ? packetReplacement : data, &outPacket );
+        if( outPacket )
+            packetReplacement = std::move( outPacket );
     }
 }
 
