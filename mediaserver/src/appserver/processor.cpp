@@ -193,10 +193,10 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         }
         QSet<QByteArray> modifiedFields;
         {
-            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), m_defaultUserAttrs->cameraID );
-            (*userAttributesLock)->assign( *m_defaultUserAttrs, &modifiedFields );
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttrCopy->cameraID );
+            (*userAttributesLock)->assign( *userAttrCopy, &modifiedFields );
         }
-        const QnResourcePtr& res = qnResPool->getResourceById(m_defaultUserAttrs->cameraID);
+        const QnResourcePtr& res = qnResPool->getResourceById(userAttrCopy->cameraID);
         if( res )   //it is OK if resource is missing
             res->emitModificationSignals( modifiedFields );
     }
