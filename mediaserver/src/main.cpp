@@ -621,7 +621,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 void initLog(const QString& _logLevel) 
 {
     QString logLevel = _logLevel;
-    const QString& configLogLevel = MSSettings::roSettings()->value("log-level").toString();
+    const QString& configLogLevel = MSSettings::roSettings()->value("logLevel").toString();
     if (!configLogLevel.isEmpty())
         logLevel = configLogLevel;
 
@@ -854,6 +854,7 @@ void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
 void QnMain::stopSync()
 {
     qWarning()<<"Stopping server";
+    NX_LOG( lit("Stopping server"), cl_logALWAYS );
     if (serviceMainInstance) {
         {
             QMutexLocker lock(&m_stopMutex);

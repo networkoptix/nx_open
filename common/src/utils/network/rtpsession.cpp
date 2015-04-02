@@ -616,8 +616,8 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         m_openedTime = startTime;
     m_SessionId.clear();
     m_responseCode = CODE_OK;
-    mUrl = url;
-    m_contentBase = mUrl.toString();
+    m_url = url;
+    m_contentBase = m_url.toString();
     m_responseBufferLen = 0;
     m_rtpToTrack.clear();
     m_rtspAuthCtx.clear();
@@ -638,8 +638,8 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     int destinationPort = 0;
     if( m_proxyPort == 0 )
     {
-        targetAddress = mUrl.host();
-        destinationPort = mUrl.port(DEFAULT_RTP_PORT);
+        targetAddress = m_url.host();
+        destinationPort = m_url.port(DEFAULT_RTP_PORT);
     }
     else
     {
@@ -703,6 +703,11 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     if (m_sdpTracks.size()<=0) {
         stop();
         result = CameraDiagnostics::NoMediaTrackResult( url );
+    }
+
+    if( result )
+    {
+        NX_LOG( lit("Sucessfully opened RTSP stream %1").arg(m_url.toString()), cl_logALWAYS );
     }
 
     return result;
@@ -793,7 +798,7 @@ nx_http::Request RTPSession::createDescribeRequest()
 
     nx_http::Request request;
     request.requestLine.method = "DESCRIBE";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -830,7 +835,7 @@ bool RTPSession::sendOptions()
 {
     nx_http::Request request;
     request.requestLine.method = "OPTIONS";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -924,7 +929,7 @@ bool RTPSession::sendSetup()
             request += trackInfo->setupURL;
         }   
         else {
-            request += mUrl.toString();
+            request += m_url.toString();
             request += '/';
             request += trackInfo->setupURL;
             /*
@@ -982,7 +987,7 @@ bool RTPSession::sendSetup()
         }   
         else
         {
-            request.requestLine.url = mUrl;
+            request.requestLine.url = m_url;
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
             request.requestLine.urlPostfix = QByteArray("/") + trackInfo->setupURL;
         }
@@ -1106,7 +1111,7 @@ bool RTPSession::sendSetParameter( const QByteArray& paramName, const QByteArray
     request.messageBody.append("\r\n");
 
     request.requestLine.method = "SET_PARAMETER";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -1213,7 +1218,7 @@ bool RTPSession::sendPause()
 {
     nx_http::Request request;
     request.requestLine.method = "PAUSE";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -1225,7 +1230,7 @@ bool RTPSession::sendTeardown()
 {
     nx_http::Request request;
     request.requestLine.method = "TEARDOWN";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -1344,7 +1349,7 @@ bool RTPSession::sendKeepAlive()
 {
     nx_http::Request request;
     request.requestLine.method = "GET_PARAMETER";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
