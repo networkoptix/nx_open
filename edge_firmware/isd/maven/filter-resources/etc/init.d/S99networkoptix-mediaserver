@@ -167,12 +167,14 @@ case "$1" in
         ;;
 
     restart|reload|force-reload)
+        stop_watchdog
         stop
         while [ `/bin/pidof $BIN_NAME` ]
         do
             /bin/sleep 1
         done
         start
+        start_watchdog
         ;;
 
     start_watchdog)
