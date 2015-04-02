@@ -14,6 +14,9 @@ export LD_LIBRARY_PATH=$PREFIX/lib
 export VMS_PLUGIN_DIR=$PREFIX/plugins
 
 echo "/media/mmcblk0p1/cores/core.%p" > /proc/sys/kernel/core_pattern
+if [ ! -e "/media/mmcblk0p1/cores" ]; then
+    mkdir /media/mmcblk0p1/cores
+fi
 ulimit -c unlimited
 
 start() {
