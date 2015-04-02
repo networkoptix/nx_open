@@ -2,8 +2,10 @@
 
 #include <QtCore/QMetaType>
 
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
+#include <plugins/resource/avi/avi_resource.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
 #include <utils/common/model_functions.h>
@@ -91,15 +93,20 @@ bool QnCachingCameraDataLoader::createLoaders(const QnResourcePtr &resource, QnA
         loaders[i] = NULL;
 
     bool success = true;
-    bool isNetRes = resource.dynamicCast<QnNetworkResource>();
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    QnAviResourcePtr aviFile = resource.dynamicCast<QnAviResource>();
+
     for(int i = 0; i < Qn::CameraDataTypeCount; i++) 
     {
         Qn::CameraDataType type = static_cast<Qn::CameraDataType>(i);
       
-        if (isNetRes)
-            loaders[i] = QnMultiServerCameraDataLoader::newInstance(resource, type);
+        if (camera)
+            loaders[i] = QnMultiServerCameraDataLoader::newInstance(camera, type);
+        else if (aviFile)
+            loaders[i] = QnLayoutFileCameraDataLoader::newInstance(aviFile, type);
         else
-            loaders[i] = QnLayoutFileCameraDataLoader::newInstance(resource, type);
+            loaders[i] = NULL;
+
         if(!loaders[i]) {
             success = false;
             break;

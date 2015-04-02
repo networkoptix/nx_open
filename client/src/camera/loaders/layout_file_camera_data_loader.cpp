@@ -16,13 +16,13 @@ namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
 
-QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
     QnAbstractCameraDataLoader(resource, dataType, parent)
 {
 
 }
 
-QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent):
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent):
     QnAbstractCameraDataLoader(resource, dataType, parent),
     m_data(data)
 {
@@ -35,12 +35,9 @@ QnLayoutFileCameraDataLoader::~QnLayoutFileCameraDataLoader()
     //qFreeAligned(m_motionData);
 }
 
-QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent)
+QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent)
 {
-    QnAviResourcePtr localFile = resource.dynamicCast<QnAviResource>();
-    if (!localFile)
-        return NULL;
-    QnLayoutFileStorageResourcePtr storage = localFile->getStorage().dynamicCast<QnLayoutFileStorageResource>();
+    QnLayoutFileStorageResourcePtr storage = resource->getStorage().dynamicCast<QnLayoutFileStorageResource>();
     if (!storage)
         return NULL;
 

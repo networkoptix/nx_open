@@ -16,3 +16,7 @@ QnAbstractCameraDataLoader::~QnAbstractCameraDataLoader() {
 void QnAbstractCameraDataLoader::discardCachedData(const qint64 resolutionMs /*= 0*/) {
     Q_UNUSED(resolutionMs) 
 }
+
+QnResourcePtr QnAbstractCameraDataLoader::resource() const {
+    return m_resource;
+}

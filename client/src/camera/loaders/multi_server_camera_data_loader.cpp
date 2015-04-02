@@ -17,15 +17,12 @@ namespace {
 
 // ------------------------------------------ QnMultiServerCameraDataLoader ----------------------------------------
 
-QnMultiServerCameraDataLoader::QnMultiServerCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
+QnMultiServerCameraDataLoader::QnMultiServerCameraDataLoader(const QnVirtualCameraResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
     QnAbstractCameraDataLoader(resource, dataType, parent)
 {}
 
-QnMultiServerCameraDataLoader *QnMultiServerCameraDataLoader::newInstance(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent) {
-    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (resource);
-    if (netRes == NULL)
-        return NULL;
-    return new QnMultiServerCameraDataLoader(netRes, dataType, parent);
+QnMultiServerCameraDataLoader *QnMultiServerCameraDataLoader::newInstance(const QnVirtualCameraResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent) {
+    return new QnMultiServerCameraDataLoader(resource, dataType, parent);
 }
 
 int QnMultiServerCameraDataLoader::load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
@@ -58,7 +55,7 @@ void QnMultiServerCameraDataLoader::discardCachedData(const qint64 resolutionMs)
         loader->discardCachedData(resolutionMs);
 }
 
-int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
+int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &server, const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
     if (!server || server->getStatus() != Qn::Online)
         return -1;
 

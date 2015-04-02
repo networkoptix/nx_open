@@ -5,7 +5,7 @@
 #include <camera/data/bookmark_camera_data.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_bookmark.h>
 
@@ -22,7 +22,7 @@ namespace {
     const int minOverlapDuration = 40*1000;
 }
 
-QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
+QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
     QnAbstractCameraDataLoader(camera, dataType, parent),
     m_connection(connection)
 {
@@ -33,7 +33,7 @@ QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnecti
         qnNullWarning(camera);
 }
 
-QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera,  Qn::CameraDataType dataType, QObject *parent) {
+QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaServerResourcePtr &server, const QnVirtualCameraResourcePtr &camera,  Qn::CameraDataType dataType, QObject *parent) {
     if (!server || !camera)
         return NULL;
     
@@ -43,6 +43,11 @@ QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaS
 
     return new QnGenericCameraDataLoader(serverConnection, camera, dataType, parent);
 }
+
+QnVirtualCameraResourcePtr QnGenericCameraDataLoader::camera() const {
+    return m_resource.dynamicCast<QnVirtualCameraResource>();
+}
+
 
 int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QString &filter, const qint64 resolutionMs) {
     if (filter != m_filter)
@@ -134,7 +139,7 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
     case Qn::MotionTimePeriod: 
     case Qn::BookmarkTimePeriod:
         return m_connection->getTimePeriodsAsync(
-            QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
+            camera(),
             periodToLoad.startTimeMs, 
             periodToLoad.startTimeMs + periodToLoad.durationMs, 
             1, 
@@ -152,7 +157,7 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
             bookmarkFilter.text = m_filter;
 
             return m_connection->getBookmarksAsync( 
-                m_resource.dynamicCast<QnNetworkResource>(),
+                camera(),
                 bookmarkFilter,
                 this,
                 SLOT(at_bookmarksReceived(int, const QnCameraBookmarkList &, int))

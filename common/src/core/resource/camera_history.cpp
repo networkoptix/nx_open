@@ -20,6 +20,38 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getCurrentServer(const QnVirtualCa
     return camera->getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
+bool QnCameraHistoryPool::isCameraDataLoaded(const QnVirtualCameraResourcePtr &camera) const {
+    auto itr = m_historyDetail.find(camera->getId());
+    return (itr != m_historyDetail.cend());
+}
+
+
+bool QnCameraHistoryPool::prepareCamera(const QnVirtualCameraResourcePtr &camera, callbackFunction handler) {
+    if (isCameraDataLoaded(camera))
+        return true;
+
+    QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return false;
+
+    auto connection = server->apiConnection();
+    if (!connection)
+        return false;
+
+    int handle = connection->getTimePeriodsAsync(camera, 0, DATETIME_NOW, 1, Qn::RecordingContent, QString(), this, SLOT(at_cameraPrepared(int, const QnTimePeriodList &, int)));
+    if (handle < 0)
+        return false;
+
+    m_loadingCameras[handle] = handler;
+
+    return true;
+}
+
+void QnCameraHistoryPool::at_cameraPrepared(int status, const QnTimePeriodList &periods, int handle) {
+
+}
+
+
 QnMediaServerResourceList QnCameraHistoryPool::getFootageServersByCamera(const QnVirtualCameraResourcePtr &camera) const {
     QnMediaServerResourceList result;
     QnUuid cameraId = camera->getId();
@@ -34,16 +66,15 @@ QnMediaServerResourceList QnCameraHistoryPool::getFootageServersByCamera(const Q
     return result;
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::tryGetFootageServersByCameraPeriod(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const
-{
-    auto itr = m_historyDetail.find(camera->getId());
-    if (itr == m_historyDetail.end()) {
-
+QnMediaServerResourceList QnCameraHistoryPool::tryGetFootageServersByCameraPeriod(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const {
+    if (!isCameraDataLoaded(camera)) {
         auto footageServers = getFootageServersByCamera(camera);
         Q_ASSERT_X(footageServers.isEmpty(), Q_FUNC_INFO, "history_detail map still is not loaded");
-
         return QnMediaServerResourceList();
     }
+
+    //TODO: #history_refactor double find
+    auto itr = m_historyDetail.find(camera->getId());
     const auto& moveData = itr.value();
     if (moveData.empty())
         return QnMediaServerResourceList();
@@ -60,6 +91,7 @@ QnMediaServerResourceList QnCameraHistoryPool::tryGetFootageServersByCameraPerio
 
 ec2::ApiCameraHistoryMoveDataList::const_iterator QnCameraHistoryPool::getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryMoveDataList& data, qint64 timestamp) const
 {
+    //TODO: #history_refactor test me!!!
     // todo: test me!!!
     return std::lower_bound(data.begin(), data.end(), timestamp, [](const ec2::ApiCameraHistoryMoveData& data, qint64 timestamp) { 
         return timestamp < data.timestampMs; // inverse compare

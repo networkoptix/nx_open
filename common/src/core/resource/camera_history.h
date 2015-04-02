@@ -1,16 +1,20 @@
 #ifndef QN_CAMERA_HISTORY_H
 #define QN_CAMERA_HISTORY_H
 
+#include <set>
+
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
-#include <utils/common/uuid.h>
 
-#include "recording/time_period.h"
-#include "resource_fwd.h"
-#include <set>
-#include "nx_ec/data/api_fwd.h"
+#include <core/resource/resource_fwd.h>
+
+#include <nx_ec/data/api_fwd.h>
+
+#include <recording/time_period.h>
+#include <recording/time_period_list.h>
 
 #include <utils/common/singleton.h>
+#include <utils/common/uuid.h>
 
 class QnCameraHistoryPool: public QObject, public Singleton<QnCameraHistoryPool> {
     Q_OBJECT
@@ -24,13 +28,17 @@ public:
     void setCamerasWithArchive(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
     std::vector<QnUuid> getCamerasWithArchive(const QnUuid& serverGuid) const;
 
+
+    typedef std::function<void(bool success)> callbackFunction;
+    bool prepareCamera(const QnVirtualCameraResourcePtr &camera, callbackFunction handler);
+
     /*
     *   \return Server list where camera were archived.
     */
     QnMediaServerResourceList getFootageServersByCamera(const QnVirtualCameraResourcePtr &camera) const;
 
     /*
-    *   \return nServer list where camera were archived during specified period - if data is loaded.
+    *   \return Server list where camera was archived during specified period - if data is loaded.
     */
     QnMediaServerResourceList tryGetFootageServersByCameraPeriod(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const;
 
@@ -49,6 +57,10 @@ private:
     ec2::ApiCameraHistoryMoveDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryMoveDataList& detailData, qint64 timestamp) const;
     ec2::ApiCameraHistoryMoveDataList filterOnlineServers(const ec2::ApiCameraHistoryMoveDataList& dataList) const;
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
+
+    bool isCameraDataLoaded(const QnVirtualCameraResourcePtr &camera) const;
+    Q_SLOT void at_cameraPrepared(int status, const QnTimePeriodList &periods, int handle);
+    
 private:
 
     mutable QMutex m_mutex;
@@ -56,6 +68,9 @@ private:
 
     typedef QMap<QnUuid, ec2::ApiCameraHistoryMoveDataList> DetailHistoryMap;
     DetailHistoryMap m_historyDetail; // camera move detail by camera
+
+    typedef QMap<int, callbackFunction> HandlerMap;
+    HandlerMap m_loadingCameras;
 };
 
 

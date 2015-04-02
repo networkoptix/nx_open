@@ -17,10 +17,10 @@
 class QnLayoutFileCameraDataLoader: public QnAbstractCameraDataLoader
 {
 public:
-    QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent);
-    QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent);
+    QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent);
+    QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent);
     virtual ~QnLayoutFileCameraDataLoader();
-    static QnLayoutFileCameraDataLoader* newInstance(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = 0);
+    static QnLayoutFileCameraDataLoader* newInstance(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = 0);
     virtual int load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) override;
 private:
     int loadChunks(const QnTimePeriod &period);
