@@ -8,7 +8,6 @@ PREFIX=/usr/local/apps/$CUSTOMIZATION/mediaserver/
 BIN_NAME=mediaserver
 BIN_PATH=$PREFIX/bin/$BIN_NAME
 STORAGE_PATH=/media/mmcblk0p1
-LOG_LEVEL=WARNING
 HTTP_LOG_LEVEL=none
 
 export LD_LIBRARY_PATH=$PREFIX/lib
@@ -38,7 +37,7 @@ start() {
     fi
 
     echo -n "Starting $BIN_NAME..... "
-    $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=$LOG_LEVEL --msg-log-level=$HTTP_LOG_LEVEL 2>/dev/null 1>&2&
+    $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --msg-log-level=$HTTP_LOG_LEVEL 2>/dev/null 1>&2&
     if [ `/bin/pidof $BIN_NAME` ]
     then
         echo "OK"
@@ -130,11 +129,11 @@ case "$1" in
             return 1
         fi
 
-        $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=$LOG_LEVEL --msg-log-level=$HTTP_LOG_LEVEL
+        $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --msg-log-level=$HTTP_LOG_LEVEL
         ;;
 
     start_gdb)
-        gdbserver 0.0.0.0:12345 $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=$LOG_LEVEL --msg-log-level=$HTTP_LOG_LEVEL
+        gdbserver 0.0.0.0:12345 $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --msg-log-level=$HTTP_LOG_LEVEL
         ;;
 
     stop)
