@@ -20,6 +20,7 @@
 #include "utils/common/util.h"
 #include "core/resource/camera_user_attribute_pool.h"
 #include "utils/license_usage_helper.h"
+#include "media_server/settings.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
     : m_serverId(serverId)
@@ -142,8 +143,8 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 
 void QnAppserverResourceProcessor::readDefaultUserAttrs()
 {
-    
-    QFile f(closeDirPath(getDataDirectory()) + lit("default_rec.json"));
+    QString dir = MSSettings::roSettings()->value("staticDataDir", getDataDirectory()).toString();
+    QFile f(closeDirPath(dir) + lit("default_rec.json"));
     if (!f.open(QFile::ReadOnly))
         return;
     QByteArray data = f.readAll();
