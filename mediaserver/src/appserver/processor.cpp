@@ -66,6 +66,9 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
+        if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
+            continue;   //ignoring newly discovered camera
+
         /*
         QnVirtualCameraResourceList cameras;
         const ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCameraSync( cameraResource, &cameras );
@@ -158,6 +161,9 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
 
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
+    if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
+        return;   //ignoring newly discovered camera
+
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
     Q_ASSERT(!cameraResource->getId().isNull());
     QnVirtualCameraResourceList cameras;

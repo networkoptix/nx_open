@@ -402,6 +402,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             case DiscoveryMode::partiallyEnabled:
                 if( !qnResPool->getResourceByUniqId(it->first->getUniqueId()) )
                     continue;   //ignoring newly discovered camera
+                it->first->addFlags(Qn::search_upd_only);
                 break;
 
             case DiscoveryMode::disabled:
