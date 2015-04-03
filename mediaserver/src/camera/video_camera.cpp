@@ -128,6 +128,9 @@ void QnVideoCameraGopKeeper::putData(
             QnCompressedVideoDataPtr clonedFrame;
             if (m_lastKeyFrames[ch].empty() || m_lastKeyFrames[ch].back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
             {
+                //video->clone here is required since video data can be allocated by cyclic allocator 
+                    //and storing frame here will result in heavy memory usage in allocator
+                    //TODO #ak upgrade cyclic allocator to remove video->clone from here
                 clonedFrame = QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator));
                 m_lastKeyFrames[ch].push_back(clonedFrame);
                 *packetReplacement = clonedFrame;
