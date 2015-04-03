@@ -257,9 +257,12 @@ int QnTranscoder::setVideoCodec(
             ffmpegTranscoder->setQuality(quality);
             ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
 
-            bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
-            if (isAtom || resolution.height() >= 1080)
-                ffmpegTranscoder->setMTMode(true);
+            if (codec != CODEC_ID_H263P) {
+                // H263P has bug for multi thread encoding in current ffmpeg version
+                bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
+                if (isAtom || resolution.height() >= 1080)
+                    ffmpegTranscoder->setMTMode(true);
+            }
             m_vTranscoder = QnVideoTranscoderPtr(ffmpegTranscoder);
             break;
         }

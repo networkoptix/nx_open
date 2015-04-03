@@ -35,6 +35,7 @@ public:
     virtual bool addTag( const QString& name, const QString& value ) override;
     void setInMiddleOfStream(bool value) { m_inMiddleOfStream = value; }
     bool inMiddleOfStream() const { return m_inMiddleOfStream; }
+    void setStartTimeOffset(qint64 value) { m_startTimeOffset = value; }
 protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) override;
 
@@ -54,6 +55,7 @@ private:
     QString m_container;
     qint64 m_baseTime;
     bool m_inMiddleOfStream;
+    qint64 m_startTimeOffset;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

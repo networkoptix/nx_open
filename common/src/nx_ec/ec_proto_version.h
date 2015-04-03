@@ -6,7 +6,7 @@
 #ifndef EC_PROTO_VERSION_H
 #define EC_PROTO_VERSION_H
 
-#inclue "version.h"
+#include "version.h"
 
 namespace nx_ec
 {

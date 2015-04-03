@@ -24,7 +24,7 @@ namespace {
     }
 
 #ifdef Q_OS_MAC
-    const QString relativeHelpRootPath = lit("/help");
+    const QString relativeHelpRootPath = lit("/../Resources/help");
 #else
     const QString relativeHelpRootPath = lit("/../help");
 #endif
