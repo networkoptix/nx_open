@@ -53,7 +53,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NxInterface.1">
-      <HintPath>..\..\..\build_environment\target\x86\bin\release\NxInterface.1.dll</HintPath>
+      <HintPath>..\..\NxInterface\x86\bin\release\NxInterface.1.dll</HintPath>
     </Reference>
     <Reference Include="Paxton.Net2.OemDvrInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=d6bad0497ee6d215, processorArchitecture=MSIL" />
     <Reference Include="System" />
