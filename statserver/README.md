@@ -1,0 +1,37 @@
+# NX Statistics server
+
+## MySQL database setup
+
+```
+  sudo apt-get install mysql-server
+
+  mysql --user=USER --password=PASSWORD < database.sql # Create database and tables
+```
+
+
+## CGI Script
+
+```
+  sudo apt-get install python-pip
+  sudo pip install Flask Python-mysql pygal # pygal is optional, for sqlCharts only
+
+  ./cgi.py # running CGI, edit to configure database connection
+```
+
+
+## NGINX forwarding
+
+```
+  location /api {
+    proxy_pass http://127.0.0.1:8000;
+  }
+```
+
+## Wanna see a demo?
+
+Run a script `rr.py` a couple times to generate randome reports and see how statistics works:
+
+```
+http://localhost/api/sqlFormat/SELECT parentId, count(id) FROM cameras_latest GROUP BY parentId
+http://localhost/api/sqlChart/SELECT cpuArchitecture, count(id) FROM mediaservers GROUP BY cpuArchitecture
+```

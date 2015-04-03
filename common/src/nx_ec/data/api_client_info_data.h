@@ -10,6 +10,7 @@ namespace ec2 {
         : ApiData
     {
         QnUuid id;
+		QnUuid parentId;
 
 		QString cpuArchitecture, cpuModelName;
 		qint64 phisicalMemory;
@@ -17,7 +18,7 @@ namespace ec2 {
 
 		bool operator == (const ApiClientInfoData& rhs) const;
     };
-#define ApiClientInfoData_Fields (id) \
+#define ApiClientInfoData_Fields (id)(parentId) \
     (cpuArchitecture)(cpuModelName)(phisicalMemory) \
     (openGLVersion)(openGLVendor)(openGLRenderer)
 

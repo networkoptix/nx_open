@@ -13,7 +13,7 @@ static const QString JUST_INITIATED = lit("just initiated");
 // Parametrize
 static const uint REPORT_CYCLE = 30*24*60*60; /* about a month */
 static const uint REPORT_MAX_DELAY = REPORT_CYCLE / 4; /* about a week */
-static const QString REPORT_SERVER = "http://localhost:5000/api/reportStatistics";
+static const QString REPORT_SERVER = "http://10.0.2.171:80/api/reportStatistics";
 
 namespace ec2
 {
@@ -25,7 +25,7 @@ namespace ec2
             if (user->isAdmin())
                 return user;
 
-        qFatal(lit("Can not get user admin"));
+        qFatal("Can not get user admin");
 		return QnUserResourcePtr();
     }
 
@@ -86,7 +86,7 @@ namespace ec2
             ApiMediaServerDataExList mediaservers;
             auto res = QnDbManager::instance()->doQuery(nullptr, mediaservers);
             if (res != ErrorCode::ok) return res;
-            for (auto& ms : mediaservers) outData->mediaservers.push_back(ms);
+            for (auto& ms : mediaservers) outData->mediaservers.push_back(std::move(ms));
         } {
             ApiCameraDataExList cameras;
             auto res = QnDbManager::instance()->doQuery(nullptr, cameras);
@@ -94,7 +94,7 @@ namespace ec2
 
             for (ApiCameraDataEx& cam : cameras)
                 if (cam.typeId != m_desktopCameraTypeId)
-                    outData->cameras.push_back(cam);
+                    outData->cameras.push_back(std::move(cam));
         } {
             auto res = QnDbManager::instance()->doQuery(nullptr, outData->clients);
             if (res != ErrorCode::ok) return res;
@@ -102,10 +102,12 @@ namespace ec2
             ApiLicenseDataList licenses;
             auto res = QnDbManager::instance()->doQuery(nullptr, licenses);
             if (res != ErrorCode::ok) return res;
-            for (auto& lic : licenses) outData->licenses.push_back(lic);
+            for (auto& lic : licenses) outData->licenses.push_back(std::move(lic));
         } {
-            auto res = QnDbManager::instance()->doQuery(nullptr, outData->businessRules);
+			ApiBusinessRuleDataList bRules;
+            auto res = QnDbManager::instance()->doQuery(nullptr, bRules);
             if (res != ErrorCode::ok) return res;
+            for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
         }
 
         NX_LOG(lit("Ec2StaticticsReporter. Collected: %1 mediaserver(s), %2 camera(s) and %3 client(s) in with systemId=%4")

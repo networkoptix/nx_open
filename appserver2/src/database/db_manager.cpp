@@ -1711,8 +1711,9 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?)");
+    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?, ?)");
     query.addBindValue(tran.params.id.toRfc4122());
+	query.addBindValue(tran.params.parentId.toRfc4122());
     query.addBindValue(tran.params.cpuArchitecture);
     query.addBindValue(tran.params.cpuModelName);
     query.addBindValue(tran.params.phisicalMemory);
@@ -3195,12 +3196,13 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataLi
         ApiClientInfoData info;
 
 		info.id = QnSql::deserialized_field<QnUuid>(query.value(0));
-		info.cpuArchitecture = query.value(1).toString();
-		info.cpuModelName = query.value(2).toString();
-		info.phisicalMemory = query.value(3).toLongLong();
-		info.openGLVersion = query.value(4).toString();
-		info.openGLVendor = query.value(5).toString();
-		info.openGLRenderer = query.value(6).toString();
+		info.parentId = QnSql::deserialized_field<QnUuid>(query.value(1));
+		info.cpuArchitecture = query.value(2).toString();
+		info.cpuModelName = query.value(3).toString();
+		info.phisicalMemory = query.value(4).toLongLong();
+		info.openGLVersion = query.value(5).toString();
+		info.openGLVendor = query.value(6).toString();
+		info.openGLRenderer = query.value(7).toString();
 
 		data.push_back(std::move(info));
     }

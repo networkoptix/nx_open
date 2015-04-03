@@ -15,6 +15,7 @@ namespace ec2 {
 
     struct ApiBusinessActionData;
     struct ApiBusinessRuleData;
+    struct ApiBusinessRuleStatistics;
     struct ApiCameraData;
     struct ApiCameraAttributesData;
     struct ApiCameraDataEx;
@@ -96,6 +97,7 @@ namespace ec2 {
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
     typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
+    typedef std::vector<ApiBusinessRuleStatistics> ApiBusinessRuleStatisticsList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraAttributesData> ApiCameraAttributesDataList;
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
@@ -131,6 +133,7 @@ namespace ec2 {
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\
+	(ApiBusinessRuleStatistics)\
     (ApiCameraData)\
     (ApiCameraAttributesData)\
     (ApiCameraDataEx)\

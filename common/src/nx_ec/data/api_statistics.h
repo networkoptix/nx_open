@@ -22,14 +22,13 @@ namespace std
     };
 }
 
-namespace ec2
-{
+namespace ec2 {
+
     struct ApiCameraDataStatistics
-    :
-        ApiCameraDataEx
+		: ApiCameraDataEx
     {
         ApiCameraDataStatistics();
-        ApiCameraDataStatistics(const ApiCameraDataEx& data);
+        ApiCameraDataStatistics(const ApiCameraDataEx&& data);
 
 		const static std::unordered_set<QString> ADD_PARAMS;
 
@@ -41,20 +40,18 @@ namespace ec2
         (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
 
     struct ApiStorageDataStatistics
-    :
-        ApiStorageData
+		: ApiStorageData
     {
         ApiStorageDataStatistics();
-        ApiStorageDataStatistics(const ApiStorageData& data);
+        ApiStorageDataStatistics(const ApiStorageData&& data);
     };
 #define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)
 
     struct ApiMediaServerDataStatistics
-    :
-        ApiMediaServerDataEx
+		: ApiMediaServerDataEx
     {
         ApiMediaServerDataStatistics();
-        ApiMediaServerDataStatistics(const ApiMediaServerDataEx& data);
+        ApiMediaServerDataStatistics(const ApiMediaServerDataEx&& data);
 
 		const static std::unordered_set<QString> ADD_PARAMS;
 
@@ -74,25 +71,38 @@ namespace ec2
 	};
 #define ApiLicenseStatistics_Fields (name)(cameraCount)(licenseType)(version)(brand)(expiration)
 
+	struct ApiBusinessRuleStatistics
+		: ApiBusinessRuleData
+	{
+        ApiBusinessRuleStatistics();
+        ApiBusinessRuleStatistics(const ApiBusinessRuleData&& data);
+
+		// TODO: Convert enums to strings
+		// QString actionType, eventState, eventType; 
+	};
+#define ApiBusinessRuleStatistics_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState) \
+	(actionType)(actionResourceIds)(actionParams)(aggregationPeriod)(disabled)(schedule)(system)
+
     struct ApiSystemStatistics
     {
         QnUuid systemId;
-
-        ApiMediaServerDataStatisticsList    mediaservers;
+		
+        ApiBusinessRuleStatisticsList       businessRules;
         ApiCameraDataStatisticsList         cameras;
         ApiClientInfoDataList               clients;
         ApiLicenseStatisticsList            licenses;
-        ApiBusinessRuleDataList             businessRules;
+        ApiMediaServerDataStatisticsList    mediaservers;
     };
 #define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)
 
     struct ApiStatisticsServerInfo
     {
-        QnUuid systemId;
+        QnUuid  systemId;
         QString url;
         QString status;
     };
 #define ApiStatisticsServerInfo_Fields (systemId)(url)(status)
-}
+
+} // namespace ec2
 
 #endif // API_STATISTICS_H

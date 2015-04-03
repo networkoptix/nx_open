@@ -18,6 +18,28 @@ USE `nx_statistics`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `businessRules`
+--
+
+DROP TABLE IF EXISTS `businessRules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `businessRules` (
+  `id` varchar(45) NOT NULL,
+  `systemId` varchar(45) NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `etc` text,
+  `actionType` varchar(45) DEFAULT NULL,
+  `aggregationPeriod` int(11) DEFAULT NULL,
+  `disabled` tinyint(1) DEFAULT NULL,
+  `eventState` varchar(45) DEFAULT NULL,
+  `eventType` varchar(45) DEFAULT NULL,
+  `schedule` varchar(45) DEFAULT NULL,
+  `system` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `cameras`
 --
 
@@ -27,6 +49,7 @@ DROP TABLE IF EXISTS `cameras`;
 CREATE TABLE `cameras` (
   `id` varchar(45) NOT NULL,
   `parentId` varchar(45) NOT NULL,
+  `systemId` varchar(45) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `etc` text,
   `audioEnabled` tinyint(1) DEFAULT NULL,
@@ -43,7 +66,10 @@ CREATE TABLE `cameras` (
   `secondaryStreamQuality` varchar(45) DEFAULT NULL,
   `status` varchar(45) DEFAULT NULL,
   `statusFlags` varchar(45) DEFAULT NULL,
-  `vendor` varchar(45) DEFAULT NULL
+  `vendor` varchar(45) DEFAULT NULL,
+  `MaxFPS` int(11) DEFAULT NULL,
+  `hasDualStreaming` tinyint(1) DEFAULT NULL,
+  `isAudioSupported` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -57,14 +83,37 @@ DROP TABLE IF EXISTS `clients`;
 CREATE TABLE `clients` (
   `id` varchar(45) NOT NULL,
   `parentId` varchar(45) NOT NULL,
+  `systemId` varchar(45) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `etc` text,
   `cpuArchitecture` varchar(45) DEFAULT NULL,
   `cpuModelName` varchar(45) DEFAULT NULL,
-  `phisicalMemory` int(64) DEFAULT NULL,
+  `phisicalMemory` bigint(20) unsigned DEFAULT NULL,
   `openGLRenderer` varchar(45) DEFAULT NULL,
   `openGLVendor` varchar(45) DEFAULT NULL,
   `openGLVersion` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `licenses`
+--
+
+DROP TABLE IF EXISTS `licenses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `licenses` (
+  `id` varchar(45) NOT NULL,
+  `parentId` varchar(45) NOT NULL,
+  `systemId` varchar(45) NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `etc` text,
+  `name` varchar(45) DEFAULT NULL,
+  `licenseType` varchar(45) DEFAULT NULL,
+  `version` varchar(45) DEFAULT NULL,
+  `brand` varchar(45) DEFAULT NULL,
+  `expiration` varchar(45) DEFAULT NULL,
+  `cameraCount` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -103,6 +152,7 @@ DROP TABLE IF EXISTS `storages`;
 CREATE TABLE `storages` (
   `id` varchar(45) NOT NULL,
   `parentId` varchar(45) NOT NULL,
+  `systemId` varchar(45) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `etc` text,
   `spaceLimit` bigint(20) DEFAULT NULL,
@@ -119,4 +169,4 @@ CREATE TABLE `storages` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-03-26 20:21:30
+-- Dump completed on 2015-04-03 21:06:36

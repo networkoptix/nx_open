@@ -527,23 +527,26 @@ namespace ec2
         
 		if (!loginInfo.clientInfo.id.isNull())
         {
+			auto clientInfo = loginInfo.clientInfo;
+			clientInfo.parentId = qnCommon->moduleGUID();
+
 			ApiClientInfoDataList infos;
-			auto result = dbManager->doQuery(loginInfo.clientInfo.id, infos);
+			auto result = dbManager->doQuery(clientInfo.id, infos);
 			if (result != ErrorCode::ok)
 				return result;
 
-			if (infos.size() && loginInfo.clientInfo == infos.front())
+			if (infos.size() && clientInfo == infos.front())
 			{
-				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registred with the same params"),
+				NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
 					cl_logDEBUG2);
 				return ErrorCode::ok;
 			}
 
             m_serverQueryProcessor.processUpdateAsync(
-				QnTransaction<ApiClientInfoData>(ApiCommand::saveClientInfo, loginInfo.clientInfo),
+				QnTransaction<ApiClientInfoData>(ApiCommand::saveClientInfo, clientInfo),
 				[&](ErrorCode result) {
 					if (result == ErrorCode::ok) {
-						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registred"),
+						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
 							cl_logINFO);
 					}
 					else {
