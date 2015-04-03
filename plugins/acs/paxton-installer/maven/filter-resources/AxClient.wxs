@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Fragment>
     <DirectoryRef Id="AxClient23Dir">
-      <Component Id="cmpB3D4F3658BAA459B93E5CFB40B240519" Guid="{7229B18D-75CD-4ABF-B968-32E5AB41282D}">
+      <Component Id="cmpB3D4F3658BAA459B93E5CFB40B240519">
         <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.AxSourceDir)\axhdwitness.dll">
           <Class Id="{5E813AE3-F318-4814-ABE0-59ECD0CAFBC8}" Context="InprocServer32" Description="AxHDWitness Class" Version="1.0" Programmable="yes" Control="yes">
             <ProgId Id="axhdwitness.AxHDWitness.1" Description="AxHDWitness Class">
@@ -12,138 +12,138 @@
         </File>
       </Component>
 
-      <Component Id="cmp3E8A91F11BA0CC36AA4DD87F303B6E32" Guid="{A1EDC48E-05FF-4DA3-98F9-945043C7E582}">
+      <Component Id="cmp3E8A91F11BA0CC36AA4DD87F303B6E32">
         <File Id="fil0D2098C0235320AF051D84C2A8E46EE0" KeyPath="yes" Source="$(var.AxSourceDir)\avcodec-54.dll" />
       </Component>
-      <Component Id="cmp1EC586C67603C547D26471D8FCA5AFBE" Guid="{FB49654F-1428-4730-9376-B0ADF7EC28CA}">
+      <Component Id="cmp1EC586C67603C547D26471D8FCA5AFBE">
         <File Id="fil1CE816542F65C224B5D27FBD99CF6C90" KeyPath="yes" Source="$(var.AxSourceDir)\avdevice-54.dll" />
       </Component>
-      <Component Id="cmp20AC17A5BAEA316D29CD40EFD564EA3E" Guid="{9FB2DDF5-02B3-472B-9BD8-CB80D7CFC740}">
+      <Component Id="cmp20AC17A5BAEA316D29CD40EFD564EA3E">
         <File Id="filE6FF39F2939984B168F40511773B39F6" KeyPath="yes" Source="$(var.AxSourceDir)\avfilter-2.dll" />
       </Component>
-      <Component Id="cmpB6A04294DD5CF49CAD73844279A74C1B" Guid="{0739BE7D-3953-4293-805B-079F96D4D7EF}">
+      <Component Id="cmpB6A04294DD5CF49CAD73844279A74C1B">
         <File Id="fil454DA5DDEA251786DEA14BF4D46CD862" KeyPath="yes" Source="$(var.AxSourceDir)\avformat-54.dll" />
       </Component>
-      <Component Id="cmp0AE06F75ED907C59C0BB6F24B5CCE30F" Guid="{6A8EBCBE-89EC-4569-8574-5952F6BEDC9A}">
+      <Component Id="cmp0AE06F75ED907C59C0BB6F24B5CCE30F">
         <File Id="filC90922A08D770646675BE1C2530CC94F" KeyPath="yes" Source="$(var.AxSourceDir)\avutil-51.dll" />
       </Component>
-      <Component Id="cmp3E75C8C546EE33C88133ACEE3708447D" Guid="{0152DF33-34D3-42CF-B3FC-11A6D52D2DDD}">
+      <Component Id="cmp3E75C8C546EE33C88133ACEE3708447D">
         <File Id="filC26B2049C5CAB0FACDB72A6218A10F71" KeyPath="yes" Source="$(var.AxSourceDir)\icudt53.dll" />
       </Component>
-      <Component Id="cmp880E224056AF8AF4B659C54A55BC6825" Guid="{BB0D2D1E-80E5-4BAD-ACA2-FAB4C56FAB18}">
+      <Component Id="cmp880E224056AF8AF4B659C54A55BC6825">
         <File Id="filBE47A4EB21F6958D47A22DC0FE333643" KeyPath="yes" Source="$(var.AxSourceDir)\icuin53.dll" />
       </Component>
-      <Component Id="cmpF6C4E8818A7BB450AEB4351BFC97B53F" Guid="{50BCBB72-441D-4E4A-89E0-4A7E58690429}">
+      <Component Id="cmpF6C4E8818A7BB450AEB4351BFC97B53F">
         <File Id="fil57E27991E5A6C997720E4677A1221937" KeyPath="yes" Source="$(var.AxSourceDir)\icuuc53.dll" />
       </Component>
-      <Component Id="cmp27388013FBAC92F7826F02F940C89D96" Guid="{387A6E4B-B2C9-4CD3-8D6B-B5B683DFBBD8}">
+      <Component Id="cmp27388013FBAC92F7826F02F940C89D96">
         <File Id="filC7D0434DC8A22E54158D9499BABF351F" KeyPath="yes" Source="$(var.AxSourceDir)\libeay32.dll" />
       </Component>
-      <Component Id="cmpD7CC49ADDCDE41C2AD4C70E1A4ED9A4B" Guid="{9C5555CD-C817-4761-9124-CF53F86623E1}">
+      <Component Id="cmpD7CC49ADDCDE41C2AD4C70E1A4ED9A4B">
         <File Id="fil102DC58765E19A8793DE90546CAD17C7" KeyPath="yes" Source="$(var.AxSourceDir)\libmp3lame-0.dll" />
       </Component>
-      <Component Id="cmp0FA0DA54FBB8B6733E83E57B2324AD68" Guid="{1F9940D4-4431-4E67-9E0B-E131F2C17B5E}">
+      <Component Id="cmp0FA0DA54FBB8B6733E83E57B2324AD68">
         <File Id="fil1FB7986829E31384553DFF15253611C2" KeyPath="yes" Source="$(var.AxSourceDir)\libogg-0.dll" />
       </Component>
-      <Component Id="cmp6041C02418D36BA6066C5E15EDE56DC2" Guid="{89F88480-9B52-4900-8042-294DB8C3FE9B}">
+      <Component Id="cmp6041C02418D36BA6066C5E15EDE56DC2">
         <File Id="filF7C9DE9C27C871D42267A15C2375B399" KeyPath="yes" Source="$(var.AxSourceDir)\libvorbis-0.dll" />
       </Component>
-      <Component Id="cmp32197FA6F3FF41A9E0BE245F58D3F480" Guid="{56DC1175-D44D-4BD0-BA1B-71266F685DDE}">
+      <Component Id="cmp32197FA6F3FF41A9E0BE245F58D3F480">
         <File Id="fil6A5BD73D4C6217CD554B601AC7B73CF7" KeyPath="yes" Source="$(var.AxSourceDir)\libvorbisenc-2.dll" />
       </Component>
-      <Component Id="cmp829CE0622888FA7A500C2E9E1A118D85" Guid="{7596B623-36EB-43FD-954D-DA4DB8CD7FF7}">
+      <Component Id="cmp829CE0622888FA7A500C2E9E1A118D85">
         <File Id="filCA24EFE3151FF316E2ED28C88D67CDA1" KeyPath="yes" Source="$(var.AxSourceDir)\OpenAL32.dll" />
       </Component>
-      <Component Id="cmpEF755C9C18FB5F827C258ED8E3F96029" Guid="{9E4183A0-A801-49C5-AC8F-241F3DC4D7D7}">
+      <Component Id="cmpEF755C9C18FB5F827C258ED8E3F96029">
         <File Id="fil8C06CA636A45D31A550F549215C31908" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Concurrent.dll" />
       </Component>
-      <Component Id="cmp51C5F1A915931C2FF01CC4496E04BFA6" Guid="{EFEBB4EB-9AB6-4026-B2E0-224422350397}">
+      <Component Id="cmp51C5F1A915931C2FF01CC4496E04BFA6">
         <File Id="filC0D4B93DE1E6830AC33E23C288744D6F" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Core.dll" />
       </Component>
-      <Component Id="cmpD050B48FDD8D9A0E081354B8FB9C089F" Guid="{0D8EA4EF-7630-4820-A6A5-47EC0EEF5D47}">
+      <Component Id="cmpD050B48FDD8D9A0E081354B8FB9C089F">
         <File Id="fil8FDA9F298D20E879EE706694D1FC5578" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Gui.dll" />
       </Component>
-      <Component Id="cmp3A674E44F90243192C4FFDFC4C8ACDBF" Guid="{52F16D97-0833-4455-9D8A-28D4887336D5}">
+      <Component Id="cmp3A674E44F90243192C4FFDFC4C8ACDBF">
         <File Id="fil54ECA21BE0BCF68C0CB07CC448B92E0C" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Multimedia.dll" />
       </Component>
-      <Component Id="cmpEA75D0F301D3779329723B21A2658F50" Guid="{F1367B4E-B28D-401B-8728-EB84E8FCAE33}">
+      <Component Id="cmpEA75D0F301D3779329723B21A2658F50">
         <File Id="fil0A6D96ACE93371DA75EDC98F122E1339" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5MultimediaWidgets.dll" />
       </Component>
-      <Component Id="cmpAA077EDCAECFB632EA72CA8D784B6157" Guid="{1889C01F-63D9-445A-B0AC-E69840ABB743}">
+      <Component Id="cmpAA077EDCAECFB632EA72CA8D784B6157">
         <File Id="fil967D8D1BA8D703F50AD901D3DFDFE9A2" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Network.dll" />
       </Component>
-      <Component Id="cmpB9C1D7461302A2D2032F4EC31F56CFD9" Guid="{330AC130-89B9-4853-BB0D-BD6B2057B8EE}">
+      <Component Id="cmpB9C1D7461302A2D2032F4EC31F56CFD9">
         <File Id="fil29A32E0DA203277ED2B972E44BF213C9" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5OpenGL.dll" />
       </Component>
-      <Component Id="cmpA9C29AFDEB3102B6CC7A35D4AB1B0FCF" Guid="{F7DBD998-990B-40BF-B161-CC5451D080BE}">
+      <Component Id="cmpA9C29AFDEB3102B6CC7A35D4AB1B0FCF">
         <File Id="filF0B794FFB339CFC4AAC93BD0E07BDF56" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5PrintSupport.dll" />
       </Component>
-      <Component Id="cmp42E4B278E442EE6DA910B7F2AEBFEC42" Guid="{6EC70CFB-3031-40E1-B3B2-7B220305D259}">
+      <Component Id="cmp42E4B278E442EE6DA910B7F2AEBFEC42">
         <File Id="fil2D0E50F74EE970E224AAA3A98411F4B4" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Qml.dll" />
       </Component>
-      <Component Id="cmpAE8E230447136A2CCB791D83ACF0EF4F" Guid="{EB5C276E-4095-42F5-B567-5F253B070EFB}">
+      <Component Id="cmpAE8E230447136A2CCB791D83ACF0EF4F">
         <File Id="fil2633E5BECBC5178E226F7A33ED96A978" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Quick.dll" />
       </Component>
-      <Component Id="cmp7AEA990FA959601B0EB807FC3A181756" Guid="{0E93A446-0C2B-4B77-BE2C-7EFE95D85678}">
+      <Component Id="cmp7AEA990FA959601B0EB807FC3A181756">
         <File Id="fil3FDF5C4FC69D8AA8475FFBC76B2DBB20" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Sql.dll" />
       </Component>
-      <Component Id="cmpFD7D972D74D81414B2836D5F8C4F5381" Guid="{61391950-28B8-461B-92F9-5026FC997BC4}">
+      <Component Id="cmpFD7D972D74D81414B2836D5F8C4F5381">
         <File Id="fil814F4252654D80B7063A24A52715D41D" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5WebKit.dll" />
       </Component>
-      <Component Id="cmp995E36BC6D7F4D99EED947CC6DF48E14" Guid="{58E73A8A-6A5C-4179-8C78-402B2CB67B65}">
+      <Component Id="cmp995E36BC6D7F4D99EED947CC6DF48E14">
         <File Id="filF8B95B240BD0D49DE59E40AFB6142DDB" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5WebKitWidgets.dll" />
       </Component>
-      <Component Id="cmpB57208B5636136E75F0270E0934FB794" Guid="{C84EB7E1-DE5E-4A2A-9C1D-53725362C5A1}">
+      <Component Id="cmpB57208B5636136E75F0270E0934FB794">
         <File Id="fil2CDEAAA4A492364BB98065AE7AF6104A" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Widgets.dll" />
       </Component>
-      <Component Id="cmpE6530C0D5E64E1CF47E5890EA8016112" Guid="{FDF8863B-18E7-4AC4-B649-5184A48D003C}">
+      <Component Id="cmpE6530C0D5E64E1CF47E5890EA8016112">
         <File Id="fil9225D193AE7CABCE5C875B3ADDDF1294" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Xml.dll" />
       </Component>
-      <Component Id="cmpDE30C0AA5FD9530A8AC7B52002236877" Guid="{D566537A-538F-4565-8008-40A777FFA16E}">
+      <Component Id="cmpDE30C0AA5FD9530A8AC7B52002236877">
         <File Id="fil344BCE93F2E8F56E852DCE8EF6B74F21" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5XmlPatterns.dll" />
       </Component>
-      <Component Id="cmp9FB3E43AF50B8A49F737F4CDB2062581" Guid="{DAB0E9EC-106C-4647-8CCD-33253D71BF30}">
+      <Component Id="cmp9FB3E43AF50B8A49F737F4CDB2062581">
         <File Id="fil03348326D5B80FCCB5432727A1184AC4" KeyPath="yes" Source="$(var.AxSourceDir)\quazip.dll" />
       </Component>
-      <Component Id="cmpA6F1BE5D2036CD53EAA4A4F2E38823BA" Guid="{2E9CED2B-595F-4EE7-B8BB-055E8CFEF5E7}">
+      <Component Id="cmpA6F1BE5D2036CD53EAA4A4F2E38823BA">
         <File Id="fil6F9745DC02952BD838E45178A2F208BC" KeyPath="yes" Source="$(var.AxSourceDir)\sigar.dll" />
       </Component>
-      <Component Id="cmpA39F076DC929158C0A26D80AF4281F68" Guid="{B7D52A31-DEB4-4982-A795-DB76E657B4C0}">
+      <Component Id="cmpA39F076DC929158C0A26D80AF4281F68">
         <File Id="fil5CFF8275424D7E4DF192B4430C8B8600" KeyPath="yes" Source="$(var.AxSourceDir)\ssleay32.dll" />
       </Component>
-      <Component Id="cmpC1102E56F9C36DCAC27979F5C82FA156" Guid="{E9169357-9312-4FFE-945A-934AA48684D3}">
+      <Component Id="cmpC1102E56F9C36DCAC27979F5C82FA156">
         <File Id="fil476BCE7D25707F67787B7E21A8855261" KeyPath="yes" Source="$(var.AxSourceDir)\swscale-2.dll" />
       </Component>
-      <Component Id="cmp99566ED8A215FB88596EF331660AFB5C" Guid="{12636591-812D-49C5-AC0A-17A44ACDBCE7}">
+      <Component Id="cmp99566ED8A215FB88596EF331660AFB5C">
         <File Id="fil65CDF7CD386FA2058DBC50FAEE9AA134" KeyPath="yes" Source="$(var.AxSourceDir)\wrap_oal.dll" />
       </Component>
-      <Component Id="cmp90D7BD1DF030B8037665DC74A4AF4D80" Guid="{00F00773-E150-4BF7-97CF-ED596CC8F0AD}">
+      <Component Id="cmp90D7BD1DF030B8037665DC74A4AF4D80">
         <File Id="fil6F9E5F20D0B83AC4795F8A12C6557E66" KeyPath="yes" Source="$(var.AxSourceDir)\zlibwapi.dll" />
       </Component>
       <Directory Id="dirAC1018FAFBD12AB1F52C7FFED327C154" Name="imageformats">
-        <Component Id="cmpB3390B82888592C4DA8719158B9B8F55" Guid="{90EB46B8-AEB0-4D61-8744-AC5B72259332}">
+        <Component Id="cmpB3390B82888592C4DA8719158B9B8F55">
           <File Id="filBCF131E9B40421F0D79414070A159793" KeyPath="yes" Source="$(var.AxSourceDir)\imageformats\qgif.dll" />
         </Component>
-        <Component Id="cmp0C752DD2D0420B95CD0A5FD1CEB664D4" Guid="{C303D81B-D113-42FD-B7D1-F1C3F14BE7B9}">
+        <Component Id="cmp0C752DD2D0420B95CD0A5FD1CEB664D4">
           <File Id="fil24B5B9AB613A9716835DE8E9E638410D" KeyPath="yes" Source="$(var.AxSourceDir)\imageformats\qjpeg.dll" />
         </Component>
-        <Component Id="cmpC8FCB355B6595A456855C5BFCACAAB8A" Guid="{A3B26D07-B791-454B-8653-BA401BE871B9}">
+        <Component Id="cmpC8FCB355B6595A456855C5BFCACAAB8A">
           <File Id="filCDC85BCDBDED95AAF1AB709D5F693FE2" KeyPath="yes" Source="$(var.AxSourceDir)\imageformats\qtiff.dll" />
         </Component>
       </Directory>
       <Directory Id="dir2DAE262B57151EA29206C84756153BEF" Name="platforms">
-        <Component Id="cmpA269DE43DCAC1C47E19BFB85CB81C32F" Guid="{C2B3D1DB-EFDC-424D-A52A-D5C3FF44E212}">
+        <Component Id="cmpA269DE43DCAC1C47E19BFB85CB81C32F">
           <File Id="fil6180D81F092EDCA832C987D8BE906673" KeyPath="yes" Source="$(var.AxSourceDir)\platforms\qminimal.dll" />
         </Component>
-        <Component Id="cmpAB7F9529338C67C891DA1A7C85DCB5BE" Guid="{8B1A4D2D-5B16-48DB-99EE-D5175ACD5AB9}">
+        <Component Id="cmpAB7F9529338C67C891DA1A7C85DCB5BE">
           <File Id="fil772B5034CCCDD521F47E26551735BA83" KeyPath="yes" Source="$(var.AxSourceDir)\platforms\qoffscreen.dll" />
         </Component>
-        <Component Id="cmp76A0B8BAD93376696703C5B0838B1921" Guid="{0B7E4E94-DA1D-407B-9F7B-EBA7C14AE238}">
+        <Component Id="cmp76A0B8BAD93376696703C5B0838B1921">
           <File Id="filD1ED1C741D8B75DF71FB1AD3FF178961" KeyPath="yes" Source="$(var.AxSourceDir)\platforms\qwindows.dll" />
         </Component>
       </Directory>
       <Directory Id="dirB3323877C0BB6A34947EFF84214541AF" Name="styles">
-        <Component Id="cmp74465E0B91CD3BF33F41857A6EF6E2AD" Guid="{0EA82535-80A1-4525-ABA0-24F7C170C973}">
+        <Component Id="cmp74465E0B91CD3BF33F41857A6EF6E2AD">
           <File Id="fil5C913B0F3FB13BED65EAF427F5B93113" KeyPath="yes" Source="$(var.AxSourceDir)\styles\bespin.dll" />
         </Component>
       </Directory>

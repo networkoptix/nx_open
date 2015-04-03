@@ -20,10 +20,15 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             public string model { get; set; }
         }
 
+        class CurrentTime {
+            public string value { get; set; }
+        }
+
         class ConnectInfo {
             public string brand { get; set; }
             public string systemName { get; set; }
             public string version { get; set; }
+            public int nxClusterProtoVersion { get; set; }
         }
     }
 
@@ -110,6 +115,14 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             return OemDvrStatus.FailedToListCameras;
         }
 
+        private T LoadData<T>(string url, string login, string password) {
+            WebRequest request = HttpWebRequest.Create(url);
+            request.Credentials = new NetworkCredential(login, password);
+            WebResponse response = request.GetResponse();
+            StreamReader reader = new StreamReader(response.GetResponseStream());
+            return JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
+        }
+
         public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
             // MessageBox.Show("pe2");
 
@@ -130,42 +143,53 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
 
                 switch (pbInfo.PlaybackFunction) {
                     case OemDvrPlaybackFunction.Start: {
-                            WebRequest request = HttpWebRequest.Create(url.ToString() + "ec2/connect");
-                            request.Credentials = new NetworkCredential(cnInfo.UserId, cnInfo.Password);
-                            WebResponse response = request.GetResponse();
+                        // Calculate time offset
+                        double timeOffset = 0;
 
-                            StreamReader reader = new StreamReader(response.GetResponseStream());
-                            Api.ConnectInfo connectInfo = JsonConvert.DeserializeObject<Api.ConnectInfo>(reader.ReadToEnd());
+                        DateTime startTime = DateTime.Now.ToUniversalTime();
+                        Api.CurrentTime currentTime = LoadData<Api.CurrentTime>(url.ToString() + "ec2/getCurrentTime", cnInfo.UserId, cnInfo.Password);
+                        DateTime endTime = DateTime.Now.ToUniversalTime();
 
-                            Version serverVersion = Util.shortenVersion(connectInfo.version);
-                            Version ourVersion = Util.shortenVersion(Properties.version);
+                        DateTime localTime = startTime.AddMilliseconds((endTime - startTime).TotalMilliseconds / 2);
+                        DateTime serverTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(Convert.ToInt64(currentTime.value));
+                        timeOffset = (serverTime - localTime).TotalMilliseconds;
 
-                            if (Properties.brand != connectInfo.brand) {
-                                MessageBox.Show("Incompatible brand", "Error", MessageBoxButtons.OK);
-                                return OemDvrStatus.FootagePlaybackFailed;
-                            }
+                        // Add timeoffset to tick
+                        _tick += (long)timeOffset;
 
-                            if (ourVersion < serverVersion) {
-                                MessageBox.Show("Incompatible version. Please update... blah-blah-blah", "Error", MessageBoxButtons.OK);
-                                return OemDvrStatus.FootagePlaybackFailed;
-                            }
+                        Api.ConnectInfo connectInfo = LoadData<Api.ConnectInfo>(url.ToString() + "ec2/connect", cnInfo.UserId, cnInfo.Password);
 
-                            String assemblyName = String.Format("NxControl.{0}.{1}", serverVersion.Major, serverVersion.Minor);
-                            try {
-                                axHDWitness = LoadAssembly(assemblyName);
-                                axHDWitnessForm = (Control)axHDWitness;
-                            }
-                            catch (Exception) {
-                                MessageBox.Show("Ask to download old package", "Error", MessageBoxButtons.OK);
-                                return OemDvrStatus.FootagePlaybackFailed;
-                            }
+                        Version serverVersion = new Version(connectInfo.version);
+                        int ourProtoVersion = Properties.protoVersion;
 
-                            Load(pbSurface, url);
-
-                            _cameras = pbInfo.DvrCameras;
-                            axHDWitness.play();
-                            break;
+                        if (Properties.brand != connectInfo.brand) {
+                            MessageBox.Show("Incompatible software", "Error", MessageBoxButtons.OK);
+                            return OemDvrStatus.FootagePlaybackFailed;
                         }
+
+                        if (ourProtoVersion < connectInfo.nxClusterProtoVersion) {
+                            MessageBox.Show("Incompatible version. Please update... blah-blah-blah", "Error", MessageBoxButtons.OK);
+                            return OemDvrStatus.FootagePlaybackFailed;
+                        }
+
+                        String assemblyName = String.Format("NxControl.{0}", connectInfo.nxClusterProtoVersion);
+                        try {
+                            axHDWitness = LoadAssembly(assemblyName);
+                            axHDWitnessForm = (Control)axHDWitness;
+                        }
+                        catch (Exception) {
+                            string message = String.Format("You need to install the package version {0}.{1}.{2} to connect to this server.",
+                                serverVersion.Major, serverVersion.Minor, serverVersion.Build);
+                            MessageBox.Show(message, "Error", MessageBoxButtons.OK);
+                            return OemDvrStatus.FootagePlaybackFailed;
+                        }
+
+                        Load(pbSurface, url);
+
+                        _cameras = pbInfo.DvrCameras;
+                        axHDWitness.play();
+                        break;
+                    }
                     case OemDvrPlaybackFunction.Forward:
                     case OemDvrPlaybackFunction.Backward:
                     case OemDvrPlaybackFunction.Pause: {

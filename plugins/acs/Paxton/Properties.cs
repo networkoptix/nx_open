@@ -5,6 +5,7 @@ using System.Text;
 
 namespace NetworkOptix {
     class Properties {
+        public static int protoVersion = 1010;
         public static string version = "2.3.0.0";
         public static string brand = "hdwitness";
     }

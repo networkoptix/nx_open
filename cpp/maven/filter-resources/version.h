@@ -58,7 +58,7 @@
 #define QN_HELP_URL                     "${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url"
 #define QN_ARM_BOX                      "${box}"
 #define QN_IOS_PLAYBUTTON_TINT          "${ios.playButton.tint}"
-
+#define NX_EC_EC2_PROTO_VERSION         "${nxec.ec2ProtoVersion}"
 
 /* 
  * These constants are here for windows resource file.

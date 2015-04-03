@@ -6,6 +6,7 @@
 #ifndef EC_PROTO_VERSION_H
 #define EC_PROTO_VERSION_H
 
+#inclue "version.h"
 
 namespace nx_ec
 {
@@ -14,7 +15,7 @@ namespace nx_ec
         This version MUST be incremented by hand, when changes to transaction structures are done.
         Modules with different proto version do not connect to each other!
     */
-    static const int EC2_PROTO_VERSION = 1010;
+    static const int EC2_PROTO_VERSION = NX_EC_EC2_PROTO_VERSION;
     //!Servers with no proto version support have this version
     /*!
         THIS VALUE MUST NOT BE CHANGED!
