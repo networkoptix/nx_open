@@ -1,4 +1,5 @@
 TEMPLATE = lib
+TARGET = Ax${ax.className}
 DEF_FILE = ${basedir}/contrib/activeqt/control/qaxserver.def
 #RC_FILE  = ${project.build.sourceDirectory}/axhdwitness.rc
 
@@ -14,17 +15,18 @@ INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${root.dir}/client/src/
 
 include(${root.dir}/bespin/bespin.pri)
-				
+                
 CONFIG(debug, debug|release) {
-  QMAKE_POST_LINK = ../post.bat debug ${arch};
+  QMAKE_POST_LINK = ..\${arch}\post.bat debug ${arch};
 }
 
 CONFIG(release, debug|release) {
-  QMAKE_POST_LINK = ../post.bat release ${arch};
+  QMAKE_POST_LINK = ..\${arch}\post.bat release ${arch};
 }
 
 win32 {
   QT += axserver
+  DEFINES += AxHDWitness=Ax${ax.className}
   CONFIG += dll qaxserver_no_postlink 
   CONFIG -= console
 }

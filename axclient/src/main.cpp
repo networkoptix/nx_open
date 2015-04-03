@@ -9,7 +9,7 @@
 
 
 // namespace hdw {
-QAXFACTORY_BEGIN("{817D1E50-BFBA-4691-B331-1B8AA838A745}", "{49D52858-E6F3-441A-A5F7-24A3B3E056AF}")
+QAXFACTORY_BEGIN(QN_AX_TYPELIB_ID, QN_AX_APP_ID)
     QAXCLASS(AxHDWitness)
 QAXFACTORY_END()
 // } // namespace hdw
@@ -49,13 +49,13 @@ QAxFactory *qax_instantiate() {
         const QVariant::Handler *oldHandler = *currentHandler;
         *currentHandler = qcoreVariantHandler();*/
         
-		LPWSTR *szArgsList = CommandLineToArgvW(GetCommandLineW(), &qn_argc);
-		qn_argv = new char*[qn_argc];
-		for (int i = 0; i < qn_argc; ++i) {
-			qn_argv[i] = "";
-		}
+        LPWSTR *szArgsList = CommandLineToArgvW(GetCommandLineW(), &qn_argc);
+        qn_argv = new char*[qn_argc];
+        for (int i = 0; i < qn_argc; ++i) {
+            qn_argv[i] = "";
+        }
 
-		qn_application = new QApplication(qn_argc, qn_argv);
+        qn_application = new QApplication(qn_argc, qn_argv);
 
         /* Roll back if QApplication constructor didn't behave as expected. */
         /* if(*currentHandler == qcoreVariantHandler()) {

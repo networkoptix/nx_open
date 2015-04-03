@@ -160,9 +160,9 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                         Api.ConnectInfo connectInfo = LoadData<Api.ConnectInfo>(url.ToString() + "ec2/connect", cnInfo.UserId, cnInfo.Password);
 
                         Version serverVersion = new Version(connectInfo.version);
-                        int ourProtoVersion = Properties.protoVersion;
+                        int ourProtoVersion = CustomProperties.protoVersion;
 
-                        if (Properties.brand != connectInfo.brand) {
+                        if (CustomProperties.brand != connectInfo.brand) {
                             MessageBox.Show("Incompatible software", "Error", MessageBoxButtons.OK);
                             return OemDvrStatus.FootagePlaybackFailed;
                         }
@@ -172,7 +172,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                             return OemDvrStatus.FootagePlaybackFailed;
                         }
 
-                        String assemblyName = String.Format("NxControl.{0}", connectInfo.nxClusterProtoVersion);
+                        String assemblyName = String.Format("{0}Control.{1}", CustomProperties.className, connectInfo.nxClusterProtoVersion);
                         try {
                             axHDWitness = LoadAssembly(assemblyName);
                             axHDWitnessForm = (Control)axHDWitness;

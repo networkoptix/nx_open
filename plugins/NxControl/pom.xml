@@ -43,11 +43,11 @@
         </dependency>        
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>axhdwitness</artifactId>
+            <artifactId>axclient</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/axhdwitness/pom.xml</systemPath>
+            <systemPath>${root.dir}/axclient/pom.xml</systemPath>
         </dependency>        
     </dependencies>  
     <build>

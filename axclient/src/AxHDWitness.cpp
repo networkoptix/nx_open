@@ -31,7 +31,6 @@
 
 #include <fstream>
 
-#include "version.h"
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
 
@@ -168,8 +167,8 @@ LRESULT QT_WIN_CALLBACK qn_FilterProc(int nCode, WPARAM wParam, LPARAM lParam)
 AxHDWitness::AxHDWitness(QWidget* parent, const char* name)
     : m_mainWindow(0), m_isInitialized(false)
 {
-	Q_UNUSED(parent);
-	Q_UNUSED(name);
+    Q_UNUSED(parent);
+    Q_UNUSED(name);
 
     initialize();
 }
@@ -249,15 +248,15 @@ void AxHDWitness::play()
 double AxHDWitness::minimalSpeed() {
     if(!m_mainWindow)
         return 0.0;
-		
-	return m_context->navigator()->minimalSpeed();
+        
+    return m_context->navigator()->minimalSpeed();
 }
 
 double AxHDWitness::maximalSpeed() {
     if(!m_mainWindow)
         return 0.0;
 
-	return m_context->navigator()->maximalSpeed();
+    return m_context->navigator()->maximalSpeed();
 }
 
 double AxHDWitness::speed()
@@ -343,7 +342,7 @@ void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timest
 
     QnResourceList resources;
     foreach(QString id, ids.split(QLatin1Char('|'))) {
-		QnResourcePtr resource = m_context->resourcePool()->getResourceById(id);
+        QnResourcePtr resource = m_context->resourcePool()->getResourceById(id);
         if(resource)
             resources << resource;
     } 
@@ -374,9 +373,9 @@ void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timest
 }
 
 void AxHDWitness::removeFromCurrentLayout(const QString &uniqueId) {
-	auto layout = m_context->workbench()->currentLayout()->resource();
-	if (layout)
-		layout->removeItem(layout->getItem(uniqueId));
+    auto layout = m_context->workbench()->currentLayout()->resource();
+    if (layout)
+        layout->removeItem(layout->getItem(uniqueId));
 }
 
 QString AxHDWitness::resourceListXml() {
@@ -440,23 +439,23 @@ void AxHDWitness::slidePanelsOut() {
 bool AxHDWitness::doInitialize()
 {
     
-	AllowSetForegroundWindow(ASFW_ANY);
+    AllowSetForegroundWindow(ASFW_ANY);
 
-	int argc = 0;
+    int argc = 0;
 
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
 
-	m_timerManager.reset(new TimerManager());
+    m_timerManager.reset(new TimerManager());
 
-	m_clientModule.reset(new QnClientModule(argc, NULL));
-	m_syncTime.reset(new QnSyncTime());
+    m_clientModule.reset(new QnClientModule(argc, NULL));
+    m_syncTime.reset(new QnSyncTime());
 
-	m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
-	m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
+    m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
+    m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
 
-	QnResourcePool::initStaticInstance( new QnResourcePool() );
+    QnResourcePool::initStaticInstance( new QnResourcePool() );
 
     m_dictionary.reset(new QnResourcePropertyDictionary());
     m_statusDictionary.reset(new QnResourceStatusDictionary());
@@ -467,7 +466,7 @@ bool AxHDWitness::doInitialize()
     m_globalSettings.reset(new QnGlobalSettings());
     m_clientMessageProcessor.reset(new QnClientMessageProcessor());
     m_runtimeInfoManager.reset(new QnRuntimeInfoManager());
-	m_serverCameraFactory.reset(new QnServerCameraFactory());
+    m_serverCameraFactory.reset(new QnServerCameraFactory());
 
     qnSettings->setLightMode(Qn::LightModeActiveX);
     qnSettings->setActiveXMode(true);
@@ -486,11 +485,11 @@ bool AxHDWitness::doInitialize()
     QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
 
-	m_ec2ConnectionFactory.reset(getConnectionFactory(Qn::PT_DesktopClient));
+    m_ec2ConnectionFactory.reset(getConnectionFactory(Qn::PT_DesktopClient));
 
     ec2::ResourceContext resCtx(QnServerCameraFactory::instance(), qnResPool, qnResTypePool);
-	m_ec2ConnectionFactory->setContext( resCtx );
-	QnAppServerConnectionFactory::setEC2ConnectionFactory( m_ec2ConnectionFactory.data() );
+    m_ec2ConnectionFactory->setContext( resCtx );
+    QnAppServerConnectionFactory::setEC2ConnectionFactory( m_ec2ConnectionFactory.data() );
     
     /* Initialize application instance. */
     QApplication::setStartDragDistance(20);
@@ -511,7 +510,7 @@ bool AxHDWitness::doInitialize()
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
     
-	QnSessionManager::instance()->start();
+    QnSessionManager::instance()->start();
     
     ffmpegInit();
     
@@ -539,7 +538,7 @@ bool AxHDWitness::doInitialize()
     QStyle *baseStyle = new Bespin::Style();
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
     qApp->setStyle(style);
-	qApp->processEvents();
+    qApp->processEvents();
 
     connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
         emit connectionProcessed(0, QString());
@@ -595,17 +594,17 @@ void AxHDWitness::doFinalize()
     m_syncTime.reset(NULL);
     m_clientModule.reset(NULL);
 
-	m_timerManager.reset(NULL);
+    m_timerManager.reset(NULL);
 }
 
 void AxHDWitness::createMainWindow() {
     assert(m_mainWindow == NULL);
 
     m_context.reset(new QnWorkbenchContext(qnResPool));
-	m_context->instance<QnFglrxFullScreen>();
+    m_context->instance<QnFglrxFullScreen>();
 
-	Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
-	m_context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
+    Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
+    m_context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     m_mainWindow = new QnMainWindow(m_context.data());
     m_mainWindow->setOptions(m_mainWindow->options() & ~(QnMainWindow::TitleBarDraggable | QnMainWindow::WindowButtonsVisible));

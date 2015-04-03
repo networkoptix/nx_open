@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="x86\version.properties" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -9,7 +10,6 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Paxton.NetworkOptixControl</RootNamespace>
-    <AssemblyName>NetworkOptix.OemDvrMiniDriver</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseIntermediateOutputPath>x86/obj</BaseIntermediateOutputPath>
@@ -52,9 +52,6 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NxInterface.1">
-      <HintPath>..\..\NxInterface\x86\bin\release\NxInterface.1.dll</HintPath>
-    </Reference>
     <Reference Include="Paxton.Net2.OemDvrInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=d6bad0497ee6d215, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -63,8 +60,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomProperties.cs" />
     <Compile Include="NetworkOptixMiniDriver.cs" />
-    <Compile Include="Properties.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
@@ -92,18 +89,5 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Target Name="AfterBuild">
-    <PropertyGroup>
-      <ReferenceAssemblies>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0</ReferenceAssemblies>
-      <ILMergePath>$(ProjectDir)packages\ilmerge.2.14.1208\tools\ILMerge.exe</ILMergePath>
-      <SignKey>$(ProjectDir)Sign.snk</SignKey>
-    </PropertyGroup>
-    <CreateItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(CopyLocal)'=='true' AND '%(Extension)'=='.dll'">
-      <Output TaskParameter="Include" ItemName="AssembliesToMerge" />
-    </CreateItem>
-    <Exec Command="&quot;$(ILMergePath)&quot; /keyfile:$(SignKey) /target:library /out:NetworkOptix.OemDvrMiniDriver.Merged.dll NetworkOptix.OemDvrMiniDriver.dll Newtonsoft.Json.dll" WorkingDirectory="$(OutputPath)" />
-    <Delete Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
-    <Delete Files="$(OutputPath)\NetworkOptix.OemDvrMiniDriver.dll" />
-    <Delete Files="$(OutputPath)\NetworkOptix.OemDvrMiniDriver.pdb" />
-  </Target>
+  <Import Project="x86\targets.properties" />
 </Project>

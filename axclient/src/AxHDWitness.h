@@ -1,6 +1,8 @@
 #ifndef CLIENT_AXHDWITNESS_H_
 #define CLIENT_AXHDWITNESS_H_
 
+#include "version.h"
+
 #include <QtCore/QScopedPointer>
 
 #include <ActiveQt/QAxBindable>
@@ -37,9 +39,9 @@ class AxHDWitness : public QWidget
 {
     Q_OBJECT
 
-    Q_CLASSINFO("ClassID", "{5E813AE3-F318-4814-ABE0-59ECD0CAFBC8}");
-    Q_CLASSINFO("InterfaceID", "{4DB301D1-DB3C-4746-8A92-CEDA4322018A}");
-    Q_CLASSINFO("EventsID", "{78AA2C5E-1115-405C-A8D6-BDE8CF00309A}");
+    Q_CLASSINFO("ClassID", QN_AX_CLASS_ID);
+    Q_CLASSINFO("InterfaceID", QN_AX_INTERFACE_ID);
+    Q_CLASSINFO("EventsID", QN_AX_EVENTS_ID);
 
 public:
     AxHDWitness(QWidget* parent, const char* name = 0);
@@ -56,9 +58,9 @@ public slots:
     void prevFrame();
     void clear();
 
-	double minimalSpeed();
-	double maximalSpeed();
-	double speed();
+    double minimalSpeed();
+    double maximalSpeed();
+    double speed();
     void setSpeed(double speed);
 
     qint64 currentTime();
@@ -95,18 +97,18 @@ private:
 private:
     bool m_isInitialized;
 
-	QScopedPointer<ec2::AbstractECConnectionFactory> m_ec2ConnectionFactory;
+    QScopedPointer<ec2::AbstractECConnectionFactory> m_ec2ConnectionFactory;
     QnClientResourceProcessor m_clientResourceProcessor;
 
     QScopedPointer<QnServerCameraFactory> m_serverCameraFactory;
 
     QScopedPointer<QnWorkbenchContext> m_context;
-	QScopedPointer<QnSkin> skin;
-	QScopedPointer<QnCustomizer> customizer;
-	QScopedPointer<QnClientModule> m_clientModule;
-	QScopedPointer<QnSyncTime> m_syncTime;
+    QScopedPointer<QnSkin> skin;
+    QScopedPointer<QnCustomizer> customizer;
+    QScopedPointer<QnClientModule> m_clientModule;
+    QScopedPointer<QnSyncTime> m_syncTime;
 
-	QScopedPointer<QnPlatformAbstraction> m_platform;
+    QScopedPointer<QnPlatformAbstraction> m_platform;
     QScopedPointer<QnLongRunnablePool> m_runnablePool;
     QScopedPointer<QnClientPtzControllerPool> m_clientPtzPool;
     QScopedPointer<QnGlobalSettings> m_globalSettings;
@@ -114,17 +116,17 @@ private:
     QScopedPointer<QnRuntimeInfoManager> m_runtimeInfoManager;
 
     QScopedPointer<QnModuleFinder> m_moduleFinder;
-	QScopedPointer<QnRouter> m_router;
-	QScopedPointer<QnGlobalModuleFinder> m_globalModuleFinder;
-	QScopedPointer<QnServerInterfaceWatcher> m_serverInterfaceWatcher;
+    QScopedPointer<QnRouter> m_router;
+    QScopedPointer<QnGlobalModuleFinder> m_globalModuleFinder;
+    QScopedPointer<QnServerInterfaceWatcher> m_serverInterfaceWatcher;
 
     QScopedPointer<QnResourcePropertyDictionary> m_dictionary;
     QScopedPointer<QnResourceStatusDictionary> m_statusDictionary;
 
     QScopedPointer<QnCameraUserAttributePool> m_cameraUserAttributePool;
-	QScopedPointer<QnMediaServerUserAttributesPool> m_mediaServerUserAttributesPool;
+    QScopedPointer<QnMediaServerUserAttributesPool> m_mediaServerUserAttributesPool;
 
-	QScopedPointer<TimerManager> m_timerManager;
+    QScopedPointer<TimerManager> m_timerManager;
 
     QnMainWindow *m_mainWindow;
 };

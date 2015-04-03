@@ -3,10 +3,10 @@
   <Fragment>
     <DirectoryRef Id="AxClient23Dir">
       <Component Id="cmpB3D4F3658BAA459B93E5CFB40B240519">
-        <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.AxSourceDir)\axhdwitness.dll">
-          <Class Id="{5E813AE3-F318-4814-ABE0-59ECD0CAFBC8}" Context="InprocServer32" Description="AxHDWitness Class" Version="1.0" Programmable="yes" Control="yes">
-            <ProgId Id="axhdwitness.AxHDWitness.1" Description="AxHDWitness Class">
-              <ProgId Id="axhdwitness.AxHDWitness" Description="AxHDWitness Class" />
+        <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.AxSourceDir)\ax${ax.className}2.dll">
+          <Class Id="${ax.classId}" Context="InprocServer32" Description="Ax${ax.className} Class" Version="1.0" Programmable="yes" Control="yes">
+            <ProgId Id="axhdwitness.AxHDWitness.1" Description="Ax${ax.className} Class">
+              <ProgId Id="axhdwitness.AxHDWitness" Description="Ax${ax.className} Class" />
             </ProgId>
           </Class>
         </File>

@@ -40,21 +40,6 @@
     <AssemblyOriginatorKeyFile>Sign.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AxInterop.hdwitness, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d6f1cbce45742ab1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\build_environment\target\x86\bin\Release\AxInterop.hdwitness.dll</HintPath>
-      <Private>False</Private>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Interop.hdwitness, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d6f1cbce45742ab1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\..\build_environment\target\x86\bin\Release\Interop.hdwitness.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NxInterface.1">
-      <HintPath>..\nxinterface\x86\bin\Release\NxInterface.1.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
