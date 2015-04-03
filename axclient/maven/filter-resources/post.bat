@@ -1,4 +1,3 @@
-SETLOCAL
 call "%VS110COMNTOOLS%\..\..\VC\vcvarsall.bat"
 
 set CONFIG=%1
@@ -24,5 +23,3 @@ cd %bebin_path%\%CONFIG%
 tlbimp /keyfile:%AXHDW%\Sign.snk /out:Interop.${ax.className}.dll %LIBNAME%.dll 
 regsvr32 /s %LIBNAME%.dll
 AxImp /keyfile:%AXHDW%\Sign.snk /rcw:Interop.${ax.className}.dll /out:AxInterop.${ax.className}.dll %LIBNAME%.dll
-
-ENDLOCAL

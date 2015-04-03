@@ -11,4 +11,3 @@ rem IF NOT [%1] == [] call msbuild common-${arch}.vcproj /t:Rebuild /consolelogg
 rem IF NOT [%2] == [] call msbuild common-${arch}.vcproj /t:Rebuild /consoleloggerparameters:ErrorsOnly /p:Configuration=%CONFIG2%
 
 call msbuild ${basedir}\NxInterface.csproj /t:Build /consoleloggerparameters:Summary /p:Configuration=${build.configuration}
-rem call ${environment.dir}\bin\jom /S
