@@ -1,11 +1,16 @@
 #include "camera_history.h"
 
-#include <utils/common/util.h>
+#include <api/helpers/chunks_request_data.h>
+
+#include <nx_ec/data/api_camera_server_item_data.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+
+#include <utils/common/util.h>
+#include <utils/common/delayed.h>
 
 // ------------------- CameraHistory Pool ------------------------
 
@@ -25,11 +30,15 @@ bool QnCameraHistoryPool::isCameraDataLoaded(const QnVirtualCameraResourcePtr &c
     return (itr != m_historyDetail.cend());
 }
 
-
 bool QnCameraHistoryPool::prepareCamera(const QnVirtualCameraResourcePtr &camera, callbackFunction handler) {
-    if (isCameraDataLoaded(camera))
+    if (isCameraDataLoaded(camera)) {
+        executeDelayed([handler] {
+            handler(true);
+        });
         return true;
+    }
 
+    //TODO: #GDM #history_refactor Current server we are connected to - it is online.
     QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
     if (!server)
         return false;
@@ -38,7 +47,12 @@ bool QnCameraHistoryPool::prepareCamera(const QnVirtualCameraResourcePtr &camera
     if (!connection)
         return false;
 
-    int handle = connection->getTimePeriodsAsync(camera, 0, DATETIME_NOW, 1, Qn::RecordingContent, QString(), this, SLOT(at_cameraPrepared(int, const QnTimePeriodList &, int)));
+    //ec2/cameraHistory
+
+    QnChunksRequestData request;
+    request.resList << camera;
+
+    int handle = connection->cameraHistory(request, this, SLOT(at_cameraPrepared(int, const ec2::ApiCameraHistoryDetailDataList &, int)));
     if (handle < 0)
         return false;
 
@@ -47,8 +61,16 @@ bool QnCameraHistoryPool::prepareCamera(const QnVirtualCameraResourcePtr &camera
     return true;
 }
 
-void QnCameraHistoryPool::at_cameraPrepared(int status, const QnTimePeriodList &periods, int handle) {
+void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHistoryDetailDataList &periods, int handle) {
+    bool success = (status == 0);
 
+    for (const auto &detail: periods)
+        m_historyDetail[detail.cameraId] = detail.moveHistory;
+
+    if (!m_loadingCameras.contains(handle))
+        return;
+    auto handler = m_loadingCameras.take(handle);
+    handler(success);
 }
 
 

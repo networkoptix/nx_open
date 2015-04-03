@@ -93,8 +93,6 @@ namespace ec2 {
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraAttributesData> ApiCameraAttributesDataList;
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
-    typedef std::vector<ApiCameraHistoryData> ApiCameraHistoryDataList;
-    typedef std::vector<ApiCameraHistoryMoveData> ApiCameraHistoryMoveDataList;
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
@@ -115,6 +113,9 @@ namespace ec2 {
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiIdData> ApiIdDataList;
     typedef std::vector<ApiResourceStatusData> ApiResourceStatusDataList;
+    typedef std::vector<ApiCameraHistoryData> ApiCameraHistoryDataList;
+    typedef std::vector<ApiCameraHistoryDetailData> ApiCameraHistoryDetailDataList;
+    typedef std::vector<ApiCameraHistoryMoveData> ApiCameraHistoryMoveDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\

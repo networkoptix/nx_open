@@ -59,7 +59,7 @@ private:
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
 
     bool isCameraDataLoaded(const QnVirtualCameraResourcePtr &camera) const;
-    Q_SLOT void at_cameraPrepared(int status, const QnTimePeriodList &periods, int handle);
+    Q_SLOT void at_cameraPrepared(int status, const ec2::ApiCameraHistoryDetailDataList &periods, int handle);
     
 private:
 

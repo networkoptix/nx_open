@@ -91,6 +91,30 @@ protected:
         emitFinished(derived, status, reply, handle, errorString);
     }
 
+    template<class T, class Derived>
+    void processFusionReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+        QString errorString = QString::fromUtf8(response.errorString);
+
+        T reply;
+        if(status == 0) {
+            bool jsonDeserialized = QJson::deserialize(response.data, &reply);
+            if (!jsonDeserialized) {
+#ifdef JSON_REPLY_DEBUG
+                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+#endif
+                status = 1;
+            }
+        } else {
+#ifdef JSON_REPLY_DEBUG
+            qnWarning("Error processing request: %1.", response.errorString);
+#endif
+        }
+
+        emitFinished(derived, status, reply, handle, errorString);
+    }
+
+
 private:
     int m_object;
     bool m_finished;

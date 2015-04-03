@@ -10,6 +10,8 @@
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkReply>
 
+#include <api/helpers/chunks_request_data.h>
+
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -19,6 +21,9 @@
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
 #include <core/ptz/ptz_data.h>
+
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/data/api_camera_server_item_data.h>
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
@@ -32,7 +37,7 @@
 #include "network_proxy_factory.h"
 #include "session_manager.h"
 #include "media_server_reply_processor.h"
-#include "nx_ec/data/api_conversion_functions.h"
+
 #include "model/camera_list_reply.h"
 #include "model/configure_reply.h"
 #include "model/upload_update_reply.h"
@@ -87,6 +92,7 @@ namespace {
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
+        (ec2CameraHistoryObject,   "ec2/cameraHistory")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -254,6 +260,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case MergeSystemsObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
+        break;
+    case ec2CameraHistoryObject:
+        processFusionReply<ec2::ApiCameraHistoryDetailDataList>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -806,4 +815,8 @@ int QnMediaServerConnection::modulesInformation(QObject *target, const char *slo
     QnRequestParamList params;
     params << QnRequestParam("allModules", lit("true"));
     return sendAsyncGetRequest(ModulesInformationObject, params, QN_STRINGIZE_TYPE(QList<QnModuleInformation>), target, slot);
+}
+
+int QnMediaServerConnection::cameraHistory(const QnChunksRequestData &request, QObject *target, const char *slot) {
+    return sendAsyncGetRequest(ec2CameraHistoryObject, request.toParams(), QN_STRINGIZE_TYPE(ec2::ApiCameraHistoryDetailDataList) ,target, slot);
 }

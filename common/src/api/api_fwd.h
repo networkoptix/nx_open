@@ -13,4 +13,6 @@ typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 class QnMediaServerConnection;
 typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
+struct QnChunksRequestData;
+
 #endif // QN_API_FWD_H

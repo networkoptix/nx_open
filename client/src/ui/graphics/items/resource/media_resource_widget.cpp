@@ -60,6 +60,7 @@
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
+#include <core/resource/camera_history.h>
 
 //TODO: #Elric remove
 #include <camera/loaders/caching_camera_data_loader.h>
@@ -121,6 +122,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         qnCritical("Media resource widget was created with a non-media resource.");
     m_camera = base_type::resource().dynamicCast<QnVirtualCameraResource>();
 
+    if (m_camera) {
+        qnCameraHistoryPool->prepareCamera(m_camera, [](bool success) {
+            qDebug() << "camera prepared" << success;
+        });
+    }
 
     // TODO: #Elric
     // Strictly speaking, this is a hack.
