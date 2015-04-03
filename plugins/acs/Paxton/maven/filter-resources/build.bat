@@ -12,4 +12,3 @@ rem IF NOT [%2] == [] call msbuild common-${arch}.vcproj /t:Rebuild /consolelogg
 
 call nuget restore -PackagesDirectory packages
 call msbuild ${basedir}\NetworkOptixMiniDriver.csproj /t:Build /consoleloggerparameters:Summary /p:Configuration=${build.configuration}
-rem call ${environment.dir}\bin\jom /S

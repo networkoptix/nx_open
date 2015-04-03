@@ -55,6 +55,30 @@
         <outputDirectory>${arch}</outputDirectory>
         <sourceDirectory>${basedir}/src</sourceDirectory> 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>custom-resources</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <targetPath>${basedir}</targetPath>
+                                    <directory>${basedir}/maven/root-resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>                                
+                            </resources>              
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>
            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
