@@ -40,6 +40,9 @@
     <AssemblyOriginatorKeyFile>Sign.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AxInterop.NxWitness">
+      <HintPath>..\..\build_environment\target\x86\bin\debug\AxInterop.NxWitness.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
