@@ -121,8 +121,8 @@ namespace ite
             }
         }
 
-        debug_printf("-- Can't lock channel for camera Tx: %d; Rx: %d (used: %d)\n",
-                     txID, m_rxID, m_sync.usedByCamera.load());
+        debug_printf("-- Can't lock Rx. Tx %d; Rx: %d; channel: %d (used: %d)\n",
+                     txID, m_rxID, chan, m_sync.usedByCamera.load());
         return false;
     }
 
@@ -218,41 +218,28 @@ namespace ite
         return false;
     }
 
-    void RxDevice::startSearchLost(unsigned lostNum)
-    {
-        unsigned num = 0;
-        for (size_t chan = 0; chan < m_txs.size(); ++chan)
-        {
-            if (m_txs[chan].lost)
-            {
-                if (num == lostNum)
-                {
-                    startSearchTx(chan);
-                    return;
-                }
-
-                ++num;
-            }
-        }
-    }
-
-    void RxDevice::startSearchTx(unsigned channel)
+    bool RxDevice::startSearchTx(unsigned channel, unsigned timeoutMS)
     {
         if (tryLockC(channel, false))
         {
-            debug_printf("searching Tx. Rx: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
-                   rxID(), TxDevice::freq4chan(channel), quality(), strength(), present());
+            debug_printf("searching Tx (%d sec). Rx: %d; channel: %d (%d); quality: %d; strength: %d; presence: %d\n",
+                   timeoutMS/1000, rxID(), channel, TxDevice::freq4chan(channel), quality(), strength(), present());
 
             if (good())
             {
                 m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
-                m_devReader->start(m_device.get(), true);
+                m_devReader->start(m_device.get(), timeoutMS);
+
+                m_sync.searching.store(true);
+                return true;
             }
 
-            m_sync.searching.store(true);
+            unlockC();
+            return false;
         }
-        else
-            debug_printf("can't search, used. Rx: %d; frequency: %d\n", rxID(), TxDevice::freq4chan(channel));
+
+        debug_printf("can't search, used. Rx: %d; channel: %d (%d)\n", rxID(), channel, TxDevice::freq4chan(channel));
+        return false;
     }
 
     void RxDevice::stopSearchTx(DevLink& devLink)
@@ -262,42 +249,54 @@ namespace ite
 
         if (m_sync.searching && isLocked())
         {
-            if (good())
+            m_devReader->wait();
+
+            bool first = true;
+            for (;;)
             {
-                m_devReader->wait();
+                RcPacketBuffer pktBuf;
+                if (! m_devReader->getRcPacket(pktBuf))
+                    break;
 
-                bool first = true;
-                for (;;)
+                if (pktBuf.pid() != It930x::PID_RETURN_CHANNEL)
                 {
-                    RcPacketBuffer pktBuf;
-                    if (! m_devReader->getRcPacket(pktBuf))
-                        break;
-
-                    RcPacket pkt = pktBuf.packet();
-                    if (! pkt.isOK())
-                    {
-                        debug_printf("[RC] bad packet\n");
-                        continue;
-                    }
-
-                    if (first)
-                    {
-                        first = false;
-                        devLink.txID = pkt.txID();
-                        devLink.channel = m_channel;
-
-                        setTx(m_channel, devLink.txID);
-                    }
-
-                    if (pkt.txID() != devLink.txID)
-                        debug_printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, pkt.txID());
-                    if (! devLink.txID)
-                        debug_printf("txID == 0\n");
+                    debug_printf("[RC] packet error: wrong PID\n");
+                    continue;
                 }
 
-                m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
+                if (pktBuf.checkbit())
+                {
+                    debug_printf("[RC] packet error: TS error bit\n");
+                    continue;
+                }
+
+                RcPacket pkt = pktBuf.packet();
+                if (! pkt.isOK())
+                {
+                    pkt.print();
+                    continue;
+                }
+
+                if (pkt.txID() == 0 || pkt.txID() == 0xffff)
+                {
+                    debug_printf("wrong txID: %d\n", pkt.txID());
+                    continue;
+                }
+
+                if (first)
+                {
+                    first = false;
+                    devLink.txID = pkt.txID();
+                    devLink.channel = m_channel;
+
+                    setTx(m_channel, devLink.txID);
+                }
+
+                if (pkt.txID() != devLink.txID)
+                    debug_printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, pkt.txID());
             }
 
+            m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
             unlockC();
         }
 

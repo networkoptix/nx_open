@@ -5,32 +5,23 @@
 
 #include "dev_reader.h"
 
-#ifdef COUNT_OBJECTS
-#include "device_mapper.h"
-#include "discovery_manager.h"
-#include "camera_manager.h"
-#include "media_encoder.h"
-#include "stream_reader.h"
-#include "video_packet.h"
-#endif
-
 namespace ite
 {
     ///
     class DevReadThread
     {
     public:
-        DevReadThread(DevReader * reader = nullptr, bool rcOnly = false)
+        DevReadThread(DevReader * reader = nullptr, unsigned timeMS = 0)
         :   m_stopMe(false),
             m_devReader(reader),
-            m_rcOnly(rcOnly)
+            m_timeMS(timeMS)
         {
         }
 
         DevReadThread(DevReadThread&& obj)
         :   m_stopMe(false),
             m_devReader(obj.m_devReader),
-            m_rcOnly(obj.m_rcOnly)
+            m_timeMS(obj.m_timeMS)
         {
         }
 
@@ -41,15 +32,18 @@ namespace ite
 
             m_devReader->sync();
 
-            if (m_rcOnly)
+            bool err = false;
+            if (m_timeMS)
             {
-                static const unsigned SEARCH_TIME_MS = 4000;
                 Timer t(true);
 
-                while (!m_stopMe && t.elapsedMS() < SEARCH_TIME_MS)
+                while (!m_stopMe && t.elapsedMS() < m_timeMS)
                 {
                     if (! m_devReader->readStep(true)) // blocking
+                    {
+                        err = true;
                         break;
+                    }
                 }
             }
             else
@@ -57,12 +51,14 @@ namespace ite
                 while (!m_stopMe)
                 {
                     if (! m_devReader->readStep(false)) // blocking
+                    {
+                        err = true;
                         break;
+                    }
                 }
             }
 
-            debug_printf("stop reading TS stream\n");
-            printCouners();
+            debug_printf("stop reading TS stream, error: %d; forced: %d\n", err, m_stopMe.load());
 
             m_devReader->setThreadObj(nullptr);
         }
@@ -72,39 +68,10 @@ namespace ite
     private:
         std::atomic_bool m_stopMe;
         DevReader * m_devReader;
-        bool m_rcOnly;
+        unsigned m_timeMS;
 
         DevReadThread(const DevReadThread&);
         DevReadThread& operator = (const DevReadThread&);
-
-#ifdef COUNT_OBJECTS
-        void printCouners()
-        {
-            printf("\n");
-            printCtorDtor<ContentPacket>();
-            printCtorDtor<Demux>();
-            printCtorDtor<DeviceBuffer>();
-            printCtorDtor<DevReader>();
-            printCtorDtor<DeviceMapper>();
-
-            printCtorDtor<DiscoveryManager>();
-            printCtorDtor<CameraManager>();
-            printCtorDtor<MediaEncoder>();
-            printCtorDtor<StreamReader>();
-            printCtorDtor<VideoPacket>();
-            printf("\n");
-        }
-
-        template <typename T>
-        void printCtorDtor()
-        {
-            typedef ObjectCounter<T> Counter;
-
-            printf("%s:\t%d - %d = %d\n", Counter::name(), Counter::ctorCount(), Counter::dtorCount(), Counter::diffCount());
-        }
-#else
-        static void printCouners() {}
-#endif
     };
 }
 

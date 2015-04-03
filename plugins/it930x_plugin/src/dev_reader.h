@@ -403,7 +403,7 @@ namespace ite
         bool subscribe(uint16_t pid);
         void unsubscribe(uint16_t pid);
 
-        void start(It930x * dev, bool rcOnly = false);
+        void start(It930x * dev, unsigned timeMS = 0);
         void stop();
         void wait();
 

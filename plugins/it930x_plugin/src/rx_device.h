@@ -93,8 +93,7 @@ namespace ite
         bool isLocked() const;
         void unlockC();
 
-        void startSearchTx(unsigned channel);
-        void startSearchLost(unsigned lostNum);
+        bool startSearchTx(unsigned channel, unsigned timeoutMS);
         void stopSearchTx(DevLink& outDevLink);
 
         void processRcQueue();

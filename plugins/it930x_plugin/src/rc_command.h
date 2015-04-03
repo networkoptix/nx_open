@@ -136,6 +136,18 @@ namespace ite
 
         uint8_t * tsBuffer() { return m_buffer; }
 
+        //
+
+        bool checkbit() const { return m_buffer[1] & 0x80; }   // Transport Error Indicator
+
+        uint16_t pid() const
+        {
+            uint16_t x = (m_buffer[1] & 0x1F);
+            x <<= 8;
+            x |= m_buffer[2];
+            return x;
+        }
+
     private:
         uint8_t m_buffer[BUF_SIZE];
     };

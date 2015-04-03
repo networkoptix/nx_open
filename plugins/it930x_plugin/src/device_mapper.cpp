@@ -8,6 +8,43 @@
 
 #include "device_mapper.h"
 
+#ifdef COUNT_OBJECTS
+#include "device_mapper.h"
+#include "discovery_manager.h"
+#include "camera_manager.h"
+#include "media_encoder.h"
+#include "stream_reader.h"
+#include "video_packet.h"
+
+namespace
+{
+    void printCounters()
+    {
+        printf("\n");
+        printCtorDtor<ContentPacket>();
+        printCtorDtor<Demux>();
+        printCtorDtor<DeviceBuffer>();
+        printCtorDtor<DevReader>();
+        printCtorDtor<DeviceMapper>();
+
+        printCtorDtor<DiscoveryManager>();
+        printCtorDtor<CameraManager>();
+        printCtorDtor<MediaEncoder>();
+        printCtorDtor<StreamReader>();
+        printCtorDtor<VideoPacket>();
+        printf("\n");
+    }
+
+    template <typename T>
+    void printCtorDtor()
+    {
+        typedef ObjectCounter<T> Counter;
+
+        printf("%s:\t%d - %d = %d\n", Counter::name(), Counter::ctorCount(), Counter::dtorCount(), Counter::diffCount());
+    }
+}
+#endif
+
 namespace ite
 {
     INIT_OBJECT_COUNTER(DeviceMapper)
@@ -174,6 +211,7 @@ namespace ite
     void DeviceMapper::updateTxDevices()
     {
         std::vector<RxDevicePtr> scanDevs;
+        std::stringstream ssFreeDevs;
 
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
@@ -181,17 +219,33 @@ namespace ite
             for (auto it = m_rxDevs.begin(); it != m_rxDevs.end(); ++it)
             {
                 if (it->second.get() && ! it->second->isLocked())
+                {
                     scanDevs.push_back(it->second);
+                    ssFreeDevs << ' ' << it->second->rxID();
+                }
             }
         }
 
-        std::vector<DevLink> links;
-#if 0
-        // restore lost
-        for (unsigned lostN = 0; lostN < TxDevice::CHANNELS_NUM; ++lostN)
+        if (scanDevs.empty())
         {
+            debug_printf("Start Tx search. All Rx are busy. Do nothing\n");
+            Timer::sleep(1000);
+            return;
+        }
+
+        debug_printf("Scan for Tx. Free Rx:%s\n", ssFreeDevs.str().c_str());
+
+        std::vector<DevLink> links;
+        std::map<uint16_t, std::vector<bool>> rescan; // {i, chan[N]}
+
+        // normal channel search
+        static const unsigned SCAN_TIMEOUT_MS = 4000;
+        for (unsigned chan = 0; chan < TxDevice::CHANNELS_NUM; ++chan)
+        {
+            std::vector<bool> good(scanDevs.size(), false);
+
             for (size_t i = 0; i < scanDevs.size(); ++i)
-                scanDevs[i]->startSearchLost(lostN);
+                good[i] = scanDevs[i]->startSearchTx(chan, SCAN_TIMEOUT_MS);
 
             for (size_t i = 0; i < scanDevs.size(); ++i)
             {
@@ -199,18 +253,32 @@ namespace ite
                 scanDevs[i]->stopSearchTx(link);
                 if (link.txID)
                     links.push_back(link);
+
+                if (good[i] && ! link.txID)
+                {
+                    rescan[i].resize(TxDevice::CHANNELS_NUM);
+                    rescan[i][chan] = true;
+                }
             }
 
             for (auto it = links.begin(); it != links.end(); ++it)
                 addTxDevice(*it);
             links.clear();
         }
-#endif
-        // normal channel search
+
+        if (rescan.size())
+            debug_printf("Rescan started\n");
+
+        /// @note workaround: rescan good() Rx with [RC] bad packets
+        static const unsigned RESCAN_TIMEOUT_MS = 16000;
         for (unsigned chan = 0; chan < TxDevice::CHANNELS_NUM; ++chan)
         {
             for (size_t i = 0; i < scanDevs.size(); ++i)
-                scanDevs[i]->startSearchTx(chan);
+            {
+                auto it = rescan.find(i);
+                if (it != rescan.end() && it->second.size() && it->second[chan])
+                    scanDevs[i]->startSearchTx(chan, RESCAN_TIMEOUT_MS);
+            }
 
             for (size_t i = 0; i < scanDevs.size(); ++i)
             {
@@ -224,6 +292,9 @@ namespace ite
                 addTxDevice(*it);
             links.clear();
         }
+
+        if (rescan.size())
+            debug_printf("Rescan finished\n");
     }
 
     void DeviceMapper::restoreCamera(const nxcip::CameraInfo& info)

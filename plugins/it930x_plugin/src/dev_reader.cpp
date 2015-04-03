@@ -304,13 +304,13 @@ namespace ite
         }
     }
 
-    void DevReader::start(It930x * dev, bool rcOnly)
+    void DevReader::start(It930x * dev, unsigned timeMS)
     {
         m_buf.setDevice(dev);
 
         try
         {
-            m_readThread = std::thread( DevReadThread(this, rcOnly) );
+            m_readThread = std::thread( DevReadThread(this, timeMS) );
             m_hasThread = true;
         }
         catch (std::system_error& )
