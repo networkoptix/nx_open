@@ -555,7 +555,7 @@ QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Conn
     return QnMediaServerResourcePtr();
 }
 
-QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr)
+QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr, bool isNewServerInstance)
 {
     QnMediaServerResourcePtr savedServer;
     serverPtr->setStatus(Qn::Online, true);
@@ -563,7 +563,29 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(serverPtr, &savedServer);
     if (rez != ec2::ErrorCode::ok)
     {
-        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
+        qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
+        return QnMediaServerResourcePtr();
+    }
+
+    if (!isNewServerInstance)
+        return savedServer;
+
+    // insert server user attributes if defined
+    QString dir = MSSettings::roSettings()->value("staticDataDir", getDataDirectory()).toString();
+    QFile f(closeDirPath(dir) + lit("server_settings.json"));
+    if (!f.open(QFile::ReadOnly))
+        return savedServer;
+    QByteArray data = f.readAll();
+    ec2::ApiMediaServerUserAttributesData userAttrsData;
+    if (!QJson::deserialize(data, &userAttrsData))
+        return savedServer;
+    userAttrsData.serverID = savedServer->getId();
+    auto defaultServerAttrs = QnMediaServerUserAttributesPtr(new QnMediaServerUserAttributes());
+    fromApiToResource(userAttrsData, defaultServerAttrs);
+    ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveUserAttributesSync(QnMediaServerUserAttributesList() << defaultServerAttrs);
+    if (rez != ec2::ErrorCode::ok)
+    {
+        qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
 
@@ -1650,7 +1672,7 @@ void QnMain::run()
 
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
-
+    bool isNewServerInstance = false;
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
@@ -1659,6 +1681,7 @@ void QnMain::run()
             server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
+            isNewServerInstance = true;
         }
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
@@ -1736,7 +1759,7 @@ void QnMain::run()
             encodeAndStoreAuthKey(authKey);
 
         if (isModified)
-            m_mediaServer = registerServer(ec2Connection, server);
+            m_mediaServer = registerServer(ec2Connection, server, isNewServerInstance);
         else
             m_mediaServer = server;
 
