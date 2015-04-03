@@ -40,6 +40,8 @@ namespace {
             m_device(device)
         {
                 m_valid = device->open(QIODevice::ReadOnly);
+                if (m_valid)
+                    device->reset();
         }
 
         ~QnIODeviceRAAI() {
@@ -111,6 +113,9 @@ void QnCachingCameraAdvancedParamsReader::setParams(const QnResourcePtr &resourc
 }
 
 bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {
+    //TODO: #GDM Why the file is not reset to initial position? It leads to 'EOF' error in parsing.
+    return true;
+
     QnIODeviceRAAI guard(xmlSource);
     if (!guard.isValid())
         return false;

@@ -142,11 +142,17 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
 }
 
 bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const {
-    QFile paramsTemplateFile(lit(":/camera_advanced_params/dw.xml"));
+    const QString paramsTemplateFileName(lit(":/camera_advanced_params/dw.xml"));
+    QFile paramsTemplateFile(paramsTemplateFileName);
 #ifdef _DEBUG
     QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
 #endif
-    return QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
+    bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
+#ifdef _DEBUG
+    if (!result)
+        qWarning() << "Error while parsing xml" << paramsTemplateFileName;
+#endif
+    return result;
 }
 
 void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params) {
