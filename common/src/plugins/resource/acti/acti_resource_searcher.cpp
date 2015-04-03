@@ -48,7 +48,8 @@ QnResourceList QnActiResourceSearcher::findResources(void)
         {
             if (processedUuid.contains(uuidStr))
                 continue;
-
+            if (response.contains("AXIS"))
+                continue;
             QByteArray response = getDeviceXml(QString(QLatin1String("http://%1:%2/devicedesc.xml")).arg(removeAddress).arg(ACTI_DEVICEXML_PORT)); // async request
             //QByteArray response = getDeviceXml(QString(QLatin1String("http://%1:%2")).arg(removeAddress).arg(80)); // test request
             processDeviceXml(response, removeAddress, removeAddress, result);
