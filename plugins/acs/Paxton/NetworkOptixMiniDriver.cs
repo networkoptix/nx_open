@@ -177,7 +177,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                             axHDWitness = LoadAssembly(assemblyName);
                             axHDWitnessForm = (Control)axHDWitness;
                         }
-                        catch (Exception) {
+                        catch (Exception e) {
                             string message = String.Format("You need to install the package version {0}.{1}.{2} to connect to this server.",
                                 serverVersion.Major, serverVersion.Minor, serverVersion.Build);
                             MessageBox.Show(message, "Error", MessageBoxButtons.OK);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NxInterface;
-using AxInterop.${ax.className};
+using AxInterop.${ax.className}_${nxec.ec2ProtoVersion};
 
 namespace NxControl
 {

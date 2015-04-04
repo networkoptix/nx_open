@@ -52,10 +52,10 @@
   <Fragment>
     <ComponentGroup Id="RootComponents" Directory="PaxtonAccessDir">
       <Component Id="InteropComponent">
-        <File Id="Interop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\Interop.${ax.className}.dll" KeyPath="yes"/>
+        <File Id="Interop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\Interop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
       </Component>
       <Component Id="AxInteropComponent">
-        <File Id="AxInterop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\AxInterop.${ax.className}.dll" KeyPath="yes"/>
+        <File Id="AxInterop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\AxInterop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
       </Component>
       <Component Id="NxControlComponent">
         <File Id="NxControl.${nxec.ec2ProtoVersion}.dll" Source="..\..\..\nxcontrol\x86\bin\release\${ax.className}Control.${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
