@@ -7,7 +7,13 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     exclude-result-prefixes="clitype fn iso4217 ix java link xbrldi xbrli xlink xs xsi">
-    <xsl:output method="html" omit-xml-declaration="yes" indent="yes" encoding="UTF-8"/>
+    <xsl:output
+            method="xml"
+            doctype-system="about:legacy-compat"
+            omit-xml-declaration="yes"
+            indent="yes"
+            encoding="UTF-8"/>
+
     <xsl:variable name="XML" select="/"/>
     <xsl:template match="/">
         <xsl:text disable-output-escaping="yes">&lt;!DOCTYPE html></xsl:text>
