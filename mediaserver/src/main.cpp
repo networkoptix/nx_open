@@ -173,6 +173,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "media_server/resource_status_watcher.h"
 #include "nx_ec/dummy_handler.h"
+#include "ec2_statictics_reporter.h"
 
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
@@ -1745,14 +1746,14 @@ void QnMain::run()
         else
             m_mediaServer = server;
 
-        auto hwInfo = HardwareInformation::instance();
+        const auto hwInfo = HardwareInformation::instance();
         if (server->getProperty(CPU_ARCHITECTURE) != hwInfo.cpuArchitecture)
             server->setProperty(CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
 
         if (server->getProperty(CPU_MODEL_NAME) != hwInfo.cpuModelName)
             server->setProperty(CPU_MODEL_NAME, hwInfo.cpuModelName);
 
-        auto phisicalMemory = QString::number(hwInfo.phisicalMemory);
+        const auto phisicalMemory = QString::number(hwInfo.phisicalMemory);
         if (server->getProperty(PHISICAL_MEMORY) != phisicalMemory)
             server->setProperty(PHISICAL_MEMORY, QVariant(hwInfo.phisicalMemory));
 
@@ -1931,6 +1932,17 @@ void QnMain::run()
     QnUserResourcePtr adminUser = qnResPool->getAdministrator();
     if (adminUser)
         connect(adminUser.data(), &QnResource::resourceChanged, this, &QnMain::updateModuleInfo);
+
+    static const auto SR_ALLOWED = ec2::Ec2StaticticsReporter::SR_ALLOWED;
+    if (MSSettings::roSettings()->value(SR_ALLOWED, false).toBool())
+    {
+        if (adminUser->getProperty(SR_ALLOWED).toInt() == 0)        // == 0 => false
+            adminUser->setProperty(SR_ALLOWED, QString::number(1)); // != 0 => true
+        propertyDictionary->saveParams(adminUser->getId());
+
+        MSSettings::roSettings()->remove(SR_ALLOWED);
+        MSSettings::roSettings()->sync();
+    }
 
     QnAbstractStorageResourceList storages = m_mediaServer->getStorages();
     QnAbstractStorageResourceList modifiedStorages = createStorages(m_mediaServer);
@@ -2342,6 +2354,25 @@ void SIGUSR1_handler(int)
 }
 #endif
 
+static uint timeStringToSecs(const QString& str, uint defaultValue)
+{
+    qlonglong secs;
+    bool ok(true);
+
+    if (str.endsWith(lit("d"), Qt::CaseInsensitive)) 
+        secs = str.left(str.length() - 1).toLongLong(&ok) * 24 * 60 * 60;
+    else
+    if (str.endsWith(lit("h"), Qt::CaseInsensitive)) 
+        secs = str.left(str.length() - 1).toLongLong(&ok) * 60 * 60;
+    else 
+    if (str.endsWith(lit("m"), Qt::CaseInsensitive)) 
+        secs = str.left(str.length() - 1).toLongLong(&ok) * 60;
+    else
+        secs = str.toLongLong(&ok);
+
+    return ok ? static_cast<uint>(secs) : defaultValue;
+}
+
 int main(int argc, char* argv[])
 {
 #if 0
@@ -2372,6 +2403,9 @@ int main(int argc, char* argv[])
     bool showHelp = false;
     QString engineVersion;
 
+    QString statisticsTimeCycle;
+    QString statisticsMaxDelay;
+
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
         "Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
@@ -2399,6 +2433,17 @@ int main(int argc, char* argv[])
         lit("This help message"), true);
     commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
         lit("Force the other engine version"), QString());
+
+    auto& statConst = ec2::Ec2StaticticsReporter::c_constants;
+    commandLineParser.addParameter(&statisticsTimeCycle, "--statistics-time-cycle", NULL,
+        lit("Statistics report min interval between reports (postfixes: d(days), h(hours), m(minutes)"),
+        QString::number(statConst.timeCycle));
+    commandLineParser.addParameter(&statisticsMaxDelay, "--statistics-max-delay", NULL,
+        lit("Statistics report max delay after time has come (postfixes: d(days), h(hours), m(minutes)"),
+        QString::number(statConst.maxDelay));
+    commandLineParser.addParameter(&statConst.serverApi, "--statistics-server-api", NULL,
+        lit("Statistics report server POST address"), statConst.serverApi);
+
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
     if( showVersion )
@@ -2413,6 +2458,9 @@ int main(int argc, char* argv[])
         commandLineParser.print(stream);
         return 0;
     }
+
+    statConst.timeCycle = timeStringToSecs(statisticsTimeCycle, statConst.timeCycle);
+    statConst.maxDelay = timeStringToSecs(statisticsMaxDelay, statConst.maxDelay);
 
     if( !configFilePath.isEmpty() )
         MSSettings::initializeROSettingsFromConfFile( configFilePath );

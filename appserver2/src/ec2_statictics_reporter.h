@@ -26,6 +26,27 @@ namespace ec2
         /** Collects \class ApiSystemStatistics and sends it to the statistics server */
         ErrorCode triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData);
 
+		/** Constants to control statistics report process */
+		struct Constants
+		{
+			uint		timeCycle;	/**< Minimal interval between reports in the system */
+			uint		maxDelay;	/**< Maximal delay after time has come
+									 *  (actual sending time is randomized) */
+
+			QString		serverApi;  /**< Statistics POST address (for JSON report) */
+		};
+
+		/** Actual report constants
+		 *  Initialized by hardcoded in cpp but could be changed (for testing purpose ONLY!)
+		 *  NOTE: affects ONLY current mediaserver so the one with the shortest time in the 
+		 *        system most likely reports more often */
+		static Constants c_constants;
+
+        // text strings
+        static const QString SR_ALLOWED;
+        static const QString SR_LAST_TIME;
+        static const QString SYSTEM_ID;
+
     private:
         void setupTimer(uint delay = 0);
         void timerEvent();
