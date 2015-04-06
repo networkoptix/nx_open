@@ -27,7 +27,7 @@
 #include <nx_ec/data/api_time_data.h>
 #include <nx_ec/data/api_license_overflow_data.h>
 #include <nx_ec/data/api_discovery_data.h>
-#include <nx_ec/data/api_camera_server_item_data.h>
+#include <nx_ec/data/api_camera_history_data.h>
 
 #include "ec_api_fwd.h"
 

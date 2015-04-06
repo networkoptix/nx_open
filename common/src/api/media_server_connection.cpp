@@ -23,7 +23,7 @@
 #include <core/ptz/ptz_data.h>
 
 #include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/data/api_camera_server_item_data.h>
+#include <nx_ec/data/api_camera_history_data.h>
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>

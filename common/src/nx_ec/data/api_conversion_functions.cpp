@@ -28,7 +28,7 @@
 #include "api_camera_attributes_data.h"
 #include "api_camera_data_ex.h"
 #include "api_camera_bookmark_data.h"
-#include "api_camera_server_item_data.h"
+#include "api_camera_history_data.h"
 #include "api_email_data.h"
 #include "api_full_info_data.h"
 #include "api_layout_data.h"

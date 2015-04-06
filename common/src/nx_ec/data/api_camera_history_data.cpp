@@ -1,4 +1,4 @@
-#include "api_camera_server_item_data.h"
+#include "api_camera_history_data.h"
 #include "api_model_functions_impl.h"
 
 namespace ec2 {

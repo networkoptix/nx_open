@@ -2,7 +2,7 @@
 
 #include <api/helpers/chunks_request_data.h>
 
-#include <nx_ec/data/api_camera_server_item_data.h>
+#include <nx_ec/data/api_camera_history_data.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/network_resource.h>

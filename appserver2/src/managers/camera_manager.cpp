@@ -11,7 +11,7 @@
 #include "server_query_processor.h"
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
-#include "nx_ec/data/api_camera_server_item_data.h"
+#include "nx_ec/data/api_camera_history_data.h"
 
 namespace ec2
 {

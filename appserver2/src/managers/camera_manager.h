@@ -8,7 +8,7 @@
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_camera_attributes_data.h"
 #include "transaction/transaction.h"
-#include "nx_ec/data/api_camera_server_item_data.h"
+#include "nx_ec/data/api_camera_history_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 
 
