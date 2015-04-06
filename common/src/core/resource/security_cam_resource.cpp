@@ -822,10 +822,6 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         result = true;
     }
 
-    if (getFirmware() != camera->getFirmware() && !camera->getFirmware().isEmpty()) {
-        setFirmware(camera->getFirmware());
-        result = true;
-    }
 
     return result;
 }
