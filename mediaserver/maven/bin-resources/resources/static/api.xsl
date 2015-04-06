@@ -8,7 +8,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     exclude-result-prefixes="clitype fn iso4217 ix java link xbrldi xbrli xlink xs xsi">
     <xsl:output
-            method="xml"
+            method="html"
             doctype-system="about:legacy-compat"
             indent="yes"
             encoding="UTF-8"/>
