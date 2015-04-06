@@ -6,7 +6,7 @@ namespace ec2 {
         (ApiServerFootageData), 
         (ubjson)(xml)(json)(csv_record)(sql_record), _Fields)
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-        (ApiCameraHistoryMoveData)(ApiCameraHistoryDetailData), 
+        (ApiCameraHistoryItemData)(ApiCameraHistoryData), 
         (ubjson)(xml)(json)(csv_record), _Fields)
     
 } // namespace ec2

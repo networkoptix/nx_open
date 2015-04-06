@@ -52,7 +52,7 @@ bool QnCameraHistoryPool::prepareCamera(const QnVirtualCameraResourcePtr &camera
     QnChunksRequestData request;
     request.resList << camera;
 
-    int handle = connection->cameraHistory(request, this, SLOT(at_cameraPrepared(int, const ec2::ApiCameraHistoryDetailDataList &, int)));
+    int handle = connection->cameraHistory(request, this, SLOT(at_cameraPrepared(int, const ec2::ApiCameraHistoryDataList &, int)));
     if (handle < 0)
         return false;
 
@@ -61,11 +61,11 @@ bool QnCameraHistoryPool::prepareCamera(const QnVirtualCameraResourcePtr &camera
     return true;
 }
 
-void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHistoryDetailDataList &periods, int handle) {
+void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle) {
     bool success = (status == 0);
 
     for (const auto &detail: periods)
-        m_historyDetail[detail.cameraId] = detail.moveHistory;
+        m_historyDetail[detail.cameraId] = detail.items;
 
     if (!m_loadingCameras.contains(handle))
         return;
@@ -111,19 +111,19 @@ QnMediaServerResourceList QnCameraHistoryPool::tryGetFootageServersByCameraPerio
     return result.toList();
 }
 
-ec2::ApiCameraHistoryMoveDataList::const_iterator QnCameraHistoryPool::getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryMoveDataList& data, qint64 timestamp) const
+ec2::ApiCameraHistoryItemDataList::const_iterator QnCameraHistoryPool::getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& data, qint64 timestamp) const
 {
     //TODO: #history_refactor test me!!!
     // todo: test me!!!
-    return std::lower_bound(data.begin(), data.end(), timestamp, [](const ec2::ApiCameraHistoryMoveData& data, qint64 timestamp) { 
+    return std::lower_bound(data.begin(), data.end(), timestamp, [](const ec2::ApiCameraHistoryItemData& data, qint64 timestamp) { 
         return timestamp < data.timestampMs; // inverse compare
     });
 }
 
-ec2::ApiCameraHistoryMoveDataList QnCameraHistoryPool::filterOnlineServers(const ec2::ApiCameraHistoryMoveDataList& dataList) const
+ec2::ApiCameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers(const ec2::ApiCameraHistoryItemDataList& dataList) const
 {
-    ec2::ApiCameraHistoryMoveDataList result;
-    std::copy_if(dataList.cbegin(), dataList.cend(), std::back_inserter(result), [](const ec2::ApiCameraHistoryMoveData &data)
+    ec2::ApiCameraHistoryItemDataList result;
+    std::copy_if(dataList.cbegin(), dataList.cend(), std::back_inserter(result), [](const ec2::ApiCameraHistoryItemData &data)
     {
         QnResourcePtr res = qnResPool->getResourceById(data.serverGuid);
         return !res || res->getStatus() != Qn::Online;

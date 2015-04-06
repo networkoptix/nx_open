@@ -58,19 +58,19 @@ signals:
 private:
     QnMediaServerResourcePtr getCurrentServer(const QnVirtualCameraResourcePtr &camera) const;
     void setCamerasWithArchiveNoLock(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
-    ec2::ApiCameraHistoryMoveDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryMoveDataList& detailData, qint64 timestamp) const;
-    ec2::ApiCameraHistoryMoveDataList filterOnlineServers(const ec2::ApiCameraHistoryMoveDataList& dataList) const;
+    ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& detailData, qint64 timestamp) const;
+    ec2::ApiCameraHistoryItemDataList filterOnlineServers(const ec2::ApiCameraHistoryItemDataList& dataList) const;
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
 
     bool isCameraDataLoaded(const QnVirtualCameraResourcePtr &camera) const;
-    Q_SLOT void at_cameraPrepared(int status, const ec2::ApiCameraHistoryDetailDataList &periods, int handle);
+    Q_SLOT void at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle);
     
 private:
 
     mutable QMutex m_mutex;
     QMap<QnUuid, std::vector<QnUuid>> m_archivedCamerasByServer; // archived cameras by server
 
-    typedef QMap<QnUuid, ec2::ApiCameraHistoryMoveDataList> DetailHistoryMap;
+    typedef QMap<QnUuid, ec2::ApiCameraHistoryItemDataList> DetailHistoryMap;
     DetailHistoryMap m_historyDetail; // camera move detail by camera
 
     typedef QMap<int, callbackFunction> HandlerMap;

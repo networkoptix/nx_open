@@ -262,7 +262,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnModuleInformation>(this, response, handle);
         break;
     case ec2CameraHistoryObject:
-        processFusionReply<ec2::ApiCameraHistoryDetailDataList>(this, response, handle);
+        processFusionReply<ec2::ApiCameraHistoryDataList>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -818,5 +818,5 @@ int QnMediaServerConnection::modulesInformation(QObject *target, const char *slo
 }
 
 int QnMediaServerConnection::cameraHistory(const QnChunksRequestData &request, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(ec2CameraHistoryObject, request.toParams(), QN_STRINGIZE_TYPE(ec2::ApiCameraHistoryDetailDataList) ,target, slot);
+    return sendAsyncGetRequest(ec2CameraHistoryObject, request.toParams(), QN_STRINGIZE_TYPE(ec2::ApiCameraHistoryDataList) ,target, slot);
 }

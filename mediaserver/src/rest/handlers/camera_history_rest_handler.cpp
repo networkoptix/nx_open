@@ -13,9 +13,9 @@ int findNextServerIdx(qint64 currentTime, const MultiServerPeriodDataList& chunk
 }
 */
 
-ec2::ApiCameraHistoryMoveDataList QnCameraHistoryRestHandler::buildHistoryData(const MultiServerPeriodDataList& chunks)
+ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(const MultiServerPeriodDataList& chunks)
 {
-    ec2::ApiCameraHistoryMoveDataList result;
+    ec2::ApiCameraHistoryItemDataList result;
     std::vector<int> scanPos;
     scanPos.resize(chunks.size());
     qint64 currentTime = 0;
@@ -53,7 +53,7 @@ ec2::ApiCameraHistoryMoveDataList QnCameraHistoryRestHandler::buildHistoryData(c
         if (index == prevIndex)
             continue; // ignore same server (no changes)
 
-        result.push_back(ec2::ApiCameraHistoryMoveData(chunks[index].guid, currentTime));
+        result.push_back(ec2::ApiCameraHistoryItemData(chunks[index].guid, currentTime));
         currentTime = curPeriod.endTimeMs();
         prevIndex = index;
     }
@@ -67,16 +67,16 @@ int QnCameraHistoryRestHandler::executeGet(const QString& path, const QnRequestP
     if (!request.isValid())
         return nx_http::StatusCode::badRequest;
 
-    ec2::ApiCameraHistoryDetailDataList outputData;
+    ec2::ApiCameraHistoryDataList outputData;
     for (const auto& camera: request.resList)
     {
         QnChunksRequestData updatedRequest = request;
         updatedRequest.resList.clear();
         updatedRequest.resList.push_back(camera);
         MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(request);
-        ec2::ApiCameraHistoryDetailData outputRecord;
+        ec2::ApiCameraHistoryData outputRecord;
         outputRecord.cameraId = request.resList.first()->getId();
-        outputRecord.moveHistory = buildHistoryData(chunks);
+        outputRecord.items = buildHistoryData(chunks);
         outputData.push_back(std::move(outputRecord));
     }
 

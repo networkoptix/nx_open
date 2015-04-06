@@ -17,25 +17,25 @@ namespace ec2
     #define ApiServerFootageData_Fields (serverGuid)(archivedCameras)
 
     /** History item of camera movement from server to server. Server and timestamp when the camera moved to it. */
-    struct ApiCameraHistoryMoveData: ApiData
+    struct ApiCameraHistoryItemData: ApiData
     {
-        ApiCameraHistoryMoveData(): timestampMs(0) {}
-        ApiCameraHistoryMoveData(const QnUuid& serverGuid, const qint64& timestampMs): serverGuid(serverGuid), timestampMs(timestampMs) {}
+        ApiCameraHistoryItemData(): timestampMs(0) {}
+        ApiCameraHistoryItemData(const QnUuid& serverGuid, const qint64& timestampMs): serverGuid(serverGuid), timestampMs(timestampMs) {}
         QnUuid serverGuid;
         qint64 timestampMs;
     };
-    #define ApiCameraHistoryMoveData_Fields (serverGuid)(timestampMs)
+    #define ApiCameraHistoryItemData_Fields (serverGuid)(timestampMs)
 
     /** Full history of the movement for the given camera. */
-    struct ApiCameraHistoryDetailData {
+    struct ApiCameraHistoryData {
         QnUuid cameraId;
-        ApiCameraHistoryMoveDataList moveHistory;
+        ApiCameraHistoryItemDataList items;
     };
-    #define ApiCameraHistoryDetailData_Fields (cameraId)(moveHistory)
+    #define ApiCameraHistoryData_Fields (cameraId)(items)
 }
 
 Q_DECLARE_METATYPE(ec2::ApiServerFootageData)
-Q_DECLARE_METATYPE(ec2::ApiCameraHistoryMoveData)
-Q_DECLARE_METATYPE(ec2::ApiCameraHistoryDetailData)
+Q_DECLARE_METATYPE(ec2::ApiCameraHistoryItemData)
+Q_DECLARE_METATYPE(ec2::ApiCameraHistoryData)
 
 #endif // __CAMERA_SERVER_ITEM_DATA_H__

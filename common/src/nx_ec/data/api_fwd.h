@@ -19,8 +19,8 @@ namespace ec2 {
     struct ApiCameraAttributesData;
     struct ApiCameraDataEx;
     struct ApiServerFootageData;
-    struct ApiCameraHistoryMoveData;
-    struct ApiCameraHistoryDetailData;
+    struct ApiCameraHistoryItemData;
+    struct ApiCameraHistoryData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
 	struct ApiFullInfoData;
@@ -114,16 +114,16 @@ namespace ec2 {
     typedef std::vector<ApiIdData> ApiIdDataList;
     typedef std::vector<ApiResourceStatusData> ApiResourceStatusDataList;
     typedef std::vector<ApiServerFootageData> ApiServerFootageDataList;
-    typedef std::vector<ApiCameraHistoryDetailData> ApiCameraHistoryDetailDataList;
-    typedef std::vector<ApiCameraHistoryMoveData> ApiCameraHistoryMoveDataList;
+    typedef std::vector<ApiCameraHistoryData> ApiCameraHistoryDataList;
+    typedef std::vector<ApiCameraHistoryItemData> ApiCameraHistoryItemDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\
     (ApiCameraData)\
     (ApiServerFootageData)\
-    (ApiCameraHistoryMoveData)\
-    (ApiCameraHistoryDetailData)\
+    (ApiCameraHistoryItemData)\
+    (ApiCameraHistoryData)\
     (ApiCameraAttributesData)\
     (ApiCameraDataEx)\
     (ApiEmailData)\
