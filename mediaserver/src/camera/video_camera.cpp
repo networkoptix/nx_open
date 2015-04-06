@@ -40,9 +40,7 @@ public:
 
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
-    virtual void putData(
-        const QnAbstractDataPacketPtr& data,
-        QnAbstractDataPacketPtr* const packetReplacement) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     //QnMediaContextPtr getVideoCodecContext();
@@ -108,9 +106,7 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
 */
 static CyclicAllocator gopKeeperKeyFramesAllocator;
 
-void QnVideoCameraGopKeeper::putData(
-    const QnAbstractDataPacketPtr& nonConstData,
-    QnAbstractDataPacketPtr* const packetReplacement )
+void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QMutexLocker lock(&m_queueMtx);
     if (QnConstCompressedVideoDataPtr video = std::dynamic_pointer_cast<const QnCompressedVideoData>(nonConstData))
@@ -124,28 +120,19 @@ void QnVideoCameraGopKeeper::putData(
             }
             m_gotIFramesMask |= 1 << video->channelNumber;
             int ch = video->channelNumber;
+            m_lastKeyFrame[ch] = video;
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
-            QnCompressedVideoDataPtr clonedFrame;
             if (m_lastKeyFrames[ch].empty() || m_lastKeyFrames[ch].back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
-            {
-                //video->clone here is required since video data can be allocated by cyclic allocator 
-                    //and storing frame here will result in heavy memory usage in allocator
-                    //TODO #ak upgrade cyclic allocator to remove video->clone from here
-                clonedFrame = QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator));
-                m_lastKeyFrames[ch].push_back(clonedFrame);
-                *packetReplacement = clonedFrame;
-            }
-            m_lastKeyFrame[ch] = clonedFrame ? clonedFrame : video;
+                m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));
             while (!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold || 
                     m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames[ch].pop_front();
         }
 
         if (m_dataQueue.size() < m_dataQueue.maxSize()) {
-            const QnAbstractDataPacketPtr& usedPacket = (*packetReplacement) ? *packetReplacement : nonConstData;
             //TODO #ak MUST NOT modify video packet here! It can be used by other threads concurrently and flags value can be undefined in other threads
-            static_cast<QnAbstractMediaData*>(usedPacket.get())->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-            QnAbstractDataConsumer::putData( usedPacket );
+            static_cast<QnAbstractMediaData*>(nonConstData.get())->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            QnAbstractDataConsumer::putData( nonConstData );
         }
     }
     else if (QnConstCompressedAudioDataPtr audio = std::dynamic_pointer_cast<const QnCompressedAudioData>(nonConstData))

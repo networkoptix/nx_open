@@ -21,18 +21,6 @@ public:
 
     //!Returns true, if following \a putData call is garanteed to accept input data
     virtual bool canAcceptData() const = 0;
-    //!Allows implementation to replace source packet
-    /*!
-        Default implementation just calls \a QnAbstractDataConsumer::putData( \a data )
-        \param outFrame If \a *outFrame is not NULL, it should be used futher instead of \a data
-        \note Currently, it is not garanteed that replacement will be used futher. It may be ignored
-    */
-    virtual void putData(
-        const QnAbstractDataPacketPtr& data,
-        QnAbstractDataPacketPtr* const /*outFrame*/ )
-    {
-        putData( data );
-    }
     //!
     /*!
         \note Can ignore data for some reasons (e.g., some internal buffer size is exceeded). 

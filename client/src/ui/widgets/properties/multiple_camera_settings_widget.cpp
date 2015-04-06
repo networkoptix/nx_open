@@ -210,7 +210,7 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
     bool overrideRotation = ui->rotCheckBox->checkState() == Qt::Checked;
     bool clearRotation = ui->rotCheckBox->checkState() == Qt::Unchecked;
 
-    foreach(QnVirtualCameraResourcePtr camera, m_cameras) 
+    for(const QnVirtualCameraResourcePtr &camera: m_cameras) 
     {
         QString cameraLogin = camera->getAuth().user();
         if (!login.isEmpty() || !m_loginWasEmpty)
@@ -433,6 +433,12 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             ui->expertSettingsWidget->updateFromResources(m_cameras);
 
+            int maxFps = std::numeric_limits<int>::max();
+            int maxDualStreamingFps = maxFps;
+
+            Q_D(QnCameraSettingsWidget);
+            d->calculateMaxFps(&maxFps, &maxDualStreamingFps);
+
             bool isScheduleEqual = true;
             QList<QnScheduleTask::Data> scheduleTasksData;
             foreach (const QnScheduleTask& scheduleTask, m_cameras.front()->getScheduleTasks())
@@ -440,12 +446,35 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
                 QList<QnScheduleTask::Data> cameraScheduleTasksData;
-                foreach (const QnScheduleTask& scheduleTask, camera->getScheduleTasks())
+                foreach (const QnScheduleTask& scheduleTask, camera->getScheduleTasks()) {
                     cameraScheduleTasksData << scheduleTask.getData();
-                if (cameraScheduleTasksData != scheduleTasksData) {
+
+                    bool fpsValid = true;
+                    switch (scheduleTask.getRecordingType()) {
+                    case Qn::RT_Never:
+                        continue;
+                    case Qn::RT_MotionAndLowQuality:
+                        fpsValid = scheduleTask.getFps() <= maxDualStreamingFps;
+                        break;
+                    case Qn::RT_Always:
+                    case Qn::RT_MotionOnly:
+                        fpsValid = scheduleTask.getFps() <= maxFps;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (!fpsValid) {
+                        isScheduleEqual = false;
+                        break;
+                    }
+                }
+
+                if (!isScheduleEqual || cameraScheduleTasksData != scheduleTasksData) {
                     isScheduleEqual = false;
                     break;
                 }
+
             }
             ui->cameraScheduleWidget->setChangesDisabled(!isScheduleEqual);
             if(isScheduleEqual) {

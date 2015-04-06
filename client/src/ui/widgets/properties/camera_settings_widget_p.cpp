@@ -21,7 +21,7 @@ void QnCameraSettingsWidgetPrivate::setCameras(const QnVirtualCameraResourceList
 }
 
 void QnCameraSettingsWidgetPrivate::calculateMaxFps(int *maxFps, int *maxDualStreamFps, Qn::MotionType motionTypeOverride) {
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras)
+    for (const QnVirtualCameraResourcePtr &camera: m_cameras)
     {
         int cameraFps = camera->getMaxFps();
         int cameraDualStreamingFps = cameraFps;
