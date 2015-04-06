@@ -77,6 +77,8 @@ private:
     void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera);
     void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
+    void lockTime(qint64 value);
+    void unlockTime();
 private:
     QnMutex m_mutex;
     RTPSession m_rtspSession;
@@ -121,6 +123,7 @@ private:
         QnUuid videowall;
     } m_auth;
     mutable QnMutex m_timeMutex;
+    qint64 m_lockedTime;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

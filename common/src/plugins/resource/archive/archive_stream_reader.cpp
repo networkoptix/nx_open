@@ -1211,7 +1211,11 @@ QnMediaContextPtr QnArchiveStreamReader::getCodecContext() const
 qint64 QnArchiveStreamReader::startTime() const
 {
     Q_ASSERT(m_delegate);
-    const QnTimePeriod p = m_playbackMaskHelper.getPlaybackRange();
+    QnTimePeriod p;
+    {
+        QMutexLocker lock(&m_playbackMaskSync);
+        p = m_playbackMaskHelper.getPlaybackRange();
+    }
     if (p.isEmpty())
         return m_delegate->startTime();
     else
@@ -1221,7 +1225,11 @@ qint64 QnArchiveStreamReader::startTime() const
 qint64 QnArchiveStreamReader::endTime() const
 {
     Q_ASSERT(m_delegate);
-    const QnTimePeriod p = m_playbackMaskHelper.getPlaybackRange();
+    QnTimePeriod p;
+    {
+        QMutexLocker lock(&m_playbackMaskSync);
+        p = m_playbackMaskHelper.getPlaybackRange();
+    }
     if (p.isEmpty())
         return m_delegate->endTime();
     else

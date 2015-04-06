@@ -6,15 +6,15 @@
     <message>
         <source>System Tray</source>
         <translatorcomment>มีเดียเซิร์ฟเวอร์</translatorcomment>
-        <translation>แถบงาน</translation>
+        <translation>ถาดระบบ</translation>
     </message>
     <message>
         <source>There is no system tray on this system.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่มีถาดระบบในระบบนี้.</translation>
     </message>
     <message>
         <source>Application will now quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>ในขณะนี้แอพลิเคชันจะปิด.</translation>
     </message>
 </context>
 <context>
@@ -112,7 +112,7 @@
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
-        <translation type="unfinished"></translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะเข้าถึงบริการในการติดตั้ง:</translation>
     </message>
 </context>
 </TS>

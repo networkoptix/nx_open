@@ -12,6 +12,8 @@
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
+#include "recorder/recording_manager.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 
 static_assert(AV_NOPTS_VALUE == DATETIME_INVALID, "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
 
@@ -58,7 +60,10 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_someDataIsDropped(false),
     m_previousRtpTimestamp(-1),
     m_previousScaledRtpTimestamp(-1),
-    m_framesSinceRangeCheck(0)
+    m_framesSinceRangeCheck(0),
+    m_prevStartTime(AV_NOPTS_VALUE),
+    m_prevEndTime(AV_NOPTS_VALUE)
+
 {
     m_timer.start();
     SCOPED_MUTEX_LOCK( lock, &m_allConsumersMutex);
@@ -440,6 +445,26 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     }
 }
 
+QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged(const QnConstAbstractMediaDataPtr& media)
+{
+    QnArchiveStreamReader* archiveDP = dynamic_cast<QnArchiveStreamReader*>(media->dataProvider);
+    if (!archiveDP)
+        return QByteArray();
+
+    qint64 endTime = archiveDP->endTime();
+    if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
+        endTime = DATETIME_NOW;
+
+    if (archiveDP->startTime() != m_prevStartTime || endTime != m_prevEndTime) {
+        m_prevStartTime = archiveDP->startTime();
+        m_prevEndTime = endTime;
+        return m_owner->getRangeStr(archiveDP);
+    }
+    else {
+        return QByteArray();
+    }
+};
+
 bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
@@ -601,7 +626,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if( (++m_framesSinceRangeCheck) > FRAMES_BETWEEN_PLAY_RANGE_CHECK )
     {
         m_framesSinceRangeCheck = 0;
-        const QByteArray& newRange = m_owner->getRangeHeaderIfChanged();
+        const QByteArray& newRange = getRangeHeaderIfChanged(media);
         if (!newRange.isEmpty())
             sendMetadata(newRange);
     }

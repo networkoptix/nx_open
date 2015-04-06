@@ -143,8 +143,9 @@ private:
     std::map<QString, SocketReadCtx> m_socketList;
     char* m_readBuf;
     HttpClientsDict m_httpClients;
-    std::list<DiscoveredDeviceInfo> m_discoveredDevices;
-    std::list<DiscoveredDeviceInfo> m_discoveredDevicesToProcess;
+    //!map<device host address, device info>
+    std::map<HostAddress, DiscoveredDeviceInfo> m_discoveredDevices;
+    std::map<HostAddress, DiscoveredDeviceInfo> m_discoveredDevicesToProcess;
     std::map<QByteArray, UPNPDescriptionCacheItem> m_upnpDescCache;
     bool m_terminated;
     QElapsedTimer m_cacheTimer;

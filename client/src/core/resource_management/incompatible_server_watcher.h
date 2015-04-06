@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/uuid.h>
 
-struct QnGlobalModuleInformation;
+struct QnModuleInformationWithAddresses;
 
 class QnIncompatibleServerWatcher : public QObject {
     Q_OBJECT
@@ -16,12 +16,11 @@ public:
     void start();
     void stop();
 
-private slots:
-    void at_peerChanged(const QnGlobalModuleInformation &moduleInformation);
-    void at_peerLost(const QnGlobalModuleInformation &moduleInformation);
-    void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
-
 private:
+    void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
+    void at_moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive);
+
+    void addResource(const QnModuleInformationWithAddresses &moduleInformation);
     void removeResource(const QnUuid &id);
     QnUuid getFakeId(const QnUuid &realId) const;
 
@@ -29,6 +28,7 @@ private:
     mutable QnMutex m_mutex;
     QHash<QnUuid, QnUuid> m_fakeUuidByServerUuid;
     QHash<QnUuid, QnUuid> m_serverUuidByFakeUuid;
+    QHash<QnUuid, QnModuleInformationWithAddresses> m_moduleInformationById;
 };
 
 #endif // INCOMPATIBLE_SERVER_WATCHER_H

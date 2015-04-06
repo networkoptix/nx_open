@@ -41,6 +41,7 @@
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
@@ -98,6 +99,7 @@
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
 #include <rest/handlers/camera_bookmarks_rest_handler.h>
+#include <rest/handlers/crash_server_handler.h>
 #include <rest/handlers/external_business_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
 #include <rest/handlers/image_rest_handler.h>
@@ -118,7 +120,6 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
-#include <rest/handlers/routing_information_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
 #include <rest/handlers/current_user_rest_handler.h>
@@ -142,7 +143,6 @@
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
 #include <utils/network/module_finder.h>
-#include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include <utils/common/ssl_gen_cert.h>
 
@@ -520,29 +520,6 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
         }
     }
 
-    qint64 bigStorageThreshold = 0;
-    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages()) {
-        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
-        if (!storage)
-            continue;
-        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
-        bigStorageThreshold = qMax(bigStorageThreshold, available);
-    }
-    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
-
-    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages()) {
-        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
-        if (!storage)
-            continue;
-        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
-        if (available < bigStorageThreshold) {
-            if (storage->isUsedForWriting()) {
-                storage->setUsedForWriting(false);
-                result.insert(storage->getId(), storage);
-                qWarning() << "Disable writing to storage" << storage->getPath() << "because of low storage size";
-            }
-        }
-    }
     return result.values();
 }
 
@@ -1013,7 +990,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );
+        messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );        
 
         //read server's storages
         QnResourceList storages;
@@ -1332,7 +1309,6 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
-    QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
@@ -1343,6 +1319,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/dev-mode-key", new QnCrashServerHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(
         QHostAddress::Any,
@@ -1543,6 +1520,7 @@ void QnMain::run()
     QnConnectionInfo connectInfo;
     QnResourcePropertyDictionary dictionary;
     QnResourceStatusDictionary statusDict;
+    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
 
     while (!needToStop())
     {
@@ -1829,10 +1807,7 @@ void QnMain::run()
 
     // ------------------------------------------
 
-    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
-
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
-    globalModuleFinder->setConnection(ec2Connection);
+    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 

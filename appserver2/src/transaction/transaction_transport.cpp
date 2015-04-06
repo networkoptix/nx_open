@@ -137,6 +137,7 @@ void QnTransactionTransport::startListening()
         m_chunkHeaderLen = 0;
         using namespace std::placeholders;
         m_lastReceiveTimer.restart();
+        m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
         if( !m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
         {
             m_lastReceiveTimer.invalidate();
@@ -245,6 +246,8 @@ void QnTransactionTransport::fillAuthInfo()
 
 void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
 {
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::doOutgoingConnect. remoteAddr = %1").arg(remoteAddr.toString()), cl_logDEBUG2 );
+
     setState(ConnectingStage1);
     m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     m_httpClient->setDecodeChunkedMessageBody( false ); //chunked decoding is done in this class
@@ -356,6 +359,9 @@ void QnTransactionTransport::cancelConnecting()
 
 void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
 {
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::onSomeBytesRead. errorCode = %1, bytesRead = %2").
+        arg((int)errorCode).arg(bytesRead), cl_logDEBUG2 );
+    
     SCOPED_MUTEX_LOCK( lock, &m_mutex);
 
     m_asyncReadScheduled = false;
@@ -445,6 +451,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
         return; //not reading futher while that much transactions are not processed yet
 
     using namespace std::placeholders;
+    m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
     if( m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
     {
         m_asyncReadScheduled = true;
@@ -477,6 +484,7 @@ void QnTransactionTransport::transactionProcessed()
     assert( m_socket );
 
     using namespace std::placeholders;
+    m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
     if( m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
     {
         m_asyncReadScheduled = true;
@@ -552,6 +560,10 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
 void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
 {
     int statusCode = client->response()->statusLine.statusCode;
+
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::at_responseReceived. statusCode = %1").
+        arg(statusCode), cl_logDEBUG2 );
+
     if (statusCode == nx_http::StatusCode::unauthorized)
     {
         if (m_authByKey) {
@@ -647,6 +659,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
 void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
 {
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::at_httpClientDone. state = %1").
+        arg((int)client->state()), cl_logDEBUG2 );
+
     nx_http::AsyncHttpClient::State state = client->state();
     if( state == nx_http::AsyncHttpClient::sFailed ) {
         cancelConnecting();

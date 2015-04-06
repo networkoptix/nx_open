@@ -266,7 +266,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::FullscreenMaximizeHotkeyAction));
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::PreferencesGeneralTabAction));
-    addAction(action(Qn::BusinessEventsLogAction));
+    addAction(action(Qn::OpenBookmarksSearchAction));
+    addAction(action(Qn::OpenBusinessLogAction));
     addAction(action(Qn::CameraListAction));
     addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::OpenFileAction));

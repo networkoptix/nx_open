@@ -18,19 +18,20 @@
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Camera output</source>
+        <translatorcomment>แสดงผลกล้อง</translatorcomment>
         <translation>Camera output</translation>
     </message>
     <message>
         <source>Camera output for 30 sec</source>
-        <translation>Camera output สำหรับ 30 วินาที</translation>
+        <translation>แสดงผลกล้องสำหรับ 30 วินาที</translation>
     </message>
     <message>
         <source>Bookmark</source>
-        <translation>Bookmark</translation>
+        <translation>บุ๊คมาร์ก</translation>
     </message>
     <message>
         <source>Camera recording</source>
-        <translation>การบันทึกภาพ</translation>
+        <translation>กำลังบันทึกภาพ</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -42,7 +43,7 @@
     </message>
     <message>
         <source>Write to log</source>
-        <translation>เขียนเพื่อเข้าสู่ระบบ</translation>
+        <translation>เขียนลงบันทึก</translation>
     </message>
     <message>
         <source>Show notification</source>
@@ -50,7 +51,7 @@
     </message>
     <message>
         <source>Repeat sound</source>
-        <translation>เสียงซ้ำ</translation>
+        <translation>เล่นเสียงซ้ำ</translation>
     </message>
     <message>
         <source>Play sound</source>
@@ -78,11 +79,11 @@
     </message>
     <message>
         <source>Camera Disconnected</source>
-        <translation>กล้องตัดการเชื่อมต่อ</translation>
+        <translation>กล้องขาดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Storage Failure</source>
-        <translation>การจัดเก็บข้อมูลความล้มเหลว</translation>
+        <translation>ที่เก็บข้อมูลผิดพลาด</translation>
     </message>
     <message>
         <source>Network Issue</source>
@@ -90,7 +91,7 @@
     </message>
     <message>
         <source>Camera IP Conflict</source>
-        <translation>กล้อง IP ขัดแย้ง</translation>
+        <translation>กล้อง IP ขัดข้อง</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -98,23 +99,23 @@
     </message>
     <message>
         <source>Server Conflict</source>
-        <translation>ความขัดแย้งของเซิร์ฟเวอร์</translation>
+        <translation>เซิร์ฟเวอร์ ขัดข้อง</translation>
     </message>
     <message>
         <source>Server Started</source>
-        <translation>เซิร์ฟเวอร์เริ่มต้น</translation>
+        <translation>เซิร์ฟเวอร์เริ่มทำงาน</translation>
     </message>
     <message>
         <source>License Issue</source>
-        <translation>ออกใบอนุญาต</translation>
+        <translation>ปัญหาใบอนุญาต</translation>
     </message>
     <message>
         <source>Any Camera Issue</source>
-        <translation>ฉบับกล้องใด ๆ</translation>
+        <translation>ปัญหาบาง กล้อง</translation>
     </message>
     <message>
         <source>Any Server Issue</source>
-        <translation>ปัญหาที่เซิร์ฟเวอร์ใด</translation>
+        <translation>ปัญหาบางเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Any Event</source>
@@ -122,7 +123,7 @@
     </message>
     <message>
         <source>Undefined event has occurred on %1</source>
-        <translation>เหตุการณ์ที่ไม่ได้กำหนดได้ที่เกิดขึ้นใน  %1</translation>
+        <translation>เหตุการณ์ที่ไม่ได้กำหนดที่เกิดขึ้นใน  %1</translation>
     </message>
     <message>
         <source>Camera %1 was disconnected</source>
@@ -138,7 +139,7 @@
     </message>
     <message>
         <source>Storage Failure at %1</source>
-        <translation>การจัดเก็บข้อมูลความล้มเหลวที่ %1</translation>
+        <translation>ที่เก็บข้อมูลผิดพลาด %1</translation>
     </message>
     <message>
         <source>Network Issue at %1</source>
@@ -150,15 +151,15 @@
     </message>
     <message>
         <source>Camera IP Conflict at %1</source>
-        <translation>กล้อง IP ขัดแย้ง %1</translation>
+        <translation>กล้อง IP ขัดข้อง%1</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Conflict</source>
-        <translation>ความขัดแย้ง &quot;%1&quot; ของเซิร์ฟเวอร์</translation>
+        <translation>ความขัดข้อง &quot;%1&quot; ของเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Started</source>
-        <translation>เซิร์ฟเวอร์ &quot;%1&quot;เริ่มต้น</translation>
+        <translation>เซิร์ฟเวอร์ &quot;%1&quot;เริ่มทำงาน</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; had license issue</source>
@@ -174,7 +175,7 @@
     </message>
     <message>
         <source>Source: %1</source>
-        <translation>ที่มา: %1</translation>
+        <translation>แหล่งที่มา: %1</translation>
     </message>
     <message>
         <source>Url: %1</source>
@@ -190,7 +191,7 @@
     </message>
     <message>
         <source>Conflict address: %1</source>
-        <translation>ความขัดแย้งที่อยู่: %1</translation>
+        <translation>ที่อยู่ขัดข้อง: %1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -198,7 +199,7 @@
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
-        <translation>ที่ขัดแย้งกันเสิร์ฟ #%1: %2</translation>
+        <translation>เซิร์ฟเวอร์ที่ขัดข้อง:%1: %2</translation>
     </message>
     <message>
         <source>%2 %1</source>
@@ -232,23 +233,23 @@
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation>การเชื่อมต่อกับกล้อง (สตรีมหลัก) ถูกปิดอย่างไม่คาดคิด.</translation>
+        <translation>การเชื่อมต่อกับกล้อง (ช่องทางหลัก) ถูกปิดอย่างไม่คาดคิด.</translation>
     </message>
     <message>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation>การเชื่อมต่อกับกล้อง (สตรีมรอง) ถูกปิดอย่างไม่คาดคิด.</translation>
+        <translation>การเชื่อมต่อกับกล้อง (ช่องทางสำรอง) ถูกปิดอย่างไม่คาดคิด.</translation>
     </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation>RTP ตรวจพบการสูญเสียแพ็คเก็ต, prev seq.=%1 next seq.=%2.</translation>
+        <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย, prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
         <source>RTP packet loss detected.</source>
-        <translation>RTP ตรวจพบการสูญเสียแพ็คเก็ต.</translation>
+        <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย.</translation>
     </message>
     <message>
         <source>Server terminated.</source>
-        <translation>เซิร์ฟเวอร์ยกเลิก.</translation>
+        <translation>สิ้นสุด เซิร์ฟเวอร์.</translation>
     </message>
     <message>
         <source>Server started after crash.</source>
@@ -272,7 +273,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ที่ขัดข้อง:%1</translation>
     </message>
 </context>
 <context>
@@ -315,95 +316,95 @@
     </message>
     <message>
         <source>Server %1 is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ %1 ไม่สามารถใช้ได้.</translation>
     </message>
     <message>
         <source>Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบสถานะการทำงานของเซิร์ฟเวอร์.</translation>
     </message>
     <message>
         <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>ได้รับการตอบสนองที่ไม่ดีจากเซิร์ฟเวอร์ %1: &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบว่า เซิร์ฟเวอร์ ทำงานอยู่ และรุ่นที่เหมาะสม.</translation>
     </message>
     <message>
         <source>Cannot connect to http port %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเชื่อมต่อพอร์ต http. %1.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่ากล้องเชื่อมต่อเข้ากับเครือข่าย.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเปิดสื่อ url%1 ไม่สามารถเชื่อมต่อไปยังสื่อพอร์ต %2.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่าพอร์ต %2 เข้าถึงได้ (เช่นการส่งต่อไป) โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเปิดสื่อ url %1 การเชื่อมต่อกับพอร์ต %2 ถูกปิดโดยไม่ได้ตั้งใจ.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่ากล้องเสียบเข้ากับเครือข่าย ลองรีบูตกล้องอีกครั้ง.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถแยกการตอบสนองของกล้อง url %1 โปรดระบุชื่อ %2.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดลองรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>สุดท้าย พยายามที่จะปรับปรุง เฟิร์มแวร์ หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน.</translation>
     </message>
     <message>
         <source>No supported media tracks at url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่มีการสนับสนุนสื่อที่แทร็ค url%1.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเปิดสื่อ url%1. ไม่สนับสนุนสื่อโพรโทคอล %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>การกำหนดค่าพารามิเตอร์ไม่ถูกต้อง %1.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>เริ่มแรก พยายามที่จะเปิดการบันทึก (ถ้าปิดอยู่) และลดเฟรมต่อวินาทีในการตั้งค่ากล้อง.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>ถ้ายังไม่ได้ ให้คืนค่าเริ่มต้นจากโรงงานในเว็บกล้อง หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน. </translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>คำขอกล้อง &quot;%1&quot; ล้มเหลวเกิดข้อผิดพลาด &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown Camera Issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่รู้จักกล้อง.</translation>
     </message>
     <message>
         <source>Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาติดต่อฝ่ายสนับสนุน.</translation>
     </message>
     <message>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>อินพุต / เอาต์พุต มีข้อผิดพลาดเกิดขึ้น ข้อความ OS: &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>พารามิเตอร์:</translation>
     </message>
 </context>
 <context>
@@ -768,7 +769,7 @@
     <name>QnSystemHealthStringsHelper</name>
     <message>
         <source>Email address is not set</source>
-        <translation>ที่อยู่อีเมล์ไม่ได้ตั้งค่า</translation>
+        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่า</translation>
     </message>
     <message>
         <source>No licenses</source>
@@ -780,15 +781,15 @@
     </message>
     <message>
         <source>Some users have not set their email addresses</source>
-        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมลของพวกเขา</translation>
+        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมล</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
-        <translation>การเชื่อมต่อกับเซิร์ฟเวอร์ขาดหายไป</translation>
+        <translation>การเชื่อมต่อกับเซิร์ฟเวอร์ขาดหาย</translation>
     </message>
     <message>
         <source>Error while sending email</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่การส่งอีเมล์</translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่ส่งอีเมล</translation>
     </message>
     <message>
         <source>Storages are full</source>
@@ -800,7 +801,7 @@
     </message>
     <message>
         <source>Email address is not set for user %1</source>
-        <translation>ที่อยู่อีเมล์ไม่ได้ตั้งค่าสำหรับการใช้งาน %1</translation>
+        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่าสำหรับการใช้งาน %1</translation>
     </message>
     <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
@@ -808,51 +809,51 @@
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation>เลือกเซิร์ฟเวอร์สำหรับปรับเวลาให้ตรงกัน</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>ดัชนีเก็บสร้างใหม่เป็นที่เรียบร้อยแล้ว</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่า.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์อีเมลไม่ได้ตั้งค่า.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมล.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>พวกเขาไม่สามารถรับการแจ้งเตือนผ่านทางอีเมล.</translation>
     </message>
     <message>
         <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>พื้นที่หน่วยความจำเต็ม บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
     </message>
     <message>
         <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>หน่วยความจำไม่ได้กำหนดค่าบนเซิร์ฟเวอร์ต่อไปนี้:</translation>
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณไม่มีใบอนุญาต.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>ท่านไม่สามารถบันทึกวิดีโอจากกล้องได้.</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>ดัชนีเก็บสร้างใหม่เสร็จสมบูรณ์บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
     </message>
 </context>
 <context>
@@ -871,7 +872,7 @@
     </message>
     <message>
         <source>Unsupported Transport</source>
-        <translation>การขนส่งได้รับการสนับสนุน</translation>
+        <translation>การขนส่งไม่ได้รับการสนับสนุน</translation>
     </message>
     <message>
         <source>Internal Server Error</source>
@@ -898,14 +899,14 @@
     </message>
     <message>
         <source>Unknown Transcode Method</source>
-        <translation>Unknown Transcode Method</translation>
+        <translation>ไม่รู้จัก การแปลง </translation>
     </message>
 </context>
 <context>
     <name>QnTranslationListModel</name>
     <message>
         <source>%1 (built-in)</source>
-        <translation>%1 (ในตัว)</translation>
+        <translation>%1 (ภายใน)</translation>
     </message>
     <message>
         <source>%1 (external)</source>

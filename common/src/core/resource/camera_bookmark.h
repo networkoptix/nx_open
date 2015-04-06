@@ -39,11 +39,20 @@ struct QnCameraBookmark {
     /** List of tags attached to the bookmark. */
     QnCameraBookmarkTags tags;
 
+    /** Camera unique identifier. */
+    QString cameraId;
+
     QnCameraBookmark():
         timeout(-1),
         startTimeMs(0),
         durationMs(0)
     {}
+
+    QString tagsAsString() const
+    {
+        static const QString kDelimiter = lit(" ");
+        return tags.join(kDelimiter);
+    }
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)
 

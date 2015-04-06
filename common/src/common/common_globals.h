@@ -358,8 +358,8 @@ public:
     enum CameraDataType {
         RecordedTimePeriod,
         MotionTimePeriod,
-        BookmarkTimePeriod,
-        BookmarkData,
+        BookmarkTimePeriod, /// Used for retreiving general time periods of bookmarks
+        BookmarkData,       /// Used for retreiving bookmarks data
 
         CameraDataTypeCount
     };

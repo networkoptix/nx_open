@@ -131,8 +131,6 @@ private:
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
 
-    int getFileNumFromCache(const QString& base, const QString& folder);
-    void putFileNumToCache(const QString& base, int fileNum);
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
     QSet<QnStorageResourcePtr> getWritableStorages() const;
@@ -151,6 +149,7 @@ private:
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
+    void testStoragesDone();
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
@@ -164,9 +163,6 @@ private:
     bool m_storagesStatisticsReady;
     QTimer m_timer;
 
-    typedef QMap<QString, QPair<QString, int > > FileNumCache;
-    FileNumCache m_fileNumCache;
-    QnMutex m_cacheMutex;
     bool m_warnSended;
     bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
@@ -189,6 +185,7 @@ private:
     mutable QnMutex m_sdbMutex;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
     mutable QnMutex m_csvMigrationMutex;
+    bool m_firstStorageTestDone;
 };
 
 #define qnStorageMan QnStorageManager::instance()

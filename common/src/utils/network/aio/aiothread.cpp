@@ -202,7 +202,9 @@ namespace aio
         unsigned int newReadMonitorTaskCount;
         unsigned int newWriteMonitorTaskCount;
         mutable QnMutex mutex;
+        //TODO #ak get rid of map here to avoid undesired allocations
         std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
+        //TODO #ak use cyclic array here to minimize allocations
         std::deque<SocketAddRemoveTask> postedCalls;
 
         AIOThreadImpl( QnMutex* const _aioServiceMutex )

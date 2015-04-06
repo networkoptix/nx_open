@@ -74,6 +74,12 @@ public:
     QnCameraBookmarkList findAll(const qint64 position) const;
 
     /**
+     * @brief data                                  Get raw data list using specified time period
+     * @return                                      List of filtered by specified period bookmarks sorted by their start time.
+     */
+    QnCameraBookmarkList data(const QnTimePeriod &period) const;
+
+    /**
      * @brief data                                  Get raw data list.
      * @return                                      List of all stored bookmarks sorted by their start time.
      */

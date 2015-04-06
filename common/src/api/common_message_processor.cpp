@@ -13,6 +13,7 @@
 #include <business/business_event_rule.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
 #include "common/common_module.h"
@@ -136,11 +137,21 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
 {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.id).dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
     QUrl url(data.url);
+
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.id).dynamicCast<QnMediaServerResource>();
+    if (!server) {
+        if (!data.ignore) {
+            QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->additionalUrls(data.id);
+            urls.append(url);
+            QnServerAdditionalAddressesDictionary::instance()->setAdditionalUrls(data.id, urls);
+        } else {
+            QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(data.id);
+            urls.append(url);
+            QnServerAdditionalAddressesDictionary::instance()->setIgnoredUrls(data.id, urls);
+        }
+        return;
+    }
 
     QList<QHostAddress> addresses = server->getNetAddrList();
     QList<QUrl> additionalUrls = server->getAdditionalUrls();
@@ -337,9 +348,6 @@ void QnCommonMessageProcessor::resetResources(const QnResourceList& resources) {
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
     
-    /* Remove all incompatible resources - they will be added if exist. */
-    qnResPool->removeResources(qnResPool->getAllIncompatibleResources());
-
     /* Packet adding. */
     qnResPool->beginTran();
     for (const QnResourcePtr& resource: resources) {
@@ -436,6 +444,7 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
+    QnServerAdditionalAddressesDictionary::instance()->clear();
     //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
     resetResources(fullData.resources);
     resetPropertyList(fullData.allProperties);

@@ -129,6 +129,7 @@ private:
     void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
     void extractSpsPps(
         const QnCompressedVideoDataPtr& videoData,
+        QSize* const newResolution,
         std::map<QString, QString>* const customStreamParams );
 
 private:
