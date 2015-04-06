@@ -87,9 +87,13 @@ class SqlAdapter(object):
     def deleteAll(self):
         '''Removes all records from all tables in database
         '''
-        self._log.warning("Removind all data in all tables!");
-        for table in self._table_names():
-            self._cursor.execute("DELETE FROM %s" % table)
+        tables = self._table_names()
+        self._log.warning('Removing all data in all tables: %s' % ', '.join(tables))
+        self._cursor.execute('SET SQL_SAFE_UPDATES = 0')
+        for tbl in tables:
+            self._cursor.execute('DELETE FROM %s' % tbl)
+        self._db.commit()
+
 
     def _save(self, table, data, systemId):
         data['systemId'] = systemId

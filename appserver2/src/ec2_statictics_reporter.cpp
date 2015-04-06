@@ -63,6 +63,23 @@ namespace ec2
         , m_desktopCameraTypeId(getDesktopCameraTypeId(resourceManager))
         , m_timerDisabled(false)
     {
+        // Do not allow to set delay longer than cycle itself to avoid funny situation
+        // when tester sets cycle 10min and still waits for report a month :)
+        if (c_constants.maxDelay > c_constants.timeCycle)
+        {
+            NX_LOG(lit("Ec2StaticticsReporter: maxDalay=%1 is bigger, timeCycle=%2, reducing: timeCycle=%2")
+                   .arg(toTimeString(c_constants.maxDelay))
+                   .arg(toTimeString(c_constants.timeCycle)), cl_logWARNING);
+
+            c_constants.maxDelay = c_constants.timeCycle;
+        }
+        else
+        {
+            NX_LOG(lit("Ec2StaticticsReporter: maxDelay=%1, timeCycle=%2")
+                   .arg(toTimeString(c_constants.maxDelay))
+                   .arg(toTimeString(c_constants.timeCycle)), cl_logDEBUG1);
+        }
+
         setupTimer();
     }
 
@@ -172,17 +189,6 @@ namespace ec2
     {
         static std::once_flag flag;
         std::call_once(flag, [](){ qsrand((uint)QTime::currentTime().msec()); });
-
-        // Do not allow to set delay longer than cycle itself to avoid funny situation
-        // when tester sets cycle 10min and still waits for report a month :)
-        if (c_constants.maxDelay > c_constants.timeCycle)
-        {
-            NX_LOG(lit("Ec2StaticticsReporter: maxDalay is set to %1 which is more than %2 (entire cycle), reducing automatically")
-                   .arg(toTimeString(c_constants.maxDelay))
-                   .arg(toTimeString(c_constants.timeCycle)), cl_logWARNING);
-
-            c_constants.timeCycle = c_constants.maxDelay;
-        }
 
         // Add random delay
         delay += static_cast<uint>(qrand()) % c_constants.maxDelay;

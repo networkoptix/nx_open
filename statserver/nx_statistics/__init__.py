@@ -56,10 +56,10 @@ def sqlChart(query):
     except app.SqlError as e:
         return 'SQL error: %s' % e.args[1], 400
 
-@app.route('/api/removeAll', methods=['GET'])
+@app.route('/api/deleteAll', methods=['GET'])
 def removeAll():
-    if not add.debug:
-        return 'removeAll is avaliable only in debug mode', 404
-    getAdapter().removeAll()
+    if not app.debug:
+        return 'deleteAll is avaliable only in debug mode', 404
+    getAdapter().deleteAll()
     return 'Success', 201
 
