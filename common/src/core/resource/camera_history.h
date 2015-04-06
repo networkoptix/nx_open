@@ -20,11 +20,10 @@ class QnCameraHistoryPool: public QObject, public Singleton<QnCameraHistoryPool>
     Q_OBJECT
 
 public:
-
     QnCameraHistoryPool(QObject *parent = NULL);
     virtual ~QnCameraHistoryPool();
 
-    void setCamerasWithArchiveList(const ec2::ApiCameraHistoryDataList& cameraHistoryList);
+    void setCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList);
     void setCamerasWithArchive(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
     std::vector<QnUuid> getCamerasWithArchive(const QnUuid& serverGuid) const;
 
@@ -51,6 +50,11 @@ public:
     QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0) const;
 
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
+
+signals:
+
+    void cameraHistoryChanged(const QnVirtualCameraResourcePtr &camera);
+
 private:
     QnMediaServerResourcePtr getCurrentServer(const QnVirtualCameraResourcePtr &camera) const;
     void setCamerasWithArchiveNoLock(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);

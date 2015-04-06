@@ -263,7 +263,7 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_cameraHistoryChanged(const ec2::ApiCameraHistoryData &cameraHistory) 
+void QnCommonMessageProcessor::on_cameraHistoryChanged(const ec2::ApiServerFootageData &cameraHistory) 
 {
     // todo: refactor: implement me
     //QnCameraHistoryPool::instance()->addCameraHistoryItem(*cameraHistory.data());
@@ -354,8 +354,8 @@ void QnCommonMessageProcessor::resetLicenses(const QnLicenseList& licenses) {
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiCameraHistoryDataList& cameraHistoryList) {
-    QnCameraHistoryPool::instance()->setCamerasWithArchiveList(cameraHistoryList);
+void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList) {
+    qnCameraHistoryPool->setCamerasWithArchiveList(cameraHistoryList);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &) 

@@ -151,7 +151,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataExList& cameraList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraHistoryDataList& historyList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
 
         //getCameraBookmarkTags
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
@@ -236,7 +236,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraHistoryData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiServerFootageData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
@@ -499,7 +499,7 @@ namespace ec2
         bool beforeInstallUpdate(const QString& updateName);
         bool afterInstallUpdate(const QString& updateName);
 
-        ErrorCode addCameraHistory(const ApiCameraHistoryData& params);
+        ErrorCode addCameraHistory(const ApiServerFootageData& params);
         ErrorCode removeCameraHistory(const QnUuid& serverId);
         ErrorCode getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);

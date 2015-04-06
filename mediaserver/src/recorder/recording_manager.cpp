@@ -188,7 +188,7 @@ bool QnRecordingManager::updateCameraHistory() {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
         return false;
     }
-    QnCameraHistoryPool::instance()->setCamerasWithArchive(qnCommon->moduleGUID(), archivedListNew);
+    qnCameraHistoryPool->setCamerasWithArchive(qnCommon->moduleGUID(), archivedListNew);
     return true;
 }
 

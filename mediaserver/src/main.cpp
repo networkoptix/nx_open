@@ -1081,7 +1081,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     }
 
     {
-        ec2::ApiCameraHistoryDataList cameraHistoryList;
+        ec2::ApiServerFootageDataList cameraHistoryList;
         while (( rez = ec2Connection->getCameraManager()->getCamerasWithArchiveListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
@@ -1089,7 +1089,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        QnCameraHistoryPool::instance()->setCamerasWithArchiveList(cameraHistoryList);
+        qnCameraHistoryPool->setCamerasWithArchiveList(cameraHistoryList);
     }
 
     {

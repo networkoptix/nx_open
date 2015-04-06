@@ -195,11 +195,11 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
     return toMediaServer(detailItr->serverGuid);
 }
 
-void QnCameraHistoryPool::setCamerasWithArchiveList(const ec2::ApiCameraHistoryDataList& cameraHistoryList)
+void QnCameraHistoryPool::setCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList)
 {
     QMutexLocker lock(&m_mutex);
     m_archivedCamerasByServer.clear();
-    for(const ec2::ApiCameraHistoryData& item: cameraHistoryList)
+    for(const ec2::ApiServerFootageData& item: cameraHistoryList)
         setCamerasWithArchiveNoLock(item.serverGuid, item.archivedCameras);
 }
 

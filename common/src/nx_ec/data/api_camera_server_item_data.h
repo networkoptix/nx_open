@@ -9,12 +9,12 @@
 namespace ec2
 {
     /** List of cameras that have footage on the given server. */
-    struct ApiCameraHistoryData: ApiData
+    struct ApiServerFootageData: ApiData
     {
         QnUuid serverGuid;
         std::vector<QnUuid> archivedCameras;
     };
-    #define ApiCameraHistoryData_Fields (serverGuid)(archivedCameras)
+    #define ApiServerFootageData_Fields (serverGuid)(archivedCameras)
 
     /** History item of camera movement from server to server. Server and timestamp when the camera moved to it. */
     struct ApiCameraHistoryMoveData: ApiData
@@ -32,11 +32,9 @@ namespace ec2
         ApiCameraHistoryMoveDataList moveHistory;
     };
     #define ApiCameraHistoryDetailData_Fields (cameraId)(moveHistory)
-
-    #define ApiCameraHistoryTypes (ApiCameraHistoryData)(ApiCameraHistoryMoveData)(ApiCameraHistoryDetailData)
 }
 
-Q_DECLARE_METATYPE(ec2::ApiCameraHistoryData)
+Q_DECLARE_METATYPE(ec2::ApiServerFootageData)
 Q_DECLARE_METATYPE(ec2::ApiCameraHistoryMoveData)
 Q_DECLARE_METATYPE(ec2::ApiCameraHistoryDetailData)
 

@@ -226,7 +226,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
     qRegisterMetaType<ec2::ApiResourceParamDataList>("ApiResourceParamDataList");
-    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
+    qRegisterMetaType<ec2::ApiServerFootageDataList>("ec2::ApiServerFootageDataList");
     qRegisterMetaType<ec2::ApiCameraHistoryDetailData>("ec2::ApiCameraHistoryDetailData");
     qRegisterMetaType<ec2::ApiCameraHistoryDetailDataList>("ec2::ApiCameraHistoryDetailDataList");
 

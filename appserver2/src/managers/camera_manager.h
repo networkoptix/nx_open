@@ -71,7 +71,7 @@ namespace ec2
             emit cameraRemoved( QnUuid(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraHistoryData>& tran )
+        void triggerNotification( const QnTransaction<ApiServerFootageData>& tran )
         {
             if (tran.command == ApiCommand::addCameraHistoryItem)
                 emit cameraHistoryChanged( tran.params);
@@ -124,7 +124,7 @@ namespace ec2
 
         //!Implementation of AbstractCameraManager::addCamera
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) override;
-        //!Implementation of AbstractCameraManager::ApiCameraHistoryData
+        //!Implementation of AbstractCameraManager::ApiServerFootageData
         virtual int setCamerasWithArchive(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::getCameras
         virtual int getCameras( const QnUuid& mediaServerId, impl::GetCamerasHandlerPtr handler ) override;

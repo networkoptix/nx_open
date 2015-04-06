@@ -16,7 +16,7 @@ namespace ec2
         ApiLayoutDataList layouts;
         ApiVideowallDataList videowalls;
         ApiBusinessRuleDataList rules;
-        ApiCameraHistoryDataList cameraHistory;
+        ApiServerFootageDataList cameraHistory;
         ApiLicenseDataList licenses;
         ApiDiscoveryDataList discoveryData;
         ApiResourceParamWithRefDataList allProperties;

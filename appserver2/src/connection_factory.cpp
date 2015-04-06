@@ -164,9 +164,9 @@ namespace ec2
         //AbstractCameraManager::getUserAttributes
         registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::getCameraUserAttributes );
         //AbstractCameraManager::addCameraHistoryItem
-        registerUpdateFuncHandler<ApiCameraHistoryData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
+        registerUpdateFuncHandler<ApiServerFootageData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryItems
-        registerGetFuncHandler<std::nullptr_t, ApiCameraHistoryDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
+        registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
         //AbstractCameraManager::getCamerasEx

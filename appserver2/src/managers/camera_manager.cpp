@@ -51,7 +51,7 @@ namespace ec2
         const int reqID = generateRequestID();
         ApiCommand::Value command = ApiCommand::addCameraHistoryItem;
 
-        QnTransaction<ApiCameraHistoryData> tran(command);
+        QnTransaction<ApiServerFootageData> tran(command);
         tran.params.serverGuid = serverGuid;
         tran.params.archivedCameras = cameras;
         using namespace std::placeholders;
@@ -80,13 +80,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraHistoryDataList& cameraHistory) {
-            ApiCameraHistoryDataList outData;
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiServerFootageDataList& cameraHistory) {
+            ApiServerFootageDataList outData;
             if( errorCode == ErrorCode::ok )
                 outData = cameraHistory;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraHistoryDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiServerFootageDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryItems, nullptr, queryDoneHandler );
         return reqID;
     }

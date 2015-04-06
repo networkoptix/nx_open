@@ -692,7 +692,7 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
         return false;
 
-    //if (!fillTransactionLogInternal<ApiCameraHistoryData, ApiCameraHistoryDataList>(ApiCommand::addCameraHistoryItem))
+    //if (!fillTransactionLogInternal<ApiServerFootageData, ApiServerFootageDataList>(ApiCommand::addCameraHistoryItem))
     //    return false;
 
     if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
@@ -2113,7 +2113,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
         return ErrorCode::notImplemented;
 }
 
-ErrorCode QnDbManager::addCameraHistory(const ApiCameraHistoryData& params)
+ErrorCode QnDbManager::addCameraHistory(const ApiServerFootageData& params)
 {
     QSqlQuery query(m_sdb);
     query.prepare("INSERT OR REPLACE INTO vms_used_cameras (server_guid, cameras) VALUES(?, ?)");
@@ -2140,7 +2140,7 @@ ErrorCode QnDbManager::removeCameraHistory(const QnUuid& serverId)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraHistoryData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiServerFootageData>& tran)
 {
     if (tran.command == ApiCommand::addCameraHistoryItem)
         return addCameraHistory(tran.params);
@@ -3028,7 +3028,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
 }
 
 //getCameraHistoryItems
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraHistoryDataList& historyList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -3038,7 +3038,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraHistor
         return ErrorCode::dbError;
     }
     while (query.next()) {
-        ApiCameraHistoryData data;
+        ApiServerFootageData data;
         data.serverGuid = QnUuid::fromRfc4122(query.value(0).toByteArray());
         data.archivedCameras = QnUbjson::deserialized<std::vector<QnUuid>>(query.value(1).toByteArray());
         historyList.push_back(std::move(data));
