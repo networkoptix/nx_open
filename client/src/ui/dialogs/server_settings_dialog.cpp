@@ -110,7 +110,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
     m_hasStorageChanges(false),
-    m_maxCamerasAdjusted(false)
+    m_maxCamerasAdjusted(false),
+    m_rebuildWasCanceled(false)
 {
     ui->setupUi(this);
 
@@ -489,8 +490,10 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
     RebuildAction action;
     if (m_rebuildState.state > Qn::RebuildState_None) {
         action = RebuildAction_Cancel;
+        m_rebuildWasCanceled = true;
     } else {
         action = RebuildAction_Start;
+        m_rebuildWasCanceled = false;
     }
 
     if (action == RebuildAction_Start)
@@ -550,7 +553,7 @@ void QnServerSettingsDialog::updateRebuildUi(const QnStorageScanData& reply) {
      ui->rebuildStartButton->setEnabled(reply.state == Qn::RebuildState_None);
      ui->rebuildStopButton->setEnabled(reply.state == Qn::RebuildState_FullScan);
 
-     if (oldState.state == Qn::RebuildState_FullScan && reply.state == Qn::RebuildState_None) {
+     if (oldState.state == Qn::RebuildState_FullScan && reply.state == Qn::RebuildState_None && !m_rebuildWasCanceled) {
          emit rebuildArchiveDone();
          QMessageBox::information(this,
          tr("Finished"),
