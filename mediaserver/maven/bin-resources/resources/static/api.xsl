@@ -10,13 +10,11 @@
     <xsl:output
             method="xml"
             doctype-system="about:legacy-compat"
-            omit-xml-declaration="yes"
             indent="yes"
             encoding="UTF-8"/>
 
     <xsl:variable name="XML" select="/"/>
     <xsl:template match="/">
-        <xsl:text disable-output-escaping="yes">&lt;!DOCTYPE html></xsl:text>
         <html>
             <head>
                 <meta charset="utf-8"/>
