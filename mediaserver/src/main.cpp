@@ -1089,7 +1089,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        qnCameraHistoryPool->setCamerasWithArchiveList(cameraHistoryList);
+        qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
     }
 
     {

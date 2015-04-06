@@ -179,7 +179,7 @@ bool QnRecordingManager::updateCameraHistory() {
     m_updateCameraHistoryTimer.restart();
 
     std::vector<QnUuid> archivedListNew = qnStorageMan->getCamerasWithArchive();
-    std::vector<QnUuid> archivedListOld = qnCameraHistoryPool->getCamerasWithArchive(qnCommon->moduleGUID());
+    std::vector<QnUuid> archivedListOld = qnCameraHistoryPool->getServerFootageData(qnCommon->moduleGUID());
     if (archivedListOld == archivedListNew) 
         return true;
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
@@ -188,7 +188,7 @@ bool QnRecordingManager::updateCameraHistory() {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
         return false;
     }
-    qnCameraHistoryPool->setCamerasWithArchive(qnCommon->moduleGUID(), archivedListNew);
+    qnCameraHistoryPool->setServerFootageData(qnCommon->moduleGUID(), archivedListNew);
     return true;
 }
 

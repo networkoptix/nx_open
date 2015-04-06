@@ -23,23 +23,26 @@ public:
     QnCameraHistoryPool(QObject *parent = NULL);
     virtual ~QnCameraHistoryPool();
 
-    void setCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList);
-    void setCamerasWithArchive(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
-    std::vector<QnUuid> getCamerasWithArchive(const QnUuid& serverGuid) const;
+    /** Reset information about camera footage presence on different servers. */
+    void resetServerFootageData(const ec2::ApiServerFootageDataList& serverFootageDataList);
 
+    /** Update information about camera footage presence on a single server. */
+    void setServerFootageData(const ec2::ApiServerFootageData &serverFootageData);
 
-    typedef std::function<void(bool success)> callbackFunction;
-    bool prepareCamera(const QnVirtualCameraResourcePtr &camera, callbackFunction handler);
+    /** Update information about camera footage presence on a single server. */
+    void setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
+
+    /** \return list of camera id's that have footage on the selected server. */
+    std::vector<QnUuid> getServerFootageData(const QnUuid& serverGuid) const;
+
+    /** \return server list where the selected camera has footage. */
+    QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr &camera) const;
 
     /*
-    *   \return Server list where camera were archived.
+    *   \return Server list where camera was archived during specified period.
+    *   If camera history still not loaded, full camera footage server list will be returned.
     */
-    QnMediaServerResourceList getFootageServersByCamera(const QnVirtualCameraResourcePtr &camera) const;
-
-    /*
-    *   \return Server list where camera was archived during specified period - if data is loaded.
-    */
-    QnMediaServerResourceList tryGetFootageServersByCameraPeriod(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const;
+    QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const;
 
     /*
     *  \return media server where camera was recorded on specified time
@@ -51,13 +54,19 @@ public:
 
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
 
-signals:
+    typedef std::function<void(bool success)> callbackFunction;
+    bool prepareCamera(const QnVirtualCameraResourcePtr &camera, callbackFunction handler);
 
+signals:
+    /** Notify about changes in the list of servers where the camera has footage. */
+    void cameraFootageChanged(const QnVirtualCameraResourcePtr &camera);
+
+    /** Notify about changes in the camera history. */
     void cameraHistoryChanged(const QnVirtualCameraResourcePtr &camera);
 
 private:
     QnMediaServerResourcePtr getCurrentServer(const QnVirtualCameraResourcePtr &camera) const;
-    void setCamerasWithArchiveNoLock(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
+    void setServerFootageDataNoLock(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
     ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& detailData, qint64 timestamp) const;
     ec2::ApiCameraHistoryItemDataList filterOnlineServers(const ec2::ApiCameraHistoryItemDataList& dataList) const;
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;

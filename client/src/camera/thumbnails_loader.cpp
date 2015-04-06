@@ -397,7 +397,8 @@ void QnThumbnailsLoader::process() {
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
-        for(const QnMediaServerResourcePtr &server: qnCameraHistoryPool->tryGetFootageServersByCameraPeriod(camera, period))
+        QnMediaServerResourceList servers = qnCameraHistoryPool->getCameraFootageData(camera, period);        
+        for(const QnMediaServerResourcePtr &server: servers)
         {
             if (server->getStatus() != Qn::Online)
                 continue;
