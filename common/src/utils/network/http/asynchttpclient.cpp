@@ -938,10 +938,17 @@ namespace nx_http
     bool downloadFileAsync(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler,
-        const nx_http::HttpHeaders& extraHeaders)
+        const nx_http::HttpHeaders& extraHeaders,
+        const QAuthenticator &auth)
     {
-        nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
+        nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();       
         httpClientCaptured->addRequestHeaders(extraHeaders);
+        if (!auth.isNull()) {
+            httpClientCaptured->setUserName(auth.user());
+            httpClientCaptured->setUserPassword(auth.password());
+            httpClientCaptured->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+        }
+
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {

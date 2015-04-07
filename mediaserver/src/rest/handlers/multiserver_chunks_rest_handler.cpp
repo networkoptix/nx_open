@@ -1,19 +1,24 @@
+#include "multiserver_chunks_rest_handler.h"
+
 #include <QUrlQuery>
 #include <QWaitCondition>
 
-#include "multiserver_chunks_rest_handler.h"
 #include "recording/time_period.h"
-#include "utils/serialization/compressed_time.h"
 #include "recording/time_period_list.h"
-#include <utils/common/model_functions.h>
+
 #include "chunks/chunks_request_helper.h"
+#include "common/common_module.h"
+
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"
-#include "common/common_module.h"
 #include "core/resource/camera_history.h"
 #include "core/resource/media_server_resource.h"
+#include <core/resource/user_resource.h>
+
 #include "utils/network/router.h"
+#include <utils/common/model_functions.h>
 #include "utils/network/http/asynchttpclient.h"
+#include "utils/serialization/compressed_time.h"
 
 namespace {
     static QString urlPath;
@@ -34,7 +39,7 @@ QnMultiserverChunksRestHandler::QnMultiserverChunksRestHandler(const QString& pa
     urlPath = path;
 }
 
-void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataList& outputData, QnMediaServerResourcePtr server, InternalContext* ctx)
+void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataList& outputData, const QnMediaServerResourcePtr &server, InternalContext* ctx)
 {
 
     auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
@@ -52,7 +57,7 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
     };
 
     QUrl apiUrl(server->getApiUrl());
-    apiUrl.setPath(urlPath);
+    apiUrl.setPath(L'/' + urlPath + L'/');
 
     QnChunksRequestData modifiedRequest = ctx->request;
     modifiedRequest.format = Qn::CompressedPeriodsFormat;
@@ -62,8 +67,14 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
     nx_http::HttpHeaders headers;
 	QnRouter::instance()->updateRequest(apiUrl, headers, server->getId());
 
+    QAuthenticator auth;
+    if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
+        auth.setUser(admin->getName());
+        auth.setPassword(QString::fromUtf8(admin->getDigest()));
+    }
+
     QMutexLocker lock(&ctx->mutex);
-    if (nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers))
+    if (nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers, auth))
         ctx->requestsInProgress++;
 }
 
