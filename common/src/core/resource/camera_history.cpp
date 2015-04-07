@@ -188,6 +188,7 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirt
         QnMediaServerResourcePtr mServer = toMediaServer(itr2->serverGuid);
         if (mServer)
             result << mServer;
+        ++itr2;
     }
     return result.toList();
 }
@@ -270,14 +271,17 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
 
 void QnCameraHistoryPool::resetServerFootageData(const ec2::ApiServerFootageDataList& cameraHistoryList)
 {
+    QSet<QnUuid> localHistoryValidCameras;
     {
         QMutexLocker lock(&m_mutex);
         m_archivedCamerasByServer.clear();
         m_historyDetail.clear();
+        localHistoryValidCameras = m_historyValidCameras;
         for(const ec2::ApiServerFootageData& item: cameraHistoryList)
             m_archivedCamerasByServer.insert(item.serverGuid, item.archivedCameras);
     }
-    for (const QnUuid &cameraId: m_historyValidCameras)
+
+    for (const QnUuid &cameraId: localHistoryValidCameras)
         invalidateCameraHistory(cameraId);
 }
 

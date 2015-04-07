@@ -332,11 +332,6 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
     }
 }
 
-
-////////////////////////////////////////////////////////////
-//// QnCameraHistoryItem
-////////////////////////////////////////////////////////////
-
 void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst) {
     dst.host = src.server;
     dst.port = src.port;
@@ -370,7 +365,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.videowalls, dst.resources);
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
-    //fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
+    dst.camerasWithArchiveList = src.cameraHistory;
     dst.allProperties = src.allProperties;
     fromApiToResourceList(src.storages, dst.resources, ctx);
     dst.resStatusList = src.resStatusList;
