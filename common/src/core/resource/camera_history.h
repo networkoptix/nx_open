@@ -127,7 +127,7 @@ private:
     QSet<QnUuid> m_historyValidCameras;
 
     typedef QMap<int, callbackFunction> HandlerMap;
-    HandlerMap m_loadingCameras;
+    HandlerMap m_runningRequests;
 };
 
 

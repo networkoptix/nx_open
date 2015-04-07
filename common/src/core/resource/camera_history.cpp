@@ -35,7 +35,21 @@ namespace {
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     QObject(parent),
     m_mutex(QMutex::Recursive)
-{}
+{
+    connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource) {
+        /* Fast check. */
+        if (!resource->hasFlags(Qn::remote_server))
+            return;
+
+        /* Do not invalidate history if server goes offline. */
+        if (resource->getStatus() != Qn::Online)
+            return;
+
+        auto cameras = getServerFootageData(resource->getId());
+        for (const auto &cameraId: cameras)
+            invalidateCameraHistory(cameraId);
+    });
+}
 
 QnCameraHistoryPool::~QnCameraHistoryPool() {}
 
@@ -66,7 +80,6 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
         return true;
     }
 
-    //TODO: #GDM #history_refactor Current server we are connected to - it is online.
     QnMediaServerResourcePtr server = qnCommon->currentServer();
     if (!server)
         return false;
@@ -84,7 +97,7 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
 
     {
         QMutexLocker lock(&m_mutex);
-        m_loadingCameras[handle] = callback;
+        m_runningRequests[handle] = callback;
     }
 
     return true;
@@ -126,9 +139,9 @@ void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHist
         }  
     }
 
-    if (!m_loadingCameras.contains(handle))
+    if (!m_runningRequests.contains(handle))
         return;
-    auto handler = m_loadingCameras.take(handle);
+    auto handler = m_runningRequests.take(handle);
 
     lock.unlock();
 
