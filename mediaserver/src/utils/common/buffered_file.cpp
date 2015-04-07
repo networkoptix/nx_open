@@ -425,8 +425,8 @@ bool QBufferedFile::open(QIODevice::OpenMode mode)
     if (!rez)
         return false;
     m_filePos = 0;
-
-    m_queueWriter = QnWriterPool::instance()->getWriter(m_fileEngine.getFileName());
+    if (mode & QIODevice::WriteOnly)
+        m_queueWriter = QnWriterPool::instance()->getWriter(m_fileEngine.getFileName());
     m_actualFileSize = 0;
     return QIODevice::open(mode | QIODevice::Unbuffered);
 }
