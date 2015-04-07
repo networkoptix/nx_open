@@ -5,7 +5,7 @@
 ```
   sudo apt-get install mysql-server
 
-  mysql --user=USER --password=PASSWORD < database.sql # Create database and tables
+  mysql --user=USER --password=PASSWORD <database name> < database.sql # Create database and tables
 ```
 
 
@@ -13,7 +13,7 @@
 
 ```
   sudo apt-get install python-pip
-  sudo pip install Flask Python-mysql pygal # pygal is optional, for sqlCharts only
+  sudo pip install Flask MySql-python pygal # pygal is optional, for sqlCharts only
 
   ./cgi.py # running CGI, edit to configure database connection
 ```

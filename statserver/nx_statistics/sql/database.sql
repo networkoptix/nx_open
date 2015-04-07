@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `nx_statistics` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `nx_statistics`;
 -- MySQL dump 10.13  Distrib 5.5.41, for debian-linux-gnu (x86_64)
 --
 -- Host: 127.0.0.1    Database: nx_statistics
