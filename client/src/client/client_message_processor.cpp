@@ -52,6 +52,10 @@ QnConnectionState QnClientMessageProcessor::connectionState() const {
     return m_status.state();
 }
 
+QnIncompatibleServerWatcher *QnClientMessageProcessor::incompatibleServerWatcher() const {
+    return m_incompatibleServerWatcher;
+}
+
 void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
     if (m_holdConnection == holdConnection)
         return;
