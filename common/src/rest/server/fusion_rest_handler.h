@@ -46,10 +46,7 @@ public:
     virtual ~QnFusionRestHandler() {}
 
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, 
-                            QByteArray& resultContentType, const QnRestConnectionProcessor*)  override
-    {
-        return nx_http::StatusCode::notImplemented;
-    }
+                            QByteArray& resultContentType, const QnRestConnectionProcessor *processor)  override;
 };
 
 
