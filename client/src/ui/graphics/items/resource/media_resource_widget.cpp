@@ -123,9 +123,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_camera = base_type::resource().dynamicCast<QnVirtualCameraResource>();
 
     if (m_camera) {
-        qnCameraHistoryPool->prepareCamera(m_camera, [](bool success) {
+        qnCameraHistoryPool->updateCameraHistoryAsync(m_camera, [](bool success) {
             qDebug() << "camera prepared" << success;
         });
+
+        //TODO: #GDM history_refactor move this code to navigator
+        //TODO: #GDM history_refactor listen to all changes in camera footage data
+        //TODO: #GDM history_refactor listen if any camera footage servers goes ONLINE (only)
     }
 
     // TODO: #Elric

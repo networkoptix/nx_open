@@ -16,6 +16,24 @@
 #include <utils/common/singleton.h>
 #include <utils/common/uuid.h>
 
+/**
+ *  Class for maintaining camera history - what server contains which part of the camera archive.
+ *  Terms: 
+ *  \li Footage - part of the camera archive.
+ *  \li Camera footage data - list of servers, that have this camera footage
+ *  \li Server footage data - list of cameras, that have footage on this server
+ *  \li Camera history - list of camera movements from one server to another. 
+ *  Main task for this class is to provide info, which server contains footage for the given 
+ *  camera for the given moment of time. 
+ *  
+ *  Footage data is stored in the database, so it is received and updated almost instantly.
+ *  All methods that operates only footage data are reliable.
+ *  
+ *  Camera history is not received instantly, so using signals is encouraged. It can also be 
+ *  changed in runtime, e.g. when server containing footage goes online or offline.
+ *  All methods that require camera history to operate are non-reliable.
+ * 
+ */
 class QnCameraHistoryPool: public QObject, public Singleton<QnCameraHistoryPool> {
     Q_OBJECT
 
@@ -36,26 +54,36 @@ public:
     std::vector<QnUuid> getServerFootageData(const QnUuid& serverGuid) const;
 
     /** \return server list where the selected camera has footage. */
+    QnMediaServerResourceList getCameraFootageData(const QnUuid &cameraId) const;
+
+    /** \return server list where the selected camera has footage. */
     QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr &camera) const;
 
-    /*
-    *   \return Server list where camera was archived during specified period.
-    *   If camera history still not loaded, full camera footage server list will be returned.
+    /**
+    * \return                       Server list where camera was archived during specified period.
+    *                               If camera history still not loaded, full camera footage server
+    *                               list will be returned.
     */
     QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const;
 
-    /*
-    *  \return media server where camera was recorded on specified time
-    * @param camera     camera to find
-    * @param timestamp     timestamp in milliseconds to find
-    * @param allowOfflineServers  drop out offline media servers if parameter is false
-    */
+    /**
+     *  \return media server where camera was recorded on specified time
+     * @param camera                Camera to find
+     * @param timestamp             Timestamp in milliseconds to find
+     * @param allowOfflineServers   Drop out offline media servers if parameter is false
+     */
     QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0) const;
 
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
 
     typedef std::function<void(bool success)> callbackFunction;
-    bool prepareCamera(const QnVirtualCameraResourcePtr &camera, callbackFunction handler);
+    /**
+     * Update camera history for the given camera.
+     * \param camera                Target camera
+     * \param callback              Callback function that will be executed when request finished.
+     * \returns                     True if request was successful, false otherwise.
+     */
+    bool updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback);
 
 signals:
     /** Notify about changes in the list of servers where the camera has footage. */
@@ -65,15 +93,23 @@ signals:
     void cameraHistoryChanged(const QnVirtualCameraResourcePtr &camera);
 
 private:
-    QnMediaServerResourcePtr getCurrentServer(const QnVirtualCameraResourcePtr &camera) const;
     void setServerFootageDataNoLock(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
     ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& detailData, qint64 timestamp) const;
     ec2::ApiCameraHistoryItemDataList filterOnlineServers(const ec2::ApiCameraHistoryItemDataList& dataList) const;
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
 
-    bool isCameraDataLoaded(const QnVirtualCameraResourcePtr &camera) const;
     Q_SLOT void at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle);
-    
+
+    /**
+     * \brief                       Check if camera history is valid for the given camera.
+     * \param camera                Target camera.      
+     * \returns                     True if the camera history for the given camera is already loaded, false otherwise.
+     */
+    bool isCameraHistoryValid(const QnVirtualCameraResourcePtr &camera) const;
+
+    /** Mark camera history as dirty and subject to update. */
+    void invalidateCameraHistory(const QnVirtualCameraResourcePtr &camera);
+
 private:
 
     mutable QMutex m_mutex;
@@ -81,6 +117,9 @@ private:
 
     typedef QMap<QnUuid, ec2::ApiCameraHistoryItemDataList> DetailHistoryMap;
     DetailHistoryMap m_historyDetail; // camera move detail by camera
+
+    /** Set of cameras which have the data loaded and actual. */
+    QSet<QnUuid> m_historyValidCameras;
 
     typedef QMap<int, callbackFunction> HandlerMap;
     HandlerMap m_loadingCameras;

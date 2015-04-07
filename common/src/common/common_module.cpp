@@ -60,6 +60,13 @@ QnUuid QnCommonModule::remoteGUID() const {
     return m_remoteUuid;
 }
 
+QnMediaServerResourcePtr QnCommonModule::currentServer() const {
+    QnUuid serverId = remoteGUID();
+    if (serverId.isNull())
+        return QnMediaServerResourcePtr();
+    return qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+}
+
 void QnCommonModule::setLocalSystemName(const QString &value) {
     if (m_localSystemName == value)
         return;
