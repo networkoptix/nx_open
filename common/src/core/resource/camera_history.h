@@ -67,10 +67,10 @@ public:
     QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const;
 
     /**
-     *  \return media server where camera was recorded on specified time
-     * @param camera                Camera to find
-     * @param timestamp             Timestamp in milliseconds to find
-     * @param allowOfflineServers   Drop out offline media servers if parameter is false
+     * \return                      Server where camera was recorded on specified time.
+     * \param camera                Camera to find
+     * \param timestamp             Timestamp in milliseconds to find
+     * \param allowOfflineServers   Drop out offline media servers if parameter is false
      */
     QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod = 0) const;
 
@@ -85,30 +85,35 @@ public:
      */
     bool updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback);
 
-signals:
-    /** Notify about changes in the list of servers where the camera has footage. */
-    void cameraFootageChanged(const QnVirtualCameraResourcePtr &camera);
-
-    /** Notify about changes in the camera history. */
-    void cameraHistoryChanged(const QnVirtualCameraResourcePtr &camera);
-
-private:
-    void setServerFootageDataNoLock(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras);
-    ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& detailData, qint64 timestamp) const;
-    ec2::ApiCameraHistoryItemDataList filterOnlineServers(const ec2::ApiCameraHistoryItemDataList& dataList) const;
-    QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
-
-    Q_SLOT void at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle);
-
     /**
      * \brief                       Check if camera history is valid for the given camera.
      * \param camera                Target camera.      
      * \returns                     True if the camera history for the given camera is already loaded, false otherwise.
      */
     bool isCameraHistoryValid(const QnVirtualCameraResourcePtr &camera) const;
+signals:
+    /** 
+     * \brief                       Notify that camera history is no longer valid.
+     *                              Usually it means that camera history must be updated (if needed).
+     */
+    void cameraHistoryInvalidated(const QnVirtualCameraResourcePtr &camera);
+
+    /** 
+     * \brief                       Notify about changes in the camera history.
+     *                              Usually it means that all who use camera history should update their info.
+     */
+    void cameraHistoryChanged(const QnVirtualCameraResourcePtr &camera);
+
+private:
+    ec2::ApiCameraHistoryItemDataList filterOnlineServers(const ec2::ApiCameraHistoryItemDataList& dataList) const;
+
+    QnVirtualCameraResourcePtr toCamera(const QnUuid& guid) const;
+    QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
+
+    Q_SLOT void at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle);
 
     /** Mark camera history as dirty and subject to update. */
-    void invalidateCameraHistory(const QnVirtualCameraResourcePtr &camera);
+    void invalidateCameraHistory(const QnUuid &cameraId);
 
 private:
 
