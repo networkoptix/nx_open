@@ -7,6 +7,10 @@ static const uint SECS_A_DAY = 24*60*60;
 
 namespace ec2
 {
+    // Hardcoded credentials (because of no way to keep it better)
+    static const QString AUTH_USER = lit("nx");
+    static const QString AUTH_PASSWORD = lit("f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
+
     // Hardcoded defaults
     Ec2StaticticsReporter::Constants Ec2StaticticsReporter::c_constants =
     {
@@ -14,7 +18,8 @@ namespace ec2
         /* maxDelay     = */ 10 * SECS_A_DAY,   /* just 10 days */
 
         // TODO: fix as soon as we have actual public server
-        /* serverApi    = */ QLatin1String("http://localhost:8000/api/reportStatistics"),
+        /* serverApi    = */ QLatin1String("http://stats.networkoptix.com/statserver/api/reportStatistics"),
+        /* serverAuth   = */ true,
     };
 
     const QString Ec2StaticticsReporter::SR_ALLOWED = lit("statisticsReportAllowed");
@@ -259,6 +264,12 @@ namespace ec2
         m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
         connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done,
                 this, &Ec2StaticticsReporter::finishReport, Qt::DirectConnection);
+
+        if (c_constants.serverAuth) // auth can be disabled by command line
+        {
+            m_httpClient->setUserName(AUTH_USER);
+            m_httpClient->setUserPassword(AUTH_PASSWORD);
+        }
 
         const auto format = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
         if (!m_httpClient->doPost(QUrl(c_constants.serverApi), format, QJson::serialized(data)))

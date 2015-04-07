@@ -2466,6 +2466,8 @@ int main(int argc, char* argv[])
         QString::number(statConst.maxDelay));
     commandLineParser.addParameter(&statConst.serverApi, "--statistics-server-api", NULL,
         lit("Statistics report server POST address"), statConst.serverApi);
+    commandLineParser.addParameter(&statConst.serverAuth, "--statistics-server-no-auth", NULL,
+        lit("Disable statistics report server authentication"), false);
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
