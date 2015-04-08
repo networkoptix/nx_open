@@ -49,7 +49,7 @@ protected:
     QnVirtualCameraResourcePtr camera() const;
 
 private slots:
-    void at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle);
+    void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
     void at_bookmarksReceived(int status, const QnCameraBookmarkList &bookmarks, int requestHandle);
 
 private:

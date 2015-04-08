@@ -93,6 +93,7 @@ namespace {
         (TestEmailSettingsObject,  "testEmailSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
         (ec2CameraHistoryObject,   "ec2/cameraHistory")
+        (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -260,6 +261,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case ec2CameraHistoryObject:
         processFusionReply<ec2::ApiCameraHistoryDataList>(this, response, handle);
+        break;
+    case ec2RecordedTimePeriodsObject:
+        processFusionReply<MultiServerPeriodDataList>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -816,4 +820,8 @@ int QnMediaServerConnection::modulesInformation(QObject *target, const char *slo
 
 int QnMediaServerConnection::cameraHistory(const QnChunksRequestData &request, QObject *target, const char *slot) {
     return sendAsyncGetRequest(ec2CameraHistoryObject, request.toParams(), QN_STRINGIZE_TYPE(ec2::ApiCameraHistoryDataList) ,target, slot);
+}
+
+int QnMediaServerConnection::recordedTimePeriods(const QnChunksRequestData &request, QObject *target, const char *slot) {
+    return sendAsyncGetRequest(ec2RecordedTimePeriodsObject, request.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList) ,target, slot);
 }

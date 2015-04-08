@@ -15,4 +15,7 @@ typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
 struct QnChunksRequestData;
 
+struct MultiServerPeriodData;
+typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
+
 #endif // QN_API_FWD_H

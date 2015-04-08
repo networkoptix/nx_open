@@ -35,9 +35,9 @@ int QnMultiServerCameraDataLoader::load(const QnTimePeriod &period, const QStrin
     
     // sometime camera moved between servers. Get all servers for requested time period
     QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
-    QnResourceList serverList = qnCameraHistoryPool->getCameraFootageData(camera, period);
-    foreach(const QnResourcePtr& server, serverList) {
-        int handle = loadInternal(server.dynamicCast<QnMediaServerResource>(), camera, period, filter, resolutionMs);
+    auto serverList = qnCameraHistoryPool->getCameraFootageData(camera, period);
+    foreach(const QnMediaServerResourcePtr& server, serverList) {
+        int handle = loadInternal(server, camera, period, filter, resolutionMs);
         if (handle > 0)
             handles << handle;
     }

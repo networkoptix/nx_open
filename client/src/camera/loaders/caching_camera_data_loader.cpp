@@ -2,14 +2,18 @@
 
 #include <QtCore/QMetaType>
 
+#include <common/common_module.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
+
 #include <plugins/resource/avi/avi_resource.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
 #include <utils/common/model_functions.h>
 
+#include <camera/loaders/generic_camera_data_loader.h>
 #include <camera/loaders/multi_server_camera_data_loader.h>
 #include <camera/loaders/layout_file_camera_data_loader.h>
 
@@ -100,8 +104,10 @@ bool QnCachingCameraDataLoader::createLoaders(const QnResourcePtr &resource, QnA
     {
         Qn::CameraDataType type = static_cast<Qn::CameraDataType>(i);
       
-        if (camera)
+        if (camera && type == Qn::BookmarkData)
             loaders[i] = QnMultiServerCameraDataLoader::newInstance(camera, type);
+        else if (camera)
+            loaders[i] = QnGenericCameraDataLoader::newInstance(qnCommon->currentServer(), camera, type);
         else if (aviFile)
             loaders[i] = QnLayoutFileCameraDataLoader::newInstance(aviFile, type);
         else
