@@ -1956,14 +1956,34 @@ void QnMain::run()
     if (adminUser)
         connect(adminUser.data(), &QnResource::resourceChanged, this, &QnMain::updateModuleInfo);
 
-    static const auto SR_ALLOWED = ec2::Ec2StaticticsReporter::SR_ALLOWED;
-    if (MSSettings::roSettings()->value(SR_ALLOWED, false).toBool())
+    typedef ec2::Ec2StaticticsReporter stats;
+    bool adminParamsChanged = false;
+    if (MSSettings::roSettings()->value(stats::SR_ALLOWED, false).toBool())
     {
-        if (adminUser->getProperty(SR_ALLOWED).toInt() == 0)        // == 0 => false
-            adminUser->setProperty(SR_ALLOWED, QString::number(1)); // != 0 => true
-        propertyDictionary->saveParams(adminUser->getId());
+        if (adminUser->getProperty(stats::SR_ALLOWED).toInt() == 0)        // == 0 => false
+            adminUser->setProperty(stats::SR_ALLOWED, QString::number(1)); // != 0 => true
 
-        MSSettings::roSettings()->remove(SR_ALLOWED);
+        MSSettings::roSettings()->remove(stats::SR_ALLOWED);
+        adminParamsChanged = true;
+    }
+
+    // TODO: fix VS supports init lists
+    const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API, &stats::SR_SERVER_NO_AUTH };
+    for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
+    {
+        const QString& param = **it;
+        const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
+        if (!val.isEmpty() && val != adminUser->getProperty(param))
+        {
+            adminUser->setProperty(param, val);
+            MSSettings::roSettings()->remove(param);
+            adminParamsChanged = true;
+        }
+    }
+
+    if (adminParamsChanged)
+    {
+        propertyDictionary->saveParams(adminUser->getId());
         MSSettings::roSettings()->sync();
     }
 
@@ -2377,25 +2397,6 @@ void SIGUSR1_handler(int)
 }
 #endif
 
-static uint timeStringToSecs(const QString& str, uint defaultValue)
-{
-    qlonglong secs;
-    bool ok(true);
-
-    if (str.endsWith(lit("d"), Qt::CaseInsensitive)) 
-        secs = str.left(str.length() - 1).toLongLong(&ok) * 24 * 60 * 60;
-    else
-    if (str.endsWith(lit("h"), Qt::CaseInsensitive)) 
-        secs = str.left(str.length() - 1).toLongLong(&ok) * 60 * 60;
-    else 
-    if (str.endsWith(lit("m"), Qt::CaseInsensitive)) 
-        secs = str.left(str.length() - 1).toLongLong(&ok) * 60;
-    else
-        secs = str.toLongLong(&ok);
-
-    return ok ? static_cast<uint>(secs) : defaultValue;
-}
-
 int main(int argc, char* argv[])
 {
 #if 0
@@ -2426,9 +2427,6 @@ int main(int argc, char* argv[])
     bool showHelp = false;
     QString engineVersion;
 
-    QString statisticsTimeCycle;
-    QString statisticsMaxDelay;
-
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
         "Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
@@ -2456,19 +2454,6 @@ int main(int argc, char* argv[])
         lit("This help message"), true);
     commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
         lit("Force the other engine version"), QString());
-
-    auto& statConst = ec2::Ec2StaticticsReporter::c_constants;
-    commandLineParser.addParameter(&statisticsTimeCycle, "--statistics-time-cycle", NULL,
-        lit("Statistics report min interval between reports (postfixes: d(days), h(hours), m(minutes)"),
-        QString::number(statConst.timeCycle));
-    commandLineParser.addParameter(&statisticsMaxDelay, "--statistics-max-delay", NULL,
-        lit("Statistics report max delay after time has come (postfixes: d(days), h(hours), m(minutes)"),
-        QString::number(statConst.maxDelay));
-    commandLineParser.addParameter(&statConst.serverApi, "--statistics-server-api", NULL,
-        lit("Statistics report server POST address"), statConst.serverApi);
-    commandLineParser.addParameter(&statConst.serverAuth, "--statistics-server-no-auth", NULL,
-        lit("Disable statistics report server authentication"), false);
-
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
     if( showVersion )
@@ -2483,9 +2468,6 @@ int main(int argc, char* argv[])
         commandLineParser.print(stream);
         return 0;
     }
-
-    statConst.timeCycle = timeStringToSecs(statisticsTimeCycle, statConst.timeCycle);
-    statConst.maxDelay = timeStringToSecs(statisticsMaxDelay, statConst.maxDelay);
 
     if( !configFilePath.isEmpty() )
         MSSettings::initializeROSettingsFromConfFile( configFilePath );
