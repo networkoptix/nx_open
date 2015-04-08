@@ -23,11 +23,6 @@ SocketAddress DummySocket::getLocalAddress() const
     return m_localAddress;
 }
 
-SocketAddress DummySocket::getPeerAddress() const
-{
-    return m_remotePeerAddress;
-}
-
 bool DummySocket::setReuseAddrFlag( bool reuseAddr )
 {
     return true;
