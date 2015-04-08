@@ -30,7 +30,7 @@ public:
 
     void setFilterText(const QString &text);
 
-    void setCameras(const QnResourceList &cameras);
+    void setCameras(const QnVirtualCameraResourceList &cameras);
 
     /// QAbstractItemModel overrides
 

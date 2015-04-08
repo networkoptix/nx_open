@@ -59,7 +59,7 @@ public:
 
     void setFilterText(const QString &text);
 
-    void setCameras(const QnResourceList &cameras);
+    void setCameras(const QnVirtualCameraResourceList &cameras);
     
     void applyFilter(bool clearBookmarksCache);
 
@@ -132,7 +132,7 @@ void QnSearchBookmarksModel::Impl::setFilterText(const QString &text)
     m_filter.text = text;
 }
 
-void QnSearchBookmarksModel::Impl::setCameras(const QnResourceList &cameras)
+void QnSearchBookmarksModel::Impl::setCameras(const QnVirtualCameraResourceList &cameras)
 {
     m_filter.cameras = cameras;
 }
@@ -141,7 +141,7 @@ void QnSearchBookmarksModel::Impl::applyFilter(bool clearBookmarksCache)
 {
     QnCameraBookmarksManager::FilterParameters filter = m_filter;
     if (filter.cameras.empty())
-        filter.cameras = qnResPool->getAllCameras(QnResourcePtr()).filtered<QnResource>();
+        filter.cameras = qnResPool->getAllCameras(QnResourcePtr(), true);
 
     m_bookmarksManager->getBookmarksAsync(filter, clearBookmarksCache
         , [this](bool success, const QnCameraBookmarkList &bookmarks)
@@ -270,7 +270,7 @@ void QnSearchBookmarksModel::setFilterText(const QString &text)
     m_impl->setFilterText(text);
 }
 
-void QnSearchBookmarksModel::setCameras(const QnResourceList &cameras)
+void QnSearchBookmarksModel::setCameras(const QnVirtualCameraResourceList &cameras)
 {
     m_impl->setCameras(cameras);
 }
@@ -297,7 +297,6 @@ QModelIndex QnSearchBookmarksModel::index(int row, int column, const QModelIndex
 
 QModelIndex QnSearchBookmarksModel::parent(const QModelIndex &child) const
 {
-    const int row = child.row();
     return QModelIndex();
 }
 

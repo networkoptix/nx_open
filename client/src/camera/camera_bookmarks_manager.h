@@ -16,9 +16,9 @@ public:
 
     virtual ~QnCameraBookmarksManager();
 
-    /// @brief Asynchroniously gathers bookmarks using specified filter
+    /// @brief Asynchronously gathers bookmarks using specified filter
     /// @param filter Filter parameters
-    /// @param clearBookmarkCache Shows if loaders should discard theri caches
+    /// @param clearBookmarkCache Shows if loaders should discard their caches
     /// @param callback Callback for receiving bookmarks data
     void getBookmarksAsync(const FilterParameters &filter
         , bool clearBookmarksCache
@@ -32,7 +32,7 @@ private:
 struct QnCameraBookmarksManager::FilterParameters
 {
     QString text;
-    QnResourceList cameras;
+    QnVirtualCameraResourceList cameras;
     qint64 startTime;
     qint64 finishTime;
 };

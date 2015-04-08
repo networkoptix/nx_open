@@ -1,9 +1,8 @@
 
 #include "camera_bookmarks_manager.h"
 
-#include <core/resource/resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <camera/loaders/generic_camera_data_loader.h>
 #include <camera/data/bookmark_camera_data.h>
@@ -73,9 +72,8 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
         if (it == m_loaders.end())
         {
             const QnMediaServerResourcePtr mediaServer = camera->getParentResource().dynamicCast<QnMediaServerResource>();
-            const QnNetworkResourcePtr networkResource = camera.dynamicCast<QnNetworkResource>();
             if (QnGenericCameraDataLoader *loader = QnGenericCameraDataLoader::newInstance(
-                mediaServer, networkResource, Qn::BookmarkData, this))
+                mediaServer, camera, Qn::BookmarkData, this))
             {
                 connect(loader, &QnAbstractCameraDataLoader::ready, this, &Impl::bookmarksDataEvent);
                 connect(loader, &QnAbstractCameraDataLoader::failed, this
@@ -85,7 +83,7 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
             } 
             else
             {
-                /// If we don't hav such loader and can't create it we should mark request as failed and skip this camera
+                /// If we don't have such loader and can't create it we should mark request as failed and skip this camera
                 request.success = false;
                 continue;
             }
