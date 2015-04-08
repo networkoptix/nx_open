@@ -12,7 +12,9 @@
 #include <QDateTime>
 #include <utils/serialization/compressed_time_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
-#include "recording/time_period_list.h"
+
+#include <recording/time_period.h>
+#include <recording/time_period_list.h>
 
 class TimePeriodCompressedSerializationTest
     :
@@ -28,9 +30,8 @@ protected:
     }
 };
 
-QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))
 
-TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriods)
+TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriodsUnsigned)
 {
 
     std::vector<QnTimePeriod> srcData;
@@ -58,14 +59,17 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriods)
     }
     
     ASSERT_TRUE( dstData == srcData );
+}
 
-    // 2. signed stream test
 
-    srcData.clear();
-    dstData.clear();
-    buffer.clear();
+// 2. signed stream test
+TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriodsSigned)
+{
+    std::vector<QnTimePeriod> srcData;
+    std::vector<QnTimePeriod> dstData;
+    QByteArray buffer;
     
-    currentTime = QDateTime::currentMSecsSinceEpoch();
+    quint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     srcData.push_back(QnTimePeriod(currentTime, 30 * 1000ll));
     currentTime += 20 * 1000ll;
     srcData.push_back(QnTimePeriod(currentTime, 20 * 1000ll));
@@ -88,3 +92,57 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriods)
 
 }
 
+TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPeriodData)
+{
+    MultiServerPeriodDataList srcData;
+
+    MultiServerPeriodData data;
+
+    quint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    data.periods.push_back(QnTimePeriod(currentTime, 30 * 1000ll));
+    currentTime += 40 * 1000ll;
+    data.periods.push_back(QnTimePeriod(currentTime, 120 * 1000ll));
+    currentTime += 1000 * 1000ll;
+    data.periods.push_back(QnTimePeriod(currentTime, 1000000ll));
+    currentTime += 1000000ll;
+    data.periods.push_back(QnTimePeriod(3000000000ll * 1000ll, 5));       
+
+    srcData.push_back(std::move(data));
+
+    QByteArray buffer = QnCompressedTime::serialized(srcData, false);
+
+    bool success = false;
+    MultiServerPeriodDataList dstData = QnCompressedTime::deserialized(buffer, MultiServerPeriodDataList(), &success);
+
+    ASSERT_TRUE( success ); 
+    ASSERT_TRUE( dstData == srcData );
+}
+
+TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPeriodDataListUnsigned)
+{
+    MultiServerPeriodDataList srcData;
+
+    for (int i = 0; i < 5; ++i) {
+        MultiServerPeriodData data;
+
+        quint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+        data.periods.push_back(QnTimePeriod(currentTime, 30 * 1000ll));
+        currentTime += 40 * 1000ll;
+        data.periods.push_back(QnTimePeriod(currentTime, 120 * 1000ll));
+        currentTime += 1000 * 1000ll;
+        data.periods.push_back(QnTimePeriod(currentTime, 1000000ll));
+        currentTime += 1000000ll;
+        data.periods.push_back(QnTimePeriod(3000000000ll * 1000ll, 5));       
+
+        srcData.push_back(std::move(data));
+    }
+
+
+    QByteArray buffer = QnCompressedTime::serialized(srcData, false);
+    
+    bool success = false;
+    MultiServerPeriodDataList dstData = QnCompressedTime::deserialized(buffer, MultiServerPeriodDataList(), &success);
+
+    ASSERT_TRUE( success ); 
+    ASSERT_TRUE( dstData == srcData );
+}
