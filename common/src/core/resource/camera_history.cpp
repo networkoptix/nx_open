@@ -22,11 +22,20 @@ namespace {
     }
 
     ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& data, qint64 timestamp) {
-        //TODO: #history_refactor test me!!!
-        // todo: test me!!!
-        return std::lower_bound(data.begin(), data.end(), timestamp, [](const ec2::ApiCameraHistoryItemData& data, qint64 timestamp) { 
-            return timestamp < data.timestampMs; // inverse compare
+        /* Find first data with timestamp not less than given. */
+        auto iter = std::lower_bound(data.cbegin(), data.cend(), timestamp, [](const ec2::ApiCameraHistoryItemData& data, qint64 timestamp) { 
+            return data.timestampMs < timestamp;
         });
+
+        /* Check exact match. */
+        if (iter->timestampMs == timestamp)
+            return iter;
+
+        /* Otherwise get previous server. */
+        if (std::distance(data.cbegin(), iter) > 1)
+            --iter;
+
+        return iter;
     }
 }
 
@@ -200,7 +209,7 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers(const
     std::copy_if(dataList.cbegin(), dataList.cend(), std::back_inserter(result), [this](const ec2::ApiCameraHistoryItemData &data)
     {
         QnMediaServerResourcePtr res = toMediaServer(data.serverGuid);
-        return !res || res->getStatus() != Qn::Online;
+        return res && res->getStatus() == Qn::Online;
     });
     return result;
 }
