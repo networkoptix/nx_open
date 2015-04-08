@@ -41,17 +41,6 @@ namespace ec2
         }
     };
 
-    class CommonRequestsProcessor
-    {
-    public:
-        static ErrorCode getCurrentTime( std::nullptr_t, qint64* curTime )
-        {
-            *curTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-            return ErrorCode::ok;
-        }
-    };
-
-
     class ServerQueryProcessor
     {
     public:
@@ -293,7 +282,10 @@ namespace ec2
                 if( errorCode != ErrorCode::ok )
                     return;
                 if (!dbTran->commit())
+                {
+                    errorCode = ErrorCode::dbError;
                     return;
+                }
             }
             else 
             {

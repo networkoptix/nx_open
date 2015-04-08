@@ -300,6 +300,7 @@ public:
 
         parent_change = 0x800000,       /**< Camera discovery internal purpose */
         depend_on_parent_status = 0x1000000,   /**< Resource status depend on parent resource status */
+        search_upd_only = 0x2000000,   /**< Disable to insert new resource during discovery process, allow update only */
 
         local_media = local | media,
         local_layout = local | layout,

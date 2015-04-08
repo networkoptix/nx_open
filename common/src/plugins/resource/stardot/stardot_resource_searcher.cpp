@@ -101,7 +101,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                     continue;
                 resource->setTypeId(typeId);
 
-                resource->setHostAddress(senderEndpoint.toString());
+                resource->setHostAddress(senderEndpoint.address.toString());
                 resource->setMAC(QnMacAddress(mac));
                 resource->setModel(QLatin1String(model));
                 resource->setName(QLatin1String(model));

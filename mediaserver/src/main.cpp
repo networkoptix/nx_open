@@ -555,7 +555,7 @@ QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Conn
     return QnMediaServerResourcePtr();
 }
 
-QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr)
+QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr, bool isNewServerInstance)
 {
     QnMediaServerResourcePtr savedServer;
     serverPtr->setStatus(Qn::Online, true);
@@ -563,7 +563,29 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(serverPtr, &savedServer);
     if (rez != ec2::ErrorCode::ok)
     {
-        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
+        qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
+        return QnMediaServerResourcePtr();
+    }
+
+    if (!isNewServerInstance)
+        return savedServer;
+
+    // insert server user attributes if defined
+    QString dir = MSSettings::roSettings()->value("staticDataDir", getDataDirectory()).toString();
+    QFile f(closeDirPath(dir) + lit("server_settings.json"));
+    if (!f.open(QFile::ReadOnly))
+        return savedServer;
+    QByteArray data = f.readAll();
+    ec2::ApiMediaServerUserAttributesData userAttrsData;
+    if (!QJson::deserialize(data, &userAttrsData))
+        return savedServer;
+    userAttrsData.serverID = savedServer->getId();
+    auto defaultServerAttrs = QnMediaServerUserAttributesPtr(new QnMediaServerUserAttributes());
+    fromApiToResource(userAttrsData, defaultServerAttrs);
+    ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveUserAttributesSync(QnMediaServerUserAttributesList() << defaultServerAttrs);
+    if (rez != ec2::ErrorCode::ok)
+    {
+        qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
 
@@ -621,7 +643,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 void initLog(const QString& _logLevel) 
 {
     QString logLevel = _logLevel;
-    const QString& configLogLevel = MSSettings::roSettings()->value("log-level").toString();
+    const QString& configLogLevel = MSSettings::roSettings()->value("logLevel").toString();
     if (!configLogLevel.isEmpty())
         logLevel = configLogLevel;
 
@@ -854,6 +876,7 @@ void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
 void QnMain::stopSync()
 {
     qWarning()<<"Stopping server";
+    NX_LOG( lit("Stopping server"), cl_logALWAYS );
     if (serviceMainInstance) {
         {
             QMutexLocker lock(&m_stopMutex);
@@ -1647,7 +1670,7 @@ void QnMain::run()
 
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
-
+    bool isNewServerInstance = false;
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
@@ -1656,6 +1679,7 @@ void QnMain::run()
             server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
+            isNewServerInstance = true;
         }
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
@@ -1733,7 +1757,7 @@ void QnMain::run()
             encodeAndStoreAuthKey(authKey);
 
         if (isModified)
-            m_mediaServer = registerServer(ec2Connection, server);
+            m_mediaServer = registerServer(ec2Connection, server, isNewServerInstance);
         else
             m_mediaServer = server;
 
@@ -1769,23 +1793,15 @@ void QnMain::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation;
-    selfInformation.type = moduleName;
+    QnModuleInformation selfInformation = m_mediaServer->getModuleInformation();
     if (!compatibilityMode)
         selfInformation.customization = QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
-    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
-    selfInformation.systemName = qnCommon->localSystemName();
-    selfInformation.name = m_mediaServer->getName();
-    selfInformation.port = MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT ).toInt();
-    //selfInformation.remoteAddresses = ;
-    selfInformation.id = serverGuid();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
-    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
 
     qnCommon->setModuleInformation(selfInformation);
-    updateModuleInfo();
+    qnCommon->bindModuleinformation(m_mediaServer);
 
     m_moduleFinder = new QnModuleFinder( false );
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
@@ -1908,8 +1924,10 @@ void QnMain::run()
 
     loadResourcesFromECS(messageProcessor.data());
     QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-    if (adminUser)
-        connect(adminUser.data(), &QnResource::resourceChanged, this, &QnMain::updateModuleInfo);
+    if (adminUser) {
+        qnCommon->bindModuleinformation(adminUser);
+        qnCommon->updateModuleInformation();
+    }
 
     QnAbstractStorageResourceList storages = m_mediaServer->getStorages();
     QnAbstractStorageResourceList modifiedStorages = createStorages(m_mediaServer);
@@ -2131,21 +2149,6 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
                 }
                 m_updateUserRequests.remove(user->getId());
             } );
-    }
-}
-
-void QnMain::updateModuleInfo()
-{
-    QnModuleInformation moduleInformationCopy = qnCommon->moduleInformation();
-    if (qnResPool) {
-        QnUserResourcePtr admin = qnResPool->getAdministrator();
-        if (admin) {
-            QCryptographicHash md5(QCryptographicHash::Md5);
-            md5.addData(admin->getHash());
-            md5.addData(moduleInformationCopy.systemName.toUtf8());
-            moduleInformationCopy.authHash = md5.result();
-        }
-        qnCommon->setModuleInformation(moduleInformationCopy);
     }
 }
 

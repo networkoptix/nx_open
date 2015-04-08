@@ -183,16 +183,8 @@ static const int MAX_DATA_QUEUE_SIZE = 120;
 
 void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    //QnConstAbstractDataPacketPtr data = nonConstData;
-
-//    NX_LOG("queueSize=", m_dataQueue.size(), cl_logALWAYS);
-//    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-//    NX_LOG(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
-
     QMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(nonConstData);
-    //QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
-    //if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
 
     // quality control
 

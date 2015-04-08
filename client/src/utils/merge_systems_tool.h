@@ -6,8 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-struct QnModuleInformation;
+#include <utils/network/module_information.h>
 
 class QnMergeSystemsTool : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -38,6 +37,7 @@ private slots:
 private:
     QHash<int, QnMediaServerResourcePtr> m_serverByRequestHandle;
     QString m_password;
+    QPair<ErrorCode, QnModuleInformation> m_foundModule;
 };
 
 #endif // MERGE_SYSTEMS_TOOL_H
