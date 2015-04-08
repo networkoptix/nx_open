@@ -41,7 +41,7 @@ namespace QnCompressedTimeDetail {
     template<class Collection, class Output>
     void serialize_collection(const Collection &value, QnCompressedTimeWriter<Output> *stream) {
         stream->writeSizeToStream(static_cast<int>(value.size()));
-
+        stream->resetLastValue();
         for(auto pos = boost::begin(value); pos != boost::end(value); ++pos)
             serialize_collection_element(*pos, stream, typename QnCollection::collection_category<Collection>::type());
     }

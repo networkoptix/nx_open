@@ -26,6 +26,10 @@ public:
             m_stream.write(QnCompressedTime::UNSIGNED_FORMAT, sizeof(QnCompressedTime::UNSIGNED_FORMAT));
     }
 
+    void resetLastValue() {
+        m_lastValue = 0;
+    }
+
     /*
     void writeInt64(qint64 value) 
     {
