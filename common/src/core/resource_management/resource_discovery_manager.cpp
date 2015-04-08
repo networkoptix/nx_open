@@ -182,9 +182,12 @@ void QnResourceDiscoveryManager::run()
 }
 
 static const int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
+static const int MIN_DISCOVERY_SEARCH_MS = 1000 * 15;
 
 void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
+    QElapsedTimer discoveryTime;
+    discoveryTime.restart();
     if( UPNPDeviceSearcher::instance() )
         UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
 
@@ -228,7 +231,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
         }
     }
 
-    m_timer->start( GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS );
+    m_timer->start( qMax(GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS, int(MIN_DISCOVERY_SEARCH_MS - discoveryTime.elapsed()) ));
 }
 
 void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList& resources)
@@ -321,7 +324,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     
     for (auto itr = candidates.begin(); itr != candidates.end(); ++itr)
     {
-        QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(qnResPool->getResourceByUniqId(itr.key()));
+        QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(qnResPool->getResourceByUrl(itr.key()));
         if (!camera || !camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
             cameras.insert(itr.key(), itr.value());
     }
@@ -402,6 +405,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             case DiscoveryMode::partiallyEnabled:
                 if( !qnResPool->getResourceByUniqId(it->first->getUniqueId()) )
                     continue;   //ignoring newly discovered camera
+                it->first->addFlags(Qn::search_upd_only);
                 break;
 
             case DiscoveryMode::disabled:

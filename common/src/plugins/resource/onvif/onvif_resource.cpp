@@ -2175,7 +2175,10 @@ QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
         return QRect();
     }
     onvifXsd__IntRectangleRange* br = response.Options->BoundsRange;
-    return QRect(qMax(0, br->XRange->Min), qMax(0, br->YRange->Min), br->WidthRange->Max, br->HeightRange->Max);
+    QRect result(qMax(0, br->XRange->Min), qMax(0, br->YRange->Min), br->WidthRange->Max, br->HeightRange->Max);
+    if (result.isEmpty())
+        return QRect();
+    return result;
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
@@ -2222,7 +2225,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 
         QRect currentRect(conf->Bounds->x, conf->Bounds->y, conf->Bounds->width, conf->Bounds->height);
         QRect maxRect = getVideoSourceMaxSize(QString::fromStdString(conf->token));
-        m_videoSourceSize = QSize(maxRect.width(), maxRect.height());
+        if (maxRect.isValid())
+            m_videoSourceSize = QSize(maxRect.width(), maxRect.height());
         if (maxRect.isValid() && currentRect != maxRect && !isCameraControlDisabled())
         {
             updateVideoSource(conf, maxRect);

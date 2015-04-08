@@ -272,6 +272,12 @@ namespace ec2
             return saveUserAttributes( serverAttrs, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode saveUserAttributesSync( const QnMediaServerUserAttributesList& serverAttrs) {
+            return impl::doSyncCall<impl::SimpleHandler>( 
+                [=](const impl::SimpleHandlerPtr &handler) { return this->saveUserAttributes(serverAttrs, handler); });
+        }
+
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */

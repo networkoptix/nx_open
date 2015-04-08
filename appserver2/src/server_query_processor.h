@@ -282,7 +282,10 @@ namespace ec2
                 if( errorCode != ErrorCode::ok )
                     return;
                 if (!dbTran->commit())
+                {
+                    errorCode = ErrorCode::dbError;
                     return;
+                }
             }
             else 
             {

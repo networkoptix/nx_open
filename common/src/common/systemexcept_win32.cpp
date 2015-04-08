@@ -31,7 +31,7 @@ public:
 
 static GlobalCrashDumpSettings globalCrashDumpSettingsInstance;
 
-typedef BOOL (*pfMiniDumpWriteDump) (
+typedef BOOL (WINAPI *pfMiniDumpWriteDump) (
     HANDLE,
     DWORD,
     HANDLE,

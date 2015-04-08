@@ -114,8 +114,6 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
-        //NX_LOG("before dec",  cl_logALWAYS);
-
         if (outbuf_len + out_size > (int)result.capacity())
         {
             //Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
@@ -130,8 +128,6 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         // TODO: #vasilenko avoid using deprecated methods
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
-
-        //NX_LOG("after dec",  cl_logALWAYS);
 
         if (len < 0) 
             return false;
