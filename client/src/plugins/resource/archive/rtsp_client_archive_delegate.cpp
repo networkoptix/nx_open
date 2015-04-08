@@ -523,7 +523,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         }
         */
     }
-    if (!result)
+    if (!result && !m_closing)
         reopen();
     if (result) {
         m_lastPacketFlags = result->flags;

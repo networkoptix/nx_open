@@ -145,17 +145,15 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     }
 
     /* Save additional address if needed */
-    if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
-        if (!moduleInformation.remoteAddresses.contains(url.host())) {
-            QUrl simpleUrl;
-            simpleUrl.setScheme(lit("http"));
-            simpleUrl.setHost(url.host());
-            if (url.port() != moduleInformation.port)
-                simpleUrl.setPort(url.port());
-            ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-        }
-        QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
+    if (!moduleInformation.remoteAddresses.contains(url.host())) {
+        QUrl simpleUrl;
+        simpleUrl.setScheme(lit("http"));
+        simpleUrl.setHost(url.host());
+        if (url.port() != moduleInformation.port)
+            simpleUrl.setPort(url.port());
+        ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
+    QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
 
     /* Connect to server if it is compatible */
     if (compatible && QnServerConnector::instance())

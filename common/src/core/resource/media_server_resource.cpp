@@ -18,6 +18,7 @@
 #include "../resource_management/resource_pool.h"
 #include "utils/serialization/lexical.h"
 #include "core/resource/security_cam_resource.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
 #include "nx_ec/ec_proto_version.h"
 
 
@@ -115,15 +116,18 @@ void QnMediaServerResource::setServerName( const QString& name )
     (*lk)->name = name;
 }
 
-void QnMediaServerResource::setApiUrl(const QString& restUrl)
+void QnMediaServerResource::setApiUrl(const QString &apiUrl)
 {
-    QMutexLocker lock(&m_mutex);
-    if (restUrl != m_apiUrl)
     {
-        m_apiUrl = restUrl;
+        QMutexLocker lock(&m_mutex);
+        if (apiUrl == m_apiUrl)
+            return;
+
+        m_apiUrl = apiUrl;
         if (m_restConnection)
             m_restConnection->setUrl(m_apiUrl);
     }
+    emit apiUrlChanged(::toSharedPointer(this));
 }
 
 QString QnMediaServerResource::getApiUrl() const
@@ -147,36 +151,34 @@ QList<QHostAddress> QnMediaServerResource::getNetAddrList() const
 
 void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
-    {
-        QMutexLocker lock(&m_mutex);
-        if (m_additionalUrls == urls)
-            return;
-        m_additionalUrls = urls;
-    }
+    QnUuid id = getId();
+    QList<QUrl> oldUrls = QnServerAdditionalAddressesDictionary::instance()->additionalUrls(id);
+    if (oldUrls == urls)
+        return;
+
+    QnServerAdditionalAddressesDictionary::instance()->setAdditionalUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_additionalUrls;
+    return QnServerAdditionalAddressesDictionary::instance()->additionalUrls(getId());
 }
 
 void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
-    {
-        QMutexLocker lock(&m_mutex);
-        if (m_ignoredUrls == urls)
-            return;
-        m_ignoredUrls = urls;
-    }
+    QnUuid id = getId();
+    QList<QUrl> oldUrls = QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(id);
+    if (oldUrls == urls)
+        return;
+
+    QnServerAdditionalAddressesDictionary::instance()->setIgnoredUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_ignoredUrls;
+    return QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(getId());
 }
 
 quint16 QnMediaServerResource::getPort() const {
@@ -263,21 +265,12 @@ private:
 };
 */
 
-void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
+void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
 {
-    QUrl origApiUrl = getApiUrl();
-    {
-        QMutexLocker lock(&m_mutex);
-    
-        QUrl apiUrl(getApiUrl());
-        apiUrl.setHost(primaryIF);
-        setApiUrl(apiUrl.toString());
-
-        QUrl url(getUrl());
-        url.setHost(primaryIF);
-        setUrl(url.toString());
-    }
-    emit serverIfFound(::toSharedPointer(this), primaryIF, origApiUrl.toString());
+    QString apiScheme = QUrl(getApiUrl()).scheme();
+    QString urlScheme = QUrl(getUrl()).scheme();
+    setApiUrl(lit("%1://%2").arg(apiScheme).arg(primaryAddress.toString()));
+    setUrl(lit("%1://%2").arg(urlScheme).arg(primaryAddress.toString()));
 }
 
 Qn::PanicMode QnMediaServerResource::getPanicMode() const 

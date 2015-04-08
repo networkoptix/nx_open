@@ -36,7 +36,7 @@ public:
     virtual void setName( const QString& name ) override;
     void setServerName( const QString& name );
 
-    void setApiUrl(const QString& restUrl);
+    void setApiUrl(const QString& apiUrl);
     QString getApiUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
@@ -58,7 +58,7 @@ public:
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    void setPrimaryIF(const QString& primaryIF);
+    void setPrimaryAddress(const SocketAddress &primaryAddress);
 
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
@@ -105,7 +105,7 @@ private slots:
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
-    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
+    void apiUrlChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);

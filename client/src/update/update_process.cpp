@@ -347,6 +347,9 @@ void QnUpdateProcess::installIncompatiblePeers() {
     restUpdatePeerTask->setUpdateId(m_id);
     restUpdatePeerTask->setVersion(m_target.version);
     connect(restUpdatePeerTask, &QnNetworkPeerTask::finished,                   this,   &QnUpdateProcess::at_restUpdateTask_finished);
+    connect(restUpdatePeerTask, &QnNetworkPeerTask::peerFinished,               this,   [this](const QnUuid &peerId) {
+        setPeerStage(peerId, QnPeerUpdateStage::Init);
+    });
     connect(restUpdatePeerTask, &QnRestUpdatePeerTask::peerUpdateFinished,      this,   &QnUpdateProcess::at_restUpdateTask_peerUpdateFinished);
     connect(restUpdatePeerTask, &QnNetworkPeerTask::finished,                   restUpdatePeerTask,   &QObject::deleteLater);
     m_currentTask = restUpdatePeerTask;

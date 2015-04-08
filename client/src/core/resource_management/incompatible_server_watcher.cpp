@@ -87,6 +87,25 @@ void QnIncompatibleServerWatcher::stop() {
     }
 }
 
+void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep) {
+    QMutexLocker lock(&m_mutex);
+
+    auto it = m_moduleInformationById.find(id);
+    if (it == m_moduleInformationById.end())
+        return;
+
+    it->keep = keep;
+
+    if (!it->removed)
+        return;
+
+    m_moduleInformationById.erase(it);
+
+    lock.unlock();
+
+    removeResource(getFakeId(id));
+}
+
 void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
@@ -105,7 +124,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
         removeResource(getFakeId(id));
     } else if (status == Qn::Offline) {
         QMutexLocker lock(&m_mutex);
-        QnModuleInformationWithAddresses moduleInformation = m_moduleInformationById.value(id);
+        QnModuleInformationWithAddresses moduleInformation = m_moduleInformationById.value(id).moduleInformation;
         lock.unlock();
         if (!moduleInformation.id.isNull())
             addResource(moduleInformation);
@@ -113,14 +132,30 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
 }
 
 void QnIncompatibleServerWatcher::at_moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive) {
+    QMutexLocker lock(&m_mutex);
+    auto it = m_moduleInformationById.find(moduleInformation.id);
+
     if (!isAlive) {
-        removeResource(getFakeId(moduleInformation.id));
-        QMutexLocker lock(&m_mutex);
+        if (it == m_moduleInformationById.end())
+            return;
+
+        if (it->keep) {
+            it->removed = true;
+            return;
+        }
+
         m_moduleInformationById.remove(moduleInformation.id);
-        return;
+
+        lock.unlock();
+        removeResource(getFakeId(moduleInformation.id));
     } else {
-        QMutexLocker lock(&m_mutex);
-        m_moduleInformationById.insert(moduleInformation.id, moduleInformation);
+        if (it != m_moduleInformationById.end()) {
+            it->removed = false;
+            it->moduleInformation = moduleInformation;
+        } else {
+            m_moduleInformationById.insert(moduleInformation.id, moduleInformation);
+        }
+
         lock.unlock();
         addResource(moduleInformation);
     }

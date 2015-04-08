@@ -277,7 +277,13 @@ class QnTimeSliderChunkPainter {
 public:
     QnTimeSliderChunkPainter(QnTimeSlider *slider, QPainter *painter): 
         m_slider(slider), 
-        m_painter(painter) 
+        m_painter(painter),
+        m_centralPosition(0),
+        m_centralCoordinate(0),
+        m_minChunkLength(0),
+        m_position(0),
+        m_pendingLength(0),
+        m_pendingPosition(0)
     {
         assert(m_painter && m_slider);
 

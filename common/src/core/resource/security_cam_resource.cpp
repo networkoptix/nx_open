@@ -588,11 +588,11 @@ void QnSecurityCamResource::setModel(const QString &model) {
 }
 
 QString QnSecurityCamResource::getFirmware() const {
-    return getProperty(lit("firmware"));
+    return getProperty( Qn::FIRMWARE_PARAM_NAME );
 }
 
 void QnSecurityCamResource::setFirmware(const QString &firmware) {
-    setProperty(lit("firmware"), firmware);
+    setProperty( Qn::FIRMWARE_PARAM_NAME, firmware );
 }
 
 QString QnSecurityCamResource::getVendor() const {

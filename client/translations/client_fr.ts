@@ -106,11 +106,11 @@
     </message>
     <message>
         <source>When</source>
-        <translation type="unfinished"></translation>
+        <translation>Quand</translation>
     </message>
     <message>
         <source>Do</source>
-        <translation type="unfinished"></translation>
+        <translation>Faire</translation>
     </message>
 </context>
 <context>
@@ -232,7 +232,7 @@
     </message>
     <message>
         <source>Discovered Cameras:</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméras Découvertes:</translation>
     </message>
 </context>
 <context>
@@ -371,11 +371,11 @@
     </message>
     <message>
         <source>Warning! Low quality may result in low resolution image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention! Basse qualité peut entraîner une image de basse résolution.</translation>
     </message>
     <message>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Autoriser le système à optimiser les paramètres caméra&quot; est désactivé dans l&apos;administration système.</translation>
     </message>
 </context>
 <context>
@@ -708,7 +708,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Restart required</source>
-        <translation type="unfinished"></translation>
+        <translation>Redémarrage nécessaire</translation>
     </message>
 </context>
 <context>
@@ -826,7 +826,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished">&lt;No image&gt;</translation>
+        <translation>&lt;No image&gt;</translation>
     </message>
 </context>
 <context>
@@ -1413,43 +1413,43 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 uses the following external libraries:</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 utilise les librairies externes suivantes:</translation>
     </message>
     <message>
         <source>OpenGL version</source>
-        <translation type="unfinished"></translation>
+        <translation>Version OpenGL</translation>
     </message>
     <message>
         <source>OpenGL renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendu OpenGL</translation>
     </message>
     <message>
         <source>OpenGL vendor</source>
-        <translation type="unfinished"></translation>
+        <translation>Vendeur OpenGL</translation>
     </message>
     <message>
         <source>OpenGL max texture size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille Texture Max OpenGL</translation>
     </message>
     <message>
         <source>Support</source>
-        <translation type="unfinished">Support</translation>
+        <translation>Support</translation>
     </message>
     <message>
         <source>Server at %2: v%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur à %2: v%1</translation>
     </message>
     <message>
         <source>%1 version %2 (%3).</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 version %2 (%3).</translation>
     </message>
     <message>
         <source>Built for %1-%2 with %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>Construit pour %1-%2 avec %3.</translation>
     </message>
     <message>
         <source>Client is not connected to any server</source>
-        <translation type="unfinished"></translation>
+        <translation>Le Client n&apos;est pas connecté à un serveur</translation>
     </message>
 </context>
 <context>
@@ -2503,10 +2503,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Calibrer le &apos;fisheye&apos;</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>Paramètres de l&apos;image ...</translation>
-    </message>
-    <message>
         <source>Zoom to Selection</source>
         <translation>Zoom sur la sélection</translation>
     </message>
@@ -2517,6 +2513,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Debug Control Panel</source>
         <translation>Panneau de configuration &apos;Debug&apos;</translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation>Paramètres Fichier...</translation>
     </message>
 </context>
 <context>
@@ -2832,11 +2832,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to reset rules to the defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous sûr de vouloir réinitialiser les règles par défaut?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette action NE PEUT PAS être annulée!</translation>
     </message>
 </context>
 <context>
@@ -2978,32 +2978,32 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Examples:</source>
-        <translation type="unfinished"></translation>
+        <translation>Exemples:</translation>
     </message>
     <message>
         <source>Server is offline.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le serveur est hors ligne.</translation>
     </message>
     <message>
         <source>Camera addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;ajout de caméra est seulement possible pour les serveurs en ligne.</translation>
     </message>
     <message numerus="yes">
         <source>%n cameras added successfully.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n caméra ajouté avec succès.</numerusform>
+            <numerusform>%n caméras ajoutées avec succès.</numerusform>
         </translation>
     </message>
     <message>
         <source>It might take a few moments to populate them in the tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cela peut prendre quelques instants pour apparaitre dans l&apos;arbre.</translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n cameras.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Erreur pendant l&apos;ajout de %n caméra.</numerusform>
+            <numerusform>Erreur pendant l&apos;ajout de %n caméras.</numerusform>
         </translation>
     </message>
 </context>
@@ -3033,11 +3033,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please wait while settings are being loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. patientez pendant que la configuration se charge.</translation>
     </message>
     <message>
         <source>This can take a lot of time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceci peut prendre beaucoup de temps.</translation>
     </message>
 </context>
 <context>
@@ -3436,7 +3436,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not connect to Server</source>
-        <translation>Impossible de se connecter au Serveur</translation>
+        <translation>Ne peut pas se connecter au Serveur</translation>
     </message>
     <message>
         <source>Server</source>
@@ -3456,87 +3456,87 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Connection to the Server could not be established.</source>
-        <translation type="unfinished"></translation>
+        <translation>La connexion au serveur ne peut pas être établie.</translation>
     </message>
     <message>
         <source>Connection details that you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les détails de connexion entrés sont incorrects, S.V.P. essayez à nouveau.</translation>
     </message>
     <message>
         <source>If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si l&apos;erreur persiste, S.V.P. contactez votre administrateur VMS.</translation>
     </message>
     <message>
         <source> - Client version: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation> - Version Client: %1.</translation>
     </message>
     <message>
         <source> - Server version: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation> - Version Serveur: %1.</translation>
     </message>
     <message>
         <source>You are about to connect to Server which has a different version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes sur le point de vous connecter sur un serveur d&apos;une version différente:</translation>
     </message>
     <message>
         <source>These versions are not compatible. Please update your %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ces versions ne sont pas compatibles. S.V.P. mettre à jour votre %1.</translation>
     </message>
     <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode compatible pour les versions inférieures à %1 ne sont pas supportés.</translation>
     </message>
     <message>
         <source>Selected Server has a different version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur sélectionné à une version différente:</translation>
     </message>
     <message>
         <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;autre version du Client est nécessaire pour établir une connexion à ce Serveur.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenue en essayant de redémarrer en mode compatible.</translation>
     </message>
     <message>
         <source>Client version %1 is required to connect to this Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Version Client %1 est nécessaire pour connexion à ce Serveur.</translation>
     </message>
     <message>
         <source>Download version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharger version %1?</translation>
     </message>
     <message>
         <source>Would you like to restart the Client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation>Voulez-vous redémarrer le Client en mode compatible?</translation>
     </message>
     <message>
         <source>Cannot restart the Client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas redémarrer le Client en mode compatible.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. fermer l&apos;application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
     </message>
     <message>
         <source>Failed to launch compatibility version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec du lancement de compatibilité version %1</translation>
     </message>
     <message>
         <source>Try to restore version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Essayer de restaurer version %1?</translation>
     </message>
     <message>
         <source>Server has a different version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur a une version différente:</translation>
     </message>
     <message>
         <source>You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous serez invité à redémarrer le client en mode compatibilité.</translation>
     </message>
     <message>
         <source>You will be asked to update your %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous serez invité à mettre à jour votre %1</translation>
     </message>
 </context>
 <context>
@@ -3826,7 +3826,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 times</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 fois</translation>
     </message>
 </context>
 <context>
@@ -3891,22 +3891,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Disable only if the client takes too much CPU</source>
-        <translation type="unfinished"></translation>
+        <translation>Désactiver seulement si le client prend trop de CPU</translation>
     </message>
 </context>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
         <source>Open Alarm/Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Gestionnaire de règles Alarme/Éven</translation>
     </message>
     <message>
         <source>Open Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Journal d&apos;évén</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Liste de caméras</translation>
     </message>
 </context>
 <context>
@@ -3921,7 +3921,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Unsaved changes will be lost. Save the following pages?</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifications non sauvegardées seront perdues. Sauvegarder?</translation>
     </message>
 </context>
 <context>
@@ -4004,7 +4004,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="unfinished">Exportation vers &quot;%1&quot;...</translation>
+        <translation>Exportation vers &quot;%1&quot;...</translation>
     </message>
 </context>
 <context>
@@ -4019,27 +4019,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>&lt;No picture&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;No picture&gt;</translation>
     </message>
     <message>
         <source>&lt;Error while loading picture&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Error while loading picture&gt;</translation>
     </message>
     <message>
         <source>&lt;Error while uploading picture&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Error while uploading picture&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture cannot be read&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Picture cannot be read&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Picture is too big. Maximum size is %1 Mb&gt;</translation>
     </message>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Picture cannot be loaded&gt;</translation>
     </message>
 </context>
 <context>
@@ -4047,7 +4047,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished">Écran %1</translation>
+        <translation>Écran %1</translation>
     </message>
 </context>
 <context>
@@ -4215,41 +4215,41 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>%1 %2</source>
-        <translation type="unfinished">%1% {1 %2?}</translation>
+        <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %2 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Au moins %n %2 est requis</numerusform>
+            <numerusform>Au moins %n %2 sont requis</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %2 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 est en utilisation</numerusform>
+            <numerusform>%n %2 sont en utilisations</numerusform>
         </translation>
     </message>
     <message>
         <source>You do not have a valid license installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous n&apos;avez pas de licence valide installée.</translation>
     </message>
     <message>
         <source>Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. activez votre licence commerciale ou d&apos;essai.</translation>
     </message>
     <message>
         <source>Please activate your commercial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. activez votre licence commerciale.</translation>
     </message>
     <message>
         <source>Network error has occurred during automatic license activation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenue durant l&apos;activation automatique de licence.</translation>
     </message>
     <message>
         <source>Try to activate your license manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Essayez d&apos;activer votre licence manuellement.</translation>
     </message>
 </context>
 <context>
@@ -4379,7 +4379,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to delete this connection: %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous sûr de vouloir effacer cette connexion %1?</translation>
     </message>
 </context>
 <context>
@@ -4442,7 +4442,22 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette option n&apos;affecte pas l&apos;horaire d&apos;enregistrement. L&apos;horaire est toujours basé sur l&apos;heure du Serveur.</translation>
+    </message>
+</context>
+<context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation>Paramètres Fichier</translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation>L&apos;image n&apos;est pas chargée</translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation>Ceci est un fichier lentille &apos;fisheye&apos;</translation>
     </message>
 </context>
 <context>
@@ -4584,15 +4599,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Success!</source>
-        <translation type="unfinished"></translation>
+        <translation>Succès!</translation>
     </message>
     <message>
         <source>The system was configured successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le système a été configuré avec succès.</translation>
     </message>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les serveurs des systèmes distants devraient apparaitre dans votre système sous peu.</translation>
     </message>
 </context>
 <context>
@@ -4685,15 +4700,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnNetworkSpeedStrings</name>
     <message>
         <source>b/s</source>
-        <translation type="unfinished">b/s</translation>
+        <translation>b/s</translation>
     </message>
     <message>
         <source>Kb/s</source>
-        <translation type="unfinished">Kb/s</translation>
+        <translation>Kb/s</translation>
     </message>
     <message>
         <source>Mb/s</source>
-        <translation type="unfinished">Mb/s</translation>
+        <translation>Mb/s</translation>
     </message>
 </context>
 <context>
@@ -4770,7 +4785,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Custom title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Titre Personnalisé:</translation>
     </message>
 </context>
 <context>
@@ -4800,11 +4815,11 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnNotificationToolTipWidget</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished">Fermer</translation>
+        <translation>Fermer</translation>
     </message>
     <message>
         <source>Right Click</source>
-        <translation type="unfinished"></translation>
+        <translation>Clic Droit</translation>
     </message>
 </context>
 <context>
@@ -4863,30 +4878,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnPerformanceTest</name>
     <message>
         <source>Performance of this computer allows running %1 in configuration mode only.</source>
-        <translation type="unfinished"></translation>
+        <translation>La performance de cet ordinateur autorise %1 en mode configuration seulement.</translation>
     </message>
     <message>
         <source>For full-featured mode please use another computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour le mode &apos;Toutes fonctions&apos;, S.V.P. utilisez un autre ordinateur.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">Attention</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>Paramètres de l&apos;image</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>L&apos;image n&apos;est pas chargée</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>Ceci est une lentille &apos;fisheye&apos;</translation>
+        <translation>Attention</translation>
     </message>
 </context>
 <context>
@@ -4917,15 +4917,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Settings file is read-only. Please contact your system administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier de config. est en lecture seul. S.V.P. contactez votre administrateur de système.</translation>
     </message>
     <message>
         <source>All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous les changements seront perdus à la fermeture du programme.</translation>
     </message>
     <message>
         <source>Settings cannot be saved. Please contact your system administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Config. ne peut pas être sauvé. S.V.P. contactez votre administrateur système.</translation>
     </message>
 </context>
 <context>
@@ -4967,23 +4967,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>This preset is used in some tours.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce préréglage est utilisé dans certains tours.</translation>
     </message>
     <message>
         <source>These tours will become invalid if you remove it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ces tours seront invalides si vous l&apos;enlevez.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenue en essayant d&apos;obtenir la position de la caméra %1.</translation>
     </message>
     <message>
         <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. attendez que la caméra soit en ligne.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenue en essayant de régler la position de la caméra %1.</translation>
     </message>
 </context>
 <context>
@@ -5458,27 +5458,27 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes sur le point de lancer la resynchronisation d&apos;archive.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation type="unfinished"></translation>
+        <translation>ATTENTION! L&apos;usage de disque dur va augmenter durant le processus de resynchronisation! Selon la taille totale d&apos;archive, cela pourrait prendre plusieurs heures.</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce processus est nécessaire seulement si le dossier d&apos;archive a été déplacé, renommé ou remplacé. Vous pouvez annuler la reconstruction à n&apos;importe quel moment sans perte de données.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous sûr que vous voulez continuer?</translation>
     </message>
     <message>
         <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Reconstruction de l&apos;index d&apos;archive pour le stockage %1 en progrès</translation>
     </message>
     <message>
         <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
-        <translation type="unfinished"></translation>
+        <translation>Balayage rapide d&apos;archive pour stockage %1 en progrès </translation>
     </message>
 </context>
 <context>
@@ -5768,23 +5768,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Cannot cancel update at this state.</source>
-        <translation type="unfinished">Impossible d&apos;annuler la MàJ dans cet état.</translation>
+        <translation>Impossible d&apos;annuler la MàJ dans cet état.</translation>
     </message>
     <message>
         <source>Please wait until update is finished</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. attendez que la MàJ se termine</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas redémarrer le client.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. fermer l&apos;application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
     </message>
     <message>
         <source>Check for updates automatically</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier les MàJ automatiquement</translation>
     </message>
 </context>
 <context>
@@ -5858,11 +5858,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Are you sure you want to reset motion regions to the defaults?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous sûr de vouloir réinitialiser les régions de mouvement par défaut?</translation>
     </message>
     <message>
         <source>This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette action NE PEUT PAS être annulée!</translation>
     </message>
 </context>
 <context>
@@ -6001,19 +6001,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Windows Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation>Réseau Windows de partage ressouce</translation>
     </message>
     <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
     </message>
     <message>
         <source>Coldstore Network Storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Stockage réseau &apos;ColdStore&apos;</translation>
     </message>
     <message>
         <source>coldstore://&lt;Address&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>coldstore://&lt;Address&gt;</translation>
     </message>
 </context>
 <context>
@@ -6097,115 +6097,115 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnTimeSlider</name>
     <message>
         <source>NO THUMBNAILS AVAILABLE</source>
-        <translation type="unfinished"></translation>
+        <translation>AUCUNE VIGNETTE DISPONIBLE</translation>
     </message>
     <message>
         <source>auto</source>
         <comment>AM/PM usage based on user&apos;s system locale.</comment>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">auto</translation>
+        <translation>auto</translation>
     </message>
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">s</translation>
+        <translation></translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished">M</translation>
+        <translation></translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM</source>
         <comment>Format for displaying days on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
         <comment>Format for displaying day caption in timeline&apos;s header.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
         <comment>Format for displaying month caption in timeline&apos;s header.</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
         <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6681,49 +6681,49 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message numerus="yes">
         <source>These %n cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n caméra auto-découverte.</numerusform>
+            <numerusform>%n caméras sont auto-découverte.</numerusform>
         </translation>
     </message>
     <message>
         <source>They may be auto-discovered again after removing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Elles peuvent être &apos;auto-découvertes&apos; à nouveau après les avoirs enlevées.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous sûr que vous voulez les supprimer?</translation>
     </message>
     <message numerus="yes">
         <source>%n of these %1 cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n de ces %1 caméras est &apos;auto-découverte&apos;.</numerusform>
+            <numerusform>%n de ces %1 caméras sont &apos;auto-découvertes&apos;.</numerusform>
         </translation>
     </message>
     <message>
         <source>An error has occurred while trying to delete a resource from Server. </source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenue en essayant de supprimer une ressource du Serveur. </translation>
     </message>
     <message>
         <source>Error description: &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Description de l&apos;erreur:&apos;%1&apos;</translation>
     </message>
     <message>
         <source>Cannot restart the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas redémarrer le client.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. fermer l&apos;application et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
     </message>
     <message>
         <source>Picture is too big. Maximum size is %1 Mb</source>
-        <translation type="unfinished"></translation>
+        <translation>Picture is too big. Maximum size is %1 Mb</translation>
     </message>
     <message>
         <source>Error while uploading picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de l&apos;envoi de l&apos;image.</translation>
     </message>
 </context>
 <context>
@@ -6950,10 +6950,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Coin inférieur droit (Transcodage nécessaire)</translation>
     </message>
     <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>Transcode vidéo pour garantir &quot;WYSIWYG&quot;</translation>
-    </message>
-    <message>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
         <translation>Le format AVI n&apos;est pas recommandé pour l&apos;exportation d&apos;enregistrement &apos;non continu&apos; quand la piste audio est présente. Voulez-vous continuer?</translation>
     </message>
@@ -6975,19 +6971,23 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes sur le point d&apos;exporter une séquence vidéo plus longue que 30 minutes.</translation>
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plus de 1Go d&apos;espace disque peut être requis et selon la vitesse de votre connexion, cela peut prendre plusieurs minutes à compléter.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Voulez-vous continuer?</translation>
     </message>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes sur le point d&apos;exporter plusieurs séquences vidéos avec un total plus long que 30 minutes.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation>Appliquer Filtres: Rotation, Dérouler, Amélioration d&apos;image, Aspect Personnalisé (requiers transcodes)</translation>
     </message>
 </context>
 <context>
@@ -7030,19 +7030,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Authentication failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d&apos;Authentification.</translation>
     </message>
     <message>
         <source>Please, check the password you have entered.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P., vérifier le mot de passe que vous avez entré.</translation>
     </message>
     <message>
         <source>Could not update the selected servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas faire la MàJ des serveurs sélectionnées.</translation>
     </message>
     <message>
         <source>You can try to update the servers again in the System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous pouvez essayer de faire la MàJ serveur à nouveau dans l&apos;Administration Système.</translation>
     </message>
 </context>
 <context>
@@ -7147,12 +7147,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>yyyy MMM dd</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Live</source>
         <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Direct</translation>
     </message>
 </context>
 <context>
@@ -7175,15 +7175,15 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenue en essayant d&apos;obtenir la position de la caméra %1.</translation>
     </message>
     <message>
         <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. attendez que la caméra soit en ligne.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenue en essayant de régler la position de la caméra %1.</translation>
     </message>
 </context>
 <context>
@@ -7289,11 +7289,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Please update %1 Client.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P. faites la MàJ Client %1.</translation>
     </message>
     <message>
         <source>New version %1 is available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvelle version %1 disponible.</translation>
     </message>
 </context>
 <context>
@@ -7425,19 +7425,19 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Could not start control session.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas démarrer la session contrôle.</translation>
     </message>
     <message>
         <source>Another user is already controlling this screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Un autre usager contrôle déjà cet écran.</translation>
     </message>
     <message>
         <source>Are you sure you want to stop the Video Wall?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous sûr que vous voulez arrêter le mur vidéo?</translation>
     </message>
     <message>
         <source>You&apos;ll have to start it manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous devrez le démarrer manuellement.</translation>
     </message>
 </context>
 <context>
@@ -7992,7 +7992,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>(recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>(recommandé)</translation>
     </message>
 </context>
 <context>

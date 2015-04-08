@@ -182,12 +182,11 @@ Recorders QnRecordingManager::findRecorders(const QnResourcePtr& res) const
     return m_recordMap.value(res);
 }
 
-QnServerStreamRecorder* QnRecordingManager::createRecorder(const QnResourcePtr &res, QnVideoCamera* camera, QnServer::ChunksCatalog catalog)
+QnServerStreamRecorder* QnRecordingManager::createRecorder(const QnResourcePtr &res, const QnAbstractMediaStreamDataProviderPtr& reader, 
+                                                           QnServer::ChunksCatalog catalog, const QnDualStreamingHelperPtr& dualStreamingHelper)
 {
-    const QnAbstractMediaStreamDataProviderPtr& reader = camera->getLiveReader(catalog);
-    if (reader == 0)
-        return 0;
     QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, catalog, reader.data());
+    recorder->setDualStreamingHelper(dualStreamingHelper);
     recorder->setTruncateInterval(RECORDING_CHUNK_LEN);
     reader->addDataProcessor(recorder);
     reader->setNeedKeyData();
@@ -419,60 +418,36 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
 
 void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
 {
-    const QnResourcePtr& res = cameraRes;
+    if (cameraRes->hasFlags(Qn::foreigner) && !m_recordMap.contains(cameraRes))
+        return;
+
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(cameraRes);
+    if (!camera)
+        return;
+
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
 
-    //if (cameraRes->getMotionType() == MT_SoftwareGrid)
+    m_mutex.lock();
+    Recorders& recorders = m_recordMap[cameraRes];
+    m_mutex.unlock(); // todo: refactor it. I've just keep current logic
 
+    if (!recorders.dualStreamingHelper)
+        recorders.dualStreamingHelper = QnDualStreamingHelperPtr(new QnDualStreamingHelper());
 
-    if (camera)
-    {
-        QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(res);
-        if (itrRec != m_recordMap.end())
-        {
-            Recorders& recorders = itrRec.value();
-            if (recorders.recorderHiRes)
-                recorders.recorderHiRes->updateCamera(cameraRes);
+    if (providerHi && !recorders.recorderHiRes)
+        recorders.recorderHiRes = createRecorder(cameraRes, providerHi, QnServer::HiQualityCatalog, recorders.dualStreamingHelper);
+    if (providerLow && !recorders.recorderLowRes)
+        recorders.recorderLowRes = createRecorder(cameraRes, providerLow, QnServer::LowQualityCatalog, recorders.dualStreamingHelper);
 
-            if (recorders.recorderHiRes && providerLow && !recorders.recorderLowRes)
-            {
-                recorders.recorderLowRes = createRecorder(res, camera, QnServer::LowQualityCatalog);
-                if (recorders.recorderLowRes)
-                    recorders.recorderLowRes->setDualStreamingHelper(recorders.recorderHiRes->getDualStreamingHelper());
-            }
-            if (recorders.recorderLowRes)
-                recorders.recorderLowRes->updateCamera(cameraRes);
-
-            startOrStopRecording(res, camera, recorders.recorderHiRes, recorders.recorderLowRes);
-        }
-        else if (!cameraRes->hasFlags(Qn::foreigner))
-        {
-            QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnServer::HiQualityCatalog);
-            QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnServer::LowQualityCatalog);
-
-            if (!recorderHiRes && !recorderLowRes)
-                return;
-            
-            QnDualStreamingHelperPtr dialStreamingHelper(new QnDualStreamingHelper());
-            if (recorderHiRes)
-                recorderHiRes->setDualStreamingHelper(dialStreamingHelper);
-            if (recorderLowRes)
-                recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
-
-            m_mutex.lock();
-            m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
-            m_mutex.unlock();
-
-            if (recorderHiRes)
-                recorderHiRes->updateCamera(cameraRes);
-            if (recorderLowRes)
-                recorderLowRes->updateCamera(cameraRes);
-
-            startOrStopRecording(res, camera, recorderHiRes, recorderLowRes);
-        }
+    if (cameraRes->isInitialized()) {
+        if (recorders.recorderHiRes)
+            recorders.recorderHiRes->updateCamera(cameraRes);
+        if (recorders.recorderLowRes)
+            recorders.recorderLowRes->updateCamera(cameraRes);
     }
+
+    startOrStopRecording(cameraRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
 }
 
 void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource)
@@ -518,8 +493,7 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         camera->setDataProviderFactory(QnServerDataProviderFactory::instance());
-        if (camera->isInitialized())
-            updateCamera(camera);
+        updateCamera(camera);
     }
 }
 
