@@ -102,7 +102,7 @@ struct MultiServerPeriodData
     QnTimePeriodList periods;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData, (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time));
+QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData, (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time)(eq));
 
 Q_DECLARE_METATYPE(QnTimePeriodList);
 Q_DECLARE_METATYPE(MultiServerPeriodDataList);

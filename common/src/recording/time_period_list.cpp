@@ -6,7 +6,7 @@
 #include <utils/serialization/compressed_time_functions.h>
 
 QN_FUSION_ADAPT_STRUCT(MultiServerPeriodData, (guid)(periods))
-QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((MultiServerPeriodData), (json)(ubjson)(xml)(csv_record)(compressed_time))
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((MultiServerPeriodData), (json)(ubjson)(xml)(csv_record)(compressed_time)(eq))
 
 namespace {
     static const qint64 InvalidValue = INT64_MAX;
