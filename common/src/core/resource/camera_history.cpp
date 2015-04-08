@@ -69,7 +69,7 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
 
     if (notify)
         if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
-            emit cameraHistoryInvalidated(camera);
+            emit cameraFootageChanged(camera);
 }
 
 bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback) {
@@ -149,8 +149,6 @@ void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHist
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
             emit cameraHistoryChanged(camera);
-
-    lock.relock();
 }
 
 QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid &cameraId) const {
@@ -160,11 +158,12 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid
     for(auto itr = m_archivedCamerasByServer.cbegin(); itr != m_archivedCamerasByServer.cend(); ++itr) {
         const auto &data = itr.value();
         if (std::find(data.cbegin(), data.cend(), cameraId) != data.cend()) {
-            QnMediaServerResourcePtr mServer = toMediaServer(itr.key());
-            if (mServer)
-                result << mServer;
+            QnMediaServerResourcePtr server = toMediaServer(itr.key());
+            if (server)
+                result << server;
         }
     }
+
     return result;
 }
 
@@ -181,15 +180,18 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirt
     const auto& moveData = itr.value();
     if (moveData.empty())
         return QnMediaServerResourceList();
-    auto itr2 = getMediaServerOnTimeInternal(moveData, timePeriod.startTimeMs);
-    Q_ASSERT(itr2 != moveData.end());
+
+    auto itr2 = getMediaServerOnTimeInternal(moveData, timePeriod.startTimeMs);   
+    /* itr2 can be empty in case when the timePeriod starts after the last camera movement. */
+
     QSet<QnMediaServerResourcePtr> result;
     while (itr2 != moveData.end() && itr2->timestampMs < timePeriod.endTimeMs()) {
-        QnMediaServerResourcePtr mServer = toMediaServer(itr2->serverGuid);
-        if (mServer)
-            result << mServer;
+        QnMediaServerResourcePtr server = toMediaServer(itr2->serverGuid);
+        if (server)
+            result << server;
         ++itr2;
     }
+
     return result.toList();
 }
 

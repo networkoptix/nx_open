@@ -117,7 +117,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(discardCacheTimer, &QTimer::timeout, m_cameraDataManager, &QnCameraDataManager::clearCache);
     discardCacheTimer->start();
 
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryInvalidated, this, [this](const QnVirtualCameraResourcePtr &camera) {
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
         if (hasWidgetWithCamera(camera))
             updateHistoryForCamera(camera);
     });

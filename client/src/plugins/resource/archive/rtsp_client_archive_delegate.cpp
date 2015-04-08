@@ -73,6 +73,31 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_auth.username = QnAppServerConnectionFactory::url().userName();
     m_auth.password = QnAppServerConnectionFactory::url().password();
     m_auth.videowall = QnAppServerConnectionFactory::videowallGuid();
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
+        /* Ignore camera history if fixed server is set. */
+        if (m_fixedServer || !m_isMultiserverAllowed)
+            return;
+
+        /* Ignore other cameras changes. */
+        if (camera != m_camera)
+            return;
+
+        if (m_server != getServerOnTime(m_position))
+            reopen();
+    });
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
+        /* Ignore camera history if fixed server is set. */
+        if (m_fixedServer || !m_isMultiserverAllowed)
+            return;
+
+        /* Ignore other cameras changes. */
+        if (camera != m_camera)
+            return;
+
+        checkMinTimeFromOtherServer(m_camera);
+    });
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &camera)
@@ -81,7 +106,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &ca
         return;
 
     m_camera = camera;
-    m_server = qnResPool->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    m_server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
     setupRtspSession(camera, m_server, &m_rtspSession, m_playNowModeAllowed);
 }
 
@@ -107,7 +132,7 @@ QString QnRtspClientArchiveDelegate::getUrl(const QnVirtualCameraResourcePtr &ca
     // if camera is null we can't get its parent in any case
     QnMediaServerResourcePtr server = (_server || (!camera))
         ? _server 
-        : qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+        : camera->getParentResource().dynamicCast<QnMediaServerResource>();
     if (!server)
         return QString();
     QString url = server->getUrl() + QLatin1Char('/');
@@ -183,7 +208,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 timeUsec) {
     if (!m_camera)
         return QnMediaServerResourcePtr();
-    QnMediaServerResourcePtr currentServer = qnResPool->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr currentServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
 
     if (timeUsec == DATETIME_NOW)
         return currentServer;
