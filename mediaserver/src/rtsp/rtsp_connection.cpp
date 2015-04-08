@@ -439,22 +439,22 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     return layout ? layout->channelCount() : -1;
 }
 
-QByteArray QnRtspConnectionProcessor::getRangeStr(QnArchiveStreamReader* archiveDP)
+QByteArray QnRtspConnectionProcessor::getRangeStr()
 {
     Q_D(QnRtspConnectionProcessor);
     QByteArray range;
-    if (archiveDP) 
+    if (d->archiveDP) 
     {
-        qint64 archiveEndTime = archiveDP->endTime();
-        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()); // && !endTimeInFuture;
+        qint64 archiveEndTime = d->archiveDP->endTime();
+        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
             range = "npt=";
-            if (archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
+            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += "now";
             else
-                range += QByteArray::number(archiveDP->startTime());
+                range += QByteArray::number(d->archiveDP->startTime());
 
             range += "-";
             if (endTimeIsNow)
@@ -466,15 +466,15 @@ QByteArray QnRtspConnectionProcessor::getRangeStr(QnArchiveStreamReader* archive
         {
             // use 'clock' attrubute. see RFC 2326
             range = "clock=";
-            if (archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
+            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             else
-                range += QDateTime::fromMSecsSinceEpoch(archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             range += "-";
-            if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
+            if (QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()))
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
             else
-                range += QDateTime::fromMSecsSinceEpoch(archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
         }
     }
     return range;
@@ -487,7 +487,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     if (d->archiveDP && !d->archiveDP->offlineRangeSupported())
         d->archiveDP->open();
 
-    QByteArray range = getRangeStr(d->archiveDP.data());
+    QByteArray range = getRangeStr();
     if (!range.isEmpty())
     {
         nx_http::insertOrReplaceHeader(
@@ -1502,4 +1502,10 @@ bool QnRtspConnectionProcessor::isTcpMode() const
 {
     Q_D(const QnRtspConnectionProcessor);
     return d->tcpMode;
+}
+
+QSharedPointer<QnArchiveStreamReader> QnRtspConnectionProcessor::getArchiveDP()
+{
+    Q_D(QnRtspConnectionProcessor);
+    return d->archiveDP;
 }
