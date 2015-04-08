@@ -1814,23 +1814,15 @@ void QnMain::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation;
-    selfInformation.type = moduleName;
+    QnModuleInformation selfInformation = m_mediaServer->getModuleInformation();
     if (!compatibilityMode)
         selfInformation.customization = QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
-    selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
-    selfInformation.systemName = qnCommon->localSystemName();
-    selfInformation.name = m_mediaServer->getName();
-    selfInformation.port = MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT ).toInt();
-    //selfInformation.remoteAddresses = ;
-    selfInformation.id = serverGuid();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
-    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
 
     qnCommon->setModuleInformation(selfInformation);
-    updateModuleInfo();
+    qnCommon->bindModuleinformation(m_mediaServer);
 
     m_moduleFinder = new QnModuleFinder( false );
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
@@ -1860,7 +1852,9 @@ void QnMain::run()
     QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
         nx_ms_conf::RESOURCE_INIT_THREADS_COUNT,
         nx_ms_conf::DEFAULT_RESOURCE_INIT_THREADS_COUNT ).toInt() );
-
+    QnResource::initAsyncPoolInstance()->setExpiryTimeout(-1); // default experation timeout is 30 second. But it has a bug in QT < v.5.3
+    QThreadPool::globalInstance()->setExpiryTimeout(-1);
+    
     //============================
     std::unique_ptr<UPNPDeviceSearcher> upnpDeviceSearcher(new UPNPDeviceSearcher());
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
@@ -1953,8 +1947,10 @@ void QnMain::run()
 
     loadResourcesFromECS(messageProcessor.data());
     QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-    if (adminUser)
-        connect(adminUser.data(), &QnResource::resourceChanged, this, &QnMain::updateModuleInfo);
+    if (adminUser) {
+        qnCommon->bindModuleinformation(adminUser);
+        qnCommon->updateModuleInformation();
+    }
 
     typedef ec2::Ec2StaticticsReporter stats;
     bool adminParamsChanged = false;
@@ -2207,21 +2203,6 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
                 }
                 m_updateUserRequests.remove(user->getId());
             } );
-    }
-}
-
-void QnMain::updateModuleInfo()
-{
-    QnModuleInformation moduleInformationCopy = qnCommon->moduleInformation();
-    if (qnResPool) {
-        QnUserResourcePtr admin = qnResPool->getAdministrator();
-        if (admin) {
-            QCryptographicHash md5(QCryptographicHash::Md5);
-            md5.addData(admin->getHash());
-            md5.addData(moduleInformationCopy.systemName.toUtf8());
-            moduleInformationCopy.authHash = md5.result();
-        }
-        qnCommon->setModuleInformation(moduleInformationCopy);
     }
 }
 

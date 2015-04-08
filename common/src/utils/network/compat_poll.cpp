@@ -23,7 +23,7 @@ static const size_t USEC_PER_MS = 1000;
         - SOCKET_ERROR - an error occurred. Call the WSAGetLastError function to retrieve the extended error code
     \note Implementation is very inefficient! (same as select, actually)
 */
-int pollOverSelectWin32(
+int WINAPI pollOverSelectWin32(
     pollfd fdarray[],
     ULONG nfds,
     INT timeout )
@@ -93,8 +93,6 @@ int pollOverSelectWin32(
 
     return pollResult;
 }
-
-
 
 
 PollFuncType getPollFuncAddress()
