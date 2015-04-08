@@ -52,10 +52,27 @@ angular.module('webadminApp')
                     hightlightChunkColor:'rgb(192,192,192)',
                     loadingChunkColor:'rgb(200,200,200)',
 
-                    timeMarkerColor:'blue'
+                    timeMarkerColor:'blue',
+                    dateFormat:'dd.mm.yyyy',
+                    timeFormat:'HH:MM:ss'
                 };
 
+                scope.$watch('position', function(newValue, oldValue){
+                    var lastCoord = scope.positionCoordinate;
+                    scope.positionCoordinate = dateToScreenPosition(scope.position).toFixed(1);
 
+//                    console.log("positionCoordinate ",timeMarker,lastCoord,scope.positionCoordinate);
+
+                    if(scope.positionCoordinate != lastCoord){
+
+                        console.log("positionCoordinate ",timeMarker,lastCoord,scope.positionCoordinate);
+                        timeMarker.css("left",scope.positionCoordinate + "px");
+                    }
+
+                    var date = new Date(scope.position);
+                    scope.playingDate = dateFormat(date, timelineConfig.dateFormat);
+                    scope.playingTime= dateFormat(date, timelineConfig.timeFormat);
+                });
                 var chunksVertStart = timelineConfig.topLabelHeight +
                     5 * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize
                     + timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * 3
@@ -67,8 +84,10 @@ angular.module('webadminApp')
                 var viewportWidth = element.find('.viewport').width();
                 var containerHeight = element.find('.viewport').height();
 
+
                 var frame = element.find('.frame');
                 var scroll = element.find('.scroll');
+                var timeMarker = element.find(".timeMarker");
 
                 var canvas = element.find('canvas').get(0);
                 canvas.width  = viewportWidth;
@@ -435,13 +454,12 @@ angular.module('webadminApp')
                     context.strokeStyle = timelineConfig.timeMarkerColor;
                     context.fillStyle = timelineConfig.timeMarkerColor;
 
-                    var position = dateToScreenPosition(scope.position);
+
+
                     context.beginPath();
-                    context.moveTo(position, 0);
-                    context.lineTo(position, canvas.height);
+                    context.moveTo(scope.positionCoordinate, 0);
+                    context.lineTo(scope.positionCoordinate, canvas.height);
                     context.stroke();
-
-
 
                 }
                 function drawRuler(){
