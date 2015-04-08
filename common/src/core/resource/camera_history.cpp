@@ -28,11 +28,15 @@ namespace {
         });
 
         /* Check exact match. */
-        if (iter->timestampMs == timestamp)
+        if (iter != data.cend() && iter->timestampMs == timestamp)
             return iter;
 
+        /* Check if the first data is already greater than required. */
+        if (iter == data.cbegin())
+            return data.cend();
+
         /* Otherwise get previous server. */
-        if (std::distance(data.cbegin(), iter) > 1)
+        if (data.cbegin() != iter)
             --iter;
 
         return iter;
