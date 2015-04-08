@@ -22,7 +22,7 @@ QnAbstractCameraDataPtr QnTimePeriodCameraData::clone() const {
 }
 
 bool QnTimePeriodCameraData::isEmpty() const {
-    return m_data.isEmpty();
+    return m_data.empty();
 }
 
 void QnTimePeriodCameraData::append(const QnAbstractCameraDataPtr &other) {
@@ -35,25 +35,29 @@ void QnTimePeriodCameraData::append(const QList<QnAbstractCameraDataPtr> &other)
     if (other.isEmpty())
         return;
 
-    QVector<QnTimePeriodList> allPeriods;
-    allPeriods << m_data;
+    std::vector<QnTimePeriodList> allPeriods;
+    allPeriods.push_back(m_data);
 
-    foreach (const QnAbstractCameraDataPtr &other_data, other)
+    for (const QnAbstractCameraDataPtr &other_data: other) {
         if (other_data)
-            allPeriods << other_data->dataSource();
+            allPeriods.push_back(other_data->dataSource());
+    }
     m_data = QnTimePeriodList::mergeTimePeriods(allPeriods);
 }
 
 void QnTimePeriodCameraData::append(const QnTimePeriodList &other) {
-    if (other.isEmpty())
+    if (other.empty())
         return;
 
     /* Check if the current last piece marked as Live. */ 
-    QVector<QnTimePeriodList> allPeriods;
-    if (!m_data.isEmpty() && m_data.last().durationMs == -1) 
-        if (other.last().startTimeMs >= m_data.last().startTimeMs)
-            m_data.removeLast();    //cut "recording" piece
-    allPeriods << m_data << other;
+    if (!m_data.empty() && m_data.rbegin()->durationMs == -1) {
+        if (other.rbegin()->startTimeMs >= m_data.rbegin()->startTimeMs)
+            m_data.pop_back();    //cut "recording" piece
+    }
+    std::vector<QnTimePeriodList> allPeriods;
+    for(const auto& p: m_data)
+        allPeriods.push_back(p);
+    allPeriods.push_back(other);
     m_data = QnTimePeriodList::mergeTimePeriods(allPeriods); // union data
 }
 
@@ -75,19 +79,18 @@ QnTimePeriodList QnTimePeriodCameraData::dataSource() const  {
 }
 
 bool QnTimePeriodCameraData::trim(qint64 trimTime) {
-    if(m_data.isEmpty())
+    if(m_data.empty())
         return false;
 
-    QnTimePeriod period = m_data.last();
+    QnTimePeriod& period = *m_data.rbegin();
     if(period.durationMs != -1)
         return false;
 
     qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
-    period.durationMs = trimmedDurationMs;
-    if(period.durationMs == 0) {
+    if(trimmedDurationMs == 0) {
         m_data.pop_back();
     } else {
-        m_data.back() = period;
+        period.durationMs = trimmedDurationMs;
     }
 
     return true;

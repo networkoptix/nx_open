@@ -120,9 +120,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnMediaServerUserAttributesPtr>();
     qRegisterMetaType<QnMediaServerUserAttributesList>();
 
-    qRegisterMetaType<QnCameraHistoryList>();
-    qRegisterMetaType<QnCameraHistoryItemPtr>();
-
     qRegisterMetaType<QnCameraBookmark>();
     qRegisterMetaType<QnCameraBookmarkList>();
     qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");/* The underlying type is identical to QStringList. */
@@ -230,7 +227,10 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ApiResourceParamWithRefDataList");
 
     qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
-    qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamDataList");
+    qRegisterMetaType<ec2::ApiResourceParamDataList>("ApiResourceParamDataList");
+    qRegisterMetaType<ec2::ApiServerFootageDataList>("ec2::ApiServerFootageDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryData>("ec2::ApiCameraHistoryData");
+    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
 
     qRegisterMetaType<QnUuid>( "QnUuid" );
     qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );

@@ -190,7 +190,7 @@ namespace ec2
         m_resourceManager->triggerNotification( tran );
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran ) {
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiServerFootageData>& tran ) {
         return m_cameraManager->triggerNotification( tran );
     }
 

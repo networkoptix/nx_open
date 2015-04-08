@@ -29,7 +29,7 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = NULL);
+    QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
 
     /**
      * Creates a new time period loader for the given camera resource. Returns NULL
@@ -39,11 +39,14 @@ public:
      * \param parent                    Parent object for the loader to create.
      * \returns                         Newly created time period loader.
      */
-    static QnGenericCameraDataLoader *newInstance(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
+    static QnGenericCameraDataLoader *newInstance(const QnMediaServerResourcePtr &server, const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
     
     virtual int load(const QnTimePeriod &timePeriod, const QString &filter, const qint64 resolutionMs) override;
 
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;
+
+protected:
+    QnVirtualCameraResourcePtr camera() const;
 
 private slots:
     void at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle);

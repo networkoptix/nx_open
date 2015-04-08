@@ -1289,7 +1289,7 @@ int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
         return Qn::MainWindow_Thumbnails_Help;
     bool hasMotion = false;
     for (int i = 0; i < m_lineCount; i++) {
-        if (!timePeriods(i, Qn::MotionContent).isEmpty()) {
+        if (!timePeriods(i, Qn::MotionContent).empty()) {
             hasMotion = true;
             break;
         }

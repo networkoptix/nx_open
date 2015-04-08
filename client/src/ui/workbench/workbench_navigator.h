@@ -200,6 +200,9 @@ protected slots:
 private:
     QnCachingCameraDataLoader* loaderByWidget(const QnResourceWidget* widget);
 
+    bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
+    void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
+
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
@@ -255,6 +258,9 @@ private:
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 
     QnCameraDataManager* m_cameraDataManager;
+
+    /** Set of cameras, for which history was not loaded and should be updated again. */
+    QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

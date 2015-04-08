@@ -2,14 +2,17 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include "utils/common/log.h"
-#include "nx_ec/dummy_handler.h"
-#include "nx_ec/ec_api.h"
-#include "common/common_module.h"
-#include "module_finder.h"
-#include "api/app_server_connection.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource_management/resource_pool.h"
+// #include "utils/common/log.h"
+// #include "nx_ec/dummy_handler.h"
+// #include "nx_ec/ec_api.h"
+
+#include <api/app_server_connection.h>
+#include <common/common_module.h>
+
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <utils/network/module_finder.h>
 
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),
@@ -47,4 +50,15 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     if (!result.addr.isNull())
         result.gatewayId = routeVia; // route gateway is found
     return result;
+}
+
+void QnRouter::updateRequest(QUrl& url, nx_http::HttpHeaders& headers, const QnUuid &id)
+{
+    QnRoute route = routeTo(id);
+    if (route.isValid()) 
+    {
+        url.setHost(route.addr.address.toString());
+        url.setPort(route.addr.port);
+        headers.emplace("x-server-guid", id.toByteArray());
+    }
 }

@@ -47,6 +47,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::BnsFormat,         "bns")
     (Qn::CsvFormat,         "csv")
     (Qn::XmlFormat,         "xml")
+    (Qn::CompressedPeriodsFormat, "periods")
 )
 
 

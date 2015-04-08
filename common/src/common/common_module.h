@@ -5,6 +5,8 @@
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
+#include <core/resource/resource_fwd.h>
+
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
@@ -58,6 +60,9 @@ public:
 
     void setRemoteGUID(const QnUuid& guid);
     QnUuid remoteGUID() const;
+
+    /** Server we are currently connected to. */
+    QnMediaServerResourcePtr currentServer() const;
 
     QUrl moduleUrl() const { return m_url; }
     void setModuleUlr(const QUrl& url) { m_url = url; }

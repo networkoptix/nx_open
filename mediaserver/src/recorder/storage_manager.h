@@ -20,6 +20,7 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include "utils/common/uuid.h"
+#include <set>
 #include "api/model/rebuild_archive_reply.h"
 
 class QnAbstractMediaStreamDataProvider;
@@ -111,6 +112,11 @@ public:
     void initDone();
     int getStorageIndex(const QnStorageResourcePtr& storage);
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
+
+    /*
+    * Return camera list with existing archive. Camera Unique ID is used as camera ID
+    */
+    std::vector<QnUuid> getCamerasWithArchive() const;
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
@@ -127,7 +133,7 @@ private:
     int detectStorageIndex(const QString& path);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
-    void getTimePeriodInternal(QVector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
+    void getTimePeriodInternal(std::vector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
 
@@ -149,6 +155,7 @@ private:
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
+    void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;
     void testStoragesDone();
 private:
     StorageMap m_storageRoots;

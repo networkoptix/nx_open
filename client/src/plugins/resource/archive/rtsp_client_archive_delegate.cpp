@@ -74,6 +74,31 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_auth.username = QnAppServerConnectionFactory::url().userName();
     m_auth.password = QnAppServerConnectionFactory::url().password();
     m_auth.videowall = QnAppServerConnectionFactory::videowallGuid();
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
+        /* Ignore camera history if fixed server is set. */
+        if (m_fixedServer || !m_isMultiserverAllowed)
+            return;
+
+        /* Ignore other cameras changes. */
+        if (camera != m_camera)
+            return;
+
+        if (m_server != getServerOnTime(m_position))
+            reopen();
+    });
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
+        /* Ignore camera history if fixed server is set. */
+        if (m_fixedServer || !m_isMultiserverAllowed)
+            return;
+
+        /* Ignore other cameras changes. */
+        if (camera != m_camera)
+            return;
+
+        checkMinTimeFromOtherServer(m_camera);
+    });
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &camera)
@@ -82,7 +107,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &ca
         return;
 
     m_camera = camera;
-    m_server = qnResPool->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    m_server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
     setupRtspSession(camera, m_server, &m_rtspSession, m_playNowModeAllowed);
 }
 
@@ -101,17 +126,14 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
         return QnMediaServerResourcePtr();
     if (m_fixedServer)
         return QnMediaServerResourcePtr();
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
-    if (!history)
-        return QnMediaServerResourcePtr();
-    return history->getNextMediaServerAndPeriodOnTime(time, m_serverTimePeriod, m_rtspSession.getScale() >= 0);
+    return qnCameraHistoryPool->getNextMediaServerAndPeriodOnTime(camera, time, m_rtspSession.getScale() >= 0, &m_serverTimePeriod);
 }
 
 QString QnRtspClientArchiveDelegate::getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &_server) const {
     // if camera is null we can't get its parent in any case
     QnMediaServerResourcePtr server = (_server || (!camera))
         ? _server 
-        : qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+        : camera->getParentResource().dynamicCast<QnMediaServerResource>();
     if (!server)
         return QString();
     QString url = server->getUrl() + QLatin1Char('/');
@@ -163,23 +185,19 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
         return;
     }
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
-    if (!history) {
+    QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera);
+    /* Check if no archive available on any server. */
+    if (mediaServerList.isEmpty()) {
         QMutexLocker lock(&m_timeMutex);
         m_globalMinArchiveTime = AV_NOPTS_VALUE;
         return;
     }
 
-    QnServerHistoryMap mediaServerList = history->getOnlineTimePeriods();
     QList<ArchiveTimeCheckInfo> checkList;
     qint64 currentMinTime  = AV_NOPTS_VALUE;
     qint64 otherMinTime  = AV_NOPTS_VALUE;
-    for (const QnUuid &serverId: mediaServerList.values().toSet()) 
-    {
-        QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverId));
-        if (server)
-            checkList << ArchiveTimeCheckInfo(camera, server, this, server == m_server ? &currentMinTime : &otherMinTime);
-    }
+    for (const auto &server: mediaServerList)
+        checkList << ArchiveTimeCheckInfo(camera, server, this, server == m_server ? &currentMinTime : &otherMinTime);
     QtConcurrent::blockingFilter(checkList, checkGlobalMinTime);
     QMutexLocker lock(&m_timeMutex);
     if ((otherMinTime != AV_NOPTS_VALUE) && (currentMinTime == AV_NOPTS_VALUE || otherMinTime < currentMinTime))
@@ -191,18 +209,14 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 timeUsec) {
     if (!m_camera)
         return QnMediaServerResourcePtr();
-    QnMediaServerResourcePtr currentServer = qnResPool->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr currentServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
 
     if (timeUsec == DATETIME_NOW)
         return currentServer;
 
     qint64 timeMs = timeUsec / 1000;
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(m_camera);
-    if (!history)
-        return currentServer;
-
-    QnMediaServerResourcePtr mediaServer = history->getMediaServerAndPeriodOnTime(timeMs, m_serverTimePeriod, false);
+    QnMediaServerResourcePtr mediaServer = qnCameraHistoryPool->getMediaServerOnTime(m_camera, timeMs, &m_serverTimePeriod);
     if (!mediaServer)
         return currentServer;
     

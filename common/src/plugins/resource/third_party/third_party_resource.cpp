@@ -316,7 +316,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         nxcip::UsecUTCTimestamp periodEnd = nxcip::INVALID_TIMESTAMP_VALUE;
         timePeriods->get( &periodStart, &periodEnd );
 
-        resultTimePeriods << QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS );
+        resultTimePeriods.push_back(QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS ));
     }
     timePeriods->releaseRef();
 
@@ -643,7 +643,14 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
             if( QnCameraAdvacedParamsXmlParser::validateXml(&dataSource)) {
                 //parsing xml to load param list and get cameraID
                 QnCameraAdvancedParams params;
-				if (QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params))
+                bool success = QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params);
+#ifdef _DEBUG
+                if (!success) {
+                    qWarning() << "Error while parsing xml for the camera" << getPhysicalId();
+                    qWarning() << paramDescXML;
+                }
+#endif
+				if (success)
                     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), params);
             }
             else {

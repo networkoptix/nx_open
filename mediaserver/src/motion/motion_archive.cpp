@@ -236,10 +236,15 @@ QnTimePeriodList QnMotionArchive::matchPeriod(const QRegion& region, qint64 msSt
                         break;
                     }
 
-                    if (!rez.isEmpty() && fullStartTime <= rez.last().startTimeMs + rez.last().durationMs + detailLevel)
-                        rez.last().durationMs = qMax(rez.last().durationMs, i->duration + fullStartTime - rez.last().startTimeMs);
-                    else
+                    if (rez.empty())
                         rez.push_back(QnTimePeriod(fullStartTime, i->duration));
+                    else {
+                        QnTimePeriod& last = *(rez.end()-1);
+                        if (fullStartTime <= last.startTimeMs + last.durationMs + detailLevel)
+                            last.durationMs = qMax(last.durationMs, i->duration + fullStartTime - last.startTimeMs);
+                        else
+                            rez.push_back(QnTimePeriod(fullStartTime, i->duration));
+                    }
                 }
                 curData += MOTION_DATA_RECORD_SIZE;
                 ++i;

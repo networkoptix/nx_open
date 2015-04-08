@@ -24,6 +24,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
+#include "core/resource/camera_history.h"
 
 QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NULL */):
     base_type(parent),
@@ -75,11 +76,7 @@ QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const
     if (time == DATETIME_NOW)
         return currentServer;
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
-    if (!history)
-        return currentServer;
-
-    QnMediaServerResourcePtr mediaServer = history->getMediaServerOnTime(time, false);
+    QnMediaServerResourcePtr mediaServer = qnCameraHistoryPool->getMediaServerOnTime(camera, time);
     if (!mediaServer)
         return currentServer;
 

@@ -62,6 +62,7 @@
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
+#include <core/resource/camera_history.h>
 
 //TODO: #Elric remove
 #include <camera/loaders/caching_camera_data_loader.h>

@@ -14,6 +14,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
@@ -251,8 +252,13 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
     }
 }
 
-void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourcePtr &camera, qint64 usecsSinceEpoch) {
-    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(camera, usecsSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
+void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, 
+                                                           const QnVirtualCameraResourcePtr &camera, 
+                                                           const QnMediaServerResourcePtr &server, 
+                                                           qint64 msecSinceEpoch) {
+    QnSingleThumbnailLoader *loader = new QnSingleThumbnailLoader(camera,
+        server,
+        msecSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
     item->setImageProvider(loader);
 }
 
@@ -262,6 +268,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
+
+    QnMediaServerResourcePtr source = qnResPool->getResourceById(params.sourceServerId).dynamicCast<QnMediaServerResource>();
 
     if(m_list->itemCount() >= maxNotificationItems)
         return; /* Just drop the notification if we already have too many of them in queue. */
@@ -287,6 +295,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     switch (eventType) {
     case QnBusiness::CameraMotionEvent: {
+        qint64 timestampMs = params.eventTimestampUsec / 1000;
         QIcon icon = soundAction 
             ? qnSkin->icon("events/sound.png") 
             : qnSkin->icon("events/camera.png");
@@ -294,9 +303,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             icon,
             tr("Browse Archive"),
             Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.eventTimestamp/1000)
+            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, timestampMs)
         );
-        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), params.eventTimestamp);
+        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), source, timestampMs);
         break;
     }
     case QnBusiness::CameraInputEvent: {
@@ -309,7 +318,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>());
+        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), source);
         break;
     }
     case QnBusiness::CameraDisconnectEvent: {
@@ -319,7 +328,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>());
+        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), source);
         break;
     }
     case QnBusiness::StorageFailureEvent: {
@@ -338,7 +347,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>());
+        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), source);
         break;
     }
     case QnBusiness::CameraIpConflictEvent: {
@@ -591,7 +600,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
 
         QnBusinessEventParameters params;
         params.eventType = eventType;
-        params.eventTimestamp = (quint64)QDateTime::currentMSecsSinceEpoch() * 1000ull;
+        params.eventTimestampUsec = (quint64)QDateTime::currentMSecsSinceEpoch() * 1000ull;
         switch(eventType) {
         case QnBusiness::CameraMotionEvent: {
                 if (!sampleCamera)

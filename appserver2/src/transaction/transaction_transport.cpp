@@ -232,7 +232,7 @@ void QnTransactionTransport::fillAuthInfo()
         QUrl url = QnAppServerConnectionFactory::url();
         m_httpClient->setUserName(url.userName());
 		if (dbManager) {
-	        QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
+	        QnUserResourcePtr adminUser = qnResPool->getAdministrator();
 	        if (adminUser) {
 	            m_httpClient->setUserPassword(adminUser->getDigest());
 	            m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);

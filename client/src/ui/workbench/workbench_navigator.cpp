@@ -27,6 +27,7 @@ extern "C"
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_history.h>
 
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
@@ -60,6 +61,12 @@ extern "C"
 #include "camera/thumbnails_loader.h"
 #include "plugins/resource/archive/abstract_archive_stream_reader.h"
 #include "redass/redass_controller.h"
+
+namespace {
+
+    const int cameraHistoryRetryTimeoutMs = 5 * 1000;
+
+}
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     base_type(parent),
@@ -111,6 +118,23 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     discardCacheTimer->setSingleShot(false);
     connect(discardCacheTimer, &QTimer::timeout, m_cameraDataManager, &QnCameraDataManager::clearCache);
     discardCacheTimer->start();
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
+        if (hasWidgetWithCamera(camera))
+            updateHistoryForCamera(camera);
+    });
+
+    QTimer* updateCameraHistoryTimer = new QTimer(this);
+    updateCameraHistoryTimer->setInterval(cameraHistoryRetryTimeoutMs);
+    updateCameraHistoryTimer->setSingleShot(false);
+    connect(updateCameraHistoryTimer, &QTimer::timeout, this, [this] {
+        QSet<QnVirtualCameraResourcePtr> localQueue = m_updateHistoryQueue;
+        for (const QnVirtualCameraResourcePtr &camera: localQueue)
+            if (hasWidgetWithCamera(camera))
+                updateHistoryForCamera(camera);
+        m_updateHistoryQueue.clear();
+    });
+    updateCameraHistoryTimer->start();
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -497,6 +521,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
 
     updateCurrentWidget();
     updateSyncedPeriods();
+    updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>());
 }
 
 void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
@@ -514,6 +539,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
      * and is therefore perfectly safe. */
     m_syncedResources.erase(m_syncedResources.find(widget->resource()->toResourcePtr()));
     m_motionIgnoreWidgets.remove(widget);
+    m_updateHistoryQueue.remove(widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>());
 
     if(QnCachingCameraDataLoader *loader = loaderByWidget(widget))
         loader->setMotionRegions(QList<QRegion>());
@@ -608,14 +634,14 @@ void QnWorkbenchNavigator::jumpBackward() {
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
         
-        if (!periods.isEmpty()) {
+        if (!periods.empty()) {
             qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
 
             if (currentTime == DATETIME_NOW) {
-                pos = periods.last().startTimeMs * 1000;
+                pos = periods.rbegin()->startTimeMs * 1000;
             } else {
                 QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime/1000, true);
-                itr = qMax(itr - 1, periods.constBegin());
+                itr = qMax(itr - 1, periods.cbegin());
                 pos = itr->startTimeMs * 1000;
                 if (reader->isReverseMode() && itr->durationMs != -1)
                     pos += itr->durationMs * 1000;
@@ -647,10 +673,10 @@ void QnWorkbenchNavigator::jumpForward() {
 
         qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000;
         QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
-        if (itr != periods.constEnd())
+        if (itr != periods.cend())
             ++itr;
         
-        if (itr == periods.constEnd()) {
+        if (itr == periods.cend()) {
             /* Do not make step forward to live if we are playing backward. */
             if (reader->isReverseMode())
                 return;
@@ -1058,7 +1084,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent type) {
         }
     }
 
-    QVector<QnTimePeriodList> periodsList;
+    std::vector<QnTimePeriodList> periodsList;
     foreach(QnCachingCameraDataLoader *loader, loaders)
         periodsList.push_back(loader->periods(type));
 
@@ -1231,7 +1257,7 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
         aspectRatio /= QnGeometry::aspectRatio(m_centralWidget->channelLayout()->size());
 
         if(QnCachingCameraDataLoader *loader = loaderByWidget(m_centralWidget)) {
-            if(!loader->periods(Qn::RecordingContent).isEmpty())
+            if(!loader->periods(Qn::RecordingContent).empty())
                 resource = m_centralWidget->resource();
         } else if(m_currentMediaWidget && !m_currentMediaWidget->display()->isStillImage()) {
             resource = m_centralWidget->resource();
@@ -1696,4 +1722,25 @@ void QnWorkbenchNavigator::setBookmarkTags(const QnCameraBookmarkTags &tags) {
 
     m_bookmarksSearchWidget->lineEdit()->setCompleter(completer);
     m_bookmarkTagsCompleter.reset(completer);
+}
+
+bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const {
+    QnUuid cameraId = camera->getId();
+    return std::any_of(m_syncedWidgets.cbegin(), m_syncedWidgets.cend(), [cameraId](const QnMediaResourceWidget *widget)
+        { return widget->resource()->toResourcePtr()->getId() == cameraId; });
+}
+
+void QnWorkbenchNavigator::updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera) {
+    if (!camera)
+        return;
+
+    m_updateHistoryQueue.remove(camera);
+
+    if (qnCameraHistoryPool->isCameraHistoryValid(camera))
+        return;
+
+    qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera] (bool success) {
+        if (!success)
+            m_updateHistoryQueue.insert(camera);
+    });
 }

@@ -171,7 +171,7 @@ namespace {
                     result.eventType = (QnBusiness::EventType) toInt(field);
                     break;
                 case EventTimestampParam:
-                    result.eventTimestamp = toInt64(field);
+                    result.eventTimestampUsec = toInt64(field);
                     break;
                 case EventResourceParam:
                     result.eventResourceId = QnUuid(field);
@@ -380,7 +380,7 @@ bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
         "event_resource_guid, action_resource_guid) "
         "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_guid, :toggle_state, :aggregation_count, :event_type, :event_resource_guid, :action_resource_guid);");
 
-    qint64 timestampUsec = action->getRuntimeParams().eventTimestamp;
+    qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
     
     QnBusinessEventParameters actionRuntime = action->getRuntimeParams();

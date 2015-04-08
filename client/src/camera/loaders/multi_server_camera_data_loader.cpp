@@ -4,10 +4,12 @@
 #include <camera/data/abstract_camera_data.h>
 #include <camera/loaders/generic_camera_data_loader.h>
 
+#include <core/resource_management/resource_pool.h>
+
 #include <core/resource/network_resource.h>
-#include "core/resource/media_server_resource.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/camera_history.h"
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
 
 namespace {
     QAtomicInt qn_multiHandle(1);
@@ -15,15 +17,12 @@ namespace {
 
 // ------------------------------------------ QnMultiServerCameraDataLoader ----------------------------------------
 
-QnMultiServerCameraDataLoader::QnMultiServerCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
+QnMultiServerCameraDataLoader::QnMultiServerCameraDataLoader(const QnVirtualCameraResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
     QnAbstractCameraDataLoader(resource, dataType, parent)
 {}
 
-QnMultiServerCameraDataLoader *QnMultiServerCameraDataLoader::newInstance(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent) {
-    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (resource);
-    if (netRes == NULL)
-        return NULL;
-    return new QnMultiServerCameraDataLoader(netRes, dataType, parent);
+QnMultiServerCameraDataLoader *QnMultiServerCameraDataLoader::newInstance(const QnVirtualCameraResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent) {
+    return new QnMultiServerCameraDataLoader(resource, dataType, parent);
 }
 
 int QnMultiServerCameraDataLoader::load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
@@ -35,8 +34,8 @@ int QnMultiServerCameraDataLoader::load(const QnTimePeriod &period, const QStrin
     QList<int> handles;
     
     // sometime camera moved between servers. Get all servers for requested time period
-    QnNetworkResourcePtr camera = m_resource.dynamicCast<QnNetworkResource>();
-    QnResourceList serverList = QnCameraHistoryPool::instance()->getAllCameraServers(camera, period);
+    QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
+    QnResourceList serverList = qnCameraHistoryPool->getCameraFootageData(camera, period);
     foreach(const QnResourcePtr& server, serverList) {
         int handle = loadInternal(server.dynamicCast<QnMediaServerResource>(), camera, period, filter, resolutionMs);
         if (handle > 0)
@@ -56,7 +55,7 @@ void QnMultiServerCameraDataLoader::discardCachedData(const qint64 resolutionMs)
         loader->discardCachedData(resolutionMs);
 }
 
-int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
+int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &server, const QnVirtualCameraResourcePtr &camera, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
     if (!server || server->getStatus() != Qn::Online)
         return -1;
 

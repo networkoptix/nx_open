@@ -5,7 +5,7 @@
 #include <camera/data/bookmark_camera_data.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_bookmark.h>
 
@@ -22,7 +22,7 @@ namespace {
     const int minOverlapDuration = 40*1000;
 }
 
-QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
+QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
     QnAbstractCameraDataLoader(camera, dataType, parent),
     m_connection(connection)
 {
@@ -33,7 +33,7 @@ QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnecti
         qnNullWarning(camera);
 }
 
-QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera,  Qn::CameraDataType dataType, QObject *parent) {
+QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaServerResourcePtr &server, const QnVirtualCameraResourcePtr &camera,  Qn::CameraDataType dataType, QObject *parent) {
     if (!server || !camera)
         return NULL;
     
@@ -43,6 +43,11 @@ QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaS
 
     return new QnGenericCameraDataLoader(serverConnection, camera, dataType, parent);
 }
+
+QnVirtualCameraResourcePtr QnGenericCameraDataLoader::camera() const {
+    return m_resource.dynamicCast<QnVirtualCameraResource>();
+}
+
 
 int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QString &filter, const qint64 resolutionMs) {
     if (filter != m_filter)
@@ -79,7 +84,7 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
 
     /* Try to reduce duration of the period to load. */
     QnTimePeriod periodToLoad = timePeriod;
-    if (!loadedPeriodList.isEmpty())
+    if (!loadedPeriodList.empty())
     {
         QnTimePeriodList::const_iterator itr = qUpperBound(loadedPeriodList.cbegin(), loadedPeriodList.cend(), periodToLoad.startTimeMs);
         if (itr != loadedPeriodList.cbegin())
@@ -134,7 +139,7 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
     case Qn::MotionTimePeriod: 
     case Qn::BookmarkTimePeriod:
         return m_connection->getTimePeriodsAsync(
-            QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
+            camera(),
             periodToLoad.startTimeMs, 
             periodToLoad.startTimeMs + periodToLoad.durationMs, 
             1, 
@@ -152,7 +157,7 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
             bookmarkFilter.text = m_filter;
 
             return m_connection->getBookmarksAsync( 
-                m_resource.dynamicCast<QnNetworkResource>(),
+                camera(),
                 bookmarkFilter,
                 this,
                 SLOT(at_bookmarksReceived(int, const QnCameraBookmarkList &, int))
@@ -185,27 +190,29 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
 
     // limit the loaded period to the right edge of the loaded data
     if(!loadedData->isEmpty())
-        newPeriod.durationMs = qMin(newPeriod.durationMs, loadedData->dataSource().last().endTimeMs() - newPeriod.startTimeMs);
+        newPeriod.durationMs = qMin(newPeriod.durationMs, loadedData->dataSource().rbegin()->endTimeMs() - newPeriod.startTimeMs);
 
     // union loaded time range info 
     if(newPeriod.durationMs > 0) {
         QnTimePeriodList newPeriods;
         newPeriods.push_back(newPeriod);
 
-        QVector<QnTimePeriodList> allLoadedPeriods;
-        allLoadedPeriods << loadedPeriods << newPeriods;
+        std::vector<QnTimePeriodList> allLoadedPeriods;
+        for (const auto& p: loadedPeriods)
+            allLoadedPeriods.push_back(p);
+        allLoadedPeriods.push_back(newPeriods);
 
         loadedPeriods = QnTimePeriodList::mergeTimePeriods(allLoadedPeriods); 
     }
 
     // reduce right edge of loaded period info if last period under writing now
-    if (!loadedPeriods.isEmpty() && !loadedData->isEmpty() && loadedData->dataSource().last().durationMs == -1)
+    if (!loadedPeriods.empty() && !loadedData->isEmpty() && loadedData->dataSource().rbegin()->durationMs == -1)
     {
-        qint64 lastDataTime = loadedData->dataSource().last().startTimeMs;
-        while (!loadedPeriods.isEmpty() && loadedPeriods.last().startTimeMs > lastDataTime)
+        qint64 lastDataTime = loadedData->dataSource().rbegin()->startTimeMs;
+        while (!loadedPeriods.empty() && loadedPeriods.rbegin()->startTimeMs > lastDataTime)
             loadedPeriods.pop_back();
-        if (!loadedPeriods.isEmpty()) {
-            QnTimePeriod& lastPeriod = loadedPeriods.last();
+        if (!loadedPeriods.empty()) {
+            QnTimePeriod& lastPeriod = *loadedPeriods.rbegin();
             lastPeriod.durationMs = qMin(lastPeriod.durationMs, lastDataTime - lastPeriod.startTimeMs);
         }
     }

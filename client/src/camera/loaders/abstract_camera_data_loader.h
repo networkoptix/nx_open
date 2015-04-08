@@ -30,9 +30,9 @@ public:
     virtual int load(const QnTimePeriod &period, const QString &filter = QString(), const qint64 resolutionMs = 1) = 0;
 
     /**
-     * \returns                         Resource that this loader works with.
+     * \returns                         Resource that this loader works with (camera or archive).
      */
-    QnResourcePtr resource() const { return m_resource; }
+    QnResourcePtr resource() const;
 
     /**
      * Discards cached data, if any.
