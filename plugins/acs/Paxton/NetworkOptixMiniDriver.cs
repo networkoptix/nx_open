@@ -33,6 +33,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
     }
 
     public class NetworkOptixMiniDriver : IOemDvrMiniDriver {
+        private static readonly int PLAY_OFFSET_MS = 5000;
         private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static IPlugin axHDWitness;
@@ -48,7 +49,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         #region Implementation of IDvrMiniDriver
 
         public string GetSupplierIdentity() {
-            const string supplierIdentity = @"NxWitness";
+            const string supplierIdentity = CustomProperties.displayProductName;
 
             _logger.InfoFormat("Queried supplier Oem DVR: {0}", supplierIdentity);
             return supplierIdentity;
@@ -153,9 +154,12 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                         DateTime localTime = startTime.AddMilliseconds((endTime - startTime).TotalMilliseconds / 2);
                         DateTime serverTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(Convert.ToInt64(currentTime.value));
                         timeOffset = (serverTime - localTime).TotalMilliseconds;
+                        timeOffset -= PLAY_OFFSET_MS;
 
                         // Add timeoffset to tick
                         _tick += (long)timeOffset;
+
+                        MessageBox.Show(String.Format("Offset {0}", timeOffset));
 
                         Api.ConnectInfo connectInfo = LoadData<Api.ConnectInfo>(url.ToString() + "ec2/connect", cnInfo.UserId, cnInfo.Password);
 
@@ -177,7 +181,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                             axHDWitness = LoadAssembly(assemblyName);
                             axHDWitnessForm = (Control)axHDWitness;
                         }
-                        catch (Exception e) {
+                        catch (Exception) {
                             string message = String.Format("You need to install the package version {0}.{1}.{2} to connect to this server.",
                                 serverVersion.Major, serverVersion.Minor, serverVersion.Build);
                             MessageBox.Show(message, "Error", MessageBoxButtons.OK);
