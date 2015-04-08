@@ -50,10 +50,8 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) = 0;
-    //!Get socket address
+    //!Get local address, socket is bound to
     virtual SocketAddress getLocalAddress() const = 0;
-    //!Get peer address
-    virtual SocketAddress getPeerAddress() const = 0;
     //!Close socket
     virtual void close() = 0;
     //!Returns true, if socket has been closed previously with \a AbstractSocket::close call
@@ -433,7 +431,11 @@ public:
         Difference from \a AbstractCommunicatingSocket::connect() method is this method does not enable filtering incoming datagrams by (\a foreignAddress, \a foreignPort),
             and \a AbstractCommunicatingSocket::connect() does
     */
-    virtual bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort ) = 0;
+    virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) = 0;
+    //TODO #ak drop following method
+    bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort ) {
+        return setDestAddr( SocketAddress( foreignAddress, foreignPort ) );
+    }
     //!Send the given \a buffer as a datagram to the specified address/port
     /*!
         \param buffer buffer to be written
@@ -463,15 +465,13 @@ public:
     /*!
         \param buffer buffer to receive data
         \param bufferLen maximum number of bytes to receive
-        \param sourceAddress address of datagram source
-        \param sourcePort port of data source
+        \param sourceAddress If not \a nullptr datagram source endpoint is stored here
         \return number of bytes received and -1 in case of error
     */
     virtual int recvFrom(
         void* buffer,
         unsigned int bufferLen,
-        QString& sourceAddress,
-        unsigned short& sourcePort ) = 0;
+        SocketAddress* const sourceAddress ) = 0;
     //!Returns address of previous datagram read with \a AbstractCommunicatingSocket::recv or \a AbstractDatagramSocket::recvFrom
     virtual SocketAddress lastDatagramSourceAddress() const = 0;
     //!Checks, whether data is available for reading in non-blocking mode. Does not block for timeout, returns immediately

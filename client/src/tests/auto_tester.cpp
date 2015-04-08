@@ -15,6 +15,7 @@ namespace {
     int defaultTestPeriod = 1000;
 }
 
+/* This module is inner and therefore should not be translatable. */
 QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     QObject(parent),
     m_state(Initial),
@@ -28,9 +29,9 @@ QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     bool showHelp = false;
 
     QnCommandLineParser parser;
-    parser.addParameter(&m_timeout,                 "--test-timeout",               NULL, tr("Time to wait before finishing the test, in milliseconds. Default is %1.").arg(defaultAutoTesterTimeout));
-    parser.addParameter(&m_resourceSearchString,    "--test-resource-substring",    NULL, tr("Substring that must be present in one of the resources."));
-    parser.addParameter(&showHelp,                  "--test-help",                  NULL, tr("Show this help screen."), true);
+    parser.addParameter(&m_timeout,                 "--test-timeout",               NULL, lit("Time to wait before finishing the test, in milliseconds. Default is %1.").arg(defaultAutoTesterTimeout));
+    parser.addParameter(&m_resourceSearchString,    "--test-resource-substring",    NULL, lit("Substring that must be present in one of the resources."));
+    parser.addParameter(&showHelp,                  "--test-help",                  NULL, lit("Show this help screen."), true);
 
     bool valid = parser.parse(argc, argv, stderr);
     if(valid) {
@@ -83,10 +84,10 @@ void QnAutoTester::at_timer_timeout() {
 
     if(m_succeeded || QDateTime::currentMSecsSinceEpoch() - m_startTime > m_timeout) {
         if(m_succeeded) {
-            m_message = tr("All tests completed successfully.\n");
+            m_message = lit("All tests completed successfully.\n");
         } else {
             if(needsTesting(ResourceSubstring))
-                m_message += tr("Test for resource substring '%1' failed.\n").arg(m_resourceSearchString);
+                m_message += lit("Test for resource substring '%1' failed.\n").arg(m_resourceSearchString);
         }
 
         m_state = Finished;

@@ -8,9 +8,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation></translation>
+        <source>There is no system tray on this system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -40,11 +43,6 @@ Application will now quit.</source>
     </message>
     <message>
         <source>Could not access installed services</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
         <translation></translation>
     </message>
     <message>
@@ -110,6 +108,10 @@ Application will now quit.</source>
     <message>
         <source>Media Server Web Page</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

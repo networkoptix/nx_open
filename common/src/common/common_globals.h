@@ -32,7 +32,7 @@ namespace Qn
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
-            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+            StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             ServerFlag CameraStatusFlag)
     Q_FLAGS(Borders Corners
             ResourceFlags
@@ -146,6 +146,14 @@ public:
 
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
+
+    enum RebuildState {
+        RebuildState_Unknown     = 0,
+        RebuildState_None        = 1,
+        RebuildState_FullScan    = 2,
+        RebuildState_PartialScan = 3
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RebuildState)
 
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
@@ -292,6 +300,7 @@ public:
 
         parent_change = 0x800000,       /**< Camera discovery internal purpose */
         depend_on_parent_status = 0x1000000,   /**< Resource status depend on parent resource status */
+        search_upd_only = 0x2000000,   /**< Disable to insert new resource during discovery process, allow update only */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -350,8 +359,8 @@ public:
     enum CameraDataType {
         RecordedTimePeriod,
         MotionTimePeriod,
-        BookmarkTimePeriod,
-        BookmarkData,
+        BookmarkTimePeriod, /// Used for retreiving general time periods of bookmarks
+        BookmarkData,       /// Used for retreiving bookmarks data
 
         CameraDataTypeCount
     };
@@ -639,7 +648,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
-        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType), 
+        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState),
     (metatype)(lexical)
 )
 

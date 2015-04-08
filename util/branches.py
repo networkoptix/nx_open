@@ -6,10 +6,24 @@ import sys
 import argparse
 from datetime import datetime
 from datetime import timedelta
+from itertools import groupby
 from common_module import init_color,info,green,warn,err,separator
 
 tooOld = timedelta(days = 30)
-all_branches = False
+verbose = False
+
+class Branch():
+    def __init__(self, name, rev, hash, active):
+        self.name = name
+        self.rev = rev
+        self.hash = hash
+        self.active = active
+        self.user = ''
+        self.date = datetime.now()
+        self.age = self.date - self.date
+        
+    def __str__(self):
+        return self.name
 
 def check_branches():
     output = subprocess.check_output("hg branches", shell=True)
@@ -18,18 +32,19 @@ def check_branches():
 
     for row in output.split('\n'):
         if ':' in row:
-            key, value = row.split(':')
+            key, hash = row.split(':')
             name, rev = key.split()
             if name == 'default':
                 continue
-            branch = {'name' : name, 'rev' : rev, 'hash': value, 'inactive': False }
-            if '(' in value:
-                branch['hash'] = value.split('(')[0].strip()
-                branch['inactive'] = True
+            branch = Branch(name, rev, hash, True)
+            branch = Branch(name, rev, hash, True)
+            if '(' in hash:
+                branch.hash = hash.split('(')[0].strip()
+                branch.active = False
             result.append(branch)
 
     for branch in result:
-        log = "hg log -r " + branch['rev'] + ' --template "date:{date|shortdate}\\nuser:{author}"'
+        log = "hg log -r " + branch.rev + ' --template "date:{date|shortdate}\\nuser:{author}"'
         info = subprocess.check_output(log, shell=True)
         for row in info.split('\n'):
             if 'user:' in row:
@@ -37,42 +52,46 @@ def check_branches():
                 user = value.strip()
                 if '<' in user:
                     user = user.split('<')[0].strip()
-                branch['user'] = user
+                branch.user = user
             if 'date:' in row:
                 dateStr = row[5:].strip()
                 date = datetime.strptime(dateStr, "%Y-%m-%d")
                 age = curDate - date
-                branch['date'] = date
-                branch['age'] = age
+                branch.date = date
+                branch.age = age
+  
+    userKey = lambda branch: branch.user
+    result.sort(key=userKey)
+    return groupby(result, userKey)
 
-    result.sort(key=lambda branch: (branch['user'], branch['inactive']))
-    return result
-
-def print_branches(branches):
+def print_branches(grouped_branches):
     prevUser = ''
 
-    for branch in branches:           
-        if prevUser != branch['user']:
-            if prevUser != '':
-                separator()
-            prevUser = branch['user']
-            info(prevUser)
+    for user, branches_iter in grouped_branches:           
+        branches = [i for i in branches_iter if verbose or not i.active or i.age > tooOld]
+        if len(branches) == 0:
+            continue
+            
+        if prevUser != '':
             separator()
-        branch_name = str(branch['name']).ljust(40)
-        if branch['inactive']:
-            err(branch_name + '(INACTIVE)')
-        elif branch['age'] > tooOld:
-            warn(branch_name + '(TOO OLD: ' + str(branch['age'].days) + ' days)')
-        elif all_branches == True:
-            info(branch_name)
+        prevUser = user
+        info(user)
+        for branch in sorted(branches, key = lambda x: not x.active):
+            branch_name = str(branch.name).ljust(40)
+            if not branch.active:
+                err(branch_name + '(INACTIVE)')
+            elif branch.age > tooOld:
+                warn(branch_name + '(TOO OLD: ' + str(branch.age.days) + ' days)')
+            elif verbose == True:
+                info(branch_name)
     
 def main(): 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-a', '--all', action='store_true', help="show all branches (including valid)")
+    parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
     parser.add_argument('-c', '--color', action='store_true', help="colorized output")
     args = parser.parse_args()
-    global all_branches
-    all_branches = args.all
+    global verbose
+    verbose = args.verbose
 
     if args.color:
         init_color()    

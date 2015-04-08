@@ -287,7 +287,7 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
-    int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
+    static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
     bool resoulutionOK =  videoData->width * videoData->height <= maxSquare || !m_forcedMotionStream.isEmpty();
 
     if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && resoulutionOK)
@@ -454,8 +454,12 @@ void QnLiveStreamProvider::extractMediaStreamParams(
     switch( videoData->compressionType )
     {
         case CODEC_ID_H264:
-            if( customStreamParams )
-                extractSpsPps( videoData, customStreamParams );
+            extractSpsPps(
+                videoData,
+                (videoData->width > 0 && videoData->height > 0)
+                    ? nullptr   //taking resolution from sps only if video frame does not already contain it
+                    : newResolution,
+                customStreamParams );
 
         case CODEC_ID_MPEG2VIDEO:
             if( videoData->width > 0 && videoData->height > 0 )
@@ -591,6 +595,7 @@ namespace
 
 void QnLiveStreamProvider::extractSpsPps(
     const QnCompressedVideoDataPtr& videoData,
+    QSize* const newResolution,
     std::map<QString, QString>* const customStreamParams )
 {
     //vector<pair<nalu buf, nalu size>>
@@ -619,10 +624,32 @@ void QnLiveStreamProvider::extractSpsPps(
                 else
                     spsFound = true;
 
-                profileLevelID = QByteArray::fromRawData( (const char*)nalu.first + 1, 3 ).toHex();
-                spropParameterSets = NALUnit::decodeNAL( 
-                    QByteArray::fromRawData( (const char*)nalu.first, nalu.second ) ).toBase64() +
-                        "," + spropParameterSets;
+                if( newResolution )
+                {
+                    //parsing sps to get resolution
+                    SPSUnit sps;
+                    sps.decodeBuffer( nalu.first, nalu.first+nalu.second );
+                    sps.deserialize();
+                    newResolution->setWidth( sps.getWidth() );
+                    newResolution->setHeight( sps.pic_height_in_map_units * 16 );
+
+                    //reading frame cropping settings
+                    const unsigned int subHeightC = sps.chroma_format_idc == 1 ? 2 : 1;
+                    const unsigned int cropUnitY = (sps.chroma_format_idc == 0)
+                        ? (2 - sps.frame_mbs_only_flag)
+                        : (subHeightC * (2 - sps.frame_mbs_only_flag));
+                    const unsigned int originalFrameCropTop = cropUnitY * sps.frame_crop_top_offset;
+                    const unsigned int originalFrameCropBottom = cropUnitY * sps.frame_crop_bottom_offset;
+                    newResolution->setHeight( newResolution->height() - (originalFrameCropTop+originalFrameCropBottom) );
+                }
+
+                if( customStreamParams )
+                {
+                    profileLevelID = QByteArray::fromRawData( (const char*)nalu.first + 1, 3 ).toHex();
+                    spropParameterSets = NALUnit::decodeNAL( 
+                        QByteArray::fromRawData( (const char*)nalu.first, static_cast<int>(nalu.second) ) ).toBase64() +
+                            "," + spropParameterSets;
+                }
                 break;
 
             case nuPPS:
@@ -631,16 +658,22 @@ void QnLiveStreamProvider::extractSpsPps(
                 else
                     ppsFound = true;
 
-                spropParameterSets += NALUnit::decodeNAL( 
-                    QByteArray::fromRawData( (const char*)nalu.first, nalu.second ) ).toBase64();
+                if( customStreamParams )
+                {
+                    spropParameterSets += NALUnit::decodeNAL( 
+                        QByteArray::fromRawData( (const char*)nalu.first, static_cast<int>(nalu.second) ) ).toBase64();
+                }
                 break;
         }
     }
 
-    if( !profileLevelID.isEmpty() )
-        customStreamParams->emplace( Qn::PROFILE_LEVEL_ID_PARAM_NAME, QLatin1String(profileLevelID) );
-    if( !spropParameterSets.isEmpty() )
-        customStreamParams->emplace( Qn::SPROP_PARAMETER_SETS_PARAM_NAME, QLatin1String(spropParameterSets) );
+    if( customStreamParams )
+    {
+        if( !profileLevelID.isEmpty() )
+            customStreamParams->emplace( Qn::PROFILE_LEVEL_ID_PARAM_NAME, QLatin1String(profileLevelID) );
+        if( !spropParameterSets.isEmpty() )
+            customStreamParams->emplace( Qn::SPROP_PARAMETER_SETS_PARAM_NAME, QLatin1String(spropParameterSets) );
+    }
 }
 
 #endif // ENABLE_DATA_PROVIDERS

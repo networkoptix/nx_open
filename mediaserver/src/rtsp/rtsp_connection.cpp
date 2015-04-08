@@ -112,8 +112,6 @@ public:
         lastPlayCSeq(0),
         quality(MEDIA_Quality_High),
         qualityFastSwitch(true),
-        prevStartTime(AV_NOPTS_VALUE),
-        prevEndTime(AV_NOPTS_VALUE),
         metadataChannelNum(7),
         audioEnabled(false),
         wasDualStreaming(false),
@@ -191,8 +189,6 @@ public:
     int lastPlayCSeq;
     MediaQuality quality;
     bool qualityFastSwitch;
-    qint64 prevStartTime;
-    qint64 prevEndTime;
     int metadataChannelNum;
     bool audioEnabled;
     bool wasDualStreaming;
@@ -337,7 +333,7 @@ bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
 QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return QHostAddress(d->socket->getPeerAddress().address.ipv4());
+    return QHostAddress(d->socket->getForeignAddress().address.ipv4());
 }
 
 void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
@@ -369,30 +365,6 @@ void QnRtspConnectionProcessor::generateSessionId()
     d->sessionId += QString::number(rand());
 }
 
-QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
-{
-    Q_D(QnRtspConnectionProcessor);
-    if (!d->mediaRes)
-        return QString(); // prevent deadlock
-
-    QMutexLocker lock(&d->mutex);
-
-    if (!d->archiveDP)
-        return QString();
-
-    qint64 endTime = d->archiveDP->endTime();
-    //bool endTimeInFuture = endTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
-    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes->toResourcePtr()))
-        endTime = DATETIME_NOW;
-
-    if (d->archiveDP->startTime() != d->prevStartTime || endTime != d->prevEndTime)
-    {
-        return getRangeStr();
-    }
-    else {
-        return QString();
-    }
-};
 
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
@@ -415,14 +387,14 @@ int QnRtspConnectionProcessor::getAVTcpChannel(int trackNum) const
         return -1;
 }
 
-RtspServerTrackInfoPtr QnRtspConnectionProcessor::getTrackInfo(int trackNum) const
+RtspServerTrackInfo* QnRtspConnectionProcessor::getTrackInfo(int trackNum) const
 {
     Q_D(const QnRtspConnectionProcessor);
     ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
     if (itr != d->trackInfo.end())
-        return itr.value();
+        return itr.value().data();
     else
-        return RtspServerTrackInfoPtr();
+        return nullptr;
 }
 
 int QnRtspConnectionProcessor::getTracksCount() const
@@ -467,50 +439,42 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     return layout ? layout->channelCount() : -1;
 }
 
-QString QnRtspConnectionProcessor::getRangeStr()
+QByteArray QnRtspConnectionProcessor::getRangeStr(QnArchiveStreamReader* archiveDP)
 {
     Q_D(QnRtspConnectionProcessor);
-    QString range;
-    if (d->archiveDP) 
+    QByteArray range;
+    if (archiveDP) 
     {
-        if (!d->archiveDP->offlineRangeSupported())
-            d->archiveDP->open();
-        d->prevStartTime = d->archiveDP->startTime();
-        qint64 archiveEndTime = d->archiveDP->endTime();
-        //bool endTimeInFuture = archiveEndTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
-        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->mediaRes->toResourcePtr()); // && !endTimeInFuture;
-        if (endTimeIsNow)
-            d->prevEndTime = DATETIME_NOW;
-        else
-            d->prevEndTime = archiveEndTime;
+        qint64 archiveEndTime = archiveDP->endTime();
+        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()); // && !endTimeInFuture;
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
             range = "npt=";
-            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
+            if (archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += "now";
             else
-                range += QString::number(d->archiveDP->startTime());
+                range += QByteArray::number(archiveDP->startTime());
 
             range += "-";
             if (endTimeIsNow)
                 range += "now";
             else 
-                range += QString::number(archiveEndTime);
+                range += QByteArray::number(archiveEndTime);
         }
         else 
         {
             // use 'clock' attrubute. see RFC 2326
             range = "clock=";
-            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
-                range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
+            if (archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
+                range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             else
-                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT);
+                range += QDateTime::fromMSecsSinceEpoch(archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             range += "-";
-            if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes->toResourcePtr()))
+            if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
             else
-                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT);
+                range += QDateTime::fromMSecsSinceEpoch(archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
         }
     }
     return range;
@@ -519,12 +483,16 @@ QString QnRtspConnectionProcessor::getRangeStr()
 void QnRtspConnectionProcessor::addResponseRangeHeader()
 {
     Q_D(QnRtspConnectionProcessor);
-    QString range = getRangeStr();
+    
+    if (d->archiveDP && !d->archiveDP->offlineRangeSupported())
+        d->archiveDP->open();
+
+    QByteArray range = getRangeStr(d->archiveDP.data());
     if (!range.isEmpty())
     {
         nx_http::insertOrReplaceHeader(
             &d->response.headers,
-            nx_http::HttpHeader( "Range", range.toLatin1() ) );
+            nx_http::HttpHeader( "Range", range ) );
     }
 };
 
@@ -840,7 +808,7 @@ int QnRtspConnectionProcessor::composeSetup()
                     trackInfo->clientPort = ports[0].toInt();
                     trackInfo->clientRtcpPort = ports[1].toInt();
                     if (!d->tcpMode) {
-                        if (trackInfo->openServerSocket(d->socket->getPeerAddress().address.toString())) {
+                        if (trackInfo->openServerSocket(d->socket->getForeignAddress().address.toString())) {
                             transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket->getLocalAddress().port));
                             transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalAddress().port));
                         }

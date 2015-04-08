@@ -8,10 +8,12 @@
         <translation>系统托盘工具</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>此系统上没有系统托盘。
-应用程序将退出。</translation>
+        <source>There is no system tray on this system.</source>
+        <translation>当前系统无托盘工具.</translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation>应用程序将退出.</translation>
     </message>
 </context>
 <context>
@@ -77,11 +79,11 @@ Application will now quit.</source>
     </message>
     <message>
         <source>Access denied.</source>
-        <translation>访问被拒绝！</translation>
+        <translation>访问被拒绝.</translation>
     </message>
     <message>
         <source>Specified database does not exist.</source>
-        <translation>指定的数据库不存在。</translation>
+        <translation type="unfinished">指定的数据库不存在.</translation>
     </message>
     <message>
         <source>Specified parameter is invalid.</source>
@@ -90,12 +92,6 @@ Application will now quit.</source>
     <message>
         <source>Could not access installed services</source>
         <translation>无法访问已安装的服务</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>已经在尝试访问已安装的服务时发生错误： 
- %1</translation>
     </message>
     <message>
         <source>Show &amp;Media Server Log</source>
@@ -112,6 +108,10 @@ Application will now quit.</source>
     <message>
         <source>Stop Media Server</source>
         <translation>停止媒体服务器</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation>访问已安装服务时，发生错误.</translation>
     </message>
 </context>
 </TS>

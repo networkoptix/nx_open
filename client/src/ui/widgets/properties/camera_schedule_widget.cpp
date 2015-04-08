@@ -585,6 +585,17 @@ void QnCameraScheduleWidget::setFps(int value)
     ui->fpsSpinBox->setValue(value);
 }
 
+void QnCameraScheduleWidget::showMaxFpsWarning(int setValue, int maxValue) {
+    QMessageBox::warning(this, tr("FPS value is too high"),
+        tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.").arg(setValue).arg(maxValue));
+}
+
+void QnCameraScheduleWidget::showMaxDualStreamingWarning(int setValue, int maxValue) {
+    QMessageBox::warning(this, tr("FPS value is too high"),
+        tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.")
+        .arg(setValue).arg(maxValue));
+}
+
 void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     /* Silently ignoring invalid input is OK here. */
     if(value < ui->fpsSpinBox->minimum())
@@ -592,27 +603,22 @@ void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     if(dualStreamValue < ui->fpsSpinBox->minimum())
         dualStreamValue = ui->fpsSpinBox->minimum();
 
-    m_maxFps = value;
-    m_maxDualStreamingFps = dualStreamValue;
-
-    int currentMaxFps = getGridMaxFps();
-    int currentMaxDualStreamingFps = getGridMaxFps(true);
-    if (currentMaxFps > value)
-    {
-        QMessageBox::warning(this, tr("FPS value is too high"),
-            tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.").arg(currentMaxFps).arg(value));
-        emit scheduleTasksChanged();
+    if (m_maxFps != value) {
+        m_maxFps = value;
+        int currentMaxFps = getGridMaxFps();
+        if (currentMaxFps > m_maxFps)
+            emit scheduleTasksChanged();
     }
-    if (currentMaxDualStreamingFps > dualStreamValue)
-    {
-        QMessageBox::warning(this, tr("FPS value is too high"),
-            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.")
-                             .arg(currentMaxDualStreamingFps).arg(dualStreamValue));
-        emit scheduleTasksChanged();
+
+    if (m_maxDualStreamingFps != dualStreamValue) {
+        m_maxDualStreamingFps = dualStreamValue;       
+        int currentMaxDualStreamingFps = getGridMaxFps(true);       
+        if (currentMaxDualStreamingFps > m_maxDualStreamingFps)           
+            emit scheduleTasksChanged();
     }
 
     updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());
-    ui->gridWidget->setMaxFps(value, dualStreamValue);
+    ui->gridWidget->setMaxFps(m_maxFps, m_maxDualStreamingFps);
 }
 
 int QnCameraScheduleWidget::getGridMaxFps(bool motionPlusLqOnly)
@@ -879,7 +885,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
 
     const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();
     QnVirtualCameraResourceList cameras = dialog->selectedResources().filtered<QnVirtualCameraResource>();
-    foreach(QnVirtualCameraResourcePtr camera, cameras) 
+    for(const QnVirtualCameraResourcePtr &camera: cameras) 
     {
         if (copyArchiveLength) {
             int maxDays = maxRecordedDays();

@@ -157,29 +157,41 @@ QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidSt
     return result;
 }
 
-QHostAddress QnUpnpResourceSearcher::findBestIface(const QString& host)
+QHostAddress QnUpnpResourceSearcher::findBestIface(const HostAddress& host)
 {
-    QString oldAddress;
-    QString result;
+    QHostAddress oldAddress;
+    QHostAddress result;
     for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
-        QString newAddress = iface.address.toString();
+        const QHostAddress& newAddress = iface.address;
         if (isNewDiscoveryAddressBetter(host, newAddress, oldAddress))
         {
             oldAddress = newAddress;
             result = newAddress;
         }
     }
-    return QHostAddress(result);
+    return result;
 }
 
-void QnUpnpResourceSearcher::readDeviceXml(const QByteArray& uuidStr, const QUrl& descritionUrl, const QString& sender, QnResourceList& result)
+void QnUpnpResourceSearcher::readDeviceXml(
+    const QByteArray& uuidStr,
+    const QUrl& descritionUrl,
+    const HostAddress& sender,
+    QnResourceList& result )
 {
     QByteArray foundDeviceDescription = getDeviceDescription(uuidStr, descritionUrl);
-    processDeviceXml(foundDeviceDescription, descritionUrl.host(), sender, result);
+    processDeviceXml(
+        foundDeviceDescription,
+        HostAddress( descritionUrl.host() ),
+        sender,
+        result );
 }
 
-void QnUpnpResourceSearcher::processDeviceXml(const QByteArray& foundDeviceDescription, const QString& host, const QString& sender, QnResourceList& result)
+void QnUpnpResourceSearcher::processDeviceXml(
+    const QByteArray& foundDeviceDescription,
+    const HostAddress& host,
+    const HostAddress& sender,
+    QnResourceList& result )
 {
     //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
 
@@ -201,12 +213,10 @@ void QnUpnpResourceSearcher::processSocket(AbstractDatagramSocket* socket, QSet<
 {
     while(socket->hasData())
     {
-
         char buffer[1024*16+1];
 
-        QString sender;
-        quint16 senderPort;
-        int readed = socket->recvFrom(buffer, sizeof(buffer), sender, senderPort);
+        SocketAddress sourceEndpoint;
+        int readed = socket->recvFrom(buffer, sizeof(buffer), &sourceEndpoint);
         if (readed > 0)
             buffer[readed] = 0;
         QByteArray reply = QByteArray::fromRawData(buffer, readed);
@@ -234,7 +244,7 @@ void QnUpnpResourceSearcher::processSocket(AbstractDatagramSocket* socket, QSet<
             continue;
         processedUuid << uuidStr;
 
-        readDeviceXml(uuidStr, descritionUrl, sender, result);
+        readDeviceXml(uuidStr, descritionUrl, sourceEndpoint.address, result);
     }
 }
 
@@ -300,7 +310,7 @@ QnResourceList QnUpnpResourceSearcherAsync::findResources()
 
 bool QnUpnpResourceSearcherAsync::processPacket(
     const QHostAddress& localInterfaceAddress,
-    const QString& discoveredDevAddress,
+    const HostAddress& discoveredDevAddress,
     const UpnpDeviceInfo& devInfo,
     const QByteArray& xmlDevInfo )
 {

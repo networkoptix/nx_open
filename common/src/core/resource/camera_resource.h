@@ -38,16 +38,16 @@ public:
     void saveParams();
     void saveParamsAsync();
     int saveAsync();
-public slots:
+
+    static int issuesTimeoutMs();
+
     void issueOccured();
-    void noCameraIssues();
-private slots:
-    void at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
+    void cleanCameraIssues();
 protected:
 
 private:
     QnAbstractDTSFactory* m_dtsFactory;
-    int m_issueTimes;
+    int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
 };
 

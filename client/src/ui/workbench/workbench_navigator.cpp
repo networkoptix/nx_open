@@ -41,10 +41,12 @@ extern "C"
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/search_line_edit.h>
+#include <ui/common/search_query_strategy.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
@@ -267,6 +269,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(selectionPressed()),                         this,   SLOT(at_timeSlider_selectionPressed()));
     connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
     connect(m_timeSlider,                       SIGNAL(thumbnailClicked()),                         this,   SLOT(at_timeSlider_thumbnailClicked()));
+    connect(m_timeSlider, &QnTimeSlider::bookmarksUnderCursorUpdated, this, &QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated);
     m_timeSlider->setLineCount(SliderLineCount);
     m_timeSlider->setLineStretch(CurrentLine, 1.5);
     m_timeSlider->setLineStretch(SyncedLine, 1.0);
@@ -284,10 +287,28 @@ void QnWorkbenchNavigator::initialize() {
 
     connect(m_dayTimeWidget,                    SIGNAL(timeClicked(const QTime &)),                 this,   SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
 
-    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::textChanged, this, [this](const QString &text) {
+    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::textChanged
+        , m_searchQueryStrategy, &QnSearchQueryStrategy::changeQuery);
+    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::enterKeyPressed, this, [this]() 
+    { 
+        const QString query = m_bookmarksSearchWidget->lineEdit()->text();
+        m_searchQueryStrategy->changeQueryForcibly(query);
+    });
+    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::enabledChanged, this, [this]()
+    {
+        const QString query = m_bookmarksSearchWidget->lineEdit()->text();
+        m_searchQueryStrategy->changeQueryForcibly(query);
+    });
+
+    connect(m_bookmarksSearchWidget, &QnSearchLineEdit::escKeyPressed, this, [this] 
+    {
+        m_searchQueryStrategy->changeQueryForcibly(QString()); 
+    });
+
+    connect(m_searchQueryStrategy, &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text)
+    {
         if (!m_currentMediaWidget)
             return;
-        //TODO: #GDM #Bookmarks do not search till the full tag or at least 3 letters will be entered, search once in 2-3 seconds
         if(QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
             loader->setBookmarksTextFilter(text); //TODO: #GDM #Bookmarks synced widgets? clear previous?
     });
@@ -1005,9 +1026,9 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
             switch (dataType) {
             case Qn::RecordedTimePeriod:
             case Qn::MotionTimePeriod:
+            case Qn::BookmarkTimePeriod:
                 loader->setTargetPeriod(calendarPeriod, dataType);
                 break;
-            case Qn::BookmarkTimePeriod:
             case Qn::BookmarkData:
                 loader->setTargetPeriod(timeSliderPeriod, dataType);
                 break;
@@ -1304,6 +1325,29 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
     return base_type::eventFilter(watched, event);
 }
 
+void QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated(const QPointF& pos)
+{
+    if (qnSettings->isVideoWallMode())
+    {    
+        m_timeSlider->bookmarksViewer()->updateBookmarks(QnCameraBookmarkList(), QnActionParameters());
+        return;
+    }
+
+    const qint64 position = m_timeSlider->valueFromPosition(pos);
+    const QnActionParameters params(currentTarget(Qn::SliderScope));
+    QnCameraBookmarkList bookmarks;
+    if (m_currentMediaWidget && m_timeSlider->timePeriods(QnWorkbenchNavigator::CurrentLine, Qn::BookmarksContent).containTime(position))
+    {
+        if (QnCachingCameraDataLoader * const loader = loaderByWidget(m_currentMediaWidget))
+        {
+            bookmarks = loader->allBookmarksByTime(position);
+        }
+    }
+
+    m_timeSlider->bookmarksViewer()->updateBookmarks(bookmarks, params);
+}
+
+
 void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos) {
     if(!context() || !context()->menu()) {
         qnWarning("Requesting context menu for a time slider while no menu manager instance is available.");
@@ -1402,23 +1446,32 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
     if(isLive())
         value = DATETIME_NOW;
 
+    //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
+    QString tooltipFormatDate = tr("yyyy MMM dd");
+
+    //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
+    QString tooltipFormatTime = tr("hh:mm:ss");
+
+    //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
+    QString tooltipFormatTimeShort = tr("mm:ss");
+
+    //: Time slider's tooltip for position on live. 
+    QString tooltipFormatLive = tr("Live");
+
     /* Update tool tip format. */
-    if (value == DATETIME_NOW) {
-        //: Time slider's tooltip for position on live. 
-        //: Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for.
-        //: That's where these single quotes come from.
-        m_timeSlider->setToolTipFormat(tr("'Live'"));
+    if (value == DATETIME_NOW) {       
+        /* Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for.
+         That's where these single quotes come from. */
+        m_timeSlider->setToolTipFormat(lit("'%1'").arg(tooltipFormatLive));
     } else {
         if (m_currentWidgetFlags & WidgetUsesUTC) {
-            //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
-            m_timeSlider->setToolTipFormat(tr("yyyy MMM dd\nhh:mm:ss"));
+            
+            m_timeSlider->setToolTipFormat(tooltipFormatDate + L'\n' + tooltipFormatTime);
         } else {
             if(m_timeSlider->maximum() >= 60ll * 60ll * 1000ll) { /* Longer than 1 hour. */
-                //: This is a date/time format for time slider's tooltip for local files. Please translate it only if you're absolutely sure that you know what you're doing.
-                m_timeSlider->setToolTipFormat(tr("hh:mm:ss"));
+                m_timeSlider->setToolTipFormat(tooltipFormatTime);
             } else {
-                //: This is a date/time format for time slider's tooltip for short local files. Please translate it only if you're absolutely sure that you know what you're doing.
-                m_timeSlider->setToolTipFormat(tr("mm:ss"));
+                m_timeSlider->setToolTipFormat(tooltipFormatTimeShort);
             }
         }
     }
@@ -1625,18 +1678,23 @@ QnSearchLineEdit * QnWorkbenchNavigator::bookmarksSearchWidget() const {
     return m_bookmarksSearchWidget;
 }
 
-void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget) {
+void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget)
+{
     if(m_bookmarksSearchWidget == bookmarksSearchWidget)
         return;
 
     if(m_bookmarksSearchWidget) {
         disconnect(m_bookmarksSearchWidget, NULL, this, NULL);
+        disconnect(m_searchQueryStrategy, nullptr, this, nullptr);
 
         if(isValid())
             deinitialize();
     }
 
     m_bookmarksSearchWidget = bookmarksSearchWidget;
+
+    enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
+    m_searchQueryStrategy = new QnSearchQueryStrategy(m_bookmarksSearchWidget, kMinimalSymbolsCount, kDelayMs);
 
     if(m_bookmarksSearchWidget) {
         connect(m_bookmarksSearchWidget, &QObject::destroyed, this, [this](){setBookmarksSearchWidget(NULL);});

@@ -44,7 +44,6 @@ public:
     void setResources(const QVector<QnUuid>& resources);
 
     const QVector<QnUuid>& getResources() const;
-    QnResourceList getResourceObjects() const;
 
     void setParams(const QnBusinessActionParameters& params);
     const QnBusinessActionParameters& getParams() const;

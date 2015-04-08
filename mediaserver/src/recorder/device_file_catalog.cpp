@@ -29,7 +29,6 @@
 
 #include <boost/array.hpp>
 
-DeviceFileCatalog::RebuildMethod DeviceFileCatalog::m_rebuildArchive = DeviceFileCatalog::Rebuild_None;
 QMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
 
@@ -93,15 +92,8 @@ QString getDirName(const QString& prefix, int currentParts[4], int i)
     return result;
 }
 
-bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, bool checkDirOnly)
+bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage)
 {
-    //fileSize = 0;
-    QnStorageResourcePtr storage = qnStorageMan->findStorageByOldIndex(chunk.storageIndex);
-    if (!storage)
-        return false;
-
-    if (!storage->isCatalogAccessible())
-        return true; // Can't check if file really exists
 	QString prefix = rootFolder(storage, m_catalog); 
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
@@ -148,6 +140,9 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, bool checkDirO
     if (!prevParts[3].second)
         return false;
 
+    return true;
+
+    /*
     // do not check files. just check dirs
     if (checkDirOnly)
         return true;
@@ -175,6 +170,7 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, bool checkDirO
     }
     //m_prevFileNames[chunk.storageIndex] = fName;
     return found;
+    */
 }
 
 qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs, const QnStorageResourcePtr &storage)
@@ -321,7 +317,8 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
     if (avi->open(res) && avi->findStreams() && avi->endTime() != (qint64)AV_NOPTS_VALUE) {
         qint64 startTimeMs = avi->startTime()/1000;
         qint64 endTimeMs = avi->endTime()/1000;
-        int fileIndex = QnFile::baseName(fileName).toInt();
+        QString baseName = QnFile::baseName(fileName);
+        int fileIndex = baseName.length() <= 3 ? baseName.toInt() : Chunk::FILE_INDEX_NONE;
 
         if (startTimeMs < 1 || endTimeMs - startTimeMs < 1) {
             delete avi;
@@ -386,10 +383,10 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     QDir dir(folder);
     for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
-        while (m_rebuildArchive != Rebuild_None && needRebuildPause())
+        while (!qnStorageMan->needToStopMediaScan() && needRebuildPause())
             QnLongRunnable::msleep(100);
 
-        if (m_rebuildArchive == Rebuild_Canceled || QnResource::isStopping())
+        if (qnStorageMan->needToStopMediaScan() || QnResource::isStopping())
             return; // cancceled
 
         if (fi.isDir()) {
@@ -454,9 +451,9 @@ bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, co
     //m_rebuildStartTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QMap<qint64, Chunk> allChunks;
-    if (m_rebuildArchive == Rebuild_None || m_rebuildArchive == Rebuild_Canceled) {
+    if (qnStorageMan->needToStopMediaScan())
         return false;
-    }
+    
     QVector<EmptyFileInfo> emptyFileList;
     readStorageData(storage, m_catalog, allChunks, emptyFileList, period);
 
@@ -680,6 +677,12 @@ void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
         chunk.durationMs = itr->durationMs;
 }
 
+QString DeviceFileCatalog::Chunk::fileName() const
+{
+    QString baseName = fileIndex != FILE_INDEX_NONE ? strPadLeft(QString::number(fileIndex), 3, '0') : QString::number(startTimeMs);
+    return baseName + QString(".mkv");
+}
+
 QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 {
     QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
@@ -688,10 +691,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 
     QString root = rootFolder(storage, m_catalog);
     QString separator = getPathSeparator(root);
-    return root +
-                QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone, separator) + 
-                strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
-                QString(".mkv");
+    return root + QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone, separator) + chunk.fileName();
 }
 
 qint64 DeviceFileCatalog::minTime() const
@@ -756,11 +756,6 @@ qint64 DeviceFileCatalog::firstTime() const
         return m_chunks[0].startTimeMs;
 }
 
-void DeviceFileCatalog::setRebuildArchive(RebuildMethod value)
-{
-    m_rebuildArchive = value;
-}
-
 void DeviceFileCatalog::close()
 {
 }
@@ -820,8 +815,6 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
 
     // deserializeTitleFile()
 
-    bool needRewriteCatalog = false;
-
     int timeZoneExist = 0;
     QByteArray headerLine = file.readLine();
     if (headerLine.contains("timezone"))
@@ -843,13 +836,15 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
         int duration = fields[3+timeZoneExist].trimmed().toInt()/coeff;
         Chunk chunk(startTime, fields[1+timeZoneExist].toInt(), fields[2+timeZoneExist].toInt(), duration, timeZone);
 
+        addChunk(chunk);
+
+        /*
         QnStorageResourcePtr storage = qnStorageMan->findStorageByOldIndex(chunk.storageIndex);
         if (fields[3+timeZoneExist].trimmed().isEmpty()) 
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
             if (qnStorageMan->isStorageAvailable(storage))
             {
-                needRewriteCatalog = true;
                 //chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
                 storage->removeFile(fullFileName(chunk));
                 continue;
@@ -862,7 +857,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
         //qint64 chunkFileSize = 0;
         if (!qnStorageMan->isStorageAvailable(storage)) 
         {
-             needRewriteCatalog |= addChunk(chunk);
+             addChunk(chunk);
         }
         else if (csvMigrationCheckFile(chunk, checkDirOnly))
         {
@@ -877,21 +872,14 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
 
                 qWarning() << "File " << fileName << "has invalid duration " << chunk.durationMs/1000.0 << "s and corrupted. Delete file from catalog";
                 storage->removeFile(fileName);
-                needRewriteCatalog = true;
                 continue;
             }
-            needRewriteCatalog |= addChunk(chunk);
+            addChunk(chunk);
         }
-        else {
-            needRewriteCatalog = true;
-        }
+        */
 
     } while (!line.isEmpty());
     
-    if (!timeZoneExist)
-        needRewriteCatalog = true; // update catalog to new version
-
-
     return true;
 }
 

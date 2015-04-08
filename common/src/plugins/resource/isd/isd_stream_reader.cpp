@@ -50,10 +50,12 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         QString result;
         QTextStream t(&result);
 
+#ifndef USE_VBR
         //const QnSecurityCamResource* cameraRes = dynamic_cast<const QnSecurityCamResource*>(m_resource.data());
         //Q_ASSERT( cameraRes );
         //const bool isAmbarellaFirmware = cameraRes->getModel().indexOf(lit("4K")) != -1;
         const bool isAmbarellaChipset = true; 
+#endif
 
         if (role == Qn::CR_SecondaryLiveVideo)
         {
@@ -194,7 +196,7 @@ QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
         rez = m_rtpStreamParser.getNextData();
         if (rez) 
         {
-            QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
+            //QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(rez);
             //ToDo: if (videoData)
             //    parseMotionInfo(videoData);
 

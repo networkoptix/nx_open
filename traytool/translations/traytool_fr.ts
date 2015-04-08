@@ -8,10 +8,12 @@
         <translation>Zone de notifications </translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>Il n&apos;y a aucune icône dans la zone de notification sur ce système.
-L&apos;application va être fermée.</translation>
+        <source>There is no system tray on this system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -92,12 +94,6 @@ L&apos;application va être fermée.</translation>
         <translation>Ne peut pas accéder les services installés</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>Une erreur est survenue en essayant d&apos;accéder aux services installés:
-%1</translation>
-    </message>
-    <message>
         <source>Show &amp;Media Server Log</source>
         <translation>&amp;Afficher le journal du Média Serveur</translation>
     </message>
@@ -112,6 +108,10 @@ L&apos;application va être fermée.</translation>
     <message>
         <source>Stop Media Server</source>
         <translation>Arrêter le Média Serveur</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -44,6 +44,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
 #include <utils/aspect_ratio.h>
+#include <utils/common/delayed.h>
 
 #include "client/client_settings.h"
 
@@ -163,7 +164,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
     connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
 
-    updateFromResource();
+    updateFromResource(true);
     updateLicensesButtonVisible();
 }
 
@@ -193,9 +194,9 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateIpAddressText()));
         connect(m_camera, &QnResource::urlChanged,      this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM also listen to hostAddress changes?
         connect(m_camera, &QnResource::resourceChanged, this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM why?
-   }
+    }
 
-    updateFromResource();
+    updateFromResource(!isVisible());
     if (currentTab() == Qn::AdvancedCameraSettingsTab)
         ui->advancedSettingsWidget->reloadData();
 }
@@ -324,9 +325,8 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     }
 }
 
-void QnSingleCameraSettingsWidget::reject()
-{
-    updateFromResource();
+void QnSingleCameraSettingsWidget::reject() {
+    updateFromResource(true);
 }
 
 bool QnSingleCameraSettingsWidget::licensedParametersModified() const {
@@ -336,7 +336,7 @@ bool QnSingleCameraSettingsWidget::licensedParametersModified() const {
     return m_scheduleEnabledChanged || m_hasScheduleChanges;
 }
 
-void QnSingleCameraSettingsWidget::updateFromResource() {
+void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if(!m_camera) {
@@ -493,8 +493,15 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     m_hasScheduleControlsChanges = false;
     m_hasMotionControlsChanges = false;
 
-    if (m_camera)
+    if (m_camera) {
         updateMaxFPS();
+
+        /* Check if schedule was changed during load, e.g. limited by max fps. */
+        if (!silent)
+            executeDelayed([this] {
+                showMaxFpsWarningIfNeeded();
+        });
+    }
 
     // Rollback the fisheye preview options. Makes no changes if params were not modified. --gdm
     QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
@@ -584,6 +591,53 @@ void QnSingleCameraSettingsWidget::connectToMotionWidget() {
 
     connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dbDataChanged()), Qt::UniqueConnection);
     connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_motionRegionListChanged()), Qt::UniqueConnection);
+}
+
+void QnSingleCameraSettingsWidget::showMaxFpsWarningIfNeeded() {
+    if (!m_camera)
+        return;
+
+    int maxFps = -1;
+    int maxDualStreamFps = -1;
+
+    for (const QnScheduleTask& scheduleTask: m_camera->getScheduleTasks()) {
+        switch (scheduleTask.getRecordingType()) {
+        case Qn::RT_Never:
+            continue;
+        case Qn::RT_MotionAndLowQuality:
+            maxDualStreamFps = qMax(maxDualStreamFps, scheduleTask.getFps());
+            break;
+        case Qn::RT_Always:
+        case Qn::RT_MotionOnly:
+            maxFps = qMax(maxFps, scheduleTask.getFps());
+            break;
+        default:
+            break;
+        }
+    
+    }
+
+    bool hasChanges = false;
+
+    int maxValidFps = std::numeric_limits<int>::max();
+    int maxDualStreamingValidFps = maxFps;
+
+    Q_D(QnCameraSettingsWidget);
+    d->calculateMaxFps(&maxValidFps, &maxDualStreamingValidFps);
+
+    //TODO: #GDM #TR fix calling showWarning from other module, #StringFreeze
+    if (maxValidFps < maxFps) {
+        ui->cameraScheduleWidget->showMaxFpsWarning(maxFps, maxValidFps);
+        hasChanges = true;
+    }
+
+    if (maxDualStreamingValidFps < maxDualStreamFps) {
+        ui->cameraScheduleWidget->showMaxDualStreamingWarning(maxDualStreamFps, maxDualStreamingValidFps);
+        hasChanges = true;
+    }
+
+    if (hasChanges)
+        at_cameraScheduleWidget_scheduleTasksChanged();
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
@@ -791,8 +845,7 @@ void QnSingleCameraSettingsWidget::updateWebPageText() {
 void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked() {
     if (QMessageBox::warning(this,
         tr("Confirm motion regions reset"),
-        tr("Are you sure you want to reset motion regions to the defaults?\n"\
-        "This action CANNOT be undone!"),
+        tr("Are you sure you want to reset motion regions to the defaults?") + L'\n' + tr("This action CANNOT be undone!"),
         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
         QMessageBox::Cancel) == QMessageBox::Cancel)
         return;

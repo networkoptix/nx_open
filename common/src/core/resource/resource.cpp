@@ -65,7 +65,7 @@ private:
     QString m_id;
 };
 
-typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
+typedef std::shared_ptr<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
 
 // -------------------------------------------------------------------------- //
 // QnResourceGetParamsCommand
@@ -102,7 +102,7 @@ private:
     QSet<QString> m_ids;
 };
 
-typedef QSharedPointer<QnResourceGetParamsCommand> QnResourceGetParamsCommandPtr;
+typedef std::shared_ptr<QnResourceGetParamsCommand> QnResourceGetParamsCommandPtr;
 
 // -------------------------------------------------------------------------- //
 // QnResourceSetParamCommand
@@ -132,7 +132,7 @@ private:
     QString m_id;
     QString m_value;
 };
-typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+typedef std::shared_ptr<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 // -------------------------------------------------------------------------- //
 // QnResourceSetParamsCommand
@@ -167,7 +167,7 @@ public:
 private:
     QnCameraAdvancedParamValueList m_values;
 };
-typedef QSharedPointer<QnResourceSetParamsCommand> QnResourceSetParamsCommandPtr;
+typedef std::shared_ptr<QnResourceSetParamsCommand> QnResourceSetParamsCommandPtr;
 
 
 #endif // ENABLE_DATA_PROVIDERS

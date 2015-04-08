@@ -17,14 +17,14 @@ struct QnRoutePoint {
     bool operator ==(const QnRoutePoint &other) const;
 };
 
-struct QnRoute {
+struct QnOldRoute {
     QList<QnRoutePoint> points;
     int weight;
 
-    QnRoute() : weight(0) {}
+    QnOldRoute() : weight(0) {}
 
     bool isValid() const;
-    bool isEqual(const QnRoute &other) const;
+    bool isEqual(const QnOldRoute &other) const;
 
     int length() const;
 
@@ -32,10 +32,10 @@ struct QnRoute {
     bool containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const;
     bool containsPoint(const QnUuid &id) const;
 
-    bool operator <(const QnRoute &other) const;
-	QnRoute operator +(const QnRoute &other) const;
+    bool operator <(const QnOldRoute &other) const;
+	QnOldRoute operator +(const QnOldRoute &other) const;
 };
 
-typedef QList<QnRoute> QnRouteList;
+typedef QList<QnOldRoute> QnRouteList;
 
 #endif // ROUTE_H

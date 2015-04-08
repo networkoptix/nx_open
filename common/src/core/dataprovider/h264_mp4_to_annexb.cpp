@@ -19,7 +19,7 @@ H264Mp4ToAnnexB::H264Mp4ToAnnexB( const AbstractOnDemandDataProviderPtr& dataSou
 QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* const data )
 {
     static const quint8 START_CODE[] = { 0, 0, 0, 1 };
-    QnCompressedVideoDataPtr srcVideoPacket = data->dynamicCast<QnCompressedVideoData>();
+    QnCompressedVideoData* srcVideoPacket = dynamic_cast<QnCompressedVideoData*>(data->get());
     if( !srcVideoPacket || srcVideoPacket->compressionType != CODEC_ID_H264 )
         return *data;
     if( srcVideoPacket->data()[3] == 1 )
@@ -48,8 +48,8 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
         readH264SeqHeaderFromExtraData( videoPacket, &seqHeader );
         if( seqHeader.size() > 0 )
         {
-            QnByteArray mediaDataWithSeqHeader( FF_INPUT_BUFFER_PADDING_SIZE, seqHeader.size() + videoPacket->dataSize() );
-            mediaDataWithSeqHeader.resize( seqHeader.size() + videoPacket->dataSize() );
+            QnByteArray mediaDataWithSeqHeader( FF_INPUT_BUFFER_PADDING_SIZE, static_cast<unsigned int>(seqHeader.size() + videoPacket->dataSize()) );
+            mediaDataWithSeqHeader.resize( static_cast<unsigned int>(seqHeader.size() + videoPacket->dataSize()) );
             memcpy( mediaDataWithSeqHeader.data(), seqHeader.data(), seqHeader.size() );
             memcpy( mediaDataWithSeqHeader.data() + seqHeader.size(), videoPacket->data(), videoPacket->dataSize() );
             videoPacket->m_data = mediaDataWithSeqHeader;

@@ -30,8 +30,6 @@ protected:
         const QHostAddress& foundHostAddress ) = 0;
 };
 
-bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
-
 #endif // ENABLE_MDNS
 
 #endif // avigilon_device_server_h_1809

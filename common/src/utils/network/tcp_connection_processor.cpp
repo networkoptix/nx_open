@@ -100,7 +100,7 @@ int QnTCPConnectionProcessor::isFullMessage(
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-//    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
+//    qDebug() << "Client request from " << d->socket->getForeignAddress().address.toString();
 //    qDebug() << d->clientRequest;
 
     d->request = nx_http::Request();
@@ -215,10 +215,10 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     }
 
     if (displayDebug)
-        NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getPeerAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
+        NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
 
     NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
-        arg(d->socket->getPeerAddress().toString()).
+        arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->responseBody.size() : 0)))), cl_logDEBUG1 );
 
     QMutexLocker lock(&d->sockMutex);
@@ -314,13 +314,14 @@ bool QnTCPConnectionProcessor::readRequest()
             if (isFullMessage(d->clientRequest, &fullHttpMessageSize))
             {
                 NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
-                    arg(d->socket->getPeerAddress().toString()).
+                    arg(d->socket->getForeignAddress().toString()).
                     arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
                 return true;
             }
             else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
             {
-                qWarning() << "Too large HTTP client request. Ignoring";
+                qWarning() << "Too large HTTP client request ("<<d->clientRequest.size()<<" bytes"
+                    ", "<<MAX_REQUEST_SIZE<<" allowed). Ignoring...";
                 return false;
             }
             if( fullHttpMessageSize )
@@ -359,7 +360,7 @@ void QnTCPConnectionProcessor::execute(QMutex& mutex)
 SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    return d->socket ? d->socket->getPeerAddress() : SocketAddress();
+    return d->socket ? d->socket->getForeignAddress() : SocketAddress();
 }
 
 void QnTCPConnectionProcessor::releaseSocket()

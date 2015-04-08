@@ -157,6 +157,34 @@ QnCameraBookmark QnBookmarkCameraData::find(const qint64 position) const {
     return result;
 }
 
+QnCameraBookmarkList QnBookmarkCameraData::findAll(const qint64 position) const
+{
+    QnCameraBookmarkList result;
+    foreach (const QnCameraBookmark &bookmark, m_data)
+    {
+        if (bookmark.startTimeMs > position)
+            break;
+
+        if (position <= bookmark.endTimeMs())
+            result.push_back(bookmark);
+    }
+
+    return result;
+}
+
+QnCameraBookmarkList QnBookmarkCameraData::data(const QnTimePeriod &period) const
+{
+    QnCameraBookmarkList result;
+    foreach (const QnCameraBookmark &bookmark, m_data)
+    {
+        if (period.contains(bookmark.startTimeMs))
+        {
+            result.push_back(bookmark);
+        }
+    }
+    return result;
+}
+
 QnCameraBookmarkList QnBookmarkCameraData::data() const {
     return m_data;
 }

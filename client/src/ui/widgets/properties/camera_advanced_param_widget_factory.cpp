@@ -61,13 +61,15 @@ public:
         double min = 0;
         double max = 0;
         parameter.getRange(min, max);
-        bool isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min <= 1.0);
-        if (isInteger) {
+        m_isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min > 1.0);
+        if (m_isInteger) {
             m_spinBox->setMinimum(qRound(min));
             m_spinBox->setMaximum(qRound(max));
+        } else {
+            m_spinBox->setMinimum(qRound(min * 100));
+            m_spinBox->setMaximum(qRound(max * 100));
         }
-        //TODO: #GDM float spinbox
-
+        
 		m_spinBox->setToolTip(parameter.description);
 		setReadOnly(m_spinBox, parameter.readOnly);
 
@@ -79,15 +81,22 @@ public:
 	}
 
 	virtual QString value() const override	{
-		return QString::number(m_spinBox->value());
+		int innerValue = m_spinBox->value();
+        if (m_isInteger)
+            return QString::number(innerValue);
+        return QString::number(0.01 * innerValue);
 	}
 
 	virtual void setValue(const QString &newValue) override	{
-		m_spinBox->setValue(newValue.toInt());
+        if (m_isInteger)
+            m_spinBox->setValue(newValue.toInt());
+        else 
+            m_spinBox->setValue(qRound(newValue.toDouble() * 100));
 	}
 
 private:
 	QSpinBox* m_spinBox;
+    bool m_isInteger;
 };
 
 class QnEnumerationCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {

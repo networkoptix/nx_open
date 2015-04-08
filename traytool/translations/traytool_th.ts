@@ -6,13 +6,15 @@
     <message>
         <source>System Tray</source>
         <translatorcomment>มีเดียเซิร์ฟเวอร์</translatorcomment>
-        <translation>แถบงาน</translation>
+        <translation>ถาดระบบ</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>ไม่มีแถบงานในระบบนี้
-แอพลิเคชันจะทำการปิด.</translation>
+        <source>There is no system tray on this system.</source>
+        <translation>ไม่มีถาดระบบในระบบนี้.</translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation>ในขณะนี้แอพลิเคชันจะปิด.</translation>
     </message>
 </context>
 <context>
@@ -43,12 +45,6 @@ Application will now quit.</source>
     <message>
         <source>Could not access installed services</source>
         <translation>ไม่สามารถเข้าถึงการติดตั้งได้</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะเข้าถึงบริการการติดตั้ง:
- %1</translation>
     </message>
     <message>
         <source>No %1 services installed</source>
@@ -113,6 +109,10 @@ Application will now quit.</source>
     <message>
         <source>Media Server Web Page</source>
         <translation>มีเดียเซิร์ฟเวอร์  เว็บเพจ</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะเข้าถึงบริการในการติดตั้ง:</translation>
     </message>
 </context>
 </TS>

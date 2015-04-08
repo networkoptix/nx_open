@@ -106,7 +106,6 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
 
 QnResourcePoolModel::~QnResourcePoolModel() {
     /* Disconnect from context. */
-    QnResourceList resources = resourcePool()->getResources(); 
     disconnect(resourcePool(), NULL, this, NULL);
     disconnect(snapshotManager(), NULL, this, NULL);
 
@@ -527,6 +526,9 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
 
     } else if(QnMediaServerResourcePtr server = node->resource().dynamicCast<QnMediaServerResource>()) {
+        if(server->getStatus() == Qn::Incompatible)
+            return true;
+
         if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
             /* Allow drop of non-layout item data, from tree only. */
 
@@ -576,12 +578,15 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
         connect(camera,     &QnVirtualCameraResource::groupIdChanged,   this,   &QnResourcePoolModel::at_resource_parentIdChanged);
         connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
-        connect(camera,     &QnResource::nameChanged,                   this,   [this](const QnResourcePtr &resource) {
+        connect(camera,     &QnVirtualCameraResource::statusFlagsChanged, this, &QnResourcePoolModel::at_resource_resourceChanged);
+        auto updateParent = [this](const QnResourcePtr &resource) {
             /* Automatically update display name of the EDGE server if its camera was renamed. */
             QnResourcePtr parent = resource->getParentResource();
             if (QnMediaServerResource::isEdgeServer(parent))
                 at_resource_resourceChanged(parent);
-        });
+        };
+        connect(camera, &QnResource::nameChanged, this, updateParent);
+        updateParent(camera);
     }
 
 
@@ -601,11 +606,8 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if (server) {
         m_rootNodes[Qn::OtherSystemsNode]->update();
-
-        QnUuid serverId = server->getId();
-        foreach (QnResourcePoolModelNode *node, m_rootNodes[Qn::BastardNode]->children()) {
-            QnResourcePtr resource = node->resource();
-            if (resource && resource->getParentId() == serverId)
+        for (const QnResourcePtr &resource: qnResPool->getResourcesByParentId(server->getId())) {
+            if (m_resourceNodeByResource.contains(resource))
                 at_resource_parentIdChanged(resource);
         }
     }
@@ -670,8 +672,9 @@ void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resou
 
     /* update edge resource */
     if (resource.dynamicCast<QnVirtualCameraResource>()) {
+        QnResourcePtr server = resource->getParentResource();
         bool wasEdge = (node->type() == Qn::EdgeNode);
-        bool mustBeEdge = QnMediaServerResource::isHiddenServer(resource->getParentResource());
+        bool mustBeEdge = QnMediaServerResource::isHiddenServer(server);
         if (wasEdge != mustBeEdge) {
             QnResourcePoolModelNode *parent = node->parent();
 
@@ -682,6 +685,9 @@ void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resou
                 parent->update();
 
             node = this->node(resource);
+
+            if (QnResourcePoolModelNode *node = m_resourceNodeByResource.value(server))
+                node->update();
         }
     }
 
@@ -711,6 +717,7 @@ void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
 
     node->setResource(resource);
     node->setParent(parentNode);
+    node->update();
 }
 
 void QnResourcePoolModel::at_layout_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {

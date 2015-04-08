@@ -7,8 +7,17 @@ QTCHECK=`ldd ${libdir}/lib/${build.configuration}/libQt5Core.so.5 | grep libglib
 DEBUG=
 
 if [ $PLATFORM == 'Linux' ] && [ "${arch}" != "arm"  ] && [ -z "$QTCHECK" ]; then
-     echo 'invalid QT - does not support libglib. Compilation terminated'
+     echo '+++++++++++++ Invalid QT - does not support libglib. Compilation terminated +++++++++++++'
      exit 1
+fi
+
+if [ "${box}" == "rpi" ] || [ "${box}" == "bpi" ]; then
+     QTCHECK_ARM=`/usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-ldd --root ${libdir}/lib/${build.configuration} ${libdir}/lib/${build.configuration}/libQt5Core.so.5 | grep libglib-2.0.so.0`
+     if [ -z "$QTCHECK_ARM" ]; then
+         echo '+++++++++++++ Invalid QT - does not support libglib. Compilation terminated +++++++++++++'
+         exit 1
+     fi
+     echo '+++++++++++++ QT for ${box} is valid +++++++++++++'
 fi
 
 export LD_LIBRARY_PATH=${libdir}/lib/${build.configuration}:${qt.dir}/lib

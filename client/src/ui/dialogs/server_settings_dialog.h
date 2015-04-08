@@ -39,15 +39,6 @@ public slots:
     virtual void reject() override;
 
 private:
-    enum RebuildState {
-        Invalid,
-        Ready,
-        Starting,
-        InProgress,
-        InProgressFastScan,
-        Stopping
-    };
-
     void updateFromResources();
     void submitToResources();
 
@@ -60,7 +51,7 @@ private:
     QString bottomLabelText() const;
     int dataRowCount() const;
 
-    void updateRebuildUi(RebuildState newState, int progress = -1);
+    void updateRebuildUi(const QnStorageScanData& reply);
     void updateFailoverLabel();
 
 private slots:
@@ -70,7 +61,7 @@ private slots:
     void at_pingButton_clicked();
     void at_rebuildButton_clicked();
 
-    void at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int);
+    void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int);
     void sendNextArchiveRequest();
     void at_updateRebuildInfo();
 
@@ -85,8 +76,9 @@ private:
     bool m_hasStorageChanges;
     bool m_maxCamerasAdjusted;
 
-    RebuildState m_rebuildState;
+    QnStorageScanData m_rebuildState;
     ec2::ApiIdDataList m_storagesToRemove;
+    bool m_rebuildWasCanceled;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

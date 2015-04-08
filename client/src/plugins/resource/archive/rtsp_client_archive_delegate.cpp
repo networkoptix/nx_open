@@ -56,7 +56,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_isMultiserverAllowed(true),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_lockedTime(AV_NOPTS_VALUE)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -264,6 +265,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
+        lockTime(startTime());
         if (m_isMultiserverAllowed)
             checkMinTimeFromOtherServer(m_camera);
 
@@ -277,6 +279,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
             m_rtpData = trackInfo[0]->ioDevice;
         if (!m_rtpData)
             m_rtspSession.stop();
+        unlockTime();
     }
     else {
         m_rtspSession.stop();
@@ -337,9 +340,23 @@ void QnRtspClientArchiveDelegate::close()
     m_parsers.clear();
 }
 
+void QnRtspClientArchiveDelegate::lockTime(qint64 value)
+{
+    QMutexLocker lock(&m_timeMutex);
+    m_lockedTime = value;
+}
+
+void QnRtspClientArchiveDelegate::unlockTime()
+{
+    QMutexLocker lock(&m_timeMutex);
+    m_lockedTime = AV_NOPTS_VALUE;
+}
+
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
     QMutexLocker lock(&m_timeMutex);
+    if(m_lockedTime != AV_NOPTS_VALUE)
+        return m_lockedTime;
     qint64 result = m_globalMinArchiveTime != AV_NOPTS_VALUE ? m_globalMinArchiveTime : m_rtspSession.startTime();
 
     if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
@@ -483,7 +500,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
         }
         else if (format == QLatin1String("ffmpeg")) {
-            result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2, &parserPosition));
+            result = std::dynamic_pointer_cast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2, &parserPosition));
             if (!result && m_frameCnt == 0 && receiveTimer.elapsed() > 4000)
                 emit dataDropped(m_reader); // if client can't receive first frame too long inform that stream is slow
         }
@@ -494,7 +511,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
 
         if (result && m_sendedCSec != result->opaque)
-            result.clear(); // ignore old archive data
+            result.reset(); // ignore old archive data
         if (result && parserPosition != AV_NOPTS_VALUE)
             m_position = parserPosition;
         /*
@@ -520,7 +537,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         }
         */
     }
-    if (!result)
+    if (!result && !m_closing)
         reopen();
     if (result) {
         m_lastPacketFlags = result->flags;

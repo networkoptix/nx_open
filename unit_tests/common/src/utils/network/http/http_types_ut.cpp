@@ -390,6 +390,39 @@ TEST( HttpHeaderTest, AcceptEncoding_parse )
 
 
 //////////////////////////////////////////////
+//   nx_http::RequestLine
+//////////////////////////////////////////////
+
+TEST( HttpRequestTest, RequestLine_parse )
+{
+    {
+        nx_http::RequestLine requestLine;
+        ASSERT_TRUE( requestLine.parse( nx_http::BufferType( "GET /hren/hren/hren?hren=hren&hren HTTP/1.0" ) ) );
+        ASSERT_EQ( requestLine.method, nx_http::BufferType("GET") );
+        ASSERT_EQ( requestLine.url, QUrl("/hren/hren/hren?hren=hren&hren") );
+        ASSERT_EQ( requestLine.urlPostfix, QString() );
+        ASSERT_EQ( requestLine.version, nx_http::http_1_0 );
+    }
+
+    {
+        nx_http::RequestLine requestLine;
+        ASSERT_TRUE( requestLine.parse( nx_http::BufferType( "  PUT   /abc?def=ghi&jkl   HTTP/1.1" ) ) );
+        ASSERT_EQ( requestLine.method, nx_http::BufferType("PUT") );
+        ASSERT_EQ( requestLine.url, QUrl("/abc?def=ghi&jkl") );
+        ASSERT_EQ( requestLine.urlPostfix, QString() );
+        ASSERT_EQ( requestLine.version, nx_http::http_1_1 );
+    }
+
+    {
+        nx_http::RequestLine requestLine;
+        ASSERT_FALSE( requestLine.parse( nx_http::BufferType( "GET    HTTP/1.1" ) ) );
+        ASSERT_FALSE( requestLine.parse( nx_http::BufferType() ) );
+    }
+}
+
+
+
+//////////////////////////////////////////////
 //   nx_http::Request
 //////////////////////////////////////////////
 
@@ -408,7 +441,7 @@ static const nx::Buffer HTTP_REQUEST(
     "x-media-quality: low\r\n"
     "\r\n" );
 
-TEST( HttpHeaderTest, Request_parse )
+TEST( HttpRequestTest, Request_parse )
 {
     nx_http::Request request;
     ASSERT_TRUE( request.parse( HTTP_REQUEST ) );

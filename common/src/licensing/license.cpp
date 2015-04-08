@@ -34,7 +34,7 @@ namespace {
         "-----END PUBLIC KEY-----";
 
     /* One analog encoder requires one license to maintain this number of cameras. */
-    const int camerasPerAnalogEncoderCount = 4;
+    const int camerasPerAnalogEncoderCount = 1;
 
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {
@@ -611,16 +611,16 @@ bool QnLicensePool::isEmpty() const
 }
 
 
-QList<QByteArray> QnLicensePool::mainHardwareIds() const {
+QVector<QByteArray> QnLicensePool::mainHardwareIds() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::compatibleHardwareIds() const {
+QVector<QByteArray> QnLicensePool::compatibleHardwareIds() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
 }
 
 QByteArray QnLicensePool::currentHardwareId() const {
-    QList<QByteArray> hwIds = mainHardwareIds();
+    QVector<QByteArray> hwIds = mainHardwareIds();
     return hwIds.isEmpty() 
         ? QByteArray() 
         : hwIds.last();

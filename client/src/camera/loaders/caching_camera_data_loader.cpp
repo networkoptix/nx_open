@@ -271,6 +271,11 @@ void QnCachingCameraDataLoader::removeBookmark(const QnCameraBookmark & bookmark
     emit bookmarksChanged();
 }
 
+QnCameraBookmarkList QnCachingCameraDataLoader::allBookmarksByTime(qint64 position) const
+{
+    return m_bookmarkCameraData.findAll(position);
+}
+
 QnCameraBookmark QnCachingCameraDataLoader::bookmarkByTime(qint64 position) const {
     return m_bookmarkCameraData.find(position);
 }
@@ -395,15 +400,18 @@ void QnCachingCameraDataLoader::discardCachedData() {
 }
 
 qint64 QnCachingCameraDataLoader::bookmarkResolution(qint64 periodDuration) const {
-    static const std::vector<qint64> steps = [](){ 
+    const int maxPeriodsPerTimeline = 1024; // magic const, thus visible periods can be edited through right-click
+    qint64 maxPeriodLength = periodDuration / maxPeriodsPerTimeline;
+
+    static const std::vector<qint64> steps = [maxPeriodLength](){ 
         std::vector<qint64> result;
         for (int i = 0; i < 40; ++i)
             result.push_back(1ll << i);
+
+        result.push_back(maxPeriodLength);  /// To avoid end() result from lower_bound
         return result; 
     }();
 
-    const int maxPeriodsPerTimeline = 1024; // magic const, thus visible periods can be edited through right-click
-    qint64 maxPeriodLength = periodDuration / maxPeriodsPerTimeline;
     auto step = std::lower_bound(steps.cbegin(), steps.cend(), maxPeriodLength);
     return *step;
 }

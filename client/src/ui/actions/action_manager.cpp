@@ -481,9 +481,11 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this));
 
     factory(Qn::OpenBusinessLogAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget 
+            | Qn::LayoutItemTarget | Qn::WidgetTarget | Qn::GlobalHotkey).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         icon(qnSkin->icon("events/log.png")).
+        shortcut(tr("Ctrl+L")).
         text(tr("Event Log..."));
 
     factory(Qn::OpenBusinessRulesAction).
@@ -509,6 +511,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SelectTimeServerAction).
         flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Select time server"));
 
     factory(Qn::PtzActivatePresetAction).
@@ -793,12 +796,10 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+E")).
         autoRepeat(false);
 
-    factory(Qn::BusinessEventsLogAction).
+    factory(Qn::OpenBookmarksSearchAction).
         flags(Qn::GlobalHotkey).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Event Log...")).
-        icon(qnSkin->icon("events/log.png")).
-        shortcut(tr("Ctrl+L")).
+        text(tr("Bookmarks...")).
+        shortcut(tr("Ctrl+B")).
         autoRepeat(false);
 
     factory(Qn::CameraListAction).
@@ -1300,10 +1301,10 @@ QnActionManager::QnActionManager(QObject *parent):
              new QnPreviewSearchModeCondition(true, this),
              this));
 
-    factory(Qn::PictureSettingsAction).
+    factory(Qn::MediaFileSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Picture Settings...")).
-        condition(new QnResourceActionCondition(hasFlags(Qn::still_image), Qn::Any, this));
+        text(tr("File Settings...")).
+        condition(new QnResourceActionCondition(hasFlags(Qn::local_media), Qn::Any, this));
 
     factory(Qn::LayoutSettingsAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -1374,11 +1375,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
-            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::Any, this),
-            new QnDisjunctionActionCondition(
-                      new QnResourceStatusActionCondition(Qn::Incompatible, false, this),
-                      new QnResourceStatusActionCondition(Qn::Unauthorized, false, this),
-                      this),
+            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::All, this),
+            new QnResourceStatusActionCondition(QSet<Qn::ResourceStatus>() << Qn::Incompatible << Qn::Unauthorized, true, this),
+            new QnTreeNodeTypeCondition(Qn::ResourceNode, this),
             this));
 
     factory().

@@ -172,10 +172,10 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
     }
 
     int port = iter->port;
-    for (const QString &remoteAddr: iter->remoteAddresses) {
+    for (const SocketAddress &remoteAddress: QnModuleFinder::instance()->moduleAddresses(iter->id)) {
         bool found = false;
-        auto sameUrl = [port, remoteAddr](const QUrl &url) {
-            return url.port() == port && url.host() == remoteAddr;
+        auto sameUrl = [remoteAddress](const QUrl &url) {
+            return url.port() == remoteAddress.port && url.host() == remoteAddress.address.toString();
         };
         for (InterfaceInfo &item: interfaces) {
             if (!sameUrl(item.url))
@@ -188,8 +188,8 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
             InterfaceInfo info;
             info.online = true;
             info.url.setScheme(lit("http"));
-            info.url.setHost(remoteAddr);
-            info.url.setPort(port);
+            info.url.setHost(remoteAddress.address.toString());
+            info.url.setPort(remoteAddress.port);
             info.url.setUserName(m_userName);
             info.url.setPassword(m_password);
             interfaces << info;

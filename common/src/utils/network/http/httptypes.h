@@ -249,7 +249,8 @@ namespace nx_http
 
         bool operator==( const MimeProtoVersion& right ) const
         {
-            return protocol == right.protocol && version == right.version;
+            return protocol == right.protocol
+                && version == right.version;
         }
     };
 
@@ -262,7 +263,7 @@ namespace nx_http
         StringType method;
         QUrl url;
         MimeProtoVersion version;
-        QString urlPostfix;
+        nx::Buffer urlPostfix;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer

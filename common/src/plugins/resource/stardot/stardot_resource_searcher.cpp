@@ -61,15 +61,13 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 QByteArray datagram;
                 datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-                QString sender;
-                quint16 senderPort;
-
-                int readed = sock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
+                SocketAddress senderEndpoint;
+                int readed = sock->recvFrom(datagram.data(), datagram.size(), &senderEndpoint);
                 if (readed < 1)
                     continue;
                 datagram = datagram.left(readed);
 
-                if (senderPort != STARDOT_DISCOVERY_PORT || !datagram.startsWith("StarDot")) // minimum response size
+                if (senderEndpoint.port != STARDOT_DISCOVERY_PORT || !datagram.startsWith("StarDot")) // minimum response size
                     continue;
 
                 int idPos = datagram.indexOf("id=");
@@ -103,7 +101,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                     continue;
                 resource->setTypeId(typeId);
 
-                resource->setHostAddress(sender);
+                resource->setHostAddress(senderEndpoint.address.toString());
                 resource->setMAC(QnMacAddress(mac));
                 resource->setModel(QLatin1String(model));
                 resource->setName(QLatin1String(model));

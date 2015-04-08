@@ -136,11 +136,12 @@ void QnSystrayWindow::findServiceInfo() {
                 errorText = tr("Specified database does not exist.");
                 break;
             case ERROR_INVALID_PARAMETER:
-                errorText =  tr("Specified parameter is invalid.");
+                errorText = tr("Specified parameter is invalid.");
                 break;
         }
         if (m_firstTimeToolTipError) {
-            showMessage(tr("Could not access installed services"), tr("An error has occurred while trying to access installed services:\n %1").arg(errorText), QSystemTrayIcon::Critical);
+            showMessage(tr("Could not access installed services"),
+                tr("An error has occurred while trying to access installed services:") + lit("\n %1").arg(errorText), QSystemTrayIcon::Critical);
             m_firstTimeToolTipError = false;
         }
         return;

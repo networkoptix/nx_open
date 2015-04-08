@@ -223,6 +223,7 @@ namespace nx_http
         if( errorCode == SystemError::noError )
         {
             //connect successful
+            m_remoteEndpoint = SocketAddress( m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT) );
             serializeRequest();
             m_state = sSendingRequest;
             lk.unlock();
@@ -407,7 +408,7 @@ namespace nx_http
                 if( m_terminated )
                     break;
 
-                //is message body follows?
+                //does message body follow?
                 if( !messageHasMessageBody )
                 {
                     //no message body: done
@@ -533,6 +534,7 @@ namespace nx_http
         }
 
         m_url = url;
+        const SocketAddress remoteEndpoint( url.host(), url.port(nx_http::DEFAULT_HTTP_PORT) );
 
         if( m_socket )
         {
@@ -541,17 +543,19 @@ namespace nx_http
 
             if( !m_connectionClosed &&
                 canUseExistingConnection &&
-                (m_socket->getForeignAddress() == SocketAddress(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT))) )
+                (m_remoteEndpoint == remoteEndpoint) )  //m_socket->getForeignAddress() returns ip address only, not host name
             {
                 ++m_awaitedMessageNumber;   //current message will be skipped
 
                 serializeRequest();
                 m_state = sSendingRequest;
 
-                if( !m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
+                if( !m_socket->sendAsync(
+                        m_requestBuffer,
+                        std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
                 {
-                    NX_LOG( lit("Failed to init async socket call (connecting to %1:%2) to aio service. %3").
-                        arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+                    NX_LOG( lit("Failed to init async socket call (connecting to %1) to aio service. %2").
+                        arg(remoteEndpoint.toString()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                     m_socket.clear();
                     return false;
                 }
@@ -688,7 +692,12 @@ namespace nx_http
 
     void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
     {
-        m_additionalHeaders.insert( make_pair(key, value) );
+        m_additionalHeaders.emplace( key, value );
+    }
+
+    void AsyncHttpClient::removeAdditionalHeader( const StringType& key )
+    {
+        m_additionalHeaders.erase( key );
     }
 
     void AsyncHttpClient::addRequestHeaders(const HttpHeaders& headers)
@@ -721,90 +730,6 @@ namespace nx_http
         //TODO #ak we need reconnect and request entity from the point we stopped at
         return false;
     }
-
-    //bool calcDigestResponse(
-    //    const QString& method,
-    //    const QString& userName,
-    //    const QString& userPassword,
-    //    const QUrl& url,
-    //    const header::WWWAuthenticate& wwwAuthenticateHeader,
-    //    header::DigestAuthorization* const digestAuthorizationHeader )
-    //{
-    //    if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
-    //        return false;
-
-    //    //reading params
-    //    QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
-    //    const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
-    //    QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
-    //    const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
-    //    QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
-    //    const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
-
-    //    if( qop.indexOf("auth-int") != -1 )
-    //        return false;   //qop=auth-int is not supported
-
-    //    BufferType nonceCount = "00000001";     //TODO/IMPL
-    //    BufferType clientNonce = "0a4f113b";    //TODO/IMPL
-
-    //    QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-
-    //    //HA1
-    //    md5HashCalc.addData( userName.toLatin1() );
-    //    md5HashCalc.addData( ":" );
-    //    md5HashCalc.addData( realm );
-    //    md5HashCalc.addData( ":" );
-    //    md5HashCalc.addData( userPassword.toLatin1() );
-    //    const BufferType& ha1 = md5HashCalc.result().toHex();
-    //    //HA2, qop=auth-int is not supported
-    //    md5HashCalc.reset();
-    //    md5HashCalc.addData( method.toLatin1() );
-    //    md5HashCalc.addData( ":" );
-    //    //md5HashCalc.addData( url.path().toLatin1() );
-    //    md5HashCalc.addData( url.toString().toLatin1() );
-    //    const BufferType& ha2 = md5HashCalc.result().toHex();
-    //    //response
-    //    digestAuthorizationHeader->addParam( "username", userName.toLatin1() );
-    //    digestAuthorizationHeader->addParam( "realm", realm );
-    //    digestAuthorizationHeader->addParam( "nonce", nonce );
-    //    digestAuthorizationHeader->addParam( "uri", url.toString().toLatin1() );
-    //    md5HashCalc.reset();
-    //    md5HashCalc.addData( ha1 );
-    //    md5HashCalc.addData( ":" );
-    //    md5HashCalc.addData( nonce );
-    //    md5HashCalc.addData( ":" );
-    //    if( !qop.isEmpty() )
-    //    {
-    //        md5HashCalc.addData( nonceCount );
-    //        md5HashCalc.addData( ":" );
-    //        md5HashCalc.addData( clientNonce );
-    //        md5HashCalc.addData( ":" );
-    //        md5HashCalc.addData( qop );
-    //        md5HashCalc.addData( ":" );
-
-    //        digestAuthorizationHeader->addParam( "qop", qop );
-    //        digestAuthorizationHeader->addParam( "nc", nonceCount );
-    //        digestAuthorizationHeader->addParam( "cnonce", clientNonce );
-    //    }
-    //    md5HashCalc.addData( ha2 );
-    //    digestAuthorizationHeader->addParam( "response", md5HashCalc.result().toHex() );
-    //    return true;
-    //}
-
-
-//    nx_http::header::WWWAuthenticate wwwAuthenticateHeader;
-//    wwwAuthenticateHeader.authScheme = nx_http::header::AuthScheme::digest;
-//    wwwAuthenticateHeader.params["realm"] = "Surveillance Server";
-//    wwwAuthenticateHeader.params["nonce"] = "06737538";
-//    nx_http::header::DigestAuthorization digestAuthorizationHeader;
-//
-//    bool res = nx_http::calcDigestResponse(
-//        lit("DESCRIBE"),
-//        lit("admin"), lit("admin"),
-//        QUrl(lit("rtsp://192.168.1.104:554/0")),
-//        wwwAuthenticateHeader,
-//        &digestAuthorizationHeader );
-
 
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
     {

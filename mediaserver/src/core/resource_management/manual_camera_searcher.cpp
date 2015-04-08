@@ -40,7 +40,7 @@ namespace {
         }
         else {
             // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition checking for IP address
-            QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>();
+            QnSecurityCamResourcePtr netRes = resource.dynamicCast<QnSecurityCamResource>();
             if (netRes) {
                 QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
                 for(const QnNetworkResourcePtr& existRes: existResList) 
@@ -48,6 +48,12 @@ namespace {
                     QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
                     if (!existCam)
                         continue;
+
+                    bool newIsRtsp = (netRes->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
+                    bool existIsRtsp = (existCam->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
+                    if (newIsRtsp && !existIsRtsp)
+                        continue; // allow to stack RTSP and non RTSP cameras with same IP:port
+
                     if (!existCam->isManuallyAdded())
                         existResource = true; // block manual and auto add in same time
                     else if (existRes->getTypeId() != netRes->getTypeId()) 

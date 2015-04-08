@@ -16,21 +16,33 @@ struct QnModuleInformation {
     QnSystemInformation systemInformation;
     QString systemName;
     QString name;
-    quint16 port;
-    QSet<QString> remoteAddresses;
+    int port;
     QnUuid id;
     bool sslAllowed;
     QByteArray authHash;
     int protoVersion;
+    QnUuid runtimeId;
 
     QnModuleInformation() : port(0), sslAllowed(false), protoVersion(0) {}
 
     bool isCompatibleToCurrentSystem() const;
     bool hasCompatibleVersion() const;
-    bool isLocal() const; //!< true if at least one address from \a remoteHostAddress is a local address
+    void fixRuntimeId();
 };
-#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(remoteAddresses)(id)(sslAllowed)(authHash)(protoVersion)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json)(metatype)(eq))
+struct QnModuleInformationWithAddresses : QnModuleInformation {
+    QSet<QString> remoteAddresses;
+    QnModuleInformationWithAddresses() {}
+    QnModuleInformationWithAddresses(const QnModuleInformation &other) :
+        QnModuleInformation(other)
+    {}
+};
+
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(id)(sslAllowed)(authHash)(protoVersion)(runtimeId)
+#define QnModuleInformationWithAddresses_Fields QnModuleInformation_Fields(remoteAddresses)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(metatype)(eq))
+
+QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformationWithAddresses, (ubjson)(xml)(json)(metatype)(eq))
 
 #endif // MODULE_INFORMATION_H
