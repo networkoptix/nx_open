@@ -25,6 +25,10 @@ public:
         m_signed = memcmp(format, QnCompressedTime::SIGNED_FORMAT, sizeof(QnCompressedTime::SIGNED_FORMAT)) == 0;
     }
 
+    void resetLastValue() {
+        m_lastValue = 0;
+    }
+
     /*
     bool readInt64(qint64 *target) {
         qint64 deltaVal = 0;
