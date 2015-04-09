@@ -16,6 +16,7 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
     m_isRotated = false;
+    m_flipTimer.invalidate();
 }
 
 QnArecontPanoramicResource::~QnArecontPanoramicResource()
