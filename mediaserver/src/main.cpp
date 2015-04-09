@@ -194,9 +194,6 @@ static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
-static const QString CPU_ARCHITECTURE = "cpuArchitecture";
-static const QString CPU_MODEL_NAME = "cpuModelName";
-static const QString PHISICAL_MEMORY = "phisicalMemory";
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -1770,15 +1767,21 @@ void QnMain::run()
             m_mediaServer = server;
 
         const auto hwInfo = HardwareInformation::instance();
-        if (server->getProperty(CPU_ARCHITECTURE) != hwInfo.cpuArchitecture)
-            server->setProperty(CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+        if (server->getProperty(Qn::CPU_ARCHITECTURE) != hwInfo.cpuArchitecture)
+            server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
 
-        if (server->getProperty(CPU_MODEL_NAME) != hwInfo.cpuModelName)
-            server->setProperty(CPU_MODEL_NAME, hwInfo.cpuModelName);
+        if (server->getProperty(Qn::CPU_MODEL_NAME) != hwInfo.cpuModelName)
+            server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
 
         const auto phisicalMemory = QString::number(hwInfo.phisicalMemory);
-        if (server->getProperty(PHISICAL_MEMORY) != phisicalMemory)
-            server->setProperty(PHISICAL_MEMORY, QVariant(hwInfo.phisicalMemory));
+        if (server->getProperty(Qn::PHISICAL_MEMORY) != phisicalMemory)
+            server->setProperty(Qn::PHISICAL_MEMORY, QVariant(hwInfo.phisicalMemory));
+
+        #ifdef QN_BETA
+            const auto isBeta = QString::number(lit(QN_BETA) == lit("true") ? 1 : 0);
+            if (server->getProperty(Qn::BETA) != isBeta)
+                server->setProperty(Qn::BETA, isBeta);
+        #endif
 
         propertyDictionary->saveParams(server->getId());
 

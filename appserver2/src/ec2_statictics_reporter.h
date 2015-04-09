@@ -41,7 +41,6 @@ namespace ec2
 
         ErrorCode initiateReport(QString* reportApi = 0);
         QnUuid getOrCreateSystemId();
-        uint getTimeSetting(const QString& name, uint defaultValue = 0);
 
     private slots:
         void finishReport(nx_http::AsyncHttpClientPtr httpClient);
@@ -50,7 +49,7 @@ namespace ec2
         QnUserResourcePtr m_admin;
         QnUuid m_desktopCameraTypeId;
         nx_http::AsyncHttpClientPtr m_httpClient;
-        boost::optional<uint> m_plannedReportTime;
+        boost::optional<QDateTime> m_plannedReportTime;
 
         QMutex m_mutex;
         bool m_timerDisabled;

@@ -30,8 +30,9 @@ class SqlAdapter(object):
         '''Saves report [data] into database tables
         '''
         systemId = data['systemId']
-        self._log.debug('Recieved report from system %s, with data %s' % (
-            systemId, str({k: len(d) for k, d in data.items()})
+        counts = list("%i %s" % (len(d), k) for k, d in data.items() if k != 'systemId')
+        self._log.info('Recieved report from system %s, with data: %s' % (
+            systemId, ', '.join(counts)
         ))
         for ms in data['mediaservers']:
             if 'storages' in ms:

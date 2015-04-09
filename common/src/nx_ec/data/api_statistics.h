@@ -30,7 +30,7 @@ namespace ec2 {
         ApiCameraDataStatistics();
         ApiCameraDataStatistics(const ApiCameraDataEx&& data);
 
-		const static std::unordered_set<QString> ADD_PARAMS;
+		const static std::unordered_set<QString> EXCEPT_PARAMS;
 
         ApiResourceParamDataList addParams;
     };
@@ -53,10 +53,7 @@ namespace ec2 {
         ApiMediaServerDataStatistics();
         ApiMediaServerDataStatistics(const ApiMediaServerDataEx&& data);
 
-		const static std::unordered_set<QString> ADD_PARAMS;
-
         ApiStorageDataStatisticsList    storages;
-        ApiResourceParamDataList        addParams;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
     (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)

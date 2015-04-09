@@ -1,28 +1,29 @@
 #include "api_statistics.h"
 #include "api_model_functions_impl.h"
+#include "core/resource/param.h"
 
 #include <utils/serialization/lexical.h>
 
 #include <unordered_map>
 
-const static QString __CAMERA_DATA[] = {
-	QLatin1String("MaxFPS"), QLatin1String("cameraSettingsId"), QLatin1String("firmware"),
-	QLatin1String("hasDualStreaming"), QLatin1String("isAudioSupported"), 
-	QLatin1String("mediaStreams"), QLatin1String("ptzCapabilities"),
-};
-const static QString __MEDIASERVER_DATA[] = {
-    QLatin1String("cpuArchitecture"), QLatin1String("cpuModelName"), QLatin1String("phisicalMemory")
+const static QString __CAMERA_EXCEPT_PARAMS[] = {
+	Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+    Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, 
+    Qn::CAMERA_SETTINGS_ID_PARAM_NAME,
+    Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME,
+    QLatin1String("DeviceID"), QLatin1String("DeviceUrl"), // from plugin onvif
+    QLatin1String("MediaUrl"),
 };
 
 // TODO: remove this hack when VISUAL STUDIO supports initializer lists
 #define INIT_LIST(array) &array[0], &array[(sizeof(array)/sizeof(array[0]))]
 
 static ec2::ApiResourceParamDataList getExtraParams( const ec2::ApiResourceParamDataList& paramList,
-                                                     const std::unordered_set<QString>& nameSet)
+                                                     const std::unordered_set<QString>& exceptSet)
 {
     ec2::ApiResourceParamDataList extraParams;
     for (auto& param : paramList)
-        if (nameSet.count(param.name))
+        if (!exceptSet.count(param.name))
             extraParams.push_back(param);
     return extraParams;
 }
@@ -39,9 +40,9 @@ namespace ec2 {
 
     ApiCameraDataStatistics::ApiCameraDataStatistics(const ApiCameraDataEx&& data)
         : ApiCameraDataEx(data)
-        , addParams(getExtraParams(ApiCameraDataEx::addParams, ADD_PARAMS)) {}
+        , addParams(getExtraParams(ApiCameraDataEx::addParams, EXCEPT_PARAMS)) {}
 
-	const std::unordered_set<QString> ApiCameraDataStatistics::ADD_PARAMS(INIT_LIST(__CAMERA_DATA));
+	const std::unordered_set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(INIT_LIST(__CAMERA_EXCEPT_PARAMS));
 
     ApiStorageDataStatistics::ApiStorageDataStatistics() {}
 
@@ -53,13 +54,10 @@ namespace ec2 {
 
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(const ApiMediaServerDataEx&& data)
         : ApiMediaServerDataEx(data)
-        , addParams(getExtraParams(ApiMediaServerDataEx::addParams, ADD_PARAMS))
     {
         for (auto s : ApiMediaServerDataEx::storages)
             storages.push_back(std::move(s));
     }
-	
-	const std::unordered_set<QString> ApiMediaServerDataStatistics::ADD_PARAMS(INIT_LIST(__MEDIASERVER_DATA));
 
     ApiLicenseStatistics::ApiLicenseStatistics() {}
 
