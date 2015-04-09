@@ -270,7 +270,7 @@ bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target)
     std::array<char, 16> tmp;
     if(!stream->template readBinaryData<>(&tmp))
         return false;
-    *target = QnUuid::fromRfc4122(QByteArray::fromRawData(tmp.data(), tmp.size()));
+    *target = QnUuid::fromRfc4122(QByteArray::fromRawData(tmp.data(), static_cast<int>(tmp.size())));
     return true;
 }
 

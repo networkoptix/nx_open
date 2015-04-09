@@ -54,7 +54,7 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
 	}
 
 	QString cameraPhysicalId = params[lit("res_id")];
-	QnResourcePtr camera = QnResourcePool::instance()->getNetResourceByPhysicalId( cameraPhysicalId );
+	QnResourcePtr camera = qnResPool->getNetResourceByPhysicalId( cameraPhysicalId );
 	if(!camera) {
 		NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. Unknown camera %1 in request %2. Ignoring...").arg(cameraPhysicalId).arg(path), cl_logWARNING );
 		return CODE_NOT_FOUND;

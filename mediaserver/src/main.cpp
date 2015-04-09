@@ -131,8 +131,6 @@
 
 #include <rtsp/rtsp_connection.h>
 
-#include <soap/soapserver.h>
-
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
 #include <utils/common/sleep.h>
@@ -1447,15 +1445,8 @@ void QnMain::run()
     // todo: #rvasilenko this class doesn't used any more on the server side
     //QnSessionManager::instance()->start();
 
-#ifdef ENABLE_ONVIF
-    QnSoapServer soapServer;    //starting soap server to accept event notifications from onvif cameras
-    soapServer.bind();
-    soapServer.start();
-#endif //ENABLE_ONVIF
-
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    QnResourcePool::initStaticInstance( new QnResourcePool() );
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
@@ -1645,8 +1636,6 @@ void QnMain::run()
         qnCommon->setTranscodeDisabled(true);
 
     QnResource::startCommandProc();
-
-    QnResourcePool::instance(); // to initialize net state;
 
     std::unique_ptr<QnRestProcessorPool> restProcessorPool( new QnRestProcessorPool() );
 
@@ -2096,9 +2085,6 @@ void QnMain::run()
 
     fileDeletor.reset();
     storageManager.reset();
-
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
 
     m_mediaServer.clear();
 }

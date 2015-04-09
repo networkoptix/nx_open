@@ -30,6 +30,7 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
     loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"), false);
 
+    instance<QnResourcePool>();
     instance<QnCameraHistoryPool>();
 
     /* Init members. */
