@@ -93,10 +93,16 @@ public:
     bool isCameraHistoryValid(const QnVirtualCameraResourcePtr &camera) const;
 signals:
     /** 
-     * \brief                       Notify that camera footage is changed - a server was added or removed.
-     *                              Usually it means that camera history must be updated (if needed).
+     * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
+     *                              Usually it means that camera chunks must be updated (if needed).
      */
     void cameraFootageChanged(const QnVirtualCameraResourcePtr &camera);
+
+    /** 
+     * \brief                       Notify that camera in no longer valid - a server was added or goes online.
+     *                              Usually it means that camera history must be updated (if needed).
+     */
+    void cameraHistoryInvalidated(const QnVirtualCameraResourcePtr &camera);
 
     /** 
      * \brief                       Notify about changes in the camera history.

@@ -54,13 +54,16 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
         if (!resource->hasFlags(Qn::remote_server))
             return;
 
-        /* Do not invalidate history if server goes offline. */
-        if (resource->getStatus() != Qn::Online)
-            return;
-
         auto cameras = getServerFootageData(resource->getId());
+
+        /* Do not invalidate history if server goes offline. */
+        if (resource->getStatus() == Qn::Online)
+            for (const auto &cameraId: cameras)
+                invalidateCameraHistory(cameraId);
+
         for (const auto &cameraId: cameras)
-            invalidateCameraHistory(cameraId);
+            if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
+                emit cameraFootageChanged(camera);
     });
 }
 
@@ -82,7 +85,7 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
 
     if (notify)
         if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
-            emit cameraFootageChanged(camera);
+            emit cameraHistoryInvalidated(camera);
 }
 
 bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback) {
@@ -287,17 +290,25 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
 void QnCameraHistoryPool::resetServerFootageData(const ec2::ApiServerFootageDataList& cameraHistoryList)
 {
     QSet<QnUuid> localHistoryValidCameras;
+    QSet<QnUuid> allCameras;
     {
         QMutexLocker lock(&m_mutex);
         m_archivedCamerasByServer.clear();
         m_historyDetail.clear();
         localHistoryValidCameras = m_historyValidCameras;
-        for(const ec2::ApiServerFootageData& item: cameraHistoryList)
+        for(const ec2::ApiServerFootageData& item: cameraHistoryList) {
             m_archivedCamerasByServer.insert(item.serverGuid, item.archivedCameras);
+            for (const auto &cameraId: item.archivedCameras)
+                allCameras.insert(cameraId);
+        }
     }
 
     for (const QnUuid &cameraId: localHistoryValidCameras)
         invalidateCameraHistory(cameraId);
+
+    for (const QnUuid &cameraId: allCameras) 
+        if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
+            emit cameraFootageChanged(camera);
 }
 
 void QnCameraHistoryPool::setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras) {
@@ -305,8 +316,11 @@ void QnCameraHistoryPool::setServerFootageData(const QnUuid& serverGuid, const s
         QMutexLocker lock(&m_mutex);
         m_archivedCamerasByServer.insert(serverGuid, cameras);
     }
-    for (const auto &cameraId : cameras)
+    for (const auto &cameraId : cameras) {
         invalidateCameraHistory(cameraId);
+        if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
+            emit cameraFootageChanged(camera);
+    }
 }
 
 void QnCameraHistoryPool::setServerFootageData(const ec2::ApiServerFootageData &serverFootageData) {

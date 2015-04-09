@@ -17,8 +17,6 @@
 #include <camera/loaders/multi_server_camera_data_loader.h>
 #include <camera/loaders/layout_file_camera_data_loader.h>
 
-#include "api/common_message_processor.h"
-
 #include <utils/serialization/json.h>
 #include <utils/serialization/json_functions.h>
 
@@ -65,10 +63,8 @@ void QnCachingCameraDataLoader::init() {
         m_loaders[i] = NULL;
     }
 
-    if(!m_resourceIsLocal) {
+    if(!m_resourceIsLocal)
         connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
-        connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::initialResourcesReceived, this, &QnCachingCameraDataLoader::discardCachedData);
-    }
 }
 
 void QnCachingCameraDataLoader::initLoaders(QnAbstractCameraDataLoader **loaders) {
