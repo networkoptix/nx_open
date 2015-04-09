@@ -263,7 +263,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processFusionReply<ec2::ApiCameraHistoryDataList>(this, response, handle);
         break;
     case ec2RecordedTimePeriodsObject:
-        processFusionReply<MultiServerPeriodDataList>(this, response, handle);
+        processCompressedPeriodsReply<MultiServerPeriodDataList>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -823,5 +823,7 @@ int QnMediaServerConnection::cameraHistory(const QnChunksRequestData &request, Q
 }
 
 int QnMediaServerConnection::recordedTimePeriods(const QnChunksRequestData &request, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(ec2RecordedTimePeriodsObject, request.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList) ,target, slot);
+    QnChunksRequestData fixedFormatRequest(request);
+    fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
+    return sendAsyncGetRequest(ec2RecordedTimePeriodsObject, fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList) ,target, slot);
 }

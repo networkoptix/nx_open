@@ -7,7 +7,9 @@
 
 #include <rest/server/json_rest_result.h>
 #include <utils/common/warnings.h>
+
 #include <utils/serialization/json.h>
+#include <utils/serialization/compressed_time.h>
 
 #include "abstract_connection.h"
 
@@ -114,6 +116,18 @@ protected:
         emitFinished(derived, status, reply, handle, errorString);
     }
 
+    template<class T, class Derived>
+    void processCompressedPeriodsReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+        T reply;
+        if(status == 0) {
+            bool success = true;
+            reply = QnCompressedTime::deserialized(response.data, T(), &success);
+            if (!success)
+                status = 1;
+        } 
+        emitFinished(derived, status, reply, handle, QString::fromUtf8(response.errorString));
+    }
 
 private:
     int m_object;
