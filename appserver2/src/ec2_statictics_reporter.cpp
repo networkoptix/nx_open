@@ -249,7 +249,7 @@ namespace ec2
         }
 
         NX_LOG(lit("Ec2StaticticsReporter: Sending statistics asynchronously to %1")
-               .arg(serverApi), cl_logDEBUG1);
+               .arg(url.toString()), cl_logDEBUG1);
 
         if (reportApi) *reportApi = url.toString();
         return ErrorCode::ok;

@@ -67,7 +67,8 @@ CREATE TABLE `cameras` (
   `vendor` varchar(45) DEFAULT NULL,
   `MaxFPS` int(11) DEFAULT NULL,
   `hasDualStreaming` tinyint(1) DEFAULT NULL,
-  `isAudioSupported` tinyint(1) DEFAULT NULL
+  `isAudioSupported` tinyint(1) DEFAULT NULL,
+  `overrideAr` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -134,7 +135,8 @@ CREATE TABLE `mediaservers` (
   `not_used` varchar(45) DEFAULT NULL,
   `status` varchar(45) DEFAULT NULL,
   `systemInfo` varchar(45) DEFAULT NULL,
-  `version` varchar(45) DEFAULT NULL
+  `version` varchar(45) DEFAULT NULL,
+  `beta` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -165,4 +167,4 @@ CREATE TABLE `storages` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-04-06 20:29:46
+-- Dump completed on 2015-04-09 18:19:49

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from setuptools import setup, find_packages
 from pip.req import parse_requirements
 import sys, os
@@ -15,7 +17,7 @@ setup(name='statserver',
       classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='',
       author='Mikhail Uskov',
-      author_email='',
+      author_email='muskov@networkoptix.com',
       url='',
       license='Commercial',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
