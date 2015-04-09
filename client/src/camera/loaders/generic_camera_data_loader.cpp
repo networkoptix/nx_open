@@ -136,20 +136,21 @@ void QnGenericCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
 }
 
 int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, const qint64 resolutionMs) {
-    QnChunksRequestData requestData;
-    requestData.resList << camera();
-    requestData.startTimeMs = periodToLoad.startTimeMs;
-    requestData.endTimeMs = periodToLoad.endTimeMs();
-    requestData.filter = m_filter;
-    requestData.periodsType = dataTypeToPeriod(m_dataType);
-
-
     switch (m_dataType) {
     case Qn::RecordedTimePeriod:
     case Qn::MotionTimePeriod: 
-    case Qn::BookmarkTimePeriod:
-        return m_connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int))
-        );
+    case Qn::BookmarkTimePeriod: 
+        {
+            QnChunksRequestData requestData;
+            requestData.resList << camera();
+            requestData.startTimeMs = periodToLoad.startTimeMs;
+            requestData.endTimeMs = periodToLoad.endTimeMs();
+            requestData.filter = m_filter;
+            requestData.periodsType = dataTypeToPeriod(m_dataType);
+
+            return m_connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int))
+            );
+        }
     case Qn::BookmarkData:
         {
             QnCameraBookmarkSearchFilter bookmarkFilter;
