@@ -5,8 +5,6 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QProcess>
 #include <QtCore/QElapsedTimer>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>

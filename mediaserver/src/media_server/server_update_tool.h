@@ -13,7 +13,6 @@
 
 class QFile;
 class QIODevice;
-class QNetworkAccessManager;
 class QnZipExtractor;
 
 class QnServerUpdateTool : public QObject, public Singleton<QnServerUpdateTool> {
