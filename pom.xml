@@ -285,7 +285,7 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
-                <module>hole_punching_mediator</module>
+                <module>nx_cloud/connection_mediator</module>
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -625,7 +625,7 @@
             <properties>
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
-		<target.arch>amd64</target.arch>
+        <target.arch>amd64</target.arch>
             </properties>
         </profile>
         <profile>
@@ -644,7 +644,7 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-		<target.arch>i386</target.arch>
+        <target.arch>i386</target.arch>
             </properties>
         </profile>  
         <profile>
@@ -664,7 +664,7 @@
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-		<target.arch>i386</target.arch>
+        <target.arch>i386</target.arch>
             </properties>
         </profile>          
         <profile>
