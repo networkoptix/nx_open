@@ -3,14 +3,14 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "hole_puncher_service.h"
+#include "mediator_service.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
 
-static HolePuncherProcess* serviceInstance = NULL;
+static MediatorProcess* serviceInstance = NULL;
 
 void stopServer( int /*signal*/ )
 {
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     signal(SIGTERM, stopServer);
 #endif
 
-    HolePuncherProcess service(argc, argv);
+    MediatorProcess service(argc, argv);
     serviceInstance = &service;
     const int result = service.exec();
 

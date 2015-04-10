@@ -17,17 +17,16 @@
 #include <utils/network/connection_server/multi_address_server.h>
 #include <utils/network/http/server/http_stream_socket_server.h>
 
-#include "hole_punching_requests_processor.h"
 #include "stun/stun_stream_socket_server.h"
 
 
-class HolePuncherProcess
+class MediatorProcess
 :
     public QtService<QtSingleCoreApplication>,
     public QnStoppable
 {
 public:
-    HolePuncherProcess( int argc, char **argv );
+    MediatorProcess( int argc, char **argv );
 
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop() override;

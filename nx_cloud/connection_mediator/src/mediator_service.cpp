@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "hole_puncher_service.h"
+#include "mediator_service.h"
 
 #include <algorithm>
 #include <iostream>
@@ -25,7 +25,7 @@
 #include "version.h"
 
 
-HolePuncherProcess::HolePuncherProcess( int argc, char **argv )
+MediatorProcess::MediatorProcess( int argc, char **argv )
 : 
     QtService<QtSingleCoreApplication>(argc, argv, QN_APPLICATION_NAME),
     m_argc( argc ),
@@ -34,12 +34,12 @@ HolePuncherProcess::HolePuncherProcess( int argc, char **argv )
     setServiceDescription(QN_APPLICATION_NAME);
 }
 
-void HolePuncherProcess::pleaseStop()
+void MediatorProcess::pleaseStop()
 {
     application()->quit();
 }
 
-int HolePuncherProcess::executeApplication()
+int MediatorProcess::executeApplication()
 {
     static const QLatin1String DEFAULT_LOG_LEVEL( "ERROR" );
     static const QLatin1String DEFAULT_STUN_ADDRESS_TO_LISTEN( ":3345" );
@@ -159,6 +159,7 @@ int HolePuncherProcess::executeApplication()
     if( !m_multiAddressHttpServer->listen() )
         return 5;
 
+    //TODO #ak remove qt event loop
     //application's main loop
     const int result = application()->exec();
 
@@ -169,7 +170,7 @@ int HolePuncherProcess::executeApplication()
     return result;
 }
 
-void HolePuncherProcess::start()
+void MediatorProcess::start()
 {
     QtSingleCoreApplication* application = this->application();
 
@@ -181,12 +182,12 @@ void HolePuncherProcess::start()
     }
 }
 
-void HolePuncherProcess::stop()
+void MediatorProcess::stop()
 {
     application()->quit();
 }
 
-QString HolePuncherProcess::getDataDirectory()
+QString MediatorProcess::getDataDirectory()
 {
     const QString& dataDirFromSettings = m_settings->value( "dataDir" ).toString();
     if( !dataDirFromSettings.isEmpty() )
@@ -202,7 +203,7 @@ QString HolePuncherProcess::getDataDirectory()
 #endif
 }
 
-int HolePuncherProcess::printHelp()
+int MediatorProcess::printHelp()
 {
     //TODO #ak
 

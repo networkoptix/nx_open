@@ -17,7 +17,7 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>2.3.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>hole_punching_mediator</artifactId>
+    <artifactId>connection_mediator</artifactId>
     <packaging>pom</packaging>
     <name>HD Witness Mediator</name>    
 
