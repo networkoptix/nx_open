@@ -66,7 +66,13 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
     d->executorThread->start();
 
     d->commandThreadPool = new QThreadPool(this);
-    d->commandThreadPool->setMaxThreadCount(128); /* This should be enough. TODO #ak this is certainly enough to kill mediaserver on some ARM-based platform */
+#ifdef __arm__
+    const int maxThreads = 8;
+#else
+    const int maxThreads = 32;
+#endif
+    d->commandThreadPool->setMaxThreadCount(maxThreads);
+    d->commandThreadPool->setExpiryTimeout(-1); // default experation timeout is 30 second. But it has a bug in QT < v.5.3
 
     connect(d->resourcePool,    &QnResourcePool::resourceAdded,             this,   &QnPtzControllerPool::registerResource);
     connect(d->resourcePool,    &QnResourcePool::resourceRemoved,           this,   &QnPtzControllerPool::unregisterResource);

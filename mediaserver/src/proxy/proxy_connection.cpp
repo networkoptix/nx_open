@@ -347,7 +347,7 @@ void QnProxyConnectionProcessor::doRawProxy()
     Q_D(QnProxyConnectionProcessor);
 
     //TODO #ak move away from C buffer
-    std::unique_ptr<char> buffer( new char[READ_BUFFER_SIZE] );
+    std::unique_ptr<char[]> buffer( new char[READ_BUFFER_SIZE] );
 
     while (!m_needStop)
     {
@@ -403,7 +403,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
 {
     Q_D(QnProxyConnectionProcessor);
 
-    std::unique_ptr<char> buffer( new char[READ_BUFFER_SIZE] );
+    std::unique_ptr<char[]> buffer( new char[READ_BUFFER_SIZE] );
     d->clientRequest.clear();
 
     while (!m_needStop)
