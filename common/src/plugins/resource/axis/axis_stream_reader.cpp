@@ -163,7 +163,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
         CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
         const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=remove&group=root.StreamProfile."+profileToRemove);
         const int httpStatus = http.doGET( requestPath );    //ignoring error code
-        if( status != CL_HTTP_SUCCESS )
+        if( httpStatus != CL_HTTP_SUCCESS )
         {
             NX_LOG( lit("Failed to remove old Axis profile %1 on camera %2").
                 arg(QLatin1String(profileToRemove)).arg(res->getHostAddress()), cl_logDEBUG1 );
