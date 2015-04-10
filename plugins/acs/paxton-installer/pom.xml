@@ -18,7 +18,7 @@
     <version>2.3.0-SNAPSHOT</version>
     <artifactId>paxton-installer</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Generic RTSP plugin</name> 
+    <name>Paxton Integration Module Installer</name> 
 
     <properties>
         <product.title>Paxton Integration Module Installer</product.title>    

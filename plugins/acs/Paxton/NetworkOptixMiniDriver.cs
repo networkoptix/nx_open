@@ -46,6 +46,35 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
 
         private long _tick;
 
+        private Api.ConnectInfo getConnectInfo(Uri url, string login, string password) {
+            Api.ConnectInfo connectInfo = LoadData<Api.ConnectInfo>(url.ToString() + "ec2/connect", login, password);
+
+            Version serverVersion = new Version(connectInfo.version);
+            int ourProtoVersion = CustomProperties.protoVersion;
+
+            if (CustomProperties.brand != connectInfo.brand) {
+                MessageBox.Show("Incompatible software", "Error", MessageBoxButtons.OK);
+                return null;
+            }
+
+            if (ourProtoVersion < connectInfo.nxClusterProtoVersion) {
+                MessageBox.Show("Incompatible version. Please update... blah-blah-blah", "Error", MessageBoxButtons.OK);
+                return null;
+            }
+
+            return connectInfo;
+        }
+
+        private Uri buildUrl(OemDvrConnection cnInfo) {
+            Uri url = cnInfo.HostName.StartsWith("http://") ? new Uri(cnInfo.HostName) : new Uri("http://" + cnInfo.HostName);
+
+            int port = (int)cnInfo.Port;
+            if (port == 0)
+                port = url.Port;
+
+            return new UriBuilder("http", url.Host, port).Uri;
+        }
+
         #region Implementation of IDvrMiniDriver
 
         public string GetSupplierIdentity() {
@@ -55,40 +84,29 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             return supplierIdentity;
         }
 
-        public OemDvrStatus VerifyDvrCredentials(OemDvrConnection connectionInfo) {
+        public OemDvrStatus VerifyDvrCredentials(OemDvrConnection cnInfo) {
             try {
-                Uri url = new Uri(connectionInfo.HostName);
-                int port = (int)connectionInfo.Port;
-                if (port == 0)
-                    port = url.Port;
-
-                WebRequest request = HttpWebRequest.Create(String.Format("http://{0}:{1}/ec2/testConnection", url.Host, port));
-
-                request.Credentials = new NetworkCredential(connectionInfo.UserId, connectionInfo.Password);
-
-                WebResponse response = request.GetResponse();
-                response.Close();
-
-                return OemDvrStatus.Succeeded;
-            }
-            catch (Exception excp) {
+                Uri url = buildUrl(cnInfo);
+                Api.ConnectInfo connectInfo = getConnectInfo(url, cnInfo.UserId, cnInfo.Password);
+                if (connectInfo != null)
+                    return OemDvrStatus.Succeeded;
+            } catch (Exception excp) {
                 _logger.Error(excp);
             }
+
+            MessageBox.Show("Can't connect to the server");
 
             return OemDvrStatus.InsufficientPriviledges;
         }
 
-        public OemDvrStatus GetListOfCameras(OemDvrConnection connectionInfo, List<OemDvrCamera> cameras) {
+        public OemDvrStatus GetListOfCameras(OemDvrConnection cnInfo, List<OemDvrCamera> cameras) {
             WebResponse response = null;
 
             try {
-                Uri url = new Uri(connectionInfo.HostName);
-                int port = (int)connectionInfo.Port;
-                if (port == 0)
-                    port = url.Port;
+                Uri baseUrl = buildUrl(cnInfo);
 
-                WebRequest request = HttpWebRequest.Create(String.Format("http://{0}:{1}/ec2/getCamerasEx?format=json", url.Host, port));
-                request.Credentials = new NetworkCredential(connectionInfo.UserId, connectionInfo.Password);
+                WebRequest request = HttpWebRequest.Create(new Uri(baseUrl, "/ec2/getCamerasEx?format=json"));
+                request.Credentials = new NetworkCredential(cnInfo.UserId, cnInfo.Password);
                 response = request.GetResponse();
 
                 StreamReader reader = new StreamReader(response.GetResponseStream());
@@ -124,13 +142,28 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             return JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
         }
 
-        public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
-            // MessageBox.Show("pe2");
+        private long calculateTimeOffsetMs(Uri url, string login, string password) {
+            DateTime startTime = DateTime.Now.ToUniversalTime();
+            Api.CurrentTime currentTime = LoadData<Api.CurrentTime>(url.ToString() + "ec2/getCurrentTime", login, password);
+            DateTime endTime = DateTime.Now.ToUniversalTime();
 
+            DateTime localTime = startTime.AddMilliseconds((endTime - startTime).TotalMilliseconds / 2);
+            DateTime serverTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(Convert.ToInt64(currentTime.value));
+
+            long timeOffset = (long)(serverTime - localTime).TotalMilliseconds;
+            timeOffset -= PLAY_OFFSET_MS;
+
+            return timeOffset;
+        }
+
+        private long dateToMsecsSinceEpoch(DateTime dateTime) {
+            return (long)((dateTime.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds);
+        }
+
+        public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
             try {
-                _tick = (long)((pbInfo.StartTimeUtc.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds);
-                Uri hostUrl = new Uri(cnInfo.HostName);
-                Uri url = new Uri(String.Format("http://{0}:{1}@{2}:{3}", cnInfo.UserId, cnInfo.Password, hostUrl.Host, hostUrl.Port));
+                _tick = dateToMsecsSinceEpoch(pbInfo.StartTimeUtc);
+                Uri baseUrl = buildUrl(cnInfo);
 
                 if ((pbInfo.DvrCameras == null) || (pbInfo.DvrCameras.Length <= 0)) {
                     _logger.Error("Playback request without cameras.");
@@ -144,37 +177,27 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
 
                 switch (pbInfo.PlaybackFunction) {
                     case OemDvrPlaybackFunction.Start: {
-                        // Calculate time offset
-                        double timeOffset = 0;
-
-                        DateTime startTime = DateTime.Now.ToUniversalTime();
-                        Api.CurrentTime currentTime = LoadData<Api.CurrentTime>(url.ToString() + "ec2/getCurrentTime", cnInfo.UserId, cnInfo.Password);
-                        DateTime endTime = DateTime.Now.ToUniversalTime();
-
-                        DateTime localTime = startTime.AddMilliseconds((endTime - startTime).TotalMilliseconds / 2);
-                        DateTime serverTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(Convert.ToInt64(currentTime.value));
-                        timeOffset = (serverTime - localTime).TotalMilliseconds;
-                        timeOffset -= PLAY_OFFSET_MS;
-
-                        // Add timeoffset to tick
-                        _tick += (long)timeOffset;
-
-                        MessageBox.Show(String.Format("Offset {0}", timeOffset));
-
-                        Api.ConnectInfo connectInfo = LoadData<Api.ConnectInfo>(url.ToString() + "ec2/connect", cnInfo.UserId, cnInfo.Password);
+                        Api.ConnectInfo connectInfo = getConnectInfo(baseUrl, cnInfo.UserId, cnInfo.Password);
+                        if (connectInfo == null)
+                            return OemDvrStatus.FootagePlaybackFailed;
 
                         Version serverVersion = new Version(connectInfo.version);
-                        int ourProtoVersion = CustomProperties.protoVersion;
 
-                        if (CustomProperties.brand != connectInfo.brand) {
-                            MessageBox.Show("Incompatible software", "Error", MessageBoxButtons.OK);
-                            return OemDvrStatus.FootagePlaybackFailed;
-                        }
+                        // Calculate time offset
+                        long timeOffset = calculateTimeOffsetMs(baseUrl, cnInfo.UserId, cnInfo.Password);
 
-                        if (ourProtoVersion < connectInfo.nxClusterProtoVersion) {
-                            MessageBox.Show("Incompatible version. Please update... blah-blah-blah", "Error", MessageBoxButtons.OK);
-                            return OemDvrStatus.FootagePlaybackFailed;
-                        }
+                        // Add timeoffset to tick
+                        _tick += timeOffset;
+
+                        // Last minute tricks
+                        // if time is within last 30 secs show live
+                        // if it is less than 70 secs set time to current - 70 secs
+                        long currentTime = dateToMsecsSinceEpoch(DateTime.Now);
+                        long timeDiff = currentTime - _tick;
+                        if (timeDiff < 30000)
+                            _tick = -1;
+                        else if (timeDiff < 70000)
+                            _tick = currentTime - 70000;
 
                         String assemblyName = String.Format("{0}Control.{1}", CustomProperties.className, connectInfo.nxClusterProtoVersion);
                         try {
@@ -187,8 +210,11 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                             MessageBox.Show(message, "Error", MessageBoxButtons.OK);
                             return OemDvrStatus.FootagePlaybackFailed;
                         }
-
-                        Load(pbSurface, url);
+                        
+                        UriBuilder uriBuilder = new UriBuilder(baseUrl);
+                        uriBuilder.UserName = cnInfo.UserId;
+                        uriBuilder.Password = cnInfo.Password;
+                        Load(pbSurface, uriBuilder.Uri);
 
                         _cameras = pbInfo.DvrCameras;
                         axHDWitness.play();
@@ -201,7 +227,6 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                         }
 
                     case OemDvrPlaybackFunction.Stop: {
-                            //                        AppDomain.Unload(domain);
                             break;
                         }
 
@@ -345,16 +370,5 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
 
             axHDWitness.reconnect(url.ToString());
         }
-
-        /*
-                static void Main(string[] args) {
-                    OemDvrConnection connectionInfo = new OemDvrConnection("http://mono", 7001, "admin", "123");
-                    List<OemDvrCamera> cameras = new List<OemDvrCamera>();
-
-                    new NetworkOptixMiniDriver().GetListOfCameras(connectionInfo, cameras);
-
-                    // Display the number of command line arguments:
-                    System.Console.WriteLine(args.Length);
-                } */
     }
 }

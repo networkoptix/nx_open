@@ -3,9 +3,12 @@
   <Product Id="*" Name="${display.product.name} Paxton Plugin" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${paxtonInstaller.upgradeCode}">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
-    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
-    <WixVariable Id="WixUIBannerBmp" Value="logo_493x58.bmp" />
-    <WixVariable Id="WixUIDialogBmp" Value="logo_493x312.bmp" />
+    <WixVariable Id="WixUILicenseRtf" Value="resources\License.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="resources\logo_493x58.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="resources\logo_493x312.bmp" />
+
+    <Icon Id="logo.ico" SourceFile="resources\logo.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="logo.ico" />
 
     <Property Id="PAXTONINSTALLED">
       <RegistrySearch Id="PaxtonInstalledSearch" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\{1C927CD7-BE59-4578-B990-50826AF7A762}" Name="Installed" Type="raw" />
