@@ -52,14 +52,6 @@ namespace ec2
         return QnUuid();
     }
 
-    static QString secsToString(uint secs)
-    {
-        static const uint DAY = 24 * 60 * 60;
-        const auto days = secs / DAY, rest = secs % DAY;
-        return lit("%1 days %2").arg(days).arg(rest ?
-            QTime(0, 0).addSecs(rest).toString() : lit("sharp"));
-    }
-
     static uint secsWithPostfix(const QString& str, uint defaultValue)
     {
         qlonglong secs;

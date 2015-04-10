@@ -64,7 +64,7 @@ namespace ec2 {
         ApiLicenseStatistics(const ApiLicenseData& data);
 
         QString name, licenseType, version, brand, expiration;
-        uint64_t cameraCount;
+        qint64 cameraCount;
 	};
 #define ApiLicenseStatistics_Fields (name)(cameraCount)(licenseType)(version)(brand)(expiration)
 

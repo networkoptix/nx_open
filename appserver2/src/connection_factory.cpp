@@ -542,9 +542,9 @@ namespace ec2
 				return ErrorCode::ok;
 			}
 
-            m_serverQueryProcessor.processUpdateAsync(
-				QnTransaction<ApiClientInfoData>(ApiCommand::saveClientInfo, clientInfo),
-				[&](ErrorCode result) {
+            QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
+            m_serverQueryProcessor.processUpdateAsync(transaction,
+                [&](ErrorCode result) {
 					if (result == ErrorCode::ok) {
 						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
 							cl_logINFO);
