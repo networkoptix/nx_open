@@ -28,6 +28,7 @@ public:
 
     using Singleton<QnCommonModule>::instance;
     using QnInstanceStorage::instance;
+    using QnInstanceStorage::store;
 
     QnResourceDataPool *dataPool() const {
         return m_dataPool;
