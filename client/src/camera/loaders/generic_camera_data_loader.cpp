@@ -165,7 +165,18 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
     return -1;
 }
 
-void QnGenericCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle) {
+void QnGenericCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods_, int requestHandle) {
+    QnTimePeriodList timePeriods;
+    for (const QnTimePeriod &p: timePeriods_) {
+        if (p.durationMs < 1) {
+            timePeriods.push_back(p);
+        } else {
+            qint64 step = qMax(2ll, p.durationMs / 1000000);
+            for (qint64 t = p.startTimeMs; t < p.endTimeMs(); t += step)
+                timePeriods.push_back(QnTimePeriod(t, step - 1));
+        }
+    }
+
     QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(timePeriods));
     handleDataLoaded(status, data, requestHandle);
 }

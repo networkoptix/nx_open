@@ -785,7 +785,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         return result;
 
     size_t firstIndex = itr - m_chunks.begin();
-    result << QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs);
+    result.push_back(QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs));
 
     for (size_t i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
     {
@@ -796,7 +796,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         else {
             if (last.durationMs < detailLevel && result.size() > 1)
                 result.pop_back();
-            result << QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs);
+            result.push_back(QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs));
         }
     }
     //if (!result.isEmpty())

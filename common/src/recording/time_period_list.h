@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include <QtCore/QVector>
-
 #include "time_period.h"
 
 class QnTimePeriodListTimeIterator;
@@ -13,9 +11,9 @@ class QnTimePeriodListTimeIterator;
  * A sorted list of time periods that basically is an implementation of 
  * an interval container concept.
  */
-class QnTimePeriodList: public QVector<QnTimePeriod> {
+class QnTimePeriodList: public std::vector<QnTimePeriod> {
 public:
-    QnTimePeriodList(): QVector<QnTimePeriod>() {}
+    QnTimePeriodList(): std::vector<QnTimePeriod>() {}
     QnTimePeriodList(const QnTimePeriod &singlePeriod);
 
     /**
@@ -51,6 +49,14 @@ public:
 
     inline QnTimePeriodListTimeIterator timeBegin() const;
     inline QnTimePeriodListTimeIterator timeEnd() const;
+
+    const QnTimePeriod &first() const { return *begin(); }
+    QnTimePeriod &first() { return *begin(); }
+
+    const QnTimePeriod &last() const { return *(end() - 1); }
+    QnTimePeriod &last() { return *(end() - 1); }
+
+    bool isEmpty() const { return empty(); }
 
     /** 
      * Encode (compress) data to a byte array. 

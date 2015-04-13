@@ -614,7 +614,7 @@ void QnWorkbenchNavigator::jumpBackward() {
                 pos = periods.last().startTimeMs * 1000;
             } else {
                 QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime/1000, true);
-                itr = qMax(itr - 1, periods.constBegin());
+                itr = qMax(itr - 1, periods.cbegin());
                 pos = itr->startTimeMs * 1000;
                 if (reader->isReverseMode() && itr->durationMs != -1)
                     pos += itr->durationMs * 1000;
@@ -647,10 +647,10 @@ void QnWorkbenchNavigator::jumpForward() {
 
         qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000;
         QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
-        if (itr != periods.constEnd())
+        if (itr != periods.cend())
             ++itr;
         
-        if (itr == periods.constEnd()) {
+        if (itr == periods.cend()) {
             /* Do not make step forward to live if we are playing backward. */
             if (reader->isReverseMode())
                 return;

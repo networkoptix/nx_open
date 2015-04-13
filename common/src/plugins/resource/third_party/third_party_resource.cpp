@@ -327,7 +327,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         nxcip::UsecUTCTimestamp periodEnd = nxcip::INVALID_TIMESTAMP_VALUE;
         timePeriods->get( &periodStart, &periodEnd );
 
-        resultTimePeriods << QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS );
+        resultTimePeriods.push_back(QnTimePeriod(periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS));
     }
     timePeriods->releaseRef();
 

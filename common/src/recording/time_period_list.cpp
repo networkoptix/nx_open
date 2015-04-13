@@ -2,21 +2,23 @@
 
 #include <utils/common/util.h>
 #include <utils/math/math.h>
+#include <QElapsedTimer>
 
 namespace {
     static const qint64 InvalidValue = INT64_MAX;
 }
 
-QnTimePeriodList::QnTimePeriodList(const QnTimePeriod &singlePeriod): 
-    QVector<QnTimePeriod>() {
-        append(singlePeriod);
+QnTimePeriodList::QnTimePeriodList(const QnTimePeriod &singlePeriod) :
+    std::vector<QnTimePeriod>()
+{
+    push_back(singlePeriod);
 }
 
 QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 timeMs, bool searchForward) const {
     if (isEmpty())
         return end();
 
-    const_iterator itr = qUpperBound(constBegin(), constEnd(), timeMs);
+    const_iterator itr = qUpperBound(cbegin(), cend(), timeMs);
     if (itr != begin())
         --itr;
 
@@ -32,7 +34,7 @@ qint64 QnTimePeriodList::roundTimeToPeriodUSec(qint64 timeUsec, bool searchForwa
 {
     qint64 timeMs = timeUsec/1000;
     const_iterator period = findNearestPeriod(timeMs, searchForward);
-    if (period != constEnd()) {
+    if (period != cend()) {
         if (period->contains(timeMs))
             return timeUsec;
         else if (searchForward)
@@ -69,8 +71,8 @@ bool QnTimePeriodList::containTime(qint64 timeMs) const
 }
 
 bool QnTimePeriodList::containPeriod(const QnTimePeriod &period) const {
-    auto found = std::find_if(constBegin(), constEnd(), [period](const QnTimePeriod &p){return p.contains(period);});
-    return found != constEnd();
+    auto found = std::find_if(cbegin(), cend(), [period](const QnTimePeriod &p){return p.contains(period);});
+    return found != cend();
 }
 
 QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const {
@@ -146,20 +148,23 @@ bool QnTimePeriodList::encode(QByteArray &stream, bool intersected)
 {
     if (isEmpty())
         return true;
+
     qint64 timePos = first().startTimeMs;
 
     qint64 val = htonll(timePos << 16);
     stream.append(((const char*) &val), 6);
 
-    for (int i = 0; i < size(); ++i)
-    {
-        qint64 timeDelta = at(i).startTimeMs - timePos;
+    bool first = true;
+    for (const QnTimePeriod &period: *this) {
+        qint64 timeDelta = period.startTimeMs - timePos;
         if (timeDelta < 0 && !intersected)
             return false;
-        if (i > 0)
+        if (Q_LIKELY(!first)) {
             serializeField(stream, timeDelta, intersected);
-        serializeField(stream, at(i).durationMs+1, intersected);
-        timePos += timeDelta + at(i).durationMs;
+            first = false;
+        }
+        serializeField(stream, period.durationMs+1, intersected);
+        timePos += timeDelta + period.durationMs;
     }
     return true;
 };
@@ -244,22 +249,22 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &
     QnTimePeriodList result;
     if (periods.isEmpty())
         return result;
-    result << periods[0];
 
-    for (int i = 1; i < periods.size(); ++i)
-    {
-        QnTimePeriod& last = result.last();
+    result.push_back(*periods.begin());
+
+    for (const QnTimePeriod &p: periods) {
+        QnTimePeriod &last = result.last();
         if(last.durationMs == -1)
             break;
 
-        if (last.startTimeMs + last.durationMs + detailLevelMs > periods[i].startTimeMs) {
-            if(periods[i].durationMs == -1) {
+        if (last.startTimeMs + last.durationMs + detailLevelMs > p.startTimeMs) {
+            if(p.durationMs == -1) {
                 last.durationMs = -1;
             } else {
-                last.durationMs = qMax(last.durationMs, periods[i].startTimeMs + periods[i].durationMs - last.startTimeMs);
+                last.durationMs = qMax(last.durationMs, p.startTimeMs + p.durationMs - last.startTimeMs);
             }
         } else {
-            result << periods[i];
+            result.push_back(p);
         }
     }
 
@@ -269,48 +274,48 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &
 QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periods)
 {
     if(periods.size() == 1)
-        return periods[0];
+        return periods.first();
 
-    QVector<int> minIndexes;
-    minIndexes.resize(periods.size());
+    QVector<int> minIndexes(periods.size());
     QnTimePeriodList result;
     int minIndex = 0;
-    while (minIndex != -1)
-    {
+    while (minIndex != -1) {
         qint64 minStartTime = 0x7fffffffffffffffll;
         minIndex = -1;
-        for (int i = 0; i < periods.size(); ++i) 
-        {
-            int startIdx = minIndexes[i];
-            if (startIdx < periods[i].size() && periods[i][startIdx].startTimeMs < minStartTime) {
+        int i = 0;
+        for (const QnTimePeriodList &periodsList: periods) {
+            size_t startIdx = minIndexes[i];
+            const QnTimePeriod &startPeriod = periodsList[startIdx];
+
+            if (startIdx < periodsList.size() && startPeriod.startTimeMs < minStartTime) {
                 minIndex = i;
-                minStartTime = periods[i][startIdx].startTimeMs;
+                minStartTime = startPeriod.startTimeMs;
             }
+            ++i;
         }
 
-        if (minIndex >= 0)
-        {
-            int& startIdx = minIndexes[minIndex];
+        if (minIndex >= 0) {
+            int &startIdx = minIndexes[minIndex];
+            const QnTimePeriodList &periodsList = periods[minIndex];
+            const QnTimePeriod &startPeriod = periodsList[startIdx];
+
             // add chunk to merged data
-            if (result.isEmpty()) {
-                result << periods[minIndex][startIdx];
-            }
-            else {
-                QnTimePeriod& last = result.last();
-                if (periods[minIndex][startIdx].durationMs == -1) 
-                {
+            if (result.empty()) {
+                result.push_back(startPeriod);
+            } else {
+                QnTimePeriod &last = result.last();
+                if (startPeriod.durationMs == -1) {
                     if (last.durationMs == -1)
-                        last.startTimeMs = qMin(last.startTimeMs, periods[minIndex][startIdx].startTimeMs);
-                    else if (periods[minIndex][startIdx].startTimeMs > last.startTimeMs+last.durationMs)
-                        result << periods[minIndex][startIdx];
+                        last.startTimeMs = qMin(last.startTimeMs, startPeriod.startTimeMs);
+                    else if (startPeriod.startTimeMs > last.startTimeMs+last.durationMs)
+                        result.push_back(startPeriod);
                     else 
                         last.durationMs = -1;
                     break;
-                }
-                else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime)
-                    last.durationMs = qMax(last.durationMs, minStartTime + periods[minIndex][startIdx].durationMs - last.startTimeMs);
-                else {
-                    result << periods[minIndex][startIdx];
+                } else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime) {
+                    last.durationMs = qMax(last.durationMs, minStartTime + startPeriod.durationMs - last.startTimeMs);
+                } else {
+                    result.push_back(startPeriod);
                 }
             } 
             startIdx++;
