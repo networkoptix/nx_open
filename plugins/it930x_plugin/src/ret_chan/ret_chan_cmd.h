@@ -26,7 +26,7 @@
 
 #endif
 
-#include "../it930x/type.h"
+#include "../dtvapi_v14/type.h"
 
 #ifndef IN
 #define IN

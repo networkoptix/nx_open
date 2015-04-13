@@ -1,4 +1,4 @@
-/* DTVAPI.cpp : Defines the entry point for the DLL application. */
+#ifdef DTVAPI_V15
 
 #include "DTVAPI.h"
 
@@ -6,22 +6,21 @@ int DTV_DeviceOpen(
 	IN	HandleType handle_type,
 	IN	Byte handle_number)
 {
-    static const unsigned MAX_DEVICE_NAME = 128;
-
+	static const unsigned MAX_DEVICE_NAME = 128;
+	
 	int handle = 0, ret = 0;
-    char handle_path[MAX_DEVICE_NAME];
-	ret += 0;
+	char handle_path[MAX_DEVICE_NAME];
 	switch(handle_type){
 		case OMEGA:
-            ret = snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it913x%d", handle_number);
+			ret = snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it913x%d", handle_number);
 			break;
 		
 		case ENDEAVOUR:
-            ret = snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it930x%d", handle_number);
+			ret = snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it930x%d", handle_number);
 			break;
 		
 		case SAMBA:
-            ret = snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it9175%d", handle_number);
+			ret = snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it9175%d", handle_number);
 			break;
 		
 		default:
@@ -108,7 +107,6 @@ Dword DTV_AcquireChannel(
 	return result;
 }
 
-#if 1
 Dword DTV_IsLocked(
 	IN	int handle,
 	OUT	Bool *is_lock)
@@ -134,7 +132,6 @@ Dword DTV_IsLocked(
 	
 	return result;
 }
-#endif
 
 Dword DTV_EnablePIDTable(
 	IN	int handle)
@@ -262,6 +259,12 @@ Dword DTV_GetStatistic(
 	channel_statistic.abortCount = 0;
 	channel_statistic.postVitBitCount = 0;
 	channel_statistic.postVitErrorCount = 0;
+	
+	channel_statistic.preVitErrorCount = 0;
+	channel_statistic.preVitBitCount = 0;
+	channel_statistic.softErrorCount = 0;
+	channel_statistic.softBitCount = 0;
+	
 	signal_statistic.signalLocked = 0;
 	signal_statistic.signalPresented = 0;
 	signal_statistic.signalStrength = 0;
@@ -636,3 +639,25 @@ Dword DTV_WriteEEPROM(
 
 	return result;
 }
+
+Dword DTV_GetBoardInputValue(
+	IN int handle,
+	OUT Byte *value)
+{
+	Dword result = ERR_NO_ERROR;
+	int p_value = 0;
+		
+	if(handle > 0){
+		if(ioctl(handle, IOCTL_ITE_DEMOD_GETBOARDINPUTPOWER, (void *)&p_value))
+			result = ERR_CANT_FIND_USB_DEV;
+	} else {
+		result = ERR_USB_INVALID_HANDLE;
+	}
+	
+	
+	*value = p_value;
+	
+	return result;
+}
+
+#endif

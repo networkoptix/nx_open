@@ -33,9 +33,9 @@
 #include <ctype.h>
 #include <errno.h>
 
-#include "it930x/type.h"
-#include "it930x/iocontrol.h"
-#include "it930x/error.h"
+#include "type.h"
+#include "iocontrol.h"
+#include "error.h"
 
 #define DTVEXPORT 
 

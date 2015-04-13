@@ -6,7 +6,11 @@
 
 extern "C"
 {
-#include "DTVAPI.h"
+#if defined( DTVAPI_V14 )
+ #include "dtvapi_v14/DTVAPI.h"
+#elif defined( DTVAPI_V15 )
+ #include "dtvapi_v15/DTVAPI.h"
+#endif
 }
 
 #include "rc_command.h"
