@@ -117,6 +117,55 @@ namespace ec2
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
         ErrorCode doQuery(const ApiStoredFilePath& path, qint64& dumpFileSize);
 
+		// --------- misc -----------------------------
+        QnUuid getID() const;
+
+        ApiOjectType getObjectType(const QnUuid& objectId)
+        {
+            QWriteLocker lock( &m_mutex );
+            return getObjectTypeNoLock( objectId );
+        }
+        /*!
+            \note This overload should be called within transaction
+        */
+        ApiOjectType getObjectTypeNoLock(const QnUuid& objectId);
+        ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
+
+        bool saveMiscParam( const QByteArray& name, const QByteArray& value );
+        bool readMiscParam( const QByteArray& name, QByteArray* value );
+
+        //!Reads settings (properties of user 'admin')
+        ErrorCode readSettings(ApiResourceParamDataList& settings);
+
+        virtual QnDbTransaction* getTransaction() override;
+
+    signals:
+        //!Emitted after \a QnDbManager::init was successfully executed
+        void initialized();
+
+    private:
+        enum FilterType
+        {
+            RES_ID_FIELD,
+            RES_TYPE_FIELD,
+            RES_PARENT_ID_FIELD
+        };
+
+        //!query filter
+        class QnQueryFilter
+        {
+        public:
+            //filtered field, 
+            QMap<int, QVariant> fields;
+        };
+
+
+        friend class QnTransactionLog;
+        QSqlDatabase& getDB() { return m_sdb; }
+        QReadWriteLock& getMutex() { return m_mutex; }
+
+        // ------------ data retrieval --------------------------------------
+
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
         //getStorageData
@@ -186,43 +235,6 @@ namespace ec2
         //getTransactionLog
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList);
 
-		// --------- misc -----------------------------
-        QnUuid getID() const;
-
-        ApiOjectType getObjectType(const QnUuid& objectId);
-        ApiObjectInfoList getNestedObjects(const ApiObjectInfo& parentObject);
-
-        bool saveMiscParam( const QByteArray& name, const QByteArray& value );
-        bool readMiscParam( const QByteArray& name, QByteArray* value );
-
-        //!Reads settings (properties of user 'admin')
-        ErrorCode readSettings(ApiResourceParamDataList& settings);
-
-        virtual QnDbTransaction* getTransaction() override;
-    signals:
-        //!Emitted after \a QnDbManager::init was successfully executed
-        void initialized();
-
-    private:
-        enum FilterType
-        {
-            RES_ID_FIELD,
-            RES_TYPE_FIELD,
-            RES_PARENT_ID_FIELD
-        };
-
-        //!query filter
-        class QnQueryFilter
-        {
-        public:
-            //filtered field, 
-            QMap<int, QVariant> fields;
-        };
-
-
-        friend class QnTransactionLog;
-        QSqlDatabase& getDB() { return m_sdb; }
-        QReadWriteLock& getMutex() { return m_mutex; }
 
         // ------------ transactions --------------------------------------
 
