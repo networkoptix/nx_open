@@ -35,7 +35,10 @@ void QnStorageDb::afterDelete()
             return; // keep record list to delete. try to the next time
         }
     }
-    tran.commit();
+    if( !tran.commit() )
+    {
+        //TODO #ak handle error
+    }
 
     m_recordsToDelete.clear();
 }
@@ -68,34 +71,40 @@ bool QnStorageDb::deleteRecordsInternal(const DeleteRecordInfo& delRecord)
     return true;
 }
 
-void QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
+bool QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
 {
     QMutexLocker locker(&m_syncMutex);
 
     if (chunk.durationMs <= 0)
-        return;
+        return true;
 
     m_delayedData << DelayedData(cameraUniqueId, catalog, chunk);
     if (m_lastTranTime.elapsed() < COMMIT_INTERVAL) 
-        return;
+        return true;
 
-    flushRecordsNoLock();
+    return flushRecordsNoLock();
 }
 
-void QnStorageDb::flushRecords()
+bool QnStorageDb::flushRecords()
 {
     QMutexLocker locker(&m_syncMutex);
-    flushRecordsNoLock();
+    return flushRecordsNoLock();
 }
 
-void QnStorageDb::flushRecordsNoLock()
+bool QnStorageDb::flushRecordsNoLock()
 {
     QnDbTransactionLocker tran(getTransaction());
     for(const DelayedData& data: m_delayedData)
-        addRecordInternal(data.cameraUniqueId, data.catalog, data.chunk);
-    tran.commit();
+        if( !addRecordInternal(data.cameraUniqueId, data.catalog, data.chunk) )
+            return false;
+    if( !tran.commit() )
+    {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        return false;
+    }
     m_lastTranTime.restart();
     m_delayedData.clear();
+    return true;
 }
 
 bool QnStorageDb::addRecordInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
@@ -142,7 +151,11 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
         }
     }
 
-    tran.commit();
+    if( !tran.commit() )
+    {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        return false;
+    }
     return true;
 }
 
@@ -170,7 +183,11 @@ bool QnStorageDb::createDatabase()
     if (!initializeBookmarksFtsTable())
         return false;
 
-    tran.commit();
+    if( !tran.commit() )
+    {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        return false;
+    }
 
     m_lastTranTime.restart();
     return true;

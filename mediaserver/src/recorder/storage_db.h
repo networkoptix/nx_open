@@ -34,8 +34,14 @@ public:
     bool open(const QString& fileName);
 
     bool deleteRecords(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, qint64 startTimeMs = -1);
-    void addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
-    void flushRecords();
+    /*!
+        \return \a false if failed to save record to DB
+    */
+    bool addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
+    /*!
+        \return \a false if failed to save to DB
+    */
+    bool flushRecords();
     bool createDatabase();
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
@@ -49,7 +55,7 @@ public:
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 private:
     virtual QnDbTransaction* getTransaction() override;
-    void flushRecordsNoLock();
+    bool flushRecordsNoLock();
     bool initializeBookmarksFtsTable();
 
     bool deleteRecordsInternal(const DeleteRecordInfo& delRecord);
