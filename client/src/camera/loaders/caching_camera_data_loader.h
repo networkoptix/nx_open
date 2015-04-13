@@ -89,11 +89,14 @@ private:
 
     qreal m_loadingMargin;
     qint64 m_updateInterval;
+    
+    qint64 m_previousRequestTime[Qn::TimePeriodContentCount];
 
     QnTimePeriod m_targetPeriod[Qn::CameraDataTypeCount];
     QnTimePeriod m_boundingPeriod;
 
     QnTimePeriodList m_requestedTimePeriods[Qn::TimePeriodContentCount];
+    QnTimePeriodList m_queuedToLoadTimePeriods[Qn::TimePeriodContentCount];
     QnTimePeriodCameraData m_timePeriodCameraData[Qn::TimePeriodContentCount];
 
     QMap<qint64, QnTimePeriodList> m_requestedBookmarkPeriodsByResolution;  //TODO: #GDM #Bookmarks should we enumerate by resolution set index?

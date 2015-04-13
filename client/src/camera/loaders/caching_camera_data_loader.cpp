@@ -42,6 +42,36 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(QnAbstractCameraDataLoader 
 {
     init();
     initLoaders(loaders);
+
+    for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
+        Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
+        m_previousRequestTime[timePeriodType] = 0;
+    }
+
+    QTimer* loadTimer = new QTimer(this);
+    loadTimer->setInterval(30 * 1000);  // time period will be loaded once in 30 seconds
+    loadTimer->setSingleShot(false);
+    connect(loadTimer, &QTimer::timeout, this, [this] {
+
+        for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
+            Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
+
+#ifndef QN_ENABLE_BOOKMARKS
+        if (timePeriodType == Qn::BookmarksContent)
+            continue;
+#endif
+
+            QVector<QnTimePeriodList> allPersiodsToLoad;
+            for (const auto &timePeriod: m_queuedToLoadTimePeriods[timePeriodType])
+                allPersiodsToLoad << QnTimePeriodList(timePeriod);
+            QnTimePeriodList periodsToLoad = QnTimePeriodList::mergeTimePeriods(allPersiodsToLoad);
+            for (const auto &timePeriod: periodsToLoad)
+                load(timePeriodToDataType(timePeriodType), timePeriod);
+        }
+
+
+    });
+    loadTimer->start();
 }
 
 QnCachingCameraDataLoader::~QnCachingCameraDataLoader() {
@@ -385,7 +415,9 @@ void QnCachingCameraDataLoader::discardCachedData() {
 
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
+        m_previousRequestTime[timePeriodType] = 0;
         m_requestedTimePeriods[timePeriodType].clear();
+        m_queuedToLoadTimePeriods[timePeriodType].clear();
         m_timePeriodCameraData[timePeriodType].clear();
         updateTimePeriods(timePeriodToDataType(timePeriodType));
         emit periodsChanged(timePeriodType);
@@ -418,13 +450,22 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::CameraDataType dataType) {
         return;
 #endif
 
-    QnTimePeriodList& requestedPeriods = m_requestedTimePeriods[dataTypeToPeriod(dataType)];
+    auto periodType = dataTypeToPeriod(dataType);
+
+    QnTimePeriodList& requestedPeriods = m_requestedTimePeriods[periodType];
     if (requestedPeriods.containPeriod(m_targetPeriod[dataType]))
         return;
 
     QnTimePeriod requestedPeriod = addLoadingMargins(m_targetPeriod[dataType], m_boundingPeriod, minTimePeriodLoadingMargin);
     requestedPeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << requestedPeriods << QnTimePeriodList(requestedPeriod));
-    load(dataType, requestedPeriod);
+
+    qint64 curTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 timeSpan = curTime - m_previousRequestTime[periodType];
+    if (m_previousRequestTime[periodType] == 0 || timeSpan > 30*1000)
+        load(dataType, requestedPeriod);
+    else
+        m_queuedToLoadTimePeriods[periodType].append(requestedPeriod);
+    m_previousRequestTime[periodType] = curTime;
 }
 
 void QnCachingCameraDataLoader::updateBookmarks() {
