@@ -5,6 +5,7 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <utils/serialization/sql.h>
+#include "utils/common/log.h"
 #include "utils/common/util.h"
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 1;
@@ -12,7 +13,8 @@ static const int COMMIT_INTERVAL = 1000 * 60 * 1;
 QnStorageDb::QnStorageDb(int storageIndex):
     QnDbHelper(),
     m_storageIndex(storageIndex),
-    m_tran(m_sdb, m_mutex)
+    m_tran(m_sdb, m_mutex),
+    m_needReopenDB(false)
 {
     m_lastTranTime.restart();
 }
@@ -37,7 +39,9 @@ void QnStorageDb::afterDelete()
     }
     if( !tran.commit() )
     {
-        //TODO #ak handle error
+        NX_LOG( lit("Error commiting to storage DB %1. %2").
+            arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        m_needReopenDB = true;
     }
 
     m_recordsToDelete.clear();
@@ -66,6 +70,7 @@ bool QnStorageDb::deleteRecordsInternal(const DeleteRecordInfo& delRecord)
     if (!query.exec())
     {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
     return true;
@@ -100,6 +105,7 @@ bool QnStorageDb::flushRecordsNoLock()
     if( !tran.commit() )
     {
         qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
     m_lastTranTime.restart();
@@ -122,8 +128,10 @@ bool QnStorageDb::addRecordInternal(const QString& cameraUniqueId, QnServer::Chu
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
+
     return true;
 }
 
@@ -138,6 +146,7 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -154,6 +163,7 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
     if( !tran.commit() )
     {
         qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
     return true;
@@ -249,6 +259,7 @@ bool QnStorageDb::removeCameraBookmarks(const QString& cameraUniqueId) {
         delQuery.bindValue(":id", cameraUniqueId);
         if (!delQuery.exec()) {
             qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+            m_needReopenDB = true;
             return false;
         }
     }
@@ -259,6 +270,7 @@ bool QnStorageDb::removeCameraBookmarks(const QString& cameraUniqueId) {
         delQuery.bindValue(":id", cameraUniqueId);
         if (!delQuery.exec()) {
             qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+            m_needReopenDB = true;
             return false;
         }
     }
@@ -279,6 +291,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
     insQuery.bindValue(":cameraUniqueId", cameraUniqueId); // unique_id
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -287,6 +300,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
     cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
     if (!cleanTagQuery.exec()) {
         qWarning() << Q_FUNC_INFO << cleanTagQuery.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -297,6 +311,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
         tagQuery.bindValue(":name", tag);
         if (!tagQuery.exec()) {
             qWarning() << Q_FUNC_INFO << tagQuery.lastError().text();
+            m_needReopenDB = true;
             return false;
         }
     }
@@ -310,6 +325,7 @@ bool QnStorageDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
     cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
     if (!cleanTagQuery.exec()) {
         qWarning() << Q_FUNC_INFO << cleanTagQuery.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -318,6 +334,7 @@ bool QnStorageDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
     cleanQuery.addBindValue(bookmark.guid.toRfc4122());
     if (!cleanQuery.exec()) {
         qWarning() << Q_FUNC_INFO << cleanQuery.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -383,6 +400,7 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -420,6 +438,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return result;
     }
     QSqlRecord queryInfo = query.record();
@@ -474,6 +493,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
     query.prepare("SELECT unique_id, start_time, duration FROM storage_bookmark ORDER BY unique_id, start_time");
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return result;
     }
     QSqlRecord queryInfo = query.record();
@@ -511,5 +531,11 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
 
 QnStorageDb::QnDbTransaction* QnStorageDb::getTransaction()
 {
+    if( m_needReopenDB )
+    {
+        if( m_sdb.open() )
+            m_needReopenDB = false;
+    }
+
     return &m_tran;
 }

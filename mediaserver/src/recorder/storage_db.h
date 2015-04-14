@@ -1,6 +1,8 @@
 #ifndef __STORAGE_DB_H_
 #define __STORAGE_DB_H_
 
+#include <memory>
+
 #include <QElapsedTimer>
 
 #include <core/resource/camera_bookmark_fwd.h>
@@ -42,7 +44,6 @@ public:
         \return \a false if failed to save to DB
     */
     bool flushRecords();
-    bool createDatabase();
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
     void beforeDelete();
@@ -53,7 +54,10 @@ public:
     bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QString& cameraUniqueId);
     bool deleteCameraBookmark(const QnCameraBookmark &bookmark);
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
+
 private:
+    bool createDatabase();
+
     virtual QnDbTransaction* getTransaction() override;
     bool flushRecordsNoLock();
     bool initializeBookmarksFtsTable();
@@ -65,6 +69,7 @@ private:
     QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
 
     void addCatalogFromMediaFolder(const QString& postfix, QnServer::ChunksCatalog catalog, QVector<DeviceFileCatalogPtr>& result);
+
 private:
     int m_storageIndex;
     QElapsedTimer m_lastTranTime;
@@ -88,8 +93,9 @@ private:
     QVector<DeleteRecordInfo> m_recordsToDelete;
     QMutex m_delMutex;
     QnDbTransaction m_tran;
+    bool m_needReopenDB;
 };
 
-typedef QSharedPointer<QnStorageDb> QnStorageDbPtr;
+typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;
 
 #endif // __STORAGE_DB_H_
