@@ -2356,7 +2356,10 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
         return ErrorCode::dbError;
     }
     if(query.next())
+    {
+        qWarning() << Q_FUNC_INFO << "Duplicate user with name "<<name<<" found";
         return ErrorCode::failure;  // another user with same name already exists
+    }
     return ErrorCode::ok;
 }
 

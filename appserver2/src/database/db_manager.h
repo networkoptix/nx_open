@@ -1,6 +1,8 @@
 #ifndef __DB_MANAGER_H_
 #define __DB_MANAGER_H_
 
+#include <QSqlError>
+
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include <nx_ec/data/api_lock_data.h>
@@ -8,6 +10,8 @@
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
+#include <utils/common/log.h>
+
 
 namespace ec2
 {
@@ -95,7 +99,11 @@ namespace ec2
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
             if (result == ErrorCode::ok) {
                 if (!lock.commit())
+                {
+                    NX_LOG( QnLog::EC2_TRAN_LOG, lit("Commit error while executing transaction %1: %2").
+                        arg(ec2::toString(result)).arg(m_sdb.lastError().text()), cl_logWARNING );
                     return ErrorCode::dbError;
+                }
             }
             return result;
         }
