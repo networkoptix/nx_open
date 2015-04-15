@@ -2176,7 +2176,7 @@ void QnMain::at_appStarted()
         return;
 
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
-    ec2::CrashReporter::scanForProblemsAndReport(qnResPool->getAdministrator());
+    ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator());
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)

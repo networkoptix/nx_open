@@ -20,7 +20,8 @@ public:
      *  \note Might be used on the start up in  every binary which generates crash dumps by
      *        \class win32_exception or \class linux_exception
      */
-    static void scanForProblemsAndReport(QnUserResourcePtr admin);
+    static void scanAndReport(QnUserResourcePtr admin);
+    static void scanAndReportAsync(QnUserResourcePtr admin);
 
     /** Sends \param crash to \param serverApi asincronously
      *  \note Might be used for debug purposes

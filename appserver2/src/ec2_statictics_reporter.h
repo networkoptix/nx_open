@@ -34,10 +34,14 @@ namespace ec2
         static const QString SR_SERVER_NO_AUTH;
         static const QString SYSTEM_ID;
 
-        // statistics server information
+        // server information
         static const QString DEFAULT_SERVER_API;
         static const QString AUTH_USER;
         static const QString AUTH_PASSWORD;
+
+        // helpers
+        static QnUserResourcePtr getAdmin(const AbstractUserManagerPtr& manager);
+        static QnUuid getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager);
 
     private:
         void setupTimer();

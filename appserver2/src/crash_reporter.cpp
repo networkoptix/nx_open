@@ -1,8 +1,12 @@
 #include "crash_reporter.h"
 
-#include "common/systemexcept_linux.h"
-#include "common/systemexcept_win32.h"
-#include "utils/common/app_info.h"
+#include <common/systemexcept_linux.h>
+#include <common/systemexcept_win32.h>
+
+#include <utils/common/app_info.h>
+#include <utils/common/concurrent.h>
+
+#include "ec2_thread_pool.h"
 
 #include <QDateTime>
 
@@ -11,10 +15,13 @@ static const QString SERVER_API_COMMAND = lit("reportCrash");
 
 namespace ec2 {
 
-void CrashReporter::scanForProblemsAndReport(QnUserResourcePtr admin)
+void CrashReporter::scanAndReport(QnUserResourcePtr admin)
 {
     if (admin->getProperty(Ec2StaticticsReporter::SR_ALLOWED).toInt() == 0)
-        return; // reports are disabled
+    {
+        qDebug() << "CrashReport sending is not allowed";
+        return;
+    }
 
     #if defined( _WIN32 )
         QDir crashDir(QString::fromStdString(win32_exception::getCrashDirectory()));
@@ -34,8 +41,15 @@ void CrashReporter::scanForProblemsAndReport(QnUserResourcePtr admin)
     const bool auth = admin->getProperty(Ec2StaticticsReporter::SR_SERVER_NO_AUTH).toInt() == 0;
 
     // all craches are going to be send in different threads
+    qDebug() << "CrashReport scan in" << crashDir << "for" << crashFilter;
     for (const auto& crash : crashDir.entryInfoList(QStringList() << crashFilter))
         CrashReporter::send(url, crash, auth);
+}
+
+void CrashReporter::scanAndReportAsync(QnUserResourcePtr admin)
+{
+    QnConcurrent::run( Ec2ThreadPool::instance(),
+                       std::bind(&CrashReporter::scanAndReport, admin));
 }
 
 void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool auth)

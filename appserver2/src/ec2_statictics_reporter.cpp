@@ -31,31 +31,6 @@ namespace ec2
     const QString Ec2StaticticsReporter::AUTH_PASSWORD = lit(
                 "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
 
-    static QnUserResourcePtr getAdmin(const AbstractUserManagerPtr& manager)
-    {
-        QnUserResourceList userList;
-        manager->getUsersSync(QnUuid(), &userList);
-        for (auto& user : userList)
-            if (user->isAdmin())
-                return user;
-
-        qFatal("Can not get user admin");
-		return QnUserResourcePtr();
-    }
-
-    static QnUuid getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager)
-    {
-        QnResourceTypeList typesList;
-        manager->getResourceTypesSync(&typesList);
-        for (auto& rType : typesList)
-            if (rType->getName() == QnResourceTypePool::desktopCameraTypeName)
-                return rType->getId();
-
-        NX_LOG(lit("Ec2StaticticsReporter: Can not get %1 resource type, using null")
-               .arg(QnResourceTypePool::desktopCameraTypeName), cl_logWARNING);
-        return QnUuid();
-    }
-
     static uint secsWithPostfix(const QString& str, uint defaultValue)
     {
         qlonglong secs;
@@ -141,6 +116,31 @@ namespace ec2
         removeTimer();
         outData->status = JUST_INITIATED;
         return initiateReport(&outData->url);
+    }
+
+    QnUserResourcePtr Ec2StaticticsReporter::getAdmin(const AbstractUserManagerPtr& manager)
+    {
+        QnUserResourceList userList;
+        manager->getUsersSync(QnUuid(), &userList);
+        for (auto& user : userList)
+            if (user->isAdmin())
+                return user;
+
+        qFatal("Can not get user admin");
+        return QnUserResourcePtr();
+    }
+
+    QnUuid Ec2StaticticsReporter::getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager)
+    {
+        QnResourceTypeList typesList;
+        manager->getResourceTypesSync(&typesList);
+        for (auto& rType : typesList)
+            if (rType->getName() == QnResourceTypePool::desktopCameraTypeName)
+                return rType->getId();
+
+        NX_LOG(lit("Ec2StaticticsReporter: Can not get %1 resource type, using null")
+               .arg(QnResourceTypePool::desktopCameraTypeName), cl_logWARNING);
+        return QnUuid();
     }
 
     void Ec2StaticticsReporter::setupTimer()

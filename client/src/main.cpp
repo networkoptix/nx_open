@@ -131,6 +131,8 @@ extern "C"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
 
+#include <crash_reporter.h>
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -499,8 +501,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
-    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
+    QObject::connect(clientMessageProcessor.data(), &QnClientMessageProcessor::initialResourcesReceived,
+        [](){ ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator()); });
 
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
 
