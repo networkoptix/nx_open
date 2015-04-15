@@ -95,7 +95,6 @@ class SqlAdapter(object):
             self._cursor.execute('DELETE FROM %s' % tbl)
         self._db.commit()
 
-
     def _save(self, table, data, systemId):
         data['systemId'] = systemId
         if data.has_key('addParams'):

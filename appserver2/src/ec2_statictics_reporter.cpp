@@ -5,15 +5,11 @@
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
 static const bool DEFAULT_SERVER_AUTH = true;
-static const QString DEFAULT_SERVER_API = lit("http://stats.networkoptix.com/statserver/api/reportStatistics");
 
 static const uint DELAY_RATIO = 50;    /* 50% about 15 days */
 static const uint TIMER_CYCLE = 60000; /* msecs, update state every minute */
-static const QString DATE_FORMAT = lit("yyyy-MM-dd hh:mm:ss"); 
-
-// Hardcoded credentials (because of no way to keep it better)
-static const QString AUTH_USER = lit("nx");
-static const QString AUTH_PASSWORD = lit("f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
+static const QString DATE_FORMAT = lit("yyyy-MM-dd hh:mm:ss");
+static const QString SERVER_API_COMMAND = lit("reportStatistics");
 
 static const QString ALREADY_IN_PROGRESS = lit("already in progress");
 static const QString JUST_INITIATED = lit("just initiated");
@@ -26,6 +22,14 @@ namespace ec2
     const QString Ec2StaticticsReporter::SR_SERVER_API = lit("statisticsReportServerApi");
     const QString Ec2StaticticsReporter::SR_SERVER_NO_AUTH = lit("statisticsReportServerNoAuth");
     const QString Ec2StaticticsReporter::SYSTEM_ID = lit("systemId");
+
+    const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit(
+                "http://stats.networkoptix.com/stats/api");
+
+    // Hardcoded credentials (because of no way to keep it better)
+    const QString Ec2StaticticsReporter::AUTH_USER = lit("nx");
+    const QString Ec2StaticticsReporter::AUTH_PASSWORD = lit(
+                "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
 
     static QnUserResourcePtr getAdmin(const AbstractUserManagerPtr& manager)
     {
@@ -230,8 +234,9 @@ namespace ec2
             m_httpClient->setUserPassword(AUTH_PASSWORD);
         }
 
-        QString serverApi = m_admin->getProperty(SR_SERVER_API);
-        QUrl url = serverApi.isEmpty() ? DEFAULT_SERVER_API : serverApi;
+        const QString configApi = m_admin->getProperty(SR_SERVER_API);
+        const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
+        const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
         const auto format = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
         if (!m_httpClient->doPost(url, format, QJson::serialized(data)))
         {

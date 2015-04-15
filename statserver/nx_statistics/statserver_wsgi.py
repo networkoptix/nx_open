@@ -10,8 +10,9 @@ import json
 import MySQLdb # or any other compartable
 app.sqlConnector = MySQLdb
 
-config_file = sys.argv[1]
-app.sqlConnection = json.load(open(config_file))
+config = json.load(open(sys.argv[1])
+app.sqlConnection = config['sql']
+app.storage = config['storage']
 
 import logging
 formatter = logging.Formatter(

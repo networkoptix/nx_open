@@ -11,7 +11,12 @@ app.sqlConnection = dict(
     host = '127.0.0.1',
     user = 'root',
     passwd = '1',
-    db = 'nx_statistics'
+    db = 'nx_statistics',
+)
+
+app.storage = dict(
+    path = '/tmp/statserver_crashes',
+    limit = 1 * 1024 * 1024 * 1024, # 1gb
 )
 
 appRun = dict(

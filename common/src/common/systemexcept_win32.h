@@ -29,6 +29,10 @@ public:
             By default, \a false
     */
     static void setCreateFullCrashDump( bool isFull );
+
+    //!How to find created dumps
+    static std::string getCrashDirectory();
+    static std::string getCrashPattern();
 };
 
 

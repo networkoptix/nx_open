@@ -11,11 +11,11 @@
 
 namespace ec2
 {
-
     class Ec2StaticticsReporter
             : public QObject
     {
     public:
+        /** Collects and reports statistics in automatic mode (by internal timer) */
         Ec2StaticticsReporter(const AbstractUserManagerPtr& userManager,
                                 const AbstractResourceManagerPtr& resourceManager);
         ~Ec2StaticticsReporter();
@@ -33,6 +33,11 @@ namespace ec2
         static const QString SR_SERVER_API;
         static const QString SR_SERVER_NO_AUTH;
         static const QString SYSTEM_ID;
+
+        // statistics server information
+        static const QString DEFAULT_SERVER_API;
+        static const QString AUTH_USER;
+        static const QString AUTH_PASSWORD;
 
     private:
         void setupTimer();

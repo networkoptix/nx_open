@@ -228,6 +228,33 @@ void win32_exception::setCreateFullCrashDump( bool isFull )
     globalCrashDumpSettingsInstance.dumpFullMemory = isFull;
 }
 
+std::string win32_exception::getCrashDirectory()
+{
+    char sProgramName[1024];
+    if(GetProgramName( sProgramName ) )
+    {
+        std::ostringstream os;
+        os << sProgramName << "_*.*";
+        return os.str();
+    }
+
+    return std::string();
+}
+
+std::string win32_exception::getCrashPattern()
+{
+    char sAppData[MAX_PATH];
+    if( FAILED(SHGetFolderPathA(
+            NULL,
+            CSIDL_LOCAL_APPDATA,
+            NULL,
+            0,
+            sAppData)))
+        return std::string();
+
+    return sAppData;
+}
+
 #define MAX_SYMBOL_SIZE 1024
 
 static

@@ -296,6 +296,13 @@ namespace ec2
                 return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(nullptr, out);
             } );
 
+    #ifdef QT_DEBUG
+        registerFunctorHandler<std::nullptr_t, ApiStatisticsServerInfo>( restProcessorPool, ApiCommand::crashProcess,
+            [ this ]( std::nullptr_t, ApiStatisticsServerInfo* const ) {
+                *reinterpret_cast<volatile int*>(0) = 777;
+                return ErrorCode::ok;
+            } );
+    #endif
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )

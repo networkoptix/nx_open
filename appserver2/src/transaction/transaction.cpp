@@ -149,6 +149,7 @@ namespace ec2
 
             REGISTER_COMMAND(getStatisticsReport),
             REGISTER_COMMAND(triggerStatisticsReport),
+            REGISTER_COMMAND(crashProcess),
 
             REGISTER_COMMAND(getTransactionLog)
         };

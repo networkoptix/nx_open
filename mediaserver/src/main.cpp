@@ -49,6 +49,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <crash_reporter.h>
+
 #include <events/mserver_business_rule_processor.h>
 
 #include <media_server/media_server_module.h>
@@ -157,6 +159,11 @@
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
 #endif
+
+#ifdef __linux__
+#include "common/systemexcept_linux.h"
+#endif
+
 #include "platform/hardware_information.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
@@ -2167,7 +2174,9 @@ void QnMain::at_appStarted()
 {
     if (isStopping())
         return;
+
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
+    ec2::CrashReporter::scanForProblemsAndReport(qnResPool->getAdministrator());
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
@@ -2401,6 +2410,7 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef __linux__
+    linux_exception::installCrashSignalHandler();
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
