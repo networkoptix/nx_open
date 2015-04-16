@@ -417,7 +417,7 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     onStreamResolutionChanged( channelNumber, newResolution );
 
     if( getRole() == Qn::CR_SecondaryLiveVideo ||
-        m_cameraRes->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability ) || 
+        !m_cameraRes->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability ) || 
         m_cameraRes->hasDualStreaming2() )
     {
         return;
