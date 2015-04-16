@@ -1,4 +1,4 @@
-#include <sys/time.h>
+#include <ctime>
 
 #include "ret_chan/ret_chan_user_host.h"
 
@@ -16,115 +16,6 @@ static void User_askUserSecurity(Security * security)
     security->userName.set(userName, 20);
     security->password.set(password, 20);
 }
-
-#if 0
-        CMD_GetTxDeviceAddressIDInput
-        CMD_GetTransmissionParameterCapabilitiesInput
-        CMD_GetTransmissionParametersInput
-        CMD_GetHwRegisterValuesInput
-        CMD_GetAdvanceOptionsInput
-        CMD_GetTPSInformationInput
-        CMD_GetSiPsiTableInput
-        CMD_GetNitLocationInput
-        CMD_GetSdtServiceInput
-        CMD_GetEITInformationInput
-
-        //CMD_SetTxDeviceAddressIDInput
-        CMD_SetCalibrationTableInput
-        CMD_SetTransmissionParametersInput
-        CMD_SetHwRegisterValuesInput
-        CMD_SetAdvaneOptionsInput
-        CMD_SetTPSInformationInput
-        CMD_SetSiPsiTableInput
-        CMD_SetNitLocationInput
-        CMD_SetSdtServiceInput
-        CMD_SetEITInformationInput
-
-        //
-
-        CMD_GetCapabilitiesInput
-        CMD_GetDeviceInformationInput
-        CMD_GetHostnameInput
-        CMD_GetSystemDateAndTimeInput
-        CMD_GetSystemLogInput
-        CMD_GetOSDInformationInput
-
-        CMD_SetSystemFactoryDefaultInput
-        CMD_SetHostnameInput
-        CMD_SetSystemDateAndTimeInput
-        CMD_SetOSDInformationInput
-
-        CMD_SystemRebootInput
-        //CMD_UpgradeSystemFirmwareInput
-
-        //
-
-        CMD_GetDigitalInputsInput
-        CMD_GetRelayOutputsInput
-
-        CMD_SetRelayOutputStateInput
-        CMD_SetRelayOutputSettingsInput
-
-        //
-
-        CMD_GetImagingSettingsInput
-        CMD_IMG_GetStatusInput
-        CMD_IMG_GetOptionsInput
-        CMD_GetUserDefinedSettingsInput
-        CMD_SetImagingSettingsInput
-        CMD_IMG_MoveInput
-        CMD_IMG_StopInput
-        CMD_SetUserDefinedSettingsInput
-
-        //
-
-        CMD_GetProfilesInput
-        CMD_GetVideoSourcesInput
-        CMD_GetVideoSourceConfigurationsInput
-        CMD_GetGuaranteedNumberOfVideoEncoderInstancesInput
-        CMD_GetVideoEncoderConfigurationsInput
-        CMD_GetAudioSourcesInput
-        CMD_GetAudioSourceConfigurationsInput
-        CMD_GetAudioEncoderConfigurationsInput
-        CMD_GetVideoSourceConfigurationOptionsInput
-        CMD_GetVideoEncoderConfigurationOptionsInput
-        CMD_GetAudioSourceConfigurationOptionsInput
-        CMD_GetAudioEncoderConfigurationOptionsInput
-        CMD_GetVideoOSDConfigurationInput
-        CMD_GetVideoPrivateAreaInput
-
-        CMD_SetSynchronizationPointInput
-        CMD_SetVideoSourceConfigurationInput
-        CMD_SetVideoEncoderConfigurationInput
-        CMD_SetAudioSourceConfigurationInput
-        CMD_SetAudioEncoderConfigurationInput
-        CMD_SetVideoOSDConfigurationInput
-        CMD_SetVideoPrivateAreaInput
-        CMD_SetVideoSourceControlInput
-
-        //
-
-        CMD_GetConfigurationsInput
-        CMD_PTZ_GetStatusInput
-        CMD_GetPresetsInput
-        CMD_GotoPresetInput
-        CMD_RemovePresetInput
-        CMD_SetPresetInput
-        CMD_AbsoluteMoveInput
-        CMD_RelativeMoveInput
-        CMD_ContinuousMoveInput
-        CMD_SetHomePositionInput
-        CMD_GotoHomePositionInput
-        CMD_PTZ_StopInput
-
-        //
-
-        CMD_GetSupportedRulesInput
-        CMD_GetRulesInput
-        CMD_CreateRuleInput
-        CMD_ModifyRuleInput
-        CMD_DeleteRuleInput
-#endif
 
 namespace ite
 {
@@ -239,29 +130,48 @@ namespace ite
         for (unsigned i = 0; i < size; ++i)
         {
             uint16_t outCmd = RcCommand::in2outID(cmdInputIDs[i]);
-            if (m_responses.find(outCmd) == m_responses.end())
+            auto it = m_responses.find(outCmd);
+            if (it == m_responses.end())
+                return false;
+            else if (it->second != RcCommand::CODE_SUCCESS && it->second != RcCommand::CODE_UNSUPPORTED)
                 return false;
         }
 
         return true;
     }
 
+    bool TxDevice::supported(uint16_t cmdID) const
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        uint16_t outCmd = RcCommand::in2outID(cmdID);
+        auto it = m_responses.find(outCmd);
+        if (it != m_responses.end())
+            return (it->second == RcCommand::CODE_SUCCESS);
+
+        return false;
+    }
+
     uint16_t TxDevice::cmd2update() const
     {
-        static const unsigned num = 7;
-        static const uint16_t cmdIDs[] = {
+        static const unsigned num = 9;
+        static const uint16_t cmdIDs[num] = {
             CMD_GetTransmissionParameterCapabilitiesInput,
             CMD_GetTransmissionParametersInput,
             CMD_GetDeviceInformationInput,
             CMD_GetProfilesInput,
             CMD_GetVideoSourcesInput,
             CMD_GetVideoSourceConfigurationsInput,
-            CMD_GetVideoEncoderConfigurationsInput
+            CMD_GetVideoEncoderConfigurationsInput,
+            //
+            CMD_GetSystemDateAndTimeInput,
+            //CMD_GetVideoOSDConfigurationInput,
+            CMD_GetOSDInformationInput
         };
 
         for (size_t i = 0; i < num; ++i)
         {
-            if (! hasResponses(&cmdIDs[i], 1))
+            if (! hasResponse(cmdIDs[i]))
                 return cmdIDs[i];
         }
 
@@ -276,7 +186,7 @@ namespace ite
             CMD_GetVideoEncoderConfigurationsInput
         };
 
-        if (! hasResponses(cmdIDs, 1))
+        if (! hasResponse(cmdIDs[0]))
             return false;
 
         //
@@ -319,6 +229,113 @@ namespace ite
             return false;
 
         return true;
+    }
+
+    bool TxDevice::prepareDateTime()
+    {
+        static const uint16_t cmdIDs[] = {
+            CMD_GetSystemDateAndTimeInput
+        };
+
+        if (! hasResponse(cmdIDs[0]))
+            return false;
+
+        time_t now = time(nullptr);
+        struct tm utc;
+        gmtime_r(&now, &utc);
+
+        systemTime.UTCSecond = utc.tm_sec;
+        systemTime.UTCMinute = utc.tm_min;
+        systemTime.UTCHour = utc.tm_hour;
+        systemTime.UTCDay = utc.tm_mday;
+        systemTime.UTCMonth = utc.tm_mon + 1;
+        systemTime.UTCYear = utc.tm_year + 1900;
+        systemTime.daylightSavings = (utc.tm_isdst > 0);
+
+        tzset();
+
+        //systemTime.countryRegionID = 0;
+        int hTimezone = timezone / 3600;
+        systemTime.timeZone = hTimezone & 0x7f;
+        if (hTimezone < 0)
+            systemTime.timeZone |= 0x80;
+
+        static const unsigned CC_SIZE = 3;
+        unsigned cc = (systemTime.daylightSavings && tzname[1] && tzname[1][0]) ? 1 : 0;
+        for (unsigned i = 0; i < CC_SIZE; ++i)
+            systemTime.countryCode[i] = tzname[cc][i];
+
+        systemTime.extensionFlag = 0;
+        //systemTime.UTCMillisecond = 0;
+        //systemTime.timeAdjustmentMode = 0;
+
+        return true;
+    }
+
+    bool TxDevice::prepareOSD(unsigned videoSource)
+    {
+        static const uint16_t cmdIDs[] = {
+            CMD_GetVideoOSDConfigurationInput,
+            CMD_GetOSDInformationInput
+        };
+
+        // *.*Enable       0/1
+        // *.*Position     0-5
+
+        if (supported(cmdIDs[0]))
+        {
+            if (videoSrcConfig.configListSize > videoSource)
+                videoOSDConfig.videoSrcToken.copy(&videoSrcConfig.configList[videoSource].token);
+
+            videoOSDConfig.dateEnable = 1;
+            videoOSDConfig.datePosition = 0;
+            videoOSDConfig.dateFormat = 0;
+
+            videoOSDConfig.timeEnable = 1;
+            videoOSDConfig.timePosition = 0;
+            videoOSDConfig.timeFormat = 1;
+
+            videoOSDConfig.logoEnable = 1;
+            videoOSDConfig.logoPosition = 0;
+            videoOSDConfig.logoOption = 0;
+
+            videoOSDConfig.detailInfoEnable = 1;
+            videoOSDConfig.detailInfoPosition = 0;
+            videoOSDConfig.detailInfoOption = 0;
+
+            videoOSDConfig.textEnable = 1;
+            videoOSDConfig.textPosition = 0;
+            videoOSDConfig.text.set((const unsigned char *)"text", 4);
+
+            return true;
+        }
+
+        if (supported(cmdIDs[1]))
+        {
+            osdInfo.dateEnable = 1;
+            osdInfo.datePosition = 0;
+            osdInfo.dateFormat = 0;
+
+            osdInfo.timeEnable = 1;
+            osdInfo.timePosition = 0;
+            osdInfo.timeFormat = 1;
+
+            osdInfo.logoEnable = 1;
+            osdInfo.logoPosition = 0;
+            osdInfo.logoOption = 0;
+
+            osdInfo.detailInfoEnable = 1;
+            osdInfo.detailInfoPosition = 0;
+            osdInfo.detailInfoOption = 0;
+
+            osdInfo.textEnable = 1;
+            osdInfo.textPosition = 0;
+            osdInfo.text.set((const unsigned char *)"text", 4);
+
+            return true;
+        }
+
+        return false;
     }
 
     //

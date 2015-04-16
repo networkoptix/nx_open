@@ -45,15 +45,16 @@ namespace ite
     {
         try
         {
-            m_device.reset(); // dtor first
-            m_device.reset(new It930x(m_rxID));
-            m_device->info(m_rxInfo);
+            m_it930x.reset(); // dtor first
+            m_it930x.reset(new It930x(m_rxID));
+            m_it930x->info(m_rxInfo);
             return true;
         }
-        catch (const char * msg)
+        catch (DtvException& ex)
         {
-            m_devReader->stop();
-            m_device.reset();
+            debug_printf("[it930x] %s %d\n", ex.what(), ex.code());
+
+            m_it930x.reset();
         }
 
         return false;
@@ -96,7 +97,7 @@ namespace ite
                 if (tryLockC(chan))
                 {
                     if (good())
-                        m_devReader->start(m_device.get());
+                        m_devReader->start(m_it930x.get());
 
                     m_txDev = txDev;
                     m_txDev->open();
@@ -121,8 +122,8 @@ namespace ite
             }
         }
 
-        debug_printf("-- Can't lock Rx. Tx %d; Rx: %d; channel: %d (used: %d)\n",
-                     txID, m_rxID, chan, m_sync.usedByCamera.load());
+        debug_printf("[camera] can't lock Rx: %d; Tx %d; channel: %d; used: %d\n",
+                     m_rxID, txID, chan, m_sync.usedByCamera.load());
         return false;
     }
 
@@ -143,27 +144,27 @@ namespace ite
         if (isLocked_u())
             return false;
 
-        if (!m_device && !open())
+        if (!m_it930x && !open())
             return false;
 
         try
         {
             //static const unsigned QUALITY_TIMEOUT_MS = 1000;
 
-            m_device->lockFrequency( TxDevice::freq4chan(channel) );
-            m_channel = channel;
+            m_it930x->lockFrequency( TxDevice::freq4chan(channel) );
 
             //Timer::sleep(QUALITY_TIMEOUT_MS);
             stats();
 
-            //if (good())
-            //    m_devReader->setDevice(m_device.get());
+            m_channel = channel;
             return true;
         }
-        catch (const char * msg)
+        catch (DtvException& ex)
         {
-            m_devReader->stop();
-            m_device.reset();
+            debug_printf("[it930x] %s %d\n", ex.what(), ex.code());
+
+            m_it930x.reset();
+            m_channel = NOT_A_CHANNEL;
         }
 
         return false;
@@ -173,11 +174,10 @@ namespace ite
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-        if (m_devReader)
-            m_devReader->stop();
+        m_devReader->stop();
 
-        if (m_device)
-            m_device->unlockFrequency();
+        if (m_it930x)
+            m_it930x->unlockFrequency();
 
         if (m_txDev)
             m_txDev->close();
@@ -195,40 +195,35 @@ namespace ite
         return isLocked_u();
     }
 
-    bool RxDevice::stats()
+    void RxDevice::stats()
     {
-        if (!m_device)
-            return false;
+        if (!m_it930x)
+            return;
 
-        try
-        {
-            m_signalQuality = 0;
-            m_signalStrength = 0;
-            m_signalPresent = false;
-            bool locked = false;
-            m_device->statistic(m_signalQuality, m_signalStrength, m_signalPresent, locked);
-            return true;
-        }
-        catch (const char * msg)
-        {
-            m_devReader->stop();
-            m_device.reset();
-        }
-
-        return false;
+        m_signalQuality = 0;
+        m_signalStrength = 0;
+        m_signalPresent = false;
+        bool locked = false;
+        m_it930x->statistic(m_signalQuality, m_signalStrength, m_signalPresent, locked);
     }
 
     bool RxDevice::startSearchTx(unsigned channel, unsigned timeoutMS)
     {
+        if (m_sync.searching)
+        {
+            debug_printf("[search] BUG. Try to lock 2 channels same time. Rx: %d; channels: %d vs %d\n", rxID(), m_channel, channel);
+            return false;
+        }
+
         if (tryLockC(channel, false))
         {
-            debug_printf("searching Tx (%d sec). Rx: %d; channel: %d (%d); quality: %d; strength: %d; presence: %d\n",
+            debug_printf("[search] %d sec. Rx: %d; channel: %d (%d); quality: %d; strength: %d; presence: %d\n",
                    timeoutMS/1000, rxID(), channel, TxDevice::freq4chan(channel), quality(), strength(), present());
 
             if (good())
             {
                 m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
-                m_devReader->start(m_device.get(), timeoutMS);
+                m_devReader->start(m_it930x.get(), timeoutMS);
 
                 m_sync.searching.store(true);
                 return true;
@@ -238,16 +233,15 @@ namespace ite
             return false;
         }
 
-        debug_printf("can't search, used. Rx: %d; channel: %d (%d)\n", rxID(), channel, TxDevice::freq4chan(channel));
+        debug_printf("[search] can't lock Rx: %d; channel: %d (%d)\n", rxID(), channel, TxDevice::freq4chan(channel));
         return false;
     }
 
     void RxDevice::stopSearchTx(DevLink& devLink)
     {
-        devLink.rxID = m_rxID;
         devLink.txID = 0;
 
-        if (m_sync.searching && isLocked())
+        if (m_sync.searching /*&& isLocked()*/)
         {
             m_devReader->wait();
 
@@ -279,13 +273,14 @@ namespace ite
 
                 if (pkt.txID() == 0 || pkt.txID() == 0xffff)
                 {
-                    debug_printf("wrong txID: %d\n", pkt.txID());
+                    debug_printf("[RC] wrong txID: %d\n", pkt.txID());
                     continue;
                 }
 
-                if (first)
+                if (first && m_channel < NOT_A_CHANNEL)
                 {
                     first = false;
+                    devLink.rxID = m_rxID;
                     devLink.txID = pkt.txID();
                     devLink.channel = m_channel;
 
@@ -293,7 +288,7 @@ namespace ite
                 }
 
                 if (pkt.txID() != devLink.txID)
-                    debug_printf("-- Different TxIDs from one channel: %d vs %d\n", devLink.txID, pkt.txID());
+                    debug_printf("[RC] different TxIDs from one channel: %d vs %d\n", devLink.txID, pkt.txID());
             }
 
             m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
@@ -342,7 +337,7 @@ namespace ite
     {
         TxDevicePtr txDev = m_txDev;
 
-        bool ok = cmd && cmd->isValid() && txDev && m_device;
+        bool ok = cmd && cmd->isValid() && txDev && m_it930x;
         if (!ok)
             return false;
 
@@ -358,9 +353,16 @@ namespace ite
         std::vector<RcPacketBuffer> pkts;
         cmd->mkPackets(sseq, m_rxID, pkts);
 
-        /// @warning possible troubles with 1-port devices if multipacket
-        for (auto itPkt = pkts.begin(); itPkt != pkts.end(); ++itPkt)
-            m_device->sendRcPacket(itPkt->packet());
+        try
+        {
+            /// @warning possible troubles with 1-port devices if multipacket
+            for (auto itPkt = pkts.begin(); itPkt != pkts.end(); ++itPkt)
+                m_it930x->sendRcPacket(itPkt->packet());
+        }
+        catch (DtvException& ex)
+        {
+            debug_printf("[it930x] %s %d\n", ex.what(), ex.code());
+        }
 
         return true;
     }

@@ -108,14 +108,14 @@ namespace
             }
 
             if (type == FrameTypeExtractor::I_Frame)
-                debug_printf("%s (size %ld; pts %ld; time %ld)\n",
+                debug_printf("[stream] %s (size %ld; pts %ld; time %ld)\n",
                              strFrameType, packet->size(), packet->pts(), time(NULL));
 #endif
             return type == FrameTypeExtractor::I_Frame;
         }
         catch (...)
         {
-            debug_printf("exception in getH264FrameType()\n");
+            debug_printf("[stream] exception in getH264FrameType()\n");
         }
 
         return false;
@@ -168,7 +168,7 @@ namespace ite
         bool key = isKey(pkt);
 #if 0
         if (key && !m_encoderNumber)
-            debug_printf("pts: %u; time: %lu; stamp: %lu\n", pkt->pts(), time(NULL), pkt->timestamp() / 1000 / 1000);
+            debug_printf("[stream] pts: %u; time: %lu; stamp: %lu\n", pkt->pts(), time(NULL), pkt->timestamp() / 1000 / 1000);
 #endif
 
         VideoPacket * packet = new VideoPacket(pkt->data(), pkt->size(), pkt->timestamp());

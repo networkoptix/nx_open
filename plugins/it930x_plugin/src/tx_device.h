@@ -221,9 +221,13 @@ namespace ite
         void resetWanted(uint16_t cmd = 0, uint8_t code = 0);
 
         bool hasResponses(const uint16_t * cmdInputIDs, unsigned size) const;
+        bool hasResponse(uint16_t cmdInputID) const { return hasResponses(&cmdInputID, 1); }
+        bool supported(uint16_t cmdInputID) const;
 
         bool prepareTransmissionParams();
         bool prepareVideoEncoderParams(unsigned streamNo);
+        bool prepareDateTime();
+        bool prepareOSD(unsigned videoSource = 0);
 
         TxDevice(const TxDevice& );
         TxDevice& operator = (const TxDevice& );

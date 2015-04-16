@@ -420,10 +420,10 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.timeFormat, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.logoEnable, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.logoPosition, 0xFF);
-					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.logooption, 0xFF);
+                    check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.logoOption, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.detailInfoEnable, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.detailInfoPosition, 0xFF);
-					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.detailInfooption, 0xFF);
+                    check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.detailInfoOption, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.textEnable, 0xFF);
 					check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->osdInfo.textPosition, 0xFF);
 
@@ -1215,7 +1215,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.timeFormat, 0xFF);
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.logoEnable, 0xFF);
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.logoPosition, 0xFF);
-						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.logooption, 0xFF);
+                        check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.logoOption, 0xFF);
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.detailInfoEnable, 0xFF);
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.detailInfoPosition, 0xFF);
 						check = Cmd_ByteRead(Buffer , checkByte, &index,  &deviceInfo->videoOSDConfig.detailInfoOption, 0xFF);
@@ -2460,10 +2460,10 @@ static unsigned Cmd_setOSDInformation(IN TxDevice * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = osdInfo->timeFormat;
 	cmd_buffer[bufferLength++] = osdInfo->logoEnable;
 	cmd_buffer[bufferLength++] = osdInfo->logoPosition;
-	cmd_buffer[bufferLength++] = osdInfo->logooption;
+    cmd_buffer[bufferLength++] = osdInfo->logoOption;
 	cmd_buffer[bufferLength++] = osdInfo->detailInfoEnable;
 	cmd_buffer[bufferLength++] = osdInfo->detailInfoPosition;
-	cmd_buffer[bufferLength++] = osdInfo->detailInfooption;
+    cmd_buffer[bufferLength++] = osdInfo->detailInfoOption;
 	cmd_buffer[bufferLength++] = osdInfo->textEnable;
 	cmd_buffer[bufferLength++] = osdInfo->textPosition;
 	Cmd_StringAssign(cmd_buffer, &osdInfo->text, &bufferLength);
@@ -2796,7 +2796,7 @@ static unsigned Cmd_setVideoOSDConfig(IN TxDevice * deviceInfo, IN Word command)
 	cmd_buffer[bufferLength++] = videoOSDConfig->timeFormat;
 	cmd_buffer[bufferLength++] = videoOSDConfig->logoEnable;
 	cmd_buffer[bufferLength++] = videoOSDConfig->logoPosition;
-	cmd_buffer[bufferLength++] = videoOSDConfig->logooption;
+    cmd_buffer[bufferLength++] = videoOSDConfig->logoOption;
 	cmd_buffer[bufferLength++] = videoOSDConfig->detailInfoEnable;
 	cmd_buffer[bufferLength++] = videoOSDConfig->detailInfoPosition;
 	cmd_buffer[bufferLength++] = videoOSDConfig->detailInfoOption;

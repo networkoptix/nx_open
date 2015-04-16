@@ -57,9 +57,14 @@ namespace ite
                     }
                 }
             }
-
-            debug_printf("stop reading TS stream, error: %d; forced: %d\n", err, m_stopMe.load());
-
+#if 1
+            const char * reason = "timer";
+            if (err)
+                reason = "error";
+            else if (m_stopMe.load())
+                reason = "forced";
+            debug_printf("[reader] stopped: %s\n", reason);
+#endif
             m_devReader->setThreadObj(nullptr);
         }
 

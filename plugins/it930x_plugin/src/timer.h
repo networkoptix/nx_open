@@ -142,9 +142,9 @@ namespace ite
                 m_basePTS = pts;    
 #if 0
                 if (pts <= m_prevPTS)
-                    debug_printf("Timestamp PTS overflow: %ld\n", m_baseUsec / 1000000);
+                    debug_printf("[stream] timestamp PTS overflow: %ld\n", m_baseUsec / 1000000);
                 else
-                    debug_printf("Timestamp drift: %ld\n", m_baseUsec / 1000000);
+                    debug_printf("[stream] timestamp drift: %ld\n", m_baseUsec / 1000000);
 #endif
             }
 

@@ -183,7 +183,7 @@ namespace ite
                 rxDevs[rxID] = std::make_shared<RxDevice>(rxID); // create RxDevice
         }
 
-        debug_printf("got RX devices: %ld\n", rxDevs.size());
+        debug_printf("[search] got RX devices: %ld\n", rxDevs.size());
 #if 1
         for (size_t i = 0; i < rxDevs.size(); ++i)
         {
@@ -205,7 +205,7 @@ namespace ite
             numTx = m_txDevs.size();
         }
 
-        debug_printf("got TX devices: %ld\n", numTx);
+        debug_printf("[search] got TX devices: %ld\n", numTx);
     }
 
     void DeviceMapper::updateTxDevices()
@@ -228,12 +228,12 @@ namespace ite
 
         if (scanDevs.empty())
         {
-            debug_printf("Start Tx search. All Rx are busy. Do nothing\n");
+            debug_printf("[search] all Rx are busy. Do nothing\n");
             Timer::sleep(1000);
             return;
         }
 
-        debug_printf("Scan for Tx. Free Rx:%s\n", ssFreeDevs.str().c_str());
+        debug_printf("[search] free Rx:%s\n", ssFreeDevs.str().c_str());
 
         std::vector<DevLink> links;
         std::map<uint16_t, std::vector<bool>> rescan; // {i, chan[N]}
@@ -267,7 +267,7 @@ namespace ite
         }
 
         if (rescan.size())
-            debug_printf("Rescan started\n");
+            debug_printf("[search] rescan started\n");
 
         /// @note workaround: rescan good() Rx with [RC] bad packets
         static const unsigned RESCAN_TIMEOUT_MS = 16000;
@@ -294,11 +294,12 @@ namespace ite
         }
 
         if (rescan.size())
-            debug_printf("Rescan finished\n");
+            debug_printf("[search] rescan finished\n");
     }
 
     void DeviceMapper::restoreCamera(const nxcip::CameraInfo& info)
     {
+#if 0
         DevLink link;
 
         std::vector<unsigned short> rxIDs;
@@ -320,6 +321,7 @@ namespace ite
                     dev->checkTx(link.channel, link.txID);
             }
         }
+#endif
     }
 
     RxDevicePtr DeviceMapper::getRx(uint16_t rxID)
@@ -335,11 +337,11 @@ namespace ite
 
     void DeviceMapper::addTxDevice(const DevLink& link)
     {
-        debug_printf("device link Rx: %d; Tx: %d; channel: %d\n", link.rxID, link.txID, link.channel);
+        unsigned freq = TxDevice::freq4chan(link.channel);
+
+        debug_printf("[link] Rx: %d; Tx: %d (%04x); channel: %d (%d)\n", link.rxID, link.txID, link.txID, link.channel, freq);
 
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        unsigned freq = TxDevice::freq4chan(link.channel);
 
         auto it = m_txDevs.find(link.txID);
         if (it == m_txDevs.end())

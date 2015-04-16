@@ -201,10 +201,10 @@ TxRC::TxRC()
 	deviceInfo->osdInfo.timeFormat = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->osdInfo.logoEnable = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->osdInfo.logoPosition = RC_USER_DEFINE_INIT_VALUE;
-	deviceInfo->osdInfo.logooption = RC_USER_DEFINE_INIT_VALUE;
+    deviceInfo->osdInfo.logoOption = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->osdInfo.detailInfoEnable = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->osdInfo.detailInfoPosition = RC_USER_DEFINE_INIT_VALUE;
-	deviceInfo->osdInfo.detailInfooption = RC_USER_DEFINE_INIT_VALUE;
+    deviceInfo->osdInfo.detailInfoOption = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->osdInfo.textEnable = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->osdInfo.textPosition = RC_USER_DEFINE_INIT_VALUE;
     deviceInfo->osdInfo.text.set(byRefStringBuffer, Ref_BufferSize);
@@ -690,7 +690,7 @@ TxRC::TxRC()
 	deviceInfo->videoOSDConfig.timeFormat = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoOSDConfig.logoEnable = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoOSDConfig.logoPosition = RC_USER_DEFINE_INIT_VALUE;
-	deviceInfo->videoOSDConfig.logooption = RC_USER_DEFINE_INIT_VALUE;
+    deviceInfo->videoOSDConfig.logoOption = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoOSDConfig.detailInfoEnable = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoOSDConfig.detailInfoPosition = RC_USER_DEFINE_INIT_VALUE;
 	deviceInfo->videoOSDConfig.detailInfoOption = RC_USER_DEFINE_INIT_VALUE;
@@ -2057,10 +2057,10 @@ void User_getOSDInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    dateFormat		= %u\n",in_OSDInfo->timeFormat);
 	printf("    logoEnable		= %u\n",in_OSDInfo->logoEnable);
 	printf("    logoPosition	= %u\n",in_OSDInfo->logoPosition);
-	printf("    logooption		= %u\n",in_OSDInfo->logooption);
+    printf("    logooption		= %u\n",in_OSDInfo->logoOption);
 	printf("    detailInfoEnable	= %u\n",in_OSDInfo->detailInfoEnable);
 	printf("    detailInfoPosition	= %u\n",in_OSDInfo->detailInfoPosition);
-	printf("    detailInfooption	= %u\n",in_OSDInfo->detailInfooption);
+    printf("    detailInfooption	= %u\n",in_OSDInfo->detailInfoOption);
 	printf("    textEnable		= %u\n",in_OSDInfo->textEnable);
 	printf("    textPosition	= %u\n",in_OSDInfo->textPosition);
 
@@ -2311,7 +2311,7 @@ void User_getVideoOSDConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    timeFormat			= %u\n",in_VideoOSDConfig->timeFormat);
 	printf("    logoEnable			= %u\n",in_VideoOSDConfig->logoEnable);
 	printf("    logoPosition		= %u\n",in_VideoOSDConfig->logoPosition);
-	printf("    logooption			= %u\n",in_VideoOSDConfig->logooption);
+    printf("    logooption			= %u\n",in_VideoOSDConfig->logoOption);
 	printf("    detailInfoEnable		= %u\n",in_VideoOSDConfig->detailInfoEnable);
 	printf("    detailInfoPosition		= %u\n",in_VideoOSDConfig->detailInfoPosition);
 	printf("    detailInfoOption		= %u\n",in_VideoOSDConfig->detailInfoOption);

@@ -530,10 +530,10 @@ typedef struct{
 	Byte timeFormat;
 	Byte logoEnable;
 	Byte logoPosition;
-	Byte logooption;
+    Byte logoOption;
 	Byte detailInfoEnable;
 	Byte detailInfoPosition;
-	Byte detailInfooption;
+    Byte detailInfoOption;
 	Byte textEnable;
 	Byte textPosition;
 	RCString text;
@@ -1055,7 +1055,7 @@ typedef struct{
 	Byte timeFormat;
 	Byte logoEnable;
 	Byte logoPosition;
-	Byte logooption;
+    Byte logoOption;
 	Byte detailInfoEnable;
 	Byte detailInfoPosition;
 	Byte detailInfoOption;

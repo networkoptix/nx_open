@@ -127,7 +127,7 @@ namespace ite
 
         void setTx(unsigned channel, uint16_t txID = 0)
         {
-            debug_printf("Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
+            debug_printf("[search] found Rx: %d; Tx: %d (%04x); channel: %d\n", rxID(), txID, txID, channel);
 
             if (channel >= m_txs.size())
                 return;
@@ -147,17 +147,17 @@ namespace ite
                 return m_txs[channel].lost;
             return m_txs[channel].present;
         }
-
+#if 0
         void checkTx(unsigned channel, uint16_t txID)
         {
-            debug_printf("restore Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
+            debug_printf("[search] restore Rx: %d; Tx: %x (%d); channel: %d\n", rxID(), txID, txID, channel);
 
             if (channel >= m_txs.size())
                 return;
 
             m_txs[channel].check(txID);
         }
-
+#endif
         unsigned chan4Tx(uint16_t txID) const
         {
             for (size_t i = 0; i < m_txs.size(); ++i)
@@ -260,7 +260,7 @@ namespace ite
         };
 
         mutable std::mutex m_mutex;
-        std::unique_ptr<It930x> m_device;
+        std::unique_ptr<It930x> m_it930x;
         std::unique_ptr<DevReader> m_devReader;
         TxDevicePtr m_txDev;                    // locked Tx device (as camera)
         const uint16_t m_rxID;
@@ -277,11 +277,11 @@ namespace ite
 
         // locked Tx device
 
-        bool isLocked_u() const { return m_device.get() && m_device->hasStream(); }
+        bool isLocked_u() const { return m_it930x.get() && m_it930x->hasStream(); }
         bool wantedByCamera() const;
 
         bool open();
-        bool stats();
+        void stats();
 
         bool sendRC(RcCommand * cmd);
     };

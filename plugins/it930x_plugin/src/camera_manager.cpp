@@ -674,7 +674,7 @@ namespace ite
 
             if (timer.elapsedMS() > WAIT_MS)
             {
-                debug_printf("-- Break camera configuration (timeout). Tx: %d; Rx: %d\n",
+                debug_printf("[camera] break configuration (timeout). Tx: %d; Rx: %d\n",
                              txID(), m_rxDevice ? m_rxDevice->rxID() : 0xffff);
                 break;
             }
@@ -762,11 +762,11 @@ namespace ite
                     dev->unlockC();
             }
             else
-                debug_printf("-- Can't lock Rx for Tx: %d\n", txID());
+                debug_printf("[camera] can't lock Rx for Tx: %d\n", txID());
         }
 
         if (supportedRxDevices.empty())
-            debug_printf("-- No Rx for Tx: %d\n", txID());
+            debug_printf("[camera] no Rx for Tx: %d\n", txID());
 
         return best;
     }
