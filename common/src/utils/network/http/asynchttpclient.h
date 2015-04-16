@@ -102,6 +102,10 @@ namespace nx_http
         */
         const Response* response() const;
         StringType contentType() const;
+
+        //! Checks state as well as response return HTTP code (expect 2XX)
+        bool hasRequestSuccesed() const;
+
         //!Returns current message body buffer, clearing it
         /*!
             \note This method is thread-safe and can be called in any thread

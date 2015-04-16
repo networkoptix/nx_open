@@ -9,6 +9,7 @@
 #include "ec2_thread_pool.h"
 
 #include <QDateTime>
+#include <QDebug>
 
 static const QString DATE_FORMAT = lit("yyyy-MM-dd_hh-mm-ss");
 static const QString SERVER_API_COMMAND = lit("reportCrash");
@@ -19,13 +20,13 @@ void CrashReporter::scanAndReport(QnUserResourcePtr admin)
 {
     if (admin->getProperty(Ec2StaticticsReporter::SR_ALLOWED).toInt() == 0)
     {
-        qDebug() << "CrashReport sending is not allowed";
+        qDebug() << "CrashReporter::scanAndReport: sending is not allowed";
         return;
     }
 
     #if defined( _WIN32 )
         QDir crashDir(QString::fromStdString(win32_exception::getCrashDirectory()));
-        auto crashFilter = QString::fromStdString(win32_exception::getCrashPattern();
+        auto crashFilter = QString::fromStdString(win32_exception::getCrashPattern());
     #elif defined ( __linux__ )
         QDir crashDir(QString::fromStdString(linux_exception::getCrashDirectory()));
         auto crashFilter = QString::fromStdString(linux_exception::getCrashPattern());
@@ -40,8 +41,8 @@ void CrashReporter::scanAndReport(QnUserResourcePtr admin)
     const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
     const bool auth = admin->getProperty(Ec2StaticticsReporter::SR_SERVER_NO_AUTH).toInt() == 0;
 
-    // all craches are going to be send in different threads
-    qDebug() << "CrashReport scan in" << crashDir << "for" << crashFilter;
+    // all crashes are going to be send in different threads
+    qDebug() << "CrashReporter::scanAndReport:" << crashDir.absolutePath() << "for files:" << crashFilter;
     for (const auto& crash : crashDir.entryInfoList(QStringList() << crashFilter))
         CrashReporter::send(url, crash, auth);
 }
@@ -57,11 +58,11 @@ void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool aut
     auto filePath = crash.absoluteFilePath();
     QFile file(filePath);
     file.open(QFile::ReadOnly);
-
     auto content = file.readAll();
     if (content.size() == 0)
     {
-        qDebug() << "CrashReport" << filePath << "is not readable or empty:" << file.errorString();
+        qDebug() << "CrashReporter::send: Error:" << filePath << "is not readable or empty:" 
+                 << file.errorString();
         return;
     }
 
@@ -79,26 +80,30 @@ void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool aut
     // keep client alive until the job is done
     c_activeHttpClients.insert(httpClient);
 
-    qDebug() << "CrashReport" << filePath << "sending to" << serverApi;
+    qDebug() << "CrashReporter::send:" << filePath << "to" << serverApi;
     httpClient->doPost(serverApi, "application/octet-stream",
                        content, report->makeHttpHeaders());
 }
 
 void CrashReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient) const
 {
-    if (httpClient->state() == nx_http::AsyncHttpClient::sFailed)
-        qDebug() << "CrashReport to" << httpClient->url() << "has failed";
-    else
+    if (httpClient->hasRequestSuccesed())
         QFile::remove(m_crashFile.absoluteFilePath());
+    else
+        qDebug() << "CrashReporter::finishReport:" << httpClient->url() << "has failed";
 
-    // no reasen to keep client alive any more
+    // no reason to keep client alive any more
     c_activeHttpClients.erase(httpClient);
 }
 
 nx_http::HttpHeaders CrashReporter::makeHttpHeaders() const
 {
     auto fileName = m_crashFile.fileName();
+#if defined( _WIN32 )
+    auto binName = fileName.split(QChar('.')).first(); // remove extension (.exe)
+#else
     auto binName = fileName.split(QChar('_')).first();
+#endif
     auto version = lit("%1-%2").arg(QnAppInfo::applicationVersion())
                                .arg(QnAppInfo::applicationRevision());
     auto systemInfo  = lit("%1-%2-%3").arg(QnAppInfo::applicationPlatform())

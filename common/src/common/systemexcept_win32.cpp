@@ -230,19 +230,6 @@ void win32_exception::setCreateFullCrashDump( bool isFull )
 
 std::string win32_exception::getCrashDirectory()
 {
-    char sProgramName[1024];
-    if(GetProgramName( sProgramName ) )
-    {
-        std::ostringstream os;
-        os << sProgramName << "_*.*";
-        return os.str();
-    }
-
-    return std::string();
-}
-
-std::string win32_exception::getCrashPattern()
-{
     char sAppData[MAX_PATH];
     if( FAILED(SHGetFolderPathA(
             NULL,
@@ -253,6 +240,19 @@ std::string win32_exception::getCrashPattern()
         return std::string();
 
     return sAppData;
+}
+
+std::string win32_exception::getCrashPattern()
+{
+    char sProgramName[1024];
+    if(GetProgramName( sProgramName ) )
+    {
+        std::ostringstream os;
+        os << sProgramName << "_*.*";
+        return os.str();
+    }
+
+    return std::string();
 }
 
 #define MAX_SYMBOL_SIZE 1024

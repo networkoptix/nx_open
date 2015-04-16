@@ -266,12 +266,7 @@ namespace ec2
 
     void Ec2StaticticsReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient)
     {
-        if (httpClient->state() == nx_http::AsyncHttpClient::sFailed)
-        {
-            NX_LOG(lit("Ec2StaticticsReporter: Could not send report to %1, retry after random delay...")
-                   .arg(httpClient->url().toString()), cl_logWARNING);
-        }
-        else
+        if (httpClient->hasRequestSuccesed())
         {
             NX_LOG(lit("Ec2StaticticsReporter: Statistics report successfully sent to %1")
                    .arg(httpClient->url().toString()), cl_logINFO);
@@ -280,7 +275,11 @@ namespace ec2
             m_admin->setProperty(SR_LAST_TIME, QDateTime::currentDateTime().toString(DATE_FORMAT));
             propertyDictionary->saveParams(m_admin->getId());
         }
-        
+        else
+        {
+            NX_LOG(lit("Ec2StaticticsReporter: Could not send report to %1, retry after random delay...")
+                   .arg(httpClient->url().toString()), cl_logWARNING);
+        }
         setupTimer();
     }
 }

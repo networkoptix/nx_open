@@ -27,7 +27,7 @@ def getStorage():
         app.storage = {'path': expanduser("~"), 'limit': 0}
     return FileStorage(log=app.logger, **app.storage)
 
-# --- INTERFACE ---
+# --- REST API ---
 
 @app.route('/api/reportStatistics', methods=['POST'])
 def reportStatistics():
@@ -74,7 +74,7 @@ def deleteAll():
 def reportCrash():
     try:
         args = {name.split('-')[1].lower(): value
-            for name, value in request.headers.items() if name.startswith('Nx')}
+            for name, value in request.headers.items() if name.startswith('Nx-')}
         getStorage().write(request.get_data(), **args)
         return 'Success', 201
     except (IndexError, OSError), e:

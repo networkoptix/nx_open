@@ -14,7 +14,7 @@ class CrashReporter
     Q_OBJECT
 
 public:
-    /** Scans for local reports and sends them to the statistics server asincronously
+    /** Scans for local reports and sends them to the statistics server asynchronously
      *  \param admin is used to configure the process (bt system settings)
      *
      *  \note Might be used on the start up in  every binary which generates crash dumps by
@@ -23,7 +23,7 @@ public:
     static void scanAndReport(QnUserResourcePtr admin);
     static void scanAndReportAsync(QnUserResourcePtr admin);
 
-    /** Sends \param crash to \param serverApi asincronously
+    /** Sends \param crash to \param serverApi asynchronously
      *  \note Might be used for debug purposes
      */
     static void send(const QUrl& serverApi, const QFileInfo& crash, bool auth);

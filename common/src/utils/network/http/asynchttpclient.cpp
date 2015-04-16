@@ -144,6 +144,19 @@ namespace nx_http
         return contentTypeIter->second;
     }
 
+    bool AsyncHttpClient::hasRequestSuccesed() const
+    {
+        if (state() == sFailed)
+            return false;
+
+        if (auto resp = response())
+        {
+            auto status = resp->statusLine.statusCode;
+            return status >= 200 && status < 300; // SUCCESS codes 2XX
+        }
+        return false;
+    }
+
     //!Returns current message body buffer, clearing it
     BufferType AsyncHttpClient::fetchMessageBodyBuffer()
     {
