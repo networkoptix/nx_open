@@ -70,7 +70,7 @@ public:
 
     //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
     bool licensedParametersModified() const;
-    void updateFromResource();
+    void updateFromResource(bool silent = false);
     void reject();
     void submitToResource();
 
@@ -128,9 +128,7 @@ private:
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
 
-    bool initAdvancedTab();
-    void initAdvancedTabWebView();
-
+    void showMaxFpsWarningIfNeeded();
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)

@@ -183,16 +183,8 @@ static const int MAX_DATA_QUEUE_SIZE = 120;
 
 void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    //QnConstAbstractDataPacketPtr data = nonConstData;
-
-//    NX_LOG("queueSize=", m_dataQueue.size(), cl_logALWAYS);
-//    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-//    NX_LOG(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
-
     QMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(nonConstData);
-    //QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
-    //if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
 
     // quality control
 
@@ -445,12 +437,11 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     }
 }
 
-QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged(const QnConstAbstractMediaDataPtr& media)
+QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged()
 {
-    QnArchiveStreamReader* archiveDP = dynamic_cast<QnArchiveStreamReader*>(media->dataProvider);
+    QSharedPointer<QnArchiveStreamReader> archiveDP = m_owner->getArchiveDP();
     if (!archiveDP)
         return QByteArray();
-
     qint64 endTime = archiveDP->endTime();
     if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
         endTime = DATETIME_NOW;
@@ -458,7 +449,7 @@ QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged(const QnConstAbstractMedi
     if (archiveDP->startTime() != m_prevStartTime || endTime != m_prevEndTime) {
         m_prevStartTime = archiveDP->startTime();
         m_prevEndTime = endTime;
-        return m_owner->getRangeStr(archiveDP);
+        return m_owner->getRangeStr();
     }
     else {
         return QByteArray();
@@ -626,7 +617,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if( (++m_framesSinceRangeCheck) > FRAMES_BETWEEN_PLAY_RANGE_CHECK )
     {
         m_framesSinceRangeCheck = 0;
-        const QByteArray& newRange = getRangeHeaderIfChanged(media);
+        const QByteArray& newRange = getRangeHeaderIfChanged();
         if (!newRange.isEmpty())
             sendMetadata(newRange);
     }
