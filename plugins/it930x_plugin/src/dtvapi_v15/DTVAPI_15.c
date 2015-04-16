@@ -8,19 +8,19 @@ int DTV_DeviceOpen(
 {
 	static const unsigned MAX_DEVICE_NAME = 128;
 	
-	int handle = 0, ret = 0;
+    int handle = 0;
 	char handle_path[MAX_DEVICE_NAME];
 	switch(handle_type){
 		case OMEGA:
-			ret = snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it913x%d", handle_number);
+            snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it913x%d", handle_number);
 			break;
 		
 		case ENDEAVOUR:
-			ret = snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it930x%d", handle_number);
+            snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it930x%d", handle_number);
 			break;
 		
 		case SAMBA:
-			ret = snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it9175%d", handle_number);
+            snprintf(handle_path, MAX_DEVICE_NAME, "/dev/usb-it9175%d", handle_number);
 			break;
 		
 		default:

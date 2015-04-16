@@ -1,7 +1,7 @@
-#ifndef RETURN_CHANNEL_USER_HOST_H
-#define RETURN_CHANNEL_USER_HOST_H
+#ifndef RETURN_CHANNEL_REPLY_H
+#define RETURN_CHANNEL_REPLY_H
 
-#include "ret_chan_cmd_host.h"
+#include "ret_chan.h"
 
 //*******************User Define Reply********************
 

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <cstring>
 
 namespace ite
 {

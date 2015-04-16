@@ -16,7 +16,7 @@ extern "C"
 
 namespace ite
 {
-    static const char * VENDOR_NAME = "ITE";
+    static const char * VENDOR_NAME = "it930x";
 
     //
 

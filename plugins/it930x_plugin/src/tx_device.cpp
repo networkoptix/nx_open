@@ -1,7 +1,5 @@
 #include <ctime>
 
-#include "ret_chan/ret_chan_user_host.h"
-
 #include "tx_device.h"
 
 // ret_chan/ret_chan_cmd_host.cpp
@@ -432,9 +430,9 @@ namespace ite
         return m_recvSecurity;
     }
 
-    SecurityValid TxDevice::rc_checkSecurity(Security& )
+    bool TxDevice::rc_checkSecurity(Security& )
     {
-        return Valid;
+        return true;
     }
 
     //

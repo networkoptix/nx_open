@@ -1,4 +1,4 @@
-#include "ret_chan/ret_chan_cmd.h"
+#include "ret_chan/ret_chan.h"
 
 #include "rc_command.h"
 #include "tx_device.h"

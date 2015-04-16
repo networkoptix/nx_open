@@ -381,8 +381,8 @@ namespace ite
         std::string strTxID = RxDevice::id2str(txID);
 
         memset( &info, 0, sizeof(nxcip::CameraInfo) );
-        strncpy( info.modelName, "Pacidal", sizeof(nxcip::CameraInfo::modelName)-1 ); // TODO
-        strncpy( info.url, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::url)-1) );
+        strncpy( info.modelName, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::modelName)-1) ); // TODO
+        strncpy( info.url, "localhost", sizeof(nxcip::CameraInfo::url)-1 );
         strncpy( info.uid, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::uid)-1) );
 
         updateInfoAux(info, txID, frequency, rxIDs);

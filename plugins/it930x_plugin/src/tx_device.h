@@ -7,7 +7,7 @@
 #include <mutex>
 #include <atomic>
 
-#include "ret_chan/ret_chan_cmd_host.h"
+#include "ret_chan/ret_chan.h"
 #include "rc_command.h"
 #include "timer.h"
 #include "object_counter.h"
@@ -204,7 +204,7 @@ namespace ite
         uint8_t * rc_getBuffer(unsigned size);
         unsigned rc_command(Byte * buffer, unsigned bufferSize);
         Security& rc_security();
-        SecurityValid rc_checkSecurity(Security& s);
+        bool rc_checkSecurity(Security& s);
         // --
 
     private:

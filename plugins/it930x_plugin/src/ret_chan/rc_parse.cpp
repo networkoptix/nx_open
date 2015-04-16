@@ -1,6 +1,5 @@
-#include "ret_chan_user_host.h"
+#include "rc_reply.h"
 
-//#include "ret_chan_cmd_host.h"
 #include "../tx_device.h"
 
 using ite::TxDevice;
@@ -35,16 +34,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
             check = Cmd_StringRead(Buffer, checkByte, &index, &security.userName);
             check = Cmd_StringRead(Buffer, checkByte, &index, &security.password);
 
-            Byte valid = deviceInfo->rc_checkSecurity(security);
-            switch (valid)
-            {
-                case UserNameInvalid:
-                    return ReturnChannelError::USER_INVALID;
-                case PasswordInvalid:
-                    return ReturnChannelError::PASSWORD_INVALID;
-                default:
-                    break;
-            }
+            deviceInfo->rc_checkSecurity(security);
         }
 
 #if 1
