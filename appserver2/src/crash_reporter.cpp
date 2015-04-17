@@ -12,7 +12,7 @@
 #include <QDebug>
 
 static const QString DATE_FORMAT = lit("yyyy-MM-dd_hh-mm-ss");
-static const QString SERVER_API_COMMAND = lit("reportCrash");
+static const QString SERVER_API_COMMAND = lit("crash/api/report");
 
 namespace ec2 {
 
@@ -104,8 +104,9 @@ nx_http::HttpHeaders CrashReporter::makeHttpHeaders() const
 #else
     auto binName = fileName.split(QChar('_')).first();
 #endif
-    auto version = lit("%1-%2").arg(QnAppInfo::applicationVersion())
-                               .arg(QnAppInfo::applicationRevision());
+    auto version = lit("%1-%2%3").arg(QnAppInfo::applicationVersion())
+                                 .arg(QnAppInfo::applicationRevision())
+                                 .arg(QnAppInfo::beta() ? "-beta" : "");
     auto systemInfo  = lit("%1-%2-%3").arg(QnAppInfo::applicationPlatform())
                                       .arg(QnAppInfo::applicationArch())
                                       .arg(QnAppInfo::applicationPlatformModification());

@@ -36,7 +36,7 @@
 
 ## Wanna see a demo ststistics?
 
-Run a script `fake_report.py` a couple times to generate randome reports and
+Run a script `statserver_fake_report.py` a couple times to generate randome reports and
 see how statistics works:
 
 ```
