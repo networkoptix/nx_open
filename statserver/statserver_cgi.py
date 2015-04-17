@@ -1,8 +1,8 @@
 #!/usr/bin/python
-'''CGI service for nx_statistics
+'''CGI service for nx_statistics.statserver
 '''
 
-from nx_statistics import app
+from nx_statistics.statserver import app
 
 import MySQLdb # or any other compartable
 app.sqlConnector = MySQLdb
@@ -14,14 +14,9 @@ app.sqlConnection = dict(
     db = 'nx_statistics',
 )
 
-app.storage = dict(
-    path = '/tmp/statserver_crashes',
-    limit = 1 * 1024 * 1024 * 1024, # 1gb
-)
-
 appRun = dict(
     host = '127.0.0.1',
-    port = 8000,
+    port = 8002,
     debug = True,
     use_reloader = False,
 )

@@ -7,7 +7,7 @@ import json, requests
 import random, uuid
 
 def post(content):
-    r = requests.post('http://localhost:8000/api/reportStatistics',
+    r = requests.post('http://localhost:8002/api/report',
                       data=json.dumps(content))
     return r.text
 

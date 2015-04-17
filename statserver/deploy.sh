@@ -3,7 +3,7 @@ set -e -x
 
 SRV=${SRV:-muskov@stats.networkoptix.com}
 
-./setup.py bdist_wheel
+python setup.py bdist_wheel
 
 WHLP=dist/*.whl
 WHLN=$(basename $WHLP)

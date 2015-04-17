@@ -2,10 +2,10 @@
 '''nx_statistics.adapters -- Data model adapters for statistics system
 '''
 
+from datetime import datetime
+
 import json
 import re
-
-from datetime import datetime
 
 class SqlAdapter(object):
     '''SQL adapter to interact with statistics

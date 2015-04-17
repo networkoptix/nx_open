@@ -10,12 +10,13 @@
 ```
 
 
-## CGI Script
+## CGI Scripts
 
 ```
   sudo apt-get install python-pip
   sudo pip install Flask MySql-python pygal # pygal is optional, for sqlCharts only
 
+  ./crashserver_cgi.py # running CGI, edit to configure storage path
   ./statserver_cgi.py # running CGI, edit to configure database connection
 ```
 
@@ -23,12 +24,17 @@
 ## NGINX forwarding
 
 ```
-  location /api {
-    proxy_pass http://127.0.0.1:8000;
+  location /crashserver {
+    rewrite ^/[^/]+(/.*)$ $1 break; # strip path prefix
+    proxy_pass http://127.0.0.1:8001;
+  }
+  location /statserver {
+    rewrite ^/[^/]+(/.*)$ $1 break; # strip path prefix
+    proxy_pass http://127.0.0.1:8002;
   }
 ```
 
-## Wanna see a demo?
+## Wanna see a demo ststistics?
 
 Run a script `fake_report.py` a couple times to generate randome reports and
 see how statistics works:

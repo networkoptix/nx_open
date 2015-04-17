@@ -1,4 +1,3 @@
--f /Users/ivigasin/.pip/packages
 Flask==0.10.1
 Jinja2==2.7.3
 MarkupSafe==0.23
