@@ -19,8 +19,68 @@ namespace ite
     class MediaEncoder;
     class DeviceMapper;
     class DevReader;
+    class CameraManager;
 
-    //!
+    ///
+    class AdvancedSettings
+    {
+    public:
+        AdvancedSettings(TxDevicePtr txDev, RxDevicePtr rxDev)
+        :   m_txDev(txDev), m_rxDev(rxDev)
+        {}
+
+        static const char * getDescriptionXML();
+        int getParamValue(const char * paramName, char * valueBuf, int * valueBufSize) const;
+        int setParamValue(CameraManager& camera, const char * paramName, const char * value);
+
+        void getChannel(std::string& s) const;
+        void getPresent(std::string& s) const { if (m_rxDev) s = m_rxDev->present() ? "true" : "false"; }
+        void getStrength(std::string& s) const { if (m_rxDev) s = num2str(m_rxDev->strength()); }
+        void getQuality(std::string& s) const { if (m_rxDev) s = num2str(m_rxDev->quality()); }
+
+        void getRxID(std::string& s) const { if (m_rxDev) s = num2str(m_rxDev->rxID()); }
+        void getRxCompany(std::string& s) const { if (m_rxDev) s = m_rxDev->rxDriverInfo().company; }
+        void getRxModel(std::string& s) const { if (m_rxDev) s = m_rxDev->rxDriverInfo().supportHWInfo; }
+        void getRxDriverVer(std::string& s) const { if (m_rxDev) s = m_rxDev->rxDriverInfo().driverVersion; }
+        void getRxAPIVer(std::string& s) const { if (m_rxDev) s = m_rxDev->rxDriverInfo().APIVersion; }
+        void getRxFwVer(std::string& s) const
+        {
+            if (m_rxDev)
+            {
+                s = m_rxDev->rxDriverInfo().fwVersionLink;
+                s += "-";
+                s += m_rxDev->rxDriverInfo().fwVersionOFDM;
+            }
+        }
+
+        void getTxID(std::string& s) const { if (m_txDev) s = num2str(m_txDev->txID()); }
+        void getTxHwID(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).hardwareId(); }
+        void getTxCompany(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).companyName(); }
+        void getTxModel(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).modelName(); }
+        void getTxSerial(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).serialNumber(); }
+        void getTxFwVer(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).firmwareVersion(); }
+
+        void getFormat(const char * value, uint8_t& format) const;
+        void getPosition(const char * value, uint8_t& enabled, uint8_t& position) const;
+        unsigned getPositionVariant(uint8_t enabled, uint8_t position) const;
+
+        void getOsdDatePosition(std::string& s) const;
+        void getOsdDateFormat(std::string& s) const;
+        void getOsdTimePosition(std::string& s) const;
+        void getOsdTimeFormat(std::string& s) const;
+        void getOsdLogoPosition(std::string& s) const;
+        void getOsdLogoFormat(std::string& s) const;
+        void getOsdInfoPosition(std::string& s) const;
+        void getOsdInfoFormat(std::string& s) const;
+        void getOsdTextPosition(std::string& s) const;
+        void getOsdText(std::string& s) const;
+
+    private:
+        TxDevicePtr m_txDev;
+        RxDevicePtr m_rxDev;
+    };
+
+    ///
     class CameraManager : public nxcip::BaseCameraManager3, public ObjectCounter<CameraManager>
     {
         DEF_REF_COUNTER
@@ -58,7 +118,7 @@ namespace ite
 
         DevReader * devReader() const;
         std::weak_ptr<RxDevice> rxDevice() const { return m_rxDevice; }
-        void processRC();
+        void processRC(bool update = false);
 
         void openStream(unsigned encNo);
         void closeStream(unsigned encNo);
@@ -67,8 +127,8 @@ namespace ite
 
         void updateTx(TxDevicePtr txDev)
         {
-            if (! m_txDev)
-                m_txDev = txDev;
+            if (! m_txDevice)
+                m_txDevice = txDev;
         }
 
         void updateCameraInfo(const nxcip::CameraInfo& info);
@@ -80,16 +140,21 @@ namespace ite
 
         unsigned short txID() const
         {
-            if (m_txDev)
-                return m_txDev->txID();
+            if (m_txDevice)
+                return m_txDevice->txID();
             return 0;
         }
+
+        //
+
+        bool changeChannel(unsigned channel);
+        bool updateOSD();
 
     private:
         mutable std::mutex m_mutex;
 
         DeviceMapper * m_devMapper;
-        TxDevicePtr m_txDev;
+        TxDevicePtr m_txDevice;
         RxDevicePtr m_rxDevice;
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders; // FIXME: do not use smart ptr for ref-counted object
 
@@ -124,36 +189,6 @@ namespace ite
 
         State checkState() const;
         State tryLoad();
-
-        //
-
-        void getParamStr_Channel(std::string& s) const;
-        void getParamStr_Present(std::string& s) const;
-        void getParamStr_Strength(std::string& s) const;
-        void getParamStr_Quality(std::string& s) const;
-
-        void getParamStr_RxID(std::string& s) const;
-        void getParamStr_RxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().company; }
-        void getParamStr_RxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().supportHWInfo; }
-        void getParamStr_RxDriverVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().driverVersion; }
-        void getParamStr_RxAPIVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().APIVersion; }
-        void getParamStr_RxFwVer(std::string& s) const
-        {
-            if (m_rxDevice)
-            {
-                s = m_rxDevice->rxDriverInfo().fwVersionLink;
-                s += "-";
-                s += m_rxDevice->rxDriverInfo().fwVersionOFDM;
-            }
-        }
-
-        void getParamStr_TxHwID(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).hardwareId; }
-        void getParamStr_TxCompany(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).companyName; }
-        void getParamStr_TxModel(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).modelName; }
-        void getParamStr_TxSerial(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).serialNumber; }
-        void getParamStr_TxFwVer(std::string& s) const { if (m_rxDevice) s = TxManufactureInfo(*m_rxDevice->txDevice()).firmwareVersion; }
-
-        bool setParam_Channel(std::string& s);
     };
 }
 

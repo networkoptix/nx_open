@@ -601,13 +601,13 @@ void User_getOSDInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    dateFormat		= %u\n",in_OSDInfo->dateFormat);
 	printf("    timeEnable		= %u\n",in_OSDInfo->timeEnable);
 	printf("    timePosition	= %u\n",in_OSDInfo->timePosition);
-	printf("    dateFormat		= %u\n",in_OSDInfo->timeFormat);
+    printf("    timeFormat		= %u\n",in_OSDInfo->timeFormat);
 	printf("    logoEnable		= %u\n",in_OSDInfo->logoEnable);
 	printf("    logoPosition	= %u\n",in_OSDInfo->logoPosition);
-    printf("    logooption		= %u\n",in_OSDInfo->logoOption);
+    printf("    logoOption		= %u\n",in_OSDInfo->logoOption);
 	printf("    detailInfoEnable	= %u\n",in_OSDInfo->detailInfoEnable);
 	printf("    detailInfoPosition	= %u\n",in_OSDInfo->detailInfoPosition);
-    printf("    detailInfooption	= %u\n",in_OSDInfo->detailInfoOption);
+    printf("    detailInfoOption	= %u\n",in_OSDInfo->detailInfoOption);
 	printf("    textEnable		= %u\n",in_OSDInfo->textEnable);
 	printf("    textPosition	= %u\n",in_OSDInfo->textPosition);
 

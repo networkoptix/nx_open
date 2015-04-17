@@ -192,7 +192,7 @@ namespace ite
             {
                 unsigned txID = rxDevs[i]->getTx(ch);
                 if (txID)
-                    debug_printf(" %d", txID);
+                    debug_printf(" %d(%d)", txID, ch);
             }
             debug_printf("\n");
         }

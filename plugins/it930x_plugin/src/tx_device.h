@@ -30,29 +30,6 @@ namespace ite
         RCERR_OTHER
     } RCError;
 
-    struct TxManufactureInfo
-    {
-        static std::string rcStr2str(const RCString& s)
-        {
-            return std::string((const char *)s.stringData, s.stringLength);
-        }
-
-        TxManufactureInfo(TxRC& txrc)
-        {
-            companyName = rcStr2str(txrc.manufactureInfo.manufactureName);
-            modelName = rcStr2str(txrc.manufactureInfo.modelName);
-            firmwareVersion = rcStr2str(txrc.manufactureInfo.firmwareVersion);
-            serialNumber = rcStr2str(txrc.manufactureInfo.serialNumber);
-            hardwareId = rcStr2str(txrc.manufactureInfo.hardwareId);
-        }
-
-        std::string companyName;
-        std::string modelName;
-        std::string firmwareVersion;
-        std::string serialNumber;
-        std::string hardwareId;
-    };
-
     ///
     struct SendSequence
     {
@@ -178,6 +155,7 @@ namespace ite
         }
 
         bool ready() const { return m_ready; }
+        void setReady() { m_ready.store(true); }
 
         //
 
@@ -187,7 +165,7 @@ namespace ite
 
         //
 
-        uint16_t cmd2update() const;
+        uint16_t cmd2update();
         bool setWanted(uint16_t cmd);
         uint16_t wantedCmd() { return m_wantedCmd; }
 
@@ -198,6 +176,7 @@ namespace ite
         RcCommand * mkRcCmd(uint16_t command);  // send: RxDevice -> TxDevice -> RcCommand -> RxDevice -> It930x
         RcCommand * mkSetChannel(unsigned channel);
         RcCommand * mkSetEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps);
+        RcCommand * mkSetOSD(unsigned osdNo = 0);
 
         // -- RC
         static uint8_t checksum(const uint8_t * buffer, unsigned length) { return RcPacket::checksum(buffer, length); }
@@ -206,6 +185,11 @@ namespace ite
         Security& rc_security();
         bool rc_checkSecurity(Security& s);
         // --
+
+        static std::string rcStr2str(const RCString& s)
+        {
+            return std::string((const char *)s.stringData, s.stringLength);
+        }
 
     private:
         mutable std::mutex m_mutex;
@@ -231,6 +215,23 @@ namespace ite
 
         TxDevice(const TxDevice& );
         TxDevice& operator = (const TxDevice& );
+    };
+
+    ///
+    struct TxManufactureInfo
+    {
+        TxManufactureInfo(TxRC& tx)
+        :   m_tx(tx)
+        {}
+
+        std::string companyName() { return TxDevice::rcStr2str(m_tx.manufactureInfo.manufactureName); }
+        std::string modelName() { return TxDevice::rcStr2str(m_tx.manufactureInfo.modelName); }
+        std::string firmwareVersion() { return TxDevice::rcStr2str(m_tx.manufactureInfo.firmwareVersion); }
+        std::string serialNumber() { return TxDevice::rcStr2str(m_tx.manufactureInfo.serialNumber); }
+        std::string hardwareId() { return TxDevice::rcStr2str(m_tx.manufactureInfo.hardwareId); }
+
+    private:
+        const TxRC& m_tx;
     };
 }
 

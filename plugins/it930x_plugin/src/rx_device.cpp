@@ -127,25 +127,41 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::tryLockC(unsigned channel, bool prio)
+    bool RxDevice::tryLockC(unsigned channel, bool prio, const char ** reason)
     {
         if (channel >= RxDevice::NOT_A_CHANNEL)
             return false;
 
         if (! prio && wantedByCamera())
+        {
+            if (reason)
+                *reason = "wanted by camera";
             return false;
+        }
 
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         if (! prio && wantedByCamera())
+        {
+            if (reason)
+                *reason = "wanted by camera";
             return false;
+        }
 
         // prevent double locking at all (even with the same frequency)
         if (isLocked_u())
+        {
+            if (reason)
+                *reason = "locked";
             return false;
+        }
 
         if (!m_it930x && !open())
+        {
+            if (reason)
+                *reason = "can't open Rx device";
             return false;
+        }
 
         try
         {
@@ -165,6 +181,8 @@ namespace ite
 
             m_it930x.reset();
             m_channel = NOT_A_CHANNEL;
+            if (reason)
+                *reason = "exception";
         }
 
         return false;
@@ -215,7 +233,8 @@ namespace ite
             return false;
         }
 
-        if (tryLockC(channel, false))
+        const char * reason;
+        if (tryLockC(channel, false, &reason))
         {
             debug_printf("[search] %d sec. Rx: %d; channel: %d (%d); quality: %d; strength: %d; presence: %d\n",
                    timeoutMS/1000, rxID(), channel, TxDevice::freq4chan(channel), quality(), strength(), present());
@@ -233,7 +252,8 @@ namespace ite
             return false;
         }
 
-        debug_printf("[search] can't lock Rx: %d; channel: %d (%d)\n", rxID(), channel, TxDevice::freq4chan(channel));
+        debug_printf("[search] can't lock Rx: %d; channel: %d (%d) - %s\n",
+                    rxID(), channel, TxDevice::freq4chan(channel), reason ? reason : "unknown reason");
         return false;
     }
 
@@ -331,6 +351,8 @@ namespace ite
             if (pcmd && pcmd->isValid())
                 sendRC(pcmd);
         }
+        else
+            m_txDev->setReady();
     }
 
     bool RxDevice::sendRC(RcCommand * cmd)
@@ -379,6 +401,30 @@ namespace ite
 
         return false;
     }
+
+    bool RxDevice::updateOSD()
+    {
+        if (m_txDev)
+        {
+            Timer::sleep(250);
+            RcCommand * pcmd = m_txDev->mkSetOSD(0);
+            bool ok = sendRC(pcmd);
+
+            Timer::sleep(250);
+            pcmd = m_txDev->mkSetOSD(1);
+            ok = sendRC(pcmd);
+
+            Timer::sleep(250);
+            pcmd = m_txDev->mkSetOSD(2);
+            ok = sendRC(pcmd);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    //
 
     bool RxDevice::setEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps)
     {

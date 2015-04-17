@@ -89,7 +89,7 @@ namespace ite
         void unsubscribe(unsigned stream) { m_devReader->unsubscribe(stream2pid(stream)); }
 
         bool lockCamera(TxDevicePtr txDev);
-        bool tryLockC(unsigned freq, bool prio = true);
+        bool tryLockC(unsigned freq, bool prio = true, const char ** reason = nullptr);
         bool isLocked() const;
         void unlockC();
 
@@ -188,6 +188,7 @@ namespace ite
         }
 
         bool changeChannel(unsigned channel);
+        bool updateOSD();
 
     private:
         ///

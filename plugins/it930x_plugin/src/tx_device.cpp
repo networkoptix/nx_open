@@ -1,5 +1,9 @@
 #include <ctime>
 
+#if 0
+#include "../../../common/src/utils/common/synctime.h"
+#endif
+
 #include "tx_device.h"
 
 // ret_chan/ret_chan_cmd_host.cpp
@@ -150,10 +154,12 @@ namespace ite
         return false;
     }
 
-    uint16_t TxDevice::cmd2update() const
+    uint16_t TxDevice::cmd2update()
     {
-        static const unsigned num = 9;
-        static const uint16_t cmdIDs[num] = {
+        static const unsigned groupsNum = 2;
+        static const unsigned num[] = {9, 1};
+
+        static const uint16_t ids0[] = {
             CMD_GetTransmissionParameterCapabilitiesInput,
             CMD_GetTransmissionParametersInput,
             CMD_GetDeviceInformationInput,
@@ -163,20 +169,48 @@ namespace ite
             CMD_GetVideoEncoderConfigurationsInput,
             //
             CMD_GetSystemDateAndTimeInput,
-            //CMD_GetVideoOSDConfigurationInput,
             CMD_GetOSDInformationInput
         };
 
-        for (size_t i = 0; i < num; ++i)
+        static const uint16_t ids1[] = {
+            CMD_SetSystemDateAndTimeInput
+        };
+
+#if 0 // TODO
+        static const uint16_t ids2[] = {
+            CMD_GetVideoOSDConfigurationInput
+        };
+#endif
+
+        static const uint16_t * ids[] = {ids0, ids1};
+
+        for (unsigned group = 0; group < groupsNum; ++group)
         {
-            if (! hasResponse(cmdIDs[i]))
-                return cmdIDs[i];
+            const uint16_t * cmdIDs = ids[group];
+            for (size_t i = 0; i < num[group]; ++i)
+            {
+                if (! hasResponse(cmdIDs[i]))
+                {
+                    switch (cmdIDs[i])
+                    {
+                        case CMD_SetSystemDateAndTimeInput:
+                            prepareDateTime();
+                            break;
+                        case CMD_SetOSDInformationInput:
+                        case CMD_GetVideoOSDConfigurationInput:
+                            prepareOSD(0); // TODO
+                            break;
+                        default:
+                            break;
+                    }
+
+                    return cmdIDs[i];
+                }
+            }
         }
 
-        m_ready.store(true);
         return 0;
     }
-
 
     bool TxDevice::prepareVideoEncoderParams(unsigned streamNo)
     {
@@ -238,7 +272,12 @@ namespace ite
         if (! hasResponse(cmdIDs[0]))
             return false;
 
+#if 0
+        time_t now = qnSyncTime->currentMSecsSinceEpoch() / 1000;
+        //systemTime.UTCMillisecond = qnSyncTime->currentMSecsSinceEpoch() % 1000;
+#else
         time_t now = time(nullptr);
+#endif
         struct tm utc;
         gmtime_r(&now, &utc);
 
@@ -248,15 +287,15 @@ namespace ite
         systemTime.UTCDay = utc.tm_mday;
         systemTime.UTCMonth = utc.tm_mon + 1;
         systemTime.UTCYear = utc.tm_year + 1900;
-        systemTime.daylightSavings = (utc.tm_isdst > 0);
 
         tzset();
 
         //systemTime.countryRegionID = 0;
         int hTimezone = timezone / 3600;
-        systemTime.timeZone = hTimezone & 0x7f;
+        systemTime.timeZone = hTimezone;
         if (hTimezone < 0)
-            systemTime.timeZone |= 0x80;
+            systemTime.timeZone = 0x80 | (-hTimezone);
+        systemTime.daylightSavings = daylight ? 1 : 0;
 
         static const unsigned CC_SIZE = 3;
         unsigned cc = (systemTime.daylightSavings && tzname[1] && tzname[1][0]) ? 1 : 0;
@@ -270,7 +309,7 @@ namespace ite
         return true;
     }
 
-    bool TxDevice::prepareOSD(unsigned videoSource)
+    bool TxDevice::prepareOSD(unsigned osdNo)
     {
         static const uint16_t cmdIDs[] = {
             CMD_GetVideoOSDConfigurationInput,
@@ -280,34 +319,37 @@ namespace ite
         // *.*Enable       0/1
         // *.*Position     0-5
 
-        if (supported(cmdIDs[0]))
+        if (osdNo /*&& supported(cmdIDs[0])*/)
         {
+            unsigned videoSource = osdNo-1;
+
             if (videoSrcConfig.configListSize > videoSource)
                 videoOSDConfig.videoSrcToken.copy(&videoSrcConfig.configList[videoSource].token);
 
-            videoOSDConfig.dateEnable = 1;
-            videoOSDConfig.datePosition = 0;
-            videoOSDConfig.dateFormat = 0;
+            videoOSDConfig.dateEnable =     osdInfo.dateEnable;
+            videoOSDConfig.datePosition =   osdInfo.datePosition;
+            videoOSDConfig.dateFormat =     osdInfo.dateFormat;
 
-            videoOSDConfig.timeEnable = 1;
-            videoOSDConfig.timePosition = 0;
-            videoOSDConfig.timeFormat = 1;
+            videoOSDConfig.timeEnable =     osdInfo.timeEnable;
+            videoOSDConfig.timePosition =   osdInfo.timePosition;
+            videoOSDConfig.timeFormat =     osdInfo.timeFormat;
 
-            videoOSDConfig.logoEnable = 1;
-            videoOSDConfig.logoPosition = 0;
-            videoOSDConfig.logoOption = 0;
+            videoOSDConfig.logoEnable =     osdInfo.logoEnable;
+            videoOSDConfig.logoPosition =   osdInfo.logoPosition;
+            videoOSDConfig.logoOption =     osdInfo.logoOption;
 
-            videoOSDConfig.detailInfoEnable = 1;
-            videoOSDConfig.detailInfoPosition = 0;
-            videoOSDConfig.detailInfoOption = 0;
+            videoOSDConfig.detailInfoEnable =   osdInfo.detailInfoEnable;
+            videoOSDConfig.detailInfoPosition = osdInfo.detailInfoPosition;
+            videoOSDConfig.detailInfoOption =   osdInfo.detailInfoOption;
 
-            videoOSDConfig.textEnable = 1;
-            videoOSDConfig.textPosition = 0;
-            videoOSDConfig.text.set((const unsigned char *)"text", 4);
+            videoOSDConfig.textEnable =     osdInfo.textEnable;
+            videoOSDConfig.textPosition =   osdInfo.textPosition;
+            videoOSDConfig.text.copy(&osdInfo.text);
 
             return true;
         }
 
+#if 0
         if (supported(cmdIDs[1]))
         {
             osdInfo.dateEnable = 1;
@@ -332,8 +374,8 @@ namespace ite
 
             return true;
         }
-
-        return false;
+#endif
+        return true;
     }
 
     //
@@ -394,6 +436,16 @@ namespace ite
         videoEncConfigSetParam.bitrateLimit = bitrateKbps;
 
         return mkRcCmd(CMD_SetVideoEncoderConfigurationInput);
+    }
+
+    RcCommand * TxDevice::mkSetOSD(unsigned osdNo)
+    {
+        if (! prepareOSD(osdNo))
+            return nullptr;
+
+        if (osdNo)
+            return mkRcCmd(CMD_SetVideoOSDConfigurationInput);
+        return mkRcCmd(CMD_SetOSDInformationInput);
     }
 
     //

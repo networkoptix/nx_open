@@ -10,54 +10,55 @@
 
 namespace
 {
-    typedef enum
+    class AdvParam
     {
-        ITE_PARAM_NONE,
-        //
-        ITE_PARAM_CHANNEL,
-        ITE_PARAM_PRESENT,
-        ITE_PARAM_STRENGTH,
-        ITE_PARAM_QUALITY,
-        //
-        ITE_PARAM_RX_ID,
-        ITE_PARAM_RX_COMPANY,
-        ITE_PARAM_RX_MODEL,
-        ITE_PARAM_RX_DRIVER_VER,
-        ITE_PARAM_RX_API_VER,
-        ITE_PARAM_RX_FW_VER,
-        //
-        ITE_PARAM_TX_ID,
-        ITE_PARAM_TX_HWID,
-        ITE_PARAM_TX_COMPANY,
-        ITE_PARAM_TX_MODEL,
-        ITE_PARAM_TX_SERIAL,
-        ITE_PARAM_TX_FW_VER,
-        //
-        ITE_PARAM_REBOOT,
-        ITE_PARAM_SET_DEFAULTS
-    } CameraParams;
+    public:
+        AdvParam(const char * name)
+        :   m_name(name)
+        {}
 
-    const char * PARAM_SIGNAL_CHANNEL =         "channel";
-    const char * PARAM_SIGNAL_PRESENT =         "present";
-    const char * PARAM_SIGNAL_STRENGTH =        "strength";
-    const char * PARAM_SIGNAL_QUALITY =         "quality";
+        bool operator == (const char * name)
+        {
+            if (!name)
+                return false;
+            return strcmp(m_name, name) == 0;
+        }
 
-    const char * PARAM_RX_ID =                  "rxID";
-    const char * PARAM_RX_COMPANY =             "rxCompany";
-    const char * PARAM_RX_MODEL =               "rxModel";
-    const char * PARAM_RX_DRIVER_VER =          "rxDriverVer";
-    const char * PARAM_RX_API_VER =             "rxAPIVer";
-    const char * PARAM_RX_FW_VER =              "rxFWVer";
+        const char * name() const { return m_name; }
 
-    const char * PARAM_TX_ID =                  "txID";
-    const char * PARAM_TX_HWID =                "txHwID";
-    const char * PARAM_TX_COMPANY =             "txCompany";
-    const char * PARAM_TX_MODEL =               "txModel";
-    const char * PARAM_TX_SERIAL =              "txSerial";
-    const char * PARAM_TX_FW_VER =              "txFWVer";
+    private:
+        const char * m_name;
+    };
 
-    const char * PARAM_COMMAND_REBOOT =         "reboot";
-    const char * PARAM_COMMAND_SET_DEFAULTS =   "setDefaults";
+    AdvParam PARAM_SIGNAL_CHANNEL =         "channel";
+    AdvParam PARAM_SIGNAL_PRESENT =         "present";
+    AdvParam PARAM_SIGNAL_STRENGTH =        "strength";
+    AdvParam PARAM_SIGNAL_QUALITY =         "quality";
+
+    AdvParam PARAM_RX_ID =                  "rxID";
+    AdvParam PARAM_RX_COMPANY =             "rxCompany";
+    AdvParam PARAM_RX_MODEL =               "rxModel";
+    AdvParam PARAM_RX_DRIVER_VER =          "rxDriverVer";
+    AdvParam PARAM_RX_API_VER =             "rxAPIVer";
+    AdvParam PARAM_RX_FW_VER =              "rxFWVer";
+
+    AdvParam PARAM_TX_ID =                  "txID";
+    AdvParam PARAM_TX_HWID =                "txHwID";
+    AdvParam PARAM_TX_COMPANY =             "txCompany";
+    AdvParam PARAM_TX_MODEL =               "txModel";
+    AdvParam PARAM_TX_SERIAL =              "txSerial";
+    AdvParam PARAM_TX_FW_VER =              "txFWVer";
+
+    AdvParam RAPAM_OSD_DATE_POSITION =      "osdDatePos";
+    AdvParam RAPAM_OSD_DATE_FORMAT =        "osdDateFmt";
+    AdvParam RAPAM_OSD_TIME_POSITION =      "osdTimePos";
+    AdvParam RAPAM_OSD_TIME_FORMAT =        "osdTimeFmt";
+    AdvParam RAPAM_OSD_LOGO_POSITION =      "osdLogoPos";
+    AdvParam RAPAM_OSD_LOGO_FORMAT =        "osdLogoFmt";
+    AdvParam RAPAM_OSD_INFO_POSITION =      "osdInfoPos";
+    AdvParam RAPAM_OSD_INFO_FORMAT =        "osdInfoFmt";
+    AdvParam RAPAM_OSD_TEXT_POSITION =      "osdTextPos";
+    AdvParam RAPAM_OSD_TEXT =               "osdText";
 
     const char * PARAM_CHANNELS[] = {
         "0 (177/6 MHz)",
@@ -78,50 +79,26 @@ namespace
         "15 (473/6 MHz)"
     };
 
-    CameraParams str2param(const char * paramName)
-    {
-        if (! strcmp(paramName, PARAM_SIGNAL_CHANNEL))
-            return ITE_PARAM_CHANNEL;
-        if (! strcmp(paramName, PARAM_SIGNAL_PRESENT))
-            return ITE_PARAM_PRESENT;
-        if (! strcmp(paramName, PARAM_SIGNAL_STRENGTH))
-            return ITE_PARAM_STRENGTH;
-        if (! strcmp(paramName, PARAM_SIGNAL_QUALITY))
-            return ITE_PARAM_QUALITY;
+    const char * PARAM_POSITIONS[] = {
+        "0 None",
+        "1 Left-Top",
+        "2 Left-Center",
+        "3 Left-Down",
+        "4 Right-Top",
+        "5 Right-Center",
+        "6 Right-Down"
+    };
 
-        if (! strcmp(paramName, PARAM_RX_ID))
-            return ITE_PARAM_RX_ID;
-        if (! strcmp(paramName, PARAM_RX_COMPANY))
-            return ITE_PARAM_RX_COMPANY;
-        if (! strcmp(paramName, PARAM_RX_MODEL))
-            return ITE_PARAM_RX_MODEL;
-        if (! strcmp(paramName, PARAM_RX_DRIVER_VER))
-            return ITE_PARAM_RX_DRIVER_VER;
-        if (! strcmp(paramName, PARAM_RX_API_VER))
-            return ITE_PARAM_RX_API_VER;
-        if (! strcmp(paramName, PARAM_RX_FW_VER))
-            return ITE_PARAM_RX_FW_VER;
+    const char * PARAM_DATE_FORMAT[] = {
+        "0 D/M/Y",
+        "1 M/D/Y",
+        "2 Y/M/D"
+    };
 
-        if (! strcmp(paramName, PARAM_TX_ID))
-            return ITE_PARAM_TX_ID;
-        if (! strcmp(paramName, PARAM_TX_HWID))
-            return ITE_PARAM_TX_HWID;
-        if (! strcmp(paramName, PARAM_TX_COMPANY))
-            return ITE_PARAM_TX_COMPANY;
-        if (! strcmp(paramName, PARAM_TX_MODEL))
-            return ITE_PARAM_TX_MODEL;
-        if (! strcmp(paramName, PARAM_TX_SERIAL))
-            return ITE_PARAM_TX_SERIAL;
-        if (! strcmp(paramName, PARAM_TX_FW_VER))
-            return ITE_PARAM_TX_FW_VER;
-
-        if (! strcmp(paramName, PARAM_COMMAND_REBOOT))
-            return ITE_PARAM_REBOOT;
-        if (! strcmp(paramName, PARAM_COMMAND_SET_DEFAULTS))
-            return ITE_PARAM_SET_DEFAULTS;
-
-        return ITE_PARAM_NONE;
-    }
+    const char * PARAM_TIME_FORMAT[] = {
+        "0 AM/PM",
+        "1 24H"
+    };
 
     unsigned replaceSubstring(std::string& str, const std::string& from, const std::string& to)
     {
@@ -149,10 +126,353 @@ namespace
 
         return replaceSubstring(str, sFrom, sTo);
     }
+
+    unsigned replaceSubstring(std::string& str, const char * from, const AdvParam to)
+    {
+        return replaceSubstring(str, from, to.name());
+    }
 }
 
 namespace ite
 {
+    const char * AdvancedSettings::getDescriptionXML()
+    {
+        static std::string paramsXML;
+
+        if (! paramsXML.size()) // first time
+        {
+            std::string params =
+            "<?xml version=\"1.0\"?> "
+            "<plugin "
+                "name = \"IT930X\" "
+                "version = \"1\" "
+                "unique_id = \"11761fbb-04f4-40c8-8213-52d9367676c6\"> "
+                "<parameters>"
+                    "<group name=\"Signal\"> "
+                        "<param id=\"{channel}\" name=\"Channel\" dataType=\"Enumeration\" range=\"{chEnum}\" /> "
+                        "<param id=\"{present}\" name=\"Signal Presence\" dataType=\"Bool\" readOnly=\"true\" /> "
+                        "<param id=\"{strength}\" name=\"Signal Strength\" dataType=\"Number\" readOnly=\"true\" range=\"0,100\" /> "
+                        "<param id=\"{quality}\" name=\"Signal Quality\" dataType=\"Number\" readOnly=\"true\" range=\"0,100\" /> "
+                    "</group> "
+                    "<group name=\"Receiver\"> "
+                        "<param id=\"{rxID}\" name=\"Receiver ID\" dataType=\"Number\" readOnly=\"true\" range=\"0,255\" /> "
+                        "<param id=\"{rxCompany}\" name=\"Company\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{rxModel}\" name=\"Model\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{rxDriverVer}\" name=\"Driver Version\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{rxAPIVer}\" name=\"API Version\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{rxFWVer}\" name=\"Firmware Version\" dataType=\"String\" readOnly=\"true\" /> "
+                    "</group> "
+                    "<group name=\"Camera\"> "
+                        "<param id=\"{txID}\" name=\"Camera ID\" dataType=\"Number\" readOnly=\"true\" range=\"0,65535\" /> "
+                        "<param id=\"{txHwID}\" name=\"Camera HWID\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{txCompany}\" name=\"Company\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{txModel}\" name=\"Model\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{txSerial}\" name=\"Serial Number\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{txFWVer}\" name=\"Firmware Version\" dataType=\"String\" readOnly=\"true\" /> "
+                    "</group> "
+                    "<group name=\"OSD\"> "
+                        "<param id=\"{osdDatePos}\" name=\"Date Position\" dataType=\"Enumeration\" range=\"{positionEnum}\" /> "
+                        "<param id=\"{osdDateFmt}\" name=\"Date Format\" dataType=\"Enumeration\" range=\"{dateFmtEnum}\" /> "
+                        "<param id=\"{osdTimePos}\" name=\"Time Position\" dataType=\"Enumeration\" range=\"{positionEnum}\" /> "
+                        "<param id=\"{osdTimeFmt}\" name=\"Time Format\" dataType=\"Enumeration\" range=\"{timeFmtEnum}\" /> "
+                        "<param id=\"{osdLogoPos}\" name=\"Logo Position\" dataType=\"Enumeration\" range=\"{positionEnum}\" /> "
+                        "<param id=\"{osdLogoFmt}\" name=\"Logo Format\" dataType=\"Enumeration\" range=\"0,1\" /> "
+                        "<param id=\"{osdInfoPos}\" name=\"Info Position\" dataType=\"Enumeration\" range=\"{positionEnum}\" /> "
+                        "<param id=\"{osdInfoFmt}\" name=\"Info Format\" dataType=\"Enumeration\" range=\"0,1\" /> "
+                        "<param id=\"{osdTextPos}\" name=\"Text Position\" dataType=\"Enumeration\" range=\"{positionEnum}\" /> "
+                        "<param id=\"{osdText}\" name=\"Text\" dataType=\"String\" readOnly=\"false\" /> "
+                    "</group> "
+                "</parameters> "
+            "</plugin>";
+
+            std::string chanEnum;
+            chanEnum += PARAM_CHANNELS[0]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[1]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[2]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[3]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[4]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[5]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[6]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[7]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[8]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[9]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[10]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[11]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[12]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[13]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[14]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[15];
+
+            std::string posEnum;
+            posEnum += PARAM_POSITIONS[0]; posEnum += ',';
+            posEnum += PARAM_POSITIONS[1]; posEnum += ',';
+            posEnum += PARAM_POSITIONS[2]; posEnum += ',';
+            posEnum += PARAM_POSITIONS[3]; posEnum += ',';
+            posEnum += PARAM_POSITIONS[4]; posEnum += ',';
+            posEnum += PARAM_POSITIONS[5]; posEnum += ',';
+            posEnum += PARAM_POSITIONS[6];
+
+            std::string dateFmtEnum;
+            dateFmtEnum += PARAM_DATE_FORMAT[0]; dateFmtEnum += ',';
+            dateFmtEnum += PARAM_DATE_FORMAT[1]; dateFmtEnum += ',';
+            dateFmtEnum += PARAM_DATE_FORMAT[2];
+
+            std::string timeFmtEnum;
+            timeFmtEnum += PARAM_TIME_FORMAT[0]; timeFmtEnum += ',';
+            timeFmtEnum += PARAM_TIME_FORMAT[1];
+
+            replaceSubstring(params, "{channel}",       PARAM_SIGNAL_CHANNEL);
+            replaceSubstring(params, "{present}",       PARAM_SIGNAL_PRESENT);
+            replaceSubstring(params, "{strength}",      PARAM_SIGNAL_STRENGTH);
+            replaceSubstring(params, "{quality}",       PARAM_SIGNAL_QUALITY);
+
+            replaceSubstring(params, "{rxID}",          PARAM_RX_ID);
+            replaceSubstring(params, "{rxCompany}",     PARAM_RX_COMPANY);
+            replaceSubstring(params, "{rxModel}",       PARAM_RX_MODEL);
+            replaceSubstring(params, "{rxDriverVer}",   PARAM_RX_DRIVER_VER);
+            replaceSubstring(params, "{rxAPIVer}",      PARAM_RX_API_VER);
+            replaceSubstring(params, "{rxFWVer}",       PARAM_RX_FW_VER);
+
+            replaceSubstring(params, "{txID}",          PARAM_TX_ID);
+            replaceSubstring(params, "{txHwID}",        PARAM_TX_HWID);
+            replaceSubstring(params, "{txCompany}",     PARAM_TX_COMPANY);
+            replaceSubstring(params, "{txModel}",       PARAM_TX_MODEL);
+            replaceSubstring(params, "{txSerial}",      PARAM_TX_SERIAL);
+            replaceSubstring(params, "{txFWVer}",       PARAM_TX_FW_VER);
+
+            replaceSubstring(params, "{osdDatePos}",    RAPAM_OSD_DATE_POSITION);
+            replaceSubstring(params, "{osdDateFmt}",    RAPAM_OSD_DATE_FORMAT);
+            replaceSubstring(params, "{osdTimePos}",    RAPAM_OSD_TIME_POSITION);
+            replaceSubstring(params, "{osdTimeFmt}",    RAPAM_OSD_TIME_FORMAT);
+            replaceSubstring(params, "{osdLogoPos}",    RAPAM_OSD_LOGO_POSITION);
+            replaceSubstring(params, "{osdLogoFmt}",    RAPAM_OSD_LOGO_FORMAT);
+            replaceSubstring(params, "{osdInfoPos}",    RAPAM_OSD_INFO_POSITION);
+            replaceSubstring(params, "{osdInfoFmt}",    RAPAM_OSD_INFO_FORMAT);
+            replaceSubstring(params, "{osdTextPos}",    RAPAM_OSD_TEXT_POSITION);
+            replaceSubstring(params, "{osdText}",       RAPAM_OSD_TEXT);
+
+            replaceSubstring(params, "{chEnum}",        chanEnum);
+            replaceSubstring(params, "{positionEnum}",  posEnum);
+            replaceSubstring(params, "{dateFmtEnum}",   dateFmtEnum);
+            replaceSubstring(params, "{timeFmtEnum}",   timeFmtEnum);
+
+            // TODO: thread safety
+            if (! paramsXML.size())
+                paramsXML.swap(params);
+        }
+
+        return paramsXML.c_str();
+    }
+
+    int AdvancedSettings::getParamValue(const char * name, char * valueBuf, int * valueBufSize) const
+    {
+        std::string str;
+
+        // Signal
+        if (PARAM_SIGNAL_CHANNEL == name)           { getChannel(str); }
+        else if(PARAM_SIGNAL_PRESENT == name)       { getPresent(str); }
+        else if(PARAM_SIGNAL_STRENGTH == name)      { getStrength(str); }
+        else if(PARAM_SIGNAL_QUALITY == name)       { getQuality(str); }
+        // Receiver
+        else if(PARAM_RX_ID == name)                { getRxID(str); }
+        else if(PARAM_RX_COMPANY == name)           { getRxCompany(str); }
+        else if(PARAM_RX_MODEL == name)             { getRxModel(str); }
+        else if(PARAM_RX_DRIVER_VER == name)        { getRxDriverVer(str); }
+        else if(PARAM_RX_API_VER == name)           { getRxAPIVer(str); }
+        else if(PARAM_RX_FW_VER == name)            { getRxFwVer(str); }
+        // Camera
+        else if(PARAM_TX_ID == name)                { getTxID(str); }
+        else if(PARAM_TX_HWID == name)              { getTxHwID(str); }
+        else if(PARAM_TX_COMPANY == name)           { getTxCompany(str); }
+        else if(PARAM_TX_MODEL == name)             { getTxModel(str); }
+        else if(PARAM_TX_SERIAL == name)            { getTxSerial(str); }
+        else if(PARAM_TX_FW_VER == name)            { getTxFwVer(str); }
+        // OSD
+        else if(RAPAM_OSD_DATE_POSITION == name)    { getOsdDatePosition(str); }
+        else if(RAPAM_OSD_DATE_FORMAT == name)      { getOsdDateFormat(str); }
+        else if(RAPAM_OSD_TIME_POSITION == name)    { getOsdTimePosition(str); }
+        else if(RAPAM_OSD_TIME_FORMAT == name)      { getOsdTimeFormat(str); }
+        else if(RAPAM_OSD_LOGO_POSITION == name)    { getOsdLogoPosition(str); }
+        else if(RAPAM_OSD_LOGO_FORMAT == name)      { getOsdLogoFormat(str); }
+        else if(RAPAM_OSD_INFO_POSITION == name)    { getOsdInfoPosition(str); }
+        else if(RAPAM_OSD_INFO_FORMAT == name)      { getOsdInfoFormat(str); }
+        else if(RAPAM_OSD_TEXT_POSITION == name)    { getOsdTextPosition(str); }
+        else if(RAPAM_OSD_TEXT == name)             { getOsdText(str); }
+        else
+            return nxcip::NX_UNKNOWN_PARAMETER;
+
+        if (str.size())
+        {
+            int strSize = str.size();
+            if (*valueBufSize < strSize)
+            {
+                *valueBufSize = strSize;
+                return nxcip::NX_MORE_DATA;
+            }
+
+            *valueBufSize = strSize;
+            strncpy(valueBuf, str.c_str(), strSize);
+            valueBuf[strSize] = '\0';
+        }
+        else
+        {
+            valueBufSize = 0;
+            return nxcip::NX_NO_DATA;
+        }
+
+        return nxcip::NX_NO_ERROR;
+    }
+
+    int AdvancedSettings::setParamValue(CameraManager& camera, const char * name, const char * value)
+    {
+        if (!value)
+            return nxcip::NX_INVALID_PARAM_VALUE;
+
+        bool osd = false;
+
+        if (PARAM_SIGNAL_CHANNEL == name)
+        {
+            /// @warning need value in front of string
+            std::string str(value);
+            unsigned chan = str2num(str);
+
+            if (! camera.changeChannel(chan))
+                return nxcip::NX_INVALID_PARAM_VALUE;
+        }
+        else if(RAPAM_OSD_DATE_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.dateEnable, m_txDev->osdInfo.datePosition); }
+        else if(RAPAM_OSD_DATE_FORMAT == name)      { osd = true; if (m_txDev) getFormat(value, m_txDev->osdInfo.dateFormat); }
+        else if(RAPAM_OSD_TIME_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.timeEnable, m_txDev->osdInfo.timePosition); }
+        else if(RAPAM_OSD_TIME_FORMAT == name)      { osd = true; if (m_txDev) getFormat(value, m_txDev->osdInfo.timeFormat); }
+        else if(RAPAM_OSD_LOGO_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.logoEnable, m_txDev->osdInfo.logoPosition); }
+        else if(RAPAM_OSD_LOGO_FORMAT == name)      { osd = true; if (m_txDev) getFormat(value, m_txDev->osdInfo.logoOption); }
+        else if(RAPAM_OSD_INFO_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.detailInfoEnable, m_txDev->osdInfo.detailInfoPosition); }
+        else if(RAPAM_OSD_INFO_FORMAT == name)      { osd = true; if (m_txDev) getFormat(value, m_txDev->osdInfo.detailInfoOption); }
+        else if(RAPAM_OSD_TEXT_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.textEnable, m_txDev->osdInfo.textPosition); }
+        else if(RAPAM_OSD_TEXT == name)             {}
+        else
+            return nxcip::NX_PARAM_READ_ONLY;
+
+        if (osd)
+        {
+            if (! camera.updateOSD()) // commit
+                return nxcip::NX_INVALID_PARAM_VALUE;
+        }
+
+        return nxcip::NX_NO_ERROR;
+    }
+
+    void AdvancedSettings::getChannel(std::string& s) const
+    {
+        if (m_rxDev)
+        {
+            unsigned chan = m_rxDev->channel();
+            if (chan < TxDevice::CHANNELS_NUM &&
+                chan != RxDevice::NOT_A_CHANNEL)
+                s = PARAM_CHANNELS[chan];
+        }
+    }
+
+    void AdvancedSettings::getPosition(const char * value, uint8_t& enabled, uint8_t& position) const
+    {
+        /// @warning need value in front of string
+        std::string str(value);
+        unsigned variant = str2num(str);
+
+        enabled = 0;
+        if (variant)
+        {
+            enabled = 1;
+            position = variant - 1;
+        }
+    }
+
+    void AdvancedSettings::getFormat(const char * value, uint8_t& format) const
+    {
+        /// @warning need value in front of string
+        std::string str(value);
+        format = str2num(str);
+    }
+
+    unsigned AdvancedSettings::getPositionVariant(uint8_t enabled, uint8_t position) const
+    {
+        unsigned variant = 0;
+        if (enabled)
+            variant = 1 + position;
+        return variant;
+    }
+
+    void AdvancedSettings::getOsdDatePosition(std::string& s) const
+    {
+        unsigned v = 0;
+        if (m_txDev)
+            v = getPositionVariant(m_txDev->osdInfo.dateEnable, m_txDev->osdInfo.datePosition);
+        s = PARAM_POSITIONS[v];
+    }
+
+    void AdvancedSettings::getOsdDateFormat(std::string& s) const
+    {
+        s = PARAM_DATE_FORMAT[m_txDev->osdInfo.dateFormat];
+    }
+
+    void AdvancedSettings::getOsdTimePosition(std::string& s) const
+    {
+        unsigned v = 0;
+        if (m_txDev)
+            v = getPositionVariant(m_txDev->osdInfo.timeEnable, m_txDev->osdInfo.timePosition);
+        s = PARAM_POSITIONS[v];
+    }
+
+    void AdvancedSettings::getOsdTimeFormat(std::string& s) const
+    {
+        s = PARAM_TIME_FORMAT[m_txDev->osdInfo.timeFormat];
+    }
+
+    void AdvancedSettings::getOsdLogoPosition(std::string& s) const
+    {
+        unsigned v = 0;
+        if (m_txDev)
+            v = getPositionVariant(m_txDev->osdInfo.logoEnable, m_txDev->osdInfo.logoPosition);
+        s = PARAM_POSITIONS[v];
+    }
+
+    void AdvancedSettings::getOsdLogoFormat(std::string& s) const
+    {
+        if (m_txDev && m_txDev->osdInfo.logoOption)
+            s = "1";
+        else
+            s = "0";
+    }
+
+    void AdvancedSettings::getOsdInfoPosition(std::string& s) const
+    {
+        unsigned v = 0;
+        if (m_txDev)
+            v = getPositionVariant(m_txDev->osdInfo.detailInfoEnable, m_txDev->osdInfo.detailInfoPosition);
+        s = PARAM_POSITIONS[v];
+    }
+
+    void AdvancedSettings::getOsdInfoFormat(std::string& s) const
+    {
+        if (m_txDev && m_txDev->osdInfo.detailInfoOption)
+            s = "1";
+        else
+            s = "0";
+    }
+
+    void AdvancedSettings::getOsdTextPosition(std::string& s) const
+    {
+        unsigned v = 0;
+        if (m_txDev)
+            v = getPositionVariant(m_txDev->osdInfo.textEnable, m_txDev->osdInfo.textPosition);
+        s = PARAM_POSITIONS[v];
+    }
+
+    void AdvancedSettings::getOsdText(std::string& s) const
+    {
+        if (m_txDev)
+            s = TxDevice::rcStr2str(m_txDev->osdInfo.text);
+    }
+
     //
 
     INIT_OBJECT_COUNTER(CameraManager)
@@ -161,7 +481,7 @@ namespace ite
     CameraManager::CameraManager(const nxcip::CameraInfo& info, DeviceMapper * devMapper, TxDevicePtr txDev)
     :   m_refManager(this),
         m_devMapper(devMapper),
-        m_txDev(txDev),
+        m_txDevice(txDev),
         m_errorStr(nullptr)
     {
         updateCameraInfo(info);
@@ -200,289 +520,25 @@ namespace ite
         return nullptr;
     }
 
+    //
+
     const char * CameraManager::getParametersDescriptionXML() const
     {
-        static std::string paramsXML;
-
-        if (! paramsXML.size()) // first time
-        {
-            std::string chanEnum;
-            chanEnum += PARAM_CHANNELS[0]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[1]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[2]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[3]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[4]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[5]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[6]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[7]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[8]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[9]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[10]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[11]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[12]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[13]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[14]; chanEnum += ',';
-            chanEnum += PARAM_CHANNELS[15];
-
-            std::string params =
-            "<?xml version=\"1.0\"?> "
-            "<plugin "
-                "name = \"IT930X\" "
-                "version = \"1\" "
-                "unique_id = \"11761fbb-04f4-40c8-8213-52d9367676c6\"> "
-                "<parameters>"
-                    "<group name=\"Signal\"> "
-                        "<param id=\"{channel}\" name=\"Channel\" dataType=\"Enumeration\" range=\"{chEnum}\" /> "
-                        "<param id=\"{present}\" name=\"Signal Presence\" dataType=\"Bool\" readOnly=\"true\" /> "
-                        "<param id=\"{strength}\" name=\"Signal Strength\" dataType=\"Number\" readOnly=\"true\" range=\"0,100\" /> "
-                        "<param id=\"{quality}\" name=\"Signal Quality\" dataType=\"Number\" readOnly=\"true\" range=\"0,100\" /> "
-                    "</group> "
-                    "<group name=\"Receiver\"> "
-                        "<param id=\"{rxID}\" name=\"Receiver ID\" dataType=\"Number\" readOnly=\"true\" range=\"0,255\" /> "
-                        "<param id=\"{rxCompany}\" name=\"Company\" dataType=\"String\" readOnly=\"true\" /> "
-                        "<param id=\"{rxModel}\" name=\"Model\" dataType=\"String\" readOnly=\"true\" /> "
-                        "<param id=\"{rxDriverVer}\" name=\"Driver Version\" dataType=\"String\" readOnly=\"true\" /> "
-                        "<param id=\"{rxAPIVer}\" name=\"API Version\" dataType=\"String\" readOnly=\"true\" /> "
-                        "<param id=\"{rxFWVer}\" name=\"Firmware Version\" dataType=\"String\" readOnly=\"true\" /> "
-                    "</group> "
-#if 1
-                    "<group name=\"Camera\"> "
-                        "<param id=\"{txID}\" name=\"Camera ID\" dataType=\"Number\" readOnly=\"true\" range=\"0,65535\" /> "
-                        "<param id=\"{txHwID}\" name=\"Camera HWID\" dataType=\"String\" readOnly=\"true\" /> "
-                        "<param id=\"{txCompany}\" name=\"Company\" dataType=\"String\" readOnly=\"true\" /> "
-                        "<param id=\"{txModel}\" name=\"Model\" dataType=\"String\" readOnly=\"true\" /> "
-                        "<param id=\"{txSerial}\" name=\"Serial Number\" dataType=\"String\" readOnly=\"true\" /> "
-                        "<param id=\"{txFWVer}\" name=\"Firmware Version\" dataType=\"String\" readOnly=\"true\" /> "
-                    "</group> "
-#endif
-#if 0
-                    "<group name=\"Commands\"> "
-                        "<param id=\"{reboot}\"  name=\"Reboot\" dataType=\"Button\" /> "
-                        "<param id=\"{setDefs}\" name=\"Set Defaults\" dataType=\"Button\" /> "
-                    "</group> "
-#endif
-                "</parameters> "
-            "</plugin>";
-
-            replaceSubstring(params, "{channel}",   PARAM_SIGNAL_CHANNEL);
-            replaceSubstring(params, "{present}",   PARAM_SIGNAL_PRESENT);
-            replaceSubstring(params, "{strength}",  PARAM_SIGNAL_STRENGTH);
-            replaceSubstring(params, "{quality}",   PARAM_SIGNAL_QUALITY);
-
-            replaceSubstring(params, "{rxID}",          PARAM_RX_ID);
-            replaceSubstring(params, "{rxCompany}",     PARAM_RX_COMPANY);
-            replaceSubstring(params, "{rxModel}",       PARAM_RX_MODEL);
-            replaceSubstring(params, "{rxDriverVer}",   PARAM_RX_DRIVER_VER);
-            replaceSubstring(params, "{rxAPIVer}",      PARAM_RX_API_VER);
-            replaceSubstring(params, "{rxFWVer}",       PARAM_RX_FW_VER);
-
-            replaceSubstring(params, "{txID}",          PARAM_TX_ID);
-            replaceSubstring(params, "{txHwID}",        PARAM_TX_HWID);
-            replaceSubstring(params, "{txCompany}",     PARAM_TX_COMPANY);
-            replaceSubstring(params, "{txModel}",       PARAM_TX_MODEL);
-            replaceSubstring(params, "{txSerial}",      PARAM_TX_SERIAL);
-            replaceSubstring(params, "{txFWVer}",       PARAM_TX_FW_VER);
-
-            replaceSubstring(params, "{reboot}",    PARAM_COMMAND_REBOOT);
-            replaceSubstring(params, "{setDefs}",   PARAM_COMMAND_SET_DEFAULTS);
-
-            replaceSubstring(params, std::string("{chEnum}"), chanEnum);
-
-            // TODO: thread safety
-            if (! paramsXML.size())
-                paramsXML.swap(params);
-        }
-
-        return paramsXML.c_str();
+        return AdvancedSettings::getDescriptionXML();
     }
 
     int CameraManager::getParamValue(const char * paramName, char * valueBuf, int * valueBufSize) const
     {
-        std::string strValue;
-
-        switch (str2param(paramName))
-        {
-            // Signal
-
-            case ITE_PARAM_CHANNEL:
-                getParamStr_Channel(strValue);
-                break;
-            case ITE_PARAM_PRESENT:
-                getParamStr_Present(strValue);
-                break;
-            case ITE_PARAM_STRENGTH:
-                getParamStr_Strength(strValue);
-                break;
-            case ITE_PARAM_QUALITY:
-                getParamStr_Quality(strValue);
-                break;
-
-            // Receiver
-
-            case ITE_PARAM_RX_ID:
-                getParamStr_RxID(strValue);
-                break;
-            case ITE_PARAM_RX_COMPANY:
-                getParamStr_RxCompany(strValue);
-                break;
-            case ITE_PARAM_RX_MODEL:
-                getParamStr_RxModel(strValue);
-                break;
-            case ITE_PARAM_RX_DRIVER_VER:
-                getParamStr_RxDriverVer(strValue);
-                break;
-            case ITE_PARAM_RX_API_VER:
-                getParamStr_RxAPIVer(strValue);
-                break;
-            case ITE_PARAM_RX_FW_VER:
-                getParamStr_RxFwVer(strValue);
-                break;
-
-            // Camera
-
-            case ITE_PARAM_TX_ID:
-                strValue = num2str(txID());
-                break;
-            case ITE_PARAM_TX_HWID:
-                getParamStr_TxHwID(strValue);
-                break;
-            case ITE_PARAM_TX_COMPANY:
-                getParamStr_TxCompany(strValue);
-                break;
-            case ITE_PARAM_TX_MODEL:
-                getParamStr_TxModel(strValue);
-                break;
-            case ITE_PARAM_TX_SERIAL:
-                getParamStr_TxSerial(strValue);
-                break;
-            case ITE_PARAM_TX_FW_VER:
-                getParamStr_TxFwVer(strValue);
-                break;
-
-            // Command
-
-            case ITE_PARAM_REBOOT:
-            case ITE_PARAM_SET_DEFAULTS:
-                break;
-
-            case ITE_PARAM_NONE:
-            default:
-                return nxcip::NX_UNKNOWN_PARAMETER;
-        }
-
-        if (strValue.size())
-        {
-            int strSize = strValue.size();
-            if (*valueBufSize < strSize)
-            {
-                *valueBufSize = strSize;
-                return nxcip::NX_MORE_DATA;
-            }
-
-            *valueBufSize = strSize;
-            strncpy(valueBuf, strValue.c_str(), strSize);
-            valueBuf[strSize] = '\0';
-        }
-        else
-        {
-            valueBufSize = 0;
-            return nxcip::NX_NO_DATA;
-        }
-
-        return nxcip::NX_NO_ERROR;
+        return AdvancedSettings(m_txDevice, m_rxDevice).getParamValue(paramName, valueBuf, valueBufSize);
     }
 
-    // TODO
     int CameraManager::setParamValue(const char * paramName, const char * value)
     {
-        if (!value)
-            return nxcip::NX_INVALID_PARAM_VALUE;
-
-        switch (str2param(paramName))
-        {
-            case ITE_PARAM_CHANNEL:
-            {
-                std::string str(value);
-                if (! setParam_Channel(str))
-                    return nxcip::NX_INVALID_PARAM_VALUE;
-                break;
-            }
-
-            case ITE_PARAM_PRESENT:
-            case ITE_PARAM_STRENGTH:
-            case ITE_PARAM_QUALITY:
-            //
-            case ITE_PARAM_RX_ID:
-            case ITE_PARAM_RX_COMPANY:
-            case ITE_PARAM_RX_MODEL:
-            case ITE_PARAM_RX_DRIVER_VER:
-            case ITE_PARAM_RX_API_VER:
-            case ITE_PARAM_RX_FW_VER:
-            //
-            case ITE_PARAM_TX_ID:
-            case ITE_PARAM_TX_HWID:
-            case ITE_PARAM_TX_COMPANY:
-            case ITE_PARAM_TX_MODEL:
-            case ITE_PARAM_TX_SERIAL:
-            case ITE_PARAM_TX_FW_VER:
-                return nxcip::NX_PARAM_READ_ONLY;
-
-            case ITE_PARAM_REBOOT:
-                break;
-            case ITE_PARAM_SET_DEFAULTS:
-                break;
-
-            case ITE_PARAM_NONE:
-            default:
-                return nxcip::NX_UNKNOWN_PARAMETER;
-        }
-
-        return nxcip::NX_NO_ERROR;
+        return AdvancedSettings(m_txDevice, m_rxDevice).setParamValue(*this, paramName, value);
     }
 
-    void CameraManager::getParamStr_Channel(std::string& s) const
+    bool CameraManager::changeChannel(unsigned chan)
     {
-        if (m_rxDevice && m_rxDevice->channel() != RxDevice::NOT_A_CHANNEL)
-        {
-            unsigned chan = m_rxDevice->channel();
-            if (chan < TxDevice::CHANNELS_NUM)
-                s = PARAM_CHANNELS[chan];
-        }
-    }
-
-    void CameraManager::getParamStr_RxID(std::string& s) const
-    {
-        if (m_rxDevice)
-            s = num2str(m_rxDevice->rxID());
-    }
-
-    void CameraManager::getParamStr_Present(std::string& s) const
-    {
-        if (m_rxDevice)
-        {
-            if (m_rxDevice->present())
-                s = "true";
-            else
-                s = "false";
-        }
-    }
-
-    void CameraManager::getParamStr_Strength(std::string& s) const
-    {
-        if (m_rxDevice)
-            s = num2str(m_rxDevice->strength());
-    }
-
-    void CameraManager::getParamStr_Quality(std::string& s) const
-    {
-        if (m_rxDevice)
-            s = num2str(m_rxDevice->quality());
-    }
-
-    bool CameraManager::setParam_Channel(std::string& s)
-    {
-        /// @warning need value in front of string
-        unsigned chan = str2num(s);
         if (chan >= TxDevice::CHANNELS_NUM)
             return false;
 
@@ -494,6 +550,17 @@ namespace ite
             m_rxDevice->changeChannel(chan);
             stopStreams(true);
             m_devMapper->forgetTx(txID());
+            return true;
+        }
+
+        return false;
+    }
+
+    bool CameraManager::updateOSD()
+    {
+        if (m_rxDevice)
+        {
+            m_rxDevice->updateOSD();
             return true;
         }
 
@@ -603,7 +670,7 @@ namespace ite
 
     CameraManager::State CameraManager::checkState() const
     {
-        if (! m_txDev)
+        if (! m_txDevice)
             return STATE_NO_CAMERA;
 
         if (! m_rxDevice)
@@ -612,10 +679,10 @@ namespace ite
         if (! m_rxDevice->isLocked() || ! m_rxDevice->isReading())
             return STATE_NOT_LOCKED;
 
-        if (m_rxDevice->isLocked() && m_rxDevice->isReading() && ! m_txDev->ready())
+        if (m_rxDevice->isLocked() && m_rxDevice->isReading() && ! m_txDevice->ready())
             return STATE_NOT_CONFIGURED;
 
-        if (m_txDev->ready() && m_encoders.size() == 0)
+        if (m_txDevice->ready() && m_encoders.size() == 0)
             return STATE_NO_ENCODERS;
 
         if (m_openedStreams.empty())
@@ -668,21 +735,23 @@ namespace ite
         static const unsigned WAIT_MS = 60000;
 
         Timer timer(true);
-        while (! m_txDev->ready())
+        while (! m_txDevice->ready())
         {
-            processRC();
+            processRC(true);
 
             if (timer.elapsedMS() > WAIT_MS)
             {
-                debug_printf("[camera] break configuration (timeout). Tx: %d; Rx: %d\n",
+                debug_printf("[camera] break config process (timeout). Tx: %d; Rx: %d\n",
                              txID(), m_rxDevice ? m_rxDevice->rxID() : 0xffff);
                 break;
             }
+
+            Timer::sleep(10);
         }
 
         // TODO: passive mode
 
-        return m_txDev->ready();
+        return m_txDevice->ready();
     }
 
     void CameraManager::reloadMedia()
@@ -748,7 +817,7 @@ namespace ite
             RxDevicePtr dev = supportedRxDevices[i];
 
             bool isGood = true;
-            if (dev->lockCamera(m_txDev)) // delay inside
+            if (dev->lockCamera(m_txDevice)) // delay inside
             {
                 isGood = dev->good();
                 if (isGood)
@@ -815,13 +884,14 @@ namespace ite
     // from StreamReader thread
 
     /// @hack reading RC in StreamReader thread
-    void CameraManager::processRC()
+    void CameraManager::processRC(bool update)
     {
         RxDevicePtr dev = m_rxDevice;
         if (dev)
         {
             dev->processRcQueue();
-            if (! m_txDev->ready())
+
+            if (update && ! m_txDevice->ready())
                 dev->updateTxParams();
         }
     }
