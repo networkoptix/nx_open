@@ -577,7 +577,6 @@
             </properties>
             <modules>
                 <module>edge_firmware/rpi</module>
-                <module>plugins/rpi_cam</module>
             </modules>             
         </profile>
 
