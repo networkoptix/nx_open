@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#ifdef ENABLE_ONVIF
+
 #include "avigilon_resource.h"
 
 #include <functional>
@@ -163,3 +165,5 @@ void QnAvigilonResource::onCheckPortRequestDone( nx_http::AsyncHttpClientPtr htt
         std::bind(&QnAvigilonResource::checkInputPortState, this, std::placeholders::_1),
         INPUT_PORT_CHECK_PERIOD_MS );
 }
+
+#endif  //ENABLE_ONVIF
