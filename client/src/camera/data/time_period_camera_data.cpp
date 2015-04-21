@@ -50,7 +50,7 @@ void QnTimePeriodCameraData::append(const QnTimePeriodList &other) {
 
     /* Check if the current last piece marked as Live. */ 
     QVector<QnTimePeriodList> allPeriods;
-    if (!m_data.isEmpty() && m_data.last().durationMs == -1)  {
+    if (!m_data.isEmpty() && m_data.last().isInfinite())  {
         auto lastIt = m_data.end() - 1;
         if (other.last().startTimeMs >= lastIt->startTimeMs)
             m_data.erase(lastIt);    //cut "recording" piece
@@ -81,7 +81,7 @@ bool QnTimePeriodCameraData::trim(qint64 trimTime) {
         return false;
 
     QnTimePeriod period = m_data.last();
-    if(period.durationMs != -1)
+    if(!period.isInfinite())
         return false;
 
     qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);

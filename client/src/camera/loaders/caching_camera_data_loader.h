@@ -34,9 +34,6 @@ public:
     qreal loadingMargin() const;
     void setLoadingMargin(qreal loadingMargin);
 
-    qint64 updateInterval() const;
-    void setUpdateInterval(qint64 msecs);
-
     QnTimePeriod boundingPeriod() const;
     void setBoundingPeriod(const QnTimePeriod &boundingPeriod);
 

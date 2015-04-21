@@ -147,7 +147,7 @@ public:
                 m_position += m_base->durationMs;
             }
         } else {
-            while(m_position > m_base->durationMs && m_base->durationMs != -1) {
+            while(m_position > m_base->durationMs && !m_base->isInfinite()) {
                 m_position -= m_base->durationMs;
                 m_base++;
             }

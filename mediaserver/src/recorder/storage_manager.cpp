@@ -664,7 +664,7 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &periods,
         {
             QnTimePeriod& lastPeriod = periods.last().last();
             bool isActive = !camera->hasFlags(Qn::foreigner) && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
-            if (lastPeriod.durationMs == -1 && !isActive)
+            if (lastPeriod.isInfinite() && !isActive)
             {
                 lastPeriod.durationMs = 0;
                 Recorders recorders = QnRecordingManager::instance()->findRecorders(camera);

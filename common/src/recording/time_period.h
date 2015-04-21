@@ -14,7 +14,7 @@ public:
     /**
      * Constructs a null time period.
      */
-    QnTimePeriod(): startTimeMs(0), durationMs(0) {}
+    QnTimePeriod();
 
     /**
      * Constructor.
@@ -22,7 +22,7 @@ public:
      * \param startTimeMs               Period's start time, normally in milliseconds since epoch.
      * \param durationMs                Period's duration, in milliseconds.
      */
-    QnTimePeriod(qint64 startTimeMs, qint64 durationMs): startTimeMs(startTimeMs), durationMs(durationMs) {}
+    QnTimePeriod(qint64 startTimeMs, qint64 durationMs);
 
     bool operator==(const QnTimePeriod &other) const;
 
@@ -52,22 +52,22 @@ public:
     /**
      * \returns                         Whether this is a null time period. 
      */
-    bool isNull() const {
-        return startTimeMs == 0 && durationMs == 0;
-    }
+    bool isNull() const;
+    
+    /**
+     * \returns                         Whether this is a infinite time period. 
+     */
+    bool isInfinite() const;
+
+    /**
+     * \returns                         Infinite duration constant value (-1). 
+     */
+    static qint64 infiniteDuration();
 
     /**
      * \return                          Type of this time period.
      */
-    Qn::TimePeriodType type() const {
-        if(isNull()) {
-            return Qn::NullTimePeriod;
-        } else if(isEmpty()) {
-            return Qn::EmptyTimePeriod;
-        } else {
-            return Qn::NormalTimePeriod;
-        }
-    }
+    Qn::TimePeriodType type() const;
 
     QByteArray serialize() const;
     QnTimePeriod& deserialize(const QByteArray& data);
@@ -77,7 +77,7 @@ public:
 
     /** Duration in milliseconds. 
      * 
-     * -1 if duration is infinite or unknown. It may be the case if this time period 
+     * infiniteDuration() if duration is infinite or unknown. It may be the case if this time period 
      * represents a video chunk that is being recorded at the moment. */
     qint64 durationMs;
 };

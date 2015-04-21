@@ -86,7 +86,7 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
             itr--;
 
         /* If last period is still recording, request at least from its start. */
-        if (itr->durationMs == -1) {
+        if (itr->isInfinite()) {
             qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
             periodToLoad.startTimeMs = itr->startTimeMs;
             periodToLoad.durationMs = endPoint - periodToLoad.startTimeMs;
@@ -212,7 +212,7 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
     }
 
     // reduce right edge of loaded period info if last period under writing now
-    if (!loadedPeriods.isEmpty() && !loadedData->isEmpty() && loadedData->dataSource().last().durationMs == -1)
+    if (!loadedPeriods.isEmpty() && !loadedData->isEmpty() && loadedData->dataSource().last().isInfinite())
     {
         qint64 lastDataTime = loadedData->dataSource().last().startTimeMs;
         while (!loadedPeriods.isEmpty() && loadedPeriods.last().startTimeMs > lastDataTime)

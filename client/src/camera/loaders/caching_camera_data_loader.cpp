@@ -17,6 +17,8 @@
 namespace {
     const qint64 minTimePeriodLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
     const qint64 defaultUpdateInterval = 10 * 1000;
+
+    const qint64 requestIntervalMs = 30 * 1000;
 }
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnResourcePtr &resource, QObject *parent):
@@ -171,14 +173,6 @@ void QnCachingCameraDataLoader::setLoadingMargin(qreal loadingMargin) {
     m_loadingMargin = loadingMargin;
 }
 
-qint64 QnCachingCameraDataLoader::updateInterval() const {
-    return m_updateInterval;
-}
-
-void QnCachingCameraDataLoader::setUpdateInterval(qint64 msecs) {
-    m_updateInterval = msecs;
-}
-
 QnTimePeriod QnCachingCameraDataLoader::boundingPeriod() const {
     return m_boundingPeriod;
 }
@@ -305,10 +299,10 @@ QnTimePeriod QnCachingCameraDataLoader::addLoadingMargins(const QnTimePeriod &ta
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
     qint64 startTime = targetPeriod.startTimeMs;
-    qint64 endTime = targetPeriod.durationMs == -1 ? currentTime : targetPeriod.startTimeMs + targetPeriod.durationMs;
+    qint64 endTime = targetPeriod.isInfinite() ? currentTime : targetPeriod.startTimeMs + targetPeriod.durationMs;
 
     qint64 minStartTime = boundingPeriod.startTimeMs;
-    qint64 maxEndTime = boundingPeriod.durationMs == -1 ? currentTime : boundingPeriod.startTimeMs + boundingPeriod.durationMs;
+    qint64 maxEndTime = boundingPeriod.isInfinite() ? currentTime : boundingPeriod.startTimeMs + boundingPeriod.durationMs;
 
     /* Adjust for margin. */
     qint64 margin = qMax(minMargin, static_cast<qint64>((endTime - startTime) * m_loadingMargin));

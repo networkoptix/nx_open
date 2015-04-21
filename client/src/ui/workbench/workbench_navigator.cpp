@@ -516,7 +516,7 @@ void QnWorkbenchNavigator::updateItemDataFromSlider(QnResourceWidget *widget) co
 
     QnTimePeriod window(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
     if(m_timeSlider->windowEnd() == m_timeSlider->maximum()) // TODO: #Elric check that widget supports live.
-        window.durationMs = -1;
+        window.durationMs = QnTimePeriod::infiniteDuration();
     item->setData(Qn::ItemSliderWindowRole, QVariant::fromValue<QnTimePeriod>(window));
 
     QnTimePeriod selection;
@@ -541,7 +541,7 @@ void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget, bo
             window = QnTimePeriod(0, -1);
 
         qint64 windowStart = window.startTimeMs;
-        qint64 windowEnd = window.durationMs == -1 ? m_timeSlider->maximum() : window.startTimeMs + window.durationMs;
+        qint64 windowEnd = window.isInfinite() ? m_timeSlider->maximum() : window.startTimeMs + window.durationMs;
         if(windowStart < m_timeSlider->minimum()) {
             qint64 delta = m_timeSlider->minimum() - windowStart;
             windowStart += delta;
@@ -616,7 +616,7 @@ void QnWorkbenchNavigator::jumpBackward() {
                 QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime/1000, true);
                 itr = qMax(itr - 1, periods.cbegin());
                 pos = itr->startTimeMs * 1000;
-                if (reader->isReverseMode() && itr->durationMs != -1)
+                if (reader->isReverseMode() && !itr->isInfinite())
                     pos += itr->durationMs * 1000;
             }
         }
@@ -655,7 +655,7 @@ void QnWorkbenchNavigator::jumpForward() {
             if (reader->isReverseMode())
                 return;
             pos = DATETIME_NOW; 
-        } else if (reader->isReverseMode() && itr->durationMs == -1) {
+        } else if (reader->isReverseMode() && itr->isInfinite()) {
             /* Do not make step forward to live if we are playing backward. */
             --itr;
             pos = itr->startTimeMs * 1000;

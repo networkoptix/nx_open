@@ -97,8 +97,8 @@ qint64 QnTimePeriodList::duration() const {
     if(isEmpty())
         return 0;
 
-    if(back().durationMs == -1)
-        return -1;
+    if(back().isInfinite())
+        return QnTimePeriod::infiniteDuration();
 
     qint64 result = 0;
     for(const QnTimePeriod &period: *this)
@@ -254,12 +254,12 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &
 
     for (const QnTimePeriod &p: periods) {
         QnTimePeriod &last = result.last();
-        if(last.durationMs == -1)
+        if(last.isInfinite())
             break;
 
         if (last.startTimeMs + last.durationMs + detailLevelMs > p.startTimeMs) {
-            if(p.durationMs == -1) {
-                last.durationMs = -1;
+            if(p.isInfinite()) {
+                last.durationMs = QnTimePeriod::infiniteDuration();
             } else {
                 last.durationMs = qMax(last.durationMs, p.startTimeMs + p.durationMs - last.startTimeMs);
             }
@@ -304,13 +304,13 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
                 result.push_back(startPeriod);
             } else {
                 QnTimePeriod &last = result.last();
-                if (startPeriod.durationMs == -1) {
-                    if (last.durationMs == -1)
+                if (startPeriod.isInfinite()) {
+                    if (last.isInfinite())
                         last.startTimeMs = qMin(last.startTimeMs, startPeriod.startTimeMs);
                     else if (startPeriod.startTimeMs > last.startTimeMs+last.durationMs)
                         result.push_back(startPeriod);
                     else 
-                        last.durationMs = -1;
+                        last.durationMs = QnTimePeriod::infiniteDuration();
                     break;
                 } else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime) {
                     last.durationMs = qMax(last.durationMs, minStartTime + startPeriod.durationMs - last.startTimeMs);
