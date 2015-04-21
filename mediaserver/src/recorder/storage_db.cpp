@@ -178,7 +178,7 @@ bool QnStorageDb::open(const QString& fileName)
 
 bool QnStorageDb::createDatabase()
 {
-    QnDbTransactionLocker tran(getTransaction());
+    QnDbTransactionLocker tran(&m_tran);
     if (!isObjectExists(lit("table"), lit("storage_data"), m_sdb))
     {
         if (!execSQLFile(lit(":/01_create_storage_db.sql"), m_sdb)) {
@@ -533,7 +533,7 @@ QnStorageDb::QnDbTransaction* QnStorageDb::getTransaction()
 {
     if( m_needReopenDB )
     {
-        if( m_sdb.open() )
+        if( m_sdb.open() && createDatabase())
             m_needReopenDB = false;
     }
 
