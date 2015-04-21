@@ -143,10 +143,13 @@ public:
             }
             else 
             {
+                QElapsedTimer t;
+                t.restart();
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 0.0));
                 m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::LowQualityCatalog, 0.5);
                 m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::HiQualityCatalog, 0.5);
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 1.0));
+                qDebug() << "rebuild archive time for storage" << scanData.storage->getPath() << "is:" << t.elapsed() << "msec";
             }
             m_scanTasks.removeFirst(1);
         }
