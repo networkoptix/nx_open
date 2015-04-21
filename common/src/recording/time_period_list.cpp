@@ -271,32 +271,42 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &
     return result;
 }
 
-QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periods)
+QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periodLists)
 {
-    if(periods.size() == 1)
-        return periods.first();
+    QVector<QnTimePeriodList> nonEmptyPeriods;
+    for (const QnTimePeriodList &periodList: periodLists)
+        if (!periodList.isEmpty())
+            nonEmptyPeriods << periodList;
 
-    QVector<int> minIndexes(periods.size());
+    if (nonEmptyPeriods.empty())
+        return QnTimePeriodList();
+
+    if(nonEmptyPeriods.size() == 1)
+        return nonEmptyPeriods.first();
+
+    QVector<int> minIndexes(nonEmptyPeriods.size());
     QnTimePeriodList result;
     int minIndex = 0;
     while (minIndex != -1) {
         qint64 minStartTime = 0x7fffffffffffffffll;
         minIndex = -1;
         int i = 0;
-        for (const QnTimePeriodList &periodsList: periods) {
+        for (const QnTimePeriodList &periodsList: nonEmptyPeriods) {
             size_t startIdx = minIndexes[i];
-            const QnTimePeriod &startPeriod = periodsList[startIdx];
 
-            if (startIdx < periodsList.size() && startPeriod.startTimeMs < minStartTime) {
-                minIndex = i;
-                minStartTime = startPeriod.startTimeMs;
+            if (startIdx < periodsList.size()) {
+                const QnTimePeriod &startPeriod = periodsList[startIdx];
+                if (startPeriod.startTimeMs < minStartTime) {
+                    minIndex = i;
+                    minStartTime = startPeriod.startTimeMs;
+                }
             }
             ++i;
         }
 
         if (minIndex >= 0) {
             int &startIdx = minIndexes[minIndex];
-            const QnTimePeriodList &periodsList = periods[minIndex];
+            const QnTimePeriodList &periodsList = nonEmptyPeriods[minIndex];
             const QnTimePeriod &startPeriod = periodsList[startIdx];
 
             // add chunk to merged data
