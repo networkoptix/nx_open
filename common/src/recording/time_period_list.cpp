@@ -289,7 +289,7 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
     if(nonEmptyPeriods.size() == 1)
         return nonEmptyPeriods.first();
 
-    QVector<int> minIndexes(nonEmptyPeriods.size());
+    std::vector<size_t> minIndices(nonEmptyPeriods.size(), 0);
     QnTimePeriodList result;
     int minIndex = 0;
     while (minIndex != -1) {
@@ -297,7 +297,7 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
         minIndex = -1;
         int i = 0;
         for (const QnTimePeriodList &periodsList: nonEmptyPeriods) {
-            size_t startIdx = minIndexes[i];
+            size_t startIdx = minIndices[i];
 
             if (startIdx < periodsList.size()) {
                 const QnTimePeriod &startPeriod = periodsList[startIdx];
@@ -310,7 +310,7 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
         }
 
         if (minIndex >= 0) {
-            int &startIdx = minIndexes[minIndex];
+            size_t &startIdx = minIndices[minIndex];
             const QnTimePeriodList &periodsList = nonEmptyPeriods[minIndex];
             const QnTimePeriod &startPeriod = periodsList[startIdx];
 

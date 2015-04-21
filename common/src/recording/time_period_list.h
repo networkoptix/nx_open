@@ -1,7 +1,13 @@
 #ifndef QN_TIME_PERIOD_LIST_H
 #define QN_TIME_PERIOD_LIST_H
 
+//#define QN_TIME_PERIODS_STD
+
+#ifdef QN_TIME_PERIODS_STD
+#include <vector>
+#else
 #include <QtCore/QVector>
+#endif
 
 #include "time_period.h"
 
@@ -11,9 +17,18 @@ class QnTimePeriodListTimeIterator;
  * A sorted list of time periods that basically is an implementation of 
  * an interval container concept.
  */
-class QnTimePeriodList: public QVector<QnTimePeriod> {
-
+class QnTimePeriodList: 
+#ifdef QN_TIME_PERIODS_STD
+    public std::vector<QnTimePeriod>
+#else
+    public QVector<QnTimePeriod> 
+#endif
+{
+#ifdef QN_TIME_PERIODS_STD
+    typedef std::vector<QnTimePeriod> base_type;
+#else
     typedef QVector<QnTimePeriod> base_type;
+#endif
 
 public:
     QnTimePeriodList();
@@ -52,6 +67,16 @@ public:
 
     inline QnTimePeriodListTimeIterator timeBegin() const;
     inline QnTimePeriodListTimeIterator timeEnd() const;
+
+#ifdef QN_TIME_PERIODS_STD
+    const QnTimePeriod &first() const { return *begin(); }
+    QnTimePeriod &first() { return *begin(); }
+
+    const QnTimePeriod &last() const { return *(end() - 1); }
+    QnTimePeriod &last() { return *(end() - 1); }
+
+    bool isEmpty() const { return empty(); }
+#endif
 
     /** 
      * Encode (compress) data to a byte array. 
