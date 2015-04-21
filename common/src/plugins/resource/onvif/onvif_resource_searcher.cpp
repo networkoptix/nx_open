@@ -238,7 +238,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     return result;
 }
 
-QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 
@@ -259,7 +259,10 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     }
     */
     
-    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(resourceType->getName()); // use name instead of manufacture to instanciate child onvif resource
+    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
+        resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
+        ? params.vendor
+        : resourceType->getName() ); // use name instead of manufacture to instanciate child onvif resource
     if (!result )
         return result; // not found
 

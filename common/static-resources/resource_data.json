@@ -771,7 +771,8 @@
                         "space": "35MmEquiv"
                     }
                 }
-            }
+            },
+            "tourGetPosWorkaround": true
         },
         {
             "keys": [

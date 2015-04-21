@@ -275,7 +275,8 @@ QnDbManager::QnDbManager()
     m_needResyncFiles(false),
     m_needResyncCameraUserAttributes(false),
     m_dbJustCreated(false),
-    m_isBackupRestore(false)
+    m_isBackupRestore(false),
+    m_needResyncLayout(false)
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
@@ -560,6 +561,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         }
         if (m_needResyncCameraUserAttributes) {
             if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+                return false;
+        }
+        if (m_needResyncLayout) {
+            if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
                 return false;
         }
     }
@@ -1197,6 +1202,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             if (updateBusinessRule(bRuleData) != ErrorCode::ok)
                 return false;
         }
+    }
+    else if (updateName == lit(":/updates/33_resync_layout.sql")) {
+        m_needResyncLayout = true;
     }
 
     return true;
