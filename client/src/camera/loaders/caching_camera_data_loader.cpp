@@ -16,7 +16,6 @@
 
 namespace {
     const qint64 minTimePeriodLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
-    const qint64 defaultUpdateInterval = 10 * 1000;
 
     const qint64 requestIntervalMs = 30 * 1000;
 }
@@ -82,7 +81,6 @@ QnCachingCameraDataLoader::~QnCachingCameraDataLoader() {
 
 void QnCachingCameraDataLoader::init() {
     m_loadingMargin = 1.0;
-    m_updateInterval = defaultUpdateInterval;
     m_resourceIsLocal = !m_resource.dynamicCast<QnNetworkResource>();
 
     for(int i = 0; i < Qn::CameraDataTypeCount; i++) {
@@ -308,7 +306,7 @@ QnTimePeriod QnCachingCameraDataLoader::addLoadingMargins(const QnTimePeriod &ta
     qint64 margin = qMax(minMargin, static_cast<qint64>((endTime - startTime) * m_loadingMargin));
     
     startTime = qMax(startTime - margin, minStartTime);
-    endTime = qMin(endTime + margin, maxEndTime + m_updateInterval);
+    endTime = qMin(endTime + margin, maxEndTime + requestIntervalMs);
 
     return QnTimePeriod(startTime, endTime - startTime);
 }

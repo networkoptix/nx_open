@@ -85,7 +85,6 @@ private:
     bool m_resourceIsLocal;
 
     qreal m_loadingMargin;
-    qint64 m_updateInterval;
     
     qint64 m_previousRequestTime[Qn::TimePeriodContentCount];
 
