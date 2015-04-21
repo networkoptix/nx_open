@@ -75,7 +75,7 @@ namespace {
 
         qDebug() << now() << "starting test 2";
         for (int i = 0; i < callsCount; ++i)
-            test = std::min<qint64>(test, periods[i % N].startTimeMs);
+            test = std::min<qint64>(test, stdPeriods[i % N].startTimeMs);
         result =  QDateTime::currentMSecsSinceEpoch() - result;
         qDebug() << now() << "test 2 finished for" << result << "ms" << test;
 
