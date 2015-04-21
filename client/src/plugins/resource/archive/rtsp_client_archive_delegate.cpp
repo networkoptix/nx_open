@@ -323,10 +323,19 @@ void QnRtspClientArchiveDelegate::close()
     m_parsers.clear();
 }
 
+#define QN_PERIODS_HIGHLOAD_TEST
+
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
     QMutexLocker lock(&m_timeMutex);
+
+#ifdef QN_PERIODS_HIGHLOAD_TEST
+    /* Two years of chunks. */
+    static const qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 365 * 2;
+    qint64 result = 1000ll * (qnSyncTime->currentMSecsSinceEpoch() - totalLengthMs);
+#else
     qint64 result = m_globalMinArchiveTime != AV_NOPTS_VALUE ? m_globalMinArchiveTime : m_rtspSession.startTime();
+#endif
 
     if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
         return result;
