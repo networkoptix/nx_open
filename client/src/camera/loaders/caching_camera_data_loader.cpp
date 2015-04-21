@@ -464,7 +464,7 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::CameraDataType dataType) {
     if (m_previousRequestTime[periodType] == 0 || timeSpan > 30*1000)
         load(dataType, requestedPeriod);
     else
-        m_queuedToLoadTimePeriods[periodType].append(requestedPeriod);
+        m_queuedToLoadTimePeriods[periodType].push_back(requestedPeriod);
     m_previousRequestTime[periodType] = curTime;
 }
 
