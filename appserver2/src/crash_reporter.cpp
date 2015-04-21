@@ -25,11 +25,11 @@ void CrashReporter::scanAndReport(QnUserResourcePtr admin)
     }
 
     #if defined( _WIN32 )
-        QDir crashDir(QString::fromStdString(win32_exception::getCrashDirectory()));
-        auto crashFilter = QString::fromStdString(win32_exception::getCrashPattern());
+        QDir crashDir(win32_exception::getCrashDirectory());
+        const auto crashFilter = win32_exception::getCrashPattern();
     #elif defined ( __linux__ )
-        QDir crashDir(QString::fromStdString(linux_exception::getCrashDirectory()));
-        auto crashFilter = QString::fromStdString(linux_exception::getCrashPattern());
+        QDir crashDir(linux_exception::getCrashDirectory());
+        const auto crashFilter = linux_exception::getCrashPattern();
     #else
         QDir crashDir;
         QString crashFilter;
@@ -49,8 +49,8 @@ void CrashReporter::scanAndReport(QnUserResourcePtr admin)
 
 void CrashReporter::scanAndReportAsync(QnUserResourcePtr admin)
 {
-    QnConcurrent::run( Ec2ThreadPool::instance(),
-                       std::bind(&CrashReporter::scanAndReport, admin));
+    QnConcurrent::run(Ec2ThreadPool::instance(),
+                      std::bind(&CrashReporter::scanAndReport, admin));
 }
 
 void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool auth)
@@ -104,12 +104,8 @@ nx_http::HttpHeaders CrashReporter::makeHttpHeaders() const
 #else
     auto binName = fileName.split(QChar('_')).first();
 #endif
-    auto version = lit("%1-%2%3").arg(QnAppInfo::applicationVersion())
-                                 .arg(QnAppInfo::applicationRevision())
-                                 .arg(QnAppInfo::beta() ? "-beta" : "");
-    auto systemInfo  = lit("%1-%2-%3").arg(QnAppInfo::applicationPlatform())
-                                      .arg(QnAppInfo::applicationArch())
-                                      .arg(QnAppInfo::applicationPlatformModification());
+    auto version = QnAppInfo::applicationFullVersion();
+    auto systemInfo = QnAppInfo::applicationSystemInfo();
     auto timestamp = m_crashFile.created().toString(DATE_FORMAT);
     auto extension = fileName.split(QChar('.')).last();
 

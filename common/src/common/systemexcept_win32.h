@@ -7,6 +7,7 @@
 #include <string>
 #include <windows.h>
 
+#include <QString>
 
 //!Used to dump unhandled structured exception call stack to file ({application_name}_{pid}.except near application binary)
 /*!
@@ -31,8 +32,9 @@ public:
     static void setCreateFullCrashDump( bool isFull );
 
     //!How to find created dumps
-    static std::string getCrashDirectory();
-    static std::string getCrashPattern();
+    static QString getCrashDirectory();
+    static QString getCrashPrefix();
+    static QString getCrashPattern();
 };
 
 

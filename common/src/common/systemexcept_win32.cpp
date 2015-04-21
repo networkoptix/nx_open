@@ -21,6 +21,7 @@ class GlobalCrashDumpSettings
 {
 public:
     bool dumpFullMemory;
+    std::string crashFile;
 
     GlobalCrashDumpSettings()
     :
@@ -210,6 +211,12 @@ static void myPurecallHandler()
 
 void win32_exception::installGlobalUnhandledExceptionHandler()
 {
+    //precalculate file name (
+    std::ostringstream os;
+    os << getCrashDirectory().toStdString() << "\\"
+       << getCrashPrefix().toStdString() << "_" << GetCurrentProcessId() << ".except";
+    globalCrashDumpSettingsInstance.crashFile = os.str();
+
     //_set_se_translator( &win32_exception::translate );
     SetUnhandledExceptionFilter( &unhandledSEHandler );
 
@@ -228,7 +235,7 @@ void win32_exception::setCreateFullCrashDump( bool isFull )
     globalCrashDumpSettingsInstance.dumpFullMemory = isFull;
 }
 
-std::string win32_exception::getCrashDirectory()
+QString win32_exception::getCrashDirectory()
 {
     char sAppData[MAX_PATH];
     if( FAILED(SHGetFolderPathA(
@@ -237,22 +244,25 @@ std::string win32_exception::getCrashDirectory()
             NULL,
             0,
             sAppData)))
-        return std::string();
+        return QLatin1String(".");
 
-    return sAppData;
+    return QLatin1String(sAppData);
 }
 
-std::string win32_exception::getCrashPattern()
+QString win32_exception::getCrashPrefix()
 {
     char sProgramName[1024];
-    if(GetProgramName( sProgramName ) )
-    {
-        std::ostringstream os;
-        os << sProgramName << "_*.*";
-        return os.str();
-    }
+    if( GetProgramName( sProgramName ) )
+        return QString();
 
-    return std::string();
+    return QString(QLatin1String("%1_%2"))
+            .arg(QLatin1String(sProgramName))
+            .arg(QnAppInfo::applicationFullVersion());
+}
+
+QString win32_exception::getCrashPattern()
+{
+    return QString(QLatin1String("%1_*.*")).arg(getCrashPrefix());
 }
 
 #define MAX_SYMBOL_SIZE 1024
@@ -260,28 +270,10 @@ std::string win32_exception::getCrashPattern()
 static
 HANDLE 
 CreateLegacyDumpFile() {
-    char sProcessName[1024];
-    char sFileName[1024];
-    char sAppData[MAX_PATH];
-
-    if( !GetProgramName(sProcessName) )
-        return INVALID_HANDLE_VALUE;
-
-    if( FAILED(SHGetFolderPathA(
-        NULL,
-        CSIDL_LOCAL_APPDATA,
-        NULL,
-        0,
-        sAppData)))
-        return INVALID_HANDLE_VALUE;
-
-    int ret = sprintf(sFileName,"%s\\%s_%d.except", sAppData, sProcessName, ::GetCurrentProcessId());
-
-    if( ret <=0 )
-        return INVALID_HANDLE_VALUE;
+    const auto fileName = globalCrashDumpSettingsInstance.crashFile;
 
     return ::CreateFileA(
-        sFileName,
+        fileName.c_str(),
         GENERIC_WRITE,
         0,
         NULL,

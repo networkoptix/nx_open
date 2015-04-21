@@ -18,17 +18,13 @@ RE_BT = re.compile(r'(.+)\(\+0x([0-9a-f]+)\)\[0x([0-9a-f]+)\]')
 
 class SimbolTable(object):
     def __init__(self, binary):
-        self._table = []
-        for line in subprocess.check_output(['nm', binary]).splitlines():
-            m = RE_NM.match(line)
-            if m:
-                addr, t, name = m.groups()
-                self._table.append((int(addr, 16), name))
+        self._binary = binary
+        self._table = self._readBinary(binary)
+        if not self._table:
+            self._table = self._readBinary(binary, '--dynamic')
         self._table.sort(key=lambda x: x[0])
 
     def resolve(self, addr):
-        if not self._table: raise KeyError(
-            'SimbolTable is empty, cant find 0x%x' & addr)
         begin, end = 0, len(self._table)
         while (end - begin) > 1:
             mid = begin + (end - begin) / 2
@@ -36,9 +32,24 @@ class SimbolTable(object):
             if addr < fn: end = mid
             else: begin = mid
         fn, name = self._table[begin]
-        if addr < fn: raise KeyError(
-            'SimbolTable starts at 0x%x, cand find 0x%x' % (fn, addr))
+        if addr < fn:
+            m = 'SimbolTable %s starts at 0x%x, cand find 0x%x'
+            raise KeyError(m % (self._binary, fn, addr))
         return (name, addr - fn)
+
+    def __nonzero__(self):
+        return bool(self._table)
+
+    @staticmethod
+    def _readBinary(binary, *options):
+        table = []
+        nm = subprocess.check_output(['nm', binary] + list(options))
+        for line in nm.splitlines():
+            m = RE_NM.match(line)
+            if m:
+                addr, t, name = m.groups()
+                table.append((int(addr, 16), name))
+        return table
 
 SIMBOL_TABLES = dict()
 def resolveSombol(binary, addr):
@@ -47,16 +58,17 @@ def resolveSombol(binary, addr):
     except KeyError:
         table = SimbolTable(binary)
         SIMBOL_TABLES[binary] = table
-    return table.resolve(addr)
+    if not table: return None
+    return '%s+0x%x' % table.resolve(addr)
 
-def resolveBacktraseStream(sIn, sOut, sErr=None):
+def resolveBacktraseStream(sIn, sOut):
     for line in sIn:
         m = RE_BT.match(line)
         if m:
             binary, addr, ret = m.groups()
-            func, addr = resolveSombol(binary, int(addr, 16))
-            line = '%s(%s+0x%x)[0x%s]' % (binary, func, addr, ret)
-        sOut.write('%s\n' % line)
+            func = resolveSombol(binary, int(addr, 16))
+            if func: line = '%s(%s)[0x%s]\n' % (binary, func, ret)
+        sOut.write(line)
 
 if __name__ == '__main__':
     resolveBacktraseStream(sys.stdin, sys.stdout)

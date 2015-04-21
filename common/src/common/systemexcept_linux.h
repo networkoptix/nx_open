@@ -3,6 +3,8 @@
 #ifndef SYSTEMEXCEPT_LINUX_H
 #define SYSTEMEXCEPT_LINUX_H
 
+#include <QString>
+
 //! Used to dump unhandled structured exception call stack to file ~/{application_name}_{pid}.crash
 /*!
  *  \note after stack collection original signal handler is called, so core can still be dumped
@@ -17,9 +19,13 @@ public:
     static void installQuitThreadBacktracer();
     static void uninstallQuitThreadBacktracer();
 
+    //! Use to disable signals handling (to see core dump unaffected)
+    static void setSignalHandlingDisabled(bool isDisabled);
+
     //! How to find created dumps
-    static std::string getCrashDirectory();
-    static std::string getCrashPattern();
+    static QString getCrashDirectory();
+    static QString getCrashPrefix();
+    static QString getCrashPattern();
 };
 
 #endif // SYSTEMEXCEPT_LINUX_H

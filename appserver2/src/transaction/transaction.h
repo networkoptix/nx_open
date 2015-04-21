@@ -157,7 +157,6 @@ namespace ec2
             /* Statistics */
             getStatisticsReport         = 5001,  /*< ApiSystemStatistics */
             triggerStatisticsReport     = 5002,  /*< ApiStatisticsServerInfo */
-            crashProcess                = 5003,  /*< SIGSEGV */
 
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */

@@ -1,5 +1,7 @@
 #include "systemexcept_linux.h"
 
+#include <utils/common/app_info.h>
+
 #include <execinfo.h>
 #include <fcntl.h>
 #include <pwd.h>
@@ -19,6 +21,7 @@
 #include <QDebug>
 
 static const int BUFFER_SIZE = 2048;
+static const int STACK_SHIFT = 2; // signalHandler and printThreadData
 static const int BT_SIZE = 100;
 static const int THREAD_COUNT = 100;
 static const int SIGNALS[] = { SIGQUIT, SIGILL, SIGFPE, SIGSEGV, SIGBUS };
@@ -61,6 +64,7 @@ private:
     pthread_t m_threads[THREAD_COUNT];
 };
 
+static bool isSignalHandlingEnabled(true);
 static std::string crashFile;
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t mainThread(0);
@@ -73,8 +77,23 @@ static int printFd(int fd, Args ... args)
 {
      char buffer[BUFFER_SIZE];
      if (const int len = sprintf(buffer, args ...))
-        return write(fd, buffer, len);
+         return write(fd, buffer, len);
      return 0;
+}
+
+static int openLogFile()
+{
+    int log = open(crashFile.c_str(), O_CREAT | O_WRONLY, 0666);
+    int status = open("/proc/self/status", O_RDONLY);
+    if (status < 0) return log;
+
+    char buffer[BUFFER_SIZE];
+    while (auto len = read(status, buffer, BUFFER_SIZE))
+        if(!write(log, buffer, len))
+            break;
+
+    close(status);
+    return log;
 }
 
 static void printThreadData(int fd, pthread_t thread, int signal,
@@ -83,33 +102,47 @@ static void printThreadData(int fd, pthread_t thread, int signal,
     void *bt[BT_SIZE];
     if (const auto size = backtrace(bt, BT_SIZE))
     {
-        printFd(fd, "%s (%d) in thread 0x%x, backtrace %d frames:\n\n",
-            strsignal(signal), signal, static_cast<int>(thread), size);
+        printFd(fd, "\n%s (%d) in thread 0x%x, backtrace %d frames:\n\n",
+            strsignal(signal), signal, static_cast<int>(thread), size - STACK_SHIFT);
 
         // TODO: consider to save some extra information from info and context
-        backtrace_symbols_fd(bt, size, fd);
-        printFd(fd, "\n\n");
+        backtrace_symbols_fd(bt + STACK_SHIFT, size - STACK_SHIFT, fd);
         syncfs(fd);
     }
 }
 
 static void signalHandler(int signal, siginfo_t* info, void* data)
 {
-    const auto thisThread = pthread_self();
-    static const auto problemThread = thisThread;
-    static const auto logFile = open(crashFile.c_str(), O_CREAT | O_WRONLY, 0666);
-    printThreadData(logFile, thisThread, signal, info, static_cast<ucontext_t*>(data));
-
     // Here we're using the mutex, shared with the rest of the program. This is not safe
     // and may lead to a deadlock! To avoid this we just will not ask for more backtareces
-    // and quit right here
+    // and quit right here.
     if (pthread_mutex_timedlock(&mutex, &WAIT_FOR_MUTEX))
     {
-        printFd(logFile, "Posible deadlock has been detected, quit...");
         originalHandlers[signal].sa_sigaction(signal, info, data);
         return;
     }
 
+    if (!isSignalHandlingEnabled)
+    {
+        pthread_mutex_unlock(&mutex);
+
+        // Signal handler is disabled => do not affect other threads in dump
+        originalHandlers[signal].sa_sigaction(signal, info, data);
+        return;
+    }
+
+    const auto thisThread = pthread_self();
+    static const auto problemThread = thisThread;
+    static const auto logFile = openLogFile();
+
+    if (logFile < 0)
+    {
+        pthread_mutex_unlock(&mutex);
+        originalHandlers[signal].sa_sigaction(signal, info, data);
+        return;
+    }
+
+    printThreadData(logFile, thisThread, signal, info, static_cast<ucontext_t*>(data));
     allThreads.remove(thisThread);
 
     // send signal the next thread to write it's backtarece
@@ -141,8 +174,8 @@ void linux_exception::installCrashSignalHandler()
     mainThread = pthread_self();
     {
         std::ostringstream os;
-        os << getpwuid(getuid())->pw_dir << "/"
-           << program_invocation_name << "_" << getpid() << ".crash";
+        os << getCrashDirectory().toStdString() << "/"
+           << getCrashPrefix().toStdString() << "_" << getpid() << ".crash";
         crashFile = os.str();
     }
 
@@ -174,16 +207,28 @@ void linux_exception::uninstallQuitThreadBacktracer()
     pthread_mutex_unlock(&mutex);
 }
 
-std::string linux_exception::getCrashDirectory()
+void linux_exception::setSignalHandlingDisabled(bool isDisabled)
 {
-    if (const auto pwd = getpwuid(getuid()))
-        return pwd->pw_dir;
-    return std::string();
+    pthread_mutex_lock(&mutex);
+    isSignalHandlingEnabled = !isDisabled;
+    pthread_mutex_unlock(&mutex);
 }
 
-std::string linux_exception::getCrashPattern()
+QString linux_exception::getCrashDirectory()
 {
-    std::ostringstream os;
-    os << program_invocation_name << "_*.*";
-    return os.str();
+    if (const auto pwd = getpwuid(getuid()))
+        return QLatin1String(pwd->pw_dir);
+    return QLatin1String(".");
+}
+
+QString linux_exception::getCrashPrefix()
+{
+    return QString(QLatin1String("%1_%2"))
+            .arg(QLatin1String(program_invocation_name))
+            .arg(QnAppInfo::applicationFullVersion());
+}
+
+QString linux_exception::getCrashPattern()
+{
+    return QString(QLatin1String("%1_*.*")).arg(getCrashPrefix());
 }
