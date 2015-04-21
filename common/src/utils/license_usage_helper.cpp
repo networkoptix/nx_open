@@ -18,6 +18,8 @@
 #include "qjsonobject.h"
 #include "mustache/mustache.h"
 
+#define QN_NO_LICENSE_CHECK
+
 namespace {
 
     QString joinedString(std::function<QString(Qn::LicenseType)> method, const QList<Qn::LicenseType> &licenseTypes) {
@@ -210,6 +212,10 @@ bool QnLicenseUsageHelper::isValid() const {
 }
 
 bool QnLicenseUsageHelper::isValid(Qn::LicenseType licenseType) const {
+#ifdef QN_NO_LICENSE_CHECK
+    return true;
+#endif
+
     updateCache();
     return m_cache.overflow[licenseType] == 0;
 }
@@ -220,6 +226,10 @@ int QnLicenseUsageHelper::totalLicenses(Qn::LicenseType licenseType) const {
 }
 
 int QnLicenseUsageHelper::usedLicenses(Qn::LicenseType licenseType) const {
+#ifdef QN_NO_LICENSE_CHECK
+    return true;
+#endif
+
     updateCache();
     /* In all cases but analog encoder licenses m_cache.used contains already valid number. */
     if (m_cache.overflow[licenseType] == 0)
@@ -228,6 +238,10 @@ int QnLicenseUsageHelper::usedLicenses(Qn::LicenseType licenseType) const {
 }
 
 int QnLicenseUsageHelper::requiredLicenses(Qn::LicenseType licenseType) const {
+#ifdef QN_NO_LICENSE_CHECK
+    return true;
+#endif
+
     updateCache();
     return m_cache.overflow[licenseType];
 }
