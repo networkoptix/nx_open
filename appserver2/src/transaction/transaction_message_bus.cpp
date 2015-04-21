@@ -688,7 +688,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                 case ErrorCode::containsBecauseSequence:
                     return; // do not proxy if transaction already exists
                 default:
-                    qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
+                    NX_LOG( QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1: %2. Reopening connection...").
+                        arg(ApiCommand::toString(tran.command)).arg(ec2::toString(errorCode)), cl_logWARNING );
                     sender->setState(QnTransactionTransport::Error);
                     return;
             }

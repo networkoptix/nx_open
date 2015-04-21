@@ -309,6 +309,10 @@ protected:
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     void updateFirmware();
+    virtual bool subscribeToCameraNotifications();
+
+    bool createPullPointSubscription();
+
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 
@@ -470,7 +474,6 @@ private:
     qint64 m_prevPullMessageResponseClock;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
-    bool createPullPointSubscription();
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);

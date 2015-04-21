@@ -11,6 +11,10 @@
 #include <utils/common/collection.h>
 
 #include "threaded_ptz_controller.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
+#include "core/resource/security_cam_resource.h"
 
 #define QN_TOUR_PTZ_EXECUTOR_DEBUG
 #ifdef QN_TOUR_PTZ_EXECUTOR_DEBUG
@@ -110,6 +114,7 @@ public:
     QVector3D lastPosition;
     int lastPositionRequestTime;
     int newPositionRequestTime;
+    bool tourGetPosWorkaround;
 };
 
 QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate(): 
@@ -151,6 +156,8 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     }
 
     connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
+    QnResourceData resourceData = qnCommon->dataPool()->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
+    tourGetPosWorkaround = resourceData.value<bool>(lit("tourGetPosWorkaround"), false);
 }
 
 void QnTourPtzExecutorPrivate::updateDefaults() {
@@ -250,6 +257,8 @@ void QnTourPtzExecutorPrivate::processMoving(bool status, const QVector3D &posit
         if(state == Moving) {
             QnPtzTourSpotData &spotData = currentSpotData();
             spotData.moveTime = lastPositionRequestTime;
+            if (tourGetPosWorkaround && !qFuzzyEquals(spotData.position, lastPosition)) 
+                spotData.moveTime += pingTimeout; // workaround for VIVOTEK SD8363E camera. It stops after getPosition call. So, increase getPosition timeout if we detect that camera changes position.
             spotData.position = lastPosition;
         }
 

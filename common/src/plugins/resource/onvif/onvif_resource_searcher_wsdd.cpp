@@ -604,6 +604,9 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
     else if(lowerName == lit("sentry")) {
         qSwap(name, manufacturer);
     }
+    else if(lowerName == lit("vivotek") && manufacturer.toLower().startsWith(lit("sd"))) {
+        qSwap(name, manufacturer);
+    }
 }
 
 template <class T> 

@@ -28,6 +28,7 @@
 #include <recording/time_period_list.h>
 
 #include <boost/array.hpp>
+#include "utils/common/concurrent.h"
 
 QMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
@@ -381,6 +382,7 @@ bool DeviceFileCatalog::needRebuildPause()
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
     QDir dir(folder);
+    QList<QFileInfo> files;
     for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
         while (!qnStorageMan->needToStopMediaScan() && needRebuildPause())
@@ -397,13 +399,29 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         }
         else 
         {
+            files << fi;
+        }
+
+    }
+
+    if (files.empty())
+        return;
+
+    QThreadPool tp;
+    tp.setMaxThreadCount(16);
+    QMutex scanFilesMutex;
+    for(const auto& fi: files)
+    {
+        QnConcurrent::run( &tp, [&]() 
+        {
             QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
 
             Chunk chunk = chunkFromFile(storage, fileName);
             chunk.setFileSize(fi.size());
             if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
-                continue;
+                return;
 
+            QMutexLocker lock(&scanFilesMutex);
             if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
                 QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
                 if (itr != allChunks.begin())
@@ -423,8 +441,9 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
                 emptyFileList << EmptyFileInfo(fi.created().toMSecsSinceEpoch(), fi.absoluteFilePath());
             }
         }
-
+        );
     }
+    tp.waitForDone();
 }
 
 void DeviceFileCatalog::readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter) 

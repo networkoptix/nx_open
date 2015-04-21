@@ -19,7 +19,6 @@ public:
 
     virtual bool bind( const SocketAddress& localAddress ) override;
     virtual SocketAddress getLocalAddress() const override;
-    virtual SocketAddress getPeerAddress() const override;
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;
     virtual bool getReuseAddrFlag( bool* val ) override;
     virtual bool setNonBlockingMode( bool val ) override;
