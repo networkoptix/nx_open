@@ -2621,6 +2621,11 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>
         m_inputMonitored = true;
     }
 
+    return subscribeToCameraNotifications();
+}
+
+bool QnPlOnvifResource::subscribeToCameraNotifications()
+{
     if( m_eventCapabilities->WSPullPointSupport )
         return createPullPointSubscription();
     else if( QnSoapServer::instance()->initialized() )

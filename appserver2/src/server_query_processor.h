@@ -322,7 +322,7 @@ namespace ec2
             errorCode = processMultiUpdateSync(
                 ApiCommand::removeResource,
                 tran.isLocal,
-                dbManager->getNestedObjects(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
+                dbManager->getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
                 transactionsToSend );
             if( errorCode != ErrorCode::ok )
                 return errorCode;
@@ -363,7 +363,7 @@ namespace ec2
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
-                switch(dbManager->getObjectType(tran.params.id))
+                switch(dbManager->getObjectTypeNoLock(tran.params.id))
                 {
                 case ApiObject_Server:
                     updatedTran.command = ApiCommand::removeMediaServer;

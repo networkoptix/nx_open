@@ -3,8 +3,6 @@
 
 #ifdef ENABLE_ACTI
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
 #include <QtCore/QElapsedTimer>
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
 
