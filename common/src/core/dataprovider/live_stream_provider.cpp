@@ -416,12 +416,8 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     m_videoResolutionByChannelNumber[channelNumber] = newResolution;
     onStreamResolutionChanged( channelNumber, newResolution );
 
-    if( getRole() == Qn::CR_SecondaryLiveVideo ||
-        !m_cameraRes->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability ) || 
-        m_cameraRes->hasDualStreaming2() )
-    {
+    if( getRole() == Qn::CR_SecondaryLiveVideo)
         return;
-    }
 
     //no secondary stream and no motion, may be primary stream is now OK for motion?
     bool newValue = newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION;
