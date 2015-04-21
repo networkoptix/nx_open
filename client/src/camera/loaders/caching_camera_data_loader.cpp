@@ -392,6 +392,8 @@ void QnCachingCameraDataLoader::discardCachedData() {
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
         m_requestedTimePeriods[timePeriodType].clear();
         m_timePeriodCameraData[timePeriodType].clear();
+        //TODO: #GDM #High make sure we are loading periods ONLY for opened cameras. 
+        //Much better if loading will be started from QnWorkbenchNavigator
         updateTimePeriods(timePeriodToDataType(timePeriodType));
         emit periodsChanged(timePeriodType);
     }
