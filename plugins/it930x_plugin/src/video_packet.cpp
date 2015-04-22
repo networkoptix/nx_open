@@ -44,11 +44,13 @@ namespace ite
 
     void * VideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
+#if 0
         if (interfaceID == nxcip::IID_VideoDataPacket)
         {
             addRef();
             return this;
         }
+#endif
         if (interfaceID == nxcip::IID_MediaDataPacket)
         {
             addRef();
@@ -59,7 +61,7 @@ namespace ite
             addRef();
             return static_cast<nxpl::PluginInterface*>(this);
         }
-        return NULL;
+        return nullptr;
     }
 
     nxcip::UsecUTCTimestamp VideoPacket::timestamp() const
@@ -101,9 +103,10 @@ namespace ite
     {
         return 0;
     }
-
+#if 0
     nxcip::Picture * VideoPacket::getMotionData() const
     {
         return nullptr;
     }
+#endif
 }

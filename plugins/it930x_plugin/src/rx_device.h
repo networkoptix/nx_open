@@ -42,6 +42,9 @@ namespace ite
         static constexpr unsigned MIN_STRENGTH() { return 60; }
         static constexpr unsigned MIN_QUALITY() { return 60; }
 
+        static constexpr unsigned RC_DELAY_MS() { return 250; }
+        static constexpr unsigned RC_ATTEMPTS() { return 16; }
+
         static uint16_t stream2pid(unsigned stream)
         {
             switch (stream)
@@ -188,7 +191,7 @@ namespace ite
         }
 
         bool changeChannel(unsigned channel);
-        bool updateOSD();
+        void updateOSD();
 
     private:
         ///
@@ -285,6 +288,7 @@ namespace ite
         void stats();
 
         bool sendRC(RcCommand * cmd);
+        bool sendRC(RcCommand * cmd, unsigned attempts);
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;

@@ -153,12 +153,14 @@ public:
 
         QnCameraAdvancedParamValueList result;
         if (success) {
+            m_resource->setParamPhysical(QString(), QLatin1String("<all>"));
             for(const QnCameraAdvancedParamValue &value: m_values) {
                 if (m_resource->setParamPhysical(value.id, value.value))
                     result << value;
                 else
                     success = false;
             }
+            m_resource->setParamPhysical(QString(), QLatin1String("</all>"));
         }
         emit m_resource->asyncParamsSetDone(m_resource, result);
         return success;

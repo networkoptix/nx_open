@@ -102,7 +102,7 @@ public:
                 errorMessage = tr("Camera initialization process in progress");
                 break;
             case cameraPluginError:
-                errorMessageParts   << tr("Camera plugin error. %1");
+                errorMessage = tr("Camera plugin error. %1");
                 break;
             default:
             {

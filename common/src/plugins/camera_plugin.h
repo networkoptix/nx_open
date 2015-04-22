@@ -452,8 +452,10 @@ namespace nxcip
             cameraParamsPersistentCapability    = 0x0800,     //!< camera parameters can be read/set even if camera is not accessible at the moment
             searchByMotionMaskCapability        = 0x1000,     //!< if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
             motionRegionCapability              = 0x2000,     //!< if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
-            groupMediaParamsChangeCapability    = 0x3000      //!< plugin aggregates media stream parameters changes. CameraMediaEncoder3 MUST be implemented
+            groupMediaParamsChangeCapability    = 0x4000,     //!< plugin aggregates media stream parameters changes. CameraMediaEncoder3 MUST be implemented
+            needIFrameDetectionCapability       = 0x8000      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
         };
+
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
         /*!
             \param[out] capabilitiesMask
@@ -663,7 +665,7 @@ namespace nxcip
     public:
         enum CameraCapability3
         { 
-            cameraParamsPersistentCapability   = 0x0800      //!<Camera parameters can be read/set even if camera is not accessible at the moment
+            cameraParamsPersistentCapability   = 0x0800,    //!< Camera parameters can be read/set even if camera is not accessible at the moment
         };
 
         //!Returns XML describing camera parameters
@@ -887,8 +889,7 @@ namespace nxcip
             fReverseStream      = 0x02,
             //!set in first packet of gop block of reverse stream (see \a nxcip::DtsArchiveReader::setReverseMode)
             fReverseBlockStart  = 0x04,
-            //!packet belongs to low-quality stream. If unset, assuming frame is in high quality
-            fLowQuality         = 0x08,
+            DEPRECATED_fLowQuality = 0x08,
             /*!
                 MUST be set after each \a nxcip::DtsArchiveReader::seek, \a nxcip::DtsArchiveReader::reverseModeCapability, 
                 \a nxcip::DtsArchiveReader::setQuality to signal discontinuity in timestamp

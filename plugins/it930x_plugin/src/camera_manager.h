@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <set>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <atomic>
@@ -25,6 +26,14 @@ namespace ite
     class AdvancedSettings
     {
     public:
+        enum
+        {
+            GROUP_SIGNAL,
+            GROUP_RX,
+            GROUP_TX,
+            GROUP_OSD
+        };
+
         AdvancedSettings(TxDevicePtr txDev, RxDevicePtr rxDev)
         :   m_txDev(txDev), m_rxDev(rxDev)
         {}
@@ -33,32 +42,30 @@ namespace ite
         int getParamValue(const char * paramName, char * valueBuf, int * valueBufSize) const;
         int setParamValue(CameraManager& camera, const char * paramName, const char * value);
 
+    private:
         void getChannel(std::string& s) const;
-        void getPresent(std::string& s) const { if (m_rxDev) s = m_rxDev->present() ? "true" : "false"; }
-        void getStrength(std::string& s) const { if (m_rxDev) s = num2str(m_rxDev->strength()); }
-        void getQuality(std::string& s) const { if (m_rxDev) s = num2str(m_rxDev->quality()); }
+        void getPresent(std::string& s) const       { s = m_rxDev->present() ? "true" : "false"; }
+        void getStrength(std::string& s) const      { s = num2str(m_rxDev->strength()); }
+        void getQuality(std::string& s) const       { s = num2str(m_rxDev->quality()); }
 
-        void getRxID(std::string& s) const { if (m_rxDev) s = num2str(m_rxDev->rxID()); }
-        void getRxCompany(std::string& s) const { if (m_rxDev) s = m_rxDev->rxDriverInfo().company; }
-        void getRxModel(std::string& s) const { if (m_rxDev) s = m_rxDev->rxDriverInfo().supportHWInfo; }
-        void getRxDriverVer(std::string& s) const { if (m_rxDev) s = m_rxDev->rxDriverInfo().driverVersion; }
-        void getRxAPIVer(std::string& s) const { if (m_rxDev) s = m_rxDev->rxDriverInfo().APIVersion; }
+        void getRxID(std::string& s) const          { s = num2str(m_rxDev->rxID()); }
+        void getRxCompany(std::string& s) const     { s = m_rxDev->rxDriverInfo().company; }
+        void getRxModel(std::string& s) const       { s = m_rxDev->rxDriverInfo().supportHWInfo; }
+        void getRxDriverVer(std::string& s) const   { s = m_rxDev->rxDriverInfo().driverVersion; }
+        void getRxAPIVer(std::string& s) const      { s = m_rxDev->rxDriverInfo().APIVersion; }
         void getRxFwVer(std::string& s) const
         {
-            if (m_rxDev)
-            {
-                s = m_rxDev->rxDriverInfo().fwVersionLink;
-                s += "-";
-                s += m_rxDev->rxDriverInfo().fwVersionOFDM;
-            }
+            s = m_rxDev->rxDriverInfo().fwVersionLink;
+            s += "-";
+            s += m_rxDev->rxDriverInfo().fwVersionOFDM;
         }
 
-        void getTxID(std::string& s) const { if (m_txDev) s = num2str(m_txDev->txID()); }
-        void getTxHwID(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).hardwareId(); }
-        void getTxCompany(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).companyName(); }
-        void getTxModel(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).modelName(); }
-        void getTxSerial(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).serialNumber(); }
-        void getTxFwVer(std::string& s) const { if (m_txDev) s = TxManufactureInfo(*m_txDev).firmwareVersion(); }
+        void getTxID(std::string& s) const          { s = num2str(m_txDev->txID()); }
+        void getTxHwID(std::string& s) const        { s = TxManufactureInfo(*m_txDev).hardwareId(); }
+        void getTxCompany(std::string& s) const     { s = TxManufactureInfo(*m_txDev).companyName(); }
+        void getTxModel(std::string& s) const       { s = TxManufactureInfo(*m_txDev).modelName(); }
+        void getTxSerial(std::string& s) const      { s = TxManufactureInfo(*m_txDev).serialNumber(); }
+        void getTxFwVer(std::string& s) const       { s = TxManufactureInfo(*m_txDev).firmwareVersion(); }
 
         void getFormat(const char * value, uint8_t& format) const;
         void getPosition(const char * value, uint8_t& enabled, uint8_t& position) const;
@@ -75,7 +82,6 @@ namespace ite
         void getOsdTextPosition(std::string& s) const;
         void getOsdText(std::string& s) const;
 
-    private:
         TxDevicePtr m_txDev;
         RxDevicePtr m_rxDev;
     };
@@ -147,8 +153,9 @@ namespace ite
 
         //
 
-        bool changeChannel(unsigned channel);
-        bool updateOSD();
+        void needUpdate(unsigned group);
+        void updateSettings();
+        void setChannel(unsigned channel) { m_newChannel = channel; }
 
     private:
         mutable std::mutex m_mutex;
@@ -160,6 +167,9 @@ namespace ite
 
         std::set<unsigned> m_openedStreams;
         Timer m_stopTimer;
+
+        std::map<uint8_t, bool> m_update;
+        unsigned m_newChannel;
 
         mutable const char * m_errorStr;
         nxcip::CameraInfo m_info;

@@ -30,7 +30,8 @@ namespace ite
         m_encoderNumber(encoderNumber),
         m_resolution(res),
         m_fpsToSet(0.0f),
-        m_bitrateToSet(0)
+        m_bitrateToSet(0),
+        m_needUpdate(false)
     {
     }
 
@@ -40,6 +41,11 @@ namespace ite
 
     void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
+        if (interfaceID == nxcip::IID_CameraMediaEncoder3)
+        {
+            addRef();
+            return static_cast<nxcip::CameraMediaEncoder3*>(this);
+        }
         if (interfaceID == nxcip::IID_CameraMediaEncoder2)
         {
             addRef();
@@ -90,52 +96,48 @@ namespace ite
 
     int MediaEncoder::setFps(const float& fps, float *)
     {
-        m_fpsToSet = fps;
+        if (m_fpsToSet != fps)
+        {
+            m_needUpdate = true;
+            m_fpsToSet = fps;
+        }
         return nxcip::NX_NO_ERROR;
-        //return commit();
     }
 
     int MediaEncoder::setBitrate(int bitrateKbps, int * selectedBitrateKbps)
     {
         static const unsigned MIN_BITRATE_KBPS = 200;
 
-        m_bitrateToSet = bitrateKbps;
-        if (m_bitrateToSet < MIN_BITRATE_KBPS)
-            m_bitrateToSet = MIN_BITRATE_KBPS;
+        if (bitrateKbps < MIN_BITRATE_KBPS)
+            bitrateKbps = MIN_BITRATE_KBPS;
+
+        if (m_bitrateToSet = bitrateKbps)
+        {
+            m_needUpdate = true;
+            m_bitrateToSet = bitrateKbps;
+        }
 
         *selectedBitrateKbps = m_bitrateToSet;
-        //return nxcip::NX_NO_ERROR;
-        return commit();
+        return nxcip::NX_NO_ERROR;
     }
 
     int MediaEncoder::commit()
     {
-        if (m_fpsToSet != 0.0f && m_bitrateToSet)
-        {
-            RxDevicePtr rxDev = m_cameraManager->rxDevice().lock();
-            if (! rxDev)
-                return nxcip::NX_OTHER_ERROR;
+        RxDevicePtr rxDev = m_cameraManager->rxDevice().lock();
+        if (! rxDev)
+            return nxcip::NX_OTHER_ERROR;
 
-            TxDevicePtr txDev = rxDev->txDevice();
-            if (txDev)
+        if (m_needUpdate)
+        {
+            if (rxDev->setEncoderParams(m_encoderNumber, m_fpsToSet, m_bitrateToSet))
             {
-                int width, height, bitrate;
-                float fps;
-                txDev->videoEncoderCfg(m_encoderNumber, width, height, fps, bitrate);
-                if (bitrate == (int)m_bitrateToSet && fps == m_fpsToSet)
-                {
-                    m_fpsToSet = 0.0f;
-                    m_bitrateToSet = 0;
-                    return nxcip::NX_NO_ERROR;
-                }
+                // TODO: get new values
+
+                m_needUpdate = false;
+                return nxcip::NX_NO_ERROR;
             }
 
-            if (! rxDev->setEncoderParams(m_encoderNumber, m_fpsToSet, m_bitrateToSet))
-                return nxcip::NX_INVALID_PARAM_VALUE;
-
-            m_fpsToSet = 0.0f;
-            m_bitrateToSet = 0;
-            return nxcip::NX_NO_ERROR;
+            return nxcip::NX_INVALID_PARAM_VALUE;
         }
 
         return nxcip::NX_NO_ERROR;

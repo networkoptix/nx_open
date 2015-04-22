@@ -361,12 +361,20 @@ namespace ite
 
         bool ok = cmd && cmd->isValid() && txDev && m_it930x;
         if (!ok)
+        {
+            debug_printf("[RC send] bad command or device. RxID: %d TxID: %d\n", rxID(), txDev->txID());
+            Timer::sleep(RC_DELAY_MS());
             return false;
+        }
 
         uint16_t cmdID = cmd->commandID();
 
         if (! txDev->setWanted(cmdID))
-            return false; // can't send, waiting for response
+        {
+            debug_printf("[RC send] not sent - waiting response. RxID: %d TxID: %d cmd: 0x%x\n", rxID(), txDev->txID(), cmdID);
+            Timer::sleep(RC_DELAY_MS());
+            return false;
+        }
 
         SendSequence& sseq = txDev->sendSequence();
 
@@ -379,70 +387,64 @@ namespace ite
         {
             /// @warning possible troubles with 1-port devices if multipacket
             for (auto itPkt = pkts.begin(); itPkt != pkts.end(); ++itPkt)
+            {
                 m_it930x->sendRcPacket(itPkt->packet());
+                debug_printf("[RC send] OK. RxID: %d TxID: %d cmd: 0x%x\n", rxID(), txDev->txID(), cmdID);
+            }
         }
         catch (DtvException& ex)
         {
-            debug_printf("[it930x] %s %d\n", ex.what(), ex.code());
+            debug_printf("[RC send][it930x] %s %d\n", ex.what(), ex.code());
         }
 
         return true;
     }
 
+    bool RxDevice::sendRC(RcCommand * cmd, unsigned attempts)
+    {
+        for (unsigned i = 0; i < attempts; ++i)
+        {
+            if (sendRC(cmd)) // delay inside
+                return true;
+        }
+
+        return false;
+    }
+
     //
+
+    void RxDevice::updateOSD()
+    {
+        if (m_txDev)
+        {
+            RcCommand * pcmd = m_txDev->mkSetOSD(0);
+            sendRC(pcmd, RC_ATTEMPTS());
+
+            pcmd = m_txDev->mkSetOSD(1);
+            sendRC(pcmd, RC_ATTEMPTS());
+
+            pcmd = m_txDev->mkSetOSD(2);
+            sendRC(pcmd, RC_ATTEMPTS());
+        }
+    }
 
     bool RxDevice::changeChannel(unsigned chan)
     {
         if (m_txDev)
         {
             RcCommand * pcmd = m_txDev->mkSetChannel(chan);
-            return sendRC(pcmd);
+            return sendRC(pcmd, RC_ATTEMPTS());
         }
 
         return false;
     }
-
-    bool RxDevice::updateOSD()
-    {
-        if (m_txDev)
-        {
-            Timer::sleep(250);
-            RcCommand * pcmd = m_txDev->mkSetOSD(0);
-            bool ok = sendRC(pcmd);
-
-            Timer::sleep(250);
-            pcmd = m_txDev->mkSetOSD(1);
-            ok = sendRC(pcmd);
-
-            Timer::sleep(250);
-            pcmd = m_txDev->mkSetOSD(2);
-            ok = sendRC(pcmd);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    //
 
     bool RxDevice::setEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps)
     {
-        static const unsigned ATTEMPTS_COUNT = 10;
-        static const unsigned DELAY_MS = 200;
-
         if (m_txDev)
         {
             RcCommand * pcmd = m_txDev->mkSetEncoderParams(streamNo, fps, bitrateKbps);
-
-            for (unsigned i = 0; i < ATTEMPTS_COUNT; ++i)
-            {
-                if (sendRC(pcmd))
-                    return true;
-                Timer::sleep(DELAY_MS);
-            }
-
-            return false;
+            return sendRC(pcmd, RC_ATTEMPTS());
         }
 
         return false;

@@ -6,4 +6,4 @@ unix
   QMAKE_CFLAGS += -DDTVAPI_V15
 }
 
-LIBS -= -lcommon
+#LIBS -= -lcommon

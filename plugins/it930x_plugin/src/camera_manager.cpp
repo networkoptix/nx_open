@@ -30,6 +30,9 @@ namespace
         const char * m_name;
     };
 
+    AdvParam PARAM_ALL_OPEN = "<all>";
+    AdvParam PARAM_ALL_CLOSE = "</all>";
+
     AdvParam PARAM_SIGNAL_CHANNEL =         "channel";
     AdvParam PARAM_SIGNAL_PRESENT =         "present";
     AdvParam PARAM_SIGNAL_STRENGTH =        "strength";
@@ -266,7 +269,11 @@ namespace ite
 
     int AdvancedSettings::getParamValue(const char * name, char * valueBuf, int * valueBufSize) const
     {
+        if (!m_rxDev || !m_txDev)
+            return nxcip::NX_OTHER_ERROR;
+
         std::string str;
+        bool allowEmpty = false;
 
         // Signal
         if (PARAM_SIGNAL_CHANNEL == name)           { getChannel(str); }
@@ -275,18 +282,18 @@ namespace ite
         else if(PARAM_SIGNAL_QUALITY == name)       { getQuality(str); }
         // Receiver
         else if(PARAM_RX_ID == name)                { getRxID(str); }
-        else if(PARAM_RX_COMPANY == name)           { getRxCompany(str); }
-        else if(PARAM_RX_MODEL == name)             { getRxModel(str); }
-        else if(PARAM_RX_DRIVER_VER == name)        { getRxDriverVer(str); }
-        else if(PARAM_RX_API_VER == name)           { getRxAPIVer(str); }
-        else if(PARAM_RX_FW_VER == name)            { getRxFwVer(str); }
+        else if(PARAM_RX_COMPANY == name)           { getRxCompany(str); allowEmpty = true; }
+        else if(PARAM_RX_MODEL == name)             { getRxModel(str); allowEmpty = true;}
+        else if(PARAM_RX_DRIVER_VER == name)        { getRxDriverVer(str); allowEmpty = true; }
+        else if(PARAM_RX_API_VER == name)           { getRxAPIVer(str); allowEmpty = true; }
+        else if(PARAM_RX_FW_VER == name)            { getRxFwVer(str); allowEmpty = true; }
         // Camera
         else if(PARAM_TX_ID == name)                { getTxID(str); }
-        else if(PARAM_TX_HWID == name)              { getTxHwID(str); }
-        else if(PARAM_TX_COMPANY == name)           { getTxCompany(str); }
-        else if(PARAM_TX_MODEL == name)             { getTxModel(str); }
-        else if(PARAM_TX_SERIAL == name)            { getTxSerial(str); }
-        else if(PARAM_TX_FW_VER == name)            { getTxFwVer(str); }
+        else if(PARAM_TX_HWID == name)              { getTxHwID(str); allowEmpty = true; }
+        else if(PARAM_TX_COMPANY == name)           { getTxCompany(str); allowEmpty = true; }
+        else if(PARAM_TX_MODEL == name)             { getTxModel(str); allowEmpty = true; }
+        else if(PARAM_TX_SERIAL == name)            { getTxSerial(str); allowEmpty = true; }
+        else if(PARAM_TX_FW_VER == name)            { getTxFwVer(str); allowEmpty = true; }
         // OSD
         else if(RAPAM_OSD_DATE_POSITION == name)    { getOsdDatePosition(str); }
         else if(RAPAM_OSD_DATE_FORMAT == name)      { getOsdDateFormat(str); }
@@ -297,11 +304,11 @@ namespace ite
         else if(RAPAM_OSD_INFO_POSITION == name)    { getOsdInfoPosition(str); }
         else if(RAPAM_OSD_INFO_FORMAT == name)      { getOsdInfoFormat(str); }
         else if(RAPAM_OSD_TEXT_POSITION == name)    { getOsdTextPosition(str); }
-        else if(RAPAM_OSD_TEXT == name)             { getOsdText(str); }
+        else if(RAPAM_OSD_TEXT == name)             { getOsdText(str); allowEmpty = true; }
         else
             return nxcip::NX_UNKNOWN_PARAMETER;
 
-        if (str.size())
+        if (str.size() || allowEmpty)
         {
             int strSize = str.size();
             if (*valueBufSize < strSize)
@@ -325,51 +332,52 @@ namespace ite
 
     int AdvancedSettings::setParamValue(CameraManager& camera, const char * name, const char * value)
     {
-        if (!value)
+        if (!name || !value)
             return nxcip::NX_INVALID_PARAM_VALUE;
+        if (!m_txDev)
+            return nxcip::NX_OTHER_ERROR;
 
         bool osd = false;
 
-        if (PARAM_SIGNAL_CHANNEL == name)
+        if (name[0] == '\0')
+        {
+            if (PARAM_ALL_CLOSE == value)
+                camera.updateSettings();
+        }
+        else if(PARAM_SIGNAL_CHANNEL == name)
         {
             /// @warning need value in front of string
             std::string str(value);
             unsigned chan = str2num(str);
-
-            if (! camera.changeChannel(chan))
+            if (chan >= TxDevice::CHANNELS_NUM)
                 return nxcip::NX_INVALID_PARAM_VALUE;
+
+            camera.setChannel(chan);
+            camera.needUpdate(GROUP_SIGNAL);
         }
-        else if(RAPAM_OSD_DATE_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.dateEnable, m_txDev->osdInfo.datePosition); }
-        else if(RAPAM_OSD_DATE_FORMAT == name)      { osd = true; if (m_txDev) getFormat(value, m_txDev->osdInfo.dateFormat); }
-        else if(RAPAM_OSD_TIME_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.timeEnable, m_txDev->osdInfo.timePosition); }
-        else if(RAPAM_OSD_TIME_FORMAT == name)      { osd = true; if (m_txDev) getFormat(value, m_txDev->osdInfo.timeFormat); }
-        else if(RAPAM_OSD_LOGO_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.logoEnable, m_txDev->osdInfo.logoPosition); }
-        else if(RAPAM_OSD_LOGO_FORMAT == name)      { osd = true; if (m_txDev) getFormat(value, m_txDev->osdInfo.logoOption); }
-        else if(RAPAM_OSD_INFO_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.detailInfoEnable, m_txDev->osdInfo.detailInfoPosition); }
-        else if(RAPAM_OSD_INFO_FORMAT == name)      { osd = true; if (m_txDev) getFormat(value, m_txDev->osdInfo.detailInfoOption); }
-        else if(RAPAM_OSD_TEXT_POSITION == name)    { osd = true; if (m_txDev) getPosition(value, m_txDev->osdInfo.textEnable, m_txDev->osdInfo.textPosition); }
-        else if(RAPAM_OSD_TEXT == name)             {}
+        else if(RAPAM_OSD_DATE_POSITION == name)    { osd = true; getPosition(value, m_txDev->osdInfo.dateEnable, m_txDev->osdInfo.datePosition); }
+        else if(RAPAM_OSD_DATE_FORMAT == name)      { osd = true; getFormat(value, m_txDev->osdInfo.dateFormat); }
+        else if(RAPAM_OSD_TIME_POSITION == name)    { osd = true; getPosition(value, m_txDev->osdInfo.timeEnable, m_txDev->osdInfo.timePosition); }
+        else if(RAPAM_OSD_TIME_FORMAT == name)      { osd = true; getFormat(value, m_txDev->osdInfo.timeFormat); }
+        else if(RAPAM_OSD_LOGO_POSITION == name)    { osd = true; getPosition(value, m_txDev->osdInfo.logoEnable, m_txDev->osdInfo.logoPosition); }
+        else if(RAPAM_OSD_LOGO_FORMAT == name)      { osd = true; getFormat(value, m_txDev->osdInfo.logoOption); }
+        else if(RAPAM_OSD_INFO_POSITION == name)    { osd = true; getPosition(value, m_txDev->osdInfo.detailInfoEnable, m_txDev->osdInfo.detailInfoPosition); }
+        else if(RAPAM_OSD_INFO_FORMAT == name)      { osd = true; getFormat(value, m_txDev->osdInfo.detailInfoOption); }
+        else if(RAPAM_OSD_TEXT_POSITION == name)    { osd = true; getPosition(value, m_txDev->osdInfo.textEnable, m_txDev->osdInfo.textPosition); }
+        else if(RAPAM_OSD_TEXT == name)             { osd = true; TxDevice::str2rcStr(value, m_txDev->osdInfo.text); }
         else
             return nxcip::NX_PARAM_READ_ONLY;
 
         if (osd)
-        {
-            if (! camera.updateOSD()) // commit
-                return nxcip::NX_INVALID_PARAM_VALUE;
-        }
-
+            camera.needUpdate(GROUP_OSD);
         return nxcip::NX_NO_ERROR;
     }
 
     void AdvancedSettings::getChannel(std::string& s) const
     {
-        if (m_rxDev)
-        {
-            unsigned chan = m_rxDev->channel();
-            if (chan < TxDevice::CHANNELS_NUM &&
-                chan != RxDevice::NOT_A_CHANNEL)
-                s = PARAM_CHANNELS[chan];
-        }
+        unsigned chan = m_rxDev->channel();
+        if (chan < TxDevice::CHANNELS_NUM && chan != RxDevice::NOT_A_CHANNEL)
+            s = PARAM_CHANNELS[chan];
     }
 
     void AdvancedSettings::getPosition(const char * value, uint8_t& enabled, uint8_t& position) const
@@ -403,9 +411,7 @@ namespace ite
 
     void AdvancedSettings::getOsdDatePosition(std::string& s) const
     {
-        unsigned v = 0;
-        if (m_txDev)
-            v = getPositionVariant(m_txDev->osdInfo.dateEnable, m_txDev->osdInfo.datePosition);
+        unsigned v = getPositionVariant(m_txDev->osdInfo.dateEnable, m_txDev->osdInfo.datePosition);
         s = PARAM_POSITIONS[v];
     }
 
@@ -416,9 +422,7 @@ namespace ite
 
     void AdvancedSettings::getOsdTimePosition(std::string& s) const
     {
-        unsigned v = 0;
-        if (m_txDev)
-            v = getPositionVariant(m_txDev->osdInfo.timeEnable, m_txDev->osdInfo.timePosition);
+        unsigned v = getPositionVariant(m_txDev->osdInfo.timeEnable, m_txDev->osdInfo.timePosition);
         s = PARAM_POSITIONS[v];
     }
 
@@ -429,15 +433,13 @@ namespace ite
 
     void AdvancedSettings::getOsdLogoPosition(std::string& s) const
     {
-        unsigned v = 0;
-        if (m_txDev)
-            v = getPositionVariant(m_txDev->osdInfo.logoEnable, m_txDev->osdInfo.logoPosition);
+        unsigned v = getPositionVariant(m_txDev->osdInfo.logoEnable, m_txDev->osdInfo.logoPosition);
         s = PARAM_POSITIONS[v];
     }
 
     void AdvancedSettings::getOsdLogoFormat(std::string& s) const
     {
-        if (m_txDev && m_txDev->osdInfo.logoOption)
+        if (m_txDev->osdInfo.logoOption)
             s = "1";
         else
             s = "0";
@@ -445,15 +447,13 @@ namespace ite
 
     void AdvancedSettings::getOsdInfoPosition(std::string& s) const
     {
-        unsigned v = 0;
-        if (m_txDev)
-            v = getPositionVariant(m_txDev->osdInfo.detailInfoEnable, m_txDev->osdInfo.detailInfoPosition);
+        unsigned v = getPositionVariant(m_txDev->osdInfo.detailInfoEnable, m_txDev->osdInfo.detailInfoPosition);
         s = PARAM_POSITIONS[v];
     }
 
     void AdvancedSettings::getOsdInfoFormat(std::string& s) const
     {
-        if (m_txDev && m_txDev->osdInfo.detailInfoOption)
+        if (m_txDev->osdInfo.detailInfoOption)
             s = "1";
         else
             s = "0";
@@ -461,16 +461,13 @@ namespace ite
 
     void AdvancedSettings::getOsdTextPosition(std::string& s) const
     {
-        unsigned v = 0;
-        if (m_txDev)
-            v = getPositionVariant(m_txDev->osdInfo.textEnable, m_txDev->osdInfo.textPosition);
+        unsigned v = getPositionVariant(m_txDev->osdInfo.textEnable, m_txDev->osdInfo.textPosition);
         s = PARAM_POSITIONS[v];
     }
 
     void AdvancedSettings::getOsdText(std::string& s) const
     {
-        if (m_txDev)
-            s = TxDevice::rcStr2str(m_txDev->osdInfo.text);
+        s = TxDevice::rcStr2str(m_txDev->osdInfo.text);
     }
 
     //
@@ -537,34 +534,36 @@ namespace ite
         return AdvancedSettings(m_txDevice, m_rxDevice).setParamValue(*this, paramName, value);
     }
 
-    bool CameraManager::changeChannel(unsigned chan)
+    void CameraManager::needUpdate(unsigned group)
     {
-        if (chan >= TxDevice::CHANNELS_NUM)
-            return false;
-
-        if (m_rxDevice)
-        {
-            if (chan == m_rxDevice->channel())
-                return true;
-
-            m_rxDevice->changeChannel(chan);
-            stopStreams(true);
-            m_devMapper->forgetTx(txID());
-            return true;
-        }
-
-        return false;
+        m_update[group] = true;
     }
 
-    bool CameraManager::updateOSD()
+    void CameraManager::updateSettings()
     {
-        if (m_rxDevice)
+        if (!m_rxDevice)
+            return;
+
+        if (m_update[AdvancedSettings::GROUP_OSD])
         {
+            m_update[AdvancedSettings::GROUP_OSD] = false;
+
             m_rxDevice->updateOSD();
-            return true;
         }
 
-        return false;
+        if (m_update[AdvancedSettings::GROUP_SIGNAL])
+        {
+            m_update[AdvancedSettings::GROUP_SIGNAL] = false;
+
+            if (m_newChannel == m_rxDevice->channel())
+                return;
+
+            if (m_rxDevice->changeChannel(m_newChannel))
+            {
+                stopStreams(true);
+                m_devMapper->forgetTx(txID());
+            }
+        }
     }
 
     //
@@ -613,7 +612,9 @@ namespace ite
 
     int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
     {
-        *capabilitiesMask = nxcip::BaseCameraManager::nativeMediaStreamCapability;
+        *capabilitiesMask = nxcip::BaseCameraManager::nativeMediaStreamCapability |
+                            nxcip::BaseCameraManager::groupMediaParamsChangeCapability |
+                            nxcip::BaseCameraManager::needIFrameDetectionCapability;
         return nxcip::NX_NO_ERROR;
     }
 

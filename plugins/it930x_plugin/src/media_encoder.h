@@ -12,7 +12,7 @@
 namespace ite
 {
     ///
-    class MediaEncoder : public nxcip::CameraMediaEncoder2, public ObjectCounter<MediaEncoder>
+    class MediaEncoder : public nxcip::CameraMediaEncoder3, public ObjectCounter<MediaEncoder>
     {
         DEF_REF_COUNTER
 
@@ -34,13 +34,12 @@ namespace ite
         virtual nxcip::StreamReader* getLiveStreamReader() override;
         virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
+        // nxcip::CameraMediaEncoder3
+
+        virtual int commit();
+
         //
 
-        virtual int commit(); // override
-
-        //
-
-        //static void fakeFree(MediaEncoder * ) {}
         void updateResolution(const nxcip::ResolutionInfo& res) { m_resolution = res; }
 
     private:
@@ -49,6 +48,7 @@ namespace ite
         nxcip::ResolutionInfo m_resolution;
         float m_fpsToSet;
         unsigned m_bitrateToSet;
+        bool m_needUpdate;
     };
 }
 

@@ -191,6 +191,11 @@ namespace ite
             return std::string((const char *)s.stringData, s.stringLength);
         }
 
+        static void str2rcStr(const std::string& str, RCString& rcStr)
+        {
+            rcStr.set((const unsigned char *)str.c_str(), str.size());
+        }
+
     private:
         mutable std::mutex m_mutex;
         mutable std::atomic_bool m_ready;

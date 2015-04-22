@@ -432,8 +432,10 @@ namespace ite
 
         // TODO: min/max
 
-        videoEncConfigSetParam.frameRateLimit = fps;
-        videoEncConfigSetParam.bitrateLimit = bitrateKbps;
+        if (fps > 0.0f)
+            videoEncConfigSetParam.frameRateLimit = fps;
+        if (bitrateKbps > 0)
+            videoEncConfigSetParam.bitrateLimit = bitrateKbps;
 
         return mkRcCmd(CMD_SetVideoEncoderConfigurationInput);
     }

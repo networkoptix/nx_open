@@ -11,7 +11,7 @@
 namespace ite
 {
     //!
-    class VideoPacket : public nxcip::VideoDataPacket, public ObjectCounter<VideoPacket>
+    class VideoPacket : public nxcip::MediaDataPacket, public ObjectCounter<VideoPacket>
     {
         DEF_REF_COUNTER
 
@@ -29,7 +29,7 @@ namespace ite
         virtual nxcip::CompressionType codecType() const override;
         virtual unsigned int flags() const override;
         virtual unsigned int cSeq() const override;
-        virtual nxcip::Picture* getMotionData() const override;
+        //virtual nxcip::Picture* getMotionData() const override;
 
         //
 

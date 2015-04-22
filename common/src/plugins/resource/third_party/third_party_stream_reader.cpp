@@ -24,6 +24,33 @@
 #include "motion_data_picture.h"
 
 
+namespace
+{
+    bool isIFrame( QnAbstractMediaDataPtr packet )
+    {
+        CodecID codecId = packet->compressionType;
+
+        if( !packet || codecId != CODEC_ID_H264 )
+            return false;
+
+        const void * data = packet->data();
+        const quint8 * udata = static_cast<const quint8 *>(data);
+
+        FrameTypeExtractor frameTypeEx(codecId);
+        auto type = frameTypeEx.getFrameType( udata, packet->dataSize() );
+        switch(type)
+        {
+            case FrameTypeExtractor::I_Frame:
+                return true;
+
+            default:
+                break;
+        }
+
+        return false;
+    }
+}
+
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnResourcePtr res,
@@ -338,6 +365,12 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                 rez = readStreamReader( m_liveStreamReader, &errorCode );
                 if( rez )
                 {
+                    if( m_cameraCapabilities & nxcip::BaseCameraManager::needIFrameDetectionCapability )
+                    {
+                        if( isIFrame(rez) )
+                            rez->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+                    }
+
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
                     QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.data());
                     if( videoData && videoData->motion )
@@ -471,36 +504,43 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     {
         case nxcip::dptVideo:
         {
+            QnThirdPartyCompressedVideoData* videoPacket = nullptr;
             nxcip::VideoDataPacket* srcVideoPacket = static_cast<nxcip::VideoDataPacket*>(packet->queryInterface(nxcip::IID_VideoDataPacket));
-            if( !srcVideoPacket )
-                return QnAbstractMediaDataPtr();  //looks like bug in plugin implementation
 
-            QnThirdPartyCompressedVideoData* videoPacket = new QnThirdPartyCompressedVideoData( srcVideoPacket );
-            packetAp.release();
-
-            // leave PTS unchanged
-            //videoPacket->pts = packet->timestamp();
-
-            nxcip::Picture* srcMotionData = srcVideoPacket->getMotionData();
-            if( srcMotionData )
+            if (srcVideoPacket)
             {
-                static const int DEFAULT_MOTION_DURATION = 1000*1000;
+                if( !srcVideoPacket )
+                    return QnAbstractMediaDataPtr();  //looks like bug in plugin implementation
 
-                if( srcMotionData->pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                videoPacket = new QnThirdPartyCompressedVideoData( srcVideoPacket );
+                packetAp.release();
+
+                // leave PTS unchanged
+                //videoPacket->pts = packet->timestamp();
+
+                nxcip::Picture* srcMotionData = srcVideoPacket->getMotionData();
+                if( srcMotionData )
                 {
-                    //adding motion data
-                    QnMetaDataV1Ptr motion( new QnMetaDataV1() );
-                    motion->assign( *srcMotionData, srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
-                    motion->timestamp = srcVideoPacket->timestamp();
-                    motion->channelNumber = packet->channelNumber();
-                    motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                    videoPacket->motion = motion;
+                    static const int DEFAULT_MOTION_DURATION = 1000*1000;
+
+                    if( srcMotionData->pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                    {
+                        //adding motion data
+                        QnMetaDataV1Ptr motion( new QnMetaDataV1() );
+                        motion->assign( *srcMotionData, srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
+                        motion->timestamp = srcVideoPacket->timestamp();
+                        motion->channelNumber = packet->channelNumber();
+                        motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+                        videoPacket->motion = motion;
+                    }
+                    srcMotionData->releaseRef();
                 }
-                srcMotionData->releaseRef();
+                srcVideoPacket->releaseRef();
             }
+            else
+                videoPacket = new QnThirdPartyCompressedVideoData( packetAp.release() );
 
             mediaPacket = QnAbstractMediaDataPtr(videoPacket);
-            srcVideoPacket->releaseRef();
             break;
         }
 
@@ -538,7 +578,9 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
         }
     }
     if( packet->flags() & nxcip::MediaDataPacket::fKeyPacket )
+    {
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+    }
     if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
     {
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_Reverse;
@@ -546,8 +588,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     }
     if( packet->flags() & nxcip::MediaDataPacket::fReverseBlockStart )
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
-    if( packet->flags() & nxcip::MediaDataPacket::fLowQuality )
-        mediaPacket->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
     if( packet->flags() & nxcip::MediaDataPacket::fStreamReset )
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_BOF;
 
