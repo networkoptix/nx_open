@@ -3,7 +3,7 @@
 '''
 
 from nx_statistics.statserver import app
-from nx_statistics.log import handler
+from nx_statistics.utils import logHandler
 
 import sys
 import json
@@ -11,5 +11,5 @@ import MySQLdb
 
 app.sqlConnector = MySQLdb
 app.sqlConnection = json.load(open(sys.argv[1]))
-app.logger.addHandler(handler)
+app.logger.addHandler(logHandler)
 

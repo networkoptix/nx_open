@@ -9,7 +9,7 @@ static const bool DEFAULT_SERVER_AUTH = true;
 static const uint DELAY_RATIO = 50;    /* 50% about 15 days */
 static const uint TIMER_CYCLE = 60000; /* msecs, update state every minute */
 static const QString DATE_FORMAT = lit("yyyy-MM-dd hh:mm:ss");
-static const QString SERVER_API_COMMAND = lit("stats/api/report");
+static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 
 static const QString ALREADY_IN_PROGRESS = lit("already in progress");
 static const QString JUST_INITIATED = lit("just initiated");

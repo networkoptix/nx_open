@@ -3,11 +3,14 @@
 '''
 
 from nx_statistics.crashserver import app
-from nx_statistics.log import handler
+from nx_statistics.utils import logHandler
 
 import json
 import sys
 
-app.storage = json.load(open(sys.argv[1]))
-app.logger.addHandler(handler)
+config = sys.argv[1]
+for option, value in json.load(open(config)):
+    setattr(app, option, value)
+
+app.logger.addHandler(logHandler)
 

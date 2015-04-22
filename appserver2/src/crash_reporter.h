@@ -4,6 +4,7 @@
 #include "ec2_statictics_reporter.h"
 
 #include <QDir>
+#include <QtCore/QSettings>
 #include <set>
 
 namespace ec2 {
@@ -20,22 +21,23 @@ public:
      *  \note Might be used on the start up in  every binary which generates crash dumps by
      *        \class win32_exception or \class linux_exception
      */
-    static void scanAndReport(QnUserResourcePtr admin);
-    static void scanAndReportAsync(QnUserResourcePtr admin);
+    static void scanAndReport(QnUserResourcePtr admin, QSettings* settings);
+    static void scanAndReportAsync(QnUserResourcePtr admin, QSettings* settings);
 
     /** Sends \param crash to \param serverApi asynchronously
      *  \note Might be used for debug purposes
      */
-    static void send(const QUrl& serverApi, const QFileInfo& crash, bool auth);
+    static void send(const QUrl& serverApi, const QFileInfo& crash, bool auth, QSettings* settings);
 
 private slots:
     void finishReport(nx_http::AsyncHttpClientPtr httpClient) const;
 
 private:
-    CrashReporter(const QFileInfo& crashFile, QObject* parent);
+    CrashReporter(const QFileInfo& crashFile, QSettings* settings, QObject* parent);
     nx_http::HttpHeaders makeHttpHeaders() const;
 
     const QFileInfo m_crashFile;
+    QSettings* m_settings;
     static std::set<nx_http::AsyncHttpClientPtr> c_activeHttpClients;
 };
 

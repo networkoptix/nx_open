@@ -501,9 +501,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
-    QObject::connect(clientMessageProcessor.data(), &QnClientMessageProcessor::initialResourcesReceived,
-        [](){ ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator()); });
-
+    QObject::connect(clientMessageProcessor.data(), &QnClientMessageProcessor::initialResourcesReceived, [](){ 
+        ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator(), new QSettings()); 
+    });
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();

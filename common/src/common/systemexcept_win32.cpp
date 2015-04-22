@@ -2,6 +2,7 @@
 #ifdef _WIN32
 
 #include "systemexcept_win32.h"
+#include "version.h"
 
 #include <memory>
 #include <fstream>
@@ -16,12 +17,16 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
 
+#define MAX_SYMBOL_SIZE 1024
+
+static const bool isBeta = strcmp(QN_BETA, "true") == 0;
+static const std::string versionId = QN_ENGINE_VERSION"-"QN_APPLICATION_REVISION;
+static const std::string fullVersionId = versionId + (isBeta ? "-beta" : "");
 
 class GlobalCrashDumpSettings
 {
 public:
     bool dumpFullMemory;
-    std::string crashFile;
 
     GlobalCrashDumpSettings()
     :
@@ -52,13 +57,22 @@ static int GetBaseName( const char* name , DWORD len ) {
 }
 
 static bool GetProgramName( char* buffer ) {
-    char sModuleName[1024];
-    DWORD dwLen = ::GetModuleFileNameA(NULL,sModuleName,1024);
-    if( dwLen == 1024 || dwLen < 0 )
+    char sModuleName[MAX_SYMBOL_SIZE];
+    DWORD dwLen = ::GetModuleFileNameA( NULL, sModuleName, MAX_SYMBOL_SIZE );
+    if( dwLen == MAX_SYMBOL_SIZE || dwLen < 0 )
         return false;
     int iBaseNamePos = GetBaseName( sModuleName , dwLen );
     CopyMemory( buffer , sModuleName + iBaseNamePos , dwLen - iBaseNamePos + 1 );
     return true;
+}
+
+static bool GetCrashPrefix( char* sCrashPrefix )
+{
+    char sProgramName[MAX_SYMBOL_SIZE];
+    if( !GetProgramName( sProgramName ) )
+        return false;
+
+    return sprintf( sCrashPrefix, "%s_%s", sProgramName, fullVersionId.c_str());
 }
 
 static
@@ -75,14 +89,7 @@ void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
         return;
     }
 
-
-    char sFileName[1024];
-    char sProgramName[1024];
     char sAppData[MAX_PATH];
-
-    if( !GetProgramName(sProgramName) )
-        return;
-
     if( FAILED(SHGetFolderPathA(
             NULL,
             CSIDL_LOCAL_APPDATA,
@@ -90,12 +97,15 @@ void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
             0,
             sAppData)))
         return;
+    
+    char sCrashPrefix[MAX_PATH];
+    if( !GetCrashPrefix( sCrashPrefix ) )
+        return;
 
     // it should not acquire any global lock internally. Otherwise
     // we may deadlock here. 
-    int ret = sprintf(sFileName,"%s\\%s_%d.dmp", sAppData , sProgramName, ::GetCurrentProcessId());
-
-    if( ret <0 )
+    char sFileName[MAX_PATH];
+    if( sprintf(sFileName, "%s\\%s_%i.dmp", sAppData, sCrashPrefix, GetCurrentProcessId() ) < 0)
         return;
 
     HANDLE hFile = ::CreateFileA(
@@ -211,13 +221,7 @@ static void myPurecallHandler()
 
 void win32_exception::installGlobalUnhandledExceptionHandler()
 {
-    //precalculate file name (
-    std::ostringstream os;
-    os << getCrashDirectory().toStdString() << "\\"
-       << getCrashPrefix().toStdString() << "_" << GetCurrentProcessId() << ".except";
-    globalCrashDumpSettingsInstance.crashFile = os.str();
-
-    //_set_se_translator( &win32_exception::translate );
+     //_set_se_translator( &win32_exception::translate );
     SetUnhandledExceptionFilter( &unhandledSEHandler );
 
     //installing CRT handlers (invalid parameter, purecall, etc.)
@@ -235,7 +239,7 @@ void win32_exception::setCreateFullCrashDump( bool isFull )
     globalCrashDumpSettingsInstance.dumpFullMemory = isFull;
 }
 
-QString win32_exception::getCrashDirectory()
+std::string win32_exception::getCrashDirectory()
 {
     char sAppData[MAX_PATH];
     if( FAILED(SHGetFolderPathA(
@@ -244,36 +248,46 @@ QString win32_exception::getCrashDirectory()
             NULL,
             0,
             sAppData)))
-        return QLatin1String(".");
+        return std::string( "." );
 
-    return QLatin1String(sAppData);
+    return std::string( sAppData );
 }
 
-QString win32_exception::getCrashPrefix()
+std::string win32_exception::getCrashPattern()
 {
-    char sProgramName[1024];
-    if( GetProgramName( sProgramName ) )
-        return QString();
+    char sCrashPrefix[MAX_SYMBOL_SIZE];
+    if( !GetCrashPrefix( sCrashPrefix ) )
+        return std::string();
 
-    return QString(QLatin1String("%1_%2"))
-            .arg(QLatin1String(sProgramName))
-            .arg(QnAppInfo::applicationFullVersion());
+    std::ostringstream oss;
+    oss << sCrashPrefix << "_*.*";
+    return oss.str();
 }
-
-QString win32_exception::getCrashPattern()
-{
-    return QString(QLatin1String("%1_*.*")).arg(getCrashPrefix());
-}
-
-#define MAX_SYMBOL_SIZE 1024
 
 static
 HANDLE 
 CreateLegacyDumpFile() {
-    const auto fileName = globalCrashDumpSettingsInstance.crashFile;
+    char sAppData[MAX_PATH];
+    if( FAILED(SHGetFolderPathA(
+            NULL,
+            CSIDL_LOCAL_APPDATA,
+            NULL,
+            0,
+            sAppData)))
+        return INVALID_HANDLE_VALUE;
+    
+    char sCrashPrefix[MAX_PATH];
+    if( !GetCrashPrefix( sCrashPrefix ) )
+        return INVALID_HANDLE_VALUE;
+
+    // it should not acquire any global lock internally. Otherwise
+    // we may deadlock here. 
+    char sFileName[MAX_PATH];
+    if( sprintf( sFileName, "%s\\%s_%i.except", sAppData, sCrashPrefix, GetCurrentProcessId() ) < 0)
+        return INVALID_HANDLE_VALUE;
 
     return ::CreateFileA(
-        fileName.c_str(),
+        sFileName,
         GENERIC_WRITE,
         0,
         NULL,

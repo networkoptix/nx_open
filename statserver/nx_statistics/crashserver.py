@@ -3,6 +3,7 @@
 '''
 
 from storages import FileStorage
+from utils import sendmail
 from flask import Flask, request
 
 import json
@@ -12,8 +13,15 @@ app = Flask(__name__)
 def getStorage():
     if not hasattr(app, 'storage'):
         from os.path import expanduser
-        app.storage = {'path': expanduser("~"), 'limit': 0}
+        app.storage = dict(path=expanduser("~"), limit=0)
     return FileStorage(log=app.logger, **app.storage)
+
+def mailNotify(info):
+    addr = getattr(app, 'download', None)
+    mail = getattr(app, 'sendmail', None)
+    if not addr or not mail: return
+    text = 'Crash: %s\nDownload: %s' % (json.dumps(info), addr+info['path'])
+    sendmail(text=text, **mail)
 
 @app.route('/api/report', methods=['POST'])
 def report():
@@ -21,7 +29,7 @@ def report():
         headers = {n: v for n, v in request.headers.items()
                    if n.startswith('Nx-')}
         args = {n.split('-')[1].lower(): v for n, v in headers.items()}
-        getStorage().write(request.get_data(), **args)
+        mailNotify(getStorage().write(request.get_data(), **args))
         return 'Success', 201
     except (IndexError, OSError), e:
         if app.debug: raise

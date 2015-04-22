@@ -42,8 +42,10 @@ class FileStorage(object):
                 (keyArgs, filePath, fileSize(len(data))))
         dirPath = os.path.dirname(filePath)
         self._cleanupIfFull(len(bytes(data)))
+
         if not os.path.exists(dirPath): os.makedirs(dirPath)
         with open(filePath, 'wb') as fd: fd.write(data)
+        return self._displayFiles([filePath])[0]
 
     def read(self, **keyArgs):
         '''Reads file data from file system at [keyArgs]

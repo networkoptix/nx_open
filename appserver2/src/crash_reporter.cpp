@@ -12,27 +12,38 @@
 #include <QDebug>
 
 static const QString DATE_FORMAT = lit("yyyy-MM-dd_hh-mm-ss");
-static const QString SERVER_API_COMMAND = lit("crash/api/report");
+static const QString SERVER_API_COMMAND = lit("crashserver/api/report");
+static const QString LAST_CRASH = lit("statisticsReportLastCrash");
+static const uint SENDING_MIN_INTERVAL = 24 * 60 * 60; /* secs => a day */
 
 namespace ec2 {
 
-void CrashReporter::scanAndReport(QnUserResourcePtr admin)
+void CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
 {
     if (admin->getProperty(Ec2StaticticsReporter::SR_ALLOWED).toInt() == 0)
     {
         qDebug() << "CrashReporter::scanAndReport: sending is not allowed";
         return;
     }
+    
+    const auto lastTime = QDateTime::fromString(
+            settings->value(LAST_CRASH, "").toString(), DATE_FORMAT);
+    if (QDateTime::currentDateTime() < lastTime.addSecs(SENDING_MIN_INTERVAL))
+    {
+        qDebug() << lit("CrashReporter::scanAndReport: previous crash was reported %1")
+            .arg(lastTime.toString(DATE_FORMAT));
+        return;
+    }
 
     #if defined( _WIN32 )
-        QDir crashDir(win32_exception::getCrashDirectory());
-        const auto crashFilter = win32_exception::getCrashPattern();
+        const QDir crashDir(QString::fromStdString(win32_exception::getCrashDirectory()));
+        const auto crashFilter = QString::fromStdString(win32_exception::getCrashPattern());
     #elif defined ( __linux__ )
-        QDir crashDir(linux_exception::getCrashDirectory());
-        const auto crashFilter = linux_exception::getCrashPattern();
+        const QDir crashDir(QString::fromStdString(linux_exception::getCrashDirectory()));
+        const auto crashFilter = QString::fromStdString(linux_exception::getCrashPattern());
     #else
-        QDir crashDir;
-        QString crashFilter;
+        const QDir crashDir;
+        const QString crashFilter;
         return; // do nothing
     #endif
 
@@ -43,17 +54,17 @@ void CrashReporter::scanAndReport(QnUserResourcePtr admin)
 
     // all crashes are going to be send in different threads
     qDebug() << "CrashReporter::scanAndReport:" << crashDir.absolutePath() << "for files:" << crashFilter;
-    for (const auto& crash : crashDir.entryInfoList(QStringList() << crashFilter))
-        CrashReporter::send(url, crash, auth);
+    const auto crashes = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files, QDir::Time);
+    if (crashes.size()) CrashReporter::send(url, crashes.last(), auth, settings);
 }
 
-void CrashReporter::scanAndReportAsync(QnUserResourcePtr admin)
+void CrashReporter::scanAndReportAsync(QnUserResourcePtr admin, QSettings* settings)
 {
     QnConcurrent::run(Ec2ThreadPool::instance(),
-                      std::bind(&CrashReporter::scanAndReport, admin));
+                      std::bind(&CrashReporter::scanAndReport, admin, settings));
 }
 
-void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool auth)
+void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool auth, QSettings* settings)
 {
     auto filePath = crash.absoluteFilePath();
     QFile file(filePath);
@@ -67,7 +78,7 @@ void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool aut
     }
 
     auto httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-    auto report = new CrashReporter(crash, httpClient.get());
+    auto report = new CrashReporter(crash, settings, httpClient.get());
     connect(httpClient.get(), &nx_http::AsyncHttpClient::done,
             report, &CrashReporter::finishReport, Qt::DirectConnection);
 
@@ -87,13 +98,19 @@ void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool aut
 
 void CrashReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient) const
 {
-    if (httpClient->hasRequestSuccesed())
-        QFile::remove(m_crashFile.absoluteFilePath());
-    else
-        qDebug() << "CrashReporter::finishReport:" << httpClient->url() << "has failed";
-
     // no reason to keep client alive any more
     c_activeHttpClients.erase(httpClient);
+
+    if (!httpClient->hasRequestSuccesed())
+    {
+        qDebug() << "CrashReporter::finishReport: sending" << m_crashFile.absoluteFilePath()
+                 << "to" << httpClient->url() << "has failed";
+        return;
+    }
+
+    QFile::remove(m_crashFile.absoluteFilePath());
+    m_settings->setValue(LAST_CRASH, QDateTime::currentDateTime().toString(DATE_FORMAT));
+    m_settings->sync();
 }
 
 nx_http::HttpHeaders CrashReporter::makeHttpHeaders() const
@@ -118,9 +135,10 @@ nx_http::HttpHeaders CrashReporter::makeHttpHeaders() const
     return headers;
 }
 
-CrashReporter::CrashReporter(const QFileInfo& crashFile, QObject* parent)
+CrashReporter::CrashReporter(const QFileInfo& crashFile, QSettings* settings, QObject* parent)
     : QObject(parent)
     , m_crashFile(crashFile)
+    , m_settings(settings)
 {
 }
 

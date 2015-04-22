@@ -1790,11 +1790,9 @@ void QnMain::run()
         if (server->getProperty(Qn::PHISICAL_MEMORY) != phisicalMemory)
             server->setProperty(Qn::PHISICAL_MEMORY, QVariant(hwInfo.phisicalMemory));
 
-        #ifdef QN_BETA
-            const auto isBeta = QString::number(lit(QN_BETA) == lit("true") ? 1 : 0);
-            if (server->getProperty(Qn::BETA) != isBeta)
-                server->setProperty(Qn::BETA, isBeta);
-        #endif
+        const auto isBeta = QString::number(QnAppInfo::beta() ? 1 : 0);
+        if (server->getProperty(Qn::BETA) != isBeta)
+            server->setProperty(Qn::BETA, isBeta);
 
         propertyDictionary->saveParams(server->getId());
 
@@ -2182,7 +2180,7 @@ void QnMain::at_appStarted()
         return;
 
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
-    ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator());
+    ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator(), MSSettings::runTimeSettings());
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)

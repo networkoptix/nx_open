@@ -51,3 +51,30 @@ sudo pip install wheel
 
 ./deploy.sh # build whl, deploy to server and restart uwsgi
 ```
+
+
+## WSGI configs
+
+```
+statserver_wcgi.json
+{
+  'host': 'localhost',
+  'user': 'root',
+  'passwd': '1',
+  'db': 'stats'
+}
+
+crashserver_wcgi.json
+{
+  'storage': {
+    'path': '/tmp/statserver_crashes',
+    'limit': 1000000000,
+  },
+  'sendmail': {
+    'sender': 'crashserver@networkoptix.com',
+    'reciever': 'crashdumps@networkoptix.com',
+    'subjet': 'NX CrashServer: New crash dump'
+  },
+  'download': 'http://localhost:8002/api/get?path='
+}
+```
