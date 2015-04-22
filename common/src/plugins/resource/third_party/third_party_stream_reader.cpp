@@ -24,6 +24,7 @@
 #include "motion_data_picture.h"
 
 
+
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnResourcePtr res,
     nxcip::BaseCameraManager* camManager )
@@ -158,6 +159,19 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
                 &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
         {
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
+        }
+
+        if( m_cameraCapabilities & nxcip::BaseCameraManager::groupMediaParamsChangeCapability )
+        {
+            //need to call commit
+            nxpt::ScopedRef<nxcip::CameraMediaEncoder3> mediaEncoder3( 
+                (nxcip::CameraMediaEncoder3*)intf->queryInterface( nxcip::IID_CameraMediaEncoder3 ),
+                false );
+            if( !mediaEncoder3.get() )    //error in plugin implementation
+                return CameraDiagnostics::CameraPluginErrorResult(QLatin1String("no CameraMediaEncoder3"));
+
+            if( mediaEncoder3->commit() != nxcip::NX_NO_ERROR )
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("commit"));
         }
     }
 
