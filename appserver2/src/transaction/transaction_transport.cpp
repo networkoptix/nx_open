@@ -69,7 +69,6 @@ QnTransactionTransport::QnTransactionTransport(
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
-    m_emptyChunkData = QnChunkedTransferEncoder::serializedTransaction(QByteArray(), std::vector<nx_http::ChunkExtension>());
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
@@ -437,6 +436,9 @@ void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tra
     //calling processChunkExtensions
     processChunkExtensions( m_contentParser.prevFrameHeaders() );
 
+    if( tranDataWithHeader.isEmpty() )
+        return; //it happens in case of keep-alive message
+
 #ifdef SEND_4BYTE_TRANSACTION_SIZE
     //skipping transaction size
     const QnByteArrayConstRef& tranData = tranDataWithHeader.mid( sizeof(uint32_t) );
@@ -467,7 +469,7 @@ bool QnTransactionTransport::hasUnsendData() const
     QMutexLocker lock(&m_mutex);
     return !m_dataToSend.empty();
 }
- 
+
 void QnTransactionTransport::transactionProcessed()
 {
     QMutexLocker lock(&m_mutex);
@@ -488,10 +490,9 @@ void QnTransactionTransport::transactionProcessed()
 void QnTransactionTransport::sendHttpKeepAlive()
 {
     QMutexLocker lock(&m_mutex);
-    if (m_dataToSend.empty()) 
+    if (m_dataToSend.empty())
     {
         m_dataToSend.push_back( QByteArray() );
-        m_dataToSend.front().encodedSourceData = m_emptyChunkData;
         serializeAndSendNextDataBuffer();
     }
     if( !m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
