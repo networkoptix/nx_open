@@ -247,10 +247,12 @@ bool QnTimePeriodList::decode(QByteArray &stream, bool intersected)
     return decode((const quint8 *) stream.constData(), stream.size(), intersected);
 }
 
-
-
 QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &periods, int detailLevelMs)
 {
+    /* Do not aggregate periods by 1 ms */
+    if (detailLevelMs <= 1)
+        return periods;
+
     QnTimePeriodList result;
     if (periods.isEmpty())
         return result;
