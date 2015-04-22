@@ -2,6 +2,7 @@
 #include "utils/common/warnings.h"
 
 #include <camera/data/abstract_camera_data.h>
+#include <camera/loaders/flat_camera_data_loader.h>
 #include <camera/loaders/generic_camera_data_loader.h>
 
 #include <core/resource/network_resource.h>
@@ -66,7 +67,10 @@ int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &
     if (itr != m_cache.end()) {
         loader = itr.value();
     } else {
-        loader = QnGenericCameraDataLoader::newInstance(server, camera, m_dataType, this);
+        if (m_dataType == Qn::BookmarkData)
+            loader = QnGenericCameraDataLoader::newInstance(server, camera, m_dataType, this);
+        else
+            loader = QnFlatCameraDataLoader::newInstance(server, camera, m_dataType, this);
         if (!loader)
             return -1;
         
