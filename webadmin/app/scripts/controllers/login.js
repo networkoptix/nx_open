@@ -29,7 +29,7 @@ angular.module('webadminApp')
 
                 // Check auth again
                 mediaserver.getCurrentUser(true).then(reload).catch(function(error){
-                    alert("not authorized");
+                    alert("not authorized ");
                 });
             }
         };

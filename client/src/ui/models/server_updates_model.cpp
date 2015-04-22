@@ -172,6 +172,14 @@ void QnServerUpdatesModel::resetResourses() {
     for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
         m_items.append(new Item(server));
 
+    const QString systemName = qnCommon->localSystemName();
+    for (const QnResourcePtr &resource: qnResPool->getAllIncompatibleResources()) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server || server->getSystemName() != systemName)
+            continue;
+        m_items.append(new Item(server));
+    }
+
     endResetModel();
 }
 

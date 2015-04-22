@@ -106,6 +106,7 @@ public:
             {
                 QMutexLocker lock(&m_mutex);
                 if (m_scanTasks.isEmpty()) {
+                    m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
                     m_waitCond.wait(&m_mutex, 100);
                     continue;
                 }
@@ -142,14 +143,15 @@ public:
             }
             else 
             {
+                QElapsedTimer t;
+                t.restart();
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 0.0));
                 m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::LowQualityCatalog, 0.5);
                 m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::HiQualityCatalog, 0.5);
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 1.0));
+                qDebug() << "rebuild archive time for storage" << scanData.storage->getPath() << "is:" << t.elapsed() << "msec";
             }
             m_scanTasks.removeFirst(1);
-            if (m_scanTasks.isEmpty())
-                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
         }
     }
 };
@@ -349,7 +351,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         newCatalog->doRebuildArchive(storage, rebuildPeriod);
         
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
-        replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
+        if (!m_rebuildCancelled)
+            replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
 
         m_archiveRebuildInfo.progress += progressCoeff / (double) list.size();
     }
@@ -1201,7 +1204,7 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
     QMutexLocker lock(&m_mutexStorages);
     for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
-        QString root = itr.value()->getUrl();
+        QString root = itr.value()->getPath();
         if (fileName.startsWith(root))
             return itr.value();
     }

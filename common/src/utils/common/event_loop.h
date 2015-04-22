@@ -2,7 +2,13 @@
 #define QN_EVENT_LOOP_H
 
 #include <QtCore/QThread>
+#if QT_VERSION == 0x050201
 #include <QtCore/5.2.1/QtCore/private/qthread_p.h>
+#elif QT_VERSION == 0x050401
+#include <QtCore/5.4.1/QtCore/private/qthread_p.h>
+#else
+#error "Include proper header here!"
+#endif
 
 /**
  * \param thread                        Thread to check.

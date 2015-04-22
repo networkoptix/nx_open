@@ -687,7 +687,6 @@ void CLFFmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode va
 {
     if (m_decodeMode == val)
         return;
-    //NX_LOG("set cpu mode:", val, cl_logALWAYS);
     if (val >= m_decodeMode || m_decodeMode < DecodeMode_Fastest)
     {
         m_decodeMode = val;

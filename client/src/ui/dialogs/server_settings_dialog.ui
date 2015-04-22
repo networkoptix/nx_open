@@ -302,16 +302,6 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QLabel" name="rebuildLabel">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Rebuild progress</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QProgressBar" name="rebuildProgressBar">
               <property name="enabled">
                <bool>true</bool>

@@ -351,7 +351,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
 
-    QUrl mUrl;
+    QUrl m_url;
 
     QString m_SessionId;
     unsigned short m_ServerPort;

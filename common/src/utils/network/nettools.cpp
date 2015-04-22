@@ -347,7 +347,7 @@ struct PinagableT
 
 QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
 {
-    NX_LOG(QLatin1String("about to find all ip responded to ping...."), cl_logALWAYS);
+    NX_LOG(QLatin1String("about to find all ip responded to ping...."), cl_logINFO);
     QTime time;
     time.restart();
 
@@ -380,7 +380,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
             result.push_back(QHostAddress(addr.addr));
     }
 
-    NX_LOG(lit("Done. time elapsed = %1").arg(time.elapsed()), cl_logALWAYS);
+    NX_LOG(lit("Done. time elapsed = %1").arg(time.elapsed()), cl_logINFO);
 
     CL_LOG(cl_logDEBUG1)
     {
