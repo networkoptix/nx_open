@@ -147,7 +147,9 @@ protected slots:
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodContent type);
+    void updateSyncedPeriodsQueued();
     void updateSyncedPeriods();
+    void updateSyncedPeriodsQueued(Qn::TimePeriodContent type);
     void updateSyncedPeriods(Qn::TimePeriodContent type);
     void updateCurrentBookmarks();
     void updateTargetPeriod();
@@ -249,6 +251,8 @@ private:
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
     QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
+    qint64 m_previousSyncPeriodsTime[Qn::TimePeriodContentCount];
+    bool m_queuedToSyncPeriodsLines[Qn::TimePeriodContentCount];
     
     QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
