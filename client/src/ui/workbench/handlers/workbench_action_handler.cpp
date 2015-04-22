@@ -1639,7 +1639,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
     foreach (const QnResourcePtr &resource, qnResPool->getResources()) {
         if (!resource->hasFlags(checkedFlags))
             continue;
-        if (resource->getName() != newName)
+        if (resource->getName().compare(newName, Qt::CaseInsensitive) != 0)
             continue;
 
         QString title = checkedFlags == Qn::user
