@@ -686,7 +686,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             //opening forward tunnel: sending POST with infinite body
             nx_http::Request request;
             request.requestLine.method = nx_http::Method::POST;
-            request.requestLine.url = client->url();
+            request.requestLine.url = 
+                client->url().path() + 
+                (client->url().hasQuery() ? (lit("?") + client->url().query()) : QString());
             request.requestLine.version = nx_http::http_1_1;
             request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             request.headers.emplace( "Content-Type", TUNNEL_CONTENT_TYPE );
