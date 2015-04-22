@@ -321,18 +321,25 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
     if(nonEmptyPeriods.size() == 1)
         return nonEmptyPeriods.first();
 
-    std::vector<size_t> minIndices(nonEmptyPeriods.size(), 0);
+    std::vector< QnTimePeriodList::const_iterator > minIndices(nonEmptyPeriods.size());
+    for (int i = 0; i < nonEmptyPeriods.size(); ++i)
+        minIndices[i] = nonEmptyPeriods[i].cbegin();
+
     QnTimePeriodList result;
+
+    int maxSize = std::max_element(nonEmptyPeriods.cbegin(), nonEmptyPeriods.cend(), [](const QnTimePeriodList &l, const QnTimePeriodList &r) {return l.size() < r.size(); })->size();
+    result.reserve(maxSize);
+
     int minIndex = 0;
     while (minIndex != -1) {
         qint64 minStartTime = 0x7fffffffffffffffll;
         minIndex = -1;
         int i = 0;
         for (const QnTimePeriodList &periodsList: nonEmptyPeriods) {
-            size_t startIdx = minIndices[i];
+            const auto startIdx = minIndices[i];
 
-            if (startIdx < periodsList.size()) {
-                const QnTimePeriod &startPeriod = periodsList[startIdx];
+            if (startIdx != periodsList.cend()) {
+                const QnTimePeriod &startPeriod = *startIdx;
                 if (startPeriod.startTimeMs < minStartTime) {
                     minIndex = i;
                     minStartTime = startPeriod.startTimeMs;
@@ -342,9 +349,9 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
         }
 
         if (minIndex >= 0) {
-            size_t &startIdx = minIndices[minIndex];
-            const QnTimePeriodList &periodsList = nonEmptyPeriods[minIndex];
-            const QnTimePeriod &startPeriod = periodsList[startIdx];
+            auto &startIdx = minIndices[minIndex];
+            //const QnTimePeriodList &periodsList = nonEmptyPeriods[minIndex];
+            const QnTimePeriod &startPeriod = *startIdx;
 
             // add chunk to merged data
             if (result.empty()) {
