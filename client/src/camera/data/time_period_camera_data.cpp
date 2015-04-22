@@ -31,7 +31,7 @@ void QnTimePeriodCameraData::append(const QnAbstractCameraDataPtr &other) {
     append(other->dataSource());
 }
 
-void QnTimePeriodCameraData::append(const QList<QnAbstractCameraDataPtr> &other) {
+void QnTimePeriodCameraData::mergeInto(const QList<QnAbstractCameraDataPtr> &other) {
     if (other.isEmpty())
         return;
 
@@ -45,18 +45,7 @@ void QnTimePeriodCameraData::append(const QList<QnAbstractCameraDataPtr> &other)
 }
 
 void QnTimePeriodCameraData::append(const QnTimePeriodList &other) {
-    if (other.isEmpty())
-        return;
-
-    /* Check if the current last piece marked as Live. */ 
-    QVector<QnTimePeriodList> allPeriods;
-    if (!m_data.isEmpty() && m_data.last().isInfinite())  {
-        auto lastIt = m_data.end() - 1;
-        if (other.last().startTimeMs >= lastIt->startTimeMs)
-            m_data.erase(lastIt);    //cut "recording" piece
-    }
-    allPeriods << m_data << other;
-    m_data = QnTimePeriodList::mergeTimePeriods(allPeriods); // union data
+    QnTimePeriodList::appendTimePeriods(m_data, other);
 }
 
 void QnTimePeriodCameraData::clear() {

@@ -203,14 +203,8 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
         newPeriod.durationMs = qMin(newPeriod.durationMs, loadedData->dataSource().last().endTimeMs() - newPeriod.startTimeMs);
 
     // union loaded time range info 
-    if(newPeriod.durationMs > 0) {
-        QnTimePeriodList newPeriods;
-        newPeriods.push_back(newPeriod);
-
-        QVector<QnTimePeriodList> allLoadedPeriods;
-        allLoadedPeriods << loadedPeriods << newPeriods;
-
-        loadedPeriods = QnTimePeriodList::mergeTimePeriods(allLoadedPeriods); 
+    if (!newPeriod.isEmpty()) {
+        QnTimePeriodList::appendTimePeriods(loadedPeriods, QnTimePeriodList(newPeriod));
     }
 
     // reduce right edge of loaded period info if last period under writing now

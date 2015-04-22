@@ -36,7 +36,7 @@ public:
      * @brief append                                Append several pieces of data at once.
      * @param other                                 List of data structs to append.
      */
-    virtual void append(const QList<QnAbstractCameraDataPtr> &other) = 0;
+    virtual void mergeInto(const QList<QnAbstractCameraDataPtr> &other) = 0;
 
     /**
      * @brief trim                                  Trim the last data source period if it is not finished.

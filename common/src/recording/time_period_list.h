@@ -115,7 +115,19 @@ public:
      */
     qint64 roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const;
 
+    /** Merge some time period lists into one. */
     static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
+
+    /** Merge two time period lists. Optimized for common case when appending list is small and contains update
+     *  for the base list.
+     * 
+     * \param[in] basePeriods           Base list.
+     * \param[in] appendingPeriods      Appending list.
+     * \returns                         Merged list.
+     */
+    static void appendTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods);
+
+    
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
 };
 

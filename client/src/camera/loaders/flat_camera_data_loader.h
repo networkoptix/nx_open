@@ -52,7 +52,7 @@ private slots:
 
 private:
     int sendRequest(const QnTimePeriod &periodToLoad);
-    void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requstHandle);
+    void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle);
     void updateLoadedPeriod(const QnTimePeriod &loadedPeriod);
 private:
     struct LoadingInfo 

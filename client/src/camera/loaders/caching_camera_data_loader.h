@@ -62,7 +62,6 @@ public slots:
     void discardCachedData();
 private slots:
     void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, Qn::CameraDataType dataType);
-    void at_loader_failed(Qn::CameraDataType dataType);
 
 protected:
     void load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod, const qint64 resolutionMs = 1);
@@ -93,7 +92,7 @@ private:
 
     QnTimePeriodList m_requestedTimePeriods[Qn::TimePeriodContentCount];
     QnTimePeriodList m_queuedToLoadTimePeriods[Qn::TimePeriodContentCount];
-    QnTimePeriodCameraData m_timePeriodCameraData[Qn::TimePeriodContentCount];
+    QnTimePeriodList m_cameraChunks[Qn::TimePeriodContentCount];
 
     QMap<qint64, QnTimePeriodList> m_requestedBookmarkPeriodsByResolution;  //TODO: #GDM #Bookmarks should we enumerate by resolution set index?
     QnBookmarkCameraData m_bookmarkCameraData;

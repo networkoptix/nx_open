@@ -32,7 +32,7 @@ public:
      * @brief append                                Append several sets of bookmarks at once.
      * @param other                                 List of data structs to append, each of them must be instance of QnBookmarkCameraData.
      */
-    virtual void append(const QList<QnAbstractCameraDataPtr> &other) override;
+    virtual void mergeInto(const QList<QnAbstractCameraDataPtr> &other) override;
 
     /**
      * @brief clear                                 Remove all bookmarks from the struct.

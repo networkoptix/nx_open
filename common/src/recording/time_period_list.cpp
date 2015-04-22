@@ -278,6 +278,36 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &
     return result;
 }
 
+void QnTimePeriodList::appendTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods) {
+    if (appendingPeriods.isEmpty())
+        return;
+
+    if (basePeriods.isEmpty()) {
+        basePeriods = appendingPeriods;
+        return;
+    }
+
+    auto last = basePeriods.cend() - 1;
+    if (last->isInfinite())
+        basePeriods.removeLast();
+
+    auto appending = appendingPeriods.cbegin(); 
+    auto insertIter = std::upper_bound(basePeriods.begin(), basePeriods.end(), appending->startTimeMs);
+
+    while (insertIter != basePeriods.end() && appending != appendingPeriods.cend() && *insertIter == *appending) {
+        ++insertIter;
+        ++appending;
+    }
+
+    Q_ASSERT_X(insertIter == basePeriods.end(), Q_FUNC_INFO, "invalid function semantics");
+    basePeriods.reserve(basePeriods.size() + std::distance(appending, appendingPeriods.cend()) );
+    while (appending != appendingPeriods.cend()) {
+        insertIter = basePeriods.insert(insertIter, *appending);
+        ++appending;
+    }
+}
+
+
 QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periodLists)
 {
     QVector<QnTimePeriodList> nonEmptyPeriods;

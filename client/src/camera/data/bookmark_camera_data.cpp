@@ -85,10 +85,10 @@ void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
     QVector<QnTimePeriodList> periods;
     periods.append(m_dataSource);
     periods.append(other_casted->m_dataSource);
-    m_dataSource = QnTimePeriodList::mergeTimePeriods(periods);
+    QnTimePeriodList::appendTimePeriods(m_dataSource, other_casted->m_dataSource);
 }
 
-void QnBookmarkCameraData::append(const QList<QnAbstractCameraDataPtr> &other) {
+void QnBookmarkCameraData::mergeInto(const QList<QnAbstractCameraDataPtr> &other) {
     if (other.isEmpty())
         return;
 

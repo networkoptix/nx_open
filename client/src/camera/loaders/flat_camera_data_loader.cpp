@@ -194,60 +194,54 @@ void QnFlatCameraDataLoader::updateLoadedPeriod(const QnTimePeriod &loadedPeriod
 #endif
 }
 
-void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requstHandle) {
-    for (int i = 0; i < m_loading.size(); ++i) {
-        if (m_loading[i].handle != requstHandle)
-            continue;
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-        QString debugName = m_connection->url().host();
-#endif
+void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle) {
 
-        if (status == 0) {
+    auto loadingInfoIter = std::find_if(m_loading.begin(), m_loading.end(), [requestHandle](const LoadingInfo &info) {return info.handle == requestHandle; } );
+    if (loadingInfoIter == m_loading.end())
+        return;
 
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-            if (!data->dataSource().isEmpty()) {
-                qDebug() << "---------------------------------------------------------------------";
-                qDebug() << debugName << "CHUNK request" << m_loading[i].period;
-                qDebug() << debugName << "CHUNK data" << data->dataSource();
-                if (m_loadedData)
-                    qDebug() << debugName << "CHUNK total before" << m_loadedData->dataSource(); 
-            }
-#endif
+    auto loadingInfo = *loadingInfoIter;
+    m_loading.erase(loadingInfoIter);
 
-            if (!m_loadedData && data) {
-                m_loadedData = data;
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-                qDebug() << debugName << "CHUNK total after" << m_loadedData->dataSource(); 
-#endif
-                updateLoadedPeriod(m_loading[i].period);
-            }
-            else
-            if (data && !data->isEmpty()) {
-                m_loadedData->append(data);
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-                qDebug() << debugName << "CHUNK total after" << m_loadedData->dataSource(); 
-#endif
-                updateLoadedPeriod(m_loading[i].period);
-            }
-            /* Check if already recorded period was deleted on the server. */
-            else if (m_loadedData && data && data->isEmpty()) {
-                m_loadedData->trim(m_loading[i].period.startTimeMs);
-                updateLoadedPeriod(m_loading[i].period);
-            }
-
-            foreach(int handle, m_loading[i].waitingHandles)
-                emit ready(m_loadedData, handle);
-            emit ready(m_loadedData, requstHandle);
-        }
-        else {
-            foreach(int handle, m_loading[i].waitingHandles)
-                emit failed(status, handle);
-            emit failed(status, requstHandle);
-        }
-        m_loading.removeAt(i);
-        break;
-
+    if (status != 0) {
+        foreach(int handle, loadingInfo.waitingHandles)
+            emit failed(status, handle);
+        emit failed(status, requestHandle);
+        return;
     }
+
+#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
+    QString debugName = m_connection->url().host();
+    if (!data->dataSource().isEmpty()) {
+        qDebug() << "---------------------------------------------------------------------";
+        qDebug() << debugName << "CHUNK request" << loadingInfo.period;
+        qDebug() << debugName << "CHUNK data" << data->dataSource();
+        if (m_loadedData)
+            qDebug() << debugName << "CHUNK total before" << m_loadedData->dataSource(); 
+    }
+#endif
+
+    if (!m_loadedPeriod.contains(loadingInfo.period) && data) {
+        if (!m_loadedData) {
+            m_loadedData = data;
+        }
+        else if (!data->isEmpty()) {
+            m_loadedData->append(data);
+        }
+        /* Check if already recorded period was deleted on the server. */
+        else if (m_loadedData && data->isEmpty()) {
+            m_loadedData->trim(loadingInfo.period.startTimeMs);
+        }
+
+#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
+        qDebug() << debugName << "CHUNK total after" << m_loadedData->dataSource(); 
+#endif
+        updateLoadedPeriod(loadingInfo.period);
+    }
+
+    foreach(int handle, loadingInfo.waitingHandles)
+        emit ready(m_loadedData, handle);
+    emit ready(m_loadedData, requestHandle);
 }
 
 
