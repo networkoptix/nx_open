@@ -1,16 +1,14 @@
 'use strict';
 
 angular.module('webadminApp')
-    .directive('timeline', ['$interval','animateScope', function ($interval,animateScope) {
+    .directive('timeline', ['$interval','$timeout','animateScope', function ($interval,$timeout,animateScope) {
         return {
             restrict: 'E',
             scope: {
                 records: '=',
                 ngClick: '&',
                 position: '=',
-                handler:'='
-                //start: '=',
-                //end:   '=',
+                handler: '='
             },
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
@@ -58,13 +56,21 @@ angular.module('webadminApp')
                 };
 
                 scope.$watch('position', function(newValue, oldValue){
+                    if(scope.records) {
+                        var nearestPosition = scope.records.findNearestPosition(scope.position);
+                        if (nearestPosition != scope.position) {
+                            console.log("Will jump to position", nearestPosition, "from", scope.position);
+                            scope.handler(nearestPosition);
+                            return;
+                        }
+                    }
+
                     var lastCoord = scope.positionCoordinate;
                     scope.positionCoordinate = dateToScreenPosition(scope.position).toFixed(1);
 
 //                    console.log("positionCoordinate ",timeMarker,lastCoord,scope.positionCoordinate);
 
                     if(scope.positionCoordinate != lastCoord){
-
                         console.log("positionCoordinate ",timeMarker,lastCoord,scope.positionCoordinate);
                         timeMarker.css("left",scope.positionCoordinate + "px");
                     }

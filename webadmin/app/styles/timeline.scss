@@ -103,13 +103,19 @@ ng-include{
 
 
 .timeMarker{
-  display:block !important;
   margin-top:-50px !important;
   margin-left: -50px;
   width: 100px;
   text-align: center;
+  opacity:0;
+  display:none !important;
 }
 
+
+.timeline:hover .timeMarker{
+  opacity:1;
+  display:block !important;
+}
 .timeline{
   position:relative;
 }

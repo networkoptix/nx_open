@@ -415,3 +415,44 @@ CameraRecordsProvider.prototype.splice = function(result, start, end, level, par
 
     return noNeedForUpdate;
 };
+
+CameraRecordsProvider.prototype.findNearestPosition = function (position,parent) {
+    parent = parent || this.chunksTree;
+    if (!parent) {
+        return null;
+    }
+
+    if (parent.children.length > 0) {
+        for (var i = 0; i < parent.children.length; i++) {
+            var currentChunk = parent.children[i];
+            if(currentChunk.start >= position ){
+                console.log("start 1" , currentChunk);
+                return currentChunk.start;
+            }
+
+            if(currentChunk.end > position ){
+                //We may be in the actual chunk
+                //We may have to go deeper
+                return this.findNearestPosition(position,currentChunk);
+            }
+        }
+    }
+
+    if(parent.start >= position ){
+
+        console.log("start 2" , parent);
+        return parent.start;
+    }
+
+    if(parent.end < position){ //After the last chunk
+
+        console.log("start live" , parent);
+        return (new Date()).getTime(); //Go to live!
+    }
+
+    //Here we may want to request better detailization
+    console.warn("request deeper detailization", parent);
+
+    return position; // Position is inside the chunk
+
+};
