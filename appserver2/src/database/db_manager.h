@@ -527,6 +527,7 @@ namespace ec2
         bool tuneDBAfterOpen();
         bool updateCameraHistoryGuids();
         bool migrateServerGUID(const QString& table, const QString& field);
+        bool removeWrongSupportedMotionTypeForONVIF();
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
