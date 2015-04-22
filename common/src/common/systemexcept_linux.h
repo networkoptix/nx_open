@@ -3,7 +3,7 @@
 #ifndef SYSTEMEXCEPT_LINUX_H
 #define SYSTEMEXCEPT_LINUX_H
 
-#include <QString>
+#include <string>
 
 //! Used to dump unhandled structured exception call stack to file ~/{application_name}_{pid}.crash
 /*!
@@ -23,9 +23,8 @@ public:
     static void setSignalHandlingDisabled(bool isDisabled);
 
     //! How to find created dumps
-    static QString getCrashDirectory();
-    static QString getCrashPrefix();
-    static QString getCrashPattern();
+    static std::string getCrashDirectory();
+    static std::string getCrashPattern();
 };
 
 #endif // SYSTEMEXCEPT_LINUX_H

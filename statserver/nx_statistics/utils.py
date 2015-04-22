@@ -25,7 +25,7 @@ def sendmail(sender, reciever, subject, text):
     msg['Subject'] = subject
 
     cmd = Popen(SENDMAIL.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    our, err = cmd.communicate(msg)
+    out, err = cmd.communicate(msg.as_string())
     if cmd.wait() != 0:
         raise OSError("Command '%s' has failed: %s" % (SENDMAIL, err))
     return out

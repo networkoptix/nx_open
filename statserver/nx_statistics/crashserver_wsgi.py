@@ -9,7 +9,7 @@ import json
 import sys
 
 config = sys.argv[1]
-for option, value in json.load(open(config)):
+for option, value in json.load(open(config)).items():
     setattr(app, option, value)
 
 app.logger.addHandler(logHandler)

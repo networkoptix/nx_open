@@ -10,6 +10,12 @@ import json
 
 app = Flask(__name__)
 
+MAIL_FORM='''New crash has been reported!
+
+    Upload: %(upload)s, Size: %(size)s
+    Download: %(addr)s%(path)s
+'''.strip()
+
 def getStorage():
     if not hasattr(app, 'storage'):
         from os.path import expanduser
@@ -17,11 +23,9 @@ def getStorage():
     return FileStorage(log=app.logger, **app.storage)
 
 def mailNotify(info):
-    addr = getattr(app, 'download', None)
-    mail = getattr(app, 'sendmail', None)
-    if not addr or not mail: return
-    text = 'Crash: %s\nDownload: %s' % (json.dumps(info), addr+info['path'])
-    sendmail(text=text, **mail)
+    addr, mail = getattr(app, 'download', None), getattr(app, 'sendmail', None)
+    if addr and mail:
+        sendmail(text=MAIL_FORM % dict(addr=addr, **info), **mail)
 
 @app.route('/api/report', methods=['POST'])
 def report():

@@ -1,6 +1,6 @@
 #include "systemexcept_linux.h"
 
-#include <utils/common/app_info.h>
+#include "version.h"
 
 #include <execinfo.h>
 #include <fcntl.h>
@@ -29,6 +29,10 @@ static const int SIGNALS[] = { SIGQUIT, SIGILL, SIGFPE, SIGSEGV, SIGBUS };
 static const struct timespec WAIT_FOR_MUTEX     = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_THREADS   = { 1 /* sec */, 0 /* nsec */ };
 static const struct timespec WAIT_FOR_MAIN      = { 1 /* sec */, 500000 /* nsec */ };
+
+static const bool isBeta = strcmp(QN_BETA, "true") == 0;
+static const std::string versionId = QN_ENGINE_VERSION "-" QN_APPLICATION_REVISION;
+static const std::string fullVersionId = versionId + (isBeta ? "-beta" : "");
 
 /** Thread Keeper without heap usage */
 class ThreadKeeper
@@ -70,6 +74,13 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t mainThread(0);
 static ThreadKeeper allThreads;
 static struct sigaction originalHandlers[_NSIG] = {};
+
+static std::string getCrashPrefix()
+{
+    std::ostringstream ss;
+    ss << program_invocation_name << "_" << fullVersionId;
+    return ss.str();
+}
 
 // printf for fd without heap usage for sure
 template<class ... Args>
@@ -174,8 +185,8 @@ void linux_exception::installCrashSignalHandler()
     mainThread = pthread_self();
     {
         std::ostringstream os;
-        os << getCrashDirectory().toStdString() << "/"
-           << getCrashPrefix().toStdString() << "_" << getpid() << ".crash";
+        os << getCrashDirectory() << "/"
+           << getCrashPrefix() << "_" << getpid() << ".crash";
         crashFile = os.str();
     }
 
@@ -214,21 +225,16 @@ void linux_exception::setSignalHandlingDisabled(bool isDisabled)
     pthread_mutex_unlock(&mutex);
 }
 
-QString linux_exception::getCrashDirectory()
+std::string linux_exception::getCrashDirectory()
 {
     if (const auto pwd = getpwuid(getuid()))
-        return QLatin1String(pwd->pw_dir);
-    return QLatin1String(".");
+        return std::string(pwd->pw_dir);
+    return std::string(".");
 }
 
-QString linux_exception::getCrashPrefix()
+std::string linux_exception::getCrashPattern()
 {
-    return QString(QLatin1String("%1_%2"))
-            .arg(QLatin1String(program_invocation_name))
-            .arg(QnAppInfo::applicationFullVersion());
-}
-
-QString linux_exception::getCrashPattern()
-{
-    return QString(QLatin1String("%1_*.*")).arg(getCrashPrefix());
+    std::stringstream ss;
+    ss << getCrashPrefix() << "_*.*";
+    return ss.str();
 }

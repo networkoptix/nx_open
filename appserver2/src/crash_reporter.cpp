@@ -25,7 +25,7 @@ void CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
         qDebug() << "CrashReporter::scanAndReport: sending is not allowed";
         return;
     }
-    
+
     const auto lastTime = QDateTime::fromString(
             settings->value(LAST_CRASH, "").toString(), DATE_FORMAT);
     if (QDateTime::currentDateTime() < lastTime.addSecs(SENDING_MIN_INTERVAL))
