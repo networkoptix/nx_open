@@ -129,6 +129,8 @@ void QnGenericCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
 }
 
 int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, const qint64 resolutionMs) {
+    Q_ASSERT_X(m_dataType == Qn::BookmarkData, Q_FUNC_INFO, "this loader should be used to load bookmarks only");
+
     switch (m_dataType) {
     case Qn::RecordedTimePeriod:
     case Qn::MotionTimePeriod: 

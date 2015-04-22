@@ -50,7 +50,7 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(QnAbstractCameraDataLoader 
     }
 
     QTimer* loadTimer = new QTimer(this);
-    loadTimer->setInterval(30 * 1000);  // time period will be loaded once in 30 seconds
+    loadTimer->setInterval(requestIntervalMs);  // time period will be loaded no often than once in 30 seconds
     loadTimer->setSingleShot(false);
     connect(loadTimer, &QTimer::timeout, this, [this] {
 
@@ -453,7 +453,7 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::CameraDataType dataType) {
 
     qint64 curTime = QDateTime::currentMSecsSinceEpoch();
     qint64 timeSpan = curTime - m_previousRequestTime[periodType];
-    if (m_previousRequestTime[periodType] == 0 || timeSpan > 30*1000)
+    if (m_previousRequestTime[periodType] == 0 || timeSpan > requestIntervalMs)
         load(dataType, requestedPeriod);
     else
         m_queuedToLoadTimePeriods[periodType].push_back(requestedPeriod);
