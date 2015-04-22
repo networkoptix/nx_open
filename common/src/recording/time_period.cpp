@@ -162,7 +162,7 @@ qint64 QnTimePeriod::infiniteDuration() {
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
-    const QString fmt = lit("hh:mm:ss");
+    const QString fmt = lit("dd MM yyyy hh:mm:ss");
     if (!period.isInfinite())
         dbg.nospace() << "" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(fmt)
                       << " - " << QDateTime::fromMSecsSinceEpoch(period.startTimeMs + period.durationMs).toString(fmt);

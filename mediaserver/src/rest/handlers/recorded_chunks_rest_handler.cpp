@@ -26,13 +26,13 @@ namespace {
     /* 5 seconds spacing. */
     qint64 chunkSpaceMs = 1000ll * 5;
 
-    QnTimePeriodList generateAlotOfPeriods(qint64 startTimeMs, const QnTimePeriodList &basePeriods) {
+    QnTimePeriodList generateAlotOfPeriods(qint64 startTimeMs, const QnTimePeriodList &basePeriods, int offset) {
         qint64 baseStartTimeMs = basePeriods.isEmpty() ? QDateTime::currentMSecsSinceEpoch() : basePeriods.last().startTimeMs;
 
         QnTimePeriodList result;
         qint64 start = startTimeMs > 0 ? startTimeMs : baseStartTimeMs - totalLengthMs;
         // align to make sure results will be the same for different requests
-        start = start - (start % 10000);
+        start = start - (start % 10000) + offset;
 
         while (start + chunkLengthMs < baseStartTimeMs) {
             result.push_back(QnTimePeriod(start, chunkLengthMs));
@@ -167,16 +167,20 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     QnTimePeriodList periods;
     switch (periodsType) {
     case Qn::RecordingContent:
-        periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
+        {
+            periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
 #ifdef QN_PERIODS_HIGHLOAD_TEST
-        qDebug() << now() << "chunks requested for" << physicalId << "for period" << dt(startTime) << " - " << dt(endTime);
-        periods = generateAlotOfPeriods(startTime, periods);
-        if (!periods.isEmpty())
-            qDebug() << now() << "result periods starts from" << dt(periods.first().startTimeMs);
-        else 
-            qDebug() << now() << "empty periods generated";
-        testPeriods(periods);
+            qDebug() << now() << "chunks requested for" << physicalId << "for period" << dt(startTime) << " - " << dt(endTime);
+
+            auto resourceId = resList.filtered<QnVirtualCameraResource>().first()->getId().toByteArray();
+            int offset = 0;
+            for (char c: resourceId)
+                offset += c;
+            periods = generateAlotOfPeriods(startTime, periods, offset);
+            if (!periods.isEmpty())
+                qDebug() << now() << "result periods starts from" << dt(periods.first().startTimeMs);
 #endif
+        }
         break;
     case Qn::MotionContent:
         {
