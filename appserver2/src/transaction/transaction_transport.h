@@ -210,7 +210,6 @@ private:
     QByteArray m_extraData;
     bool m_authByKey;
     QElapsedTimer m_lastReceiveTimer;
-    QByteArray m_emptyChunkData;
     int m_postedTranCount;
     bool m_asyncReadScheduled;
     qint64 m_remoteIdentityTime;
