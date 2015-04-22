@@ -1089,7 +1089,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr storage = *itr;
-        qDebug() << "QnFileStorageResource " << storage->getPath() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
+//        qDebug() << "QnFileStorageResource " << storage->getPath() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
         float bitrate = storage->bitrate() / storage->getStorageBitrateCoeff();
         minBitrate = qMin(minBitrate, bitrate);
         bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
