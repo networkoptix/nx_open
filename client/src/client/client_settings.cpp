@@ -275,6 +275,10 @@ bool QnClientSettings::isWritable() const {
     return m_settings->isWritable();
 }
 
+QSettings* QnClientSettings::rawSettings() {
+    return m_settings;
+}
+
 void QnClientSettings::loadFromWebsite() {
     m_accessManager->get(QNetworkRequest(settingsUrl()));
 }

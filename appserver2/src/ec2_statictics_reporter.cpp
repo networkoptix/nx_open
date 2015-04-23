@@ -58,6 +58,7 @@ namespace ec2
         : m_admin(getAdmin(userManager))
         , m_desktopCameraTypeId(getDesktopCameraTypeId(resourceManager))
         , m_timerDisabled(false)
+        , m_timerId(boost::none)
     {
         setupTimer();
     }
@@ -156,7 +157,9 @@ namespace ec2
         {
             QMutexLocker lk(&m_mutex);
             m_timerDisabled = true;
-            timerId = m_timerId;
+
+            if (timerId = m_timerId)
+                m_timerId = boost::none;
         }
 
         if (timerId)

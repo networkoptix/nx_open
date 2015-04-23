@@ -502,7 +502,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QObject::connect(clientMessageProcessor.data(), &QnClientMessageProcessor::initialResourcesReceived, [](){ 
-        ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator(), new QSettings()); 
+        ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator(), qnSettings->rawSettings());
     });
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());

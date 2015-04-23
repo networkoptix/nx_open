@@ -253,7 +253,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
 	ec2::ApiClientInfoData clientData;
 	{
-		const auto settings = std::unique_ptr<QSettings>(new QSettings());
+        const auto settings = std::unique_ptr<QSettings>(qnSettings->rawSettings());
 		const auto hwId = LLUtil::getMainHardwareIds(0, settings.get()).last();
 		clientData.id = QnUuid::fromHardwareId(hwId);
 
