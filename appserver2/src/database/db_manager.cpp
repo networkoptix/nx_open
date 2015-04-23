@@ -809,6 +809,10 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "guid", guids))
         return false;
 
+    //guids = getGuidList("SELECT resource_ptr_id, '__USER__' || username from auth_user JOIN vms_userprofile on user_id = auth_user.id WHERE auth_user.username != 'admin' order by resource_ptr_id", CM_MakeHash);
+    //if (!updateTableGuids("vms_resource", "guid", guids))
+    //    return false;
+
     guids = getGuidList("SELECT li.id, r.guid FROM vms_layoutitem_tmp li JOIN vms_resource r on r.id = li.resource_id order by li.id", CM_Binary);
     if (!updateTableGuids("vms_layoutitem", "resource_guid", guids))
         return false;
@@ -1167,6 +1171,49 @@ bool QnDbManager::updateCameraHistoryGuids()
 
 }
 
+bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log"));
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
+
+    QSqlQuery updQuery(m_sdb);
+    updQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
+
+    while (query.next()) {
+        QnAbstractTransaction abstractTran;
+        QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
+        QByteArray srcData = query.value(1).toByteArray();
+        QnUbjsonReader<QByteArray> stream(&srcData);
+        if (!QnUbjson::deserialize(&stream, &abstractTran)) {
+            qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
+            return false;
+        }
+        if (abstractTran.command != ApiCommand::setResourceParam) 
+            continue;
+        ApiResourceParamWithRefData data;
+        if (!QnUbjson::deserialize(&stream, &data))
+        {
+            qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
+            return false;
+        }
+        if (data.name == lit("supportedMotion") && data.value.isEmpty()) 
+        {
+            updQuery.addBindValue(QnSql::serialized_field(tranGuid));
+            if (!updQuery.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/07_videowall.sql")) 
@@ -1205,6 +1252,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/33_resync_layout.sql")) {
         m_needResyncLayout = true;
+    }
+    else if (updateName == lit(":/updates/35_fix_onvif_mt.sql")) {
+        return removeWrongSupportedMotionTypeForONVIF();
     }
 
     return true;
@@ -2393,13 +2443,14 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {
+    /*
     qint32 internalId = getResourceInternalId(tran.params.id);
-
     ErrorCode result = checkExistingUser(tran.params.name, internalId);
     if (result !=ErrorCode::ok)
         return result;
-
-    result = insertOrReplaceResource(tran.params, &internalId);
+    */
+    qint32 internalId = 0;
+    ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
     if (result !=ErrorCode::ok)
         return result;
 
