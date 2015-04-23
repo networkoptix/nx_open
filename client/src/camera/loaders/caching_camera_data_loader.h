@@ -55,13 +55,13 @@ public:
     void removeBookmark(const QnCameraBookmark & bookmark);
     QnCameraBookmark bookmarkByTime(qint64 position) const;
 signals:
-    void periodsChanged(Qn::TimePeriodContent type);
+    void periodsChanged(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod = QnTimePeriod());
     void bookmarksChanged();
     void loadingFailed();
 public slots:
     void discardCachedData();
 private slots:
-    void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, Qn::CameraDataType dataType);
+    void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, const QnTimePeriod &updatedPeriod, Qn::CameraDataType dataType);
 
 protected:
     void load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod, const qint64 resolutionMs = 1);

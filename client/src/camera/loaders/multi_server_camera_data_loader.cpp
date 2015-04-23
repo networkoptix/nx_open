@@ -81,7 +81,7 @@ int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &
     return loader->load(period, filter, resolutionMs);
 }
 
-void QnMultiServerCameraDataLoader::onDataLoaded(const QnAbstractCameraDataPtr &data, int handle) {
+void QnMultiServerCameraDataLoader::onDataLoaded(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle) {
     int multiHandle = 0;
     for (auto itr = m_multiLoadProgress.begin(); itr != m_multiLoadProgress.end(); ++itr) {
         if (!itr->contains(handle)) 
@@ -90,14 +90,19 @@ void QnMultiServerCameraDataLoader::onDataLoaded(const QnAbstractCameraDataPtr &
         multiHandle = itr.key();
         itr->removeOne(handle);
 
+        QnTimePeriod mergedPeriod = m_multiLoadData[multiHandle].period;
+        mergedPeriod.addPeriod(updatedPeriod);
+        Q_ASSERT_X(!mergedPeriod.isInfinite(), Q_FUNC_INFO, "infinite periods are not supposed to be loaded");
+
         if (itr->isEmpty()) { // if that was the last piece then merge and notify...
             QnAbstractCameraDataPtr result(data->clone());
-            result->mergeInto(m_multiLoadData[multiHandle]); //bulk append works faster than appending elements one-by-one
+            result->mergeInto(m_multiLoadData[multiHandle].data); //bulk merge works faster than appending elements one-by-one
             m_multiLoadData.remove(multiHandle);
             m_multiLoadProgress.erase(itr);
-            emit ready(result, multiHandle);
+            emit ready(result, mergedPeriod, multiHandle);
         } else { // ... else just store temporary result
-            m_multiLoadData[multiHandle] << data;
+            m_multiLoadData[multiHandle].data << data;
+            m_multiLoadData[multiHandle].period = mergedPeriod;
         }
         break;
     }
@@ -112,11 +117,11 @@ void QnMultiServerCameraDataLoader::onLoadingFailed(int status, int handle) {
         multiHandle = itr.key();
         itr->removeOne(handle);
         if (itr->isEmpty()) {
-            if (!m_multiLoadData[multiHandle].isEmpty())
+            if (!m_multiLoadData[multiHandle].data.isEmpty())
             {
-                QnAbstractCameraDataPtr result = m_multiLoadData[multiHandle].takeFirst()->clone();
-                result->mergeInto(m_multiLoadData[multiHandle]);
-                emit ready(result, multiHandle);
+                QnAbstractCameraDataPtr result = m_multiLoadData[multiHandle].data.takeFirst()->clone();
+                result->mergeInto(m_multiLoadData[multiHandle].data);
+                emit ready(result, m_multiLoadData[multiHandle].period, multiHandle);
             }
             else {
                 emit failed(status, multiHandle);

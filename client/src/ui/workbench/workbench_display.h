@@ -313,7 +313,7 @@ public:
      * Status function to know if we are changing layout now.
      * \returns true if we are changing layout
      */
-    bool isChangingLayout() const { return m_inChangeLayout; } // TODO: #Elric this is evil
+    bool isChangingLayout() const { return m_inChangeLayout; } // TODO: #GDM this is evil
 
     QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
 

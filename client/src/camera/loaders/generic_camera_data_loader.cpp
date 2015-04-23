@@ -60,7 +60,7 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
             /* Must pass the ready signal through the event queue here as
              * the caller doesn't know request handle yet, and therefore 
              * cannot handle the signal. */
-            emit delayedReady(m_loadedData[resolutionMs], handle);
+            emit delayedReady(m_loadedData[resolutionMs], timePeriod, handle);
             return handle; 
         }
     }
@@ -203,9 +203,8 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
         newPeriod.durationMs = qMin(newPeriod.durationMs, loadedData->dataSource().last().endTimeMs() - newPeriod.startTimeMs);
 
     // union loaded time range info 
-    if (!newPeriod.isEmpty()) {
-        QnTimePeriodList::appendTimePeriods(loadedPeriods, QnTimePeriodList(newPeriod));
-    }
+    if (!newPeriod.isEmpty())
+        loadedPeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << loadedPeriods << newPeriod); 
 
     // reduce right edge of loaded period info if last period under writing now
     if (!loadedPeriods.isEmpty() && !loadedData->isEmpty() && loadedData->dataSource().last().isInfinite())
@@ -254,7 +253,7 @@ void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCam
             }
             else
             if (data && !data->isEmpty()) {
-                m_loadedData[resolutionMs]->append(data);
+                m_loadedData[resolutionMs]->update(data, m_loading[i].period);
 #ifdef CHUNKS_LOADER_DEBUG
                 qDebug() << debugName << "CHUNK total after" << m_loadedData[resolutionMs]->dataSource(); 
 #endif
@@ -267,8 +266,8 @@ void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCam
             }
 
             foreach(int handle, m_loading[i].waitingHandles)
-                emit ready(m_loadedData[resolutionMs], handle);
-            emit ready(m_loadedData[resolutionMs], requstHandle);
+                emit ready(m_loadedData[resolutionMs], m_loading[i].period, handle);
+            emit ready(m_loadedData[resolutionMs], m_loading[i].period, requstHandle);
         }
         else {
             foreach(int handle, m_loading[i].waitingHandles)

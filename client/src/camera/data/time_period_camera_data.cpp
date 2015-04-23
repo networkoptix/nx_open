@@ -25,10 +25,10 @@ bool QnTimePeriodCameraData::isEmpty() const {
     return m_data.isEmpty();
 }
 
-void QnTimePeriodCameraData::append(const QnAbstractCameraDataPtr &other) {
+void QnTimePeriodCameraData::update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) {
     if (!other)
         return;
-    append(other->dataSource());
+    update(other->dataSource(), updatedPeriod);
 }
 
 void QnTimePeriodCameraData::mergeInto(const QList<QnAbstractCameraDataPtr> &other) {
@@ -44,8 +44,8 @@ void QnTimePeriodCameraData::mergeInto(const QList<QnAbstractCameraDataPtr> &oth
     m_data = QnTimePeriodList::mergeTimePeriods(allPeriods);
 }
 
-void QnTimePeriodCameraData::append(const QnTimePeriodList &other) {
-    QnTimePeriodList::appendTimePeriods(m_data, other);
+void QnTimePeriodCameraData::update(const QnTimePeriodList &other, const QnTimePeriod &updatedPeriod) {
+    QnTimePeriodList::updateTimePeriods(m_data, other, updatedPeriod);
 }
 
 void QnTimePeriodCameraData::clear() {

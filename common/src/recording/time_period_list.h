@@ -57,6 +57,9 @@ public:
 
     QnTimePeriodList intersected(const QnTimePeriod &period) const;
 
+    /** Get list of periods, that starts in the target period. */
+    QnTimePeriodList intersectedPeriods(const QnTimePeriod &period) const;
+
     /**
      * \returns                         Total duration of all periods in this list,
      *                                  or -1 if the last time period of this list is infinite.
@@ -118,17 +121,33 @@ public:
     /** Merge some time period lists into one. */
     static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
 
-    /** Merge two time period lists. Optimized for common case when appending list is small and contains update
-     *  for the base list.
+    /** Update base period list with information from appendingPeriods.
+     *  Should not be used for appending different or overlapping periods (e.g. from different cameras).
+     * 
+     * \param[in] basePeriods           Base list.
+     * \param[in] newPeriods            List of updates.
+     * \returns                         Updated list.
+     */
+    static void updateTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &newPeriods, const QnTimePeriod &updatedPeriod);
+
+    /** Union two time period lists. Does not delete periods from the base list.
      * 
      * \param[in] basePeriods           Base list.
      * \param[in] appendingPeriods      Appending list.
      * \returns                         Merged list.
      */
-    static void appendTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods);
+    static void unionTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods);
 
+    /** Make very quick comparison. Does not guarantee that lists are the same.
+     *  Recommended to compare chunk lists from the same camera and the same server.
+     *  \returns                        False if lists are different for certain, true otherwise.
+     */
+    static bool quickCompareEquals(const QnTimePeriodList &left, const QnTimePeriodList &right);
     
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
+
+private:
+    void excludeTimePeriod(const QnTimePeriod &period);
 };
 
 

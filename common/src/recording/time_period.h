@@ -43,9 +43,7 @@ public:
      * \returns                         Whether this is an empty period --- a 
      *                                  period of zero length.
      */
-    bool isEmpty() const {
-        return durationMs == 0;
-    }
+    bool isEmpty() const;
 
     qint64 endTimeMs() const;
 
@@ -58,6 +56,8 @@ public:
      * \returns                         Whether this is a infinite time period. 
      */
     bool isInfinite() const;
+
+    bool isValid() const;
 
     /**
      * \returns                         Infinite duration constant value (-1). 

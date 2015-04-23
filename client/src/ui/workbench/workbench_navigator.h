@@ -9,6 +9,8 @@
 
 #include <client/client_globals.h>
 
+#include <recording/time_period.h>
+
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -147,10 +149,10 @@ protected slots:
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodContent type);
-    void updateSyncedPeriodsQueued();
-    void updateSyncedPeriods();
-    void updateSyncedPeriodsQueued(Qn::TimePeriodContent type);
-    void updateSyncedPeriods(Qn::TimePeriodContent type);
+    void updateSyncedPeriodsQueued(const QnTimePeriod &updatedPeriod = QnTimePeriod());
+    void updateSyncedPeriods(const QnTimePeriod &updatedPeriod = QnTimePeriod());
+    void updateSyncedPeriodsQueued(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod = QnTimePeriod());
+    void updateSyncedPeriods(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod = QnTimePeriod());
     void updateCurrentBookmarks();
     void updateTargetPeriod();
     void updateLines();
@@ -183,7 +185,7 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type);
+    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod);
     void updateLoaderBookmarks(QnCachingCameraDataLoader *loader);
 
     void at_timeSlider_valueChanged(qint64 value);
@@ -252,7 +254,7 @@ private:
 
     QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
     qint64 m_previousSyncPeriodsTime[Qn::TimePeriodContentCount];
-    bool m_queuedToSyncPeriodsLines[Qn::TimePeriodContentCount];
+    QnTimePeriod m_queuedToSyncPeriodsLines[Qn::TimePeriodContentCount];
     
     QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 

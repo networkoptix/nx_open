@@ -98,6 +98,19 @@ QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const
     return result;
 }
 
+QnTimePeriodList QnTimePeriodList::intersectedPeriods(const QnTimePeriod &period) const {
+    QnTimePeriodList result;
+
+    qint64 endTimeMs = period.endTimeMs();
+    auto iter = qUpperBound(cbegin(), cend(), period.startTimeMs);
+    while (iter != cend() && iter->startTimeMs < endTimeMs) {
+        result.push_back(*iter);
+        ++iter;
+    }
+    return result;
+}
+
+
 qint64 QnTimePeriodList::duration() const {
     if(isEmpty())
         return 0;
@@ -278,7 +291,97 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &
     return result;
 }
 
-void QnTimePeriodList::appendTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods) {
+
+void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period) {
+    /* Trim live period. */
+    auto last = cend() - 1;
+    if (last->isInfinite() && period.endTimeMs() >= last->startTimeMs) {
+        QnTimePeriod trimmed(last->startTimeMs, period.startTimeMs - last->startTimeMs);
+        removeLast();
+        if (trimmed.isValid()) {
+            push_back(trimmed);
+            return;
+        }
+    }
+
+    /* Trim old periods. */
+    Q_ASSERT_X(!period.isInfinite(), Q_FUNC_INFO, "We are not supposed to get infinite period here");
+    Q_ASSERT_X(!period.isEmpty(), Q_FUNC_INFO, "We are not supposed to get empty period here");
+
+    qint64 endTimeMs = period.endTimeMs();
+    auto eraseIter = std::lower_bound(begin(), end(), period.startTimeMs);
+    while (eraseIter != end() && eraseIter->startTimeMs < endTimeMs)
+        eraseIter = erase(eraseIter);
+
+}
+
+void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &newPeriods, const QnTimePeriod &updatedPeriod) {
+
+    /* Trivial case */
+    if (basePeriods.isEmpty()) {
+        basePeriods = newPeriods;
+        return;
+    }
+
+    /* Trim data, removed on the server */
+    if (newPeriods.isEmpty() && !basePeriods.isEmpty()) {       
+        basePeriods.excludeTimePeriod(updatedPeriod);
+        return;
+    }
+
+    /* Remove live chunk if we are updating this period */
+    auto last = basePeriods.cend() - 1;
+    if (last->isInfinite() && updatedPeriod.endTimeMs() > last->startTimeMs) {
+
+        /* Trim current live chunk to start time of an updated period. */
+        QnTimePeriod trimmed(last->startTimeMs, updatedPeriod.startTimeMs - last->startTimeMs);
+        basePeriods.removeLast();
+        if (trimmed.isValid())
+            basePeriods.push_back(trimmed);
+    }
+
+    auto appending = newPeriods.cbegin();
+
+    /* Check if some chunks were removed in the beginning. */
+    if (appending->startTimeMs > updatedPeriod.startTimeMs) {
+        QnTimePeriod trimmed(updatedPeriod.startTimeMs, appending->startTimeMs - updatedPeriod.startTimeMs);
+        basePeriods.excludeTimePeriod(trimmed);
+    }
+
+    auto insertIter = std::lower_bound(basePeriods.begin(), basePeriods.end(), appending->startTimeMs);
+
+    while (insertIter != basePeriods.end() && appending != newPeriods.cend() && (*insertIter == *appending)) {
+        ++insertIter;
+        ++appending;
+    }
+
+    if (insertIter != basePeriods.end() && appending != newPeriods.cend()) {
+        qDebug() << "security fallback at" << std::distance(basePeriods.begin(), insertIter) << "appending" << std::distance(newPeriods.begin(), appending);
+        Q_ASSERT_X(insertIter == basePeriods.end(), Q_FUNC_INFO, "invalid function semantics");
+        /* Security fallback */
+        basePeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << basePeriods << newPeriods);
+        return;
+    }
+
+    /* Check if some chunks were removed */
+    if (appending == newPeriods.cend()) {
+        --appending;
+        qint64 lastPeriodEnd = appending->endTimeMs() + 1;
+        QnTimePeriod trimmed(lastPeriodEnd, updatedPeriod.endTimeMs() - lastPeriodEnd);
+        if (trimmed.isValid())
+            basePeriods.excludeTimePeriod(trimmed);
+    } else
+    /* Append updated periods to the end. */
+    {
+        basePeriods.reserve(basePeriods.size() + std::distance(appending, newPeriods.cend()) );
+        while (appending != newPeriods.cend()) {
+            basePeriods.push_back(*appending);
+            ++appending;
+        }
+    }
+}
+
+void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods) {   
     if (appendingPeriods.isEmpty())
         return;
 
@@ -287,24 +390,44 @@ void QnTimePeriodList::appendTimePeriods(QnTimePeriodList& basePeriods, const Qn
         return;
     }
 
-    auto last = basePeriods.cend() - 1;
-    if (last->isInfinite())
-        basePeriods.removeLast();
+    iterator iter = basePeriods.begin();
+    for (const QnTimePeriod& period: appendingPeriods) {
+        iter = qUpperBound(iter, basePeriods.end(), period.startTimeMs);
+        if (iter != basePeriods.begin())
+            --iter;
 
-    auto appending = appendingPeriods.cbegin(); 
-    auto insertIter = std::upper_bound(basePeriods.begin(), basePeriods.end(), appending->startTimeMs);
 
-    while (insertIter != basePeriods.end() && appending != appendingPeriods.cend() && *insertIter == *appending) {
-        ++insertIter;
-        ++appending;
-    }
+        /* Note that there is no need to check for itr != end() here as the container is not empty. */
+        qint64 currentEndTime = iter->endTimeMs();
 
-    Q_ASSERT_X(insertIter == basePeriods.end(), Q_FUNC_INFO, "invalid function semantics");
-    basePeriods.reserve(basePeriods.size() + std::distance(appending, appendingPeriods.cend()) );
-    while (appending != appendingPeriods.cend()) {
-        insertIter = basePeriods.insert(insertIter, *appending);
-        ++appending;
-    }
+        /* Space is empty, just inserting period or prepending to next. */        
+        if (currentEndTime < period.startTimeMs) {
+            ++iter;
+            if (iter != basePeriods.end() && iter->startTimeMs <= period.endTimeMs())
+                iter->addPeriod(period);
+            else
+                iter = basePeriods.insert(iter, period);
+            continue;
+        } 
+
+        /* Prepending before the first chunk. */
+        if (iter->startTimeMs > period.endTimeMs()) {
+            iter = basePeriods.insert(iter, period);
+            continue;
+        }
+
+        /* Periods are overlapped. */    
+        iter->addPeriod(period);
+
+        /* Try to combine with the following */
+        auto next = iter + 1;
+        while (next != basePeriods.end() && next->startTimeMs <= iter->endTimeMs()) {
+            iter->addPeriod(*next);
+            next = basePeriods.erase(next);
+            iter = next - 1;
+        }
+        
+    } 
 }
 
 
@@ -329,6 +452,9 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
 
     int maxSize = std::max_element(nonEmptyPeriods.cbegin(), nonEmptyPeriods.cend(), [](const QnTimePeriodList &l, const QnTimePeriodList &r) {return l.size() < r.size(); })->size();
     result.reserve(maxSize);
+
+    if (maxSize > 10)
+        qDebug() << "starting merge of" << maxSize << "at" << QDateTime::currentDateTime().toString(lit("mm:ss.zzz"));
 
     int minIndex = 0;
     while (minIndex != -1) {
@@ -375,5 +501,19 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
             startIdx++;
         }
     }
+
+    if (maxSize > 10)
+        qDebug() << "merge complete at" << QDateTime::currentDateTime().toString(lit("mm:ss.zzz"));
     return result;
+}
+
+bool QnTimePeriodList::quickCompareEquals(const QnTimePeriodList &left, const QnTimePeriodList &right) {
+    if (left.size() != right.size())
+        return false;
+
+    /* Check if both are empty. */
+    if (left.isEmpty())
+        return true;
+
+    return (left.first() == right.first() && left.last() == right.last());
 }

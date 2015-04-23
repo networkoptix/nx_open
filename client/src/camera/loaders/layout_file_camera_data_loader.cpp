@@ -57,9 +57,8 @@ QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const Qn
 
 int QnLayoutFileCameraDataLoader::loadChunks(const QnTimePeriod &period)
 {
-    Q_UNUSED(period)
     int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-    emit delayedReady(m_data, handle);
+    emit delayedReady(m_data, period, handle);
     return handle;
 }
 
@@ -102,7 +101,7 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const Q
 
 
     int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-    emit delayedReady(result, handle);
+    emit delayedReady(result, period, handle);
     return handle;
 }
 

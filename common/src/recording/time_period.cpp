@@ -70,6 +70,15 @@ bool QnTimePeriod::contains(qint64 timeMs) const
 
 void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
 {
+    if (timePeriod.isNull())
+        return;
+
+    if (isNull()) {
+        startTimeMs = timePeriod.startTimeMs;
+        durationMs = timePeriod.durationMs;
+        return;
+    }
+
     qint64 endPoint1 = startTimeMs + durationMs;
     qint64 endPoint2 = timePeriod.startTimeMs + timePeriod.durationMs;
 
@@ -159,6 +168,14 @@ Qn::TimePeriodType QnTimePeriod::type() const {
 
 qint64 QnTimePeriod::infiniteDuration() {
     return ::infiniteDuration;
+}
+
+bool QnTimePeriod::isEmpty() const {
+    return durationMs == 0;
+}
+
+bool QnTimePeriod::isValid() const {
+    return durationMs > 0;
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {

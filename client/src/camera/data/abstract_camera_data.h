@@ -5,6 +5,7 @@
 
 #include <camera/data/camera_data_fwd.h>
 
+class QnTimePeriod;
 class QnTimePeriodList;
 
 /**
@@ -27,13 +28,13 @@ public:
     virtual bool isEmpty() const = 0;
     
     /**
-     * @brief append                                Append other piece of data.
+     * @brief update                                Append other piece of data.
      * @param other                                 Other data struct.
      */
-    virtual void append(const QnAbstractCameraDataPtr &other) = 0;
+    virtual void update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) = 0;
 
     /**
-     * @brief append                                Append several pieces of data at once.
+     * @brief mergeInto                             Append several pieces of data at once.
      * @param other                                 List of data structs to append.
      */
     virtual void mergeInto(const QList<QnAbstractCameraDataPtr> &other) = 0;

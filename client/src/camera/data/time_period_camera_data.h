@@ -25,7 +25,7 @@ public:
      * @brief append                                Append other set of time periods.
      * @param other                                 Other data struct.
      */
-    virtual void append(const QnAbstractCameraDataPtr &other) override;
+    virtual void update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) override;
 
     /**
      * @brief append                                Append several sets of time periods at once.
@@ -37,7 +37,7 @@ public:
      * @brief append                                Append other set of time periods.
      * @param other                                 Plain list of time periods.
      */
-    void append(const QnTimePeriodList &other);
+    void update(const QnTimePeriodList &other, const QnTimePeriod &updatedPeriod);
 
     /**
      * @brief clear                                 Remove all bookmarks from the struct.

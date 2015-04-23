@@ -74,7 +74,7 @@ int QnFlatCameraDataLoader::load(const QnTimePeriod &targetPeriod, const QString
         /* Must pass the ready signal through the event queue here as
         * the caller doesn't know request handle yet, and therefore 
         * cannot handle the signal. */
-        emit delayedReady(m_loadedData, handle);
+        emit delayedReady(m_loadedData, targetPeriod, handle);
         return handle; 
     }
 
@@ -211,14 +211,7 @@ void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCamera
     }
 
 #ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-    QString debugName = m_connection->url().host();
-    if (!data->dataSource().isEmpty()) {
-        qDebug() << "---------------------------------------------------------------------";
-        qDebug() << debugName << "CHUNK request" << loadingInfo.period;
-        qDebug() << debugName << "CHUNK data" << data->dataSource();
-        if (m_loadedData)
-            qDebug() << debugName << "CHUNK total before" << m_loadedData->dataSource(); 
-    }
+    qDebug() << "QnFlatCameraDataLoader::" << "loaded data for" << loadingInfo.period;
 #endif
 
     if (!m_loadedPeriod.contains(loadingInfo.period) && data) {
@@ -226,22 +219,18 @@ void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCamera
             m_loadedData = data;
         }
         else if (!data->isEmpty()) {
-            m_loadedData->append(data);
+            m_loadedData->update(data, loadingInfo.period);
         }
-        /* Check if already recorded period was deleted on the server. */
-        else if (m_loadedData && data->isEmpty()) {
-            m_loadedData->trim(loadingInfo.period.startTimeMs);
-        }
+        updateLoadedPeriod(loadingInfo.period);
 
 #ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-        qDebug() << debugName << "CHUNK total after" << m_loadedData->dataSource(); 
+        qDebug() << "QnFlatCameraDataLoader::" << "loaded period updated to" << m_loadedPeriod;
 #endif
-        updateLoadedPeriod(loadingInfo.period);
     }
 
     foreach(int handle, loadingInfo.waitingHandles)
-        emit ready(m_loadedData, handle);
-    emit ready(m_loadedData, requestHandle);
+        emit ready(m_loadedData, loadingInfo.period, handle);
+    emit ready(m_loadedData, loadingInfo.period, requestHandle);
 }
 
 

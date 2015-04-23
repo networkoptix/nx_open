@@ -45,10 +45,11 @@ signals:
     /**
      * This signal is emitted whenever motion periods were successfully loaded.
      *
-     * \param timePeriods               Loaded motion periods.
+     * \param data                      Full data loaded.
+     * \param updatedPeriod             Source time period for the updated piece of data.
      * \param handle                    Request handle.
      */
-    void ready(const QnAbstractCameraDataPtr &data, int handle);
+    void ready(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle);
 
     /**
      * This signal is emitted whenever the reader was unable to load motion periods.
@@ -65,7 +66,7 @@ protected:
     const Qn::CameraDataType m_dataType;
 
 signals:
-    void delayedReady(const QnAbstractCameraDataPtr &data, int handle);
+    void delayedReady(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle);
 };
 
 #endif // __QN_ABSTRACT_CAMERA_DATA_LOADER_H__

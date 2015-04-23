@@ -26,7 +26,7 @@ public:
      * @brief append                                Append other set of bookmarks.
      * @param other                                 Other data struct, must be instance of QnBookmarkCameraData.
      */
-    virtual void append(const QnAbstractCameraDataPtr &other) override;
+    virtual void update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) override;
 
     /**
      * @brief append                                Append several sets of bookmarks at once.
