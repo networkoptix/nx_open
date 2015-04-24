@@ -532,6 +532,7 @@ namespace ec2
         bool updateCameraHistoryGuids();
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
+        bool fixBusinessRules();
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
@@ -558,6 +559,7 @@ namespace ec2
         bool m_dbJustCreated;
         bool m_isBackupRestore;
         bool m_needResyncLayout;
+        bool m_needResyncbRules;
     };
 };
 

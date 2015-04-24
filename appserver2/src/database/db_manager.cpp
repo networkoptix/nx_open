@@ -275,7 +275,8 @@ QnDbManager::QnDbManager()
     m_needResyncCameraUserAttributes(false),
     m_dbJustCreated(false),
     m_isBackupRestore(false),
-    m_needResyncLayout(false)
+    m_needResyncLayout(false),
+    m_needResyncbRules(false)
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
@@ -564,6 +565,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         }
         if (m_needResyncLayout) {
             if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
+                return false;
+        }
+        if (m_needResyncbRules) {
+            if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
                 return false;
         }
     }
@@ -1213,6 +1218,41 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
     return true;
 }
 
+bool QnDbManager::fixBusinessRules()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log"));
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
+
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
+
+    while (query.next()) {
+        QnAbstractTransaction abstractTran;
+        QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
+        QByteArray srcData = query.value(1).toByteArray();
+        QnUbjsonReader<QByteArray> stream(&srcData);
+        if (!QnUbjson::deserialize(&stream, &abstractTran)) {
+            qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
+            return false;
+        }
+        if (abstractTran.command == ApiCommand::resetBusinessRules || abstractTran.command == ApiCommand::saveBusinessRule)
+        {
+            delQuery.addBindValue(QnSql::serialized_field(tranGuid));
+            if (!delQuery.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return false;
+            }
+        }
+    }
+    m_needResyncbRules = true;
+    return true;
+}
+
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/07_videowall.sql")) 
@@ -1254,6 +1294,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/35_fix_onvif_mt.sql")) {
         return removeWrongSupportedMotionTypeForONVIF();
+    }
+    else if (updateName == lit(":/updates/36_fix_brules.sql")) {
+        return fixBusinessRules();
     }
 
     return true;
