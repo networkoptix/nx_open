@@ -17,29 +17,30 @@
 #ifdef QN_PERIODS_HIGHLOAD_TEST
 namespace {
 
-    /* Two years of chunks. */
-    qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 365 * 2;
+    /* 1.5 years of chunks. */
+    qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 547;
 
-    /* One minute each. */
+    /* 60 seconds each. */
     qint64 chunkLengthMs = 1000ll * 60;
 
     /* 5 seconds spacing. */
     qint64 chunkSpaceMs = 1000ll * 5;
 
-    QnTimePeriodList generateAlotOfPeriods(qint64 startTimeMs, const QnTimePeriodList &basePeriods, int offset) {
-        qint64 baseStartTimeMs = basePeriods.isEmpty() ? QDateTime::currentMSecsSinceEpoch() : basePeriods.last().startTimeMs;
+    /* Align chunks. */
+    qint64 startAlignMs = chunkLengthMs + chunkSpaceMs;
+
+    QnTimePeriodList generateAlotOfPeriods(qint64 startTimeMs, int offset) {
+        qint64 baseStartTimeMs = QDateTime::currentMSecsSinceEpoch();
 
         QnTimePeriodList result;
         qint64 start = startTimeMs > 0 ? startTimeMs : baseStartTimeMs - totalLengthMs;
         // align to make sure results will be the same for different requests
-        start = start - (start % 10000) + offset;
+        start = start - (start % startAlignMs) + offset;
 
         while (start + chunkLengthMs < baseStartTimeMs) {
             result.push_back(QnTimePeriod(start, chunkLengthMs));
             start += (chunkLengthMs + chunkSpaceMs);
         }
-        for (const QnTimePeriod &period: basePeriods)
-            result.push_back(period);
         return result;
     }
 
@@ -176,9 +177,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             int offset = 0;
             for (char c: resourceId)
                 offset += c;
-            periods = generateAlotOfPeriods(startTime, periods, offset);
-            if (!periods.isEmpty())
-                qDebug() << now() << "result periods starts from" << dt(periods.first().startTimeMs);
+            periods = generateAlotOfPeriods(startTime, offset);
 #endif
         }
         break;
