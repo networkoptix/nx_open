@@ -4,6 +4,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
+#include <array>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
@@ -32,6 +34,7 @@ class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 class QnSearchLineEdit;
+class QnThreadedChunksMergeTool;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -149,10 +152,14 @@ protected slots:
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodContent type);
+
+    /** Clean synced line. */
     void resetSyncedPeriods();
+
+    /** Update synced line. Empty period means the whole line. Infinite period is not allowed. */
     void updateSyncedPeriods(const QnTimePeriod &updatedPeriod);
-    void updateSyncedPeriods(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod);
-    void updateSyncedPeriodsInternal(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod);
+    void updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, const QnTimePeriod &updatedPeriod);
+
     void updateCurrentBookmarks();
     void updateTargetPeriod();
     void updateLines();
@@ -252,14 +259,14 @@ private:
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
-    QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
-    qint64 m_previousSyncPeriodsTime[Qn::TimePeriodContentCount];
-    QnTimePeriod m_queuedToSyncPeriodsLines[Qn::TimePeriodContentCount];
-    
+    QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;   
     QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
     QnCameraBookmarkTags m_bookmarkTags;
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
+
+    int m_chunkMergingProcessHandle;
+    std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);
