@@ -68,6 +68,12 @@ public:
      */
     qint64 duration() const;
 
+    /**
+     * \returns                         Bounding period for this period list.
+     * \param truncateInfinite          Whether the infinite period should be truncated to fixed value.
+     */
+    QnTimePeriod boundingPeriod(qint64 truncateInfinite = QnTimePeriod::infiniteDuration()) const;
+
     inline QnTimePeriodListTimeIterator timeBegin() const;
     inline QnTimePeriodListTimeIterator timeEnd() const;
 

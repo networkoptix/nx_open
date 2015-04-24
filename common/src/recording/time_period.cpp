@@ -175,7 +175,7 @@ bool QnTimePeriod::isEmpty() const {
 }
 
 bool QnTimePeriod::isValid() const {
-    return durationMs > 0;
+    return durationMs == ::infiniteDuration || durationMs > 0;
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {

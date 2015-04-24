@@ -149,10 +149,10 @@ protected slots:
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodContent type);
-    void updateSyncedPeriodsQueued(const QnTimePeriod &updatedPeriod = QnTimePeriod());
-    void updateSyncedPeriods(const QnTimePeriod &updatedPeriod = QnTimePeriod());
-    void updateSyncedPeriodsQueued(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod = QnTimePeriod());
-    void updateSyncedPeriods(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod = QnTimePeriod());
+    void resetSyncedPeriods();
+    void updateSyncedPeriods(const QnTimePeriod &updatedPeriod);
+    void updateSyncedPeriods(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod);
+    void updateSyncedPeriodsInternal(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod);
     void updateCurrentBookmarks();
     void updateTargetPeriod();
     void updateLines();

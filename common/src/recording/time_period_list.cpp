@@ -124,6 +124,24 @@ qint64 QnTimePeriodList::duration() const {
     return result;
 }
 
+QnTimePeriod QnTimePeriodList::boundingPeriod(qint64 truncateInfinite /*= QnTimePeriod::infiniteDuration()*/) const {
+    if (isEmpty())
+        return QnTimePeriod();
+
+    QnTimePeriod result(first());
+    if (last().isInfinite()) {
+        if (truncateInfinite == QnTimePeriod::infiniteDuration())
+            result.durationMs = QnTimePeriod::infiniteDuration();
+        else {
+            result.durationMs = std::max(0ll, truncateInfinite - result.startTimeMs);
+        }
+    } else {
+        result.durationMs = std::max(0ll, last().endTimeMs() - result.startTimeMs);
+    }
+    if (!result.isValid())
+        return QnTimePeriod();
+    return result;
+}
 
 void saveField(QByteArray &stream, qint64 field, quint8 header, int dataLen)
 {
@@ -296,7 +314,7 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period) {
     /* Trim live period. */
     auto last = cend() - 1;
     if (last->isInfinite() && period.endTimeMs() >= last->startTimeMs) {
-        QnTimePeriod trimmed(last->startTimeMs, period.startTimeMs - last->startTimeMs);
+        QnTimePeriod trimmed(last->startTimeMs, std::max(0ll, period.startTimeMs - last->startTimeMs));
         removeLast();
         if (trimmed.isValid()) {
             push_back(trimmed);
@@ -334,7 +352,7 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
     if (last->isInfinite() && updatedPeriod.endTimeMs() > last->startTimeMs) {
 
         /* Trim current live chunk to start time of an updated period. */
-        QnTimePeriod trimmed(last->startTimeMs, updatedPeriod.startTimeMs - last->startTimeMs);
+        QnTimePeriod trimmed(last->startTimeMs, std::max(0ll, updatedPeriod.startTimeMs - last->startTimeMs));
         basePeriods.removeLast();
         if (trimmed.isValid())
             basePeriods.push_back(trimmed);
@@ -344,7 +362,7 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
 
     /* Check if some chunks were removed in the beginning. */
     if (appending->startTimeMs > updatedPeriod.startTimeMs) {
-        QnTimePeriod trimmed(updatedPeriod.startTimeMs, appending->startTimeMs - updatedPeriod.startTimeMs);
+        QnTimePeriod trimmed(updatedPeriod.startTimeMs, std::max(0ll, appending->startTimeMs - updatedPeriod.startTimeMs));
         basePeriods.excludeTimePeriod(trimmed);
     }
 
@@ -359,7 +377,7 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
         qDebug() << "security fallback at" << std::distance(basePeriods.begin(), insertIter) << "appending" << std::distance(newPeriods.begin(), appending);
         Q_ASSERT_X(insertIter == basePeriods.end(), Q_FUNC_INFO, "invalid function semantics");
         /* Security fallback */
-        basePeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << basePeriods << newPeriods);
+        QnTimePeriodList::unionTimePeriods(basePeriods, newPeriods);
         return;
     }
 
@@ -367,7 +385,7 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
     if (appending == newPeriods.cend()) {
         --appending;
         qint64 lastPeriodEnd = appending->endTimeMs() + 1;
-        QnTimePeriod trimmed(lastPeriodEnd, updatedPeriod.endTimeMs() - lastPeriodEnd);
+        QnTimePeriod trimmed(lastPeriodEnd, std::max(0ll, updatedPeriod.endTimeMs() - lastPeriodEnd));
         if (trimmed.isValid())
             basePeriods.excludeTimePeriod(trimmed);
     } else

@@ -35,6 +35,8 @@ static const int MAX_RTP_BUFFER_SIZE = 65535;
 
 static const int REOPEN_TIMEOUT = 1000;
 
+#define QN_PERIODS_HIGHLOAD_TEST
+
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader):
     QnAbstractArchiveDelegate(),
     m_rtpData(0),
@@ -322,8 +324,6 @@ void QnRtspClientArchiveDelegate::close()
     m_frameCnt = 0;
     m_parsers.clear();
 }
-
-#define QN_PERIODS_HIGHLOAD_TEST
 
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
