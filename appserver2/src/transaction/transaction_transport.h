@@ -18,6 +18,7 @@
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/network/http/httpstreamreader.h"
+#include "utils/network/http/http_message_stream_parser.h"
 #include "utils/network/http/multipart_content_parser.h"
 #include "utils/common/id.h"
 
@@ -164,6 +165,7 @@ public:
     void transactionProcessed();
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
+
 private:
     struct DataToSend
     {
@@ -172,6 +174,12 @@ private:
 
         DataToSend() {}
         DataToSend( QByteArray&& _sourceData ) : sourceData( std::move(_sourceData) ) {}
+    };
+
+    enum ConnectionType
+    {
+        incoming,
+        outgoing
     };
 
     ApiPeerData m_localPeer;
@@ -217,6 +225,8 @@ private:
     bool m_incomingTunnelOpened;
     nx_http::HttpStreamReader m_httpStreamReader;
     nx_http::MultipartContentParser m_contentParser;
+    nx_http::HttpMessageStreamParser m_incomingTransactionsRequestsParser;
+    ConnectionType m_connectionType;
 
 private:
     void sendHttpKeepAlive();

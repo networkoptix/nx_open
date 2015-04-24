@@ -55,6 +55,9 @@ namespace nx_http
             const BufferType& data,
             size_t count = nx_http::BufferNpos,
             size_t* bytesProcessed = NULL );
+        bool parseBytes(
+            const QnByteArrayConstRef& data,
+            size_t* bytesProcessed = NULL );
         /*!
             \return Actual only after state changed from \a readingMessageHeaders to \a waitingMessageStart or \a readingMessageBody
         */

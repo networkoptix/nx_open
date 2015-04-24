@@ -10,6 +10,7 @@
 
 #include "transaction_message_bus.h"
 #include "utils/common/log.h"
+#include "utils/common/util.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
 #include <transaction/chunked_transfer_encoder.h>
@@ -23,14 +24,14 @@
 #include "http/custom_headers.h"
 #include "version.h"
 
+#define SEND_EACH_TRANSACTION_AS_POST_REQUEST
+
 
 /*!
     Real transaction posted to the QnTransactionMessageBus can be greater 
     (all transactions that read with single read from socket)
 */
 static const int MAX_TRANS_TO_POST_AT_A_TIME = 16;
-
-//#define SEND_4BYTE_TRANSACTION_SIZE
 
 namespace ec2
 {
@@ -67,7 +68,8 @@ QnTransactionTransport::QnTransactionTransport(
     m_asyncReadScheduled(false),
     m_remoteIdentityTime(0),
     m_incomingConnection(socket),
-    m_incomingTunnelOpened(false)
+    m_incomingTunnelOpened(false),
+    m_connectionType(incoming)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
@@ -78,7 +80,12 @@ QnTransactionTransport::QnTransactionTransport(
         &QnTransactionTransport::receivedTransaction,
         this,
         std::placeholders::_1 );
-    m_contentParser.setNextFilter( std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(std::move(processTranFunc)) );
+    m_contentParser.setNextFilter(
+        std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
+#ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
+    m_incomingTransactionsRequestsParser.setNextFilter(
+        std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
+#endif
 }
 
 
@@ -276,6 +283,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::doOutgoingConnect. remoteAddr = %1").arg(remoteAddr.toString()), cl_logDEBUG2 );
 
     setState(ConnectingStage1);
+
     m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     m_httpClient->setDecodeChunkedMessageBody( false ); //chunked decoding is done in this class
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
@@ -332,7 +340,6 @@ bool QnTransactionTransport::tryAcquireConnecting(const QnUuid& remoteGuid, bool
     }
     return !fail;
 }
-
 
 void QnTransactionTransport::connectingCanceled(const QnUuid& remoteGuid, bool isOriginator)
 {
@@ -412,6 +419,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 
     assert( m_state == ReadyForStreaming );
 
+#ifndef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     //if incoming connection then expecting POST request to open incoming tunnel
     if( m_incomingConnection && !m_incomingTunnelOpened )
     {
@@ -428,9 +436,18 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
             return;
         }
     }
+#endif
 
     //parsing and processing input data
-    m_contentParser.processData( m_readBuffer );
+#ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
+    if( m_connectionType == outgoing )
+#endif
+        m_contentParser.processData( m_readBuffer );
+#ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
+    else    //m_connectionType == incoming
+        m_incomingTransactionsRequestsParser.processData( m_readBuffer );
+#endif
+
     m_readBuffer.resize(0);
 
     if( m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME )
@@ -443,17 +460,19 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tranDataWithHeader )
 {
     //calling processChunkExtensions
-    processChunkExtensions( m_contentParser.prevFrameHeaders() );
+#ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
+    if( m_connectionType == outgoing )
+#endif
+        processChunkExtensions( m_contentParser.prevFrameHeaders() );
+#ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
+    else    //m_connectionType == incoming
+        processChunkExtensions( m_incomingTransactionsRequestsParser.currentMessage().headers() );
+#endif
 
     if( tranDataWithHeader.isEmpty() )
         return; //it happens in case of keep-alive message
 
-#ifdef SEND_4BYTE_TRANSACTION_SIZE
-    //skipping transaction size
-    const QnByteArrayConstRef& tranData = tranDataWithHeader.mid( sizeof(uint32_t) );
-#else
     const QnByteArrayConstRef& tranData = tranDataWithHeader;
-#endif
 
     QByteArray serializedTran;
     QnTransactionTransportHeader transportHeader;
@@ -522,28 +541,43 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     DataToSend& dataCtx = m_dataToSend.front();
     if( dataCtx.encodedSourceData.isEmpty() )
     {
-#ifdef SEND_4BYTE_TRANSACTION_SIZE
-        const uint32_t tranSize = htonl(dataCtx.sourceData.size());
+#ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
+        if( m_connectionType == incoming )
+        {
 #endif
+            nx_http::HttpHeaders headers;
+            headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
+            headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
+            addHttpChunkExtensions( &headers );
 
-        nx_http::HttpHeaders headers;
-        headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
-        headers.emplace( "Content-Length",
-            nx_http::BufferType::number((int)(dataCtx.sourceData.size()
-#ifdef SEND_4BYTE_TRANSACTION_SIZE
-            + sizeof(tranSize)
+            dataCtx.encodedSourceData.clear();
+            dataCtx.encodedSourceData += QByteArray("--")+TUNNEL_MULTIPART_BOUNDARY+"\r\n"; //TODO #ak move to some variable
+            nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
+            dataCtx.encodedSourceData += "\r\n";
+            dataCtx.encodedSourceData += dataCtx.sourceData;
+#ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
+        }
+        else    //m_connectionType == outgoing
+        {
+            nx_http::Request request;
+            request.requestLine.method = nx_http::Method::POST;
+            request.requestLine.url = 
+                m_remoteAddr.path() + 
+                (m_remoteAddr.hasQuery() ? (lit("?") + m_remoteAddr.query()) : QString());
+            request.requestLine.version = nx_http::http_1_1;
+            request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
+            request.headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
+            request.headers.emplace( "Host", m_remoteAddr.host().toLatin1() );
+            request.headers.emplace( "Pragma", "no-cache" );
+            request.headers.emplace( "Cache-Control", "no-cache" );
+            request.headers.emplace( "Connection", "keep-alive" );
+            request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
+            addHttpChunkExtensions( &request.headers );
+            request.headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
+            request.messageBody = dataCtx.sourceData;
+            dataCtx.encodedSourceData = request.serialized();
+        }
 #endif
-            )) );
-        addHttpChunkExtensions( &headers );
-
-        dataCtx.encodedSourceData.clear();
-        dataCtx.encodedSourceData += QByteArray("--")+TUNNEL_MULTIPART_BOUNDARY+"\r\n"; //TODO #ak move to some variable
-        nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
-        dataCtx.encodedSourceData += "\r\n";
-#ifdef SEND_4BYTE_TRANSACTION_SIZE
-        dataCtx.encodedSourceData += QByteArray::fromRawData( reinterpret_cast<const char*>(&tranSize), sizeof(tranSize) );
-#endif
-        dataCtx.encodedSourceData += dataCtx.sourceData;
     }
     using namespace std::placeholders;
     assert( !dataCtx.encodedSourceData.isEmpty() );
@@ -683,6 +717,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
             setExtraDataBuffer(data);
 
+#ifndef SEND_EACH_TRANSACTION_AS_POST_REQUEST
             //opening forward tunnel: sending POST with infinite body
             nx_http::Request request;
             request.requestLine.method = nx_http::Method::POST;
@@ -692,9 +727,21 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             request.requestLine.version = nx_http::http_1_1;
             request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             request.headers.emplace( "Content-Type", TUNNEL_CONTENT_TYPE );
-            request.headers.emplace( "Host", request.requestLine.url.host().toLatin1() );
+            request.headers.emplace( "Host", client->url().host().toLatin1() );
+            request.headers.emplace( "Pragma", "no-cache" );
+            request.headers.emplace( "Cache-Control", "no-cache" );
+            //The chosen Content-Length of 3276701 is an arbitrarily large value. 
+            //    All POST requests are required to have a content length header by HTTP. 
+            //    In practice the actual value seems to be ignored by
+            //    proxy servers, so it is possible to send more than this amount of data in the form
+            //    of RTSP requests. The QuickTime Server ignores the content-length header
+            //request.headers.emplace( "Content-Length", "3276701" );
+            request.headers.emplace( "Connection", "keep-alive" );
+            request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
             addEncodedData( request.serialized() );
+#endif
 
+            m_connectionType = outgoing;
             setState(QnTransactionTransport::Connected);
         }
         else {
