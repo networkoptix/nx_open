@@ -2610,7 +2610,7 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
         result = removeVideowall(apiObject.id);
         break;
     case ApiObject_Resource:
-        result = removeObject(ApiObjectInfo(getObjectType(apiObject.id), apiObject.id));
+        result = removeObject(ApiObjectInfo(getObjectTypeNoLock(apiObject.id), apiObject.id));
         break;
     case ApiCommand::NotDefined:
         result = ErrorCode::ok; // object already removed
