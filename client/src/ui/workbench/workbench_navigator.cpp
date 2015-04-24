@@ -1113,8 +1113,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(const QnTimePeriod &updatedPeriod
 
 void QnWorkbenchNavigator::updateSyncedPeriodsQueued(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod) {
     /* Make merge for sync line only once a period. */
-    qint64 curTime = QDateTime::currentMSecsSinceEpoch();
-    qint64 timeSpan = curTime - m_previousSyncPeriodsTime[type];
+    qint64 timeSpan = QDateTime::currentMSecsSinceEpoch() - m_previousSyncPeriodsTime[type];
     if (   m_previousSyncPeriodsTime[type] == 0 
         || timeSpan > syncPeriodsIntervalMs 
         || m_timeSlider->timePeriods(SyncedLine, type).isEmpty()
@@ -1122,7 +1121,8 @@ void QnWorkbenchNavigator::updateSyncedPeriodsQueued(Qn::TimePeriodContent type,
         updateSyncedPeriods(type, updatedPeriod);
     else
         m_queuedToSyncPeriodsLines[type].addPeriod(updatedPeriod);
-    m_previousSyncPeriodsTime[type] = curTime;
+    /* Update time, including time for the merge */
+    m_previousSyncPeriodsTime[type] = QDateTime::currentMSecsSinceEpoch();
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod) {
