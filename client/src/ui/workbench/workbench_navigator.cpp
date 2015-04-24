@@ -543,15 +543,12 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     m_syncedResources.erase(m_syncedResources.find(widget->resource()->toResourcePtr()));
     m_motionIgnoreWidgets.remove(widget);
 
-    QnTimePeriod widgetPeriod;
-    if(QnCachingCameraDataLoader *loader = this->loader(widget->resource()->toResourcePtr())) {
-        widgetPeriod = loader->periods(Qn::RecordingContent).boundingPeriod(qnSyncTime->currentMSecsSinceEpoch());
+    if(QnCachingCameraDataLoader *loader = this->loader(widget->resource()->toResourcePtr()))
         loader->setMotionRegions(QList<QRegion>());
-    }
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
-        updateSyncedPeriods(widgetPeriod);
+        updateSyncedPeriods(QnTimePeriod()); /* Full rebuild on widget removing. */
 }
 
 QnResourceWidget *QnWorkbenchNavigator::currentWidget() const {

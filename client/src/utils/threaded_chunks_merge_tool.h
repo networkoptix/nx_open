@@ -25,5 +25,7 @@ private:
     QnTimePeriodList m_syncedPeriods;
     QnTimePeriod m_updatedPeriod;
     int m_handle;
+    bool m_queuedData;
+
     QMutex m_mutex;
 };
