@@ -18,7 +18,7 @@
 #include "qjsonobject.h"
 #include "mustache/mustache.h"
 
-#define QN_NO_LICENSE_CHECK
+//#define QN_NO_LICENSE_CHECK
 
 namespace {
 
