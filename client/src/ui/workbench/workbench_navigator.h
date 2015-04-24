@@ -157,8 +157,8 @@ protected slots:
     void resetSyncedPeriods();
 
     /** Update synced line. Empty period means the whole line. Infinite period is not allowed. */
-    void updateSyncedPeriods(const QnTimePeriod &updatedPeriod);
-    void updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, const QnTimePeriod &updatedPeriod);
+    void updateSyncedPeriods(const QnTimePeriod &updatedPeriod = QnTimePeriod());
+    void updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, const QnTimePeriod &updatedPeriod = QnTimePeriod());
 
     void updateCurrentBookmarks();
     void updateTargetPeriod();

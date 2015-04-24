@@ -377,7 +377,7 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
         /* We are receiving live chunk even if it starts after updatedPeriod end o_O */ 
         if (!appending->isInfinite()) {
             qDebug() << "security fallback at" << std::distance(basePeriods.begin(), insertIter) << "appending" << std::distance(newPeriods.begin(), appending);
-            Q_ASSERT_X(insertIter == basePeriods.end(), Q_FUNC_INFO, "invalid function semantics");
+            //Q_ASSERT_X(insertIter == basePeriods.end(), Q_FUNC_INFO, "invalid function semantics");
         }
         /* Security fallback */
         QnTimePeriodList::unionTimePeriods(basePeriods, newPeriods);

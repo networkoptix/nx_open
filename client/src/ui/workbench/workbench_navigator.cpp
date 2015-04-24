@@ -144,7 +144,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
     connect(workbench(), &QnWorkbench::layoutChangeProcessFinished, this, [this] {
         resetSyncedPeriods();
-        updateSyncedPeriods(QnTimePeriod()); 
+        updateSyncedPeriods(); 
     });
 }
     
@@ -518,13 +518,9 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
 
     connect(widget->resource()->toResource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    QnTimePeriod widgetPeriod;
-    if(QnCachingCameraDataLoader *loader = this->loader(widget->resource()->toResourcePtr()))
-        widgetPeriod = loader->periods(Qn::RecordingContent).boundingPeriod(qnSyncTime->currentMSecsSinceEpoch());
-
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
-        updateSyncedPeriods(widgetPeriod);
+        updateSyncedPeriods();
 }
 
 void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
@@ -548,7 +544,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
-        updateSyncedPeriods(QnTimePeriod()); /* Full rebuild on widget removing. */
+        updateSyncedPeriods(); /* Full rebuild on widget removing. */
 }
 
 QnResourceWidget *QnWorkbenchNavigator::currentWidget() const {
@@ -1629,11 +1625,7 @@ void QnWorkbenchNavigator::at_widget_optionsChanged(QnResourceWidget *widget) {
     int newSize = m_motionIgnoreWidgets.size();
 
     if(oldSize != newSize) {
-        QnTimePeriod widgetPeriod(0, qnSyncTime->currentMSecsSinceEpoch());
-        if(QnCachingCameraDataLoader *loader = this->loader(widget->resource()))
-            widgetPeriod = loader->periods(Qn::RecordingContent).boundingPeriod(qnSyncTime->currentMSecsSinceEpoch());
-
-        updateSyncedPeriods(Qn::MotionContent, widgetPeriod);
+        updateSyncedPeriods(Qn::MotionContent);
 
         if(widget == m_currentWidget)
             updateCurrentPeriods(Qn::MotionContent);
