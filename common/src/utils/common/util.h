@@ -114,9 +114,9 @@ QString debugTime(qint64 timeMSec, const QString &fmt = QString());
 #endif
 
 /**
- * Convert QDateTime to HTTP header date format
+ * Convert QDateTime to HTTP header date format (rfc822#section-5)
  */
-QString dateTimeToHTTPFormat(const QDateTime& value);
+QByteArray dateTimeToHTTPFormat(const QDateTime& value);
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H
