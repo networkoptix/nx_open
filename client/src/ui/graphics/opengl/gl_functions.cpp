@@ -111,8 +111,11 @@ public:
 #ifdef Q_OS_MACX
         /* Intel HD 3000 driver handles textures with size > 4096 incorrectly (see bug #3141).
          * To fix that we have to override maximum texture size to 4096 for this graphics adapter. */
-        if (vendor.contains(lit("Intel")) && QRegExp(lit(".*Intel.+3000.*")).exactMatch(m_openGLInfo.renderer))
+        if (m_openGLInfo.vendor.contains(lit("Intel")) && 
+            QRegExp(lit(".*Intel.+3000.*")).exactMatch(m_openGLInfo.renderer))
+        {
             qn_glFunctionsGlobal()->overrideMaxTextureSize(4096);
+        }
 #endif
 
         

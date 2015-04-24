@@ -85,7 +85,7 @@ const QString& compileCpuArchicture()
     HardwareInformation::HardwareInformation()
     {
         int mibMem[2] = { CTL_HW, HW_MEMSIZE };
-        size_t length = sizeof(int64);
+        size_t length = sizeof(phisicalMemory);
         if (sysctl(mibMem, 2, &phisicalMemory, &length, NULL, 0) == -1)
             phisicalMemory = 0;
 
@@ -93,7 +93,7 @@ const QString& compileCpuArchicture()
 
         char buffer[512];
         size_t size = sizeof(buffer);
-        if (sysctlbyname("machdep.cpu.brand_string", &bufer, &size, NULL, 0) != -1)
+        if (sysctlbyname("machdep.cpu.brand_string", &buffer, &size, NULL, 0) != -1)
             cpuModelName = QString::fromLatin1(buffer);
     }
 
