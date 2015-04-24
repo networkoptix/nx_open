@@ -59,7 +59,7 @@ extern "C"
 #include "redass/redass_controller.h"
 
 namespace {
-    const int syncPeriodsIntervalMs = 10 * 1000;
+    const int syncPeriodsIntervalMs = 5 * 1000;
 
     const int discardCacheIntervalMs = 10 * 60 * 1000;
 }

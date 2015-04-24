@@ -12,7 +12,7 @@
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
 
-#define QN_PERIODS_HIGHLOAD_TEST
+//#define QN_PERIODS_HIGHLOAD_TEST
 
 #ifdef QN_PERIODS_HIGHLOAD_TEST
 namespace {
