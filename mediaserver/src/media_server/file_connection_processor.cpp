@@ -146,6 +146,6 @@ void QnFileConnectionProcessor::run()
         }
 #endif
     }
-    d->response.headers.insert(nx_http::HttpHeader("Last-Modified", dateTimeToHTTPFormat(lastModified).toUtf8()));
+    d->response.headers.insert(nx_http::HttpHeader("Last-Modified", dateTimeToHTTPFormat(lastModified)));
     sendResponse(rez, contentType, contentEncoding, false);
 }
