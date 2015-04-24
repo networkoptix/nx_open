@@ -3,11 +3,15 @@
 #include <QtCore/QTime>
 
 #include <utils/common/log.h>
+#include <utils/common/util.h>
 #include <utils/network/http/httptypes.h>
 
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
 #include "err.h"
+
+#include "version.h"
+
 
 #ifndef Q_OS_WIN
 #   include <netinet/tcp.h>
@@ -195,8 +199,15 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     d->response.statusLine.statusCode = httpStatusCode;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
 
+    nx_http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx_http::HttpHeader("User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION) );
+    nx_http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
+
     // this header required to perform new HTTP requests if server port has been on the fly changed
-    nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) ); 
+    nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) );
 
     if (d->chunkedMode)
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );

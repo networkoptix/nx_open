@@ -18,15 +18,15 @@
     <version>2.3.0-SNAPSHOT</version>
     <artifactId>mjpg_link</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness HTTP Stream Plugin</name>	
+    <name>HD Witness HTTP Stream Plugin</name>  
 
     <properties>
-        <product.title>${project.name}</product.title>	
+        <product.title>${project.name}</product.title>  
         <!--Global libs-->
         <qt.libs>core</qt.libs>
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib common.lib -lssleay32 -llibeay32</windows.oslibs>
+        <windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib Winmm.lib common.lib -lssleay32 -llibeay32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>        
         <!--Global defines-->
