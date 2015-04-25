@@ -24,7 +24,7 @@ static const int CHECK_HELLO_RETRY_COUNT = 50;
 //extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 //extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
-QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString(QLatin1String("127.0.0.1"));
+QString OnvifResourceSearcherWsdd::LOCAL_ADDR(QLatin1String("127.0.0.1"));
 const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.org/name/";
 const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
 const char OnvifResourceSearcherWsdd::SCOPES_LOCATION_PREFIX[] = "onvif://www.onvif.org/location/";

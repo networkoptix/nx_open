@@ -261,8 +261,8 @@ QString DWCameraSetting::getIntStrAsCurrent(const QString& numStr) const
 // class DWCameraSettingReader
 //
 
-const QString& DWCameraSettingReader::IMAGING_GROUP_NAME = *(new QString(QLatin1String("%%Imaging")));
-const QString& DWCameraSettingReader::MAINTENANCE_GROUP_NAME = *(new QString(QLatin1String("%%Maintenance")));
+const QString DWCameraSettingReader::IMAGING_GROUP_NAME(QString(QLatin1String("%%Imaging")));
+const QString DWCameraSettingReader::MAINTENANCE_GROUP_NAME(QString(QLatin1String("%%Maintenance")));
 
 DWCameraSettingReader::DWCameraSettingReader(DWCameraSettings& settings, const QString& cameraSettingId):
     CameraSettingReader(cameraSettingId),

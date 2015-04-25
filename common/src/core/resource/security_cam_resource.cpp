@@ -70,7 +70,11 @@ QnSecurityCamResource::QnSecurityCamResource():
         Qt::DirectConnection);
     connect(
         this, &QnResource::resourceChanged,
-        this, &QnSecurityCamResource::atResourceChanged,
+        this, &QnSecurityCamResource::updateCachedValues,
+        Qt::DirectConnection);
+    connect(
+        this, &QnResource::propertyChanged,
+        this, &QnSecurityCamResource::updateCachedValues,
         Qt::DirectConnection);
     connect(
         this, &QnSecurityCamResource::motionRegionChanged,
@@ -852,7 +856,7 @@ Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const {
     return result;
 }
 
-void QnSecurityCamResource::atResourceChanged()
+void QnSecurityCamResource::updateCachedValues()
 {
     //resetting cached values
     m_cachedHasDualStreaming2.update();
