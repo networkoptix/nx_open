@@ -59,7 +59,7 @@ void QnThreadedChunksMergeTool::processData() {
     const auto magicCoeff = 0.5;
 
     if (updatedPeriod.isNull() || relativeDuration > magicCoeff) {
-        QnTimePeriodList result = QnTimePeriodList::mergeTimePeriods(periodsList);
+        auto result = QnTimePeriodList::mergeTimePeriods(periodsList);
         emit finished(handle, result);
     } else {
         auto result = syncedPeriods;
@@ -71,12 +71,12 @@ void QnThreadedChunksMergeTool::processData() {
         auto syncedAppending = QnTimePeriodList::mergeTimePeriods(intersectedPeriods);
         QnTimePeriodList::unionTimePeriods(result, syncedAppending);
 
-        /* Trim live if recording was stopped. */
+        /* Trim live if recording was stopped. We are not checking if updated chunks are really appended to the end and hope for the best =) */
         if (!result.isEmpty() && !syncedAppending.isEmpty() && result.last().isInfinite() && !syncedAppending.last().isInfinite())
         {
             auto last = result.takeLast();
-            last.durationMs = syncedAppending.last().endTimeMs() - last.startTimeMs;
-            if (last.durationMs > 0)
+            last.durationMs = std::max(0ll, syncedAppending.last().endTimeMs() - last.startTimeMs);
+            if (last.isValid())
                 result.push_back(last);
         }
 
