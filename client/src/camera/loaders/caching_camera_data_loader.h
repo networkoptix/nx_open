@@ -44,6 +44,8 @@ public:
     void setMotionRegions(const QList<QRegion> &motionRegions);
     bool isMotionRegionsEmpty() const;
 
+    void forcedUpdate();
+
     QnTimePeriodList periods(Qn::TimePeriodContent type) const;
     QnCameraBookmarkList bookmarks() const;
 

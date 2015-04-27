@@ -146,6 +146,24 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         resetSyncedPeriods();
         updateSyncedPeriods(); 
     });
+
+    connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
+    {
+        if (!resource->hasFlags(Qn::server))
+            return;
+
+        for (const auto &syncedResource: m_syncedResources.keys()) {
+            if (!m_loaderByResource.contains(syncedResource))
+                continue;
+            auto loader = m_loaderByResource[syncedResource];
+            if (!loader)
+                continue;
+//            if (resource->getStatus() == Qn::Offline)
+//                loader->discardCachedData();
+            loader->forcedUpdate();
+        }
+
+    });
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
