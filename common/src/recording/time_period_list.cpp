@@ -8,6 +8,8 @@ namespace {
     static const qint64 InvalidValue = INT64_MAX;
 }
 
+//#define QN_TIME_PERIOD_LIST_DEBUG
+
 QnTimePeriodList::QnTimePeriodList(const QnTimePeriod &singlePeriod) :
     base_type()
 {
@@ -336,31 +338,60 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period) {
 
 }
 
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+QnTimePeriodList last5Of(const QnTimePeriodList &source) {
+    QnTimePeriodList result;
+
+    if (source.isEmpty())
+        return result;
+    for (int i = std::max(source.size() - 6, 0); i < source.size(); ++i) {      
+        result.push_back(source[i]);
+    }
+
+    return result;
+}
+
+bool isValidList(const QnTimePeriodList &list) {
+    bool hasInfinite = false;
+    for (const QnTimePeriod &period: list) {
+        if (hasInfinite)
+            return false;
+
+        if (period.isInfinite())
+            hasInfinite = true;
+    }
+    return true;
+}
+#endif
+
 void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &newPeriods, const QnTimePeriod &updatedPeriod) {
+
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+    const auto backupCopy = basePeriods;
+    qDebug() << "Updating time periods" << last5Of(basePeriods);
+    qDebug() << "with periods" << newPeriods;
+    qDebug() << "over" << updatedPeriod;
+    Q_ASSERT(isValidList(basePeriods));
+#endif
 
     /* Trivial case */
     if (basePeriods.isEmpty()) {
         basePeriods = newPeriods;
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+        qDebug() << "result0 is" << last5Of(basePeriods);
+        Q_ASSERT(isValidList(basePeriods));
+#endif
         return;
     }
 
     /* Trim data, removed on the server */
     if (newPeriods.isEmpty() && !basePeriods.isEmpty()) {       
         basePeriods.excludeTimePeriod(updatedPeriod);
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+        Q_ASSERT(isValidList(basePeriods));
+        qDebug() << "result1 is" << last5Of(basePeriods);
+#endif
         return;
-    }
-
-    /* Remove live chunk if we are updating this period */
-    {
-        auto last = basePeriods.cend() - 1;
-        if (last->isInfinite() && updatedPeriod.endTimeMs() > last->startTimeMs) {
-
-            /* Trim current live chunk to start time of an updated period. */
-            QnTimePeriod trimmed(last->startTimeMs, std::max(0ll, updatedPeriod.startTimeMs - last->startTimeMs));
-            basePeriods.removeLast();
-            if (trimmed.isValid())
-                basePeriods.push_back(trimmed);
-        }
     }
 
     auto appending = newPeriods.cbegin();
@@ -369,47 +400,94 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
     if (appending->startTimeMs > updatedPeriod.startTimeMs) {
         QnTimePeriod trimmed(updatedPeriod.startTimeMs, std::max(0ll, appending->startTimeMs - updatedPeriod.startTimeMs));
         basePeriods.excludeTimePeriod(trimmed);
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+        Q_ASSERT(isValidList(basePeriods));
+#endif
+
     }
 
+    /* Find the matching part of the lists. */
     auto insertIter = std::lower_bound(basePeriods.begin(), basePeriods.end(), appending->startTimeMs);
 
+    /* Skip all chunks that are already in the result list. */
     while (insertIter != basePeriods.end() && appending != newPeriods.cend() && (*insertIter == *appending)) {
         ++insertIter;
         ++appending;
     }
 
+    /* We've got an updated chunk. */
     if (insertIter != basePeriods.end() && appending != newPeriods.cend()) {
-        /* We are receiving live chunk even if it starts after updatedPeriod end o_O */ 
-        if (!appending->isInfinite()) {
-            qDebug() << "security fallback at" << std::distance(basePeriods.begin(), insertIter) << "appending" << std::distance(newPeriods.begin(), appending);
-            //Q_ASSERT_X(insertIter == basePeriods.end(), Q_FUNC_INFO, "invalid function semantics");
+        /* We may receive live chunk even if it starts after updatedPeriod end. */ 
+        if (appending->isInfinite()) {
+            /* In that case just append received live period and hope for the best. */
+            unionTimePeriods(basePeriods, newPeriods);
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+        Q_ASSERT(isValidList(basePeriods));
+#endif
+        } else            
+        /* Perfectly correct case. Recording on the server was stopped. Trimming live chunk to recorded one. */
+        if (insertIter->isInfinite()) {
+            basePeriods.erase(insertIter, basePeriods.end());
+            basePeriods.reserve(basePeriods.size() + std::distance(appending, newPeriods.cend()) );
+            while (appending != newPeriods.cend()) {
+                basePeriods.push_back(*appending);
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+        Q_ASSERT(isValidList(basePeriods));
+#endif
+                ++appending;
+            }
+
+        } else 
+        /* Other case. Usually that means that something goes wrong. */
+        {
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+            const auto magicValue = 255;
+            /* Check magic value to not go into infinite recursion. */
+            if (backupCopy.first().startTimeMs == magicValue)
+                return;
+
+            qDebug() << "error while updating camera time periods";
+            qDebug() << "source periods" << backupCopy;
+            qDebug() << "updated periods" << newPeriods;
+            qDebug() << "working period" << updatedPeriod;
+            auto testPeriods = backupCopy;
+            testPeriods.first().startTimeMs = magicValue; /* Mark with magic value to not go into infinite recursion. */
+            updateTimePeriods(testPeriods, newPeriods, updatedPeriod);
+            
+#endif
             auto last = basePeriods.cend() - 1;
             if (last->isInfinite())
                 basePeriods.removeLast();
             basePeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << basePeriods << newPeriods);
-            return;
-        }
-        /* Security fallback */
-        QnTimePeriodList::unionTimePeriods(basePeriods, newPeriods);
-        return;
-    }
-
-    /* Check if some chunks were removed */
-    if (appending == newPeriods.cend()) {
-        --appending;
-        qint64 lastPeriodEnd = appending->endTimeMs() + 1;
-        QnTimePeriod trimmed(lastPeriodEnd, std::max(0ll, updatedPeriod.endTimeMs() - lastPeriodEnd));
-        if (trimmed.isValid())
-            basePeriods.excludeTimePeriod(trimmed);
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+        Q_ASSERT(isValidList(basePeriods));
+#endif
+        } 
     } else
     /* Append updated periods to the end. */
-    {
+    if (appending != newPeriods.cend()) {
         basePeriods.reserve(basePeriods.size() + std::distance(appending, newPeriods.cend()) );
         while (appending != newPeriods.cend()) {
             basePeriods.push_back(*appending);
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+        Q_ASSERT(isValidList(basePeriods));
+#endif
             ++appending;
         }
+    } else
+    /* Some chunks were removed in the end of the update period */
+    {
+        while (insertIter != basePeriods.end() && insertIter->startTimeMs < updatedPeriod.endTimeMs()) {
+            insertIter = basePeriods.erase(insertIter);
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+        Q_ASSERT(isValidList(basePeriods));
+#endif
+        }
     }
+
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+    qDebug() << "result is" << last5Of(basePeriods);
+#endif
 }
 
 void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods) {   

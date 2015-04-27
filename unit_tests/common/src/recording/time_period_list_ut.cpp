@@ -147,6 +147,25 @@ TEST( QnTimePeriodsListTest, updateByTrimLiveAndApending )
     ASSERT_EQ(resultList, sourceList);
 }
 
+TEST( QnTimePeriodsListTest, updateByTrimLiveWithShifterPeriod )
+{
+    QnTimePeriodList sourceList;
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+
+    QnTimePeriodList appendingList;
+    appendingList << QnTimePeriod(40, 5);
+
+    /* Shifted period */
+    QnTimePeriod updatePeriod(50, 30);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 5);
+
+    QnTimePeriodList::updateTimePeriods(sourceList, appendingList, updatePeriod);
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
 TEST( QnTimePeriodsListTest, updateByTrimLive )
 {
     QnTimePeriodList sourceList;
@@ -267,7 +286,7 @@ TEST( QnTimePeriodsListTest, updateByReplaceChunksInTheBeginning )
     ASSERT_EQ(resultList, sourceList);
 }
 
-TEST( QnTimePeriodsListTest, updateByReplaceChunksInTheEnd )
+TEST( QnTimePeriodsListTest, updateByReplaceChunksInTheMiddle )
 {
     QnTimePeriodList sourceList;
     sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());

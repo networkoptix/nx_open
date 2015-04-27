@@ -21,7 +21,7 @@ namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 
     /** Minimum time (in milliseconds) for overlapping time periods requests.  */
-    const int minOverlapDuration = 40*1000;
+    const int minOverlapDuration = 120*1000;
 
     /** Detail level for data loading - most precise value is used. */
     const int detailLevel = 1;
@@ -104,6 +104,13 @@ int QnFlatCameraDataLoader::load(const QnTimePeriod &targetPeriod, const QString
             periodToLoad.startTimeMs = m_loadedPeriod.endTimeMs() - minOverlapDuration;
             periodToLoad.durationMs = targetPeriod.endTimeMs() - periodToLoad.startTimeMs;
         }
+    }
+
+    /* If there is a recording period, we should load at least from its start. */
+    if (m_loadedData && !m_loadedData->dataSource().isEmpty()) {
+        auto last = m_loadedData->dataSource().last();
+        if (last.isInfinite() && periodToLoad.startTimeMs >= last.startTimeMs)
+            periodToLoad.addPeriod(QnTimePeriod(last.startTimeMs, 1));
     }
 
 #ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG

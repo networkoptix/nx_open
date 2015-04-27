@@ -45,6 +45,7 @@ void QnTimePeriodCameraData::mergeInto(const QList<QnAbstractCameraDataPtr> &oth
 }
 
 void QnTimePeriodCameraData::update(const QnTimePeriodList &other, const QnTimePeriod &updatedPeriod) {
+    /* Update data, received from one server and related to one camera. */
     QnTimePeriodList::updateTimePeriods(m_data, other, updatedPeriod);
 }
 
