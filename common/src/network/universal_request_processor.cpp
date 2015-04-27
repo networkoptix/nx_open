@@ -76,12 +76,14 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if( acceptEncodingHeaderIter != d->request.headers.end() )
             {
                 nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
-                if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
-                    ;   //preferring identity
-                else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
+                if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
                 {
                     contentEncoding = "gzip";
                     d->responseBody = GZipCompressor::compressData(d->responseBody);
+                }
+                else if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
+                {
+                    contentEncoding = "identity";
                 }
                 else
                 {
