@@ -466,6 +466,14 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
     } else
     /* Append updated periods to the end. */
     if (appending != newPeriods.cend()) {
+
+        /* Security check: if last period is infinite, trim it. */
+        auto last = basePeriods.end() - 1;
+        if (last->isInfinite())
+            last->durationMs = std::max(0ll, appending->startTimeMs - last->startTimeMs);
+        if (!last->isValid())
+            basePeriods.erase(last);
+
         basePeriods.reserve(basePeriods.size() + std::distance(appending, newPeriods.cend()) );
         while (appending != newPeriods.cend()) {
             basePeriods.push_back(*appending);
