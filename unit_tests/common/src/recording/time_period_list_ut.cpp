@@ -5,6 +5,8 @@
 
 #include <recording/time_period_list.h>
 
+//#define QN_NO_BIG_DATA_TEST
+
 void PrintTo(const QnTimePeriod& period, ::std::ostream* os) {
     const QString fmt = "%1 - %2";
     QString result;

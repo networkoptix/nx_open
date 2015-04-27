@@ -195,10 +195,10 @@ bool QnTimePeriodList::encode(QByteArray &stream, bool intersected)
         qint64 timeDelta = period.startTimeMs - timePos;
         if (timeDelta < 0 && !intersected)
             return false;
-        if (Q_LIKELY(!first)) {
-            serializeField(stream, timeDelta, intersected);
+        if (Q_LIKELY(!first))
+            serializeField(stream, timeDelta, intersected);  
+        else
             first = false;
-        }
         serializeField(stream, period.durationMs+1, intersected);
         timePos += timeDelta + period.durationMs;
     }
