@@ -142,7 +142,6 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::addLicense:            
     case ApiCommand::removeLicense:         return handleTransactionParams<ApiLicenseData>          (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::resetBusinessRules:    return handleTransactionParams<ApiResetBusinessRuleData>(serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::installUpdate:         return handleTransactionParams<ApiUpdateInstallData>    (serializedTransaction, &stream, transaction, function, fastFunction);

@@ -10,7 +10,7 @@
 #include <QtCore/QRegExp>
 
 //const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[\\t\\n -]+");
-const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp(QLatin1String("[^\\d\\w]+"));
+static const QRegExp UNNEEDED_CHARACTERS(QLatin1String("[^\\d\\w]+"));
 
 static const char* ACTI_MANUFACTURER = "acti";
 static const char* ARECONT_VISION_MANUFACTURER = "arecontvision";

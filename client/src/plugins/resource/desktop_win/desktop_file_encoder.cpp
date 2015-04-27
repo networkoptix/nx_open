@@ -870,13 +870,15 @@ void QnDesktopFileEncoder::closeStream()
     if (m_formatCtx && m_videoPacketWrited)
         av_write_trailer(m_formatCtx);
 
-    if (m_videoCodecCtx)
+    if (m_videoCodecCtx) {
         avcodec_close(m_videoCodecCtx);
-    m_videoCodecCtx = 0;
+        av_freep(&m_videoCodecCtx);
+    }
 
-    if (m_audioCodecCtx)
+    if (m_audioCodecCtx) {
         avcodec_close(m_audioCodecCtx);
-    m_audioCodecCtx = 0;
+        av_freep(&m_audioCodecCtx);
+    }
 
     if (m_formatCtx)
         avformat_free_context(m_formatCtx);
