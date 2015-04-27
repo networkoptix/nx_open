@@ -100,13 +100,16 @@ QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const
 
 QnTimePeriodList QnTimePeriodList::intersectedPeriods(const QnTimePeriod &period) const {
     QnTimePeriodList result;
+    if (isEmpty())
+        return result;
 
     qint64 endTimeMs = period.endTimeMs();
-    auto iter = qUpperBound(cbegin(), cend(), period.startTimeMs);
+    auto iter = findNearestPeriod(period.startTimeMs, false);
     while (iter != cend() && iter->startTimeMs < endTimeMs) {
         result.push_back(*iter);
         ++iter;
     }
+
     return result;
 }
 
@@ -348,14 +351,16 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
     }
 
     /* Remove live chunk if we are updating this period */
-    auto last = basePeriods.cend() - 1;
-    if (last->isInfinite() && updatedPeriod.endTimeMs() > last->startTimeMs) {
+    {
+        auto last = basePeriods.cend() - 1;
+        if (last->isInfinite() && updatedPeriod.endTimeMs() > last->startTimeMs) {
 
-        /* Trim current live chunk to start time of an updated period. */
-        QnTimePeriod trimmed(last->startTimeMs, std::max(0ll, updatedPeriod.startTimeMs - last->startTimeMs));
-        basePeriods.removeLast();
-        if (trimmed.isValid())
-            basePeriods.push_back(trimmed);
+            /* Trim current live chunk to start time of an updated period. */
+            QnTimePeriod trimmed(last->startTimeMs, std::max(0ll, updatedPeriod.startTimeMs - last->startTimeMs));
+            basePeriods.removeLast();
+            if (trimmed.isValid())
+                basePeriods.push_back(trimmed);
+        }
     }
 
     auto appending = newPeriods.cbegin();
@@ -378,6 +383,11 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
         if (!appending->isInfinite()) {
             qDebug() << "security fallback at" << std::distance(basePeriods.begin(), insertIter) << "appending" << std::distance(newPeriods.begin(), appending);
             //Q_ASSERT_X(insertIter == basePeriods.end(), Q_FUNC_INFO, "invalid function semantics");
+            auto last = basePeriods.cend() - 1;
+            if (last->isInfinite())
+                basePeriods.removeLast();
+            basePeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << basePeriods << newPeriods);
+            return;
         }
         /* Security fallback */
         QnTimePeriodList::unionTimePeriods(basePeriods, newPeriods);

@@ -56,21 +56,29 @@ void QnThreadedChunksMergeTool::processData() {
         ? updatedPeriod.durationMs / syncedPeriodsBounding.durationMs
         : 1.0;
     /* Here cost of intersecting and union becomes too high. */
-    const qreal magicCoeff = 0.5;
+    const auto magicCoeff = 0.5;
 
     if (updatedPeriod.isNull() || relativeDuration > magicCoeff) {
         QnTimePeriodList result = QnTimePeriodList::mergeTimePeriods(periodsList);
         emit finished(handle, result);
     } else {
-        QnTimePeriodList result = syncedPeriods;
+        auto result = syncedPeriods;
 
         QVector<QnTimePeriodList> intersectedPeriods;
-        for(const QnTimePeriodList &list: periodsList)
+        for(const auto& list: periodsList)
             intersectedPeriods.push_back(list.intersectedPeriods(updatedPeriod));
 
-
-        QnTimePeriodList syncedAppending = QnTimePeriodList::mergeTimePeriods(intersectedPeriods);
+        auto syncedAppending = QnTimePeriodList::mergeTimePeriods(intersectedPeriods);
         QnTimePeriodList::unionTimePeriods(result, syncedAppending);
+
+        /* Trim live if recording was stopped. */
+        if (!result.isEmpty() && !syncedAppending.isEmpty() && result.last().isInfinite() && !syncedAppending.last().isInfinite())
+        {
+            auto last = result.takeLast();
+            last.durationMs = syncedAppending.last().endTimeMs() - last.startTimeMs;
+            if (last.durationMs > 0)
+                result.push_back(last);
+        }
 
         emit finished(handle, result);
     }
