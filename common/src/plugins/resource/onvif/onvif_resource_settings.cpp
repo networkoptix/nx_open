@@ -149,7 +149,7 @@ const QString CommonStringValues::ON(QString(QLatin1String("On")));
 const QString CommonStringValues::OFF(QString(QLatin1String("Off")));
 const QString CommonStringValues::SEPARATOR(QString(QLatin1String(",")));
 
-const OnvifCameraSettingOperationEmpty OnvifCameraSetting::EMPTY_OPERATION;
+const OnvifCameraSettingOperationEmpty OnvifCameraSetting::EMPTY_OPERATION = OnvifCameraSettingOperationEmpty();
 
 static QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > createOnvifCameraSettingOperationAbstract()
 {
