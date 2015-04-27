@@ -205,7 +205,7 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );
-    if (!d->chunkedMode)
+    if (!d->chunkedMode && (contentType.indexOf("multipart") == -1))
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
 
     QByteArray response = d->response.toString();

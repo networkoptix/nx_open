@@ -25,7 +25,8 @@ namespace nx_http
         m_prevChar( 0 ),
         m_lineEndingOffset( 0 ),
         m_decodeChunked( true ),
-        m_currentMessageNumber( 0 )
+        m_currentMessageNumber( 0 ),
+        m_breakAfterReadingHeaders( false )
     {
     }
 
@@ -52,8 +53,8 @@ namespace nx_http
                 case pullingLineEndingBeforeMessageBody:
                 {
                     //reading line ending of the previous line
-                        //this is needed to handle buggy http/rtsp servers which do not use CRLF, but CR or LF
-                        //So, we allow HTTP headers to be terminated with CR of LF. Thus, if CRLF has been split to
+                        //this is needed to handle rtsp servers which are allowed to use CRLF and CR or LF alone
+                        //So, we allow HTTP headers to be terminated with CR or LF. Thus, if CRLF has been split to
                         //different buffers, we MUST read LF before reading message body
                     size_t bytesRead = 0;
                     m_lineSplitter.finishCurrentLineEnding(
@@ -63,6 +64,8 @@ namespace nx_http
                     if( bytesProcessed )
                         *bytesProcessed = currentDataPos;
                     m_state = readingMessageBody;
+                    if( m_breakAfterReadingHeaders )
+                        return true;
                     break;
                 }
 
@@ -212,6 +215,11 @@ namespace nx_http
     int HttpStreamReader::currentMessageNumber() const
     {
         return m_currentMessageNumber;
+    }
+
+    void HttpStreamReader::setBreakAfterReadingHeaders( bool val )
+    {
+        m_breakAfterReadingHeaders = val;
     }
 
     bool HttpStreamReader::parseLine( const ConstBufferRefType& data )
