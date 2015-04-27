@@ -29,6 +29,10 @@ void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os) {
 
 TEST( QnTimePeriodsListTest, mergeBigData )
 {
+#ifdef QN_NO_BIG_DATA_TEST
+    return;
+#endif
+
     /* Two years of chunks. */
     qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 365 * 2;
 
@@ -65,6 +69,10 @@ TEST( QnTimePeriodsListTest, mergeBigData )
 
 TEST( QnTimePeriodsListTest, unionBigData )
 {
+#ifdef QN_NO_BIG_DATA_TEST
+    return;
+#endif
+
     /* Two years of chunks. */
     qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 365 * 2;
 
@@ -424,6 +432,20 @@ TEST( QnTimePeriodsListTest, unionByLimits )
     QnTimePeriodList resultList = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << sourceList << appendingList);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
+TEST( QnTimePeriodsListTest, serializationUnsigned )
+{
+    QnTimePeriodList sourceList;
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+
+    QByteArray serialized;
+    sourceList.encode(serialized);
+
+    QnTimePeriodList resultList;
+    resultList.decode(serialized);
 
     ASSERT_EQ(resultList, sourceList);
 }
