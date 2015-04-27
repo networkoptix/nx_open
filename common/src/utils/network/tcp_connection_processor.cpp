@@ -14,7 +14,11 @@
 #endif
 
 // we need enough size for updates
-static const int MAX_REQUEST_SIZE = 1024*1024*100;
+#ifdef __arm__
+    static const int MAX_REQUEST_SIZE = 1024*1024*16;
+#else
+    static const int MAX_REQUEST_SIZE = 1024*1024*256;
+#endif
 
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket):
@@ -41,16 +45,25 @@ QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
     delete d_ptr;
 }
 
-int QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
+int QnTCPConnectionProcessor::isFullMessage(
+    const QByteArray& message,
+    boost::optional<qint64>* const fullMessageSize )
 {
-    QByteArray lRequest = message.toLower();
+    if( fullMessageSize && fullMessageSize->is_initialized() )
+        return fullMessageSize->get() > message.size()
+            ? 0
+            : fullMessageSize->get();   //signalling that full message has been read
+
     QByteArray delimiter = "\n";
-    int pos = lRequest.indexOf(delimiter);
+    int pos = message.indexOf(delimiter);
     if (pos == -1)
         return 0;
-    if (pos > 0 && lRequest[pos-1] == '\r')
+    if (pos > 0 && message[pos-1] == '\r')
         delimiter = "\r\n";
     int contentLen = 0;
+
+    //retrieving content-length from message
+    QByteArray lRequest = message.toLower();
     int contentLenPos = lRequest.indexOf("content-length");
     if (contentLenPos >= 0)
     {
@@ -70,12 +83,15 @@ int QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
         if (posStart >= 0)
             contentLen = lRequest.mid(posStart, posEnd - posStart+1).toInt();
     }
+
     QByteArray dblDelim = delimiter + delimiter;
-    //return lRequest.endsWith(dblDelim) && (!contentLen || lRequest.indexOf(dblDelim) < lRequest.length()-dblDelim.length());
-    if (lRequest.indexOf(dblDelim) == -1)
+    const int dblDelimPos = message.indexOf(dblDelim);
+    if (dblDelimPos == -1)
         return 0;
-    int expectedSize = lRequest.indexOf(dblDelim) + dblDelim.size() + contentLen;
-    if (expectedSize > lRequest.size())
+    const int expectedSize = dblDelimPos + dblDelim.size() + contentLen;
+    if( fullMessageSize )
+        *fullMessageSize = expectedSize;
+    if (expectedSize > message.size())
         return 0;
     else 
         return expectedSize;
@@ -84,7 +100,7 @@ int QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-//    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
+//    qDebug() << "Client request from " << d->socket->getForeignAddress().address.toString();
 //    qDebug() << d->clientRequest;
 
     d->request = nx_http::Request();
@@ -189,7 +205,7 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );
-    if (!d->chunkedMode)
+    if (!d->chunkedMode && (contentType.indexOf("multipart") == -1))
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
 
     QByteArray response = d->response.toString();
@@ -199,10 +215,10 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     }
 
     if (displayDebug)
-        NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getPeerAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
+        NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
 
     NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
-        arg(d->socket->getPeerAddress().toString()).
+        arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->responseBody.size() : 0)))), cl_logDEBUG1 );
 
     QMutexLocker lock(&d->sockMutex);
@@ -221,7 +237,6 @@ bool QnTCPConnectionProcessor::sendChunk( const QByteArray& chunk )
 
 bool QnTCPConnectionProcessor::sendChunk( const char* data, int size )
 {
-    Q_D(QnTCPConnectionProcessor);
     QByteArray result = QByteArray::number(size,16);
     result.append("\r\n");
     result.append(data, size);  //TODO/IMPL avoid copying by implementing writev in socket
@@ -287,6 +302,7 @@ bool QnTCPConnectionProcessor::readRequest()
     d->requestBody.clear();
     d->responseBody.clear();
 
+    boost::optional<qint64> fullHttpMessageSize;
     while (!needToStop() && d->socket->isConnected())
     {
         int readed;
@@ -295,18 +311,21 @@ bool QnTCPConnectionProcessor::readRequest()
         {
             //globalTimeout.restart();
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-            if (isFullMessage(d->clientRequest))
+            if (isFullMessage(d->clientRequest, &fullHttpMessageSize))
             {
                 NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
-                    arg(d->socket->getPeerAddress().toString()).
+                    arg(d->socket->getForeignAddress().toString()).
                     arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
                 return true;
             }
             else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
             {
-                qWarning() << "Too large HTTP client request. Ignoring";
+                qWarning() << "Too large HTTP client request ("<<d->clientRequest.size()<<" bytes"
+                    ", "<<MAX_REQUEST_SIZE<<" allowed). Ignoring...";
                 return false;
             }
+            if( fullHttpMessageSize )
+                d->clientRequest.reserve( fullHttpMessageSize.get() );
         }
         else //if (globalTimeout.elapsed() > CONNECTION_TIMEOUT)
         {
@@ -341,7 +360,7 @@ void QnTCPConnectionProcessor::execute(QMutex& mutex)
 SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    return d->socket ? d->socket->getPeerAddress() : SocketAddress();
+    return d->socket ? d->socket->getForeignAddress() : SocketAddress();
 }
 
 void QnTCPConnectionProcessor::releaseSocket()

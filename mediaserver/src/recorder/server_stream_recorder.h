@@ -43,6 +43,7 @@ public:
     void stopForcedRecording();
 
     int getFRAfterThreshold() const;
+    bool needConfigureProvider() const;
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);
@@ -73,6 +74,7 @@ private:
     int getFpsForValue(int fps);
     void writeRecentlyMotion(qint64 writeAfterTime);
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
+    bool isPanicMode() const;
 private slots:
     void at_recordingFinished(int status, const QString &filename);
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);

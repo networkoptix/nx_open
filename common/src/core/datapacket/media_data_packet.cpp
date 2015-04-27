@@ -37,7 +37,8 @@ QnMediaContext::QnMediaContext(CodecID codecId)
         if( codec && codec->id == codecId )
         {
             m_ctx = avcodec_alloc_context3(codec);
-            avcodec_open2(m_ctx, codec, NULL);
+            m_ctx->codec_id = codecId;
+            m_ctx->codec_type = codec->type;
         }
         else
         {
@@ -66,13 +67,7 @@ QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
 QnMediaContext::~QnMediaContext()
 {
     if (m_ctx) {
-        if (m_ctx->codec)
-            avcodec_close(m_ctx);
-        av_freep(&m_ctx->rc_override);
-        av_freep(&m_ctx->intra_matrix);
-        av_freep(&m_ctx->inter_matrix);
-        av_freep(&m_ctx->extradata);
-        av_freep(&m_ctx->rc_eq);
+        avcodec_close(m_ctx);
         av_freep(&m_ctx);
     }
 }

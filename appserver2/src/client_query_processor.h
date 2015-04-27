@@ -40,8 +40,16 @@ namespace ec2
     public:
         virtual ~ClientQueryProcessor()
         {
-            //TODO #ak following assert can be triggered during client stop
-            assert( m_runningHttpRequests.empty() );
+            QMutexLocker lk( &m_mutex );
+            while( !m_runningHttpRequests.empty() )
+            {
+                nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
+                lk.unlock();    //must unlock mutex to avoid deadlock with http completion handler
+                httpClient->terminate();
+                //it is garanteed that no http event handler is running currently and no handler will be called
+                lk.relock();
+                m_runningHttpRequests.erase( m_runningHttpRequests.begin() );
+            }
         }
 
         //!Asynchronously executes update query
@@ -83,7 +91,6 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
             {
-                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
                 return;
             }
@@ -123,7 +130,6 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             if( !httpClient->doGet( requestUrl ) )
             {
-                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
                 return;
             }

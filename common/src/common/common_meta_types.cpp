@@ -3,6 +3,7 @@
 #include <QtCore/QMetaType>
 
 #include <utils/network/mac_address.h>
+#include <utils/network/socket_common.h>
 #include <utils/common/request_param.h>
 #include <utils/common/uuid.h>
 #include <utils/serialization/json_functions.h>
@@ -21,6 +22,7 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/configure_reply.h>
+#include <api/model/upload_update_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource_fwd.h>
@@ -87,6 +89,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnMacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
+    qRegisterMetaType<SocketAddress>();
 
     //qRegisterMetaType<QnParam>();
     
@@ -175,7 +178,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
-    qRegisterMetaType<QnRebuildArchiveReply>();
+    qRegisterMetaType<QnStorageScanData>();
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
@@ -201,14 +204,16 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
+    qRegisterMetaType<Qn::RebuildState>();
 
     qRegisterMetaType<QnModuleInformation>();
+    qRegisterMetaType<QnModuleInformationWithAddresses>();
+    qRegisterMetaType<QList<QnModuleInformation>>();
 
     qRegisterMetaType<Qn::CameraDataType>();
 
-    qRegisterMetaType<QnNetworkAddress>();
-
     qRegisterMetaType<QnConfigureReply>();
+    qRegisterMetaType<QnUploadUpdateReply>();
 
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );

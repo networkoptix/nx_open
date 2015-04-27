@@ -45,10 +45,13 @@ public:
     virtual void start(Priority priority = InheritPriority) override;
 
     void beforeDestroyDataProvider(QnAbstractDataConsumer* dataProviderWrapper);
+    void addDataProcessor(QnAbstractDataConsumer* consumer);
 
     bool isInitialized() const;
 
     QnConstResourceAudioLayoutPtr getAudioLayout();
+
+    bool readyToStop() const;
 
 protected:
     virtual void run() override;
@@ -131,7 +134,7 @@ private:
     const QPixmap m_logo;
     //QSet<void*> m_needKeyData;
     qint64 m_initTime;
-    QMutex m_startMutex;
+    mutable QMutex m_startMutex;
     bool m_started;
     bool m_isInitialized;
 

@@ -1,0 +1,19 @@
+ <assembly>
+	<id>${profile.classifier}-pdb-apps</id>
+	<formats>
+		<format>dir</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${libdir}/${arch}/bin/${build.configuration}</directory>
+			<outputDirectory>../</outputDirectory>
+			<includes>
+				<include>**/client.pdb</include>
+				<include>**/mediaserver.pdb</include>
+				<include>**/traytool.pdb</include>
+				<include>**/applauncher.pdb</include>
+			</includes>           
+		</fileSet>			
+	</fileSets>
+</assembly>

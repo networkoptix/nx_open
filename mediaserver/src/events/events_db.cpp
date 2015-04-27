@@ -23,7 +23,8 @@ QnEventsDB* QnEventsDB::m_instance = 0;
 
 QnEventsDB::QnEventsDB():
     m_lastCleanuptime(0),
-    m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD)
+    m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD),
+    m_tran(m_sdb, m_mutex)
 {
     m_sdb = QSqlDatabase::addDatabase("QSQLITE");
     m_sdb.setDatabaseName( MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")) ).toString() );
@@ -423,4 +424,9 @@ QnEventsDB* QnEventsDB::instance()
     // this call is not thread safe! You should init from main thread e.t.c
     Q_ASSERT_X(m_instance, Q_FUNC_INFO, "QnEventsDB::init must be called first!");
     return m_instance;
+}
+
+QnEventsDB::QnDbTransaction* QnEventsDB::getTransaction()
+{
+    return &m_tran;
 }

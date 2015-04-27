@@ -32,8 +32,8 @@ public:
     void setButtonsVisible(int mask, bool visible);
 
     int checkedButtons() const;
-    void setCheckedButtons(int checkedButtons);
-    void setButtonsChecked(int mask, bool checked);
+    void setCheckedButtons(int checkedButtons, bool silent = false);
+    void setButtonsChecked(int mask, bool checked, bool silent = false);
 
     int enabledButtons() const;
     void setEnabledButtons(int enabledButtons);

@@ -85,13 +85,15 @@ void QnDistributedMutex::at_peerLost(ec2::ApiPeerAliveData data)
 
 void QnDistributedMutex::at_timeout()
 {
+    QSet<QnUuid> failedPeers;
     {
         QMutexLocker lock(&m_mutex);
         if (m_locked)
             return;
+        failedPeers = QSet<QnUuid>::fromList(qnTransactionBus->alivePeers().keys()) - m_proccesedPeers;
     }
     unlock();
-    emit lockTimeout();
+    emit lockTimeout(failedPeers);
 }
 
 void QnDistributedMutex::lockAsync(int timeoutMs)

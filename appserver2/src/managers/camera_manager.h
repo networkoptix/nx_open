@@ -42,6 +42,7 @@ namespace ec2
                 QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                     camera.typeId,
                     QnResourceParams(camera.id, camera.url, camera.vendor) ).dynamicCast<QnVirtualCameraResource>();
+                assert( cameraRes );
                 fromApiToResource(camera, cameraRes);
                 emit cameraAddedOrUpdated( std::move(cameraRes) );
             }
@@ -75,7 +76,7 @@ namespace ec2
             QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
                 tran.params.cameraUniqueId,
                 tran.params.timestamp,
-                tran.params.serverId ) );
+                tran.params.serverGuid ) );
             if (tran.command == ApiCommand::addCameraHistoryItem)
                 emit cameraHistoryChanged( std::move(cameraHistoryItem ));
             else

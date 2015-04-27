@@ -31,6 +31,7 @@
 #include <media_server/settings.h>
 
 #include "cached_output_stream.h"
+#include "common/common_module.h"
 
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
@@ -92,7 +93,7 @@ public:
             qint64 firstTime = lastTime - tmpQueue.size() * timeResolution;
             for (int i = 0; i < tmpQueue.size(); ++i)
             {
-                const QnAbstractMediaDataPtr& srcMedia = qSharedPointerDynamicCast<QnAbstractMediaData>(tmpQueue.atUnsafe(i));
+                const QnAbstractMediaDataPtr& srcMedia = std::dynamic_pointer_cast<QnAbstractMediaData>(tmpQueue.atUnsafe(i));
                 QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(srcMedia->clone());
                 media->timestamp = firstTime + i*timeResolution;
                 m_dataQueue.push(media);
@@ -122,7 +123,7 @@ protected:
                 return;
             }
         }
-        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(data.data());
+        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(data.get());
         if (m_needKeyData && media)
         {
             if (!(media->flags & AV_PKT_FLAG_KEY))
@@ -140,7 +141,7 @@ protected:
             doRealtimeDelay( data );
 
 
-        const QnAbstractMediaDataPtr& media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+        const QnAbstractMediaDataPtr& media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
 
         if (media->dataType == QnAbstractMediaData::EMPTY_DATA) {
             if (media->timestamp == DATETIME_NOW)
@@ -411,6 +412,13 @@ void QnProgressiveDownloadingConsumer::run()
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
 
+    if (qnCommon->isTranscodeDisabled())
+    {
+        d->responseBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
+        sendResponse(CODE_NOT_IMPLEMETED, "text/plain");
+        return;
+    }
+
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
@@ -485,12 +493,17 @@ void QnProgressiveDownloadingConsumer::run()
         if (mediaRes) {
             QnImageFilterHelper extraParams;
             extraParams.setVideoLayout(mediaRes->getVideoLayout());
-            int rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
-            qreal customAR = mediaRes->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+            int rotation;
+            if (decodedUrlQuery.hasQueryItem("rotation"))
+                rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
+            else
+                rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
+            qreal customAR = mediaRes->customAspectRatio();
             extraParams.setRotation(rotation);
             extraParams.setCustomAR(customAR);
             
             d->transcoder.setExtraTranscodeParams(extraParams);
+            d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 
         if (d->transcoder.setVideoCodec(

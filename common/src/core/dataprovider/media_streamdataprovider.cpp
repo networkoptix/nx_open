@@ -85,7 +85,7 @@ void QnAbstractMediaStreamDataProvider::afterRun()
 bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketPtr& d)
 {
 
-    QnAbstractMediaData* data = dynamic_cast<QnAbstractMediaData*>(d.data());
+    QnAbstractMediaData* data = dynamic_cast<QnAbstractMediaData*>(d.get());
 
     if (data==0)
     {
@@ -138,7 +138,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
         data->dataProvider = this;
 
     if (videoData)
-        m_stat[videoData->channelNumber].onData(data->dataSize());
+        m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
 
     return true;
 

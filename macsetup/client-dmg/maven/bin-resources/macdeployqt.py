@@ -5,6 +5,7 @@ import fnmatch
 import subprocess
 import shutil
 import sys
+import plistlib
 
 from os.path import join
 
@@ -38,20 +39,22 @@ def prepare(binary, sbindir, tlibdir):
 
     os.mkdir(tlibdir)
 
+    tresdir = join(os.path.dirname(tbindir), 'Resources')
+
     shutil.copyfile(join(sbindir, 'client'), binary)
     os.chmod(binary, 0755)
     yield binary
 
-    ignore_debug = shutil.ignore_patterns('*debug*')
+    ignore = shutil.ignore_patterns('*debug*', '.*')
     for subfolder in 'platforms', 'styles', 'imageformats':
         tfolder = join(tbindir, subfolder)
-        shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore_debug)
+        shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore)
         for f in os.listdir(tfolder):
             dep = join(tfolder, f)
             os.chmod(dep, 0644)
             yield dep
 
-    shutil.copytree(join(sbindir, 'vox'), join(tbindir, 'vox'))
+    shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
 
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
@@ -76,21 +79,47 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
                 fix_binary(tpath, bindir, libdir, qlibdir, tlibdir)
             change_dep_path(binary, full_name, name)
         elif name.startswith('Q'):
+            # name: QtCore
+            #
+            # QtCore.framework
             framework_name = '{name}.framework'.format(name=name)
             if framework_name in qframeworks:
+                # QtCore.framework/Versions/5
                 folder = path[path.find(framework_name):]
                 if not os.path.exists(join(tlibdir, folder)):
                     os.makedirs(join(tlibdir, folder))
 
                 if not os.path.exists(join(tlibdir, folder, name)):
+                    # <source>/QtCore.framework/Versions/5/QtCore
                     fpath = join(qlibdir, folder, name)
+
+                    # <target>/QtCore.framework
+                    troot = join(tlibdir, framework_name)
+
+                    # <target>/QtCore.framework/Versions/5
                     tfolder = join(tlibdir, folder)
+
+                    # <target>/QtCore.framework/Versions/5/QtCore
                     tpath = join(tfolder, name)
 
                     # Copy framework binary
                     shutil.copy(fpath, tfolder)
                     os.chmod(tpath, 0644)
-                    shutil.copytree(join(qlibdir, framework_name, 'Contents'), join(tlibdir, framework_name, 'Contents'))
+
+                    resources_dir = join(tfolder, 'Resources')
+                    os.mkdir(resources_dir)
+
+                    info_plist_path = join(qlibdir, framework_name, 'Contents', 'Info.plist')
+                    info_plist = open(info_plist_path).read().replace('_debug', '')
+                    plist_obj = plistlib.readPlistFromString(info_plist)
+                    plist_obj['CFBundleIdentifier'] = 'org.qt-project.{}'.format(name)
+                    plist_obj['CFBundleVersion'] = '5.2.1'
+                    plistlib.writePlist(plist_obj, join(resources_dir, 'Info.plist'))
+
+                    os.symlink(join('Versions/Current', name), join(troot, name))
+                    os.symlink('Versions/Current/Resources', join(troot, 'Resources'))
+                    os.symlink('5', join(troot, 'Versions/Current'))
+
                     fix_binary(tpath, bindir, libdir, qlibdir, tlibdir)
                 change_dep_path(binary, full_name, join(folder, name))
 
@@ -106,7 +135,7 @@ def main(app_path, bindir, libdir, helpdir):
     for binary in prepare(client_binary, bindir, tlibdir):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir)
 
-    shutil.copytree(helpdir, "{app_path}/Contents/help".format(app_path=app_path))
+    shutil.copytree(helpdir, "{app_path}/Contents/Resources/help".format(app_path=app_path))
 
 if __name__ == '__main__':
     _, appdir, bindir, libdir, helpdir = sys.argv

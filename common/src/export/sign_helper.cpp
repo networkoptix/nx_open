@@ -70,8 +70,10 @@ QnSignHelper::QnSignHelper():
     m_licensedToStr = tr("Trial license");
     for (const QnLicensePtr& license: list)
     {
-        if (license->type() != Qn::LC_Trial)
+        if (license->type() != Qn::LC_Trial && license->isValid()) {
             m_licensedToStr = license->name();
+            break;
+        }
     }
 }
 
@@ -404,7 +406,7 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     QString profile;
     extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), sps, pps, spsReady, ppsReady);
     if ((!spsReady || !ppsReady) && iFrame)
-        extractSpsPpsFromPrivData((quint8*)iFrame->data(), iFrame->dataSize(), sps, pps, spsReady, ppsReady);
+        extractSpsPpsFromPrivData((quint8*)iFrame->data(), static_cast<int>(iFrame->dataSize()), sps, pps, spsReady, ppsReady);
     if (spsReady && ppsReady)
     {
         if (sps.profile_idc >= 100)
@@ -440,7 +442,7 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
 
     extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), oldSps, oldPps, spsReady, ppsReady);
     if ((!spsReady || !ppsReady) && iFrame)
-        extractSpsPpsFromPrivData((quint8*)iFrame->data(), iFrame->dataSize(), oldSps, oldPps, spsReady, ppsReady);
+        extractSpsPpsFromPrivData((quint8*)iFrame->data(), static_cast<int>(iFrame->dataSize()), oldSps, oldPps, spsReady, ppsReady);
 
     if (!spsReady || !ppsReady)
         return out_size;

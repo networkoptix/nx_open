@@ -45,7 +45,12 @@ void QnButtonBoxDialog::initializeButtonBox() {
     if(m_buttonBox)
         return; /* Already initialized with a direct call to setButtonBox in derived class's constructor. */
 
-    QList<QDialogButtonBox *> buttonBoxes = findChildren<QDialogButtonBox *>();
+    QList<QDialogButtonBox *> buttonBoxes = findChildren<QDialogButtonBox *>(QString(), Qt::FindDirectChildrenOnly);
+    //Q_ASSERT_X(buttonBoxes.size() == 1, Q_FUNC_INFO, "Invalid buttonBox count");
+
+    if (buttonBoxes.isEmpty())
+        buttonBoxes = findChildren<QDialogButtonBox *>(QString(), Qt::FindChildrenRecursively);
+
     if(buttonBoxes.empty()) {
         qnWarning("Button box dialog '%1' doesn't have a button box.", metaObject()->className());
         return;

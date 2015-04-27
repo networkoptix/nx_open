@@ -14,7 +14,8 @@ QnImageFilterHelper::QnImageFilterHelper():
     m_customAR(0.0),
     m_rotAngle(0),
     m_timestampCorner(Qn::NoCorner),
-    m_onscreenDateOffset(0)
+    m_onscreenDateOffset(0),
+    m_timeMs(0)
 {
 }
 
@@ -49,15 +50,16 @@ void QnImageFilterHelper::setContrastParams(const ImageCorrectionParams& params)
     m_contrastParams = params;
 }
 
-void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, qint64 onscreenDateOffset)
+void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, qint64 onscreenDateOffset, qint64 timeMsec)
 {
     m_timestampCorner = corner;
     m_onscreenDateOffset = onscreenDateOffset;
+    m_timeMs = timeMsec;
 }
 
 bool QnImageFilterHelper::isEmpty() const
 {
-    if (m_customAR)
+    if (!qFuzzyIsNull(m_customAR))
         return false;
     if (m_layout && m_layout->channelCount() > 1)
         return false;
@@ -87,7 +89,7 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
 {
     QList<QnAbstractImageFilterPtr> result;
 
-    if (m_customAR != 0.0) {
+    if (!qFuzzyIsNull(m_customAR)) {
         QSize newSize;
         newSize.setHeight(srcResolution.height());
         newSize.setWidth(srcResolution.height() * m_customAR + 0.5);
@@ -95,8 +97,11 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
             result << QnAbstractImageFilterPtr(new QnScaleImageFilter(QnCodecTranscoder::roundSize(newSize)));
     }
 
-    if (m_layout && m_layout->channelCount() > 1)
+    bool tiledFilterExist = false;
+    if (m_layout && m_layout->channelCount() > 1) {
         result << QnAbstractImageFilterPtr(new QnTiledImageFilter(m_layout));
+        tiledFilterExist = true;
+    }
 
     if (!m_cropRect.isEmpty() && !m_itemDewarpingParams.enabled) {
         result << QnAbstractImageFilterPtr(new QnCropImageFilter(m_cropRect));
@@ -104,12 +109,12 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
     if (m_itemDewarpingParams.enabled)
         result << QnAbstractImageFilterPtr(new QnFisheyeImageFilter(m_mediaDewarpingParams, m_itemDewarpingParams));
     if (m_contrastParams.enabled)
-        result << QnAbstractImageFilterPtr(new QnContrastImageFilter(m_contrastParams));
+        result << QnAbstractImageFilterPtr(new QnContrastImageFilter(m_contrastParams, tiledFilterExist));
     if (m_rotAngle)
         result << QnAbstractImageFilterPtr(new QnRotateImageFilter(m_rotAngle));
 
     if (m_timestampCorner != Qn::NoCorner) 
-        result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_layout, m_timestampCorner, m_onscreenDateOffset));
+        result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_layout, m_timestampCorner, m_onscreenDateOffset, m_timeMs));
 
     return result;
 }

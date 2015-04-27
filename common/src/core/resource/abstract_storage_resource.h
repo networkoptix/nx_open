@@ -42,8 +42,6 @@ public:
     /*
      * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization
      */
-    void setIndex(quint16 value);
-    quint16 getIndex() const;
     virtual void setUrl(const QString& value) override;
 
     /*
@@ -51,16 +49,6 @@ public:
      */
     virtual float getAvarageWritingUsage() const;
 
-
-    // TODO: #Elric move out?
-    struct ProtocolDescription {
-        QString protocol;
-        QString name;
-        QString urlTemplate;
-        QString urlPattern;
-    };
-
-    static ProtocolDescription protocolDescription(const QString &protocol);
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 signals:
     /*
@@ -73,7 +61,6 @@ private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds
     bool m_usedForWriting;
-    quint16 m_index;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;
 };

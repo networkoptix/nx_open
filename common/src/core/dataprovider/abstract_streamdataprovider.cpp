@@ -37,6 +37,7 @@ int QnAbstractStreamDataProvider::processorsCount() const
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataReceptor* dp)
 {
+    Q_ASSERT(dp);
     QMutexLocker mutex(&m_mutex);
 
     if (!m_dataprocessors.contains(dp))
@@ -45,6 +46,17 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataReceptor* dp)
 
 
     }
+}
+
+bool QnAbstractStreamDataProvider::needConfigureProvider() const
+{
+    QMutexLocker mutex(&m_mutex);
+    for (auto processor: m_dataprocessors)
+    {
+        if (processor->needConfigureProvider())
+            return true;
+    }
+    return false;
 }
 
 void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataReceptor* dp)

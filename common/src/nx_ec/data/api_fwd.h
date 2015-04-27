@@ -18,6 +18,7 @@ namespace ec2 {
     struct ApiCameraData;
     struct ApiCameraAttributesData;
     struct ApiCameraDataEx;
+    struct ApiCameraServerItemDataOld;
     struct ApiCameraServerItemData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
@@ -34,7 +35,6 @@ namespace ec2 {
     struct ApiMediaServerData;
     struct ApiMediaServerUserAttributesData;
     struct ApiMediaServerDataEx;
-    struct ApiPanicModeData;
     struct ApiPropertyTypeData;
     struct ApiResetBusinessRuleData;
     struct ApiResourceData;
@@ -74,6 +74,7 @@ namespace ec2 {
     struct ApiDiscoverPeerData;
     struct ApiConnectionData;
     struct ApiSystemNameData;
+    struct ApiTransactionData;
 
     struct ApiTimeData;
     struct ApiPeerSystemTimeData;
@@ -85,10 +86,13 @@ namespace ec2 {
     struct ApiDatabaseDumpData;
     struct ApiLicenseOverflowData;
 
+    typedef std::vector<ApiTransactionData> ApiTransactionDataList;
+    typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraAttributesData> ApiCameraAttributesDataList;
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
+    typedef std::vector<ApiCameraServerItemDataOld> ApiCameraServerItemDataOldList;
     typedef std::vector<ApiCameraServerItemData> ApiCameraServerItemDataList;
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
@@ -117,6 +121,7 @@ namespace ec2 {
     (ApiCameraData)\
     (ApiCameraAttributesData)\
     (ApiCameraDataEx)\
+    (ApiCameraServerItemDataOld)\
     (ApiCameraServerItemData)\
     (ApiEmailData)\
     (ApiEmailSettingsData)\
@@ -133,7 +138,6 @@ namespace ec2 {
     (ApiMediaServerData)\
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\
-    (ApiPanicModeData)\
     (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\

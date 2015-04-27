@@ -14,6 +14,7 @@
 #include "plugins/resource/desktop_win/desktop_resource.h"
 #include "recording/stream_recorder.h"
 #include "core/resource_management/resource_pool.h"
+#include <utils/common/string.h>
 
 QnScreenRecorder::QnScreenRecorder(QObject *parent):
     QObject(parent),
@@ -52,7 +53,9 @@ void QnScreenRecorder::startRecording() {
 #ifdef Q_OS_WIN
     QnVideoRecorderSettings recorderSettings;
 
-    QString filePath = recorderSettings.recordingFolder() + QLatin1String("/video_recording.avi");
+    QDateTime dt = QDateTime::currentDateTime();
+    QString filePath = recorderSettings.recordingFolder() + QString(lit("/")) + 
+                       replaceNonFileNameCharacters(QString(lit("video_recording_%1.avi")).arg(datetimeSaveDialogSuggestion(dt)), QLatin1Char('_'));
     QnAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
     QnAudioDeviceInfo secondAudioDevice;
     if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())

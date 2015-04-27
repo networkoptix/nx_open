@@ -28,7 +28,18 @@ class QnThumbnailsLoader: public QnLongRunnable {
     typedef QnLongRunnable base_type;
 
 public:
-    QnThumbnailsLoader(QnResourcePtr resource, bool decode = true);
+    enum class Mode {
+        Default,                        /**< Default mode is used to load thumbnails over the timeline. */
+        Strict                          /**< Strict mode is used in preview search. */
+    };
+
+    /** 
+     *  Thumbnail loader constructor.
+     *  \param resource                 Target camera or archive file
+     *  \param mode                     Working mode. In default mode loader will adjust given time periods (add margins, etc) to show thumbnails 
+     *                                  from the middle of the each given period. In strict mode thumbnail is taken from the beginning of the period.
+     */
+    QnThumbnailsLoader(const QnResourcePtr &resource, Mode mode = Mode::Default);
     virtual ~QnThumbnailsLoader();
 
     QnResourcePtr resource() const;
@@ -92,7 +103,8 @@ private:
 
     mutable QMutex m_mutex;
     const QnResourcePtr m_resource;
-    bool m_decode;
+    const Mode m_mode;
+
     QList<QnAbstractArchiveDelegatePtr> m_delegates;
 
     qint64 m_timeStep, m_requestStart, m_requestEnd, m_processingStart, m_processingEnd;

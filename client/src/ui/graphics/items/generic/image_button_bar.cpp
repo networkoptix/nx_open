@@ -61,7 +61,9 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
 
     setButtonsVisible(mask, button->isVisible());
     setButtonsEnabled(mask, button->isEnabled());
-    setButtonsChecked(mask, button->isChecked());
+
+    /* We should not emit signal while adding button as it may corrupt saved state. */
+    setButtonsChecked(mask, button->isChecked(), true);
 
     submitButtonSize(button);
 }
@@ -109,7 +111,7 @@ int QnImageButtonBar::checkedButtons() const {
     return m_checkedButtons;
 }
 
-void QnImageButtonBar::setCheckedButtons(int checkedButtons) {
+void QnImageButtonBar::setCheckedButtons(int checkedButtons, bool silent) {
     if(m_checkedButtons == checkedButtons)
         return;
 
@@ -127,11 +129,12 @@ void QnImageButtonBar::setCheckedButtons(int checkedButtons) {
     // if checked state changes during submit, we won't catch it.
     submitCheckedButtons(changedButtons);
 
-    emit checkedButtonsChanged();
+    if (!silent)
+        emit checkedButtonsChanged();
 }
 
-void QnImageButtonBar::setButtonsChecked(int mask, bool checked) {
-    setCheckedButtons(checked ? (m_checkedButtons | mask) : (m_checkedButtons & ~mask));
+void QnImageButtonBar::setButtonsChecked(int mask, bool checked, bool silent) {
+    setCheckedButtons(checked ? (m_checkedButtons | mask) : (m_checkedButtons & ~mask), silent);
 }
 
 int QnImageButtonBar::enabledButtons() const {

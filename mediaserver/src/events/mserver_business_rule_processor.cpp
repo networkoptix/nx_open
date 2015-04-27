@@ -20,6 +20,7 @@
 
 #include "mserver_business_rule_processor.h"
 #include "camera/get_image_helper.h"
+#include "core/resource_management/resource_properties.h"
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
 {
@@ -78,9 +79,8 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     Qn::PanicMode val = Qn::PM_None;
     if (action->getToggleState() == QnBusiness::ActiveState)
         val =  Qn::PM_BusinessEvents;
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    conn->setPanicModeSync(val);
     mediaServer->setPanicMode(val);
+    propertyDictionary->saveParams(mediaServer->getId());
     return true;
 }
 
@@ -145,13 +145,13 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
                 autoResetTimeout );
 }
 
-QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const 
+QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const 
 {
     // By now only motion screenshot is supported
     if (params.getEventType() != QnBusiness::CameraMotionEvent)
-        return QImage();
+        return QByteArray();
 
     const QnResourcePtr& cameraRes = QnResourcePool::instance()->getResourceById(params.getEventResourceId());
     QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), DATETIME_NOW, dstSize);
-    return frame ? frame->toImage() : QImage();
+    return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
 }

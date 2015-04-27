@@ -35,6 +35,15 @@
 #include <utils/license_usage_helper.h>
 
 namespace {
+
+    class QnNetworkSpeedStrings {
+        Q_DECLARE_TR_FUNCTIONS(QnNetworkSpeedStrings)
+    public:
+        static QString bytesPerSecond() { return tr("b/s"); }
+        static QString kiloBytesPerSecond() { return tr("Kb/s"); }
+        static QString megaBytesPerSecond() { return tr("Mb/s"); }
+    };
+
     /** Convert angle from radians to degrees */
     qreal radiansToDegrees(qreal radian) {
         return (180 * radian) / M_PI;
@@ -65,10 +74,9 @@ namespace {
 
     QList<QString> initNetworkSuffixes() {
         QList<QString> result;
-        result << QObject::tr("b/s"); // TODO: #Elric #TR add propert context.
-        result << QObject::tr("Kb/s");
-        result << QObject::tr("Mb/s");
-   //     result << QObject::tr("Gb/s");
+        result << QnNetworkSpeedStrings::bytesPerSecond();
+        result << QnNetworkSpeedStrings::kiloBytesPerSecond();
+        result << QnNetworkSpeedStrings::megaBytesPerSecond();
         return result;
     }
     const QList<QString> networkSuffixes = initNetworkSuffixes();
@@ -479,10 +487,12 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_pointsLimit = m_manager->pointsLimit();
     m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
     m_updatePeriod = m_manager->updatePeriod(m_resource);
+    setOption(QnResourceWidget::WindowRotationForbidden);
 
     /* Note that this slot is already connected to nameChanged signal in
      * base class's constructor.*/
-    connect(m_resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
+    connect(m_resource, &QnResource::urlChanged,    this, &QnServerResourceWidget::updateTitleText);
+    connect(m_resource, &QnResource::statusChanged, this, &QnServerResourceWidget::updateTitleText);
 
     addOverlays();
 
@@ -509,6 +519,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     /* Run handlers. */
     updateButtonsVisibility();
     updateTitleText();
+    updateInfoOpacity();
     at_statistics_received();
 }
 
@@ -745,7 +756,9 @@ void QnServerResourceWidget::tick(int deltaMSecs) {
 QString QnServerResourceWidget::calculateTitleText() const {
     QString name = getFullResourceName(m_resource, true);
 
-    qint64 uptimeMs = m_manager->uptimeMs(m_resource);
+    qint64 uptimeMs = m_resource->getStatus() == Qn::Online
+        ? m_manager->uptimeMs(m_resource)
+        : 0;
     if (uptimeMs > 0) {
         int msInDay = 24 * 3600 * 1000;
         return tr("%1 (up %n days, %2)", "", uptimeMs / msInDay)

@@ -15,6 +15,8 @@ public:
     QnMediaServerResourcePtr currentServer() const;
     QUrl currentUrl() const;
 
+    void markServerAsInvalid(const QnMediaServerResourcePtr &server);
+
     void next();
 private:
     struct InterfaceInfo {
@@ -31,7 +33,6 @@ private:
 
     void addInterfaceIfNotExists(QList<InterfaceInfo> &interfaces, const InterfaceInfo &info) const;
     void replaceInterface(QList<InterfaceInfo> &interfaces, const InterfaceInfo &info) const;
-
 private:
     QnMediaServerResourceList m_allServers;
     QnMediaServerResourcePtr m_currentServer;

@@ -1,11 +1,7 @@
 TEMPLATE = app
 CONFIG += console
 
-CONFIG(debug,debug|release) {
-  LIBS += -lgtestd -lgtest_main-mdd
-} else {
-  LIBS += -lgtest -lgtest_main-md
-}
+include( ${libdir}/gtest.pri )
 
 !win32 {
   ext_debug2.target  = $(TARGET).debug

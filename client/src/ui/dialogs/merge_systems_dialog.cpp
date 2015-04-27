@@ -10,20 +10,35 @@
 #include "core/resource/media_server_resource.h"
 #include "ui/common/ui_resource_name.h"
 #include "ui/style/warning_style.h"
+#include "ui/help/help_topics.h"
+#include "ui/help/help_topic_accessor.h"
 #include "utils/merge_systems_tool.h"
 #include "utils/common/util.h"
 
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     QDialog(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnMergeSystemsDialog),
     m_mergeTool(new QnMergeSystemsTool(this))
 {
     ui->setupUi(this);
+
+    QStringList successMessage;
+    successMessage 
+        << tr("Success!") 
+        << QString() 
+        << QString() 
+        << tr("The system was configured successfully.") 
+        << tr("The servers from the remote system should appear in your system soon.");
+    ui->successLabel->setText(successMessage.join(L'\n'));
+
     ui->urlComboBox->lineEdit()->setPlaceholderText(tr("http(s)://host:port"));
     m_mergeButton = ui->buttonBox->addButton(QString(), QDialogButtonBox::ActionRole);
     setWarningStyle(ui->errorLabel);
     m_mergeButton->hide();
     ui->buttonBox->button(QDialogButtonBox::Close)->hide();
+
+    setHelpTopic(this, Qn::Systems_MergeSystems_Help);
 
     QButtonGroup *buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->currentSystemRadioButton);
@@ -112,6 +127,7 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     m_discoverer.clear();
     m_url.clear();
+    m_user.clear();
     m_password.clear();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
@@ -130,8 +146,9 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     }
 
     m_url = url;
+    m_user = lit("admin");
     m_password = password;
-    m_mergeTool->pingSystem(url, password);
+    m_mergeTool->pingSystem(m_url, m_user, m_password);
     ui->buttonBox->showProgress(tr("testing..."));
 }
 
@@ -144,7 +161,7 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     ui->configurationWidget->setEnabled(false);
     m_mergeButton->setEnabled(false);
 
-    m_mergeTool->mergeSystem(m_discoverer, m_url, m_password, ownSettings);
+    m_mergeTool->mergeSystem(m_discoverer, m_url, m_user, m_password, ownSettings);
     ui->buttonBox->showProgress(tr("merging systems..."));
 }
 

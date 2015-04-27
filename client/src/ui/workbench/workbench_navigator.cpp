@@ -95,6 +95,14 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
     m_updateSliderTimer.restart();
+
+    //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
+    // then truncate cached chunks by this region and synchronize the cache.
+    QTimer* discardCacheTimer = new QTimer(this);
+    discardCacheTimer->setInterval(10*60*1000);
+    discardCacheTimer->setSingleShot(false);
+    connect(discardCacheTimer, &QTimer::timeout, this, &QnWorkbenchNavigator::clearLoaderCache);
+    discardCacheTimer->start();
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -463,6 +471,8 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
     m_syncedWidgets.insert(widget);
     m_syncedResources.insert(widget->resource()->toResourcePtr(), QHashDummyValue());
 
+    connect(widget->resource()->toResource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+
     updateCurrentWidget();
     updateSyncedPeriods();
 }
@@ -470,6 +480,8 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
 void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     if(!m_syncedWidgets.remove(widget))
         return;
+
+    disconnect(widget->resource()->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
     if (display() && !display()->isChangingLayout()){
         if(m_syncedWidgets.contains(m_currentMediaWidget))
@@ -676,6 +688,14 @@ void QnWorkbenchNavigator::stepBackward() {
     emit positionChanged();
 }
 
+void QnWorkbenchNavigator::clearLoaderCache()
+{
+    for (QnCachingCameraDataLoader* loader: m_loaderByResource) {
+        if (loader)
+            loader->discardCachedData();
+    }
+}
+
 void QnWorkbenchNavigator::stepForward() {
     if(!m_currentMediaWidget)
         return;
@@ -709,7 +729,13 @@ void QnWorkbenchNavigator::updateCentralWidget() {
     if(m_centralWidget == centralWidget)
         return;
 
+    if (m_centralWidget && m_centralWidget->resource())
+        disconnect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+
     m_centralWidget = centralWidget;
+
+    if (m_centralWidget && m_centralWidget->resource())
+        connect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
     updateCurrentWidget();
     updateThumbnailsLoader();
@@ -719,7 +745,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     QnResourceWidget *widget = m_centralWidget;
     if (m_currentWidget == widget)
         return;
-    
+
     QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
 
     emit currentWidgetAboutToBeChanged();
@@ -732,6 +758,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
                 updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
         else
             updateItemDataFromSlider(m_currentWidget);
+        disconnect(m_currentWidget->resource(), NULL, this, NULL);
+        connect(m_currentWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
     } else {
         m_sliderDataInvalid = true;
         m_sliderWindowInvalid = true;
@@ -747,6 +775,9 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_currentWidget = widget;
         m_currentMediaWidget = mediaWidget;
     }
+
+    if (m_currentWidget)
+        connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
@@ -1340,7 +1371,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         if(!m_timeSlider->isSelectionValid())
             return;
 
-        m_timeSlider->setValue((m_timeSlider->selectionStart(), m_timeSlider->selectionEnd()) / 2, false);
+        m_timeSlider->setValue((m_timeSlider->selectionStart() + m_timeSlider->selectionEnd()) / 2, false);
         m_timeSlider->finishAnimations();
         m_timeSlider->setWindow(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd(), true);
     }
@@ -1382,23 +1413,32 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
     if(isLive())
         value = DATETIME_NOW;
 
+    //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
+    QString tooltipFormatDate = tr("yyyy MMM dd");
+
+    //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
+    QString tooltipFormatTime = tr("hh:mm:ss");
+
+    //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
+    QString tooltipFormatTimeShort = tr("mm:ss");
+
+    //: Time slider's tooltip for position on live. 
+    QString tooltipFormatLive = tr("Live");
+
     /* Update tool tip format. */
-    if (value == DATETIME_NOW) {
-        //: Time slider's tooltip for position on live. 
-        //: Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for.
-        //: That's where these single quotes come from.
-        m_timeSlider->setToolTipFormat(tr("'Live'"));
+    if (value == DATETIME_NOW) {       
+        /* Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for.
+         That's where these single quotes come from. */
+        m_timeSlider->setToolTipFormat(lit("'%1'").arg(tooltipFormatLive));
     } else {
         if (m_currentWidgetFlags & WidgetUsesUTC) {
-            //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
-            m_timeSlider->setToolTipFormat(tr("yyyy MMM dd\nhh:mm:ss"));
+            
+            m_timeSlider->setToolTipFormat(tooltipFormatDate + L'\n' + tooltipFormatTime);
         } else {
             if(m_timeSlider->maximum() >= 60ll * 60ll * 1000ll) { /* Longer than 1 hour. */
-                //: This is a date/time format for time slider's tooltip for local files. Please translate it only if you're absolutely sure that you know what you're doing.
-                m_timeSlider->setToolTipFormat(tr("hh:mm:ss"));
+                m_timeSlider->setToolTipFormat(tooltipFormatTime);
             } else {
-                //: This is a date/time format for time slider's tooltip for short local files. Please translate it only if you're absolutely sure that you know what you're doing.
-                m_timeSlider->setToolTipFormat(tr("mm:ss"));
+                m_timeSlider->setToolTipFormat(tooltipFormatTimeShort);
             }
         }
     }
@@ -1407,7 +1447,7 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
     if(m_currentMediaWidget && !m_updatingSliderFromReader) {
         if (QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader()){
             if (value == DATETIME_NOW) {
-                reader->jumpToPreviousFrame(DATETIME_NOW);
+                reader->jumpTo(DATETIME_NOW, 0);
             } else {
                 if (m_preciseNextSeek) {
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */

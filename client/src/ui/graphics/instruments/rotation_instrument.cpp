@@ -40,7 +40,7 @@ namespace {
         shape->lineTo(base + headSize.width() / 2 * sideUnit - headOverlap * frontUnit);
     }
 
-    const qreal centroidBorder = 0.5;
+    const qreal centroidBorder = 0.15;
 
     QPointF calculateOrigin(QGraphicsView *view, QGraphicsWidget *widget) {
         QRect viewportRect = view->viewport()->rect();
@@ -308,6 +308,7 @@ QGraphicsWidget *RotationInstrument::target() const {
 
 void RotationInstrument::startInternal(QGraphicsView *view, QMouseEvent *event, QGraphicsWidget *target, bool instantStart) {
     m_target = target;
+    m_sceneOrigin = calculateOrigin(view, target);
     m_originAngle = calculateSceneAngle(target, view->mapToScene(event->pos()), calculateOrigin(view, target));
 
     dragProcessor()->mousePressEvent(view->viewport(), event, instantStart);
@@ -372,12 +373,11 @@ void RotationInstrument::dragMove(DragInfo *info) {
      * We may get some nasty effects if we don't do this. */
     target()->setRotation(m_lastRotation);
 
-    QPointF sceneOrigin = calculateOrigin(info->view(), target());
-    QPoint viewportOrigin = info->view()->mapFromScene(sceneOrigin);
+    QPoint viewportOrigin = info->view()->mapFromScene(m_sceneOrigin);
     if(length(viewportOrigin - info->mouseViewportPos()) < ignoreRadius)
         return;
 
-    QPointF itemOrigin = target()->mapFromScene(sceneOrigin);
+    QPointF itemOrigin = target()->mapFromScene(m_sceneOrigin);
 
     qreal currentAngle = calculateItemAngle(target(), target()->mapFromScene(info->mouseScenePos()), itemOrigin);
     qreal currentRotation = target()->rotation();
@@ -399,23 +399,33 @@ void RotationInstrument::dragMove(DragInfo *info) {
 
     /* Rotate item if needed. */
     if(!qFuzzyCompare(currentRotation, newRotation)) {
+        QSizeF itemSize = target()->size();
+        QPointF itemCenter = target()->transformOriginPoint();
+
         target()->setRotation(newRotation);
+
+        QPointF newItemCenter = target()->transformOriginPoint();
+        qreal scale = scaleFactor(itemSize, target()->size(), Qt::KeepAspectRatio);
+        QPointF newItemOrigin = newItemCenter + (itemOrigin - itemCenter) * scale;
+
+        itemOrigin = newItemOrigin;
 
         if(!qFuzzyEquals(target()->transformOriginPoint(), itemOrigin)) {
             QPointF newSceneOrigin = target()->mapToScene(itemOrigin);
-            moveViewportScene(info->view(), newSceneOrigin - sceneOrigin);
-            sceneOrigin = newSceneOrigin;
+            moveViewportScene(info->view(), newSceneOrigin - m_sceneOrigin);
+            scaleViewport(info->view(), scale, info->view()->mapFromScene(newSceneOrigin));
+            m_sceneOrigin = newSceneOrigin;
         }
     }
 
     /* Calculate rotation head position in scene coordinates. */
     qreal sceneAngle = m_originAngle + newRotation / 180.0 * M_PI;
-    qreal headDistance = length(sceneOrigin - info->mouseScenePos());
-    QPointF sceneHead = sceneOrigin + polarToCartesian<QPointF>(headDistance, sceneAngle);
+    qreal headDistance = length(m_sceneOrigin - info->mouseScenePos());
+    QPointF sceneHead = m_sceneOrigin + polarToCartesian<QPointF>(headDistance, sceneAngle);
 
     /* Update rotation item. */
     rotationItem()->setHead(sceneHead);
-    rotationItem()->setOrigin(sceneOrigin);
+    rotationItem()->setOrigin(m_sceneOrigin);
     
     m_lastRotation = target()->rotation();
 }

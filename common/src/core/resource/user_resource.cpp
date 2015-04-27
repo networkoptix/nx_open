@@ -5,7 +5,6 @@ QnUserResource::QnUserResource():
     m_permissions(0),
     m_isAdmin(false)
 {
-    setStatus(Qn::Online, true);
     addFlags(Qn::user | Qn::remote);
 }
 
@@ -55,7 +54,7 @@ void QnUserResource::generateHash() {
     hash.append("$");
     hash.append(md5.result().toHex());
 
-    QByteArray digest = QnAuthHelper::createUserPasswordDigest(getName(), password);
+    QByteArray digest = QnAuthHelper::createUserPasswordDigest(getName().toLower(), password);
 
     setHash(hash);
     setDigest(digest);
@@ -176,4 +175,9 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
             modifiedFields << "emailChanged";
         }
     }
+}
+
+Qn::ResourceStatus QnUserResource::getStatus() const
+{
+    return Qn::Online;
 }

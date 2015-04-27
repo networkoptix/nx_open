@@ -1,175 +1,50 @@
 #include "router.h"
 
+#include <QtCore/QElapsedTimer>
+
 #include "utils/common/log.h"
 #include "nx_ec/dummy_handler.h"
 #include "nx_ec/ec_api.h"
 #include "common/common_module.h"
-#include "route_builder.h"
 #include "module_finder.h"
+#include "api/app_server_connection.h"
+#include "core/resource/media_server_resource.h"
+#include "core/resource_management/resource_pool.h"
 
-namespace {
-    const int refreshInterval = 2 * 60 * 1000; // 2 minutes
-}
-
-QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) :
+QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),
-    m_mutex(QMutex::Recursive),
-    m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
-    m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID())),
-    m_passive(passive)
+    m_moduleFinder(moduleFinder)
 {
-    connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
-    connect(moduleFinder,       &QnModuleFinder::moduleUrlLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
-
-    QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
-    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnRouter::at_runtimeInfoManager_runtimeInfoAdded);
-    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoChanged);
-    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoRemoved);
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &QnRouter::at_refreshTimer_timeout);
-    timer->start(refreshInterval);
 }
 
 QnRouter::~QnRouter() {}
 
-QMultiHash<QnUuid, QnRouter::Endpoint> QnRouter::connections() const {
-    QMutexLocker lk(&m_mutex);
-    return m_connections;
-}
+QnRoute QnRouter::routeTo(const QnUuid &id)
+{
+    QnRoute result;
+    result.id = id;
+    result.addr = m_moduleFinder->primaryAddress(id);
+    if (!result.addr.isNull())
+        return result; // direct access to peer
 
-QHash<QnUuid, QnRoute> QnRouter::routes() const {
-    QMutexLocker lk(&m_mutex);
-    return m_routeBuilder->routes();
-}
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return result; // no connection to the server, can't route
 
-QnRoute QnRouter::routeTo(const QnUuid &id) const {
-    QMutexLocker lk(&m_mutex);
-    return m_routeBuilder->routeTo(id);
-}
-
-QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
-    QnUuid id = whoIs(host, port);
-    return id.isNull() ? QnRoute() : routeTo(id);
-}
-
-QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
-    QMutexLocker lk(&m_mutex);
-
-    for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
-        if (it->host == host && it->port == port)
-            return it->id;
-    }
-    return QnUuid();
-}
-
-void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
-    Endpoint endpoint(moduleInformation.id, url.host(), url.port());
-
-    if (!addConnection(qnCommon->moduleGUID(), endpoint))
-        return;
-
-    if (!m_passive) {
-        QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
-        if (runtimeInfoManager) {
-            QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
-            ec2::ApiConnectionData connection;
-            connection.peerId = endpoint.id;
-            connection.host = endpoint.host;
-            connection.port = endpoint.port;
-            localInfo.data.availableConnections.append(connection);
-            runtimeInfoManager->updateLocalItem(localInfo);
-        }
+    bool isknownServer = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>() != 0;
+    bool isClient = qnCommon->remoteGUID() != qnCommon->moduleGUID();
+    if (!isknownServer && isClient) {
+        result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
+        result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
+        Q_ASSERT_X(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
+        return result;
     }
 
-    emit connectionAdded(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
-}
-
-void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url) {
-    Endpoint endpoint(moduleInformation.id, url.host(), url.port());
-
-    if (!removeConnection(qnCommon->moduleGUID(), endpoint))
-        return;
-
-    if (!m_passive) {
-        QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
-        if (runtimeInfoManager) {
-            QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
-            ec2::ApiConnectionData connection;
-            connection.peerId = endpoint.id;
-            connection.host = endpoint.host;
-            connection.port = endpoint.port;
-            localInfo.data.availableConnections.removeOne(connection);
-            runtimeInfoManager->updateLocalItem(localInfo);
-        }
-    }
-
-    emit connectionRemoved(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
-}
-
-void QnRouter::at_runtimeInfoManager_runtimeInfoAdded(const QnPeerRuntimeInfo &data) {
-    for (const ec2::ApiConnectionData &connection: data.data.availableConnections)
-        addConnection(data.uuid, Endpoint(connection.peerId, connection.host, connection.port));
-}
-
-void QnRouter::at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo &data) {
-    m_mutex.lock();
-    QList<Endpoint> connections = m_connections.values(data.uuid);
-    m_mutex.unlock();
-
-    QList<ec2::ApiConnectionData> newConnections = data.data.availableConnections;
-
-    while (!newConnections.isEmpty()) {
-        ec2::ApiConnectionData connection = newConnections.takeFirst();
-        Endpoint endpoint(connection.peerId, connection.host, connection.port);
-        bool isNew = !connections.removeOne(endpoint);
-        if (isNew)
-            addConnection(data.uuid, endpoint);
-    }
-
-    while (!connections.isEmpty())
-        removeConnection(data.uuid, connections.takeFirst());
-}
-
-void QnRouter::at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo &data) {
-    for (const ec2::ApiConnectionData &connection: data.data.availableConnections)
-        removeConnection(data.uuid, Endpoint(connection.peerId, connection.host, connection.port));
-}
-
-void QnRouter::at_refreshTimer_timeout() {
-    QMutexLocker lk(&m_mutex);
-    m_routeBuilder->clear();
-}
-
-bool QnRouter::addConnection(const QnUuid &id, const QnRouter::Endpoint &endpoint) {
-    QMutexLocker lk(&m_mutex);
-
-    if (m_connections.contains(id, endpoint))
-        return false;
-
-    m_connections.insert(id, endpoint);
-    m_routeBuilder->addConnection(id, endpoint.id, endpoint.host, endpoint.port);
-
-    lk.unlock();
-
-    NX_LOG(lit("QnRouter. Connection added: %1 -> %2[%3:%4]").arg(id.toString()).arg(endpoint.id.toString()).arg(endpoint.host).arg(endpoint.port), cl_logDEBUG1);
-    emit connectionAdded(id, endpoint.id, endpoint.host, endpoint.port);
-
-    return true;
-}
-
-bool QnRouter::removeConnection(const QnUuid &id, const QnRouter::Endpoint &endpoint) {
-    QMutexLocker lk(&m_mutex);
-
-    if (!m_connections.remove(id, endpoint))
-        return false;
-
-    m_routeBuilder->removeConnection(id, endpoint.id, endpoint.host, endpoint.port);
-
-    lk.unlock();
-
-    NX_LOG(lit("QnRouter. Connection removed: %1 -> %2[%3:%4]").arg(id.toString()).arg(endpoint.id.toString()).arg(endpoint.host).arg(endpoint.port), cl_logDEBUG1);
-    emit connectionRemoved(id, endpoint.id, endpoint.host, endpoint.port);
-
-    return true;
+    QnUuid routeVia = connection->routeToPeerVia(id);
+    if (routeVia == id || routeVia.isNull())
+        return result; // can't route
+    result.addr = m_moduleFinder->primaryAddress(routeVia);
+    if (!result.addr.isNull())
+        result.gatewayId = routeVia; // route gateway is found
+    return result;
 }

@@ -5,6 +5,7 @@
 #include <utils/common/warnings.h>
 #include <utils/serialization/json_functions.h>
 #include <core/resource/camera_resource.h>
+#include "utils/match/wildcard.h"
 
 struct QnResourceDataPoolChunk {
     QList<QString> keys;
@@ -30,6 +31,9 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
 {
     m_shortVendorByName.insert(lit("digital watchdog"), lit("dw"));
     m_shortVendorByName.insert(lit("panoramic"), lit("dw"));
+    m_shortVendorByName.insert(lit("ipnc"), lit("dw"));
+    m_shortVendorByName.insert(lit("norbain_"), lit("vista"));
+    m_shortVendorByName.insert(lit("norbain"), lit("vista"));
 }
 
 QnResourceDataPool::~QnResourceDataPool() {
@@ -41,6 +45,9 @@ QnResourceData QnResourceDataPool::data(const QString &key) const {
 }
 
 QnResourceData QnResourceDataPool::data(const QnSecurityCamResourcePtr &camera) const {
+    if (!camera)
+        return QnResourceData();
+
     QString vendor = camera->getVendor().toLower();
     vendor = m_shortVendorByName.value(vendor, vendor);
     QString model = camera->getModel().toLower();
@@ -49,15 +56,16 @@ QnResourceData QnResourceDataPool::data(const QnSecurityCamResourcePtr &camera) 
     QnResourceData result;
     if (!m_cachedResultByKey.contains(key1)) {
         for(auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr) {
-            QRegExp regExpr(itr.key(), Qt::CaseInsensitive, QRegExp::Wildcard);
-            if (regExpr.exactMatch(key1))
+			if (wildcardMatch(itr.key(), key1))
                 result.add(itr.value());
         }
         m_cachedResultByKey.insert(key1, result);
     } else {
         result = m_cachedResultByKey[key1];
     }
-    result.add(m_dataByKey.value(key1 + lit("|") + camera->getFirmware().toLower()));
+    auto additionData = m_dataByKey.find(key1 + lit("|") + camera->getFirmware().toLower());
+    if (additionData != m_dataByKey.end())
+        result.add(additionData.value());
     return result;
 }
 

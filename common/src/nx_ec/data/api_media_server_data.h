@@ -19,18 +19,18 @@ namespace ec2
 
     struct ApiMediaServerData: ApiResourceData
     {
-        ApiMediaServerData(): flags(Qn::SF_None), panicMode(Qn::PM_None) {}
+        ApiMediaServerData(): flags(Qn::SF_None), not_used(Qn::PM_None) {}
 
         QString         apiUrl;
         QString         networkAddresses;
         Qn::ServerFlags flags;
-        Qn::PanicMode   panicMode;
+        Qn::PanicMode   not_used;
         QString         version; 
         QString         systemInfo;
         QString         authKey;
         QString         systemName; //! < Server system name. It can be invalid sometimes, but it matters only when server is in incompatible state.
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(panicMode)(version)(systemInfo)(authKey)(systemName)
+#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(not_used)(version)(systemInfo)(authKey)(systemName)
 
 
     struct ApiMediaServerUserAttributesData: ApiData
@@ -52,27 +52,22 @@ namespace ec2
         ApiMediaServerData,
         ApiMediaServerUserAttributesData
     {
+        ApiMediaServerDataEx(): ApiMediaServerData(), ApiMediaServerUserAttributesData(), status(Qn::Offline) {}
+
         Qn::ResourceStatus status;
         std::vector<ApiResourceParamData> addParams;
         ApiStorageDataList storages;
 
-        ApiMediaServerDataEx();
-
         template<class ApiMediaServerDataRefType>
         ApiMediaServerDataEx( ApiMediaServerDataRefType&& mediaServerData )
         :
-            ApiMediaServerData( std::forward<ApiMediaServerDataRefType>(mediaServerData) )
+            ApiMediaServerData( std::forward<ApiMediaServerDataRefType>(mediaServerData) ),
+            status(Qn::Offline)
         {
         }
     };
 #define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields_Short (status)(addParams) (storages)
 
-
-    struct ApiPanicModeData: public ApiData
-    {
-        Qn::PanicMode mode;
-    };
-#define ApiPanicModeData_Fields (mode)
 
 } // namespace ec2
 

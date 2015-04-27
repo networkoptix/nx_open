@@ -5,11 +5,13 @@
 #include <utils/media/frame_info.h>
 #include <utils/math/math.h>
 
-QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params):
+QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params, bool doDeepCopy):
     m_params(params),
     m_lastGamma(-1.0)
 {
     memset(m_gammaCorrection, 0, sizeof(m_gammaCorrection));
+    if (doDeepCopy)
+        m_deepCopyFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
 }
 
 bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
@@ -25,8 +27,12 @@ static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0
     //TODO: C fallback routine
 #endif
 
-CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
+CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame)
 {
+    if (m_deepCopyFrame)
+        CLVideoDecoderOutput::copy(srcFrame.data(), m_deepCopyFrame.data());
+    const CLVideoDecoderOutputPtr& frame = m_deepCopyFrame ? m_deepCopyFrame : srcFrame;
+
     static const float GAMMA_EPS = 0.01f;
 
     if (!m_params.enabled)

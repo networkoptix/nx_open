@@ -18,7 +18,7 @@ class QnCompressedVideoData;
 class QnAbstractRenderer;
 class QnBufferedFrameDisplayer;
 
-static const int MAX_FRAME_QUEUE_SIZE = 12;
+static const int MAX_FRAME_QUEUE_SIZE = 6;
 static const int MAX_QUEUE_TIME = 1000 * 200;
 
 /**

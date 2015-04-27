@@ -37,6 +37,8 @@ private slots:
     void at_closeLayoutAction_triggered();
     void at_closeAllButThisLayoutAction_triggered();
 
+    void at_workbench_layoutsChanged();
+
     void at_layouts_saved(int status, const QnResourceList &resources, int handle);
 
 private:
@@ -70,6 +72,9 @@ private:
 
 private:
     QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
+
+    /** Flag that we are in layouts closing process. */
+    bool m_closingLayouts;
 };
 
 #endif // WORKBENCH_LAYOUTS_HANDLER_H

@@ -44,7 +44,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
 
 bool QnFileStorageResource::updatePermissions() const
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexPermission);
     if (m_durty) {
         m_durty = false;
         QUrl storageUrl(getUrl());
@@ -58,7 +58,8 @@ bool QnFileStorageResource::updatePermissions() const
             netRes.lpRemoteName = (LPWSTR) path.constData();
             LPWSTR password = (LPWSTR) storageUrl.password().constData();
             LPWSTR user = (LPWSTR) storageUrl.userName().constData();
-            WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0);
+            if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
+                return false;
         }
 #endif
     }
@@ -131,13 +132,15 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
-    updatePermissions();
+    if (!updatePermissions())
+        return -1;
     return getDiskFreeSpace(getPath());
 }
 
 qint64 QnFileStorageResource::getTotalSpace()
 {
-    updatePermissions();
+    if (!updatePermissions())
+        return -1;
     return getDiskTotalSpace(getPath());
 }
 
@@ -159,7 +162,8 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
     if( !isStorageDirMounted() )
         return false;
 
-    updatePermissions();
+    if (!updatePermissions())
+		return false;
 
     if (hasFlags(Qn::deprecated))
         return false;
@@ -193,7 +197,8 @@ bool QnFileStorageResource::isStorageAvailable()
     if( !isStorageDirMounted() )
         return false;
 
-    updatePermissions();
+    if (!updatePermissions())
+		return false;
 
     QString tmpDir = closeDirPath(getPath()) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
@@ -248,7 +253,7 @@ float QnFileStorageResource::getAvarageWritingUsage() const
 
 void QnFileStorageResource::setStorageBitrateCoeff(float value)
 {
-    qDebug() << "QnFileStorageResource " << getPath() << "coeff " << value;
+    NX_LOG(lit("QnFileStorageResource %1 coeff %2").arg(getPath()).arg(value), cl_logDEBUG2);
     m_storageBitrateCoeff = value;
 }
 
@@ -296,8 +301,9 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
 
 bool QnFileStorageResource::isStorageDirMounted()
 {
+    const QString& notResolvedStoragePath = closeDirPath(getPath());
+    const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
     //on unix, checking that storage directory is mounted, if it is to be mounted
-    const QString& storagePath = QDir(closeDirPath(getPath())).canonicalPath();   //following symbolic link
 
     QStringList mountPoints;
     if( !readTabFile( lit("/etc/fstab"), &mountPoints ) )
@@ -332,6 +338,7 @@ bool QnFileStorageResource::isStorageDirMounted()
         }
     }
 
+    NX_LOG( lit("Storage %1 is mounted (mount point %2)").arg(storagePath).arg(storageMountPoint), cl_logDEBUG2 );
     return true;
 }
 #endif    // _WIN32

@@ -24,18 +24,12 @@ class DeviceFileCatalog: public QObject
 {
     Q_OBJECT
 public:
-    // TODO: #Elric #enum
-    enum RebuildMethod {
-        Rebuild_None,    // do not rebuild chunk's database
-        Rebuild_Canceled,
-        Rebuild_LQ,      // rebuild LQ chunks only
-        Rebuild_HQ,      // rebuild HQ chunks only
-        Rebuild_All      // rebuild whole chunks
-    };
 
     struct Chunk
     {
-        Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1) {}
+        static const quint16 FILE_INDEX_NONE = 0xffff;
+
+        Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1), fileSizeHi(0), fileSizeLo(0) {}
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) : 
             startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex), timeZone(_timeZone), fileSizeHi(fileSizeHi), fileSizeLo(fileSizeLo)
         {
@@ -48,6 +42,8 @@ public:
         void truncate(qint64 timeMs);
         qint64 getFileSize() const { return ((qint64) fileSizeHi << 32) + fileSizeLo; } // 256Tb as max file size
         void setFileSize(qint64 value) { fileSizeHi = quint16(value >> 32); fileSizeLo = quint32(value); } // 256Tb as max file size
+
+        QString fileName() const;
 
 
         qint64 startTimeMs; // chunk startTime at ms
@@ -114,7 +110,6 @@ public:
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 
-    static void setRebuildArchive(RebuildMethod value);
     static void cancelRebuildArchive();
     static bool needRebuildPause();
     static void rebuildPause(void*);
@@ -123,9 +118,6 @@ public:
     static QSet<void*> m_pauseList;
 
     bool doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period);
-    bool isLastRecordRecording() const { return m_lastRecordRecording; }
-    qint64 getLatRecordingTime() const;
-    void setLatRecordingTime(qint64 value);
 
     struct ScanFilter
     {
@@ -147,7 +139,7 @@ public:
     QnServer::ChunksCatalog getRole() const;
 private:
 
-    bool fileExists(const Chunk& chunk, bool checkDirOnly);
+    bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, const QnStorageResourcePtr &storage);
     QSet<QDate> recordedMonthList();
@@ -157,6 +149,7 @@ private:
     QnTimePeriod timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName);
     void replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog);
     void removeRecord(int idx);
+    int detectTimeZone(qint64 startTimeMs, const QString& fileName);
 private:
     friend class QnStorageManager;
 
@@ -180,10 +173,8 @@ private:
     //bool m_duplicateName;
     //QMap<int,QString> m_prevFileNames;
     const QnServer::ChunksCatalog m_catalog;
-    int m_lastAddIndex; // last added record index. In most cases it is last record
+    qint64 m_recordingChunkTime;
     QMutex m_IOMutex;
-    static RebuildMethod m_rebuildArchive;
-    bool m_lastRecordRecording;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

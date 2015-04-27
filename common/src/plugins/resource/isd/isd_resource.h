@@ -18,6 +18,9 @@ public:
 
     QnPlIsdResource();
 
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+
     QSize getPrimaryResolution() const;
     QSize getSecondaryResolution() const;
 
@@ -30,19 +33,18 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
 protected:
+    QSize m_resolution1;
+    QSize m_resolution2;
+
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
     virtual void setCroppingPhysical(QRect cropping);
 
 private:
     void setMaxFps(int f);
-protected:
-    QSize m_resolution1;
-    QSize m_resolution2;
-
-    
-
+    CameraDiagnostics::Result doISDApiRequest( const QUrl& apiRequestUrl, QByteArray* const msgBody );
 };
 
 #endif // #ifdef ENABLE_ISD
+
 #endif //isd_resource_h_1934

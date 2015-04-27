@@ -34,6 +34,7 @@ QString toString( CLHttpStatus status )
 
 
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
+    m_hostString(host),
     m_port(port),
     m_connected(false),
     m_timeout(timeout),
@@ -47,6 +48,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QString& host, int port, unsigned i
 }
 
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
+    m_hostString(host.toString()),
     m_host(host),
     m_port(port),
     m_connected(false),
@@ -60,6 +62,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsig
 }
 
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, const QAuthenticator& auth):
+    m_hostString(url.host()),
     m_host(url.host()),
     m_port(url.port()),
     m_connected(false),
@@ -69,6 +72,8 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, co
     m_dataRestLen(0),
     m_localPort(0)
 {
+    if (m_host.isNull() && !url.host().isEmpty())
+        m_host = resolveAddress(url.host());
     initSocket(url.scheme() == lit("https"));
 }
 
@@ -112,7 +117,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString(), m_port))
+            if (m_host.isNull() || !m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
@@ -125,14 +130,15 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
-        request.append(m_host.toString().toUtf8());
+        request.append(m_hostString.toUtf8());
         request.append("\r\n");
         request.append("User-Agent: Simple HTTP Client 1.0\r\n");
         request.append("Accept: */*\r\n");
 
         addExtraHeaders(request);
 
-        request.append("Content-Type: application/x-www-form-urlencoded\r\n");
+        if (!request.contains("Content-Type"))
+            request.append("Content-Type: application/x-www-form-urlencoded\r\n");
 
         if (m_auth.user().length()>0 && mNonce.isEmpty())
         {
@@ -181,7 +187,10 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             {
                 getAuthInfo();
                 if (recursive)
+                {
+                    close();
                     return doPOST(requestStr, body, false);
+                }
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }
@@ -221,8 +230,6 @@ int CLSimpleHTTPClient::readHeaders()
     while (eofPos == 0)
     {
         int readed = m_sock->recv(curPtr, left);
-        if( readed == 0 )
-            return CL_NOT_HTTP; //connection closed before we could read some http header(s)
         if (readed < 1)
             return CL_TRANSPORT_ERROR;
         curPtr += readed;
@@ -289,7 +296,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString(), m_port))
+            if (m_host.isNull() || !m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
@@ -307,7 +314,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
-        request.append(m_host.toString().toUtf8());
+        request.append(m_hostString.toUtf8());
         request.append("\r\n");
 
         addExtraHeaders(request);
@@ -338,7 +345,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         //got following status line: http/1.1 401 n/a, and this method returned CL_TRANSPORT_ERROR
         nx_http::StatusLine statusLine;
         if( !statusLine.parse( m_responseLine ) )
-            return CL_NOT_HTTP;
+            return CL_TRANSPORT_ERROR;
 
         //if (!m_responseLine.contains("200 ok") && !m_responseLine.contains("204 no content"))// not ok
         if( statusLine.statusCode != nx_http::StatusCode::ok && statusLine.statusCode != nx_http::StatusCode::noContent )
@@ -351,7 +358,10 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
                 getAuthInfo();
 
                 if (recursive)
+                {
+                    close();
                     return doGET(requestStr, false);
+                }
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }

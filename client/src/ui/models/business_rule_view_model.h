@@ -21,9 +21,10 @@ namespace QnBusiness {
         SpacerColumn,
         ActionColumn,
         TargetColumn,
-        AggregationColumn,
-        ColumnCount
+        AggregationColumn
     };
+
+    QList<Columns> allColumns();
 
     enum Field {
         ModifiedField           = 0x00000001,
@@ -45,6 +46,8 @@ namespace QnBusiness {
 }
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusiness::Fields)
+
+typedef QVector<QnUuid> IDList;
 
 class QnBusinessRuleViewModel: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -142,12 +145,14 @@ private:
     bool m_modified;
 
     QnBusiness::EventType m_eventType;
-    QnResourceList m_eventResources;
+    //QnResourceList m_eventResources;
+    IDList  m_eventResources;
     QnBusinessEventParameters m_eventParams;
     QnBusiness::EventState m_eventState;
 
     QnBusiness::ActionType m_actionType;
-    QnResourceList m_actionResources;
+    //QnResourceList m_actionResources;
+    IDList  m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;

@@ -23,6 +23,9 @@ public slots:
 
 protected:
     virtual void sliderChange(SliderChange change) override;
+
+private:
+    bool m_updating;
 };
 
 #endif // QN_VOLUME_SLIDER_H

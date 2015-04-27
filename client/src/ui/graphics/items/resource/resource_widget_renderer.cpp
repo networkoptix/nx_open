@@ -276,6 +276,13 @@ void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
     ctx.uploader->ensureAllFramesWillBeDisplayed();
 }
 
+void QnResourceWidgetRenderer::waitForQueueLessThan(int channel, int maxSize) {
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->ensureQueueLessThen(maxSize);
+}
+
 void QnResourceWidgetRenderer::finishPostedFramesRender(int channel)
 {
     RenderingTools& ctx = m_channelRenderers[channel];

@@ -22,7 +22,7 @@
 #include "plugins/resource/onvif/dataprovider/onvif_mjpeg.h"
 
 #include "motion_data_picture.h"
-
+#include "version.h"
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnResourcePtr res,
@@ -119,8 +119,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
     const Qn::ConnectionRole role = getRole();
 
     const int encoderIndex = role == Qn::CR_LiveVideo
-        ? QnThirdPartyResource::PRIMARY_ENCODER_INDEX
-        : QnThirdPartyResource::SECONDARY_ENCODER_INDEX;
+        ? PRIMARY_ENCODER_INDEX
+        : SECONDARY_ENCODER_INDEX;
 
     nxcip::CameraMediaEncoder* intf = NULL;
     int result = m_camManager.getEncoder( encoderIndex, &intf );
@@ -136,26 +136,29 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
 
     m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
 
-    if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
+    if( isCameraControlRequired() )
     {
-        if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
-            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
-    }
+        if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
+        {
+            if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
+        }
 
-    const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
-    if( resolution.width*resolution.height > 0 )
-        if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
-            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
-    float selectedFps = 0;
-    if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
+        const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
+        if( resolution.width*resolution.height > 0 )
+            if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
+        float selectedFps = 0;
+        if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
 
-    int selectedBitrateKbps = 0;
-    if( cameraEncoder.setBitrate(
-            m_thirdPartyRes->suggestBitrateKbps(getQuality(), QSize(resolution.width, resolution.height), getFps()),
-            &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
-    {
-        return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
+        int selectedBitrateKbps = 0;
+        if( cameraEncoder.setBitrate(
+                m_thirdPartyRes->suggestBitrateKbps(getQuality(), QSize(resolution.width, resolution.height), getFps()),
+                &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
+        {
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
+        }
     }
 
     m_mediaEncoder2Ref = static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 ));
@@ -191,6 +194,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
         if( mediaUrl.scheme().toLower() == lit("rtsp") )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
+            rtspStreamReader->setUserAgent(lit(QN_PRODUCT_NAME));
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             m_builtinStreamReader.reset( rtspStreamReader );
@@ -239,8 +243,11 @@ QnMetaDataV1Ptr ThirdPartyStreamReader::getCameraMetadata()
 {
     //TODO/IMPL
 
-    QnMetaDataV1Ptr rez = m_lastMetadata != 0 ? m_lastMetadata : QnMetaDataV1Ptr(new QnMetaDataV1());
-    m_lastMetadata.clear();
+    QnMetaDataV1Ptr rez;
+    if( m_lastMetadata )
+        rez.swap( m_lastMetadata );
+    else
+        rez = QnMetaDataV1Ptr(new QnMetaDataV1());
     return rez;
 }
 
@@ -313,7 +320,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
             if( m_savedMediaPacket )
             {
                 rez = std::move(m_savedMediaPacket);
-                m_savedMediaPacket.clear(); //calling clear since QSharePointer move operator implementation leaves some questions...
+                m_savedMediaPacket.reset(); //calling clear since QSharePointer move operator implementation leaves some questions...
             }
             else
             {
@@ -322,12 +329,12 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                 if( rez )
                 {
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                    QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.data());
+                    QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.get());
                     if( videoData && videoData->motion )
                     {
                         m_savedMediaPacket = rez;
                         rez = std::move(videoData->motion);
-                        videoData->motion.clear();
+                        videoData->motion.reset();
                     }
                     else if( rez->dataType == QnAbstractMediaData::AUDIO )
                     {
@@ -337,7 +344,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                             if( m_mediaEncoder2Ref->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
                                 initializeAudioContext( audioFormat );
                         }
-                        static_cast<QnCompressedAudioData*>(rez.data())->context = m_audioContext;
+                        static_cast<QnCompressedAudioData*>(rez.get())->context = m_audioContext;
                     }
                 }
                 else

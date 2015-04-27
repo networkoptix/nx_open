@@ -57,6 +57,11 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor():
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDelivered, this, &QnBusinessRuleProcessor::at_actionDelivered);
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
 
+    connect(qnResPool, &QnResourcePool::resourceAdded,
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, true ); });
+    connect(qnResPool, &QnResourcePool::resourceRemoved,
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); });
+
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionReceived,
         this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction));
 
@@ -117,13 +122,13 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
 
 bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
-    const QnMediaServerResourcePtr& routeToServer = getDestMServer(action, res);
+    const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
     return routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid();
 }
 
 void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
-    const QnMediaServerResourcePtr& routeToServer = getDestMServer(action, res);
+    const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
     if (routeToServer) 
     {
         // todo: it is better to use action.clone here
@@ -151,7 +156,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnResourceList resList = action->getResourceObjects().filtered<QnNetworkResource>();
+    QnNetworkResourceList resList = qnResPool->getResources<QnNetworkResource>(action->getResources());
     if (resList.isEmpty()) {
         executeAction(action, QnResourcePtr());
     }
@@ -347,22 +352,18 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
     if (bEvent->getResource())
         eventKey += bEvent->getResource()->getUniqueId();
 
-
-    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-
-    bool isFirstCall = !m_aggregateActions.contains(eventKey);
     QnProcessorAggregationInfo& aggInfo = m_aggregateActions[eventKey];
     if (!aggInfo.initialized())
-        aggInfo.init(bEvent, rule, currentTime);
+        aggInfo.init(bEvent, rule);
 
     aggInfo.append(bEvent->getRuntimeParams());
 
-    if (isFirstCall || currentTime > aggInfo.estimatedEnd())
+    if (aggInfo.isExpired())
     {
         QnAbstractBusinessActionPtr result = QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
                                                                                         aggInfo.event(),
                                                                                         aggInfo.info());
-        aggInfo.reset(currentTime);
+        aggInfo.reset();
         return result;
     }
 
@@ -372,17 +373,16 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
 void QnBusinessRuleProcessor::at_timer()
 {
     QMutexLocker lock(&m_mutex);
-    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
     QMap<QString, QnProcessorAggregationInfo>::iterator itr = m_aggregateActions.begin();
     while (itr != m_aggregateActions.end())
     {
         QnProcessorAggregationInfo& aggInfo = itr.value();
-        if (aggInfo.totalCount() > 0 && currentTime > aggInfo.estimatedEnd())
+        if (aggInfo.totalCount() > 0 && aggInfo.isExpired())
         {
             executeAction(QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
                                                                      aggInfo.event(),
                                                                      aggInfo.info()));
-            aggInfo.reset(currentTime);
+            aggInfo.reset();
         }
         ++itr;
     }
@@ -391,6 +391,8 @@ void QnBusinessRuleProcessor::at_timer()
 bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule)
 {
     bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || rule->eventResources().contains(bEvent->getResource()->getId());
+//    auto resList = rule->eventResourceObjects<QnResource>();
+//    bool resOK = !bEvent->getResource() || resList.isEmpty() || resList.contains(bEvent->getResource());
     if (!resOK)
         return false;
 
@@ -449,12 +451,12 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(const QnAbstractBusinessAc
     //TODO: #vasilenko implement me
 }
 
-QImage QnBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const
+QByteArray QnBusinessRuleProcessor::getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const
 {
     Q_UNUSED(params);
     Q_UNUSED(dstSize);
 
-    return QImage();
+    return QByteArray();
 }
 
 static const unsigned int MS_PER_SEC = 1000;
@@ -472,7 +474,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     }
 
     QStringList recipients;
-    for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) {
         QString email = user->getEmail();
         if (!email.isEmpty() && QnEmailAddress::isValid(email))
             recipients << email;
@@ -521,7 +523,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
 
     QStringList log;
     QStringList recipients;
-    for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) {
         QString email = user->getEmail();
         log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
         if (!email.isEmpty() && QnEmailAddress::isValid(email))
@@ -568,14 +570,11 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
     contextMap[tpSystemName] = emailSettings.signature;
     attachments.append(partialInfo.attachments);
 
-    QImage screenshot = this->getEventScreenshot(action->getRuntimeParams(), QSize(640, 480));
-    if (!screenshot.isNull()) {
-        QByteArray screenshotData;
+    QByteArray screenshotData = this->getEventScreenshotEncoded(action->getRuntimeParams(), QSize(640, 480));
+    if (!screenshotData.isNull()) {
         QBuffer screenshotStream(&screenshotData);
-        if (screenshot.save(&screenshotStream, "JPEG")) {
-            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
-            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
-        }
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+        contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
     }
 
     QString messageBody = renderTemplateFromFile(lit(":/email_templates"), partialInfo.attrName + lit(".mustache"), contextMap);
@@ -671,6 +670,34 @@ void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList
     }
 }
 
+void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool toggle)
+{
+    QMutexLocker lock(&m_mutex);
+
+    QnVirtualCameraResourcePtr camResource = resource.dynamicCast<QnVirtualCameraResource>();
+    if(!camResource)
+        return;
+
+    for( const QnBusinessEventRulePtr& rule: m_rules )
+    {
+        if( rule->isDisabled() )
+            continue;
+
+        if( rule->eventType() == QnBusiness::CameraInputEvent)
+        {
+            QnVirtualCameraResourceList resList = qnResPool->getResources<QnVirtualCameraResource>(rule->eventResources());
+            if( resList.isEmpty() ||            //listening all cameras
+                resList.contains(camResource) )
+            {
+                if( toggle )
+                    camResource->inputPortListenerAttached();
+                else
+                    camResource->inputPortListenerDetached();
+            }
+        }
+    }
+}
+
 void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr& rule)
 {
     QString ruleId = rule->getUniqueId();
@@ -728,39 +755,31 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
     {
         if( businessRule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnResourceList resList = businessRule->eventResourceObjects();
-            if (resList.isEmpty()) {
-                const QnResourcePtr& mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-                resList = qnResPool->getAllCameras(mServer, true);
-            }
+            QnVirtualCameraResourceList resList = qnResPool->getResources<QnVirtualCameraResource>(businessRule->eventResources());
+            if (resList.isEmpty())
+                resList = qnResPool->getAllCameras(QnResourcePtr(), true);
 
-            for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )
+            for(const QnVirtualCameraResourcePtr &camera: resList)
             {
-                QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(it->data());
-                if( !securityCam )
-                    continue;
                 if( isRuleAdded )
-                    securityCam->inputPortListenerAttached();
+                    camera->inputPortListenerAttached();
                 else
-                    securityCam->inputPortListenerDetached();
+                    camera->inputPortListenerDetached();
             }
         }
     }
 
     //notifying resources about recording action
     {
-        const QnResourceList& resList = businessRule->actionResourceObjects();
         if( businessRule->actionType() == QnBusiness::CameraRecordingAction)
         {
-            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            QnVirtualCameraResourceList resList = qnResPool->getResources<QnVirtualCameraResource>(businessRule->actionResources());
+            for(const QnVirtualCameraResourcePtr &camera: resList)
             {
-                QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(it->data());
-                if( !securityCam )
-                    continue;
                 if( isRuleAdded )
-                    securityCam->recordingEventAttached();
+                    camera->recordingEventAttached();
                 else
-                    securityCam->recordingEventDetached();
+                    camera->recordingEventDetached();
             }
         }
     }

@@ -80,6 +80,9 @@
 #define VER_ORIGINALFILENAME_STR        "${project.artifactId}.exe"
 #define VER_PRODUCTNAME_STR             "${project.artifactId}"
 #define VER_COMPANYDOMAIN_STR           "${company.url}"
+
+#define IDI_ICON_APPLICATION            101
+#define IDI_ICON_VIDEOWALL              102
 /* Dear Developer. Please add new constants to the code block above (QN_* definitions). Thank you. */
 
 #endif // ${project.artifactId}_VERSION_H

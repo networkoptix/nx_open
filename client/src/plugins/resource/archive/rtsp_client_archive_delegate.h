@@ -59,10 +59,12 @@ public:
     void setMultiserverAllowed(bool value);
 
     void setPlayNowModeAllowed(bool value);
+
+    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
-    QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum);
+    QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal();
     void reopen();
@@ -72,9 +74,11 @@ private:
     QnMediaServerResourcePtr getNextMediaServerFromTime(const QnVirtualCameraResourcePtr &camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
-    qint64 checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera) const;
+    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera);
     void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
+    void lockTime(qint64 value);
+    void unlockTime();
 private:
     QMutex m_mutex;
     RTPSession m_rtspSession;
@@ -118,6 +122,8 @@ private:
         QString password;
         QnUuid videowall;
     } m_auth;
+    mutable QMutex m_timeMutex;
+    qint64 m_lockedTime;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

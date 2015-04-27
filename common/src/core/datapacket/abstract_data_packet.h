@@ -1,9 +1,12 @@
 #ifndef abstract_data_h_1112
 #define abstract_data_h_1112
 
-#include <QtCore/QSharedPointer>
+#include <memory>
+
+#include <common/common_globals.h>
 
 #include "abstract_media_context.h"
+
 
 class QnAbstractStreamDataProvider;
 
@@ -15,9 +18,9 @@ struct QnAbstractDataPacket {
     qint64 timestamp; // mksec // 10^-6
 };
 
-typedef QSharedPointer<QnAbstractDataPacket> QnAbstractDataPacketPtr;
+typedef std::shared_ptr<QnAbstractDataPacket> QnAbstractDataPacketPtr;
 Q_DECLARE_METATYPE(QnAbstractDataPacketPtr);
-typedef QSharedPointer<const QnAbstractDataPacket> QnConstAbstractDataPacketPtr;
+typedef std::shared_ptr<const QnAbstractDataPacket> QnConstAbstractDataPacketPtr;
 Q_DECLARE_METATYPE(QnConstAbstractDataPacketPtr);
 
 #endif //abstract_data_h_1112

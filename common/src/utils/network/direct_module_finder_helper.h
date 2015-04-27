@@ -3,41 +3,52 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
-#include <QtCore/QPointer>
-#include <QtNetwork/QHostAddress>
+#include <QtCore/QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/id.h>
+#include <utils/common/connective.h>
 
-typedef QList<QHostAddress> QnHostAddressList;
-typedef QSet<QHostAddress> QnHostAddressSet;
 typedef QSet<QUrl> QnUrlSet;
+
 class QnModuleFinder;
-class QnDirectModuleFinder;
 class QnMulticastModuleFinder;
+class SocketAddress;
+struct QnModuleInformation;
 
-class QnModuleFinderHelper : public QObject {
+class QnDirectModuleFinderHelper : public Connective<QObject> {
     Q_OBJECT
-public:
-    explicit QnModuleFinderHelper(QnModuleFinder *moduleFinder);
+    typedef Connective<QObject> base_type;
 
-    QnUrlSet urlsForPeriodicalCheck() const;
-    void setUrlsForPeriodicalCheck(const QnUrlSet &urls);
+public:
+    explicit QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder);
+
+    void setForcedUrls(const QSet<QUrl> &forcedUrls);
 
 private slots:
     void at_resourceAdded(const QnResourcePtr &resource);
+    void at_resourceRemoved(const QnResourcePtr &resource);
     void at_resourceChanged(const QnResourcePtr &resource);
     void at_resourceAuxUrlsChanged(const QnResourcePtr &resource);
-    void at_resourceRemoved(const QnResourcePtr &resource);
+    void at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void at_timer_timeout();
 
 private:
-    QnMulticastModuleFinder *m_multicastModuleFinder;
-    QnDirectModuleFinder *m_directModuleFinder;
-    QHash<QnUuid, QnHostAddressSet> m_addressesByServer;
-    QHash<QnUuid, QnUrlSet> m_manualAddressesByServer;
-    QHash<QnUuid, quint16> m_portByServer;
-    QnUrlSet m_urlsForPeriodicalCheck;
+    void updateModuleFinder();
+
+private:
+    QnModuleFinder *m_moduleFinder;
+    QElapsedTimer m_elapsedTimer;
+
+    QHash<QUrl, int> m_urls;
+    QHash<QUrl, int> m_ignoredUrls;
+    QSet<QUrl> m_forcedUrls;
+
+    QHash<QnUuid, QnUrlSet> m_serverUrlsById;
+    QHash<QnUuid, QnUrlSet> m_additionalServerUrlsById;
+    QHash<QnUuid, QnUrlSet> m_ignoredServerUrlsById;
+
+    QHash<QUrl, qint64> m_multicastedUrlLastPing;
 };
 
 #endif // DIRECT_MODULE_FINDER_HELPER_H

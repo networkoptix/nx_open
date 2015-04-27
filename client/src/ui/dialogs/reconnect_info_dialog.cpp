@@ -7,6 +7,10 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/progress_widget.h>
 
+namespace {
+    const int maxLabelWidth = 400;
+}
+
 QnReconnectInfoDialog::QnReconnectInfoDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     ui(new Ui::ReconnectInfoDialog()),
@@ -54,8 +58,10 @@ void QnReconnectInfoDialog::setServers(const QnMediaServerResourceList &servers)
     m_servers = servers;
     int row = 0;
     for (const QnMediaServerResourcePtr server: m_servers) {
+        QString text = getResourceName(server);
+
         QLabel* nameLabel = new QLabel(this);
-        nameLabel->setText(getResourceName(server));
+        nameLabel->setText(fontMetrics().elidedText(text, Qt::ElideMiddle, maxLabelWidth));
 
         QLabel *iconLabel = new QLabel(this);
         iconLabel->setPixmap(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(18, 18));

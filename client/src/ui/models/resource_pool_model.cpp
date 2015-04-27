@@ -106,7 +106,6 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
 
 QnResourcePoolModel::~QnResourcePoolModel() {
     /* Disconnect from context. */
-    QnResourceList resources = resourcePool()->getResources(); 
     disconnect(resourcePool(), NULL, this, NULL);
     disconnect(snapshotManager(), NULL, this, NULL);
 
@@ -527,6 +526,9 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
 
     } else if(QnMediaServerResourcePtr server = node->resource().dynamicCast<QnMediaServerResource>()) {
+        if(server->getStatus() == Qn::Incompatible)
+            return true;
+
         if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
             /* Allow drop of non-layout item data, from tree only. */
 
@@ -574,13 +576,17 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     }
 
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
+        connect(camera,     &QnVirtualCameraResource::groupIdChanged,   this,   &QnResourcePoolModel::at_resource_parentIdChanged);
         connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
-        connect(camera,     &QnResource::nameChanged,                   this,   [this](const QnResourcePtr &resource) {
+        connect(camera,     &QnVirtualCameraResource::statusFlagsChanged, this, &QnResourcePoolModel::at_resource_resourceChanged);
+        auto updateParent = [this](const QnResourcePtr &resource) {
             /* Automatically update display name of the EDGE server if its camera was renamed. */
             QnResourcePtr parent = resource->getParentResource();
             if (QnMediaServerResource::isEdgeServer(parent))
                 at_resource_resourceChanged(parent);
-        });
+        };
+        connect(camera, &QnResource::nameChanged, this, updateParent);
+        updateParent(camera);
     }
 
 
@@ -600,11 +606,8 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if (server) {
         m_rootNodes[Qn::OtherSystemsNode]->update();
-
-        QnUuid serverId = server->getId();
-        foreach (QnResourcePoolModelNode *node, m_rootNodes[Qn::BastardNode]->children()) {
-            QnResourcePtr resource = node->resource();
-            if (resource && resource->getParentId() == serverId)
+        for (const QnResourcePtr &resource: qnResPool->getResourcesByParentId(server->getId())) {
+            if (m_resourceNodeByResource.contains(resource))
                 at_resource_parentIdChanged(resource);
         }
     }
@@ -669,8 +672,9 @@ void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resou
 
     /* update edge resource */
     if (resource.dynamicCast<QnVirtualCameraResource>()) {
+        QnResourcePtr server = resource->getParentResource();
         bool wasEdge = (node->type() == Qn::EdgeNode);
-        bool mustBeEdge = QnMediaServerResource::isHiddenServer(resource->getParentResource());
+        bool mustBeEdge = QnMediaServerResource::isHiddenServer(server);
         if (wasEdge != mustBeEdge) {
             QnResourcePoolModelNode *parent = node->parent();
 
@@ -681,6 +685,9 @@ void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resou
                 parent->update();
 
             node = this->node(resource);
+
+            if (QnResourcePoolModelNode *node = m_resourceNodeByResource.value(server))
+                node->update();
         }
     }
 
@@ -710,6 +717,7 @@ void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
 
     node->setResource(resource);
     node->setParent(parentNode);
+    node->update();
 }
 
 void QnResourcePoolModel::at_layout_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {
@@ -749,7 +757,12 @@ void QnResourcePoolModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePt
     removeNode(Qn::VideoWallMatrixNode, matrix.uuid, videoWall);
 }
 
-void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera) {
+void QnResourcePoolModel::at_camera_groupNameChanged(const QnResourcePtr &resource) {
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    Q_ASSERT(camera);
+    if (!camera)
+        return;
+
     const QString groupId = camera->getGroupId();
     foreach (RecorderHash recorderHash, m_recorderHashByResource) {
         if (!recorderHash.contains(groupId))
@@ -763,6 +776,7 @@ void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResource
 
 void QnResourcePoolModel::at_server_systemNameChanged(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    Q_ASSERT(server);
     if (!server)
         return;
 
@@ -773,17 +787,15 @@ void QnResourcePoolModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
 void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resource) {
     QnResourcePoolModelNode *node = this->node(resource);
-    bool isHidden = QnMediaServerResource::isHiddenServer(resource);
-    QnResourcePoolModelNode *camerasParentNode = isHidden ? m_rootNodes[Qn::ServersNode] : node;
-
-    foreach (const QnResourcePtr &cameraResource, qnResPool->getAllCameras(resource, true)) {
-        if (!cameraResource.dynamicCast<QnVirtualCameraResource>())
-            continue;
-
-        this->node(cameraResource)->setParent(camerasParentNode);
-    }
-
     node->update();
+
+    for (const QnVirtualCameraResourcePtr &cameraResource: qnResPool->getAllCameras(resource, true)) {
+        QnResourcePoolModelNode *camNode = m_resourceNodeByResource.take(cameraResource);
+        deleteNode(camNode);
+        /* Re-create node as it should change its NodeType from ResourceNode to EdgeNode or vice versa. */
+        camNode = this->node(cameraResource);
+        camNode->setParent(expectedParent(camNode));
+    }
 }
 
 void QnResourcePoolModel::at_commonModule_systemNameChanged() {

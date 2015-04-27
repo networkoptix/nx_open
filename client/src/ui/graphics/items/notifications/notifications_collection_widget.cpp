@@ -13,6 +13,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
@@ -159,8 +160,12 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         button->setDefaultAction(action(actionId));
         button->setFixedSize(buttonSize);
         button->setCached(true);
-        if (helpTopicId >= 0)
+        if (helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);
+        connect(this->context(), &QnWorkbenchContext::userChanged, this, [this, button, actionId] {
+            button->setVisible(this->menu()->canTrigger(actionId));
+        });
+        button->setVisible(this->menu()->canTrigger(actionId));
         return button;
     };
 
@@ -169,6 +174,8 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     controlsLayout->setSpacing(2.0);
     controlsLayout->setContentsMargins(2.0, margin, 2.0, margin);
     controlsLayout->addStretch();
+
+#ifdef _DEBUG
     if(qnSettings->isDevMode()) {
         QnImageButtonWidget *debugButton = new QnImageButtonWidget(m_headerWidget);
         debugButton->setIcon(qnSkin->icon("item/search.png"));
@@ -178,6 +185,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         connect(debugButton, &QnImageButtonWidget::clicked, this, &QnNotificationsCollectionWidget::at_debugButton_clicked);
         controlsLayout->addItem(debugButton);
     }
+#endif // DEBUG
         
     controlsLayout->addItem(newButton(Qn::BusinessEventsLogAction, Qn::MainWindow_Notifications_EventLog_Help));
     controlsLayout->addItem(newButton(Qn::BusinessEventsAction, -1));
@@ -204,7 +212,12 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventAdded,   this,   &QnNotificationsCollectionWidget::showSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
-    connect(this->context()->instance<QnAppServerNotificationCache>(), &QnAppServerNotificationCache::fileDownloaded, this, &QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded);
+    connect(this->context()->instance<QnAppServerNotificationCache>(), &QnAppServerNotificationCache::fileDownloaded, 
+        this, [this](const QString &filename, QnAppServerFileCache::OperationResult status) {
+            if (status != QnAppServerFileCache::OperationResult::ok)
+                return;
+            at_notificationCache_fileDownloaded(filename);
+    });
 }
 
 QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget() {
@@ -238,8 +251,8 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
     }
 }
 
-void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch) {
-    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
+void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourcePtr &camera, qint64 usecsSinceEpoch) {
+    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(camera, usecsSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
     item->setImageProvider(loader);
 }
 
@@ -281,7 +294,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
         );
-        loadThumbnailForItem(item, resource, params.getEventTimestamp());
+        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>(), params.getEventTimestamp());
         break;
     }
     case QnBusiness::CameraInputEvent: {
@@ -292,7 +305,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, resource);
+        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>());
         break;
     }
     case QnBusiness::CameraDisconnectEvent: {
@@ -302,7 +315,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, resource);
+        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>());
         break;
     }
     case QnBusiness::StorageFailureEvent: {
@@ -321,7 +334,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, resource);
+        loadThumbnailForItem(item, resource.dynamicCast<QnVirtualCameraResource>());
         break;
     }
     case QnBusiness::CameraIpConflictEvent: {
@@ -687,10 +700,7 @@ void QnNotificationsCollectionWidget::at_item_actionTriggered(Qn::ActionId actio
     menu()->trigger(actionId, parameters);
 }
 
-void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const QString &filename, bool ok) {
-    if (!ok)
-        return;
-
+void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const QString &filename) {
     QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
     foreach (QnNotificationWidget* item, m_itemsByLoadingSound.values(filename)) {
         item->setSound(filePath, true);

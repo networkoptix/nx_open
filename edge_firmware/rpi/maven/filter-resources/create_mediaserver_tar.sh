@@ -43,7 +43,7 @@ PREFIX_DIR=/opt/$CUSTOMIZATION
 BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
 
-STRIP=1
+STRIP=
 
 
 for i in "$@"

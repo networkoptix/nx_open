@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <memory>
+
 #include "../camera_settings/camera_settings.h"
 #include "soap_wrapper.h"
 
@@ -18,11 +20,11 @@ typedef QHash<QString, OnvifCameraSetting> CameraSettings;
 
 class OnvifCameraSettingsResp
 {
-    DeviceSoapWrapper* m_deviceSoapWrapper;
-    ImagingSoapWrapper* m_rangesSoapWrapper;
-    ImagingSoapWrapper* m_valsSoapWrapper;
-    ImagingOptionsResp* m_rangesResponse;
-    ImagingSettingsResp* m_valsResponse;
+    std::unique_ptr<DeviceSoapWrapper> m_deviceSoapWrapper;
+    std::unique_ptr<ImagingSoapWrapper> m_rangesSoapWrapper;
+    std::unique_ptr<ImagingSoapWrapper> m_valsSoapWrapper;
+    std::unique_ptr<ImagingOptionsResp> m_rangesResponse;
+    std::unique_ptr<ImagingSettingsResp> m_valsResponse;
     const std::string m_videoSrcToken;
     const QString m_uniqId;
     CameraSettings m_cameraSettings;
@@ -49,8 +51,6 @@ public:
 
 private:
     OnvifCameraSettingsResp();
-    OnvifCameraSettingsResp( const OnvifCameraSettingsResp& );
-    OnvifCameraSettingsResp& operator=( const OnvifCameraSettingsResp& );
 };
 
 //
@@ -61,9 +61,9 @@ class CommonStringValues
 {
 public:
 
-    static const QString& ON;
-    static const QString& OFF;
-    static const QString& SEPARATOR;
+    static const QString ON;
+    static const QString OFF;
+    static const QString SEPARATOR;
 };
 
 class OnvifCameraSettingOperationAbstract
@@ -71,8 +71,6 @@ class OnvifCameraSettingOperationAbstract
 public:
     OnvifCameraSettingOperationAbstract() {}
     virtual ~OnvifCameraSettingOperationAbstract() {}
-
-    static const OnvifCameraSettingOperationAbstract& EMPTY_OPERATION;
 
     static const QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > operations;
 
@@ -127,9 +125,9 @@ public:
 
 class ImagingWhiteBalanceModeOperation: public OnvifCameraSettingOperationAbstract
 {
-    static const QString& AUTO_STR;
-    static const QString& MANUAL_STR;
-    static const QString& ALL_VALUES_STR;
+    static const QString AUTO_STR;
+    static const QString MANUAL_STR;
+    static const QString ALL_VALUES_STR;
 
 public:
 
@@ -171,9 +169,9 @@ public:
 
 class ImagingExposurePriorityOperation: public OnvifCameraSettingOperationAbstract
 {
-    static const QString& LOW_NOISE_STR;
-    static const QString& FRAME_RATE_STR;
-    static const QString& ALL_VALUES_STR;
+    static const QString LOW_NOISE_STR;
+    static const QString FRAME_RATE_STR;
+    static const QString ALL_VALUES_STR;
 
 public:
 
@@ -191,8 +189,8 @@ public:
 
 class ImagingIrCutFilterModesOperation: public OnvifCameraSettingOperationAbstract
 {
-    static const QString& AUTO_STR;
-    static const QString& ALL_VALUES_STR;
+    static const QString AUTO_STR;
+    static const QString ALL_VALUES_STR;
 
 public:
 
@@ -226,9 +224,9 @@ public:
 
 class ImagingExposureModeOperation: public OnvifCameraSettingOperationAbstract
 {
-    static const QString& AUTO_STR;
-    static const QString& MANUAL_STR;
-    static const QString& ALL_VALUES_STR;
+    static const QString AUTO_STR;
+    static const QString MANUAL_STR;
+    static const QString ALL_VALUES_STR;
 
 public:
 
@@ -324,10 +322,10 @@ public:
 class OnvifCameraSetting: public CameraSetting
 {
     const OnvifCameraSettingOperationAbstract* m_operation;
-
+    static const OnvifCameraSettingOperationEmpty EMPTY_OPERATION;
 public:
 
-    OnvifCameraSetting(): CameraSetting(), m_operation(&OnvifCameraSettingOperationAbstract::EMPTY_OPERATION) {};
+    OnvifCameraSetting(): CameraSetting(), m_operation(&EMPTY_OPERATION) {};
 
     OnvifCameraSetting(const OnvifCameraSettingOperationAbstract& operation,
         const QString& id,
@@ -354,8 +352,8 @@ public:
 
 class OnvifCameraSettingReader: public CameraSettingReader
 {
-    static const QString& IMAGING_GROUP_NAME;
-    static const QString& MAINTENANCE_GROUP_NAME;
+    static const QString IMAGING_GROUP_NAME;
+    static const QString MAINTENANCE_GROUP_NAME;
 
     OnvifCameraSettingsResp& m_settings;
 

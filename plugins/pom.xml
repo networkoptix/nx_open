@@ -2,12 +2,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.3.1-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.3.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>plugins</artifactId>
     <packaging>pom</packaging>
@@ -18,4 +18,14 @@
         <libtype>plugin</libtype>
         <buildLib>sharedlib</buildLib>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>build_environment</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/build_environment/pom.xml</systemPath>            
+        </dependency>
+    </dependencies>
 </project>

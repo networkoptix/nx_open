@@ -184,6 +184,7 @@ public:
     void waitForAllFramesDisplayed();
     //!Marks all posted frames as non-ignorable
     void ensureAllFramesWillBeDisplayed();
+    void ensureQueueLessThen(int maxSize);
     //!Clears display queue
     /*!
         This method will not block if called from GUI thread. Otherwise, it can block till GUI thread finishes rendering of a picture

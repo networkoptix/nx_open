@@ -16,6 +16,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <nx_ec/dummy_handler.h>
 #include <ui/help/help_topic_accessor.h>
@@ -64,32 +65,36 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(m_resetDefaultsButton, &QPushButton::clicked, this, &QnBusinessRulesDialog::at_resetDefaultsButton_clicked);
 
     setHelpTopic(this, Qn::EventsActions_Help);
+    setHelpTopic(ui->eventLogButton, Qn::EventLog_Help);
 
     m_currentDetailsWidget = ui->detailsWidget;
 
     createActions();
 
     m_rulesViewModel = new QnBusinessRulesActualModel(this);
+    /* Force column width must be set before table initializing because header options are not updated. */
 
-//     QnSortedBusinessRulesModel* sortedModel = new QnSortedBusinessRulesModel(this);
-//     sortedModel->setSourceModel(m_rulesViewModel);
-//     sortedModel->sort(0);
+    QList<QnBusiness::Columns> forcedColumns;
+    forcedColumns << QnBusiness::EventColumn << QnBusiness::ActionColumn << QnBusiness::AggregationColumn;
+    for (QnBusiness::Columns column: forcedColumns) {
+        m_rulesViewModel->forceColumnMinWidth(column, QnBusinessRuleItemDelegate::optimalWidth(column, this->fontMetrics()));
+    }
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
+    ui->tableView->horizontalHeader()->setStretchLastSection(false);
 
     ui->tableView->resizeColumnsToContents();
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::EventColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::ActionColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
-
-    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::SourceColumn, QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Stretch);
+    for (QnBusiness::Columns column: forcedColumns)
+        ui->tableView->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Fixed);
+    
     ui->tableView->installEventFilter(this);
 
-    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
+    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));  
 
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &QnBusinessRulesDialog::at_tableView_currentRowChanged);
@@ -185,14 +190,9 @@ void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
-    m_rulesViewModel->addRule(QnBusinessEventRulePtr());
+    m_rulesViewModel->createRule();
 
     ui->tableView->setCurrentIndex(m_rulesViewModel->index(m_rulesViewModel->rowCount() - 1, 0));
-    if (m_rulesViewModel->rowCount() == 1) {
-        ui->tableView->resizeColumnsToContents();
-        ui->tableView->horizontalHeader()->setStretchLastSection(true);
-        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
-    }
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
@@ -210,8 +210,8 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
 
     if (QMessageBox::warning(this,
                              tr("Confirm rules reset"),
-                             tr("Are you sure you want to reset rules to the defaults?\n"\
-                                "This action CANNOT be undone!"),
+                             tr("Are you sure you want to reset rules to the defaults?") + L'\n' +
+                                tr("This action CANNOT be undone!"),
                              QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
@@ -238,9 +238,6 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
     }
 
     if (change == RulesLoaded) {
-        ui->tableView->resizeColumnsToContents();
-        ui->tableView->horizontalHeader()->setStretchLastSection(true);
-        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
         updateFilter();
     }
     updateControlButtons();
@@ -280,6 +277,7 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
     Q_UNUSED(bottomRight)
     if (topLeft.column() <= QnBusiness::ModifiedColumn && bottomRight.column() >= QnBusiness::ModifiedColumn)
         updateControlButtons();
+    updateFilter();
 }
 
 void QnBusinessRulesDialog::toggleAdvancedMode() {
@@ -429,11 +427,12 @@ void QnBusinessRulesDialog::updateFilter() {
 
     filter = filter.trimmed();
     bool anyCameraPassFilter = false;
-    foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr(), true))  {
+    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(QnResourcePtr(), true))  {
         anyCameraPassFilter = camera->toSearchString().contains(filter, Qt::CaseInsensitive);
         if (anyCameraPassFilter)
             break;
     }
+    
 
     for (int i = 0; i < m_rulesViewModel->rowCount(); ++i) {
         QnBusinessRuleViewModel *ruleModel = m_rulesViewModel->getRuleModel(i);
@@ -460,6 +459,7 @@ void QnBusinessRulesDialog::setAdvancedMode(bool value) {
 bool QnBusinessRulesDialog::tryClose(bool force) {
     if (force || isHidden()) {
         m_rulesViewModel->reset();
+        setAdvancedMode(false);
         hide();
         return true;
     }
@@ -482,9 +482,11 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
     case QMessageBox::Yes:
         if (!saveAll())
             return false;   // Cancel was pressed in the confirmation dialog
+        setAdvancedMode(false);
         break;
     case QMessageBox::No:
         m_rulesViewModel->reset();
+        setAdvancedMode(false);
         break;
     default:
         return false;   // Cancel was pressed

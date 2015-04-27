@@ -165,7 +165,10 @@ private:
 
 private:
     bool m_initialized;
-    QOpenGLVertexArrayObject m_vertices;
+
+	/* QOpenGLVertexArrayObject can be destroyed only in the current context.
+	 * So if we are creating it on the stack, asynchronous deleting becomes unaccessible. */
+    QSharedPointer<QOpenGLVertexArrayObject> m_vertices;
     QOpenGLBuffer m_positionBuffer;
     QOpenGLBuffer m_textureBuffer;
 };

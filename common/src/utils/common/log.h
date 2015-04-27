@@ -16,6 +16,7 @@ public:
     static const int MAIN_LOG_ID = 0;
     static const int CUSTOM_LOG_BASE_ID = 1;
     static const int HTTP_LOG_INDEX = CUSTOM_LOG_BASE_ID + 1;
+    static const int EC2_TRAN_LOG = CUSTOM_LOG_BASE_ID + 2;
 
     QnLog();
     ~QnLog();

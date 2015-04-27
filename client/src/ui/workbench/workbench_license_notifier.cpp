@@ -66,13 +66,8 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
         if (someLicenseWillBeBlocked && !qnLicensePool->isLicenseValid(license))
         {
             licenses.push_back(license);
-
-            QnLicenseWarningState licenseWarningState = licenseWarningStates.value(license->key());
-            if (currentTime - licenseWarningState.lastWarningTime >= invalidLicenseNotificationInterval) {
-                licenseWarningStates[license->key()].lastWarningTime = currentTime;
-                warn = true;
-            }
-
+            licenseWarningStates[license->key()].lastWarningTime = currentTime;
+            warn = true;
             continue;
         }
 

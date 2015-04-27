@@ -1,9 +1,7 @@
 #include "workbench_user_watcher.h"
 
 #include <client/client_settings.h>
-
-#include <utils/common/warnings.h>
-#include <utils/common/checked_cast.h>
+#include <client/client_message_processor.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -12,20 +10,28 @@
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_reconnectOnPasswordChange(true)
 {
-    connect(resourcePool(), &QnResourcePool::resourceAdded,     this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceAdded);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {       
+        for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>()) {
+            if ( user->getName().toLower() != m_userName.toLower() )
+                continue;
+            setCurrentUser(user);
+            return;
+        }
+        setCurrentUser(QnUserResourcePtr());
+    });
+
     connect(resourcePool(), &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
-        at_resourcePool_resourceAdded(resource);
 }
 
-QnWorkbenchUserWatcher::~QnWorkbenchUserWatcher() {
-    while(!m_users.empty())
-        at_resourcePool_resourceRemoved(m_users.back());
-}
+QnWorkbenchUserWatcher::~QnWorkbenchUserWatcher() {}
 
 void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     if(m_user == user)
@@ -46,7 +52,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     if (m_user) {
         connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
         
-        connect(m_permissionsNotifier, &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+        connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
     }
 
 
@@ -56,11 +62,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
 void QnWorkbenchUserWatcher::setUserName(const QString &name) {
     if(m_userName == name)
         return;
-
     m_userName = name;
-
-    foreach(const QnUserResourcePtr &user, m_users)
-        at_resource_nameChanged(user);
 }
 
 void QnWorkbenchUserWatcher::setUserPassword(const QString &password) {
@@ -71,48 +73,30 @@ void QnWorkbenchUserWatcher::setUserPassword(const QString &password) {
     m_userPasswordHash = QByteArray(); //hash will be recalculated
 }
 
-void QnWorkbenchUserWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if(!user)
-        return;
-
-    m_users.push_back(user);
-    connect(user.data(), SIGNAL(nameChanged(const QnResourcePtr &)), this, SLOT(at_resource_nameChanged(const QnResourcePtr &)));
-
-    at_resource_nameChanged(user);
+void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool reconnect) {
+    m_reconnectOnPasswordChange = reconnect;
+    if (reconnect && m_user && isReconnectRequired(m_user))
+        emit reconnectRequired();
 }
 
 void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if(!user)
+    if(!user || user != m_user)
         return;
 
-    disconnect(user.data(), NULL, this, NULL);
-    m_users.removeOne(user);
-
-    if(user == m_user)
-        setCurrentUser(QnUserResourcePtr()); /* Assume there are no users with duplicate names. */
+    setCurrentUser(QnUserResourcePtr());
+    menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
 }
 
-void QnWorkbenchUserWatcher::at_resource_nameChanged(const QnResourcePtr &resource) {
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if(!user)
-        return;
-
-    /* Logins are case-insensitive. */
-    if(user->getName().toLower() == m_userName.toLower()) {
-        setCurrentUser(user);
-    } else if(user == m_user) {
-        setCurrentUser(QnUserResourcePtr());
-    }
-}
-
-bool QnWorkbenchUserWatcher::reconnectRequired(const QnUserResourcePtr &user) {
+bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user) {
     if (m_userName.isEmpty())
         return false;   //we are not connected
 
-    if (user->getName() != m_userName)
+    if (user->getName().toLower() != m_userName.toLower())
         return true;
+
+    if (!m_reconnectOnPasswordChange)
+        return false;
 
     if (m_userPassword.isEmpty())
         return m_userPasswordHash != user->getHash();
@@ -127,11 +111,9 @@ bool QnWorkbenchUserWatcher::reconnectRequired(const QnUserResourcePtr &user) {
 }
 
 void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resource) {
-    if (!reconnectRequired(resource.dynamicCast<QnUserResource>()))
+    if (!isReconnectRequired(resource.dynamicCast<QnUserResource>()))
         return;
-
-    //TODO: #GDM #TR add message box 
-    menu()->trigger(Qn::ReconnectAction);
+    emit reconnectRequired();
 }
 
 void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &user) {
@@ -139,9 +121,14 @@ void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &use
         return;
 
     Qn::Permissions newPermissions = accessController()->globalPermissions(m_user);
-    bool reconnect = (newPermissions & m_userPermissions) != m_userPermissions;    // some permissions were removed
+    /* Reconnect if some permissions were removed */
+    bool reconnect = (newPermissions & m_userPermissions) != m_userPermissions;
+    /* Also reconnect if 'administrator' state was changed. */
+    bool wasAdmin =     ((m_userPermissions & Qn::GlobalAdminPermissions) == Qn::GlobalAdminPermissions);
+    bool becameAdmin =  ((newPermissions    & Qn::GlobalAdminPermissions) == Qn::GlobalAdminPermissions);
+    reconnect |= (wasAdmin != becameAdmin); 
 
     m_userPermissions = newPermissions;
-    if (reconnect) //TODO: #GDM #TR add message box 
-        menu()->trigger(Qn::ReconnectAction);
+    if (reconnect)
+        emit reconnectRequired();
 }

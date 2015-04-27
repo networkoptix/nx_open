@@ -1,15 +1,5 @@
 TEMPLATE = app
 
-DEFINES += CL_FORCE_LOGO
-TRANSLATIONS += ${basedir}/translations/client_en.ts \
-
-#				${basedir}/translations/client_ru.ts \
-#				${basedir}/translations/client_zh-CN.ts \
-#				${basedir}/translations/client_fr.ts \
-#				${basedir}/translations/client_jp.ts \
-#				${basedir}/translations/client_ko.ts \
-#				${basedir}/translations/client_pt-BR.ts \
-
 INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \
                 ${qt.dir}/include/QtGui/$$QT_VERSION/ \
@@ -36,3 +26,5 @@ mac {
 unix:!mac {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }
+
+OTHER_FILES += ${root.dir}/client/src/ui/help/help_topics.i

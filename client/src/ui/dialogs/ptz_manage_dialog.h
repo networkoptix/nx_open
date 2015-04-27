@@ -31,6 +31,8 @@ public:
     bool isModified() const;
 
     virtual bool tryClose(bool force) override;
+
+    bool askToSaveChanges(bool cancelIsAllowed = true);
 protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;
@@ -57,7 +59,7 @@ private slots:
     void at_tableViewport_resizeEvent();
     void at_tourSpotsChanged(const QnPtzTourSpotList &spots);
 
-    void at_cache_imageLoaded(const QString &fileName, bool ok);
+    void at_cache_imageLoaded(const QString &filename);
 
     void storePreview(const QString &id);
     void setPreview(const QImage &image);

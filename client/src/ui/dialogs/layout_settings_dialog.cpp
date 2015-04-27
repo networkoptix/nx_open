@@ -100,6 +100,14 @@ public:
         return !croppedPreview.isNull();
     }
 
+    /** Whether we can crop the image.
+     *  The only case when we cannot - if we open already cropped and saved image.
+     */
+    bool canCropImage() const {
+        bool loadedImageIsCropped = (state == ImageLoaded && croppedPreview.isNull());
+        return !loadedImageIsCropped;
+    }
+
     DialogState state;
 
     /** Path to the selected image (may be path in cache). */
@@ -133,8 +141,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setHelpTopic(ui->imageLabel,        Qn::LayoutSettings_EMapping_Help);
-    setHelpTopic(ui->lockedCheckBox,    Qn::LayoutSettings_Locking_Help);
+    setHelpTopic(ui->lockedCheckBox,        Qn::LayoutSettings_Locking_Help);
+    setHelpTopic(ui->backgroundGroupBox,    Qn::LayoutSettings_EMapping_Help);
 
     installEventFilter(this);
     ui->imageLabel->installEventFilter(this);
@@ -189,8 +197,13 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     m_cache = layout->hasFlags(Qn::url | Qn::local | Qn::layout) //TODO: #GDM #Common refactor duplicated code
             ? new QnLocalFileCache(this)
             : new QnAppServerImageCache(this);
-    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
-    connect(m_cache, SIGNAL(fileUploaded(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
+    connect(m_cache, &QnAppServerFileCache::fileDownloaded, this, [this](const QString &filename, QnAppServerFileCache::OperationResult status) {
+        at_imageLoaded(filename, status == QnAppServerFileCache::OperationResult::ok);
+    });
+        
+    connect(m_cache, &QnAppServerFileCache::fileUploaded, this,[this](const QString &filename, QnAppServerFileCache::OperationResult status) {
+        at_imageStored(filename, status == QnAppServerFileCache::OperationResult::ok);
+    });
 
     d->clear();
     d->imageFilename = layout->backgroundImageFilename();
@@ -298,18 +311,16 @@ void QnLayoutSettingsDialog::updateControls() {
     ui->clearButton->setEnabled(imagePresent && !locked);
     ui->opacitySpinBox->setEnabled(imagePresent && !locked);
     ui->selectButton->setEnabled(!locked);
-    ui->cropToMonitorCheckBox->setEnabled(imagePresent /*&& d->canChangeAspectRatio()*/ );
-    // image is already cropped to monitor aspect ratio
-    /*
-    if (imagePresent && !d->canChangeAspectRatio())
+
+    if (!d->canCropImage()) /* Mark image as already cropped. */
         ui->cropToMonitorCheckBox->setChecked(true);
-    */
+    ui->cropToMonitorCheckBox->setEnabled(imagePresent && !locked && d->canCropImage());
 
     QImage image;
     if (!imagePresent) {
         ui->imageLabel->setPixmap(QPixmap());
         ui->imageLabel->setText(d->state != Error 
-                            ? tr("<No image>")
+                            ? tr("<No picture>")
                             : d->errorText);
     } else {
         image = (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
@@ -427,7 +438,7 @@ void QnLayoutSettingsDialog::at_imageLoaded(const QString &filename, bool ok) {
 
     if (!ok) {
         d->state = Error;
-        d->errorText = tr("<Image cannot be loaded>");
+        d->errorText = tr("<Error while loading picture>");
     } else {
         d->state = ImageDownloaded;
     }
@@ -440,7 +451,7 @@ void QnLayoutSettingsDialog::at_imageStored(const QString &filename, bool ok) {
 
     if (!ok) {
         d->state = Error;
-        d->errorText = tr("<Image cannot be uploaded>");
+        d->errorText = tr("<Error while uploading picture>");
         updateControls();
         return;
     }
@@ -507,15 +518,30 @@ void QnLayoutSettingsDialog::selectFile() {
     if(!dialog->exec())
         return;
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. */
-    if (!context()->user())
-        return;
-
     QString fileName = dialog->selectedFile();
     if (fileName.isEmpty())
         return;
 
     qnSettings->setBackgroundsFolder(QFileInfo(fileName).absolutePath());
+
+    QFileInfo fileInfo(fileName);
+    if (fileInfo.size() == 0) {
+        d->state = Error;
+        d->errorText = tr("<Picture cannot be read>");
+        updateControls();
+        return;
+    }
+
+    if (fileInfo.size() > QnAppServerFileCache::maximumFileSize()) {
+        d->state = Error;
+        d->errorText = tr("<Picture is too big. Maximum size is %1 Mb>").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024));
+        updateControls();
+        return;
+    }
+
+    /* Check if we were disconnected (server shut down) while the dialog was open. */
+    if (!context()->user())
+        return;
 
     d->clear();
     d->imageSourcePath = fileName;
@@ -533,7 +559,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
 
     if (image.isNull()) {
         d->state = Error;
-        d->errorText = tr("<Image cannot be loaded>");
+        d->errorText = tr("<Picture cannot be loaded>");
         updateControls();
         return;
     }
@@ -551,8 +577,6 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     }
     else {
         d->croppedPreview = QImage();
-        if (d->state == ImageLoaded)
-            ui->cropToMonitorCheckBox->setChecked(true);
     }
 
     if (d->state == NewImageLoaded) {

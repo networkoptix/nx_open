@@ -18,7 +18,7 @@ public:
 
     bool storeSound(const QString &filePath, int maxLengthMSecs = -1, const QString &customTitle = QString());
     bool updateTitle(const QString &filename, const QString &title);
-    void clear();
+    virtual void clear() override;
 
     QnNotificationSoundModel* persistentGuiModel() const;
 public slots:
@@ -28,9 +28,9 @@ public slots:
 private slots:
     void at_soundConverted(const QString &filePath);
 
-    void at_fileListReceived(const QStringList &filenames, bool ok);
-    void at_fileAdded(const QString &filename, bool ok);
-    void at_fileRemoved(const QString &filename, bool ok);
+    void at_fileListReceived(const QStringList &filenames, OperationResult status);
+    void at_fileAdded(const QString &filename, OperationResult status);
+    void at_fileRemoved(const QString &filename, OperationResult status);
 private:
     QnNotificationSoundModel* m_model;
     QHash<QString, int> m_updatingFiles;

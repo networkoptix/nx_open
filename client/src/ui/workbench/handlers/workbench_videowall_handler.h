@@ -45,6 +45,8 @@ private:
     ec2::AbstractECConnectionPtr connection2() const;
 
     void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout);
+
+    /** Place first layout to the first item, second layout to the second item. Save layouts if needed. */
     void swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout);
 
     /** Updates item's layout with provided value. Provided layout should be saved. */

@@ -142,8 +142,10 @@ void QnDesktopStreamreader::closeStream()
     delete m_grabber;
     m_grabber = 0;
 
-    if (m_videoCodecCtx)
+    if (m_videoCodecCtx) {
         avcodec_close(m_videoCodecCtx);
+        av_freep(&m_videoCodecCtx);
+    }
     m_videoCodecCtx = 0;
     if (m_frame)
         av_free(m_frame);

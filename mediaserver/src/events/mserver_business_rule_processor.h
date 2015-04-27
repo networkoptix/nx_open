@@ -26,7 +26,7 @@ public:
     void setEventLogPeriod(qint64 periodUsec);
 
 protected:
-    QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const override;
+    QByteArray getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const override;
 
 protected slots:
     virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res) override;

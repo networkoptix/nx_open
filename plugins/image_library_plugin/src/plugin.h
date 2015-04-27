@@ -15,7 +15,7 @@
 
 /*! \mainpage
     \par
-    This project demonstrates usage of Network Optix camera integration plugin API to add support of camera with remote archive (e.g., storage is bound directly to camera)\n
+    This project demonstrates usage of camera integration plugin API to add support of camera with remote archive (e.g., storage is bound directly to camera)\n
 
     \par Build how-to
     Compiles to dynamic library. Tested on MS Windows 7 and Ubuntu 12.04.\n
@@ -30,9 +30,8 @@
     Successful build results in libimage_library_plugin.so (linux) and image_library_plugin.dll (mswin)
 
     \par Usage
-        You MUST have HD Witness mediaserver installed to use this plugin.\n
-    To use plugin simply put built library to mediaserver directory (by default, "C:\Program Files\Network Optix\HD Witness\Mediaserver" on ms windows and
-    /opt/networkoptix/mediaserver/bin/ on linux) and restart server.\n
+        You MUST have mediaserver installed to use this plugin.\n
+    To use plugin simply put built library to mediaserver directory and restart server.\n
         To use this plugin, launch client aplication and use manual camera search ("Add Camera(s)..." in media server menu) filling "Camera Address" field with 
     absolute path to local directory, containing jpeg file(s). Specified directory will be found as camera with archive and appear in tree menu.
 

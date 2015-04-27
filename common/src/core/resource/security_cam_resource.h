@@ -4,6 +4,8 @@
 #include <QtGui/QRegion>
 #include <QtCore/QMutex>
 
+#include <utils/common/value_cache.h>
+
 #include "media_resource.h"
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
@@ -11,8 +13,13 @@
 #include "common/common_globals.h"
 #include "business/business_fwd.h"
 
+
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
+
+static const int PRIMARY_ENCODER_INDEX = 0;
+static const int SECONDARY_ENCODER_INDEX = 1;
+
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     typedef QnNetworkResource base_type;
@@ -130,8 +137,17 @@ public:
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
+    //!Returns user-defined group name (if not empty) or server-defined group name
     virtual QString getGroupName() const;
+    //!Returns server-defined group name
+    QString getDefaultGroupName() const;
     virtual void setGroupName(const QString& value);
+    //!Set group name (the one is show to the user in client)
+    /*!
+        This name is set by user.
+        \a setGroupName name is generally set automatically (e.g., by server)
+    */
+    void setUserDefinedGroupName( const QString& value );
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
 
@@ -175,6 +191,7 @@ public:
     int desiredSecondStreamFps() const;
     Qn::StreamQuality getSecondaryStreamQuality() const;
 
+    //TODO: #2.4 #rvasilenko #High Move to runtime data
     Qn::CameraStatusFlags statusFlags() const;
     bool hasStatusFlags(Qn::CameraStatusFlag value) const;
     void setStatusFlags(Qn::CameraStatusFlags value);
@@ -206,8 +223,14 @@ public:
         int detailLevel );
     
     // in some cases I just want to update couple of field from just discovered resource
-    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
+    //TODO: #rvasilenko #High #2.4 get rid of this temporary solution
+    /**
+     * Temporary solution to correctly detach desktop cameras when user reconnects from one server to another.
+     * Implemented in QnDesktopCameraResource.
+     */
+    virtual bool isReadyToDetach() const {return true;}
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -216,10 +239,14 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
+    /* All ::changed signals must have the same profile to be dynamically called from base ::updateInner method. */
     void scheduleDisabledChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
-    void groupNameChanged(const QnSecurityCamResourcePtr &resource);
+    void groupIdChanged(const QnResourcePtr &resource);
+    void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
+    void statusFlagsChanged(const QnResourcePtr &resource);
+
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     //!Emitted on camera input port state has been changed
@@ -236,7 +263,8 @@ signals:
         qint64 timestamp );
 
 protected slots:
-    virtual void at_parentIdChanged();
+    virtual void at_initializedChanged();
+    virtual void at_motionRegionChanged();
 
 protected:
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
@@ -250,39 +278,40 @@ protected:
     //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
         \warning Excess calls of this method is legal and MUST be correctly handled in implementation
-        \return true, if started input port monitoring
+        \return true, if async request has been started successfully
+        \note \a completionHandler is not called yet (support will emerge in 2.4)
     */
-    virtual bool startInputPortMonitoring();
+    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler );
     //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
         \warning Excess calls of this method is legal and MUST be correctly handled in implementation
+        \note This method has no right to fail
     */
-    virtual void stopInputPortMonitoring();
+    virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
 
 private:
-    //QList<QnMotionRegion> m_motionMaskList;
     QnDataProviderFactory *m_dpFactory;
-    //QnScheduleTaskList m_scheduleTasks;
-    //mutable Qn::MotionType m_motionType;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
-    //Qn::SecondStreamQuality m_secondaryQuality;
-    //bool m_cameraControlDisabled;
     Qn::CameraStatusFlags m_statusFlags;
-    //bool m_scheduleDisabled;
-    //bool m_audioEnabled;
     bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    //int m_minDays;
-    //int m_maxDays;
-    //QnUuid m_preferedServerId;
+    mutable Qn::LicenseType m_cachedLicenseType;
+    CachedValue<bool> m_cachedHasDualStreaming2;
+    CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
+    CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
+    CachedValue<bool> m_cachedIsDtsBased;
+    CachedValue<Qn::MotionType> m_motionType;
+    Qn::MotionTypes calculateSupportedMotionType() const;
+    Qn::MotionType calculateMotionType() const;
 
-    //QnMotionRegion getMotionRegionNonSafe(int channel) const;
+private slots:
+    void updateCachedValues();
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

@@ -38,7 +38,6 @@ signals:
 private slots:
     void at_settingsWidget_hasChangesChanged();
     void at_settingsWidget_modeChanged();
-    void at_advancedSettingChanged();
     void at_selectionChangeAction_triggered();
 
     void at_diagnoseButton_clicked();
@@ -62,8 +61,6 @@ private:
     void submitToResources(bool checkControls = false);
     
     void saveCameras(const QnVirtualCameraResourceList &cameras);
-
-    void saveAdvancedCameraSettingsAsync(const QnVirtualCameraResourceList &cameras);
 private:
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;

@@ -116,9 +116,6 @@ private:
 
     QnWorkbenchUserWatcher *m_userWatcher;
     QnWorkbenchLayoutWatcher *m_layoutWatcher;
-#ifdef Q_OS_WIN
-    QnWorkbenchDesktopCameraWatcher* m_desktopCameraWatcher;
-#endif
 };
 
 

@@ -93,7 +93,9 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(QWidget *editor, QAbstractItemM
         QnPtzManageModel *ptzModel = qobject_cast<QnPtzManageModel*>(model);
         if (ptzModel) {
             QString existingId = ptzModel->hotkeys().value(hotkey);
-            assert(!existingId.isEmpty()); // we can get here only if the selected hotkey is in use
+            Q_ASSERT_X(!existingId.isEmpty(), Q_FUNC_INFO, "we should get here only if the selected hotkey is in use");
+            if (existingId.isEmpty())
+                return;
 
             QnPtzManageModel::RowData existing = ptzModel->rowData(existingId);
             QString message = (existing.rowType == QnPtzManageModel::PresetRow)

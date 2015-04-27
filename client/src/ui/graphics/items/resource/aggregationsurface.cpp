@@ -327,11 +327,8 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             glBindTexture( GL_TEXTURE_2D, texture->id() );
 
             GLfloat w0 = 0;
-//            glGetTexLevelParameterfv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w0 );
             GLfloat h0 = 0;
-//            glGetTexLevelParameterfv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h0 );
 
-//            glPixelStorei( GL_UNPACK_ROW_LENGTH, m_buffers[i].pitch );
             Q_ASSERT( m_buffers[i].pitch >= qPower2Ceil(r_w[i],ROUND_COEFF) );
 
             #ifndef USE_PBO
@@ -339,26 +336,10 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             #else
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,qPower2Ceil(r_w[i],ROUND_COEFF),h[i],GL_LUMINANCE, GL_UNSIGNED_BYTE,NULL);
             #endif
-            /*
-            glTexSubImage2D(GL_TEXTURE_2D, 0,
-                            0, 0,
-                            qPower2Ceil(r_w[i],ROUND_COEFF),
-                            h[i],
-                            GL_LUMINANCE, GL_UNSIGNED_BYTE,
-#ifndef USE_PBO
-                            m_buffers[i].buffer.data()
-#else
-                            NULL
-#endif
-                            );*/
 
 #ifdef USE_PBO
             d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
 #endif
-
-            glCheckError("glTexSubImage2D");
-//            glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-            glCheckError("glPixelStorei");
         }
         m_textureFormat = PIX_FMT_YUV420P;
     }
@@ -372,7 +353,6 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             else
                 texture->ensureInitialized( m_fullRect.width() / 2, m_fullRect.height() / 2, m_buffers[i].pitch, 2, GL_LUMINANCE_ALPHA );
             glBindTexture( GL_TEXTURE_2D, texture->id() );
-//            glPixelStorei( GL_UNPACK_ROW_LENGTH, i == 0 ? m_buffers[0].pitch : (m_buffers[1].pitch/2) );
 
             loadImageData(  texture->textureSize().width(),
                             texture->textureSize().height(),
@@ -381,16 +361,6 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                             i == 0 ? 1 : 2,
                             i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
                             m_buffers[i].buffer.data() );
-            /*
-            glTexSubImage2D(GL_TEXTURE_2D, 0,
-                            0, 0,
-                            i == 0 ? qPower2Ceil((unsigned int)m_fullRect.width(),ROUND_COEFF) : m_fullRect.width() / 2,
-                            i == 0 ? m_fullRect.height() : m_fullRect.height() / 2,
-                            i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
-                            GL_UNSIGNED_BYTE, m_buffers[i].buffer.data() );*/
-            glCheckError("glTexSubImage2D");
-            //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-            //glCheckError("glPixelStorei");
         }
         m_textureFormat = PIX_FMT_NV12;
     }
@@ -478,22 +448,8 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                 lineInPixelsSize /= 4; // RGBA, BGRA
                 break;
         }
-
-//        glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
-        glCheckError("glPixelStorei");
-        
+      
         loadImageData(texture->textureSize().width(),texture->textureSize().height(),lineInPixelsSize,h[0],bytesPerPixel,glRGBFormat(m_format),pixels);
-        /*
-        glTexSubImage2D(GL_TEXTURE_2D, 0,
-            0, 0,
-            qPower2Ceil(r_w[0],ROUND_COEFF),
-            h[0],
-            glRGBFormat(m_format), GL_UNSIGNED_BYTE, pixels);*/
-        glCheckError("glTexSubImage2D");
-
-//        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        glCheckError("glPixelStorei");
-
         m_textureFormat = PIX_FMT_RGBA;
 
         // TODO: #Elric free memory immediately for still images

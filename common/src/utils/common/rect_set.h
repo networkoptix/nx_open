@@ -29,6 +29,9 @@ public:
     }
 
     void insert(const QRect &rect) {
+        if (!rect.isValid())
+            return;
+
         m_xSet.insert(rect.left());
         m_xSet.insert(rect.right());
         m_ySet.insert(rect.top());
@@ -36,6 +39,9 @@ public:
     }
 
     void remove(const QRect &rect) {
+        if (!rect.isValid())
+            return;
+
         remove(m_xSet, rect.left());
         remove(m_xSet, rect.right());
         remove(m_ySet, rect.top());

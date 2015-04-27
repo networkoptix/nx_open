@@ -7,9 +7,12 @@
 #include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
+
 class QnISDStreamReader: public CLServerPushStreamReader
 {
 public:
+    static const int ISD_HTTP_REQUEST_TIMEOUT_MS;
+
     QnISDStreamReader(const QnResourcePtr& res);
     virtual ~QnISDStreamReader();
 
@@ -21,20 +24,14 @@ protected:
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
-
     virtual void updateStreamParamsBasedOnQuality() override;
     virtual void updateStreamParamsBasedOnFps() override;
-
     virtual void pleaseStop() override;
-private:
 
-    
-    
-    virtual QnMetaDataV1Ptr getCameraMetadata() override;
-
-    
 private:
     QnMulticodecRtpReader m_rtpStreamParser;
+
+    virtual QnMetaDataV1Ptr getCameraMetadata() override;
 };
 
 #endif // #ifdef ENABLE_ISD

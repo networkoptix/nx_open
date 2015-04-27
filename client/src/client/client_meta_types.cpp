@@ -2,9 +2,9 @@
 
 #include <common/common_meta_types.h>
 
-#include <utils/color_space/image_correction.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/ping_utility.h>
+#include <client/client_globals.h>
+#include <client/client_model_types.h>
+#include <client/client_color_types.h>
 
 #include <camera/thumbnail.h>
 #include <camera/data/abstract_camera_data.h>
@@ -18,9 +18,10 @@
 
 #include <update/updates_common.h>
 
-#include "client_globals.h"
-#include "client_model_types.h"
-#include "client_color_types.h"
+#include <utils/color_space/image_correction.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/ping_utility.h>
+#include <utils/app_server_file_cache.h>
 
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
@@ -29,9 +30,6 @@ namespace {
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
-QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientBackground)
-QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ImageBehaviour)
-//QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::LightModeFlag)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
@@ -64,8 +62,10 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<Qn::ClientSkin>();
     qRegisterMetaTypeStreamOperators<Qn::ClientSkin>();
-    qRegisterMetaType<Qn::ClientBackground>();
-    qRegisterMetaTypeStreamOperators<Qn::ClientBackground>();
+    qRegisterMetaType<Qn::BackgroundAnimationMode>();
+    qRegisterMetaTypeStreamOperators<Qn::BackgroundAnimationMode>();
+    qRegisterMetaType<QnClientBackground>();
+    qRegisterMetaTypeStreamOperators<QnClientBackground>();
     qRegisterMetaType<Qn::ImageBehaviour>();
     qRegisterMetaTypeStreamOperators<Qn::ImageBehaviour>();
     qRegisterMetaType<ImageCorrectionParams>();
@@ -80,6 +80,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();
     qRegisterMetaType<QnPingUtility::PingResponce>();
+    qRegisterMetaType<QnAppServerFileCache::OperationResult>();
 
     qRegisterMetaType<QnTimeSliderColors>();
     qRegisterMetaType<QnTimeScrollBarColors>();
@@ -119,7 +120,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnServerUpdatesColors>();
 
     QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
-    QnJsonSerializer::registerSerializer<Qn::ClientBackground>();
+    QnJsonSerializer::registerSerializer<Qn::BackgroundAnimationMode>();
     QnJsonSerializer::registerSerializer<Qn::ImageBehaviour>();
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();

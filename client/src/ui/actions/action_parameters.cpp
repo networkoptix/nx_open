@@ -27,48 +27,39 @@ namespace {
 } // anonymous namespace
 
 QnActionParameters::QnActionParameters(const ArgumentHash &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnResourceList>(QnResourceList()));
+    init(QVariant::fromValue<QnResourceList>(QnResourceList()), arguments);
 }
 
 QnActionParameters::QnActionParameters(const QVariant &items, const ArgumentHash &arguments) {
-    setArguments(arguments);
-    setItems(items);
+    init(items, arguments);
 }
 
 QnActionParameters::QnActionParameters(const QList<QGraphicsItem *> &items, const ArgumentHash &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnResourceWidgetList>(QnActionParameterTypes::widgets(items)));
+    init(QVariant::fromValue<QnResourceWidgetList>(QnActionParameterTypes::widgets(items)), arguments);
 }
 
 QnActionParameters::QnActionParameters(QnResourceWidget *widget, const ArgumentHash &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnResourceWidget *>(widget));
+    init(QVariant::fromValue<QnResourceWidget *>(widget), arguments);
 }
 
 QnActionParameters::QnActionParameters(const QnResourceWidgetList &widgets, const ArgumentHash &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnResourceWidgetList>(widgets));
+    init(QVariant::fromValue<QnResourceWidgetList>(widgets), arguments);
 }
 
 QnActionParameters::QnActionParameters(const QnWorkbenchLayoutList &layouts, const ArgumentHash &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnWorkbenchLayoutList>(layouts));
+    init(QVariant::fromValue<QnWorkbenchLayoutList>(layouts), arguments);
 }
 
 QnActionParameters::QnActionParameters(const QnLayoutItemIndexList &layoutItems, const ArgumentHash &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnLayoutItemIndexList>(layoutItems));
+    init(QVariant::fromValue<QnLayoutItemIndexList>(layoutItems), arguments);
 }
 
 QnActionParameters::QnActionParameters(const QnVideoWallItemIndexList &videoWallItems, const ArgumentHash &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnVideoWallItemIndexList>(videoWallItems));
+    init(QVariant::fromValue<QnVideoWallItemIndexList>(videoWallItems), arguments);
 }
 
 QnActionParameters::QnActionParameters(const QnVideoWallMatrixIndexList &videoWallMatrices, const ArgumentHash &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnVideoWallMatrixIndexList>(videoWallMatrices));
+    init(QVariant::fromValue<QnVideoWallMatrixIndexList>(videoWallMatrices), arguments);
 }
 
 
@@ -142,4 +133,16 @@ QnResourceWidgetList QnActionParameters::widgets(int key) const {
     return QnActionParameterTypes::widgets(argument(key));
 }
 
+Qn::ActionScopes QnActionParameters::scope() const {
+    return m_scope;
+}
 
+void QnActionParameters::setScope(Qn::ActionScopes scope) {
+    m_scope = scope;
+}
+
+void QnActionParameters::init(const QVariant &items, const ArgumentHash &arguments) {
+    setScope(Qn::InvalidScope);
+    setArguments(arguments);
+    setItems(items);
+}

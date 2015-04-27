@@ -10,7 +10,7 @@
 #include <QtCore/QRegExp>
 
 //const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[\\t\\n -]+");
-const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp(QLatin1String("[^\\d\\w]+"));
+static const QRegExp UNNEEDED_CHARACTERS(QLatin1String("[^\\d\\w]+"));
 
 static const char* ACTI_MANUFACTURER = "acti";
 static const char* ARECONT_VISION_MANUFACTURER = "arecontvision";
@@ -200,6 +200,8 @@ PasswordHelper::PasswordHelper()
     setPasswordInfo("vista_", "admin", "admin");
     setPasswordInfo("norbain_", "admin", "admin");
 
+    setPasswordInfo("canon", "root", "camera");
+
     // default password list
 
     setPasswordInfo(DEFAULT_MANUFACTURER, "admin", "admin");
@@ -279,7 +281,7 @@ const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo
 #ifdef ONVIF_DEBUG
         qDebug() << "SoapErrorHelper::fetchDescription: fault info is null";
 #endif
-        return lit("unknown_error"); // TODO: #Elric #TR
+        return lit("unknown_error");
     }
 
     QByteArray result("Fault Info. ");

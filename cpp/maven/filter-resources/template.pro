@@ -14,6 +14,7 @@ QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
+DEFINES += ${customization.defines}
 DEFINES += ${additional.defines}
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
@@ -98,7 +99,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${environment.dir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
-                ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/
+                ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
 
 DEPENDPATH *= $${INCLUDEPATH}
 
@@ -151,7 +152,14 @@ unix: {
 unix:!mac {
   !arm {
     LIBS += ${linux.oslibs}
-    QMAKE_CXXFLAGS += -msse2
+    QMAKE_CXXFLAGS += ${compiler.arguments}
+    QMAKE_CFLAGS += ${compiler.arguments}
+    QMAKE_LFLAGS += ${compiler.arguments}
+    !clang: {
+        QMAKE_CXXFLAGS += -msse2
+    } else {
+        QMAKE_CXXFLAGS += -msse4.1
+    }
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
   } else {
     LIBS -= -lssl

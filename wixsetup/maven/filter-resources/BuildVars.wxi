@@ -10,6 +10,8 @@
     <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>
     <?define releaseVersionMinor = "${parsedVersion.minorVersion}"?>
 
+    <?define ECRegPath="Software\${company.name}\${appserver.name}"?>    
+    
     <?define productName = "${display.product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
     <?define clientName = "${product.name}"?>

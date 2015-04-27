@@ -629,7 +629,7 @@ void QnWorkbenchLayout::updateBoundingRectInternal() {
     emit dataChanged(Qn::LayoutBoundingRectRole);
 }
 
-void QnWorkbenchLayout::setCellAspectRatio(qreal cellAspectRatio) {
+void QnWorkbenchLayout::setCellAspectRatio(float cellAspectRatio) {
     if(cellAspectRatio < 0.0 || qFuzzyIsNull(cellAspectRatio)) /* Negative means 'use default value'. */
         cellAspectRatio = -1.0;
 

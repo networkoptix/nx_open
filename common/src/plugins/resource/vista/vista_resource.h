@@ -13,11 +13,11 @@ public:
     QnVistaResource();
     virtual ~QnVistaResource();
 
-    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const override;
+    //virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const override;
 
 protected:
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
-    virtual bool startInputPortMonitoring() override;
+    //virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
 };
 
 #endif //ENABLE_ONVIF

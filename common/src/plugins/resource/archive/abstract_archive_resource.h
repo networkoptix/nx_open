@@ -20,6 +20,7 @@ public:
     virtual void setUniqId(const QString& value) override;
 
     //!Implementation of QnResource::setStatus
+    virtual Qn::ResourceStatus getStatus() const override;
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
 
     //!Implementation of QnMediaResource::toResource
@@ -32,6 +33,8 @@ public:
     virtual QnResourcePtr toResourcePtr() override;
 
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+private:
+    Qn::ResourceStatus m_localStatus;
 };
 
 #endif // ENABLE_ARCHIVE

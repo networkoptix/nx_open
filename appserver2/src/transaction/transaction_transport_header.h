@@ -7,9 +7,18 @@
 
 namespace ec2 {
 
+    enum TTHeaderFlag
+    {
+        TT_None          = 0x0, 
+        TT_ProxyToClient = 0x1
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TTHeaderFlag)
+    Q_DECLARE_FLAGS(TTHeaderFlags, TTHeaderFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(TTHeaderFlags)
+
     struct QnTransactionTransportHeader
     {
-        QnTransactionTransportHeader(): sequence(0) {}
+        QnTransactionTransportHeader(): sequence(0), flags(TT_None), distance(0) {}
         QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet()):
             processedPeers(processedPeers), 
             dstPeers(dstPeers), 
@@ -21,10 +30,17 @@ namespace ec2 {
         QnPeerSet dstPeers;
         int sequence;
         QnUuid sender;
+        QnUuid senderRuntimeID;
+        TTHeaderFlags flags;
+        int distance;
     };
-#define QnTransactionTransportHeader_Fields (processedPeers)(dstPeers)(sequence)(sender)
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnTransactionTransportHeader, (json)(ubjson))
+
+#define QnTransactionTransportHeader_Fields (processedPeers)(dstPeers)(sequence)(sender)(senderRuntimeID)(flags)(distance)
+
+    QN_FUSION_DECLARE_FUNCTIONS(QnTransactionTransportHeader, (ubjson))
+
+    QString toString(const QnTransactionTransportHeader& header);
 
 } // namespace ec2
 

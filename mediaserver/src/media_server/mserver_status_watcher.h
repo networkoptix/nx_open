@@ -7,9 +7,12 @@
 #define NX_MSERVER_STATUS_WATCHER_H
 
 #include <QObject>
+#include <QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
+#include "utils/common/uuid.h"
 
+class QnMServerFailureBusinessEvent;
 
 //!Monitors mediaserver's status change and sends business event if some server goes offline
 class MediaServerStatusWatcher
@@ -24,6 +27,19 @@ public:
 
 public slots:
     void at_resource_statusChanged( const QnResourcePtr& resource );
+    void at_resource_removed( const QnResourcePtr& resource );
+private slots:
+    void sendError();
+private:
+    struct OfflineServerData
+    {
+        OfflineServerData() { timer.start(); }
+        QElapsedTimer timer;
+        QSharedPointer<QnMServerFailureBusinessEvent> serverData;
+    };
+
+    QMap<QnUuid, OfflineServerData> m_candidatesToError;
+    QSet<QnUuid> m_onlineServers;
 };
 
 #endif  //NX_MSERVER_STATUS_WATCHER_H

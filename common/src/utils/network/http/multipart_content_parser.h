@@ -12,6 +12,10 @@
 
 namespace nx_http
 {
+    /*!
+        Input: http multipart content stream.
+        Output: separate content frames
+    */
     class MultipartContentParser
     :
         public AbstractByteStreamConverter
@@ -25,17 +29,31 @@ namespace nx_http
         //!Implementation of AbstractByteStreamFilter::flush
         virtual size_t flush() override;
 
+        /*!
+            \return \a false, if \a contentType does not specify multipart content
+            \note After this method has been called, no \a MultipartContentParser::setBoundary call is needed
+        */
         bool setContentType( const StringType& contentType );
         void setBoundary( const StringType& boundary );
+        //!Returns headers of last read frame
+        const nx_http::HttpHeaders& prevFrameHeaders() const;
 
     private:
-        // TODO: #Elric #enum
         enum ParsingState
         {
             waitingBoundary,
             readingHeaders,
             readingTextData,
-            readingBinaryData
+            //!reading data with Content-Length known
+            readingSizedBinaryData,
+            //!reading data with Content-Length not known: searching for boundary
+            readingUnsizedBinaryData
+        };
+
+        enum ChunkParseState
+        {
+            waitingEndOfLine,
+            checkingForBoundaryAfterEndOfLine
         };
 
         ParsingState m_state;
@@ -44,7 +62,15 @@ namespace nx_http
         StringType m_boundary;
         StringType m_startBoundaryLine;
         StringType m_endBoundaryLine;
+        StringType m_boundaryForUnsizedBinaryParsing;
         unsigned int m_contentLength;
+        ChunkParseState m_chunkParseState;
+        nx::Buffer m_supposedBoundary;
+        nx_http::HttpHeaders m_currentFrameHeaders;
+
+        void readUnsizedBinaryData(
+            const QnByteArrayConstRef& data,
+            size_t* const offset );
     };
 }
 

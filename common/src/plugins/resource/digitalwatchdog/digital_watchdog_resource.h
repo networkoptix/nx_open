@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <memory>
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -29,6 +31,8 @@ public:
 
     virtual bool getParamPhysical(const QString &param, QVariant &val) override;
     virtual bool setParamPhysical(const QString &param, const QVariant& val) override;
+signals:
+    void physicalParamChanged(const QString& name, const QString& value);
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual void fetchAndSetCameraSettings() override;
@@ -63,8 +67,11 @@ public:
     bool setParamPhysical(const QString &param, const QVariant& val);
 
 private:
-    DWCameraProxy* m_cameraProxy;
+    std::unique_ptr<DWCameraProxy> m_cameraProxy;
     DWCameraSettings m_settings;
+
+    QnPlWatchDogResourceAdditionalSettings( const QnPlWatchDogResourceAdditionalSettings& );
+    QnPlWatchDogResourceAdditionalSettings& operator=( const QnPlWatchDogResourceAdditionalSettings& );
 };
 
 #endif //ENABLE_ONVIF

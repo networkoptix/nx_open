@@ -25,6 +25,11 @@ namespace ec2
         return m_connectionInfo;
     }
 
+    QString OldEcConnection::authInfo() const
+    {
+        return m_connectionInfo.ecUrl.password();
+    }
+
     AbstractResourceManagerPtr OldEcConnection::getResourceManager()
     {
         return AbstractResourceManagerPtr();
@@ -90,26 +95,23 @@ namespace ec2
         return AbstractTimeManagerPtr();
     }
 
-    int OldEcConnection::setPanicMode(Qn::PanicMode /*value*/, impl::SimpleHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
-        return reqID;
-    }
-
     int OldEcConnection::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::DumpDatabaseHandler::done, handler, reqID, ec2::ErrorCode::notImplemented, ec2::ApiDatabaseDumpData()));
+        return reqID;
+    }
+
+    int OldEcConnection::dumpDatabaseToFileAsync( const QString& /*dumpFilePath*/, ec2::impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
         return reqID;
     }
 
     int OldEcConnection::restoreDatabaseAsync(const ApiDatabaseDumpData& /*dbFile*/, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
         return reqID;
     }
@@ -126,7 +128,27 @@ namespace ec2
     {
     }
 
+    qint64 OldEcConnection::getTransactionLogTime() const {
+        return -1;
+    }
+
+    void OldEcConnection::setTransactionLogTime(qint64 /* value */)
+    {
+
+    }
+
+
     void OldEcConnection::startReceivingNotifications()
     {
     }
+
+    void OldEcConnection::stopReceivingNotifications()
+    {
+    }
+
+    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& dstPeer) const
+    {
+        return QnUuid();
+    }
+
 }

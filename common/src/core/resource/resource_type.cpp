@@ -61,7 +61,7 @@ bool QnResourceType::isCamera() const
     return m_isCamera;
 }
 
-void QnResourceType::addAdditionalParent(QnUuid parent)
+void QnResourceType::addAdditionalParent(const QnUuid& parent)
 {
     if (parent.isNull()) {
         qWarning() << "Adding NULL parentId";
@@ -180,14 +180,12 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
     QMutexLocker lock(&m_mutex);
     for(const QnResourceTypePtr& rt: m_resourceTypeMap)
     {
-        //NX_LOG(rt->getName(), cl_logALWAYS); //debug
-
-        if (rt->getName() == name && rt->getManufacture()==manufacture)
+        if (rt->getManufacture()==manufacture && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
             return rt->getId();
     }
 
     if (showWarning)
-        qWarning() << "Cannot find such resource type!!!!: " << manufacture << name;
+        NX_LOG( lit("Cannot find resource type for manufacturer: %1, model name: %2").arg(manufacture).arg(name), cl_logDEBUG2 );
 
     // Q_ASSERT(false);
     return QnUuid();

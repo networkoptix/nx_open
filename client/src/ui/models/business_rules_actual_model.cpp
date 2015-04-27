@@ -45,13 +45,13 @@ void QnBusinessRulesActualModel::at_resources_saved( int handle, ec2::ErrorCode 
     if(success) {
         if (model->id().isNull())
             deleteRule(model);
-        updateRule(rule);
+        addOrUpdateRule(rule);
     }
     emit afterModelChanged(RuleSaved, success);
 }
 
 void QnBusinessRulesActualModel::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {
-    updateRule(rule);
+    addOrUpdateRule(rule);
     emit businessRuleChanged(rule->id());
 }
 
@@ -83,8 +83,8 @@ void QnBusinessRulesActualModel::at_message_ruleReset(const QnBusinessEventRuleL
         return left->id() < right->id();
     });
 
-    foreach (const QnBusinessEventRulePtr &rule, sorted)
-        addRule(rule);
+    for (const QnBusinessEventRulePtr &rule: sorted)
+        addOrUpdateRule(rule);
     emit afterModelChanged(RulesLoaded, true);
 }
 

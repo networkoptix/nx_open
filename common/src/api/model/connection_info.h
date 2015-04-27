@@ -18,10 +18,10 @@ typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric #ec2 remove
 
 
 struct QnConnectionInfo {
-    QnConnectionInfo()
-    :
-        allowSslConnections( false )
-    {}
+    /*!
+        \note considering that servers with no proto version support have version nx_ec::INITIAL_EC2_PROTO_VERSION
+    */
+    QnConnectionInfo();
 
     QUrl ecUrl;
     SoftwareVersionType version;
@@ -31,9 +31,11 @@ struct QnConnectionInfo {
     QString brand;
     QString box;
     bool allowSslConnections;
+    //!Transaction message bus protocol version (defined by \a nx_ec::EC2_PROTO_VERSION)
+    int nxClusterProtoVersion;
 };
 
-#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)(allowSslConnections)
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)(allowSslConnections)(nxClusterProtoVersion)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

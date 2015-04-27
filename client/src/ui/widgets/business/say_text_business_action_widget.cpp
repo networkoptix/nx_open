@@ -17,9 +17,16 @@ QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->volumeSlider->setValue(qRound(QtvAudioDevice::instance()->volume() * 100));
+
     connect(ui->textEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
     connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(at_volumeSlider_valueChanged(int)));
+
+    connect(QtvAudioDevice::instance(), &QtvAudioDevice::volumeChanged, this, [this] {
+        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        ui->volumeSlider->setValue(qRound(QtvAudioDevice::instance()->volume() * 100));
+    });
 
     setHelpTopic(this, Qn::EventsActions_Speech_Help);
 }
@@ -68,5 +75,8 @@ void QnSayTextBusinessActionWidget::at_testButton_clicked() {
 }
 
 void QnSayTextBusinessActionWidget::at_volumeSlider_valueChanged(int value) {
+    if (m_updating)
+        return;
+
     QtvAudioDevice::instance()->setVolume((qreal)value * 0.01);
 }

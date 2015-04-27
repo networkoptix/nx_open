@@ -317,7 +317,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     }
 
     if (!serverConnection) {
-        QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers has a public IP."));
+        QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers is connected to the Internet."));
         return;
     }
 

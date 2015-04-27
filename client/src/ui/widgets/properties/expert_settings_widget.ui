@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AdvancedSettingsWidget</class>
- <widget class="QWidget" name="AdvancedSettingsWidget">
+ <class>CameraExpertSettingsWidget</class>
+ <widget class="QWidget" name="CameraExpertSettingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>864</width>
-    <height>461</height>
+    <width>982</width>
+    <height>514</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
@@ -79,6 +76,13 @@
              </widget>
             </item>
            </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="settingsDisabledWarningLabel">
+           <property name="text">
+            <string>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -219,7 +223,7 @@
             <item>
              <widget class="QLabel" name="lowQualityWarningLabel">
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Warning! Low quality may result in low resolution image.</string>
               </property>
              </widget>
             </item>
@@ -344,7 +348,7 @@
            <enum>Qt::RichText</enum>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../x64/build/client.qrc">:/skin/warning.png</pixmap>
+           <pixmap>:/skin/warning.png</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -385,16 +389,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../../x64/build/client.qrc"/>
-  <include location="../../../../x64/build/client.qrc"/>
-  <include location="../../../../x64/build/client.qrc"/>
-  <include location="../../../../x64/build/client.qrc"/>
-  <include location="../../../../x64/build/client.qrc"/>
-  <include location="../../../../x64/build/client.qrc"/>
-  <include location="../../../../x64/build/client.qrc"/>
-  <include location="../../../../x64/build/client.qrc"/>
-  <include location="../../../../x64/build/client.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

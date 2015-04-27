@@ -33,12 +33,14 @@ public:
     static const Button FishEyeButton       = static_cast<Button>(0x040);
     static const Button ZoomWindowButton    = static_cast<Button>(0x080);
     static const Button EnhancementButton   = static_cast<Button>(0x100);
+    static const Button DbgScreenshotButton = static_cast<Button>(0x200);
 #define ScreenshotButton ScreenshotButton
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
 #define FishEyeButton FishEyeButton
 #define ZoomWindowButton ZoomWindowButton
 #define EnhancementButton EnhancementButton
+#define DbgScreenshotButton DbgScreenshotButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
@@ -117,6 +119,9 @@ public:
 
     QnMediaDewarpingParams dewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams &params);
+
+    virtual float visualAspectRatio() const;
+    virtual float defaultVisualAspectRatio() const override;
 
 signals:
     void motionSelectionChanged();

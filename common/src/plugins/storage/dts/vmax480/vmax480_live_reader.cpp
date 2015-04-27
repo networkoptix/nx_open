@@ -60,7 +60,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
 
     if (!m_needStop) 
     {
-        QnAbstractMediaDataPtr media = result.dynamicCast<QnAbstractMediaData>();
+        QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(result);
         if (media && (media->dataType != QnAbstractMediaData::EMPTY_DATA)) {
             m_lastMediaTimer.restart();
             if (getResource()->getStatus() == Qn::Unauthorized || getResource()->getStatus() == Qn::Offline)
@@ -71,7 +71,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
         }
     }
 
-    return result.dynamicCast<QnAbstractMediaData>();
+    return std::dynamic_pointer_cast<QnAbstractMediaData>(result);
 }
 
 bool QnVMax480LiveProvider::canChangeStatus() const
@@ -129,6 +129,7 @@ void QnVMax480LiveProvider::beforeRun()
 void QnVMax480LiveProvider::afterRun()
 {
     //msleep(300);
+    CLServerPushStreamReader::afterRun();
     closeStream();
 }
 

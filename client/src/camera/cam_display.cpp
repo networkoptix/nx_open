@@ -30,8 +30,9 @@ Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
 static const int INITIAL_LIVE_MEDIA_LEN_THRESHOLD = 300*1000ll;   // do not sleep in live mode if queue is large
-static const int MAX_LIVE_MEDIA_LEN_THRESHOLD = 1000*1000ll;   // do not sleep in live mode if queue is large
+static const int MAX_LIVE_MEDIA_LEN_THRESHOLD = 600*1000ll;   // do not sleep in live mode if queue is large
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer 
+static const int MAX_METADATA_QUEUE_SIZE = 50; // max metadata fps is 7 for current version
 
 static void updateActivity()
 {
@@ -115,7 +116,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_emptyPacketCounter(0),
     m_isStillImage(false),
     m_isLongWaiting(false),
-    m_skippingFramesStarted(false),
+    m_skippingFramesTime(AV_NOPTS_VALUE),
     m_executingChangeSpeed(false),
     m_eofSignalSended(false),
     m_videoQueueDuration(0),
@@ -166,6 +167,9 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     if (desktopResource && desktopResource->isRendererSlow())
         m_forceMtDecoding = true; // not enough speed for desktop camera with aero in single thread mode because of slow rendering
 #endif
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (camera && camera->getMaxFps() >= 50)
+        m_forceMtDecoding = true; // we can get render speed limit instead. MT decoding and displaying frame queue turn on simultaneously
 }
 
 QnCamDisplay::~QnCamDisplay()
@@ -221,6 +225,8 @@ void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bo
         if (!m_display[i]) {
             m_display[i] = new QnVideoStreamDisplay(canDownscale, i);
             m_channelsCount++;
+            if (m_forceMtDecoding)
+                m_display[i]->setMTDecoding(true);
         }
         int rendersCount = m_display[i]->addRenderer(vw);
         m_multiView = rendersCount > 1;
@@ -410,8 +416,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
     qint32 needToSleep;
 
-    if ((vd->flags & QnAbstractMediaData::MediaFlags_BOF) || isPrebuffering)
-        m_lastSleepInterval = needToSleep = 0;
+    if (isPrebuffering)
+        m_lastSleepInterval = 0;
 
     if (vd->flags & AV_REVERSE_BLOCK_START)
     {
@@ -426,22 +432,24 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     //qDebug() << "vd->flags & QnAbstractMediaData::MediaFlags_FCZ" << (vd->flags & QnAbstractMediaData::MediaFlags_FCZ);
 
-    bool canSwitchToMT = isFullScreen() || qnRedAssController->counsumerCount() == 1;
-    bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
-    if (canSwitchToMT && shouldSwitchToMT) {
-        if (!m_useMTRealTimeDecode) {
-            m_useMTRealTimeDecode = true;
-            setMTDecoding(true); 
+    if (!m_forceMtDecoding)
+    {
+        bool canSwitchToMT = isFullScreen() || qnRedAssController->counsumerCount() == 1;
+        bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
+        if (canSwitchToMT && shouldSwitchToMT) {
+            if (!m_useMTRealTimeDecode) {
+                m_useMTRealTimeDecode = true;
+                setMTDecoding(true); 
+            }
+        }
+        else {
+            if (m_useMTRealTimeDecode) {
+                m_totalFrames = 0;
+                m_useMTRealTimeDecode = false;
+                setMTDecoding(false); 
+            }
         }
     }
-    else {
-        if (m_useMTRealTimeDecode) {
-            m_totalFrames = 0;
-            m_useMTRealTimeDecode = false;
-            setMTDecoding(false); 
-        }
-    }
-
 
     if (m_isRealTimeSource && vd && !isPrebuffering)
     {
@@ -622,7 +630,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
 
             m_timeMutex.lock();
-            if (m_buffering && m_executingJump == 0 && !m_afterJump && !m_skippingFramesStarted)
+            if (m_buffering && m_executingJump == 0 && !m_afterJump && m_skippingFramesTime == AV_NOPTS_VALUE)
             {
                 m_buffering &= ~(1 << vd->channelNumber);
                 m_timeMutex.unlock();
@@ -660,7 +668,7 @@ template <class T>
 void QnCamDisplay::markIgnoreBefore(const T& queue, qint64 time)
 {
     for (int i = 0; i < queue.size(); ++i) {
-        QnAbstractMediaDataPtr media = queue.at(i).template dynamicCast<QnAbstractMediaData>();
+        QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(queue.at(i));
         if (media) {
             if (m_speed >= 0 && media->timestamp < time)
                 media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
@@ -678,13 +686,10 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     m_dataQueue.lock();
     markIgnoreBefore(m_dataQueue, time);
     m_dataQueue.unlock();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        markIgnoreBefore(m_videoQueue[i], time);
-
     QMutexLocker lock(&m_timeMutex);
     m_singleShotQuantProcessed = false;
     m_buffering = getBufferingMask();
-    m_skippingFramesStarted = true;
+    m_skippingFramesTime = time;
 
     if (m_speed >= 0)
         blockTimeValue(qMax(time, getCurrentTime()));
@@ -799,7 +804,7 @@ void QnCamDisplay::onJumpCanceled(qint64 /*time*/)
 
 void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
 {
-    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
+    QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
     //cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString(), cl_logWARNING);
 
     clearVideoQueue();
@@ -814,7 +819,8 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
-    if (!m_afterJump && !m_skippingFramesStarted) // if not more (not handled yet) jumps expected
+    m_lastSleepInterval = 0;
+    if (!m_afterJump && m_skippingFramesTime == AV_NOPTS_VALUE) // if not more (not handled yet) jumps expected
     {
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
             if (media && !(media->flags & QnAbstractMediaData::MediaFlags_Ignore)) {
@@ -827,6 +833,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_audioDisplay->clearAudioBuffer();
     m_firstAfterJumpTime = AV_NOPTS_VALUE;
     m_prevLQ = -1;
+    clearMetaDataInfo();
 }
 
 void QnCamDisplay::onReaderPaused()
@@ -841,7 +848,8 @@ void QnCamDisplay::onReaderResumed()
 
 void QnCamDisplay::onPrevFrameOccured()
 {
-    m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
+    if (getDisplayedTime() != DATETIME_NOW)
+        m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
     QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->clearDeviceBuffer();
 }
@@ -903,13 +911,16 @@ void QnCamDisplay::processNewSpeed(float speed)
         m_audioDisplay->clearAudioBuffer();
     }
 
-    if (qAbs(speed) > 1.0 + FPS_EPS || speed < 0)
+    if (!m_forceMtDecoding) 
     {
-        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; i++)
-            m_display[i]->setMTDecoding(true);
-    }
-    else if (speed != 0) {
-        setMTDecoding(m_useMtDecoding);
+        if (qAbs(speed) > 1.0 + FPS_EPS || speed < 0)
+        {
+            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; i++)
+                m_display[i]->setMTDecoding(true);
+        }
+        else if (speed != 0) {
+            setMTDecoding(m_useMtDecoding);
+        }
     }
 
     if (speed < 0 && m_prevSpeed >= 0)
@@ -957,7 +968,7 @@ bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 
 void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
 {
-    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+    QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (video)
     {
         if ((video->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0 && video->timestamp - m_lastVideoPacketTime > m_liveBufferSize)
@@ -990,21 +1001,56 @@ bool QnCamDisplay::needBuffering(qint64 vTime) const
     //return m_audioDisplay->isBuffering() && !flushCurrentBuffer;
 }
 
+void QnCamDisplay::processSkippingFramesTime()
+{
+    QMutexLocker lock(&m_timeMutex);
+    if (m_skippingFramesTime != AV_NOPTS_VALUE)
+    {
+        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+            markIgnoreBefore(m_videoQueue[i], m_skippingFramesTime);
+        m_skippingFramesTime = AV_NOPTS_VALUE;
+    }
+}
+
+void QnCamDisplay::clearMetaDataInfo()
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_lastMetadata->clear();
+}
+
+void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
+{
+    auto & queue = m_lastMetadata[video->channelNumber];
+    if (queue.empty())
+        return;
+    auto itr = queue.upper_bound(video->timestamp);
+    if (itr != queue.begin())
+        --itr;
+
+    const QnMetaDataV1Ptr& metadata = itr->second;
+    if (metadata->containTime(video->timestamp))
+        video->motion = metadata;
+    queue.erase(queue.begin(), itr);
+}
+
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
 
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!media)
         return true;
 
-    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
+    QnMetaDataV1Ptr metadata = std::dynamic_pointer_cast<QnMetaDataV1>(data);
     if (metadata) {
-        m_lastMetadata[metadata->channelNumber] = metadata;
+        int ch = metadata->channelNumber;
+        m_lastMetadata[ch][metadata->timestamp] = metadata;
+        if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
+            m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
         return true;
     }
 
-    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-    QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
+    QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
+    QnCompressedAudioDataPtr ad = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
 
     m_processedPackets++;
 
@@ -1030,15 +1076,12 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         m_prevSpeed = speed;
     }
 
-    m_timeMutex.lock();
-    m_skippingFramesStarted = false;
-    m_timeMutex.unlock();
+    processSkippingFramesTime();
 
     if (vd)
     {
         m_ignoringVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-        if (m_lastMetadata[vd->channelNumber] && m_lastMetadata[vd->channelNumber]->containTime(vd->timestamp))
-            vd->motion = m_lastMetadata[vd->channelNumber];
+        mapMetadataFrame(vd);
     }
     
     bool oldIsStillImage = m_isStillImage;
@@ -1095,7 +1138,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         m_fpsStat.updateFpsStatistics(vd);
 
 
-    QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
+    QnEmptyMediaDataPtr emptyData = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
 
     bool flushCurrentBuffer = false;
     int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;
@@ -1327,7 +1370,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             vd = nextInOutVideodata(incoming, channel);
 
             if (vd) {
-                if (!m_useMtDecoding && (!m_isRealTimeSource || m_forceMtDecoding))
+                if (!m_useMtDecoding && !m_isRealTimeSource)
                     setMTDecoding(true);
 
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
@@ -1397,10 +1440,14 @@ void QnCamDisplay::playAudio(bool play)
         else
             m_audioDisplay->resume();
     }
-    if (m_isRealTimeSource)
-        setMTDecoding(play && (m_useMTRealTimeDecode || m_forceMtDecoding));
-    else
-        setMTDecoding(play);
+
+    if (!m_forceMtDecoding) 
+    {
+        if (m_isRealTimeSource)
+            setMTDecoding(play && m_useMTRealTimeDecode);
+        else
+            setMTDecoding(play);
+    }
 }
 
 void QnCamDisplay::pauseAudio()
@@ -1410,7 +1457,8 @@ void QnCamDisplay::pauseAudio()
         QMutexLocker lock(&m_audioChangeMutex);
         m_audioDisplay->suspend();
     }
-    setMTDecoding(false);
+    if (!m_forceMtDecoding)
+        setMTDecoding(false);
 }
 
 //==========================================================================

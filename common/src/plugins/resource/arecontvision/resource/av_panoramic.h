@@ -30,12 +30,13 @@ private:
     bool setSpecialParam(const QString& name, const QVariant& val);
     bool setResolution(bool full);
     bool setCamQuality(int q);
-
+    QnConstResourceVideoLayoutPtr getDefaultVideoLayout() const;
 protected:
     QnResourceVideoLayoutPtr m_vrl;
     bool m_isRotated;    
     mutable QnCustomResourceVideoLayoutPtr m_rotatedLayout;
     QElapsedTimer m_flipTimer;
+    mutable QnResourceVideoLayoutPtr m_defaultVideoLayout;
 };
 
 typedef QnSharedResourcePointer<QnArecontPanoramicResource> QnArecontPanoramicResourcePtr;

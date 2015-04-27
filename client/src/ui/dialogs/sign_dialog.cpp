@@ -118,10 +118,6 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_reader->addDataProcessor(m_camDispay);
     m_reader->start();
     m_camDispay->start();
-
-
-    connect(ui->buttonBox,                  SIGNAL(accepted()),                     this,   SLOT(accept()));
-    connect(ui->buttonBox,                  SIGNAL(rejected()),                     this,   SLOT(reject()));
 }
 
 SignDialog::~SignDialog()
@@ -175,11 +171,6 @@ QRect SignDialog::calcVideoRect(double windowWidth, double windowHeight, double 
         }
     }
     return videoRect;
-}
-
-void SignDialog::accept()
-{
-    done(0);
 }
 
 void SignDialog::changeEvent(QEvent *event)

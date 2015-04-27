@@ -5,7 +5,7 @@
 #include "abstract_renderer.h"
 
 QnBufferedFrameDisplayer::QnBufferedFrameDisplayer(): 
-    m_queue(MAX_FRAME_QUEUE_SIZE - 1)
+    m_queue(11)
 {
     m_currentTime = AV_NOPTS_VALUE;
     m_expectedTime = AV_NOPTS_VALUE;

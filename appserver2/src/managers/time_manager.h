@@ -16,8 +16,9 @@
 #include <common/common_globals.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_peer_system_time_data.h>
+#include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
-#include <utils/network/daytime_nist_fetcher.h>
+#include <utils/network/time/abstract_accurate_time_fetcher.h>
 #include <utils/network/http/httptypes.h>
 
 #include "nx_ec/data/api_data.h"
@@ -68,7 +69,9 @@ namespace ec2
         TimePriorityKey();
 
         bool operator==( const TimePriorityKey& right ) const;
+        bool operator!=( const TimePriorityKey& right ) const;
         bool operator<( const TimePriorityKey& right ) const;
+        bool operator<=( const TimePriorityKey& right ) const;
         bool operator>( const TimePriorityKey& right ) const;
         quint64 toUInt64() const;
         void fromUInt64( quint64 val );
@@ -101,7 +104,9 @@ namespace ec2
     */
     class TimeSynchronizationManager
     :
-        public QObject
+        public QObject,
+        public QnStoppable,
+        public EnableMultiThreadDirectConnection<TimeSynchronizationManager>
     {
         Q_OBJECT
 
@@ -113,11 +118,24 @@ namespace ec2
         static const int peerHasMonotonicClock                   = 0x0002;
         static const int peerIsNotEdgeServer                     = 0x0001;
 
+        /*!
+            \note \a TimeSynchronizationManager::start MUST be called before using class instance
+        */
         TimeSynchronizationManager( Qn::PeerType peerType );
         virtual ~TimeSynchronizationManager();
 
         static TimeSynchronizationManager* instance();
 
+        //!Implemenattion of QnStoppable::pleaseStop
+        virtual void pleaseStop() override;
+
+        //!Initial initialization
+        /*!
+            \note Cannot do it in constructor to keep valid object destruction order
+            TODO #ak look like incapsulation failure. Better remove this method
+        */
+        void start();
+        
         //!Returns synchronized time
         qint64 getSyncTime() const;
         //!Called when primary time server has been changed by user
@@ -187,9 +205,10 @@ namespace ec2
         */
         std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
         const Qn::PeerType m_peerType;
-        DaytimeNISTFetcher m_timeSynchronizer;
+        std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
         size_t m_internetTimeSynchronizationPeriod;
         bool m_timeSynchronized;
+        int m_internetSynchronizationFailureCount;
 
         /*!
             \param lock Locked \a m_mutex. This method will unlock it to emit \a TimeSynchronizationManager::timeChanged signal
@@ -206,8 +225,12 @@ namespace ec2
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,
             const TimePriorityKey& remotePeerTimePriorityKey );
-        void onBeforeSendingHttpChunk( QnTransactionTransport* transport, std::vector<nx_http::ChunkExtension>* const extensions );
-        void onRecevingHttpChunkExtensions( QnTransactionTransport* transport, const std::vector<nx_http::ChunkExtension>& extensions );
+        void onBeforeSendingTransaction(
+            QnTransactionTransport* transport,
+            nx_http::HttpHeaders* const headers );
+        void onTransactionReceived(
+            QnTransactionTransport* transport,
+            const nx_http::HttpHeaders& headers );
         void broadcastLocalSystemTime( quint64 taskID );
         void checkIfManualTimeServerSelectionIsRequired( quint64 taskID );
         //!Periodically synchronizing time with internet (if possible)
@@ -219,9 +242,10 @@ namespace ec2
 
         void updateRuntimeInfoPriority(quint64 priority);
         void peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& tran );
+        qint64 getSyncTimeNonSafe() const;
 
     private slots:
-        void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );
+        void onNewConnectionEstablished(QnTransactionTransport* transport );
         void onPeerLost( ApiPeerAliveData data );
         void onDbManagerInitialized();
     };

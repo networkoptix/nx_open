@@ -39,8 +39,8 @@ private:
 };
 
 
-QnLicensesUsageWidget::QnLicensesUsageWidget(QWidget *parent) {
-}
+QnLicensesUsageWidget::QnLicensesUsageWidget(QWidget *parent): 
+    QWidget(parent) {}
 
 QnLicensesUsageWidget::~QnLicensesUsageWidget() {
 
@@ -68,7 +68,7 @@ void QnLicensesUsageWidget::loadData(QnLicenseUsageHelper* helper) {
         if (licenseText.isEmpty())
             continue;
 
-        QString requiredText = helper->getRequiredLicenseMsg(lt);
+        QString requiredText = helper->getRequiredText(lt);
         //ui->enableRecordingCheckBox->checkState() == Qt::Checked
         //    : QString();
         row->setValues(licenseText, requiredText);

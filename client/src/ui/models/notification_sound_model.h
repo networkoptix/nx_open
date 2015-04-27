@@ -6,6 +6,8 @@
 class QnNotificationSoundModel : public QStandardItemModel
 {
     Q_OBJECT
+
+    typedef QStandardItemModel base_type;
 public:
     enum Columns {
         TitleColumn,
@@ -30,6 +32,8 @@ public:
     void updateTitle(const QString &filename, const QString &title);
 
     bool loaded() const;
+
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     // Override standard sort to avoid '<No Sound>' item from being sorted
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;

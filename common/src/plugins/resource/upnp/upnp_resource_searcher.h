@@ -39,18 +39,26 @@ protected:
     */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const QString& host,
+        const HostAddress& host,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         const QAuthenticator &auth,
         QnResourceList& result) = 0;
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
-    QHostAddress findBestIface(const QString& host);
+    QHostAddress findBestIface(const HostAddress& host);
     void processSocket(AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
 protected:
-    void readDeviceXml(const QByteArray& uuidStr, const QUrl& descritionUrl, const QString& sender, QnResourceList& result);
-    void processDeviceXml(const QByteArray& foundDeviceDescription, const QString& host, const QString& sender, QnResourceList& result);
+    void readDeviceXml(
+        const QByteArray& uuidStr,
+        const QUrl& descritionUrl,
+        const HostAddress& sender,
+        QnResourceList& result);
+    void processDeviceXml(
+        const QByteArray& foundDeviceDescription,
+        const HostAddress& host,
+        const HostAddress& sender,
+        QnResourceList& result );
 private:
     QMap<QString, AbstractDatagramSocket*> m_socketList;
     AbstractDatagramSocket* sockByName(const QnInterfaceAndAddr& iface);
@@ -76,7 +84,7 @@ public:
     //!Implementation of UPNPSearchHandler::processPacket
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
-        const QString& discoveredDevAddress,
+        const HostAddress& discoveredDevAddress,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) override;
 
@@ -89,7 +97,7 @@ protected:
     */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const QString& host,
+        const HostAddress& host,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) = 0;

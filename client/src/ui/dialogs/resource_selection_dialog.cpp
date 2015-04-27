@@ -16,6 +16,8 @@
 #include <ui/models/resource_pool_model.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -74,6 +76,8 @@ void QnResourceSelectionDialog::init() {
 
     ui.reset(new Ui::ResourceSelectionDialog);
     ui->setupUi(this);
+
+    setHelpTopic(ui->resourcesWidget->treeView(), Qn::Forced_Empty_Help);
 
     QnResourcePoolModel::Scope scope;
 

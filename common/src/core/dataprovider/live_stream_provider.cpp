@@ -4,7 +4,10 @@
 
 #include "core/resource/camera_resource.h"
 #include "utils/media/jpeg_utils.h"
+#include "utils/media/nalUnits.h"
 
+
+static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 
 QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     QnAbstractMediaStreamDataProvider(res),
@@ -15,7 +18,9 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_framesSinceLastMetaData(0),
     m_softMotionRole(Qn::CR_Default),
     m_softMotionLastChannel(0),
-    m_secondaryQuality(Qn::SSQualityNotDefined)
+    m_secondaryQuality(Qn::SSQualityNotDefined),
+    m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
+    m_owner(0)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_motionMaskBinData[i] = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
@@ -34,6 +39,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_layout = m_cameraRes->getVideoLayout();
     m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
     m_resolutionCheckTimer.invalidate();
+}
+
+void QnLiveStreamProvider::setOwner(QnAbstractVideoCamera* owner)
+{
+    m_owner = owner;
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -104,17 +114,14 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        m_cameraRes->lockConsumers();
-        for(QnResourceConsumer* consumer: m_cameraRes->getAllConsumers())
-        {
-            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-            if (lp && lp->getRole() == Qn::CR_SecondaryLiveVideo) {
+        if (m_owner) {
+            QnLiveStreamProviderPtr lp = m_owner->getSecondaryReader();
+            if (lp)
+            {
                 lp->setQuality(m_cameraRes->getSecondaryStreamQuality());
                 lp->onPrimaryFpsUpdated(m_fps);
             }
         }
-        m_cameraRes->unlockConsumers();
-
         updateStreamParamsBasedOnFps();
     }
 }
@@ -205,14 +212,11 @@ void QnLiveStreamProvider::setFps(float f)
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        m_cameraRes->lockConsumers();
-        for(QnResourceConsumer* consumer: m_cameraRes->getAllConsumers())
-        {
-            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-            if (lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
+        if (m_owner) {
+            QnLiveStreamProviderPtr lp = m_owner->getSecondaryReader();
+            if (lp)
                 lp->onPrimaryFpsUpdated(f);
         }
-        m_cameraRes->unlockConsumers();
     }
 
 
@@ -279,9 +283,11 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
 {
     m_framesSinceLastMetaData++;
 
+    saveMediaStreamParamsIfNeeded( videoData );
+
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
-    int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
+    static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
     bool resoulutionOK =  videoData->width * videoData->height <= maxSquare || !m_forcedMotionStream.isEmpty();
 
     if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && resoulutionOK)
@@ -294,7 +300,7 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
              (!m_resolutionCheckTimer.isValid() || m_resolutionCheckTimer.elapsed() > PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS) )    //from time to time checking primary stream resolution
     {
         QSize newResolution;
-        extractCodedPictureResolution( videoData, &newResolution );
+        extractMediaStreamParams( videoData, &newResolution );
         if( newResolution.isValid() )
         {
             updateStreamResolution( videoData->channelNumber, newResolution );
@@ -381,6 +387,7 @@ void QnLiveStreamProvider::startIfNotRunning()
     QMutexLocker mtx(&m_mutex);
     if (!isRunning())    
     {
+        m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
         start();
     }
 }
@@ -389,6 +396,11 @@ bool QnLiveStreamProvider::isCameraControlDisabled() const
 {
     const QnVirtualCameraResource* camRes = dynamic_cast<const QnVirtualCameraResource*>(m_resource.data());
     return camRes && camRes->isCameraControlDisabled();
+}
+
+bool QnLiveStreamProvider::isCameraControlRequired() const
+{
+    return !isCameraControlDisabled() && needConfigureProvider();
 }
 
 void QnLiveStreamProvider::filterMotionByMask(const QnMetaDataV1Ptr& motion)
@@ -404,12 +416,8 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     m_videoResolutionByChannelNumber[channelNumber] = newResolution;
     onStreamResolutionChanged( channelNumber, newResolution );
 
-    if( getRole() == Qn::CR_SecondaryLiveVideo ||
-        m_cameraRes->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability ) || 
-        m_cameraRes->hasDualStreaming2() )
-    {
+    if( getRole() == Qn::CR_SecondaryLiveVideo)
         return;
-    }
 
     //no secondary stream and no motion, may be primary stream is now OK for motion?
     bool newValue = newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION;
@@ -424,6 +432,8 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     }
 
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
+    QMutexLocker mtx(&m_livemutex);
+    updateSoftwareMotion();
 }
 
 void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
@@ -432,11 +442,21 @@ void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
 }
 
-void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVideoDataPtr& videoData, QSize* const newResolution )
+void QnLiveStreamProvider::extractMediaStreamParams(
+    const QnCompressedVideoDataPtr& videoData,
+    QSize* const newResolution,
+    std::map<QString, QString>* const customStreamParams )
 {
     switch( videoData->compressionType )
     {
         case CODEC_ID_H264:
+            extractSpsPps(
+                videoData,
+                (videoData->width > 0 && videoData->height > 0)
+                    ? nullptr   //taking resolution from sps only if video frame does not already contain it
+                    : newResolution,
+                customStreamParams );
+
         case CODEC_ID_MPEG2VIDEO:
             if( videoData->width > 0 && videoData->height > 0 )
                 *newResolution = QSize( videoData->width, videoData->height );
@@ -455,6 +475,200 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
             if( videoData->width > 0 && videoData->height > 0 )
                 *newResolution = QSize( videoData->width, videoData->height );
             break;
+    }
+}
+
+void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData )
+{
+    ++m_framesSincePrevMediaStreamCheck;
+    if( m_framesSincePrevMediaStreamCheck < CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES ||
+        (videoData->flags & QnAbstractMediaData::MediaFlags_AVKey) == 0 )
+        return;
+    m_framesSincePrevMediaStreamCheck = 0;
+
+    QSize streamResolution;
+    //vector<pair<name, value>>
+    std::map<QString, QString> customStreamParams;
+    extractMediaStreamParams(
+        videoData,
+        &streamResolution,
+        &customStreamParams );
+
+    CameraMediaStreamInfo mediaStreamInfo(
+        getRole() == Qn::CR_LiveVideo
+            ? PRIMARY_ENCODER_INDEX
+            : SECONDARY_ENCODER_INDEX,
+        QSize(streamResolution.width(), streamResolution.height()),
+        videoData->compressionType,
+        std::move(customStreamParams) );
+
+    if( m_cameraRes->saveMediaStreamInfoIfNeeded( mediaStreamInfo ) )
+        m_cameraRes->saveParamsAsync();
+}
+
+namespace
+{
+    bool isH264SeqHeaderInExtraData( const QnConstCompressedVideoDataPtr data )
+    {
+        return data->context &&
+            data->context->ctx() &&
+            data->context->ctx()->extradata_size >= 7 &&
+            data->context->ctx()->extradata[0] == 1;
+    }
+
+//dishonorably stolen from libavcodec source
+#ifndef AV_RB16
+#   define AV_RB16(x)                           \
+    ((((const uint8_t*)(x))[0] << 8) |          \
+      ((const uint8_t*)(x))[1])
+#endif
+
+    void readH264NALUsFromExtraData(
+        const QnConstCompressedVideoDataPtr data,
+        std::vector<std::pair<const quint8*, size_t>>* const nalUnits )
+    {
+        const unsigned char* p = data->context->ctx()->extradata;
+
+        //sps & pps is in the extradata, parsing it...
+        //following code has been taken from libavcodec/h264.c
+
+        // prefix is unit len
+        //const int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
+        /* sps and pps in the avcC always have length coded with 2 bytes,
+         * so put a fake nal_length_size = 2 while parsing them */
+        //int nal_length_size = 2;
+
+        // Decode sps from avcC
+        int cnt = *(p + 5) & 0x1f; // Number of sps
+        p += 6;
+
+        for( int i = 0; i < cnt; i++ )
+        {
+            const int nalsize = AV_RB16(p);
+            p += 2; //skipping nalusize
+            if( nalsize > data->context->ctx()->extradata_size - (p - data->context->ctx()->extradata) )
+                break;
+            nalUnits->emplace_back( (const quint8*)p, nalsize );
+            p += nalsize;
+        }
+
+        // Decode pps from avcC
+        cnt = *(p++); // Number of pps
+        for( int i = 0; i < cnt; ++i )
+        {
+            const int nalsize = AV_RB16(p);
+            p += 2;
+            if( nalsize > data->context->ctx()->extradata_size - (p - data->context->ctx()->extradata) )
+                break;
+
+            nalUnits->emplace_back( (const quint8*)p, nalsize );
+            p += nalsize;
+        }
+    }
+
+    void readH264NALUsFromAnnexBStream(
+        const QnConstCompressedVideoDataPtr data,
+        std::vector<std::pair<const quint8*, size_t>>* const nalUnits )
+    {
+        const quint8* dataStart = reinterpret_cast<const quint8*>(data->data());
+        const quint8* dataEnd = dataStart + data->dataSize();
+        const quint8* naluEnd = nullptr;
+        for( const quint8
+             *curNalu = NALUnit::findNALWithStartCodeEx( dataStart, dataEnd, &naluEnd ),
+             *nextNalu = NULL;
+             curNalu < dataEnd;
+             curNalu = nextNalu )
+        {
+            nextNalu = NALUnit::findNALWithStartCodeEx( curNalu, dataEnd, &naluEnd );
+            Q_ASSERT( nextNalu > curNalu );
+            //skipping leading_zero_8bits and trailing_zero_8bits
+            while( (naluEnd > curNalu) && (*(naluEnd-1) == 0) )
+                --naluEnd;
+            nalUnits->emplace_back( (const quint8*)curNalu, naluEnd-curNalu );
+        }
+    }
+}
+
+void QnLiveStreamProvider::extractSpsPps(
+    const QnCompressedVideoDataPtr& videoData,
+    QSize* const newResolution,
+    std::map<QString, QString>* const customStreamParams )
+{
+    //vector<pair<nalu buf, nalu size>>
+    std::vector<std::pair<const quint8*, size_t>> nalUnits;
+    if( isH264SeqHeaderInExtraData(videoData) )
+        readH264NALUsFromExtraData( videoData, &nalUnits );
+    else
+        readH264NALUsFromAnnexBStream( videoData, &nalUnits );
+
+    //generating profile-level-id and sprop-parameter-sets as in rfc6184
+    QByteArray profileLevelID;
+    QByteArray spropParameterSets;
+    bool spsFound = false;
+    bool ppsFound = false;
+
+    for( const std::pair<const quint8*, size_t>& nalu: nalUnits )
+    {
+        switch( *nalu.first & 0x1f )
+        {
+            case nuSPS:
+                if( nalu.second < 4 )
+                    continue;   //invalid sps
+
+                if( spsFound )
+                    continue;
+                else
+                    spsFound = true;
+
+                if( newResolution )
+                {
+                    //parsing sps to get resolution
+                    SPSUnit sps;
+                    sps.decodeBuffer( nalu.first, nalu.first+nalu.second );
+                    sps.deserialize();
+                    newResolution->setWidth( sps.getWidth() );
+                    newResolution->setHeight( sps.pic_height_in_map_units * 16 );
+
+                    //reading frame cropping settings
+                    const unsigned int subHeightC = sps.chroma_format_idc == 1 ? 2 : 1;
+                    const unsigned int cropUnitY = (sps.chroma_format_idc == 0)
+                        ? (2 - sps.frame_mbs_only_flag)
+                        : (subHeightC * (2 - sps.frame_mbs_only_flag));
+                    const unsigned int originalFrameCropTop = cropUnitY * sps.frame_crop_top_offset;
+                    const unsigned int originalFrameCropBottom = cropUnitY * sps.frame_crop_bottom_offset;
+                    newResolution->setHeight( newResolution->height() - (originalFrameCropTop+originalFrameCropBottom) );
+                }
+
+                if( customStreamParams )
+                {
+                    profileLevelID = QByteArray::fromRawData( (const char*)nalu.first + 1, 3 ).toHex();
+                    spropParameterSets = NALUnit::decodeNAL( 
+                        QByteArray::fromRawData( (const char*)nalu.first, static_cast<int>(nalu.second) ) ).toBase64() +
+                            "," + spropParameterSets;
+                }
+                break;
+
+            case nuPPS:
+                if( ppsFound )
+                    continue;
+                else
+                    ppsFound = true;
+
+                if( customStreamParams )
+                {
+                    spropParameterSets += NALUnit::decodeNAL( 
+                        QByteArray::fromRawData( (const char*)nalu.first, static_cast<int>(nalu.second) ) ).toBase64();
+                }
+                break;
+        }
+    }
+
+    if( customStreamParams )
+    {
+        if( !profileLevelID.isEmpty() )
+            customStreamParams->emplace( Qn::PROFILE_LEVEL_ID_PARAM_NAME, QLatin1String(profileLevelID) );
+        if( !spropParameterSets.isEmpty() )
+            customStreamParams->emplace( Qn::SPROP_PARAMETER_SETS_PARAM_NAME, QLatin1String(spropParameterSets) );
     }
 }
 

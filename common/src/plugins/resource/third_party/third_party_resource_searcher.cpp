@@ -183,7 +183,7 @@ QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
 
 void ThirdPartyResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
-    const QString& /*host*/,
+    const HostAddress& /*host*/,
     const UpnpDeviceInfo& /*devInfo*/,
     const QByteArray& xmlDevInfo,
     QnResourceList& result )
@@ -253,17 +253,34 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     nxcip_qt::CameraDiscoveryManager* const discoveryManager,
     const nxcip::CameraInfo& cameraInfo )
 {
+    const QString vendor = discoveryManager->getVendorName();
+
+    if( strlen(cameraInfo.uid) == 0 )
+    {
+        NX_LOG( lit("THIRD_PARTY. Plugin %1 returned camera with empty uid. This is forbidden").
+            arg(vendor), cl_logDEBUG1 );
+        return QnThirdPartyResourcePtr();
+    }
+    if( strlen(cameraInfo.url) == 0 )
+    {
+        NX_LOG( lit("THIRD_PARTY. Plugin %1 returned camera with empty url. This is forbidden").
+            arg(vendor), cl_logDEBUG1 );
+        return QnThirdPartyResourcePtr();
+    }
+
     QnUuid typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
     if( typeId.isNull() )
         return QnThirdPartyResourcePtr();
 
     nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
     if( !camManager )
+    {
+        NX_LOG( lit("THIRD_PARTY. Plugin %1 could not create BaseCameraManager").arg(vendor), cl_logDEBUG1 );
         return QnThirdPartyResourcePtr();
+    }
 
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
 
-    QString vendor = discoveryManager->getVendorName();
     bool vendorIsRtsp = vendor == lit("GENERIC_RTSP");  //TODO #ak remove this!
 
     QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
@@ -280,6 +297,8 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setVendor( vendor );
     if( strlen(cameraInfo.auxiliaryData) > 0 )
         resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );
+    if( strlen(cameraInfo.firmware) > 0 )
+        resource->setProperty( Qn::FIRMWARE_PARAM_NAME, QString::fromLatin1(cameraInfo.firmware) );
 
     if( !qnResPool->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
     {
@@ -287,9 +306,9 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         //TODO #ak reading MaxFPS here is a workaround of camera integration API defect: 
             //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
         const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
-        const float maxFps = resourceData.value<float>( lit("MaxFPS"), 0.0 );
+        const float maxFps = resourceData.value<float>( Qn::MAX_FPS_PARAM_NAME, 0.0 );
         if( maxFps > 0.0 )
-            resource->setProperty( lit("MaxFPS"), maxFps);
+            resource->setProperty( Qn::MAX_FPS_PARAM_NAME, maxFps);
     }
     
     unsigned int caps;

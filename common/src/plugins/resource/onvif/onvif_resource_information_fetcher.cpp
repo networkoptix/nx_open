@@ -13,6 +13,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "plugins/resource/flex_watch/flexwatch_resource.h"
 #include "plugins/resource/axis/axis_onvif_resource.h"
+#include "plugins/resource/avigilon/avigilon_resource.h"
 #include "../vista/vista_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
@@ -30,10 +31,11 @@ static const char* ANALOG_CAMERAS[][2] =
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
 static const char* IGNORE_VENDORS[][2] =
 {
-    {"*networkcamera*", "IP*"}, // DLINK
-    {"*", "*spartan-6*"},       // ArecontVision
+    {"IP*", "*networkcamera*"}, // DLINK
+    {"ISD", "*"},              // ISD
+    {"spartan-6*", "*"},       // ArecontVision
     {"acti*", "*"},              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
-    {"*", "KCM*"}              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
+    {"*", "KCM*"}              // ACTi.
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
@@ -275,6 +277,7 @@ QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manu
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& model, 
     const QString& mac, const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const
 {
+    Q_UNUSED(discoveryIp)
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
 
@@ -338,12 +341,16 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower() == QLatin1String("panoramic"))
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+    else if (manufacture.toLower() == QLatin1String("ipnc"))   // new dw panoramic cameras
+        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
     else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
         resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
     else if (manufacture.toLower().contains(QLatin1String("vista")))
         resource = QnPlOnvifResourcePtr(new QnVistaResource());
+    else if (manufacture.toLower().contains(QLatin1String("avigilon")))
+        resource = QnPlOnvifResourcePtr(new QnAvigilonResource());
 #ifdef ENABLE_AXIS
     else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());

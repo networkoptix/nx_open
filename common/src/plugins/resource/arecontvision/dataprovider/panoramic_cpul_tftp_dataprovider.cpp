@@ -82,11 +82,9 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
         return QnMetaDataV1Ptr(0);
 
 
-    QString zoneSize = getResource()->getProperty(lit("Zone size"));
-    if (zoneSize.isEmpty())
+    int pixelZoneSize = avRes->getZoneSite() * 32;
+    if (pixelZoneSize == 0)
         return QnMetaDataV1Ptr(0);
-
-    int pixelZoneSize = zoneSize.toInt() * 32;
 
 
     QString maxSensorWidth = getResource()->getProperty(lit("MaxSensorWidth"));

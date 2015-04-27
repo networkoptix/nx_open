@@ -19,6 +19,7 @@
 #include "ec2_thread_pool.h"
 #include "request_params.h"
 #include "server_query_processor.h"
+#include "utils/common/util.h"
 
 
 namespace ec2
@@ -74,6 +75,8 @@ namespace ec2
                     //    result = QnBinary::serialized(outputData);
                     } else if(format == Qn::JsonFormat) {
                         result = QJson::serialized(outputData);
+                        if (params.contains("extraFormatting"))
+                            result  = formatJSonString(result);
                     } else if(format == Qn::CsvFormat) {
                         result = QnCsv::serialized(outputData);
                     } else if(format == Qn::XmlFormat) {
@@ -178,7 +181,6 @@ namespace ec2
         template<class HandlerType>
         void processQueryAsync( const InputData& inputData, HandlerType handler )
         {
-            QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
             QnConcurrent::run( Ec2ThreadPool::instance(),
                 [this, inputData, handler]() {
                     OutputData output;

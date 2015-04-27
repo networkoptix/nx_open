@@ -43,7 +43,7 @@ QnTimeScrollBarColors::QnTimeScrollBarColors() {
 }
 
 QnBackgroundColors::QnBackgroundColors() {
-    normal = QColor(26, 26, 240, 40);
+    normal = QColor(0, 0, 255, 51);
     panic = QColor(255, 0, 0, 255);
 }
 
@@ -85,6 +85,10 @@ QnScheduleGridColors::QnScheduleGridColors() {
     weekendLabel =  QColor(255, 128, 128, 255);
     selectedLabel = QColor(64,  128, 192, 255);
     disabledLabel = QColor(183, 183, 183, 255);
+
+    recordNever =   QColor(64,  64,  64);
+    recordAlways =  QColor(0,   100, 0);
+    recordMotion =  QColor(100, 0,   0);
 }
 
 QnGridColors::QnGridColors() {

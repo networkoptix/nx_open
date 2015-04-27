@@ -12,6 +12,8 @@ public:
     QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth);
     virtual ~QnUniversalRequestProcessor();
 
+    static void setUnauthorizedPageBody(const QByteArray& value);
+    static QByteArray unauthorizedPageBody();
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;

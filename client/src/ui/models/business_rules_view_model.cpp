@@ -39,39 +39,42 @@ QModelIndex QnBusinessRulesViewModel::index(int row, int column, const QModelInd
 
 QModelIndex QnBusinessRulesViewModel::parent(const QModelIndex &child) const {
     Q_UNUSED(child)
-
     return QModelIndex();
 }
 
 int QnBusinessRulesViewModel::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent)
-
     return m_rules.size();
 }
 
 int QnBusinessRulesViewModel::columnCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent)
-
-    return QnBusiness::ColumnCount;
+    Q_UNUSED(parent);
+    return QnBusiness::allColumns().size();
 }
 
 QVariant QnBusinessRulesViewModel::data(const QModelIndex &index, int role) const {
+    /* Check invalid indices. */
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
-
     return m_rules[index.row()]->data(index.column(), role);
 }
 
 bool QnBusinessRulesViewModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    if (!index.isValid())
+    /* Check invalid indices. */
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
-
     return m_rules[index.row()]->setData(index.column(), value, role);
 }
 
 QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation != Qt::Horizontal)
         return QVariant();
+
+    auto validateSize = [](const QSize &size) {
+        return size.isValid() ? qVariantFromValue(size) : QVariant() ;
+    };
+
+    QnBusiness::Columns column = static_cast<QnBusiness::Columns>(section);
 
     switch (role) {
         case Qt::DisplayRole:
@@ -80,24 +83,12 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
-            break;
-        default:
-            return QVariant();
-    }
-
-    switch (section) {
-        case QnBusiness::ModifiedColumn:    return tr("#");
-        case QnBusiness::DisabledColumn:    return tr("On");
-        case QnBusiness::EventColumn:       return tr("Event");
-        case QnBusiness::SourceColumn:      return tr("Source");
-        case QnBusiness::SpacerColumn:      return tr("->");
-        case QnBusiness::ActionColumn:      return tr("Action");
-        case QnBusiness::TargetColumn:      return tr("Target");
-        case QnBusiness::AggregationColumn: return tr("Interval of Action");
+            return columnTitle(column);
+        case Qt::SizeHintRole:
+            return validateSize(columnSizeHint(column));
         default:
             break;
     }
-
     return QVariant();
 }
 
@@ -143,41 +134,77 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
     return flags;
 }
 
-void QnBusinessRulesViewModel::clear() {
-    beginResetModel();
-    m_rules.clear();
-    endResetModel();
-}
-
-void QnBusinessRulesViewModel::addRules(const QnBusinessEventRuleList &businessRules) {
-    foreach (QnBusinessEventRulePtr rule, businessRules) {
-        addRule(rule);
+QString QnBusinessRulesViewModel::columnTitle(QnBusiness::Columns column) const {
+    switch (column) {
+    case QnBusiness::ModifiedColumn:    
+        return tr("#");
+    case QnBusiness::DisabledColumn:    
+        return tr("On");
+    case QnBusiness::EventColumn:       
+        return tr("Event");
+    case QnBusiness::SourceColumn:      
+        return tr("Source");
+    case QnBusiness::SpacerColumn:      
+        return tr("->");
+    case QnBusiness::ActionColumn:      
+        return tr("Action");
+    case QnBusiness::TargetColumn:      
+        return tr("Target");
+    case QnBusiness::AggregationColumn: 
+        return tr("Interval of Action");
     }
+    return QString();
 }
 
-void QnBusinessRulesViewModel::addRule(QnBusinessEventRulePtr rule) {
-    QnBusinessRuleViewModel* ruleModel = new QnBusinessRuleViewModel(this);
-    if (rule)
-        ruleModel->loadFromRule(rule);
-    else
-        ruleModel->setModified(true);
+void QnBusinessRulesViewModel::forceColumnMinWidth(QnBusiness::Columns column, int width) {
+    m_forcedWidthByColumn[column] = width;
+}
+
+QSize QnBusinessRulesViewModel::columnSizeHint(QnBusiness::Columns column) const {
+    if (!m_forcedWidthByColumn.contains(column))
+        return QSize();
+    return QSize(m_forcedWidthByColumn[column], 1);
+}
+
+void QnBusinessRulesViewModel::addRuleModelInternal(QnBusinessRuleViewModel* ruleModel) {
     connect(ruleModel, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
-            this, SLOT(at_rule_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
+        this, SLOT(at_rule_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
 
     int row = m_rules.size();
     beginInsertRows(QModelIndex(), row, row);
     m_rules << ruleModel;
     endInsertRows();
 
-    emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
+    emit dataChanged(index(row, 0), index(row, QnBusiness::allColumns().last()));
 }
 
-void QnBusinessRulesViewModel::updateRule(QnBusinessEventRulePtr rule) {
+void QnBusinessRulesViewModel::clear() {
+    beginResetModel();
+    m_rules.clear();
+    endResetModel();
+}
+
+void QnBusinessRulesViewModel::createRule() {
+    QnBusinessRuleViewModel* ruleModel = new QnBusinessRuleViewModel(this);
+    ruleModel->setModified(true);
+    addRuleModelInternal(ruleModel);
+}
+
+void QnBusinessRulesViewModel::addOrUpdateRule(const QnBusinessEventRulePtr &rule) {
+    Q_ASSERT_X(rule, Q_FUNC_INFO, "Rule must exist");
+    if (!rule)
+        return;
+
+    /* System rules are not to be added into any visual models. */
+    if (rule->isSystem())
+        return;
+
     QnBusinessRuleViewModel* ruleModel = ruleModelById(rule->id());
-    if (ruleModel)
-        ruleModel->loadFromRule(rule);
-    else
-        addRule(rule);
+    if (!ruleModel) {
+        ruleModel = new QnBusinessRuleViewModel(this);
+        addRuleModelInternal(ruleModel);
+    }
+    ruleModel->loadFromRule(rule);
 }
 
 void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
@@ -192,7 +219,7 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     endRemoveRows();
 
     //TODO: #GDM #Business check if dataChanged is required, check row
-    //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
+    //emit dataChanged(index(row, 0), index(row, QnBusiness::allColumns().last()));
 }
 
 void QnBusinessRulesViewModel::deleteRule(const QnUuid& id) {
@@ -220,14 +247,14 @@ void QnBusinessRulesViewModel::at_rule_dataChanged(QnBusinessRuleViewModel *sour
         return;
 
     int leftMostColumn = -1;
-    int rightMostColumn = QnBusiness::ColumnCount - 1;
+    int rightMostColumn = QnBusiness::allColumns().last();
 
-    for (int i = 0; i < QnBusiness::ColumnCount; i++) {
-        if (fields & m_fieldsByColumn[i]) {
+    for (QnBusiness::Columns column: QnBusiness::allColumns()) {
+        if (fields & m_fieldsByColumn[column]) {
             if (leftMostColumn < 0)
-                leftMostColumn = i;
+                leftMostColumn = column;
             else
-                rightMostColumn = i;
+                rightMostColumn = column;
         }
     }
 

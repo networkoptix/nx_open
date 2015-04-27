@@ -27,8 +27,8 @@ WidgetAnimator::WidgetAnimator(QGraphicsWidget *widget, const QByteArray &geomet
     m_rotationAnimator->setTargetObject(widget);
     m_rotationAnimator->setAccessor(new PropertyAccessor(rotationPropertyName));
 
-    addAnimator(m_geometryAnimator);
     addAnimator(m_rotationAnimator);
+    addAnimator(m_geometryAnimator);
 }
 
 WidgetAnimator::~WidgetAnimator() {

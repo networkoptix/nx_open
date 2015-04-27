@@ -32,6 +32,7 @@ module.exports = function (grunt) {
         wiredep: {
             target: {
                 src: [
+                    '<%= yeoman.app %>/login.html',
                     '<%= yeoman.app %>/index.html',
                     '<%= yeoman.app %>/index.xsl'
                 ],
@@ -79,51 +80,52 @@ module.exports = function (grunt) {
                 livereload: 35729
             },
             proxies: [
-                /*{
-                    context: '/ec2/',
-                    host: '10.0.2.229',
-                    port: 7039,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
-                    }
-                 },
-                 {
-                     context: '/',
-                     host: 'mono',
-                     port: 41000,
-                 }
-                 */
-
-                //"Authorization": "Basic YWRtaW46MTIz" //admin:123
-                //"Authorization": "Basic dXNlcjoxMjM="//user:123
-
                 //Total proxy
-                //{context: '/',host: '192.168.56.101',port: 7002,headers: {"Authorization": "Basic YWRtaW46MTIz"}},
+                //{context: '/',host: '192.168.56.101',port: 9000},
 
+
+                //Demoaserver
+                {context: '/api/',      host: 'demo.networkoptix.com', port: 7001},
+                 {context: '/ec2/',      host: 'demo.networkoptix.com', port: 7001},
+                 {context: '/hls/',      host: 'demo.networkoptix.com',port: 7001},
+                 {context: '/media/',    host: 'demo.networkoptix.com', port: 7001},
+                 {context: '/proxy/',    host: 'demo.networkoptix.com',port: 7001}/**/
+
+                //Cube
+                /*{context: '/api/',      host: '192.168.0.25', port: 7001},
+                {context: '/ec2/',      host: '192.168.0.25', port: 7001},
+                {context: '/hls/',      host: '192.168.0.25',port: 7001},
+                {context: '/media/',    host: '192.168.0.25', port: 7001},
+                {context: '/proxy/',    host: '192.168.0.25',port: 7001}*/
 
                 //Evgeniy
-                {context: '/api/',host: '192.168.56.101',port: 9000,headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                {context: '/ec2/',host: '192.168.56.101',port: 9000,headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+                /*{context: '/api/',      host: '192.168.56.101', port: 9000},
+                {context: '/ec2/',      host: '192.168.56.101', port: 9000},
+                {context: '/hls/',      host: '192.168.56.101',port: 9000},
+                {context: '/media/',    host: '192.168.56.101', port: 9000},
+                {context: '/proxy/',    host: '192.168.56.101',port: 9000}*/
 
-                //Sergey Yuldashev
-                //{context: '/api/', host: '10.0.2.203', port: 8001, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.203', port: 8001, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+/*                //Sergey Yuldashev
+                {context: '/api/',      host: '10.0.2.203', port: 8901},
+                {context: '/ec2/',      host: '10.0.2.203', port: 8901},
+                {context: '/hls/',      host: '10.0.2.203', port: 8901},
+                {context: '/media/',    host: '10.0.2.203', port: 8901},
+                {context: '/proxy/',    host: '10.0.2.203', port: 8901}/**/
 
                 // Sasha
-                //{context: '/api/', host: '10.0.2.224', port: 7021, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.224', port: 7021, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+                /*{context: '/api/',      host: '10.0.2.119', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.119', port: 7001},
+                {context: '/hls/',      host: '10.0.2.119', port: 7001},
+                {context: '/media/',    host: '10.0.2.119', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.119', port: 7001}/**/
 
-                //Roman Vasilenko  port: 7003,7004,7005,2006
-                //{context: '/api/', host: '10.0.2.231', port: 7003, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.231', port: 7003, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+/*                //Roman Vasilenko  port: 7003,7004,7005,2006
+                {context: '/api/', host: '10.0.2.244', port: 7005},
+                {context: '/ec2/', host: '10.0.2.244', port: 7005},
+                {context: '/hls/', host: '10.0.2.244', port: 7005},
+                {context: '/media/', host: '10.0.2.244', port: 7005},
+                {context: '/proxy/', host: '10.0.2.244', port: 7005}/**/
 
-                //Daria
-                //{context: '/api/', host: '10.0.2.229', port: 7039, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.229', port: 7039, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
-
-                //Denis
-                //{context: '/api/', host: '10.0.2.182', port: 7001, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.182', port: 7001, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
             ],
             livereload: {
                 options: {
@@ -186,6 +188,26 @@ module.exports = function (grunt) {
             },
             dist: {
                 options: {
+                    middleware: function (connect, options) {
+                        if (!Array.isArray(options.base)) {
+                            options.base = [options.base];
+                        }
+
+                        // Setup the proxy
+                        var middlewares = [require('grunt-connect-proxy/lib/utils').proxyRequest];
+
+                        // Serve static files.
+                        options.base.forEach(function (base) {
+                            middlewares.push(connect.static(base));
+                        });
+
+                        // Make directory browse-able.
+                        var directory = options.directory || options.base[options.base.length - 1];
+                        middlewares.push(connect.directory(directory));
+
+                        return middlewares;
+                    },
+                    open: true,
                     base: '<%= yeoman.dist %>'
                 }
             }
@@ -236,7 +258,6 @@ module.exports = function (grunt) {
                     force: true
                 }
             }
-
         },
 
         // Add vendor prefixed styles
@@ -312,7 +333,7 @@ module.exports = function (grunt) {
         // concat, minify and revision files. Creates configurations in memory so
         // additional tasks can operate on them
         useminPrepare: {
-            html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/api.xsl'],
+            html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/login.html', '<%= yeoman.app %>/api.xsl'],
             options: {
                 dest: '<%= yeoman.dist %>'
             }
@@ -417,6 +438,7 @@ module.exports = function (grunt) {
                             'views/{,*/}*.html',
                             'customization/*',
                             //'bower_components/**/*',
+                            //'bower_components/videogular-themes-default/videogular.css',
                             'images/{,*/}*.{webp}',
                             'fonts/*'
                         ]
@@ -501,7 +523,7 @@ module.exports = function (grunt) {
         },
         protractor: {
             options: {
-                configFile: "protractor-conf.js", // Default config file
+                configFile: 'protractor-conf.js', // Default config file
                 keepAlive: true, // If false, the grunt process stops when the test fails.
                 noColor: false, // If true, protractor will not use colors in its output.
                 args: {
@@ -510,7 +532,7 @@ module.exports = function (grunt) {
             },
             all: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
                 options: {
-                    //configFile: "e2e.conf.js", // Target-specific config file
+                    //configFile: 'e2e.conf.js', // Target-specific config file
                     args: {} // Target-specific arguments
                 }
             },
@@ -531,7 +553,11 @@ module.exports = function (grunt) {
 
     grunt.registerTask('serve', function (target) {
         if (target === 'dist') {
-            return grunt.task.run(['build', 'connect:dist:keepalive']);
+            return grunt.task.run([
+                'build',
+                'configureProxies:server',
+                //'connect:livereload',
+                'connect:dist:keepalive']);
         }
 
         grunt.task.run([
@@ -558,8 +584,12 @@ module.exports = function (grunt) {
         'autoprefixer',
         'connect:test',
         'protractor_webdriver',
-        'protractor:all'
+        'protractor:all',
+        'newer:jshint'
         //'karma'
+    ]);
+    grunt.registerTask('code', [
+        'newer:jshint'
     ]);
 
     grunt.registerTask('build', [

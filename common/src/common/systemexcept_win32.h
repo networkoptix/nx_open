@@ -19,11 +19,16 @@
 class win32_exception
 {
 public:
-
     //!Registers handler to intercept system exceptions (e.g., Access violation)
     static void installGlobalUnhandledExceptionHandler();
     static void installThreadSpecificUnhandledExceptionHandler();
-
+    //!
+    /*!
+        \param isFull If \a true then in case of process crash all process memory dumped. 
+            If \a false, only call stack for each thread is dumped.
+            By default, \a false
+    */
+    static void setCreateFullCrashDump( bool isFull );
 };
 
 

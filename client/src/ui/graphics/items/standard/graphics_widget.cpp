@@ -754,7 +754,7 @@ bool GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         }
 
         if(windowData->constrained != NULL) {
-            QRectF newGeometry = windowData->constrained->constrainedGeometry(QRectF(newPos, newSize), Qn::calculatePinPoint(windowData->grabbedSection));
+            QRectF newGeometry = windowData->constrained->constrainedGeometry(QRectF(newPos, newSize), windowData->grabbedSection);
             newSize = newGeometry.size();
             newPos = newGeometry.topLeft();
         }

@@ -42,6 +42,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QLabel" name="timeSourceLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="descriptionLabel">
      <property name="text">
       <string>Choose the server which is going to be used as a time server if the system has no internet access:</string>

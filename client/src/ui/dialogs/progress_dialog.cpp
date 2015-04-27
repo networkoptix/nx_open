@@ -68,13 +68,20 @@
 #include <ui/widgets/progress_widget.h>
 
 
-// If the operation is expected to take this long (as predicted by
-// progress time), show the progress dialog.
-static const int defaultShowTime = 4000;
-// Wait at least this long before attempting to make a prediction.
-static const int minWaitTime = 50;
-// Maximum width of the label when auto-size is disabled.
-static const int maxLabelFixedWidth = 400;
+namespace {
+    /* If the operation is expected to take this long (as predicted by
+     * progress time), show the progress dialog.*/
+    const int defaultShowTime = 4000;
+
+    /* Wait at least this long before attempting to make a prediction. */
+    const int minWaitTime = 50;
+
+    /* Maximum width of the label when auto-size is disabled. */
+    const int maxLabelFixedWidth = 400;
+
+    /* Minimum dialog label width. */
+    const int minLabelWidth = 150;
+}
 
 class QnProgressDialogPrivate
 {
@@ -146,8 +153,7 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     
     label = new QnElidedLabel(q);
     label->setText(labelText);
-    int align = q->style()->styleHint(QStyle::SH_ProgressDialog_TextLabelAlignment, 0, q);
-    label->setAlignment(Qt::Alignment(align));
+    label->setAlignment(Qt::Alignment(Qt::AlignLeft));
 
     bar = new QProgressBar(q);
     bar->setRange(min, max);
@@ -166,6 +172,8 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     layout->addWidget(buttonBox);
     layout->setSizeConstraint(QLayout::SetFixedSize);
     q->setLayout(layout);
+
+    label->setMinimumWidth(minLabelWidth);
 
     infiniteProgress->hide();
 
@@ -376,6 +384,7 @@ void QnProgressDialog::setLabel(QLabel *label)
         return;
     if (label->parentWidget() != this)
         label->setParent(this, 0);
+    label->setMinimumWidth(minLabelWidth);
     label->show();
 }
 

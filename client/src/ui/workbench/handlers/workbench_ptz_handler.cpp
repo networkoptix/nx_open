@@ -106,8 +106,8 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\n"\
-               "Please wait for the camera to go online.").arg(resource->getName())
+            tr("An error has occurred while trying to get current position from camera %1.").arg(resource->getName()) + L'\n' 
+          + tr("Please wait for the camera to go online.")
         );
         return;
     }
@@ -148,8 +148,8 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not set position for camera"),
-                tr("An error has occurred while trying to set current position for camera %1.\n\n"\
-                   "Please wait for the camera to go online.").arg(resource->getName())
+                tr("An error has occurred while trying to set current position for camera %1.").arg(resource->getName()) + L'\n' 
+              + tr("Please wait for the camera to go online.")
             );
             return;
         }
@@ -168,6 +168,25 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
     if(id.isEmpty())
         return;
 
+    /* Check if tour exists and is valid. */
+    { 
+        QnPtzTourList tours;
+        if (!widget->ptzController()->getTours(&tours))
+            return;
+
+        QnPtzPresetList presets;
+        if (!widget->ptzController()->getPresets(&presets))
+            return;
+
+        int tourIdx = qnIndexOf(tours, [&id](const QnPtzTour &tour) {return id == tour.id; });
+        if (tourIdx < 0)
+            return;
+
+        QnPtzTour tour = tours[tourIdx];
+        if (!tour.isValid(presets))
+            return;
+    }
+
     if (widget->dewarpingParams().enabled) {
         QnItemDewarpingParams params = widget->item()->dewarpingParams();
         params.enabled = true;
@@ -182,8 +201,8 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not set position to camera"),
-                tr("An error has occurred while trying to set current position for camera %1.\n\n"\
-                   "Please wait for the camera to go online.").arg(resource->getName())
+                tr("An error has occurred while trying to set current position for camera %1.").arg(resource->getName()) + L'\n' 
+              + tr("Please wait for the camera to go online.")
             );
             return;
         }
@@ -227,8 +246,8 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;
 
-    dialog->setController(widget->ptzController());
     dialog->setResource(widget->resource()->toResourcePtr());
+    dialog->setController(widget->ptzController());
     dialog->show();
 }
 

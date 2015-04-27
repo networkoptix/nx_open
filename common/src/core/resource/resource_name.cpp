@@ -22,21 +22,11 @@ QString extractHost(const QString &url)
     return url.mid(startPos, endPos - startPos);
 }
 
-QString getEdgeServerName(const QnResourcePtr &resource) {
-    QnResourceList cameras = qnResPool->getResourcesByParentId(resource->getId()).filtered<QnVirtualCameraResource>();
-    if (cameras.size() == 1)
-        return cameras.first()->getName();
-    return resource->getName();
-}
-
 QString getFullResourceName(const QnResourcePtr &resource, bool showIp) {
     if (!resource)
         return QString();
 
-    QString baseName = QnMediaServerResource::isEdgeServer(resource)
-        ? getEdgeServerName(resource)
-        : resource->getName();
-
+    QString baseName = resource->getName();
     Qn::ResourceFlags flags = resource->flags();
     if (showIp && ((flags & Qn::network) || (flags & Qn::server && flags & Qn::remote))) {
         QString host = extractHost(resource->getUrl());

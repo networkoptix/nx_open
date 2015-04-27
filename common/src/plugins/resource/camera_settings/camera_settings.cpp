@@ -109,16 +109,17 @@ bool CameraSettingValue::operator != ( QString val ) const
 // CameraSetting
 //
 
-QString& CAMERA_SETTING_TYPE_ONOFF  = *(new QString(QLatin1String("Bool")));
-QString& CAMERA_SETTING_TYPE_MINMAX = *(new QString(QLatin1String("MinMaxStep")));
-QString& CAMERA_SETTING_TYPE_ENUM   = *(new QString(QLatin1String("Enumeration")));
-QString& CAMERA_SETTING_TYPE_TEXTFIELD = *(new QString(QLatin1String("String")));
-QString& CAMERA_SETTING_TYPE_BUTTON = *(new QString(QLatin1String("Button")));
-QString& CAMERA_SETTING_TYPE_CTRL_BTNS = *(new QString(QLatin1String("ControlButtonsPair")));
-QString& CAMERA_SETTING_VAL_ON = *(new QString(QLatin1String("On")));
-QString& CAMERA_SETTING_VAL_OFF = *(new QString(QLatin1String("Off")));
-
-QString& CameraSetting::SEPARATOR = *(new QString(QLatin1String(";;")));
+namespace {
+    const QString CAMERA_SETTING_TYPE_ONOFF     = lit("Bool");
+    const QString CAMERA_SETTING_TYPE_MINMAX    = lit("MinMaxStep");
+    const QString CAMERA_SETTING_TYPE_ENUM      = lit("Enumeration");
+    const QString CAMERA_SETTING_TYPE_TEXTFIELD = lit("String");
+    const QString CAMERA_SETTING_TYPE_BUTTON    = lit("Button");
+    const QString CAMERA_SETTING_TYPE_CTRL_BTNS = lit("ControlButtonsPair");
+    const QString CAMERA_SETTING_VAL_ON         = lit("On");
+    const QString CAMERA_SETTING_VAL_OFF        = lit("Off");
+    const QString SEPARATOR                     = lit(";;");
+}
 
 CameraSetting::WIDGET_TYPE CameraSetting::typeFromStr(const QString& value)
 {

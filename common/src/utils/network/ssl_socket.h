@@ -35,8 +35,7 @@ public:
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
 
     virtual bool connect(
-        const QString& foreignAddress,
-        unsigned short foreignPort,
+        const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
@@ -47,7 +46,6 @@ public:
     virtual bool bind( const SocketAddress& localAddress ) override;
     //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) override;
     virtual SocketAddress getLocalAddress() const override;
-    virtual SocketAddress getPeerAddress() const override;
     virtual void close() override;
     virtual bool isClosed() const override;
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;

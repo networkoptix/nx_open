@@ -102,8 +102,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         requestedUrl.setPath( prifileStr );
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
-
-    if (!isCameraControlDisabled()) {
+    if (isCameraControlRequired()) {
         if (role != Qn::CR_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
         {
             res->setMotionMaskPhysical(0);
@@ -178,7 +177,7 @@ bool PlDlinkStreamReader::isStreamOpened() const
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 {
     if (!isStreamOpened())
-        return QnAbstractMediaDataPtr(0);
+        return QnAbstractMediaDataPtr();
 
     if (needMetaData())
         return getMetaData();
@@ -304,7 +303,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     QTextStream t(&result);
 
     t << "config/video.cgi?profileid=" << profileNum;
-    if (!isCameraControlDisabled())
+    if (isCameraControlRequired())
     {
         t << "&resolution=" << resolution.width() << "x" << resolution.height() << "&";
 
@@ -466,7 +465,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
     videoData->m_data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
 
-    int dataLeft = contentLen - videoData->dataSize();
+    int dataLeft = contentLen - static_cast<int>(videoData->dataSize());
     char* curPtr = videoData->m_data.data() + videoData->m_data.size();
     videoData->m_data.finishWriting(dataLeft);
 

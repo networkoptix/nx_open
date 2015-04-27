@@ -4,8 +4,8 @@
 #include <deque>
 
 #include <QByteArray>
+#include <QElapsedTimer>
 #include <QSet>
-#include <QTime>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -17,11 +17,14 @@
 #include <utils/common/uuid.h>
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
+#include "utils/network/http/httpstreamreader.h"
+#include "utils/network/http/multipart_content_parser.h"
 #include "utils/common/id.h"
 
 #ifdef _DEBUG
 #include <common/common_module.h>
 #endif
+
 
 namespace ec2
 {
@@ -32,9 +35,12 @@ class QnTransactionTransport
 {
     Q_OBJECT
 public:
+    static const char* TUNNEL_MULTIPART_BOUNDARY;
+    static const char* TUNNEL_CONTENT_TYPE;
+
     //not using Qt signal/slot because it is undefined in what thread this object lives and in what thread TimerSynchronizationManager lives
-    typedef std::function<void(QnTransactionTransport*, const std::vector<nx_http::ChunkExtension>&)> HttpChunkExtensonHandler;
-    typedef std::function<void(QnTransactionTransport*, std::vector<nx_http::ChunkExtension>*)> BeforeSendingChunkHandler;
+    typedef std::function<void(QnTransactionTransport*, const nx_http::HttpHeaders&)> HttpChunkExtensonHandler;
+    typedef std::function<void(QnTransactionTransport*, nx_http::HttpHeaders*)> BeforeSendingChunkHandler;
 
     enum State {
         NotDefined,
@@ -48,8 +54,9 @@ public:
     };
     static QString toString( State state );
 
-    QnTransactionTransport(const ApiPeerData &localPeer,
-        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>());
+    QnTransactionTransport(
+        const ApiPeerData &localPeer,
+        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>() );
     ~QnTransactionTransport();
 
 signals:
@@ -72,11 +79,11 @@ public:
             //Q_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
+        Q_ASSERT_X(!transaction.isLocal || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        NX_LOG( lit("send transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").arg(remotePeer().id.toString()).
-            arg(ApiCommand::toString(transaction.command)).arg(header.sequence).arg(transaction.persistentInfo.sequence).arg(transaction.persistentInfo.timestamp), cl_logDEBUG1);
-#endif
+        if (m_remotePeer.peerType == Qn::PT_MobileClient && skipTransactionForMobileClient(transaction.command))
+            return;
 
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:
@@ -111,6 +118,12 @@ public:
     bool isSyncDone() const { return m_syncDone; }
     void setSyncDone(bool value)  {m_syncDone = value;} // end of sync marker received
 
+    bool isSyncInProgress() const { return m_syncInProgress; }
+    void setSyncInProgress(bool value)  {m_syncInProgress = value;} // synchronization process in progress
+
+    bool isNeedResync() const { return m_needResync; }
+    void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
+
     QUrl remoteAddr() const       { return m_remoteAddr; }
 
     ApiPeerData remotePeer() const { return m_remotePeer; }
@@ -118,6 +131,9 @@ public:
     // This is multi thread getters/setters
     void setState(State state);
     State getState() const;
+
+    void setRemoteIdentityTime(qint64 time);
+    qint64 remoteIdentityTime() const;
 
     //!Set \a eventHandler that will receive all http chunk extensions
     /*!
@@ -144,6 +160,10 @@ public:
     void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
+
+    void transactionProcessed();
+
+    static bool skipTransactionForMobileClient(ApiCommand::Value command);
 private:
     struct DataToSend
     {
@@ -162,6 +182,8 @@ private:
     bool m_readSync;
     bool m_writeSync;
     bool m_syncDone;
+    bool m_syncInProgress; // sync request was send and sync process still in progress
+    bool m_needResync; // sync request should be send int the future as soon as possible
 
     mutable QMutex m_mutex;
     QSharedPointer<AbstractStreamSocket> m_socket;
@@ -187,14 +209,22 @@ private:
 
     QByteArray m_extraData;
     bool m_authByKey;
-    QTime m_lastReceiveTimer;
-    QTime m_sendTimer;
-    QByteArray m_emptyChunkData;
+    QElapsedTimer m_lastReceiveTimer;
+    int m_postedTranCount;
+    bool m_asyncReadScheduled;
+    qint64 m_remoteIdentityTime;
+    bool m_incomingConnection;
+    bool m_incomingTunnelOpened;
+    nx_http::HttpStreamReader m_httpStreamReader;
+    nx_http::MultipartContentParser m_contentParser;
+
 private:
     void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
-    void addData(QByteArray &&data);
+    void addData(QByteArray&& data);
+    //!\a data will be sent as-is with no HTTP encoding applied
+    void addEncodedData(QByteArray&& data);
     /*!
         \return in case of success returns number of bytes read from \a data. In case of parse error returns 0
         \note In case of error \a chunkHeader contents are undefined
@@ -204,20 +234,26 @@ private:
     void setStateNoLock(State state);
     void cancelConnecting();
     static void connectingCanceledNoLock(const QnUuid& remoteGuid, bool isOriginator);
-    void addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions );
-    void processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader );
+    void addHttpChunkExtensions( nx_http::HttpHeaders* const transactionHeaders );
+    void processChunkExtensions( const nx_http::HttpHeaders& httpChunkHeader );
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
     void fillAuthInfo();
+    /*!
+        \note MUST be called with \a m_mutex locked
+    */
+    void scheduleAsyncRead();
+    bool readCreateIncomingTunnelMessage();
+    void receivedTransaction( const QnByteArrayConstRef& tranData );
+
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
     void repeatDoGet();
 };
 
-typedef QSharedPointer<QnTransactionTransport> QnTransactionTransportPtr;
 }
 
 Q_DECLARE_METATYPE(ec2::QnTransactionTransport::State);

@@ -3,18 +3,19 @@
 
 #include "utils/common/singleton.h"
 
-class QnResourceStatusDiscionary: public Singleton<QnResourceStatusDiscionary>
+class QnResourceStatusDictionary: public Singleton<QnResourceStatusDictionary>
 {
 public:
     Qn::ResourceStatus value(const QnUuid& resourceId) const;
     void setValue(const QnUuid& resourceId, Qn::ResourceStatus status);
     void clear();
     void clear(const QVector<QnUuid>& idList);
+    QMap<QnUuid, Qn::ResourceStatus> values() const;
 private:
     QMap<QnUuid, Qn::ResourceStatus> m_items;
     mutable QMutex m_mutex;
 };
 
-#define qnStatusDictionary QnResourceStatusDiscionary::instance()
+#define qnStatusDictionary QnResourceStatusDictionary::instance()
 
 #endif // __STATUS_DICTIONARY_H

@@ -51,29 +51,37 @@ void QnResourceListModel::addResource(const QnResourcePtr &resource) {
         if (r->getId() == resource->getId())
             return;
 
-    beginResetModel();
+    int row = m_resources.size();
+    beginInsertRows(QModelIndex(), row, row);
+
     connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     m_resources << resource;
-    endResetModel();
+
+    endInsertRows();
 }
 
 void QnResourceListModel::removeResource(const QnResourcePtr &resource) {
     if (!resource)
         return;
 
-    beginResetModel();
+    int row;
 
-    for (int i = 0; i < m_resources.size(); ++i) {
-        if (m_resources[i]->getId() == resource->getId()) { // TODO: #Elric check by pointer, not id. Makes no sense.
-            disconnect(m_resources[i].data(), NULL, this, NULL);
-            m_resources.removeAt(i);
+    for (row = 0; row < m_resources.size(); ++row) {
+        if (m_resources[row]->getId() == resource->getId()) // TODO: #Elric check by pointer, not id. Makes no sense.
             break;
-        }
     }
 
-    endResetModel();
+    if (row == m_resources.size())
+        return;
+
+    beginRemoveRows(QModelIndex(), row, row);
+
+    m_resources[row]->disconnect(this);
+    m_resources.removeAt(row);
+
+    endRemoveRows();
 }
 
 void QnResourceListModel::updateFromResources() {

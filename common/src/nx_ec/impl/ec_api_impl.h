@@ -101,7 +101,9 @@ namespace ec2
         containsBecauseTimestamp, // transaction already in database
         containsBecauseSequence,  // transaction already in database
         //!Method is not implemented yet
-        notImplemented
+        notImplemented,
+        //!Connection to peer is impossible due to incompatible protocol
+        incompatiblePeer
     };
 
     QString toString( ErrorCode errorCode );

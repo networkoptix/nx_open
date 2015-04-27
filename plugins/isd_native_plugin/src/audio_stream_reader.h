@@ -8,6 +8,7 @@
 #ifndef AUDIO_STREAM_READER_H
 #define AUDIO_STREAM_READER_H
 
+#include <atomic>
 #include <functional>
 #include <map>
 #include <memory>
@@ -49,7 +50,7 @@ private:
     nxcip::AudioFormat m_audioFormat;
     size_t m_prevReceiverID;
     std::unique_ptr<Pollable> m_pollable;
-    bool m_initializedInitially;
+    std::atomic<bool> m_initializedInitially;
     PtsToClockMapper m_ptsMapper;
     int m_framesSinceTimeResync;
 

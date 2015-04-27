@@ -3,8 +3,6 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifdef QT_WEBKITWIDGETS_LIB
-
 #include "camera_advanced_settings_web_page.h"
 #include <QNetworkAccessManager>
 #include <QNetworkCookieJar>
@@ -51,5 +49,3 @@ void CameraAdvancedSettingsWebPage::setCamera(QnResourcePtr camRes)
 {
     m_cookieJar->setCamera(camRes);
 }
-
-#endif

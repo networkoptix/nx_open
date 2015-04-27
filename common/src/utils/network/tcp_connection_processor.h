@@ -20,8 +20,11 @@ public:
 
     /**
      * Check for request or response is completed: finished with /r/n/r/n or contains full content len data
+     * \param outContentLen If Content-Length header found, saves its value to \a *outContentLen (if not null)
      */
-    static int isFullMessage(const QByteArray& message);
+    static int isFullMessage(
+        const QByteArray& message,
+        boost::optional<qint64>* const fullMessageSize = nullptr );
 
     int getSocketTimeout();
 

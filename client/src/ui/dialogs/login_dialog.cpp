@@ -146,8 +146,9 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
         qnSettings->setAutoLogin(state == Qt::Checked);
     });
 
-    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged, this, &QnLoginDialog::at_moduleFinder_moduleChanged);
-    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost,    this, &QnLoginDialog::at_moduleFinder_moduleLost);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged,         this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleAddressFound,    this, &QnLoginDialog::at_moduleFinder_moduleChanged);
+    connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost,            this, &QnLoginDialog::at_moduleFinder_moduleLost);
 
     foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
         at_moduleFinder_moduleChanged(moduleInformation);
@@ -195,7 +196,7 @@ void QnLoginDialog::accept() {
         case QnConnectionDiagnosticsHelper::Result::Failure:
             return;
         case QnConnectionDiagnosticsHelper::Result::Restart:
-            menu()->trigger(Qn::ExitActionDelayed);
+            menu()->trigger(Qn::DelayedForcedExitAction);
             break; // to avoid cycle
         default:    //success
             menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
@@ -488,7 +489,7 @@ void QnLoginDialog::at_deleteButton_clicked() {
         return;
 
     if (QMessageBox::warning(this, tr("Delete connections"),
-                                   tr("Are you sure you want to delete the connection\n%1?").arg(name),
+                                   tr("Are you sure you want to delete this connection: %1?").arg(L'\n' + name),
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 
@@ -499,23 +500,28 @@ void QnLoginDialog::at_deleteButton_clicked() {
 }
 
 void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
+    QSet<SocketAddress> addresses = QnModuleFinder::instance()->moduleAddresses(moduleInformation.id);
+
+    if (addresses.isEmpty())
+        return;
+
     QnEcData data;
     data.id = moduleInformation.id;
     data.version = moduleInformation.version.toString();
     data.systemName = moduleInformation.systemName;
 
     /* prefer localhost */
-    QHostAddress address(QHostAddress::LocalHost);
-    if (!moduleInformation.remoteAddresses.contains(address.toString()))
-        address = *moduleInformation.remoteAddresses.cbegin();
+    SocketAddress address = SocketAddress(QHostAddress(QHostAddress::LocalHost).toString(), moduleInformation.port);
+    if (!addresses.contains(address))
+        address = *addresses.cbegin();
 
     data.url.setScheme(lit("http"));
-    data.url.setHost(address.toString());
-    data.url.setPort(moduleInformation.port);
+    data.url.setHost(address.address.toString());
+    data.url.setPort(address.port);
 
     QnEcData &oldData = m_foundEcs[moduleInformation.id];
     if (!oldData.id.isNull()) {
-        if (!address.isLoopback() && moduleInformation.remoteAddresses.contains(oldData.url.host()))
+        if (!QHostAddress(address.address.toString()).isLoopback() && addresses.contains(oldData.url.host()))
             data.url.setHost(oldData.url.host());
 
         if (oldData != data) {

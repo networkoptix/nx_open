@@ -87,8 +87,7 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 {
     if (c)
     {
-        if (c->codec)
-            avcodec_close(c);
+        avcodec_close(c);
         av_free(c);
     }
 
@@ -104,7 +103,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
         return false;
 
     const unsigned char* inbuf_ptr = (const unsigned char*) data->data();
-    int size = data->dataSize();
+    int size = static_cast<int>(data->dataSize());
     unsigned char* outbuf = (unsigned char*)result.data();
 
     int outbuf_len = 0;
@@ -113,8 +112,6 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
     {
 
         int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-
-        //NX_LOG("before dec",  cl_logALWAYS);
 
         if (outbuf_len + out_size > (int)result.capacity())
         {
@@ -130,8 +127,6 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         // TODO: #vasilenko avoid using deprecated methods
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
-
-        //NX_LOG("after dec",  cl_logALWAYS);
 
         if (len < 0) 
             return false;

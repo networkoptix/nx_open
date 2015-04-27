@@ -259,7 +259,7 @@ QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetwo
 QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnNetworkResourcePtr &camera, qint64 timestamp, bool allowOfflineServers) const
 {
     QnCameraHistoryPtr history = getCameraHistory(camera);
-    return history ? history->getMediaServerOnTime(timestamp, allowOfflineServers) : QnMediaServerResourcePtr();
+    return history ? history->getMediaServerOnTime(timestamp, allowOfflineServers) : camera->getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
 QnMediaServerResourceList QnCameraHistoryPool::getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod) const
@@ -285,6 +285,14 @@ qint64 QnCameraHistoryPool::getMinTime(const QnNetworkResourcePtr &camera)
 
     return history->getMinTime();
 }
+
+void QnCameraHistoryPool::resetCameraHistory(const QnCameraHistoryList& cameraHistoryList) {
+    QMutexLocker lock(&m_mutex);
+    m_cameraHistory.clear();
+    for(const QnCameraHistoryPtr& history: cameraHistoryList)
+        m_cameraHistory[history->getCameraUniqueId()] = history;
+}
+
 
 void QnCameraHistoryPool::addCameraHistory(const QnCameraHistoryPtr &history)
 {

@@ -133,8 +133,15 @@ public:
         return *this;
     }
 
+    Qn::ActionScopes scope() const;
+    void setScope(Qn::ActionScopes scope);
+
+private:
+    void init(const QVariant &items, const ArgumentHash &arguments);
+
 private:
     ArgumentHash m_arguments;
+    Qn::ActionScopes m_scope;
 };
 
 Q_DECLARE_METATYPE(QnActionParameters)

@@ -79,7 +79,12 @@ Socket::~Socket() {
 //!Implementation of AbstractSocket::bind
 bool Socket::bind( const SocketAddress& localAddress )
 {
-    return setLocalAddressAndPort( localAddress.address.toString(), localAddress.port );
+    // Get the address of the requested host
+    sockaddr_in localAddr;
+    if (!fillAddr(localAddress, localAddr))
+        return false;
+
+    return ::bind(m_fd, (sockaddr *) &localAddr, sizeof(localAddr)) == 0;
 }
 
 ////!Implementation of AbstractSocket::bindToInterface
@@ -104,18 +109,6 @@ SocketAddress Socket::getLocalAddress() const
     unsigned int addr_len = sizeof(addr);
 
     if (getsockname(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-        return SocketAddress();
-
-    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
-}
-
-//!Implementation of AbstractSocket::getPeerAddress
-SocketAddress Socket::getPeerAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
         return SocketAddress();
 
     return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
@@ -309,44 +302,6 @@ bool Socket::dispatchImpl( std::function<void()>&& handler )
     return m_baseAsyncHelper->dispatch( std::move(handler) );
 }
 
-
-QString Socket::getLocalHostAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getsockname(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        return QString();
-    }
-
-    return QLatin1String(inet_ntoa(addr.sin_addr));
-}
-
-QString Socket::getPeerHostAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        return QString();
-    }
-
-    return QLatin1String(inet_ntoa(addr.sin_addr));
-}
-
-quint32 Socket::getPeerAddressUint() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-        return 0;
-
-    return ntohl(addr.sin_addr.s_addr);
-}
-
 unsigned short Socket::getLocalPort() const
 {
     sockaddr_in addr;
@@ -369,16 +324,6 @@ bool Socket::setLocalPort(unsigned short localPort)  {
     localAddr.sin_port = htons(localPort);
 
     return ::bind(m_fd, (sockaddr *) &localAddr, sizeof(sockaddr_in)) == 0;
-}
-
-bool Socket::setLocalAddressAndPort(const QString &localAddress,
-                                    unsigned short localPort)  {
-    // Get the address of the requested host
-    sockaddr_in localAddr;
-    if (!fillAddr(localAddress, localPort, localAddr))
-        return false;
-
-    return ::bind(m_fd, (sockaddr *) &localAddr, sizeof(localAddr)) == 0;
 }
 
 void Socket::cleanUp()  {
@@ -452,9 +397,10 @@ Socket::Socket(
 }
 
 // Function to fill in address structure given an address and port
-bool Socket::fillAddr(const QString &address, unsigned short port,
-                     sockaddr_in &addr) {
-
+bool Socket::fillAddr(
+    const SocketAddress& socketAddress,
+    sockaddr_in &addr )
+{
     memset(&addr, 0, sizeof(addr));  // Zero out address structure
     addr.sin_family = AF_INET;       // Internet address
 
@@ -468,15 +414,11 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
 
-    addrinfo *addressInfo;
-    int status = getaddrinfo(address.toLatin1(), 0, &hints, &addressInfo);
-    if (status != 0)
+    bool ok = false;
+    addr.sin_addr = socketAddress.address.inAddr(&ok);     // NOTE: blocking dns name resolve can happen here
+    if( !ok )
         return false;
-
-    addr.sin_addr.s_addr = ((struct sockaddr_in *) (addressInfo->ai_addr))->sin_addr.s_addr;
-    addr.sin_port = htons(port);     // Assign port in network byte order
-
-    freeaddrinfo(addressInfo);
+    addr.sin_port = htons( socketAddress.port );        // Assign port in network byte order
 
     return true;
 }
@@ -590,7 +532,7 @@ CommunicatingSocket::CommunicatingSocket(
         newConnSD,
         sockImpl ),
     m_aioHelper( nullptr ),
-    m_connected( true )   //this constructor is used
+    m_connected( true )   //this constructor is used is server socket
 {
     m_aioHelper = static_cast<AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper.get());
 }
@@ -602,18 +544,18 @@ CommunicatingSocket::~CommunicatingSocket()
 
 void CommunicatingSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
 {
-    m_aioHelper->terminateAsyncIO();
+    m_aioHelper->terminateAsyncIO();    //all futher async operations will be ignored
     m_aioHelper->cancelAsyncIO( aio::etNone, waitForRunningHandlerCompletion );
 }
 
 //!Implementation of AbstractCommunicatingSocket::connect
-bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short foreignPort, unsigned int timeoutMs )
+bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned int timeoutMs )
 {
     // Get the address of the requested host
     m_connected = false;
 
     sockaddr_in destAddr;
-    if (!fillAddr(foreignAddress, foreignPort, destAddr))
+    if (!fillAddr(remoteAddress, destAddr))
         return false;
 
     //switching to non-blocking mode to connect with timeout
@@ -805,31 +747,6 @@ void CommunicatingSocket::shutdown()
 #endif
 }
 
-QString CommunicatingSocket::getForeignHostAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
-        qnWarning("Fetch of foreign address failed (getpeername()).");
-        return QString();
-    }
-    return QLatin1String(inet_ntoa(addr.sin_addr));
-}
-
-unsigned short CommunicatingSocket::getForeignPort() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        qWarning()<<"Fetch of foreign port failed (getpeername()). "<<SystemError::getLastOSErrorText();
-        return -1;
-    }
-    return ntohs(addr.sin_port);
-}
-
 void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
 {
     m_aioHelper->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
@@ -887,19 +804,6 @@ TCPSocket::TCPSocket()
 #endif
         )
 {
-}
-
-TCPSocket::TCPSocket( const QString &foreignAddress, unsigned short foreignPort )
-:
-    base_type(
-        SOCK_STREAM,
-        IPPROTO_TCP
-#ifdef _WIN32
-        , new Win32TcpSocketImpl()
-#endif
-        )
-{
-    connect( foreignAddress, foreignPort, AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS );
 }
 
 TCPSocket::TCPSocket(int newConnSD)
@@ -1233,10 +1137,16 @@ bool TCPServerSocket::listen( int queueLen )
     return ::listen( m_implDelegate.handle(), queueLen ) == 0;
 }
 
-void TCPServerSocket::terminateAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
+void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
 {
+    //TODO #ak better call here m_implDelegate.m_baseAsyncHelper->terminateAsyncIO(), 
+        //not change m_implDelegate.impl()->terminated directly
     //m_implDelegate.m_baseAsyncHelper->terminateAsyncIO();
-    ++m_implDelegate.impl()->terminated;
+    m_implDelegate.impl()->terminated.store( true, std::memory_order_relaxed );
+    aio::AIOService::instance()->cancelPostedCalls(
+        static_cast<Pollable*>(&m_implDelegate), waitForRunningHandlerCompletion );
+    aio::AIOService::instance()->removeFromWatch(
+        static_cast<Pollable*>(&m_implDelegate), aio::etRead, waitForRunningHandlerCompletion );
 }
 
 //!Implementation of AbstractStreamServerSocket::accept
@@ -1273,41 +1183,6 @@ UDPSocket::UDPSocket()
     if( ::setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof( buff_size ) )<0 )
     {
         //error
-    }
-}
-
-UDPSocket::UDPSocket(unsigned short localPort)
-:
-    base_type( SOCK_DGRAM, IPPROTO_UDP )
-{
-    memset( &m_destAddr, 0, sizeof(m_destAddr) );
-    m_implDelegate.setLocalPort( localPort );
-    setBroadcast();
-
-    int buff_size = 1024*512;
-    if( ::setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof( buff_size ) )<0 )
-    {
-        //error
-    }
-}
-
-UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
-:
-    base_type( SOCK_DGRAM, IPPROTO_UDP )
-{
-    memset( &m_destAddr, 0, sizeof(m_destAddr) );
-
-    if( !m_implDelegate.setLocalAddressAndPort( localAddress, localPort ) )
-    {
-        qWarning() << "Can't create UDP socket: " << SystemError::getLastOSErrorText();
-        return;
-    }
-
-    setBroadcast();
-    int buff_size = 1024*512;
-    if( ::setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof( buff_size ) )<0 )
-    {
-        //TODO #ak
     }
 }
 
@@ -1443,18 +1318,18 @@ int UDPSocket::send( const void* buffer, unsigned int bufferLen )
 }
 
 //!Implementation of AbstractDatagramSocket::setDestAddr
-bool UDPSocket::setDestAddr( const QString& foreignAddress, unsigned short foreignPort )
+bool UDPSocket::setDestAddr( const SocketAddress& foreignEndpoint )
 {
-    return m_implDelegate.fillAddr( foreignAddress, foreignPort, m_destAddr );
+    return m_implDelegate.fillAddr( foreignEndpoint, m_destAddr );
 }
 
 //!Implementation of AbstractDatagramSocket::sendTo
 bool UDPSocket::sendTo(
     const void* buffer,
     unsigned int bufferLen,
-    const SocketAddress& foreignAddress )
+    const SocketAddress& foreignEndpoint )
 {
-    setDestAddr( foreignAddress.address.toString(), foreignAddress.port );  //TODO #ak optimize, remove (to QString); (from QString) operations
+    setDestAddr( foreignEndpoint );
     return sendTo( buffer, bufferLen );
 }
 
@@ -1467,8 +1342,7 @@ int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
 int UDPSocket::recvFrom(
     void *buffer,
     unsigned int bufferLen,
-    QString& sourceAddress,
-    unsigned short &sourcePort )
+    SocketAddress* const sourceAddress )
 {
     int rtn = recvFrom(
         buffer,
@@ -1476,10 +1350,8 @@ int UDPSocket::recvFrom(
         &m_prevDatagramAddress.address,
         &m_prevDatagramAddress.port );
 
-    if (rtn >= 0) {
-        sourceAddress = QLatin1String(inet_ntoa(m_prevDatagramAddress.address.inAddr()));
-        sourcePort = m_prevDatagramAddress.port;
-    }
+    if( rtn >= 0 && sourceAddress )
+        *sourceAddress = m_prevDatagramAddress;
     return rtn;
 }
 

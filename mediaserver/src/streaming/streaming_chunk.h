@@ -5,6 +5,7 @@
 #ifndef STREAMINGCHUNK_H
 #define STREAMINGCHUNK_H
 
+#include <fstream>
 #include <memory>
 
 #include <QByteArray>
@@ -18,6 +19,8 @@
 #include <utils/network/http/httptypes.h>
 
 #include "streaming_chunk_cache_key.h"
+
+//#define DUMP_CHUNK_TO_FILE
 
 
 class StreamingChunk;
@@ -129,6 +132,9 @@ private:
     bool m_isOpenedForModification;
     mutable QMutex m_signalEmitMutex;
     QWaitCondition m_cond;
+#ifdef DUMP_CHUNK_TO_FILE
+    std::ofstream m_dumpFile;
+#endif
 };
 
 
@@ -159,12 +165,12 @@ public:
 
     virtual bool tryRead( nx::Buffer* const dataBuffer ) override;
 
-    void setByteRange( const nx_http::header::Range& range );
+    void setByteRange( const nx_http::header::ContentRange& range );
 
 private:
     StreamingChunk* m_chunk;
     StreamingChunk::SequentialReadingContext m_readCtx;
-    boost::optional<nx_http::header::Range> m_range;
+    boost::optional<nx_http::header::ContentRange> m_range;
 };
 
 #endif  //STREAMINGCHUNK_H

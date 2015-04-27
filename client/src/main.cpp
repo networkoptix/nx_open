@@ -48,6 +48,7 @@ extern "C"
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include "core/resource_management/resource_pool.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
 #include "plugins/resource/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include <plugins/resource/server_camera/server_camera.h>
@@ -65,7 +66,10 @@ extern "C"
 #include "plugins/plugin_manager.h"
 #include "core/resource/resource_directory_browser.h"
 
+#ifdef _DEBUG
 #include "tests/auto_tester.h"
+#endif
+
 #include "plugins/resource/d-link/dlink_resource_searcher.h"
 #include "api/session_manager.h"
 #include "plugins/resource/droid/droid_resource_searcher.h"
@@ -115,7 +119,6 @@ extern "C"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
 #include <utils/network/module_finder.h>
-#include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
@@ -263,16 +266,46 @@ void initAppServerConnection(const QnUuid &videowallGuid, const QnUuid &videowal
 }
 
 /** Initialize log. */
-void initLog(const QString &logLevel, const QString fileNameSuffix) {
-    QnLog::initLog(logLevel);
+void initLog(
+    QString logLevel,
+    const QString fileNameSuffix,
+    QString ec2TranLogLevel)
+{
+    static const int DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
+    static const int DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
+
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+
+    if( logLevel.isEmpty() )
+        logLevel = qnSettings->logLevel();
+
+    QnLog::initLog(logLevel);
     QString logFileLocation = dataLocation + QLatin1String("/log");
     QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, QnLog::instance()->logLevel()))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+
+    if( ec2TranLogLevel.isEmpty() )
+        ec2TranLogLevel = qnSettings->ec2TranLogLevel();
+
+    //preparing transaction log
+    if( ec2TranLogLevel != lit("none") )
+    {
+        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
+            dataLocation + QLatin1String("/log/ec2_tran"),
+            DEFAULT_MAX_LOG_FILE_SIZE,
+            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            QnLog::logLevelFromString(ec2TranLogLevel) );
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS );
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+    }
 }
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -298,6 +331,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #include <iostream>
 
 #ifndef API_TEST_MAIN
+#define ENABLE_DYNAMIC_CUSTOMIZATION
 
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // these functions should be called in every thread that wants to use rand() and qrand()
@@ -309,7 +343,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     /* Parse command line. */
+#ifdef _DEBUG
     QnAutoTester autoTester(argc, argv);
+#endif
 
     QnSyncTime syncTime;
 
@@ -319,8 +355,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noSingleApplication = false;
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
+    QString ec2TranLogLevel;
     QString translationPath;
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
+    
     bool skipMediaFolderScan = false;
 #ifdef Q_OS_MAC
     bool noFullScreen = true;
@@ -342,6 +379,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
     commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
+    commandLineParser.addParameter(&ec2TranLogLevel,        "--ec2-tran-log-level",
+        "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", lit("none"));
 #ifdef ENABLE_DYNAMIC_TRANSLATION
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
 #endif
@@ -350,7 +389,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
+    QString dynamicCustomizationPath;
+    commandLineParser.addParameter(&dynamicCustomizationPath,"--customization",              NULL,   QString());
 #endif
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
@@ -393,7 +433,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
     }
 
-    initLog(logLevel, logFileNameSuffix);
+    initLog(logLevel, logFileNameSuffix, ec2TranLogLevel);
 
 	// TODO: #Elric why QString???
     if (!lightMode.isEmpty()) {
@@ -416,7 +456,22 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
 
+#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
+    QString skinRoot = dynamicCustomizationPath.isEmpty() 
+        ? lit(":") 
+        : dynamicCustomizationPath;
+
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin 
+        ? skinRoot + lit("/skin_light") 
+        : skinRoot + lit("/skin_dark");
+    QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << skinRoot + lit("/skin") << customizationPath));
+#else
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
+#endif // ENABLE_DYNAMIC_CUSTOMIZATION
+
+
+    
 
     QnCustomization customization;
     customization.add(QnCustomization(skin->path("customization_common.json")));
@@ -436,7 +491,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
 
     QnResourcePropertyDictionary dictionary;
-    QnResourceStatusDiscionary statusDictionary;
+    QnResourceStatusDictionary statusDictionary;
+    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
@@ -487,15 +543,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 	ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
-    QObject::connect( qnResPool, &QnResourcePool::resourceAdded, application, []( const QnResourcePtr& resource ){
-        if( resource->hasFlags(Qn::foreigner) )
-            return;
-        QnMediaServerResource* mediaServerRes = dynamic_cast<QnMediaServerResource*>(resource.data());
-        ec2::AbstractECConnectionPtr ecConnection = QnAppServerConnectionFactory::getConnection2();
-        if( mediaServerRes && ecConnection && (mediaServerRes->getSystemName() == ecConnection->connectionInfo().systemName) )
-            mediaServerRes->determineOptimalNetIF();
-    } );
-
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
@@ -536,9 +583,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
     moduleFinder->start();
 
-    QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data(), true));
-
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
+    QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
 
     QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 
@@ -585,11 +630,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
 
-    if(screen != -1) {
+    if (screen != -1) {
         QDesktopWidget *desktop = qApp->desktop();
-        if(screen >= 0 && screen < desktop->screenCount()) {
+        if (screen >= 0 && screen < desktop->screenCount()) {
             QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-
             mainWindow->move(desktop->screenGeometry(screen).topLeft() + screenDelta);
         }
     }
@@ -608,8 +652,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Process input files. */
     bool haveInputFiles = false;
-    for (int i = 1; i < argc; ++i)
-        haveInputFiles |= mainWindow->handleMessage(QFile::decodeName(argv[i]));
+    {
+        bool skipArg = true;
+        for (const auto& arg: qApp->arguments())
+        {
+            if (!skipArg)
+                haveInputFiles |= mainWindow->handleMessage(arg);
+            skipArg = false;
+        }
+    }
+
     if(!noSingleApplication)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
@@ -617,10 +669,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     addTestData();
 #endif
 
+#ifdef _DEBUG
     if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
         QObject::connect(&autoTester, SIGNAL(finished()), application, SLOT(quit()));
         autoTester.start();
     }
+#endif
 
     /* Process pending events before executing actions. */
     qApp->processEvents();
@@ -631,14 +685,50 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         QnAppInfo::beta())
         context->action(Qn::BetaVersionMessageAction)->trigger();
 
+#ifdef _DEBUG
+    /* Show FPS in debug. */
+    context->menu()->trigger(Qn::ShowFpsAction);
+#endif
+
+    /************************************************************************/
+    /* Initializing resource searchers                                      */
+    /************************************************************************/
+    QnClientResourceProcessor resourceProcessor;
+    std::unique_ptr<QnResourceDiscoveryManager> resourceDiscoveryManager( new QnResourceDiscoveryManager() );
+    resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
+
+    //============================
+    //QnResourceDirectoryBrowser
+    if(!skipMediaFolderScan) {
+        QnResourceDirectoryBrowser::instance().setLocal(true);
+        QStringList dirs;
+        dirs << qnSettings->mediaFolder();
+        dirs << qnSettings->extraMediaFolders();
+        QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    }
+
+    /* Initialize desktop camera searcher. */
+#ifdef Q_OS_WIN
+    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
+    QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
+    QnDesktopResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
+#endif
+
+    QnResourceDiscoveryManager::instance()->setReady(true);
+    QnResourceDiscoveryManager::instance()->start();
+
+
     /* If no input files were supplied --- open connection settings dialog. */
-    
-    /* 
+
+    /*
      * Do not try to connect in the following cases:
      * * we were not connected and clicked "Open in new window"
-     * * we have opened exported exe-file 
+     * * we have opened exported exe-file
      * Otherwise we should try to connect or show Login Dialog.
-     */    
+     */
     if (instantDrop.isEmpty() && !haveInputFiles) {
         /* Set authentication parameters from command line. */
         QUrl appServerUrl = QUrl::fromUserInput(authenticationString);
@@ -666,56 +756,27 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
 
-#ifdef _DEBUG
-    /* Show FPS in debug. */
-    context->menu()->trigger(Qn::ShowFpsAction);
-#endif
-
-    /************************************************************************/
-    /* Initializing resource searchers                                      */
-    /************************************************************************/
-    QnClientResourceProcessor resourceProcessor;
-    QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
-    resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
-
-    //============================
-    //QnResourceDirectoryBrowser
-    if(!skipMediaFolderScan) {
-        QnResourceDirectoryBrowser::instance().setLocal(true);
-        QStringList dirs;
-        dirs << qnSettings->mediaFolder();
-        dirs << qnSettings->extraMediaFolders();
-        QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnResourceDirectoryBrowser::instance());
-    }
-
-    /* Initialize desktop camera searcher. */
-#ifdef Q_OS_WIN
-    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
-    QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
-    QnDesktopResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
-#endif
-
-    QnResourceDiscoveryManager::instance()->setReady(true);
-    QnResourceDiscoveryManager::instance()->start();
 
     result = application->exec();
 
+#ifdef _DEBUG
     if(autoTester.state() == QnAutoTester::Finished) {
         if(!autoTester.succeeded())
             result = 1;
 
         cl_log.log(autoTester.message(), cl_logALWAYS);
     }
+#endif
 
     QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
 
-    QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
+    QnAppServerConnectionFactory::setEc2Connection(NULL);
+    QnAppServerConnectionFactory::setUrl(QUrl());
+
+    QNetworkProxyFactory::setApplicationProxyFactory(0);
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
@@ -732,6 +793,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
+
 
 int main(int argc, char **argv)
 {

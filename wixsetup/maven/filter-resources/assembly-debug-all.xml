@@ -1,0 +1,22 @@
+ <assembly>
+	<id>${profile.classifier}-pdb-all</id>
+	<formats>
+		<format>dir</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${libdir}/${arch}/bin/${build.configuration}</directory>
+			<outputDirectory>../</outputDirectory>
+			<includes>
+				<include>**/*.pdb</include>
+			</includes>
+			<excludes>
+				<exclude>**/client.pdb</exclude>
+				<exclude>**/mediaserver.pdb</exclude>
+				<exclude>**/traytool.pdb</exclude>
+				<exclude>**/applauncher.pdb</exclude>
+			</excludes>           
+		</fileSet>			
+	</fileSets>
+</assembly>

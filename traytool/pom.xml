@@ -9,22 +9,33 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.3.1-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.3.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>traytool</artifactId>
     <packaging>pom</packaging>
     <name>HD Witness Tray Assistant</name>  
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>			
+    </dependencies>		
+
     <properties>
         <product.title>${traytool.name}</product.title>
         <product.display.title>${traytool.display.name}</product.display.title>
         <!--Global libs-->
-        <global.libs></global.libs>
+        <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <qt.libs>core gui widgets</qt.libs>
         <windows.oslibs>DbgHelp.lib</windows.oslibs>

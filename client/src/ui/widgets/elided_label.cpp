@@ -4,7 +4,8 @@
 #include <QtWidgets/QStyleOption>
 
 QnElidedLabel::QnElidedLabel(QWidget *parent) :
-    QLabel(parent)
+    QLabel(parent),
+    m_elideMode(Qt::ElideLeft)
 {
 }
 

@@ -186,7 +186,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
-    m_renameAction = new QAction(this);
+    m_renameActions.insert(Qn::RenameResourceAction, new QAction(this));
+    m_renameActions.insert(Qn::RenameVideowallEntityAction, new QAction(this));
 
     setHelpTopic(this,                              Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab,                     Qn::MainWindow_Tree_Search_Help);
@@ -315,9 +316,11 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
-        manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
+        for (Qn::ActionId key: m_renameActions.keys())
+            manager->redirectAction(menu.data(), key, NULL);
     } else {
-        manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
+        for (Qn::ActionId key: m_renameActions.keys())
+            manager->redirectAction(menu.data(), key, m_renameActions[key]);
     }
 
     if(menu->isEmpty())
@@ -327,7 +330,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     QAction *action = menu->exec(pos);
 
     /* Process tree-local actions. */
-    if(action == m_renameAction)
+    if(m_renameActions.values().contains(action))
         currentTreeWidget()->edit();
 }
 

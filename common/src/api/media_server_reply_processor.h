@@ -18,6 +18,7 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/camera_list_reply.h>
 #include <api/model/configure_reply.h>
+#include <api/model/upload_update_reply.h>
 
 #include "media_server_connection.h"
 
@@ -32,7 +33,7 @@ public:
     virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
 
 signals:
-    void finished(int status, const QnRebuildArchiveReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnStorageScanData &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraListReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnStorageStatusReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnStorageSpaceReply &reply, int handle, const QString &errorString);
@@ -56,7 +57,9 @@ signals:
     void finished(int status, const QnCameraBookmark &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraBookmarkList &reply, int handle, const QString &errorString);
     void finished(int status, const QnConfigureReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnUploadUpdateReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnModuleInformation &reply, int handle, const QString &errorString);
+    void finished(int status, const QList<QnModuleInformation> &reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

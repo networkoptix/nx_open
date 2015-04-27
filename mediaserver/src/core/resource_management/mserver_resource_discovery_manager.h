@@ -32,14 +32,14 @@ private:
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(const QnResourcePtr& res);
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
-    bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 private:
     bool m_foundSmth; // minor just to minimize lof output
+    //map<uniq id, > TODO #ak old values from this dictionary are not cleared
     QMap<QString, int> m_resourceDiscoveryCounter;
+    //map<uniq id, > TODO #ak old values from this dictionary are not cleared
     QMap<QString, int> m_disconnectSended;
     QTime netStateTime;
     CLNetState netState;
-    int m_serverOfflineTimeout;
 };
 
 #endif //QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H

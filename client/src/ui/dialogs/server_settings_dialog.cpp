@@ -16,13 +16,6 @@
 
 #include <api/model/storage_space_reply.h>
 
-#include <utils/common/counter.h>
-#include <utils/common/string.h>
-#include <utils/common/variant.h>
-#include <utils/common/event_processors.h>
-#include <utils/math/interpolator.h>
-#include <utils/math/color_transformations.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -30,6 +23,7 @@
 #include <client/client_model_types.h>
 #include <client/client_settings.h>
 
+#include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/help/help_topic_accessor.h>
@@ -40,6 +34,13 @@
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <utils/common/counter.h>
+#include <utils/common/string.h>
+#include <utils/common/variant.h>
+#include <utils/common/event_processors.h>
+#include <utils/math/interpolator.h>
+#include <utils/math/color_transformations.h>
 
 //#define QN_SHOW_ARCHIVE_SPACE_COLUMN
 
@@ -110,7 +111,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     m_server(server),
     m_hasStorageChanges(false),
     m_maxCamerasAdjusted(false),
-    m_rebuildState(RebuildState::Invalid)
+    m_rebuildWasCanceled(false)
 {
     ui->setupUi(this);
 
@@ -131,6 +132,9 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     setWarningStyle(ui->failoverWarningLabel);
 
+    /* Edge servers cannot be renamed. */
+    ui->nameLineEdit->setReadOnly(QnMediaServerResource::isEdgeServer(server));
+
     m_removeAction = new QAction(tr("Remove Storage"), this);
 
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
@@ -138,7 +142,9 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->installEventFilter(signalizer);
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
     connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
-    connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString)), this, SLOT(at_updateRebuildInfo()));
+    connect(m_server, &QnMediaServerResource::apiUrlChanged, this, &QnServerSettingsDialog::at_updateRebuildInfo);
+    for (const auto& storage: m_server->getStorages())
+        connect(storage.data(), &QnResource::statusChanged, this, &QnServerSettingsDialog::at_updateRebuildInfo);
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
@@ -147,6 +153,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
     setHelpTopic(ui->rebuildGroupBox,                                         Qn::ServerSettings_ArchiveRestoring_Help);
+    setHelpTopic(ui->failoverGroupBox,                                        Qn::ServerSettings_Failover_Help);
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
@@ -162,6 +169,18 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
         m_maxCamerasAdjusted = true;
         updateFailoverLabel();
     });
+
+    QPushButton* webPageButton = new QPushButton(this);
+    QnAction* webPageAction = menu()->action(Qn::WebClientAction);
+    webPageButton->setText(tr("Open Web Page..."));
+    webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
+    connect(server, &QnResource::statusChanged, this, [this, webPageButton] {
+        webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
+    });
+    connect(webPageButton, &QPushButton::clicked, webPageAction, &QAction::trigger);
+
+    ui->buttonBox->addButton(webPageButton, QDialogButtonBox::HelpRole);
+    setHelpTopic(webPageButton, Qn::ServerSettings_WebClient_Help);
 
     updateFromResources();
 }
@@ -300,7 +319,7 @@ static const int EDGE_SERVER_MAX_CAMERAS = 1;
 void QnServerSettingsDialog::updateFromResources() 
 {
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
-    updateRebuildUi(RebuildState::Invalid);
+    updateRebuildUi(QnStorageScanData());
 
     if (m_server->getStatus() == Qn::Online)
         sendNextArchiveRequest();
@@ -469,13 +488,12 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
 void QnServerSettingsDialog::at_rebuildButton_clicked()
 {
     RebuildAction action;
-    RebuildState newState = RebuildState::Invalid;
-    if (m_rebuildState == RebuildState::InProgress) {
+    if (m_rebuildState.state > Qn::RebuildState_None) {
         action = RebuildAction_Cancel;
-        newState = RebuildState::Stopping;
+        m_rebuildWasCanceled = true;
     } else {
         action = RebuildAction_Start;
-        newState = RebuildState::Starting;
+        m_rebuildWasCanceled = false;
     }
 
     if (action == RebuildAction_Start)
@@ -483,17 +501,18 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
         int button = QMessageBox::warning(
             this,
             tr("Warning"),
-            tr("You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! "
-            "Depending on the total size of archive it can take several hours. "
-            "This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?"),
-            QMessageBox::Yes | QMessageBox::No
+            tr("You are about to launch the archive re-synchronization routine.") + L'\n' 
+          + tr("ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.") + L'\n' 
+          + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.") + L'\n' 
+          + tr("Are you sure you want to continue?"),
+            QMessageBox::Ok | QMessageBox::Cancel
             );
-        if(button == QMessageBox::No)
+        if(button != QMessageBox::Ok)
             return;
     }
 
-    m_server->apiConnection()->doRebuildArchiveAsync (action, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
-    updateRebuildUi(newState);
+    m_server->apiConnection()->doRebuildArchiveAsync (action, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
+    updateRebuildUi(m_rebuildState);
 }
 
 void QnServerSettingsDialog::at_updateRebuildInfo()
@@ -501,34 +520,47 @@ void QnServerSettingsDialog::at_updateRebuildInfo()
     if (m_server->getStatus() == Qn::Online)
         sendNextArchiveRequest();
     else
-        updateRebuildUi(RebuildState::Invalid);
+        updateRebuildUi(QnStorageScanData());
 }
 
 void QnServerSettingsDialog::sendNextArchiveRequest()
 {
-    m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
+    m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
 }
 
-void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress) {
-     RebuildState oldState = m_rebuildState;
-     m_rebuildState = newState;
+void QnServerSettingsDialog::updateRebuildUi(const QnStorageScanData& reply) {
+     QnStorageScanData oldState = m_rebuildState;
+     m_rebuildState = reply;
 
-     ui->rebuildGroupBox->setEnabled(newState != RebuildState::Invalid);
-     if (newState != RebuildState::InProgressFastScan)
-        ui->rebuildGroupBox->setTitle(tr("Rebuild archive index"));
-     else
-         ui->rebuildGroupBox->setTitle(tr("Fast initial scan in progress"));
-     if (progress >= 0)
-        ui->rebuildProgressBar->setValue(progress);
-     ui->rebuildStartButton->setEnabled(newState == RebuildState::Ready);
-     ui->rebuildStopButton->setEnabled(newState == RebuildState::InProgress);
+     ui->rebuildGroupBox->setEnabled(reply.state != Qn::RebuildState_Unknown);
+     //TODO: #TR #gdm remove trailing spaces from messages
+     QString status;
+     if (!reply.path.isEmpty()) {
+         if (reply.state == Qn::RebuildState_FullScan)
+            status = tr("Rebuild archive index for storage '%1' in progress").arg(reply.path);
+         else if (reply.state == Qn::RebuildState_PartialScan)
+             status = tr("Fast archive scan for storage '%1' in progress ").arg(reply.path);
+     }
+     else if (reply.state == Qn::RebuildState_FullScan)
+         status = tr("Rebuild archive index for storage '%1' in progress").arg(reply.path);
+     else if (reply.state == Qn::RebuildState_PartialScan)
+         status = tr("Fast archive scan for storage '%1' in progress ").arg(reply.path);
+     
+     ui->rebuildStatusLabel->setText(status);
+         
+     if (reply.progress >= 0)
+        ui->rebuildProgressBar->setValue(reply.progress * 100 + 0.5);
+     ui->rebuildStartButton->setEnabled(reply.state == Qn::RebuildState_None);
+     ui->rebuildStopButton->setEnabled(reply.state == Qn::RebuildState_FullScan);
 
-     if (oldState == RebuildState::InProgress && newState == RebuildState::Ready)
+     if (oldState.state == Qn::RebuildState_FullScan && reply.state == Qn::RebuildState_None && !m_rebuildWasCanceled) {
+         emit rebuildArchiveDone();
          QMessageBox::information(this,
          tr("Finished"),
          tr("Rebuilding archive index is completed."));
+     }
 
-     ui->stackedWidget->setCurrentIndex(newState == RebuildState::InProgress || newState == RebuildState::InProgressFastScan
+     ui->stackedWidget->setCurrentIndex(reply.state > Qn::RebuildState_None
          ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)
          : ui->stackedWidget->indexOf(ui->rebuildPreparePage));
 }
@@ -556,29 +588,12 @@ void QnServerSettingsDialog::updateFailoverLabel() {
 }
 
 
-void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int handle)
+void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnStorageScanData& reply, int handle)
 {
     Q_UNUSED(handle)
-    RebuildState state = RebuildState::Invalid;
+    updateRebuildUi(reply);
 
-    if (status == 0) {
-        switch (reply.state()) {
-        case QnRebuildArchiveReply::Started:
-            state = RebuildState::InProgress;
-            break;
-        case QnRebuildArchiveReply::FastScan:
-            state = RebuildState::InProgressFastScan;
-            break;
-        case QnRebuildArchiveReply::Stopped:
-            state = RebuildState::Ready;
-            break;
-        default:
-            break;
-        }
-    }
-    updateRebuildUi(state, reply.progress());
-
-    if (reply.state() == QnRebuildArchiveReply::Started || reply.state() == QnRebuildArchiveReply::FastScan)
+    if (reply.state > Qn::RebuildState_None)
         QTimer::singleShot(500, this, SLOT(sendNextArchiveRequest()));
 }
 
@@ -613,7 +628,8 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
     if(m_storageProtocols.isEmpty()) {
         setBottomLabelText(QString());
     } else {
-        setBottomLabelText(tr("<a href='1'>Add external Storage...</a>"));
+        const QString linkText = lit("<a href='1'>%1</a>").arg(tr("Add external Storage..."));
+        setBottomLabelText(linkText);
     }
 
     m_hasStorageChanges = false;

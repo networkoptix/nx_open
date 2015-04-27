@@ -44,7 +44,7 @@ public:
 
     bool sameTimezone() const;
 private:
-    void addItem(const QnPeerRuntimeInfo &info,  qint64 time = 0);
+    void addItem(const QnPeerRuntimeInfo &info);
     void updateColumn(Columns column);
 
     bool calculateSameTimezone() const;
@@ -58,6 +58,9 @@ private:
 
     QList<Item> m_items;
     QnUuid m_selectedServer;
+
+    /** Store received values to avoid long 'Synchronizing' in some cases. */
+    QHash<QnUuid, qint64> m_serverOffsetCache;
 
     mutable bool m_sameTimezone;
     mutable bool m_sameTimezoneValid;

@@ -33,6 +33,8 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->doubleBufferWarningLabel->setText(tr("Disable only if the client takes too much CPU"));
+
     if(!this->context()->instance<QnWorkbenchAutoStarter>()->isSupported()) {
         ui->autoStartCheckBox->hide();
         ui->autoStartLabel->hide();
@@ -42,6 +44,9 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     setHelpTopic(ui->browseLogsButton,                                        Qn::SystemSettings_General_Logs_Help);
     setHelpTopic(ui->pauseOnInactivityLabel,  ui->pauseOnInactivityCheckBox,  Qn::SystemSettings_General_AutoPause_Help);
     setHelpTopic(ui->idleTimeoutSpinBox,      ui->idleTimeoutWidget,          Qn::SystemSettings_General_AutoPause_Help);
+    setHelpTopic(ui->autoStartCheckBox,       ui->autoStartLabel,             Qn::SystemSettings_General_AutoStartWithSystem_Help);
+    setHelpTopic(ui->doubleBufferCheckbox,    ui->doubleBufferLabel,          Qn::SystemSettings_General_DoubleBuffering_Help);
+    setHelpTopic(ui->doubleBufferWarningLabel,ui->doubleBufferRestartLabel,   Qn::SystemSettings_General_DoubleBuffering_Help);
 
     setWarningStyle(ui->downmixWarningLabel);
     setWarningStyle(ui->doubleBufferWarningLabel);
@@ -49,6 +54,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     ui->downmixWarningLabel->setVisible(false);
     ui->idleTimeoutWidget->setEnabled(false);
     ui->doubleBufferRestartLabel->setVisible(false);
+    ui->doubleBufferWarningLabel->setVisible(false);
 
     connect(ui->browseMainMediaFolderButton,            &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked);
     connect(ui->addExtraMediaFolderButton,              &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked);
@@ -62,7 +68,9 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
         ui->downmixWarningLabel->setVisible(m_oldDownmix != toggled);
     });
     connect(ui->doubleBufferCheckbox,                   &QCheckBox::toggled,            this,   [this](bool toggled) {
-        ui->doubleBufferWarningLabel->setVisible(!toggled);
+        /* Show warning message if the user disables double buffering. */
+        ui->doubleBufferWarningLabel->setVisible(!toggled && m_oldDoubleBuffering);
+        /* Show restart notification if user changes value. */
         ui->doubleBufferRestartLabel->setVisible(toggled != m_oldDoubleBuffering);
     });
 }
@@ -167,7 +175,8 @@ void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
 }
 
 void QnGeneralPreferencesWidget::at_clearCacheButton_clicked() {
-    QString backgroundImage = qnSettings->backgroundImage();
+    QString backgroundImage = qnSettings->background().imageName;
+    /* Lock background image so it will not be deleted. */
     if (!backgroundImage.isEmpty()) {
         QnLocalFileCache cache;
         QString path = cache.getFullPath(backgroundImage);

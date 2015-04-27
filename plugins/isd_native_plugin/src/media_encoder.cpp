@@ -16,7 +16,7 @@
 
 
 static const QLatin1String localhost( "127.0.0.1" );
-static const int DEFAULT_ISD_PORT = 80;
+static const int DEFAULT_ISD_PORT = 8127;
 static const int ISD_HTTP_REQUEST_TIMEOUT = 6000;
 static const int PRIMARY_ENCODER_NUMBER = 0;
 static const int SECONDARY_ENCODER_NUMBER = 1;
@@ -197,8 +197,15 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
         bitrateKbps = (int64_t)bitrateKbps * MAX_FPS / m_currentFps;
     }
 #endif
+
     //std::cout<<"MediaEncoder::setBitrate "<<bitrateKbps<<" Kbps"<<std::endl;
-    return setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.BitRate=%2\r\n").arg(m_encoderNum+1).arg(bitrateKbps) );
+    QString result;
+    QTextStream t(&result);
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateControl=vbr\r\n";
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMin=" << (bitrateKbps / 5) << "\r\n";
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMax=" << (bitrateKbps / 5 * 6) << "\r\n";    //*1.2
+    t.flush();
+    return setCameraParam( result );
 }
 
 nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
@@ -222,6 +229,8 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
 #ifndef NO_ISD_AUDIO
+    if( !m_audioStreamReader->initializeIfNeeded() )
+        return nxcip::NX_IO_ERROR;
     *audioFormat = m_audioStreamReader->getAudioFormat();
     return nxcip::NX_NO_ERROR;
 #else

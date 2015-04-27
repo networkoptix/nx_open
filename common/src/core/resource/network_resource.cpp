@@ -78,7 +78,7 @@ void QnNetworkResource::setMAC(const QnMacAddress &mac)
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
 
-    if (m_physicalId.isEmpty())
+    if (m_physicalId.isEmpty() && !mac.isNull())
         m_physicalId = mac.toString();
 }
 
@@ -212,13 +212,19 @@ void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
 
 bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
 {
+    bool mergedSomething = false;
     if (source->getUrl() != getUrl())
     {
         setUrl(source->getUrl());
-        return true;
+        mergedSomething = true;
+    }
+    if (source->getMAC() != getMAC())
+    {
+        setMAC(source->getMAC());
+        mergedSomething = true;
     }
 
-    return false;
+    return mergedSomething;
 }
 
 
@@ -229,8 +235,13 @@ int QnNetworkResource::getChannel() const
 
 bool QnNetworkResource::ping()
 {
-    std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
     return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+}
+
+bool QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)>&& /*completionHandler*/ )
+{
+    return false;
 }
 
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {

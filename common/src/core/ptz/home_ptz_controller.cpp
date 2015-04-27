@@ -25,6 +25,7 @@ QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseControlle
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnHomePtzController::at_adaptor_valueChanged);
 
     at_adaptor_valueChanged();
+    restartExecutor();
 }
 
 QnHomePtzController::~QnHomePtzController() {

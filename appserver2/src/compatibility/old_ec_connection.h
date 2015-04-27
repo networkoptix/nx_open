@@ -20,6 +20,7 @@ namespace ec2
         OldEcConnection(const QnConnectionInfo& connectionInfo);
 
         virtual QnConnectionInfo connectionInfo() const override;
+        virtual QString authInfo() const override;
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() override;
@@ -39,13 +40,17 @@ namespace ec2
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
+        virtual qint64 getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(qint64 value) override;
+
+
         virtual void startReceivingNotifications() override;
-
+        virtual void stopReceivingNotifications() override;
+        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer) const override;
     protected:
-        virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
+        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, ec2::impl::SimpleHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler ) override;
-
     private:
         QnConnectionInfo m_connectionInfo;
     };

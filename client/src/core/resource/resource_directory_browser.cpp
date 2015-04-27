@@ -214,15 +214,10 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
 
     layout->setParentId(QnUuid());
-    layout->setId(QnUuid::createUuid());
     layout->setName(QFileInfo(xfile).fileName());
-    // No need to do so, at end of this function the author do it again. ---- DPENG
-    //layout->addFlags(Qn::local);
-
     layout->addFlags(Qn::url);
     layout->setUrl(xfile);
 
-    //QnLayoutItemDataMap items = layout->getItems();
     QnLayoutItemDataMap updatedItems;
 
     QScopedPointer<QIODevice> itemNamesIO(layoutStorage.open(lit("item_names.txt"), QIODevice::ReadOnly));
@@ -236,10 +231,10 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     for (int i = 0; i < items.size(); ++i) {
         QnLayoutItemData& item = items[i];
         QString path = item.resource.path;
-        item.uuid = QnUuid::createUuid();
+        Q_ASSERT_X(!path.isEmpty(), Q_FUNC_INFO, "Resource path should not be empty. Exported file is not valid.");
         if (!path.endsWith(lit(".mkv")))
-            item.resource.path += lit(".mkv");
-        item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile,item.resource.path);
+            path += lit(".mkv");
+        item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile, path);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
         storage->setUrl(xfile);

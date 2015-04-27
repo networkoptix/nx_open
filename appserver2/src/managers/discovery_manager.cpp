@@ -93,7 +93,6 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
 template<class QueryProcessorType>
 QnTransaction<ApiDiscoveryData> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnUuid &id, const QUrl &url, bool ignore) const {
     QnTransaction<ApiDiscoveryData> transaction(command);
-    Q_ASSERT_X(ignore || url.port() != -1, "Additional server URLs without a port are not allowed", Q_FUNC_INFO);
     transaction.params.id = id;
     transaction.params.url = url.toString();
     transaction.params.ignore = ignore;

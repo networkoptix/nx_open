@@ -8,7 +8,11 @@
 #  include <arpa/inet.h>
 #endif
 
+#include <memory>
+
+#include <utils/common/concurrent.h>
 #include <utils/common/log.h>
+#include <utils/network/http/httpclient.h>
 #include <utils/network/nettools.h>
 #include <utils/network/ping.h>
 
@@ -25,7 +29,8 @@ const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
-    : m_totalMdZones(64)
+    : m_totalMdZones(64),
+      m_zoneSite(8)
 {
     setVendor(lit("ArecontVision"));
 }
@@ -110,7 +115,7 @@ private:
     int m_val;
 };
 
-typedef QSharedPointer<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
+typedef std::shared_ptr<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
 
 CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int val)
 {
@@ -169,6 +174,69 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     }
 
     return result;
+}
+
+bool QnPlAreconVisionResource::ping()
+{
+    QnConcurrent::QnFuture<bool> result(1);
+    if( !checkIfOnlineAsync( [&result]( bool onlineOrNot ) {
+            result.setResultAt(0, onlineOrNot); } ) )
+        return false;
+    result.waitForFinished();
+    return result.resultAt(0);
+}
+
+bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+{
+    //checking that camera is alive and on its place
+    const QString& urlStr = getUrl();
+    QUrl url = QUrl(urlStr);
+    if( url.host().isEmpty() )
+    {
+        //url is just IP address?
+        url.setScheme( lit("http") );
+        url.setHost( urlStr );
+    }
+    url.setPath( lit("/get?mac") );
+    url.setUserName( getAuth().user() );
+    url.setPassword( getAuth().password() );
+
+    nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
+    const QnMacAddress cameraMAC = getMAC();
+
+    auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
+        ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
+    {
+        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+        httpClientCaptured.reset();
+
+        auto completionHandlerLocal = std::move( completionHandler );
+        if( (httpClient->failed()) ||
+            (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok) )
+        {
+            completionHandlerLocal( false );
+            return;
+        }
+        nx_http::BufferType msgBody = httpClient->fetchMessageBodyBuffer();
+        const int sepIndex = msgBody.indexOf('=');
+        if( sepIndex == -1 )
+        {
+            completionHandlerLocal( false );
+            return;
+        }
+        const QByteArray& mac = msgBody.mid( sepIndex+1 );
+        completionHandlerLocal( cameraMAC == QnMacAddress(mac) );
+    };
+    connect( httpClientCaptured.get(), &nx_http::AsyncHttpClient::done,
+             this, httpReqCompletionHandler,
+             Qt::DirectConnection );
+
+    if( !httpClientCaptured->doGet( url ) )
+    {
+        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+        return false;
+    }
+    return true;
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
@@ -230,21 +298,34 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
         zone_size = 1;
 
     //detecting and saving selected resolutions
+    /*
     CameraMediaStreams mediaStreams;
     const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()), streamCodec ) );
+    mediaStreams.streams.push_back( CameraMediaStreamInfo(
+        PRIMARY_ENCODER_INDEX,
+        QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()),
+        streamCodec ) );
     QString hasDualStreaming = getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME);
     if( hasDualStreaming.toInt() > 0 )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2), streamCodec ) );
-    saveResolutionList( mediaStreams );
-
+        mediaStreams.streams.push_back( CameraMediaStreamInfo(
+            SECONDARY_ENCODER_INDEX,
+            QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2),
+            streamCodec ) );
+    saveMediaStreamInfoIfNeeded( mediaStreams );
+    */
     setFirmware(firmwareVersion.toString());
     saveParams();
 
-    setParamPhysical(lit("mdzonesite"), zone_size);
+    setParamPhysical(lit("mdzonesize"), zone_size);
+    m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+int QnPlAreconVisionResource::getZoneSite() const
+{
+    return m_zoneSite;
 }
 
 QString QnPlAreconVisionResource::getDriverName() const
@@ -416,7 +497,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
         
         if (!region.getRegionBySens(sens).isEmpty())
         {
-            setParamPhysicalAsync(lit("mdtotalzones"), sensToLevelThreshold[sens]);
+            setParamPhysicalAsync(lit("mdlevelthreshold"), sensToLevelThreshold[sens]);
             break; // only 1 sensitivity for all frame is supported
         }
     }

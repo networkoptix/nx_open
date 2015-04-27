@@ -15,7 +15,7 @@ QnLocalFileCache::~QnLocalFileCache() {
 
 QString QnLocalFileCache::getFullPath(const QString &filename) const {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/local/%2/%3"))
+    return QDir::toNativeSeparators(QString(lit("%1/cache/local/%2/%3"))
                                     .arg(path)
                                     .arg(folderName())
                                     .arg(filename)
@@ -40,19 +40,19 @@ void QnLocalFileCache::storeImageData(const QString &fileName, const QImage &ima
     if (QFileInfo(fullPath).exists())
         return;
 
-    image.save(fullPath, "png");
+    image.save(fullPath);
 }
 
 void QnLocalFileCache::downloadFile(const QString &filename) {
     if (filename.isEmpty()) {
-        emit fileDownloaded(filename, false);
+        emit fileDownloaded(filename, OperationResult::invalidOperation);
         return;
     }
 
     QFileInfo info(getFullPath(filename));
-    emit fileDownloaded(filename, info.exists());
+    emit fileDownloaded(filename, info.exists() ? OperationResult::ok : OperationResult::fileSystemError);
 }
 
 void QnLocalFileCache::uploadFile(const QString &filename) {
-    emit fileUploaded(filename, true);
+    emit fileUploaded(filename, OperationResult::ok);
 }

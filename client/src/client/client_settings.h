@@ -59,9 +59,6 @@ public:
 
         UPDATE_FEED_URL,
 
-        /** Check for updates automatically. */
-        AUTO_CHECK_FOR_UPDATES,
-
         /** Disable client updates. */
         NO_CLIENT_UPDATE,
 
@@ -143,26 +140,14 @@ public:
         /** Flag that client is run in videowall mode. */
         VIDEO_WALL_MODE,
 
-        /** Mode of the client background. */
-        BACKGROUND_MODE,
-
-        /** Custom color of the background circles. */
-        CUSTOM_BACKGROUND_COLOR,
-
-        /** Custom image for the background. */
-        BACKGROUND_IMAGE,
-
-        /** Opacity of the custom background image. */
-        BACKGROUND_IMAGE_OPACITY,
-
-        /** Background image handling mode. */
-        BACKGROUND_IMAGE_MODE,
-
-        /** Speed of background circles movement. Value is period (in seconds) of the full movement cycle. Default is 120 seconds. */
-        RADIAL_BACKGROUND_CYCLE,
+        /** Full set of background options. */
+        BACKGROUND,
 
         /** A list of the urls that were discovered by QnDirectModuleFinder. */
         KNOWN_SERVER_URLS,
+
+        LOG_LEVEL,
+        EC2_TRAN_LOG_LEVEL,
 
         VARIABLE_COUNT
     };
@@ -216,7 +201,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setTranslationPath,         TRANSLATION_PATH,           QLatin1String(":/translations/common_en_US.qm"))
         QN_DECLARE_RW_PROPERTY(QString,                     updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QString())
-        QN_DECLARE_RW_PROPERTY(bool,                        isAutoCheckForUpdates,  setAutoCheckForUpdates,     AUTO_CHECK_FOR_UPDATES,     true)
         QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,           ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
         QN_DECLARE_RW_PROPERTY(bool,                        ignoreUnsavedLayouts,   setIgnoreUnsavedLayouts,    IGNORE_UNSAVED_LAYOUTS,     false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
@@ -251,17 +235,14 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isPtzPresetInUseWarningDisabled,    setPtzPresetInUseWarningDisabled,   PTZ_PRESET_IN_USE_WARNING_DISABLED, false)
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0) 
-        QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        0)
+        QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        -1)
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
+        QN_DECLARE_RW_PROPERTY(QnClientBackground,          background,             setBackground,              BACKGROUND,                 QnClientBackground())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
-        QN_DECLARE_RW_PROPERTY(Qn::ClientBackground,        backgroundMode,         setBackgroundMode,          BACKGROUND_MODE,            Qn::DefaultBackground)
-        QN_DECLARE_RW_PROPERTY(QColor,                      customBackgroundColor,  setCustomBackgroundColor,   CUSTOM_BACKGROUND_COLOR,    QColor())
-        QN_DECLARE_RW_PROPERTY(QString,                     backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QString())
-        QN_DECLARE_RW_PROPERTY(Qn::ImageBehaviour,          backgroundImageMode,    setBackgroundImageMode,     BACKGROUND_IMAGE_MODE,      Qn::StretchImage)
-        QN_DECLARE_RW_PROPERTY(qreal,                       backgroundImageOpacity, setBackgroundImageOpacity,  BACKGROUND_IMAGE_OPACITY,   0.5)
-        QN_DECLARE_RW_PROPERTY (int,                        radialBackgroundCycle,  setRadialBackgroundCycle,   RADIAL_BACKGROUND_CYCLE,    120)
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
+        QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
+        QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
     QN_END_PROPERTY_STORAGE()
 
 private:

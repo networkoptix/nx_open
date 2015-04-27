@@ -4,8 +4,9 @@
 #include <deque>
 
 #include <QtCore/QMetaType>
+#include <QtCore/QElapsedTimer>
 
-#include <nx_ec/impl/ec_api_impl.h>
+#include <nx_ec/ec_api_fwd.h>
 #include <utils/common/model_functions_fwd.h>
 #include <utils/camera/camera_diagnostics.h>
 
@@ -37,16 +38,17 @@ public:
     void saveParams();
     void saveParamsAsync();
     int saveAsync();
-public slots:
+
+    static int issuesTimeoutMs();
+
     void issueOccured();
-    void noCameraIssues();
-private slots:
-    void at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
+    void cleanCameraIssues();
 protected:
 
 private:
     QnAbstractDTSFactory* m_dtsFactory;
-    std::deque<qint64> m_issueTimes;
+    int m_issueCounter;
+    QElapsedTimer m_lastIssueTimer;
 };
 
 
@@ -55,6 +57,7 @@ const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average bet
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 
 class CameraMediaStreams;
+class CameraMediaStreamInfo;
 
 class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
 {
@@ -70,20 +73,31 @@ public:
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
 
+    /*!
+        \return \a true if \a mediaStreamInfo differs from existing and has been saved
+    */
+    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
+    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams );
+
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
-    void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
-
 private:
+    void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
+private:
+    QMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
 };
 
 class CameraMediaStreamInfo
 {
 public:
+    static const QLatin1String anyResolution;
+
+    //!0 - primary stream, 1 - secondary stream
+    int encoderIndex;
     //!has format "1920x1080" or "*" to notify that any resolution is supported
     QString resolution;
     //!transport method that can be used to receive this stream
@@ -97,12 +111,54 @@ public:
     std::vector<QString> transports;
     //!if \a true this stream is produced by transcoding one of native (having this flag set to \a false) stream
     bool transcodingRequired;
-    CodecID codec;
+    int codec;
+    std::map<QString, QString> customStreamParams;
 
-    CameraMediaStreamInfo();
-    CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec );
+    CameraMediaStreamInfo()
+    :
+        encoderIndex( -1 ),
+        resolution( lit("*") ),
+        transcodingRequired( false ),
+        codec( CODEC_ID_NONE )
+    {
+    }
+
+    CameraMediaStreamInfo(
+        int _encoderIndex,
+        const QSize& _resolution,
+        CodecID _codec )
+    :
+        encoderIndex( _encoderIndex ),
+        resolution( _resolution.isValid()
+            ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height())
+            : anyResolution ),
+        transcodingRequired( false ),
+        codec( _codec )
+    {
+        //TODO #ak delegate to next constructor after moving to vs2013
+    }
+
+    template<class CustomParamDictType>
+        CameraMediaStreamInfo(
+            int _encoderIndex,
+            const QSize& _resolution,
+            CodecID _codec,
+            CustomParamDictType&& _customStreamParams )
+    :
+        encoderIndex( _encoderIndex ),
+        resolution( _resolution.isValid()
+            ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height())
+            : anyResolution ),
+        transcodingRequired( false ),
+        codec( _codec ),
+        customStreamParams( std::forward<CustomParamDictType>(_customStreamParams) )
+    {
+    }
+
+    bool operator==( const CameraMediaStreamInfo& rhs ) const;
+    bool operator!=( const CameraMediaStreamInfo& rhs ) const;
 };
-#define CameraMediaStreamInfo_Fields (resolution)(transports)(transcodingRequired)
+#define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)(customStreamParams)
 
 
 class CameraMediaStreams

@@ -32,13 +32,14 @@ bool QnUniversalTcpListener::isProxy(const nx_http::Request& request)
 {
     return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(request));
 };
-QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(
+
+QnUniversalTcpListener::InstanceFunc QnUniversalTcpListener::findHandler(
     QSharedPointer<AbstractStreamSocket> clientSocket,
     const QByteArray& protocol,
     const nx_http::Request& request)
 {
     if (isProxy(request))
-        return m_proxyInfo.proxyHandler(clientSocket, this);
+        return m_proxyInfo.proxyHandler;
 
     QString normPath = request.requestLine.url.path();
     while (normPath.startsWith(L'/'))
@@ -59,23 +60,32 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(
         }
     }
     if (bestIdx >= 0)
-        return m_handlers[bestIdx].instanceFunc(clientSocket, this);
+        return m_handlers[bestIdx].instanceFunc;
 
     // check default '*' path handler
     for (int i = 0; i < m_handlers.size(); ++i)
     {
         if (m_handlers[i].protocol == protocol && m_handlers[i].path == QLatin1String("*"))
-            return m_handlers[i].instanceFunc(clientSocket, this);
+            return m_handlers[i].instanceFunc;
     }
 
     // check default '*' path and protocol handler
     for (int i = 0; i < m_handlers.size(); ++i)
     {
         if (m_handlers[i].protocol == "*" && m_handlers[i].path == QLatin1String("*"))
-            return m_handlers[i].instanceFunc(clientSocket, this);
+            return m_handlers[i].instanceFunc;
     }
 
     return 0;
+}
+
+QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(
+    QSharedPointer<AbstractStreamSocket> clientSocket,
+    const QByteArray& protocol,
+    const nx_http::Request& request)
+{
+    InstanceFunc handler = findHandler(clientSocket, protocol, request);
+    return handler ? handler(clientSocket, this) : 0;
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)

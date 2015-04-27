@@ -29,7 +29,6 @@ public:
 
     QVector<QnUuid> eventResources() const;
     void setEventResources(const QVector<QnUuid> &value);
-    QnResourceList eventResourceObjects() const;
 
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
@@ -41,7 +40,6 @@ public:
     void setActionType(QnBusiness::ActionType actionType);
 
     QVector<QnUuid> actionResources() const;
-    QnResourceList actionResourceObjects() const;
     void setActionResources(const QVector<QnUuid> &value);
 
     QnBusinessActionParameters actionParams() const;
@@ -67,6 +65,7 @@ public:
     bool isScheduleMatchTime(const QDateTime& datetime) const;
 
     static QnBusinessEventRuleList getDefaultRules();
+    static QnBusinessEventRuleList getSystemRules();
 
     QnBusinessEventRule* clone();
     void removeResource(const QnUuid& resId);

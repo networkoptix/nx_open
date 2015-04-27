@@ -19,7 +19,7 @@ class QnDesktopCameraConnectionProcessor;
 class QnDesktopCameraConnection: public QnLongRunnable
 {
 public:
-    QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &mServer);
+    QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &server);
     virtual ~QnDesktopCameraConnection();
 
     virtual void pleaseStop() override;
@@ -29,7 +29,7 @@ private:
     void terminatedSleep(int sleep);
 private:
     QnDesktopResource* m_owner;
-    QnMediaServerResourcePtr m_mServer;
+    QnMediaServerResourcePtr m_server;
     CLSimpleHTTPClient* connection;
     QnDesktopCameraConnectionProcessor* processor;
     QMutex m_mutex;

@@ -36,18 +36,18 @@
                          title="Reserved: {{formatSpace(storage.reservedSpace)}}, &#013;Free: {{formatSpace(storage.freeSpace)}}, &#013;Occupied: {{formatSpace(storage.totalSpace-storage.freeSpace)}}, &#013;Total: {{formatSpace(storage.totalSpace)}}">
 
                         <div class="progress-overlay progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
-                             style="width: {{storage.reservedSpace*100/storage.totalSpace}}%">
+                             ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                         </div>
 
                         <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
 
 
                         <div class="progress-bar progress-bar-success" role="progressbar"
-                             style="width: {{(storage.freeSpace)*100/storage.totalSpace}}%">
+                             ng-style="{width: (storage.freeSpace)*100/storage.totalSpace + '%'}">
                         </div>
 
                         <div class="progress-bar progress-bar-danger"
-                             style="width: {{100-storage.freeSpace*100/storage.totalSpace}}%">
+                             ng-style="{width: 100-storage.freeSpace*100/storage.totalSpace +'%'}">
                         </div>
                     </div>
                 </td>

@@ -13,6 +13,7 @@ QnVistaResource::~QnVistaResource() {
     return;
 }
 
+/*
 int QnVistaResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const 
 {
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
@@ -32,6 +33,7 @@ int QnVistaResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolut
 
     return qMax(192,result);
 }
+*/
 
 QnAbstractPtzController *QnVistaResource::createPtzControllerInternal() {
     QScopedPointer<QnAbstractPtzController> result(base_type::createPtzControllerInternal());
@@ -41,20 +43,21 @@ QnAbstractPtzController *QnVistaResource::createPtzControllerInternal() {
     return new QnVistaFocusPtzController(QnPtzControllerPtr(result.take()));
 }
 
-bool QnVistaResource::startInputPortMonitoring()
-{
-    if( hasFlags(Qn::foreigner) )     //we do not own camera
-    {
-        return false;
-    }
-
-    if( !m_eventCapabilities.get() )
-        return false;
-
-    //although Vista reports that it supports PullPoint subscription, it does not work...
-    if( QnSoapServer::instance()->initialized() )
-        return registerNotificationConsumer();
-    return false;
-}
+//bool QnVistaResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+//{
+//    if( hasFlags(Qn::foreigner) ||      //we do not own camera
+//        !hasCameraCapabilities(Qn::RelayInputCapability) )
+//    {
+//        return false;
+//    }
+//
+//    if( !m_eventCapabilities.get() )
+//        return false;
+//
+//    //although Vista reports that it supports PullPoint subscription, it does not work...
+//    if( QnSoapServer::instance()->initialized() )
+//        return registerNotificationConsumer();
+//    return false;
+//}
 
 #endif //ENABLE_ONVIF

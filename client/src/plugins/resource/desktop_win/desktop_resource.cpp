@@ -55,7 +55,7 @@ void QnDesktopResource::createSharedDataProvider()
 {
     if (m_desktopDataProvider) 
     {
-        if (m_desktopDataProvider->needToStop())
+        if (m_desktopDataProvider->readyToStop())
             delete m_desktopDataProvider; // stop and destroy old instance
         else
             return; // already exists
@@ -100,18 +100,18 @@ bool QnDesktopResource::isRendererSlow() const
     return captureMode == Qn::FullScreenMode;
 }
 
-void QnDesktopResource::addConnection(QnMediaServerResourcePtr mServer)
+void QnDesktopResource::addConnection(const QnMediaServerResourcePtr &server)
 {
-    if (m_connectionPool.contains(mServer->getId()))
+    if (m_connectionPool.contains(server->getId()))
         return;
-    QnDesktopCameraConnectionPtr connection = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, mServer));
-    m_connectionPool[mServer->getId()] = connection;
+    QnDesktopCameraConnectionPtr connection = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, server));
+    m_connectionPool[server->getId()] = connection;
     connection->start();
 }
 
-void QnDesktopResource::removeConnection(QnMediaServerResourcePtr mServer)
+void QnDesktopResource::removeConnection(const QnMediaServerResourcePtr &server)
 {
-    m_connectionPool.remove(mServer->getId());
+    m_connectionPool.remove(server->getId());
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> emptyAudioLayout( new QnEmptyResourceAudioLayout() );

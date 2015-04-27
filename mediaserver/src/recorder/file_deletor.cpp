@@ -59,13 +59,13 @@ bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
     if (!QFile::remove(fileName))
         return false;
-    QString dirName = fileName.left(fileName.lastIndexOf(QLatin1Char('/')));
+    QString dirName = fileName.left(fileName.lastIndexOf(QDir::separator()));
     while(1) 
     {
         QDir dir (dirName);
         if (!dir.rmdir(dirName))
             break;
-        dirName = dirName.left(dirName.lastIndexOf(QLatin1Char('/')));
+        dirName = dirName.left(dirName.lastIndexOf(QDir::separator()));
     }
     return true;
 }
@@ -76,6 +76,19 @@ void QnFileDeletor::deleteDir(const QString& dirName)
     QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
     for(const QFileInfo& fi: list)
         deleteFile(fi.absoluteFilePath());
+}
+
+void QnFileDeletor::deleteDirRecursive(const QString& dirName)
+{
+    QDir dir(dirName);
+    QList<QFileInfo> list = dir.entryInfoList(QDir::Files |QDir::Dirs | QDir::NoDotAndDotDot);
+    for(const QFileInfo& fi: list) {
+        if (fi.isDir())
+            deleteDirRecursive(fi.absoluteFilePath());
+        else
+            deleteFile(fi.absoluteFilePath());
+    }
+    dir.rmdir(dirName);
 }
 
 void QnFileDeletor::deleteFile(const QString& fileName)

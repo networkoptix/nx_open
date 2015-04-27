@@ -75,7 +75,7 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     connect(m_dwm,                              SIGNAL(compositionChanged()),       this,   SLOT(at_dwm_compositionChanged()));
 
 #ifdef Q_OS_WIN
-    connect(this, SIGNAL(recordingSettingsChanged()), this->context()->instance<QnWorkbenchDesktopCameraWatcher>(), SLOT(at_recordingSettingsChanged()));
+    connect(this, &QnRecordingSettingsWidget::recordingSettingsChanged, this->context()->instance<QnWorkbenchDesktopCameraWatcher>(), &QnWorkbenchDesktopCameraWatcher::forcedUpdate);
 #endif
 
     setWarningStyle(ui->recordingWarningLabel);

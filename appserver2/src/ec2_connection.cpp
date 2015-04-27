@@ -22,15 +22,14 @@ namespace ec2
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
         m_transactionLog( new QnTransactionLog(QnDbManager::instance()) ),
-        m_connectionInfo( connectionInfo )
+        m_connectionInfo( connectionInfo ),
+        m_isInitialized( false )
     {
-        QnDbManager::instance()->init(
+        m_isInitialized = QnDbManager::instance()->init(
             resCtx.resFactory,
-            dbUrl.toLocalFile(),
-            QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path") );
+            dbUrl );
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
-        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
@@ -44,7 +43,13 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void Ec2DirectConnection::startReceivingNotifications() {
-        QnTransactionMessageBus::instance()->start();
+    QString Ec2DirectConnection::authInfo() const
+    {
+        return QString();
+    }
+
+    bool Ec2DirectConnection::initialized() const
+    {
+        return m_isInitialized;
     }
 }

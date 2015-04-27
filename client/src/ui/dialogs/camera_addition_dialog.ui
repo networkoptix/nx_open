@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>726</width>
-    <height>197</height>
+    <height>215</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string>Add cameras...</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
@@ -63,6 +63,9 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="serverStatusLabel"/>
    </item>
    <item>
     <widget class="QStackedWidget" name="stageStackedWidget">
@@ -139,9 +142,6 @@
                   </item>
                   <item row="0" column="1">
                    <widget class="QLineEdit" name="singleCameraLineEdit">
-                    <property name="toolTip">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                    </property>
                     <property name="text">
                      <string notr="true"/>
                     </property>
@@ -418,7 +418,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>1</height>
           </size>
          </property>
         </spacer>
@@ -447,8 +447,14 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
-          <string>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</string>
+          <string>Discovered Cameras:</string>
          </property>
         </widget>
        </item>

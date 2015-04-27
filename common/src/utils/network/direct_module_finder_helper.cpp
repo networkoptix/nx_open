@@ -10,268 +10,151 @@
 #include <utils/network/direct_module_finder.h>
 
 namespace {
-    const int checkInterval = 30 * 1000;
+    const int checkInterval = 3000;
+
+    QUrl makeUrl(const QString &host, int port) {
+        QUrl url;
+        url.setScheme(lit("http"));
+        url.setHost(host);
+        url.setPort(port);
+        return url;
+    }
+
+    void addUrl(const QUrl &url, QHash<QUrl, int> &hash) {
+        hash[url]++;
+    }
+
+    void removeUrl(const QUrl &url, QHash<QUrl, int> &hash) {
+        auto it = hash.find(url);
+        if (it == hash.end())
+            return;
+
+        int &count = *it;
+        if (--count == 0)
+            hash.erase(it);
+    }
 }
 
-QnModuleFinderHelper::QnModuleFinderHelper(QnModuleFinder *moduleFinder) :
-    QObject(moduleFinder)
+QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder) :
+    base_type(moduleFinder),
+    m_moduleFinder(moduleFinder)
 {
     Q_ASSERT(moduleFinder);
 
-    m_multicastModuleFinder = moduleFinder->multicastModuleFinder();
-    m_directModuleFinder = moduleFinder->directModuleFinder();
-
-    for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
-        at_resourceAdded(server);
+    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnDirectModuleFinderHelper::at_resourceAdded);
+    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnDirectModuleFinderHelper::at_resourceRemoved);
+    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnDirectModuleFinderHelper::at_resourceChanged);
+    connect(moduleFinder->multicastModuleFinder(), &QnMulticastModuleFinder::responseReceived, this, &QnDirectModuleFinderHelper::at_responseReceived);
 
     QTimer *timer = new QTimer(this);
-    timer->setInterval(checkInterval);
+    connect(timer, &QTimer::timeout, this, &QnDirectModuleFinderHelper::at_timer_timeout);
+    timer->start(checkInterval);
 
-    connect(qnResPool,      &QnResourcePool::resourceAdded,         this,       &QnModuleFinderHelper::at_resourceAdded);
-    connect(qnResPool,      &QnResourcePool::resourceChanged,       this,       &QnModuleFinderHelper::at_resourceChanged);
-    connect(qnResPool,      &QnResourcePool::resourceRemoved,       this,       &QnModuleFinderHelper::at_resourceRemoved);
-
-    connect(timer,          &QTimer::timeout,                       this,       &QnModuleFinderHelper::at_timer_timeout);
-
-    timer->start();
+    m_elapsedTimer.start();
 }
 
-QnUrlSet QnModuleFinderHelper::urlsForPeriodicalCheck() const {
-    return m_urlsForPeriodicalCheck;
+void QnDirectModuleFinderHelper::setForcedUrls(const QSet<QUrl> &forcedUrls) {
+    m_forcedUrls = forcedUrls;
+    updateModuleFinder();
 }
 
-void QnModuleFinderHelper::setUrlsForPeriodicalCheck(const QnUrlSet &urls) {
-    m_urlsForPeriodicalCheck = urls;
-}
-
-void QnModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(Qn::server) || resource->getId() == qnCommon->moduleGUID())
+void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
+    if (resource->getId() == qnCommon->moduleGUID())
         return;
 
-    QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QnUuid serverId = server->getId();
-
-    QnHostAddressSet addresses = QnHostAddressSet::fromList(server->getNetAddrList());
-    quint16 port = server->getPort();
-
-    if (addresses.isEmpty() || port == 0)
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
         return;
 
-    m_addressesByServer[serverId] = addresses;
-    m_portByServer[serverId] = port;
-    m_manualAddressesByServer[serverId] = QnUrlSet::fromList(server->getAdditionalUrls());
+    connect(server, &QnMediaServerResource::auxUrlsChanged, this, &QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged);
 
-    if (m_multicastModuleFinder) {
-        for (const QUrl &url: server->getIgnoredUrls()) {
-            QnNetworkAddress address(url.host(), url.port(port));
-            if (!address.isValid())
-                continue;
-
-            m_multicastModuleFinder->addIgnoredModule(address, serverId);
-        }
-    }
-
-    if (m_directModuleFinder) {
-        for (QUrl url: server->getIgnoredUrls()) {
-            if (url.port() == -1)
-                url.setPort(port);
-            m_directModuleFinder->addIgnoredModule(url, serverId);
-        }
-
-        for (QUrl url: server->getAdditionalUrls()) {
-            if (url.port() == -1)
-                url.setPort(port);
-            m_directModuleFinder->addUrl(url, serverId);
-        }
-
-        for (const QHostAddress &address: addresses)
-            m_directModuleFinder->addUrl(QnNetworkAddress(address, port).toUrl(), serverId);
-    }
-
-    connect(server.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnModuleFinderHelper::at_resourceAuxUrlsChanged);
-}
-
-void QnModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(Qn::server) || resource->getId() == qnCommon->moduleGUID())
-        return;
-
-    QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-    QnUuid serverId = server->getId();
-
-    QnHostAddressSet oldAddresses = m_addressesByServer.value(server->getId());
-    QnHostAddressSet newAddresses = QnHostAddressSet::fromList(server->getNetAddrList());
-
-    quint16 oldPort = m_portByServer.value(server->getId());
-    quint16 newPort = server->getPort();
-
-    if (oldAddresses == newAddresses && oldPort == newPort)
-        return;
-
-    QnHostAddressSet commonAddresses;
-    if (oldPort == newPort)
-        commonAddresses = oldAddresses & newAddresses;
-
-    if (m_multicastModuleFinder) {
-        if (oldPort != newPort) {
-            QList<QnNetworkAddress> ignoredAddresses = m_multicastModuleFinder->ignoredModules().keys(serverId);
-
-            for (const QnNetworkAddress &address: ignoredAddresses)
-                m_multicastModuleFinder->removeIgnoredModule(address, serverId);
-
-            for (const QnNetworkAddress &address: ignoredAddresses)
-                m_multicastModuleFinder->addIgnoredModule(QnNetworkAddress(address.host(), newPort), serverId);
-        }
-    }
-
-    if (m_directModuleFinder) {
-        QnHostAddressSet addressesToRemove = (newPort == oldPort) ? oldAddresses - commonAddresses : oldAddresses;
-        for (const QHostAddress &address: addressesToRemove)
-            m_directModuleFinder->removeUrl(QnNetworkAddress(address, oldPort).toUrl(), serverId);
-
-        QnHostAddressSet addressesToAdd = (newPort == oldPort) ? newAddresses - commonAddresses : newAddresses;
-        for (const QHostAddress &address: addressesToAdd)
-            m_directModuleFinder->addUrl(QnNetworkAddress(address, newPort).toUrl(), serverId);
-
-        if (oldPort != newPort) {
-            QList<QUrl> additionalUrls = server->getAdditionalUrls();
-            for (QUrl url: additionalUrls) {
-                if (url.port() != -1)
-                    continue;
-                url.setPort(oldPort);
-                m_directModuleFinder->removeUrl(url, serverId);
-            }
-
-            for (QUrl url: additionalUrls) {
-                if (url.port() != -1)
-                    continue;
-                url.setPort(newPort);
-                m_directModuleFinder->addUrl(url, serverId);
-            }
-
-            QList<QUrl> ignoredUrls = server->getIgnoredUrls();
-            for (QUrl url: ignoredUrls) {
-                if (url.port() != -1)
-                    continue;
-                url.setPort(oldPort);
-                m_directModuleFinder->removeIgnoredModule(url, serverId);
-            }
-
-            for (QUrl url: ignoredUrls) {
-                if (url.port() != -1)
-                    continue;
-                url.setPort(newPort);
-                m_directModuleFinder->addIgnoredModule(url, serverId);
-            }
-        }
-    }
-
-    m_addressesByServer[serverId] = newAddresses;
-    m_portByServer[serverId] = newPort;
-}
-
-void QnModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(Qn::server) || resource->getId() == qnCommon->moduleGUID())
-        return;
-
-    QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
     QnUuid serverId = server->getId();
     quint16 port = server->getPort();
 
-    QnUrlSet newAdditionalUrls = QnUrlSet::fromList(server->getAdditionalUrls());
-    QnUrlSet newIgnoredUrls = QnUrlSet::fromList(server->getIgnoredUrls());
+    QnUrlSet urls;
+    QnUrlSet additionalUrls;
+    QnUrlSet ignoredUrls;
 
-    if (m_multicastModuleFinder) {
-        for (const QnNetworkAddress &address: m_multicastModuleFinder->ignoredModules().keys(serverId))
-            m_multicastModuleFinder->removeIgnoredModule(address, serverId);
-
-        for (const QUrl &url: newIgnoredUrls) {
-            QnNetworkAddress address(url.host(), url.port(port));
-            if (!address.isValid())
-                continue;
-            m_multicastModuleFinder->addIgnoredModule(address, serverId);
-        }
+    for (const QHostAddress &address: server->getNetAddrList()) {
+        QUrl url = makeUrl(address.toString(), port);
+        urls.insert(url);
+        addUrl(url, m_urls);
     }
 
-    if (m_directModuleFinder) {
-        QnUrlSet oldAdditionalUrls = m_manualAddressesByServer.value(serverId);
-        QnUrlSet oldIgnoredUrls = QnUrlSet::fromList(m_directModuleFinder->ignoredModules().keys(serverId));
-
-        if (oldAdditionalUrls != newAdditionalUrls) {
-            QnUrlSet commonAdditionalUrls = oldAdditionalUrls & newAdditionalUrls;
-
-            for (QUrl url: oldAdditionalUrls - commonAdditionalUrls) {
-                if (url.port() == -1)
-                    url.setPort(port);
-                m_directModuleFinder->removeUrl(url, serverId);
-            }
-
-            for (QUrl url: newAdditionalUrls - commonAdditionalUrls) {
-                if (url.port() == -1)
-                    url.setPort(port);
-                m_directModuleFinder->addUrl(url, serverId);
-            }
-        }
-
-        if (oldIgnoredUrls != newIgnoredUrls) {
-            for (const QUrl &url: oldIgnoredUrls)
-                m_directModuleFinder->removeIgnoredModule(url, serverId);
-
-            for (QUrl url: newIgnoredUrls) {
-                if (url.port() == -1)
-                    url.setPort(port);
-                m_directModuleFinder->addIgnoredModule(url, serverId);
-            }
-        }
+    for (const QUrl &url: server->getAdditionalUrls()) {
+        QUrl turl = makeUrl(url.host(), port);
+        additionalUrls.insert(turl);
+        addUrl(turl, m_urls);
     }
 
-    m_manualAddressesByServer[serverId] = newAdditionalUrls;
+    for (const QUrl &url: server->getIgnoredUrls()) {
+        QUrl turl = makeUrl(url.host(), port);
+        ignoredUrls.insert(turl);
+        addUrl(turl, m_ignoredUrls);
+    }
+
+    m_serverUrlsById[serverId] = urls;
+    m_additionalServerUrlsById[serverId] = additionalUrls;
+    m_ignoredServerUrlsById[serverId] = ignoredUrls;
+
+    updateModuleFinder();
 }
 
-void QnModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(Qn::server) || resource->getId() == qnCommon->moduleGUID())
+void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource) {
+    if (resource->getId() == qnCommon->moduleGUID())
         return;
 
-    QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    disconnect(server, &QnMediaServerResource::auxUrlsChanged, this, &QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged);
+
     QnUuid serverId = server->getId();
 
-    disconnect(server.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnModuleFinderHelper::at_resourceAuxUrlsChanged);
+    for (const QUrl &url: m_serverUrlsById.take(serverId))
+        removeUrl(url, m_urls);
 
-    QnHostAddressSet addresses = m_addressesByServer.take(serverId);
-    quint16 port = m_portByServer.take(serverId);
-    QnUrlSet additionalAddresses = m_manualAddressesByServer.take(serverId);
+    for (const QUrl &url: m_additionalServerUrlsById.take(serverId))
+        removeUrl(url, m_urls);
 
-    if (m_multicastModuleFinder) {
-        for (const QUrl &url: server->getIgnoredUrls()) {
-            QnNetworkAddress address(url.host(), url.port(port));
-            if (!address.isValid())
-                continue;
+    for (const QUrl &url: m_ignoredServerUrlsById.take(serverId))
+        removeUrl(url, m_ignoredUrls);
 
-            m_multicastModuleFinder->removeIgnoredModule(address, serverId);
-        }
-    }
-
-    if (m_directModuleFinder) {
-        for (const QHostAddress &address: addresses)
-            m_directModuleFinder->removeUrl(QnNetworkAddress(address, port).toUrl(), serverId);
-
-        for (QUrl url: additionalAddresses) {
-            if (url.port() == -1)
-                url.setPort(port);
-            m_directModuleFinder->removeUrl(url, serverId);
-        }
-
-        for (QUrl url: server->getIgnoredUrls()) {
-            if (url.port() == -1)
-                url.setPort(port);
-            m_directModuleFinder->removeIgnoredModule(url, serverId);
-        }
-    }
+    updateModuleFinder();
 }
 
-void QnModuleFinderHelper::at_timer_timeout() {
-    if (!m_directModuleFinder)
-        return;
+void QnDirectModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
+    at_resourceRemoved(resource);
+    at_resourceAdded(resource);
+}
 
-    for (const QUrl &url: m_urlsForPeriodicalCheck)
-        m_directModuleFinder->checkUrl(url);
+void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &resource) {
+    at_resourceRemoved(resource);
+    at_resourceAdded(resource);
+}
+
+void QnDirectModuleFinderHelper::at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+    Q_UNUSED(moduleInformation)
+    m_multicastedUrlLastPing[makeUrl(address.address.toString(), address.port)] = m_elapsedTimer.elapsed();
+}
+
+void QnDirectModuleFinderHelper::at_timer_timeout() {
+    int pingTimeout = m_moduleFinder->pingTimeout();
+    qint64 currentTime = m_elapsedTimer.elapsed();
+
+    for (auto it = m_multicastedUrlLastPing.begin(); it != m_multicastedUrlLastPing.end(); /* no inc */) {
+        if (*it + pingTimeout < currentTime)
+            it = m_multicastedUrlLastPing.erase(it);
+        else
+            ++it;
+    }
+    updateModuleFinder();
+}
+
+void QnDirectModuleFinderHelper::updateModuleFinder() {
+    QnUrlSet urls = QnUrlSet::fromList(m_urls.keys());
+    QnUrlSet ignored = QnUrlSet::fromList(m_ignoredUrls.keys());
+    QnUrlSet alive = QnUrlSet::fromList(m_multicastedUrlLastPing.keys());
+    m_moduleFinder->directModuleFinder()->setUrls((urls + m_forcedUrls) - ignored - alive);
 }

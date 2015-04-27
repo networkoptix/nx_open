@@ -25,7 +25,7 @@ protected slots:
     void at_mergeSystemsAction_triggered();
 
 private:
-    void connectToCurrentSystem(const QSet<QnUuid> &targets);
+    void connectToCurrentSystem(const QSet<QnUuid> &targets, const QString &initialUser = QString(), const QString &initialPassword = QString());
 
 private slots:
     void at_connectTool_finished(int errorCode);

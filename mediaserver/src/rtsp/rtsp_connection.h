@@ -11,6 +11,7 @@
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
+class QnArchiveStreamReader;
 
 struct RtspServerTrackInfo
 {
@@ -60,19 +61,17 @@ public:
     void setQuality(MediaQuality quality);
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
-    QString getRangeHeaderIfChanged();
+    QByteArray getRangeStr();
     int getMetadataChannelNum() const;
     int getAVTcpChannel(int trackNum) const;
     //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
     //UDPSocket* getMediaSocket(int trackNum) const;
-    RtspServerTrackInfoPtr getTrackInfo(int trackNum) const;
+    RtspServerTrackInfo* getTrackInfo(int trackNum) const;
     int getTracksCount() const;
 
 protected:
     virtual void run();
     void addResponseRangeHeader();
-    QString getRangeStr();
-
 private slots:
     void at_camera_parentIdChanged();
     void at_camera_resourceChanged();
@@ -99,7 +98,6 @@ private:
     int composeGetParameter();
     void createDataProvider();
     void putLastIFrameToQueue();
-    void connectToLiveDataProviders();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
     QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QSharedPointer<const QnResourceVideoLayout> vLayout);
@@ -107,7 +105,7 @@ private:
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
-
+    QSharedPointer<QnArchiveStreamReader> getArchiveDP();
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

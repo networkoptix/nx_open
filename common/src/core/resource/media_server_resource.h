@@ -6,12 +6,14 @@
 
 #include <api/media_server_connection.h>
 
+#include <utils/common/value_cache.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
 #include <core/resource/abstract_storage_resource.h>
+#include "utils/network/http/asynchttpclient.h"
 
 
 class QnMediaServerResource : public QnResource
@@ -20,8 +22,6 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
 public:
-    static const QString USE_PROXY;
-
     QnMediaServerResource(const QnResourceTypePool* resTypePool);
     virtual ~QnMediaServerResource();
 
@@ -36,11 +36,11 @@ public:
     virtual void setName( const QString& name ) override;
     void setServerName( const QString& name );
 
-    void setApiUrl(const QString& restUrl);
+    void setApiUrl(const QString& apiUrl);
     QString getApiUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
-    const QList<QHostAddress>& getNetAddrList() const;
+    QList<QHostAddress> getNetAddrList() const;
 
     void setAdditionalUrls(const QList<QUrl> &urls);
     QList<QUrl> getAdditionalUrls() const;
@@ -58,12 +58,7 @@ public:
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    void determineOptimalNetIF();
-    void setPrimaryIF(const QString& primaryIF);
-    /*!
-        \return If there is route to mediaserver, ip address of mediaserver. If there is no route, string \a USE_PROXY
-    */
-    QString getPrimaryIF() const;
+    void setPrimaryAddress(const SocketAddress &primaryAddress);
 
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
@@ -104,12 +99,14 @@ public:
     */
     QPair<int, int> saveUpdatedStorages();
 private slots:
-    void at_pingResponse(QnHTTPRawResponse, int);
+    void onNewResource(const QnResourcePtr &resource);
+    void onRemoveResource(const QnResourcePtr &resource);
+    void atResourceChanged();
+    void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
-    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
-    void panicModeChanged(const QnResourcePtr &resource);
+    void apiUrlChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);
@@ -119,26 +116,28 @@ signals:
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
-    QString m_primaryIf;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
     //QnAbstractStorageResourceList m_storages;
-    bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;
-    Qn::PanicMode m_panicMode;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
     QString m_systemName;
-    QMap<int, QString> m_runningIfRequests;
-    QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
+    QVector<nx_http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
 
     // used for client purpose only. Can be moved to separete class
     QnAbstractStorageResourceList m_storagesToUpdate;
     ec2::ApiIdDataList m_storagesToRemove;
+
+    CachedValue<Qn::PanicMode> m_panicModeCache;
+
+    mutable QnResourcePtr m_firstCamera;
+
+    Qn::PanicMode calculatePanicMode() const;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

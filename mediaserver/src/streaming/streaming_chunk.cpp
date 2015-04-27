@@ -4,6 +4,8 @@
 
 #include "streaming_chunk.h"
 
+#include <atomic>
+
 #include <QMutexLocker>
 
 
@@ -62,6 +64,11 @@ bool StreamingChunk::tryRead( SequentialReadingContext* const ctx, nx::Buffer* c
     return true;
 }
 
+#ifdef DUMP_CHUNK_TO_FILE
+static std::atomic<int> fileNumber = 1;
+static QString filePathBase( lit("c:\\tmp\\chunks\\%1_%2.ts").arg(rand()) );
+#endif
+
 //!Only one thread is allowed to modify chunk data at a time
 bool StreamingChunk::openForModification()
 {
@@ -69,6 +76,13 @@ bool StreamingChunk::openForModification()
     if( m_isOpenedForModification )
         return false;
     m_isOpenedForModification = true;
+
+#ifdef DUMP_CHUNK_TO_FILE
+    m_dumpFile.open(
+        filePathBase.arg( ++fileNumber ).toStdString(),
+        std::ios_base::binary | std::ios_base::out );
+#endif
+
     return true;
 }
 
@@ -84,6 +98,10 @@ void StreamingChunk::appendData( const nx::Buffer& data )
         m_data.append( data );
     }
 
+#ifdef DUMP_CHUNK_TO_FILE
+    m_dumpFile.write( data.constData(), data.size() );
+#endif
+
     QMutexLocker lk( &m_signalEmitMutex );
     emit newDataIsAvailable( shared_from_this(), data.size() );
 }
@@ -96,6 +114,10 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
         m_isOpenedForModification = false;
         m_cond.wakeAll();
     }
+
+#ifdef DUMP_CHUNK_TO_FILE
+    m_dumpFile.close();
+#endif
 
     QMutexLocker lk( &m_signalEmitMutex );
     emit newDataIsAvailable( shared_from_this(), 0 );
@@ -139,8 +161,11 @@ StreamingChunkInputStream::StreamingChunkInputStream( StreamingChunk* chunk )
 
 bool StreamingChunkInputStream::tryRead( nx::Buffer* const dataBuffer )
 {
-    if( !m_range || m_range.get().full(m_chunk->sizeInBytes()) )
+    if( (!m_range) ||     //no range specified
+        ((m_range.get().rangeSpec.start == 0) && (m_range.get().rangeLength() == m_chunk->sizeInBytes())) ) //full entity requested
+    {
         return m_chunk->tryRead( &m_readCtx, dataBuffer );
+    }
 
     assert( m_chunk->isClosed() && m_chunk->sizeInBytes() > 0 );
     //supporting byte range only on closed chunk
@@ -148,17 +173,14 @@ bool StreamingChunkInputStream::tryRead( nx::Buffer* const dataBuffer )
         return false;
 
     const nx::Buffer& chunkData = m_chunk->data();
-    for( const nx_http::header::Range::RangeSpec& rangeSpec: m_range.get().rangeSpecList )
-    {
-        dataBuffer->append( chunkData.mid(
-            rangeSpec.start,
-            rangeSpec.end ? (rangeSpec.end.get() - rangeSpec.start) : -1 ) );
-    }
+    dataBuffer->append( chunkData.mid(
+        m_range.get().rangeSpec.start,
+        m_range.get().rangeSpec.end ? (m_range.get().rangeSpec.end.get() - m_range.get().rangeSpec.start) : -1 ) );
 
     return true;
 }
 
-void StreamingChunkInputStream::setByteRange( const nx_http::header::Range& range )
+void StreamingChunkInputStream::setByteRange( const nx_http::header::ContentRange& range )
 {
     m_range = range;
 }

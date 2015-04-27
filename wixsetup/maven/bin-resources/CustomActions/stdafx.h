@@ -16,6 +16,7 @@
 #include <atlpath.h>
 #include <strsafe.h>
 #include <msiquery.h>
+#include <userenv.h>
 
 // WiX Header Files:
 #include <wcautil.h>
@@ -34,6 +35,7 @@
 #include <iphlpapi.h>
 #include <Aclapi.h>
 
+#include <stdexcept>
 #include <set>
 #include <vector>
 #include <algorithm>

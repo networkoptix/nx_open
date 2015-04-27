@@ -9,6 +9,8 @@
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+typedef QVector<QnUuid> IDList;
+
 class QnSelectResourcesDialogButton: public QPushButton {
     Q_OBJECT
 
@@ -17,7 +19,7 @@ class QnSelectResourcesDialogButton: public QPushButton {
 public:
     explicit QnSelectResourcesDialogButton(QWidget* parent=NULL);
 
-    QnResourceList resources() const;
+    IDList resourceIds() const;
     void setResources(QnResourceList resources);
 
     QnResourceSelectionDialogDelegate* dialogDelegate() const;
@@ -47,8 +49,9 @@ class QnBusinessRuleItemDelegate: public QStyledItemDelegate, public QnWorkbench
 public:
     explicit QnBusinessRuleItemDelegate(QObject *parent = 0);
     ~QnBusinessRuleItemDelegate();
+
+    static int optimalWidth(int column, const QFontMetrics &metrics);
 protected:
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;

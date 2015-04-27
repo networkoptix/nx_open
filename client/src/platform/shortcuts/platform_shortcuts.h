@@ -19,9 +19,10 @@ public:
      * \param destinationPath           Path where the shortcut should be created (without filename).
      * \param name                      Name of the shortcut.
      * \param arguments                 Arguments to run the source executable.
+     * \param iconId                    Id of the custom icon.
      * \returns                         True if shortcut creation was successful, false otherwise.
      */
-    virtual bool createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments) = 0;
+    virtual bool createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments, int iconId = 0) = 0;
 
     /**
      * This function deletes a target shortcut if it exists.

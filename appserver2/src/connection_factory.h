@@ -23,8 +23,6 @@
 
 namespace ec2
 {
-    class QnRuntimeTransactionLog;
-
     class Ec2DirectConnectionFactory
     :
         public AbstractECConnectionFactory,
@@ -53,14 +51,13 @@ namespace ec2
         QMutex m_mutex;
         ResourceContext m_resCtx;
         std::unique_ptr<QnDbManager> m_dbManager;
-        std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
         std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
+        std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
         Ec2DirectConnectionPtr m_directConnection;
         Ec2ThreadPool m_ec2ThreadPool;
         bool m_terminated;
         int m_runningRequests;
         bool m_sslEnabled;
-        std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
         int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );

@@ -103,7 +103,7 @@ public:
         m_hide(hide)
     {}
 protected:
-    bool isPreviewSearchMode() const;
+    bool isPreviewSearchMode(const QnActionParameters &parameters) const;
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 private:
     /** Flag that describes if action should be visible or hidden in videowall review mode. */
@@ -287,9 +287,9 @@ private:
 /**
  * Condition for resource rename.
  */
-class QnRenameActionCondition: public QnEdgeServerCondition {
+class QnRenameResourceActionCondition: public QnActionCondition {
 public:
-    QnRenameActionCondition(QObject *parent = NULL): QnEdgeServerCondition(false, parent) {}
+    QnRenameResourceActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
@@ -492,12 +492,16 @@ private:
 
 class QnResourceStatusActionCondition: public QnActionCondition {
 public:
-    QnResourceStatusActionCondition(Qn::ResourceStatus status, bool allResources, QObject *parent): QnActionCondition(parent), m_status(status), m_all(allResources) {}
+    QnResourceStatusActionCondition(const QSet<Qn::ResourceStatus> statuses, bool allResources, QObject *parent):
+        QnActionCondition(parent), m_statuses(statuses), m_all(allResources) {}
+
+    QnResourceStatusActionCondition(Qn::ResourceStatus status, bool allResources, QObject *parent):
+        QnActionCondition(parent), m_statuses(QSet<Qn::ResourceStatus>() << status), m_all(allResources) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 
 private:
-    Qn::ResourceStatus m_status;
+    QSet<Qn::ResourceStatus> m_statuses;
     bool m_all;
 };
 
@@ -551,6 +555,7 @@ public:
         m_disableIfPtzDialogVisible(disableIfPtzDialogVisible)
     {}
     
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 
@@ -642,6 +647,25 @@ public:
 
 private:
     Qn::LightModeFlags m_lightModeFlags;
+};
+
+class QnItemsCountActionCondition: public QnActionCondition {
+public:
+    enum Count {
+        MultipleItems = -1,
+        NoItems = 0,
+        OneItem = 1
+    };
+
+    QnItemsCountActionCondition(int count, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_count(count)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    int m_count;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

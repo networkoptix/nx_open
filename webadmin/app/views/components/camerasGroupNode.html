@@ -1,0 +1,13 @@
+<span ng-click="camera.collapsed = !camera.collapsed" class="span-element" ng-class="{offline:server.status!='Online'}">
+    <icon for="!camera.collapsed" on-true="chevron-down" title-true="collapse"></icon>
+    <icon for="camera.collapsed" on-true="chevron-right" title-true="expand"></icon>
+    <span class="glyphicon glyphicon-hdd" title="{{server.status}}"></span>
+    {{camera.name}}
+</span>
+<ul class="nav nav-pills nav-stacked"
+    ng-class="{hidden:camera.collapsed}">
+    <li ng-repeat="camera in camera.cameras"
+        ng-class="{active:activeCamera===camera}"
+        ng-include="'/views/components/cameraNode.html'" >
+    </li>
+</ul>

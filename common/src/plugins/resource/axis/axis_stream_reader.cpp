@@ -2,6 +2,8 @@
 
 #include "axis_stream_reader.h"
 
+#include <set>
+
 #include <QtCore/QTextStream>
 
 #include <utils/common/log.h>
@@ -12,6 +14,8 @@
 #include "axis_resource.h"
 #include "axis_resource.h"
 #include <utils/common/app_info.h>
+
+
 static const char AXIS_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int AXIS_SEI_PRODUCT_INFO = 0x0a00;
 static const int AXIS_SEI_TIMESTAMP = 0x0a01;
@@ -81,20 +85,28 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
         profileSufix = QString::number(res->getChannelNumAxis());
     }
 
+    static const QByteArray OLD_PRIMARY_STREAM_PROFILE_NAME = "netOptixPrimary";
+    static const QByteArray OLD_SECONDARY_STREAM_PROFILE_NAME = "netOptixSecondary";
+
+    QByteArray oldProfileName;
+
     if (role == Qn::CR_LiveVideo)
     {
         profileName = lit("%1Primary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
         profileDescription = QString(lit("%1 Primary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
+        oldProfileName = OLD_PRIMARY_STREAM_PROFILE_NAME;
     }
     else {
         profileName = lit("%1Secondary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
         profileDescription = QString(lit("%1 Secondary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
+        oldProfileName = OLD_SECONDARY_STREAM_PROFILE_NAME;
     }
 
 
     //================ profile setup ======================== 
     
     // -------------- check if profile already exists
+    std::set<QByteArray> profilesToRemove;
     for (int i = 0; i < 3; ++i)
     {
         CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
@@ -135,14 +147,35 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
                 if (params.size() >= 2)
                     profileNumber = params[params.size()-2];
             }
+            else if( lines[i].endsWith(QByteArray("Name=") + oldProfileName) )
+            {
+                //removing this profile
+                auto tokens = lines[i].split('.');
+                if( tokens.size() > 3 )
+                    profilesToRemove.insert( tokens[2] );
+            }
         }
     }
+
+    //removing old profiles
+    for( const auto& profileToRemove: profilesToRemove )
+    {
+        CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
+        const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=remove&group=root.StreamProfile."+profileToRemove);
+        const int httpStatus = http.doGET( requestPath );    //ignoring error code
+        if( httpStatus != CL_HTTP_SUCCESS )
+        {
+            NX_LOG( lit("Failed to remove old Axis profile %1 on camera %2").
+                arg(QLatin1String(profileToRemove)).arg(res->getHostAddress()), cl_logDEBUG1 );
+        }
+    }
+
     // ------------------- determine stream parameters ----------------------------
     float fps = getFps();
     const QnPlAxisResource::AxisResolution& resolution = res->getResolution(
         role == Qn::CR_LiveVideo
-            ? QnPlAxisResource::PRIMARY_ENCODER_INDEX
-            : QnPlAxisResource::SECONDARY_ENCODER_INDEX );
+            ? PRIMARY_ENCODER_INDEX
+            : SECONDARY_ENCODER_INDEX );
 
     if (resolution.size.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
@@ -160,7 +193,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     // --------------- update or insert new profile ----------------------
     
-    if (action == QByteArray("add") || !isCameraControlDisabled())
+    if (action == QByteArray("add") || isCameraControlRequired())
     {
         QString streamProfile;
         QTextStream str(&streamProfile);
@@ -222,7 +255,7 @@ bool QnAxisStreamReader::isStreamOpened() const
 QnMetaDataV1Ptr QnAxisStreamReader::getCameraMetadata()
 {
     QnMetaDataV1Ptr rez = m_lastMetadata != 0 ? m_lastMetadata : QnMetaDataV1Ptr(new QnMetaDataV1());
-    m_lastMetadata.clear();
+    m_lastMetadata.reset();
     if (rez)
         filterMotionByMask(rez);
     return rez;
@@ -259,7 +292,7 @@ void QnAxisStreamReader::processTriggerData(const quint8* payload, int len)
     }
 }
 
-void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
+void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoData* videoData)
 {
     const quint8* curNal = (const quint8*) videoData->data();
     const quint8* end = curNal + videoData->dataSize();
@@ -358,8 +391,7 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
         if (rez) 
         {
             if (rez->dataType == QnAbstractMediaData::VIDEO) {
-                QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
-                parseMotionInfo(videoData);
+                parseMotionInfo(static_cast<QnCompressedVideoData*>(rez.get()));
                 //if (isGotFrame(videoData))
                 break;
             }

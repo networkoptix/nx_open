@@ -55,7 +55,7 @@ namespace ec2
         bool isLocked() const;
     signals:
         void locked();
-        void lockTimeout();
+        void lockTimeout(const QSet<QnUuid> &failedPeers);
     private slots:
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);

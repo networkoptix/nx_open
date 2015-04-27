@@ -78,8 +78,10 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     QnResourceList& result,
     const QByteArray& responseData,
     const QHostAddress& discoveryAddress,
-    const QHostAddress& /*foundHostAddress*/ )
+    const QHostAddress& foundHostAddress )
 {
+    Q_UNUSED(discoveryAddress)
+    Q_UNUSED(foundHostAddress)
 
     QString smac;
     QString name;
@@ -104,14 +106,14 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     name.replace(QLatin1Char(' '), QString()); // remove spaces
     name.replace(QLatin1Char('-'), QString()); // remove spaces
     name.replace(QLatin1Char('\t'), QString()); // remove tabs
+    if (!name.toLower().startsWith(lit("iq")))
+        return local_results; // any IQA camera MUST contain IQ prefix in the name
 
     if (macpos+12 > responseData.size())
         return local_results;
 
 
-    //macpos++; // -
-
-    while(responseData.at(macpos)==' ')
+    while(responseData.at(macpos)==' ' && macpos < responseData.size())
         ++macpos;
 
 
@@ -132,6 +134,9 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     //response.fromDatagram(responseData);
 
     smac = smac.toUpper();
+    QnMacAddress macAddress(smac);
+    if (macAddress.isNull())
+        return local_results;
 
     for(const QnResourcePtr& res: result)
     {
@@ -158,7 +163,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(smac));
+    resource->setMAC(macAddress);
 
     local_results.push_back(resource);
 
@@ -251,12 +256,10 @@ QnResourceList QnPlIqResourceSearcher::findResources()
         QByteArray datagram;
         datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-        QString sender;
-        quint16 senderPort;
+        SocketAddress senderEndpoint;
+        int readed = receiveSock->recvFrom(datagram.data(), datagram.size(), &senderEndpoint);
 
-        int readed = receiveSock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
-
-        if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
+        if (senderEndpoint.port == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
             processNativePacket(result, datagram.left(readed));
     }
 

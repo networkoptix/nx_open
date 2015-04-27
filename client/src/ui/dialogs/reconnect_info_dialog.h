@@ -14,7 +14,7 @@ class QnReconnectInfoDialog: public QDialog {
 
     typedef QDialog base_type;
 public:
-    explicit QnReconnectInfoDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    explicit QnReconnectInfoDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     virtual ~QnReconnectInfoDialog();
 
     bool wasCanceled() const;

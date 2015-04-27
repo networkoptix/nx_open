@@ -51,6 +51,7 @@ class GSoapAsyncCallWrapper
 public:
     static const int SOAP_INTERRUPTED = -1;
     static const int READ_BUF_SIZE = 32 * 1024;
+    static const unsigned int SOAP_SOCKET_TIMEOUT_MS = 10*1000;
 
     typedef int(SyncWrapper::*GSoapCallFuncType)(Request&, Response&);
 
@@ -64,7 +65,6 @@ public:
         m_syncFunc(syncFunc),
         m_state(init),
         m_responseDataPos(0),
-        m_bytesSent(0),
         m_terminatedFlagPtr(nullptr)
     {
         m_responseBuffer.reserve( READ_BUF_SIZE );
@@ -127,16 +127,17 @@ public:
         \return \a true if async call has been started successfully
         \note Request interleaving is not supported. Issueing new request with previous still running causes undefined behavior
     */
-    template<class ResultHandler>
-    bool callAsync(const Request& request, ResultHandler resultHandler)
+    template<class RequestType, class ResultHandler>
+    bool callAsync(RequestType&& request, ResultHandler&& resultHandler)
     {
         m_state = init;
-        m_extCompletionHandler = std::move(resultHandler);
+        m_extCompletionHandler = std::forward<ResultHandler>(resultHandler);
         m_resultHandler = [this](int resultCode) {
             QMutexLocker lk(&m_mutex);
+            std::function<void(int)> extCompletionHandlerLocal = std::move( m_extCompletionHandler );
             m_socket.reset();
             lk.unlock();
-            m_extCompletionHandler(resultCode);
+            extCompletionHandlerLocal( resultCode );
         };
 
         //NOTE not locking mutex because all public method calls are synchronized
@@ -157,17 +158,20 @@ public:
         m_syncWrapper->getProxy()->soap->master = m_socket->handle();
 
         //serializing request
-        m_request = request;
+        m_request = std::forward<RequestType>(request);
 
         const QUrl endpoint(QLatin1String(m_syncWrapper->endpoint()));
 
         using namespace std::placeholders;
-        if( !m_socket->setNonBlockingMode( true ) ||
+        if( !m_socket->setSendTimeout(SOAP_SOCKET_TIMEOUT_MS) ||
+            !m_socket->setRecvTimeout(SOAP_SOCKET_TIMEOUT_MS) ||
+            !m_socket->setNonBlockingMode( true ) ||
             !m_socket->connectAsync(
                 SocketAddress( endpoint.host(), endpoint.port( nx_http::DEFAULT_HTTP_PORT ) ),
                 std::bind( &GSoapAsyncCallWrapper::onConnectCompleted, this, _1 ) ) )
         {
             m_socket.reset();
+            m_extCompletionHandler = std::function<void(int)>();
             return false;
         }
 
@@ -333,7 +337,6 @@ private:
     QByteArray m_responseBuffer;
     int m_responseDataPos;
     std::unique_ptr<AbstractStreamSocket> m_socket;
-    int m_bytesSent;
     std::function<void(int)> m_extCompletionHandler;
     std::function<void(int)> m_resultHandler;
     bool* m_terminatedFlagPtr;

@@ -7,11 +7,6 @@
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
 #include <business/business_resource_validation.h>
-//#include <business/events/motion_business_event.h>
-//#include <business/events/camera_input_business_event.h>
-//#include <business/actions/recording_business_action.h>
-//#include <business/actions/camera_output_business_action.h>
-//#include <business/actions/sendmail_business_action.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -39,8 +34,11 @@ QnSelectResourcesDialogButton::QnSelectResourcesDialogButton(QWidget *parent):
     connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
 }
 
-QnResourceList QnSelectResourcesDialogButton::resources() const {
-    return m_resources;
+IDList QnSelectResourcesDialogButton::resourceIds() const {
+    IDList result;
+    for (const QnResourcePtr &resource: m_resources)
+        result.append(resource->getId());
+    return result;
 }
 
 void QnSelectResourcesDialogButton::setResources(QnResourceList resources) {
@@ -95,11 +93,37 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate() {
 
 }
 
-QSize QnBusinessRuleItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    QSize sh = base_type::sizeHint(option, index);
-    if (index.column() == QnBusiness::EventColumn || index.column() == QnBusiness::ActionColumn)
-        sh.setWidth(sh.width() * 1.5);
-    return sh;
+int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics) {   
+    const int dropDownSpacer = 40;  /* Leave some space for the drop-down indicator. */
+    switch (column) {
+    case QnBusiness::EventColumn: 
+        {
+            auto eventWidth = [metrics] (QnBusiness::EventType eventType){
+                return metrics.width(QnBusinessStringsHelper::eventName(eventType));
+            };
+            int result = -1;
+            for(QnBusiness::EventType eventType: QnBusiness::allEvents())
+                result = qMax(result, eventWidth(eventType));
+            return dropDownSpacer + result;
+        }
+    case QnBusiness::ActionColumn: 
+        {
+            auto actionWidth = [metrics](QnBusiness::ActionType actionType){
+                return metrics.width(QnBusinessStringsHelper::actionName(actionType));
+            };
+            int result = -1;
+            for(QnBusiness::ActionType actionType: QnBusiness::allActions())
+                result = qMax(result, actionWidth(actionType));
+            return dropDownSpacer + result;
+        }
+    case QnBusiness::AggregationColumn:
+        {
+            return QnAggregationWidget::optimalWidth();
+        }
+    default:
+        break;
+    }
+    return -1;
 }
 
 void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const  {
@@ -283,7 +307,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
     case QnBusiness::SourceColumn:
     {
         if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
-            model->setData(index, QVariant::fromValue<QnResourceList>(btn->resources()));
+            model->setData(index, QVariant::fromValue<IDList>(btn->resourceIds()));
             return;
         }
 
@@ -323,7 +347,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
         }
 
         if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
-            model->setData(index, QVariant::fromValue<QnResourceList>(btn->resources()));
+            model->setData(index, QVariant::fromValue<IDList>(btn->resourceIds()));
             return;
         }
 

@@ -117,13 +117,10 @@ private:
         QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))
         QN_DECLARE_R_PROPERTY(qreal,    workbenchUnitSize,              WORKBENCH_UNIT_SIZE,                    10000.0) /* Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
-        QN_DECLARE_R_PROPERTY(qreal,    defaultLayoutCellAspectRatio,   DEFAULT_LAYOUT_CELL_ASPECT_RATIO,       16.0 / 9.0)
+        QN_DECLARE_R_PROPERTY(float,    defaultLayoutCellAspectRatio,   DEFAULT_LAYOUT_CELL_ASPECT_RATIO,       16.0f / 9.0f)
         QN_DECLARE_R_PROPERTY(QSizeF,   defaultLayoutCellSpacing,       DEFAULT_LAYOUT_CELL_SPACING,            QSizeF(0.1, 0.1))
 
-        QN_DECLARE_R_PROPERTY(QColor,   recordMotionColor,              RECORD_MOTION_COLOR,                    QColor(100, 0, 0))
-        QN_DECLARE_R_PROPERTY(QColor,   noRecordColor,                  NO_RECORD_COLOR,                        QColor(64, 64, 64))
         QN_DECLARE_R_PROPERTY(QColor,   mrsColor,                       MRS_COLOR,                              QColor(200, 0, 0))
-        QN_DECLARE_R_PROPERTY(QColor,   recordAlwaysColor,              RECORD_ALWAYS_COLOR,                    QColor(0, 100, 0))
 
         QN_DECLARE_R_PROPERTY(QColor,   selectionOpacityDelta,          SELECTION_OPACITY_DELTA,                QColor(0, 0, 0, 0x80))
         QN_DECLARE_R_PROPERTY(QColor,   selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0))

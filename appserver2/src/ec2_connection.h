@@ -11,7 +11,6 @@
 #include "base_ec2_connection.h"
 #include "database/db_manager.h"
 #include "server_query_processor.h"
-#include "managers/impl/license_manager_impl.h"
 
 
 namespace ec2
@@ -30,12 +29,15 @@ namespace ec2
 
         //!Implementation of ec2::AbstractECConnection::connectionInfo
         virtual QnConnectionInfo connectionInfo() const override;
-        //!Implementation of ec2::AbstractECConnection::startReceivingNotifications
-        virtual void startReceivingNotifications() override;
+        //!Implementation of ec2::AbstractECConnection::authInfo
+        virtual QString authInfo() const override;
 
+        bool initialized() const;
+    
     private:
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
+        bool m_isInitialized;
     };
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
 }

@@ -61,11 +61,11 @@ signals:
     void periodsChanged(Qn::TimePeriodContent type);
     void bookmarksChanged();
     void loadingFailed();
-
+public slots:
+    void discardCachedData();
 private slots:
     void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, Qn::CameraDataType dataType);
     void at_loader_failed(Qn::CameraDataType dataType);
-    void discardCachedData();
 
 protected:
     void load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod, const qint64 resolutionMs = 1);

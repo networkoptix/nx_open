@@ -114,7 +114,12 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(m_model,    &QnPtzManageModel::modelReset,      this,               &QnPtzManageDialog::at_model_modelReset);
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
-    connect(m_cache,    &QnLocalFileCache::fileDownloaded,  this,               &QnPtzManageDialog::at_cache_imageLoaded);
+    connect(m_cache,    &QnLocalFileCache::fileDownloaded,  this,  [this](const QString &filename, QnAppServerFileCache::OperationResult status) {
+        if (status != QnAppServerFileCache::OperationResult::ok)
+            return;
+        at_cache_imageLoaded(filename);
+    });
+
     connect(m_adaptor,  &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
 
     connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_savePositionButton_clicked);
@@ -168,10 +173,10 @@ void QnPtzManageDialog::loadData(const QnPtzData &data) {
     QnPtzPresetList presets = data.presets;
     QnPtzTourList tours = data.tours;
     qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+        return naturalStringLess(l.name, r.name);
     });
     qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+        return naturalStringLess(l.name, r.name);
     });
 
     m_model->setTours(tours);
@@ -309,7 +314,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         QnPtzPresetList presets;
         if (controller()->getPresets(&presets)) {
             qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-                return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+                return naturalStringLess(l.name, r.name);
             });
             m_model->setPresets(presets);
         }
@@ -319,7 +324,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         QnPtzTourList tours;
         if (controller()->getTours(&tours)) {
             qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-                return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+                return naturalStringLess(l.name, r.name);
             });
             m_model->setTours(tours);
         }
@@ -372,8 +377,8 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\n"
-            "Please wait for the camera to go online.").arg(m_resource->getName())
+            tr("An error has occurred while trying to get current position from camera %1.").arg(m_resource->getName()) + L'\n' 
+          + tr("Please wait for the camera to go online.")
             );
         return;
     }
@@ -394,8 +399,8 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera"),
-            tr("An error has occurred while trying to set current position for camera %1.\n\n"\
-            "Please wait for the camera to go online.").arg(m_resource->getName())
+            tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
+          + tr("Please wait for the camera to go online.")
             );
         return;
     }
@@ -435,8 +440,8 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera"),
-            tr("An error has occurred while trying to set current position for camera %1.\n\n"\
-            "Please wait for the camera to go online.").arg(m_resource->getName())
+            tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
+          + tr("Please wait for the camera to go online.")
             );
         return;
     }
@@ -490,7 +495,8 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
                 QDialogButtonBox::StandardButton button = QnCheckableMessageBox::warning(
                     this,
                     tr("Remove preset"),
-                    tr("This preset is used in some tours.\nThese tours will become invalid if you remove it."),
+                    tr("This preset is used in some tours.") + L'\n' 
+                  + tr("These tours will become invalid if you remove it."),
                     tr("Do not show again."),
                     &ignorePresetIsInUse,
                     QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
@@ -550,16 +556,13 @@ void QnPtzManageDialog::at_tourSpotsChanged(const QnPtzTourSpotList &spots) {
     m_model->updateTourSpots(m_currentTourId, spots);
 }
 
-void QnPtzManageDialog::at_cache_imageLoaded(const QString &fileName, bool ok) {
-    if (!ok)
-        return;
-
+void QnPtzManageDialog::at_cache_imageLoaded(const QString &filename) {
     QnPtzManageModel::RowData rowData = m_model->rowData(ui->tableView->currentIndex().row());
-    if (rowData.id() != fileName)
+    if (rowData.id() != filename)
         return;
 
     QnThreadedImageLoader *loader = new QnThreadedImageLoader(this);
-    loader->setInput(m_cache->getFullPath(fileName));
+    loader->setInput(m_cache->getFullPath(filename));
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(ui->previewLabel->size());
     loader->setFlags(Qn::TouchSizeFromOutside);
@@ -625,6 +628,9 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     if (m_resource == resource)
         return;
     
+    if (m_resource)
+        clear();
+    
     m_resource = resource;
     m_adaptor->setResource(resource);
 
@@ -668,12 +674,21 @@ bool QnPtzManageDialog::tryClose(bool force) {
     }
 
     show();
+    return askToSaveChanges();
+}
+
+bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /*= true*/) {
+
+    QMessageBox::StandardButtons allowedButtons = QnMessageBox::Yes | QnMessageBox::No;
+    if (cancelIsAllowed)
+        allowedButtons |= QnMessageBox::Cancel;
+
     QnMessageBox::StandardButton button = QnMessageBox::question(
         this, 
         0,
         tr("PTZ configuration is not saved"),
         tr("Changes are not saved. Do you want to save them?"),
-        QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, 
+        allowedButtons, 
         QnMessageBox::Yes);
 
     switch (button) {
@@ -681,7 +696,9 @@ bool QnPtzManageDialog::tryClose(bool force) {
         saveChanges();
         return true;
     case QnMessageBox::Cancel:
-        return false;
+        if (cancelIsAllowed)
+            return false;
+        return true;
     default:
         return true;
     }

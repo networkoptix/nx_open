@@ -28,11 +28,14 @@ public:
 
     void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, const QString& userName, const QString &userId);
 
-    TCPSocketPtr getConnection(const QString& userName);
+    TCPSocketPtr getConnectionByUserId(const QString& userId);
     quint32 incCSeq(const TCPSocketPtr& socket);
     void releaseConnection(const TCPSocketPtr& socket);
 
     virtual bool isVirtualResource() const override { return true; }
+
+    /** Check if camera really connected to our server. */
+    bool isCameraConnected(const QnVirtualCameraResourcePtr &camera);
 private:
     struct ClientConnectionInfo
     {

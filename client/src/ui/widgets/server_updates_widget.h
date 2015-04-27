@@ -46,8 +46,11 @@ private:
     void initLinkButtons();
     void initBuildSelectionButtons();
 
+    void autoCheckForUpdatesInternet();
     void checkForUpdatesInternet(bool autoSwitch = false, bool autoStart = false);
     void checkForUpdatesLocal();
+
+    QString serverNamesString(const QSet<QnUuid> &serverIds);
 
 private:
     enum UpdateSource {
@@ -71,6 +74,8 @@ private:
     QUrl m_releaseNotesUrl;
 
     QTimer *m_longUpdateWarningTimer;
+
+    qint64 m_lastAutoUpdateCheck;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H

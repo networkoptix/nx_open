@@ -13,7 +13,7 @@ QnCameraUserAttributes::QnCameraUserAttributes()
     motionType(Qn::MT_Default),
     scheduleDisabled(true),
     audioEnabled(false),
-    cameraControlDisabled( !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled() ),
+    cameraControlDisabled(false),
     secondaryQuality(Qn::SSQualityMedium),
     minDays(0),
     maxDays(0)
@@ -26,6 +26,8 @@ void QnCameraUserAttributes::assign( const QnCameraUserAttributes& right, QSet<Q
 {
     if( name != right.name )
         *modifiedFields << "nameChanged";
+    if( groupName != right.groupName )
+        *modifiedFields << "groupNameChanged";
     if( dewarpingParams != right.dewarpingParams )
         *modifiedFields << "mediaDewarpingParamsChanged";
     if( scheduleDisabled != right.scheduleDisabled )

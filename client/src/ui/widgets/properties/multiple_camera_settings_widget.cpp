@@ -25,6 +25,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <utils/aspect_ratio.h>
+
 namespace {
 
 class QnScopedUpdateRollback {
@@ -67,6 +69,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->enableAudioCheckBox,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
     connect(ui->enableAudioCheckBox,    SIGNAL(clicked()),                      this,   SLOT(at_enableAudioCheckBox_clicked()));
+    connect(ui->fisheyeCheckBox,        SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
+    connect(ui->fisheyeCheckBox,        SIGNAL(clicked()),                      this,   SLOT(at_fisheyeCheckBox_clicked()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
@@ -79,8 +83,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->moreLicensesButton,     &QPushButton::clicked,                  this,   &QnMultipleCameraSettingsWidget::moreLicensesRequested);
     connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
-    connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
+    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()));
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->expertSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
@@ -89,9 +92,9 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
 
-    ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
-    ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
-    ui->arComboBox->addItem(tr("1:1"),  1.0);
+    ui->arComboBox->addItem(tr("4:3"),  4.0f / 3);
+    ui->arComboBox->addItem(tr("16:9"), 16.0f / 9);
+    ui->arComboBox->addItem(tr("1:1"),  1.0f);
     ui->arComboBox->setCurrentIndex(0);
     connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dbDataChanged()));
 
@@ -106,7 +109,18 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     /* Set up context help. */
     setHelpTopic(this,                  Qn::CameraSettings_Multi_Help);
     setHelpTopic(ui->tabRecording,      Qn::CameraSettings_Recording_Help);
+    setHelpTopic(ui->fisheyeCheckBox,   Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(ui->arOverrideCheckBox, ui->arComboBox,    Qn::CameraSettings_AspectRatio_Help);
+    setHelpTopic(ui->rotCheckBox, ui->rotComboBox,          Qn::CameraSettings_Rotation_Help);
 
+    auto updateLicensesIfNeeded = [this] { 
+        if (!isVisible())
+            return;
+        updateLicenseText();
+    };
+
+    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
+    connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
 
     updateFromResources();
     updateLicensesButtonVisible();
@@ -196,7 +210,7 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
     bool overrideRotation = ui->rotCheckBox->checkState() == Qt::Checked;
     bool clearRotation = ui->rotCheckBox->checkState() == Qt::Unchecked;
 
-    foreach(QnVirtualCameraResourcePtr camera, m_cameras) 
+    for(const QnVirtualCameraResourcePtr &camera: m_cameras) 
     {
         QString cameraLogin = camera->getAuth().user();
         if (!login.isEmpty() || !m_loginWasEmpty)
@@ -215,8 +229,14 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         if (minDays != QnCameraScheduleWidget::RecordedDaysDontChange)
             camera->setMinDays(minDays);
         
-        if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && ui->enableAudioCheckBox->isEnabled()) 
+        if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && camera->isAudioSupported()) 
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
+
+        if (ui->fisheyeCheckBox->checkState() != Qt::PartiallyChecked) {
+            auto params = camera->getDewarpingParams();
+            params.enabled = ui->fisheyeCheckBox->isChecked();
+            camera->setDewarpingParams(params);
+        }
 
         if (m_hasScheduleEnabledChanges)
             camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
@@ -225,9 +245,9 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
             camera->setScheduleTasks(scheduleTasks);
 
         if (overrideAr)
-            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->currentData().toDouble()));
-        else if (clearAr && camera->hasProperty(QnMediaResource::customAspectRatioKey()))
-            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
+            camera->setCustomAspectRatio(ui->arComboBox->currentData().toReal());
+        else if (clearAr)
+            camera->clearCustomAspectRatio();
 
         if(overrideRotation) 
             camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->rotComboBox->currentData().toInt()));
@@ -301,6 +321,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         if(m_cameras.empty()) {
             ui->loginEdit->setText(QString());
             ui->enableAudioCheckBox->setCheckState(Qt::Unchecked);
+            ui->fisheyeCheckBox->setCheckState(Qt::Unchecked);
             ui->loginEdit->setPlaceholderText(QString());
             ui->passwordEdit->setText(QString());
             ui->passwordEdit->setPlaceholderText(QString());
@@ -312,28 +333,37 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         } else {
             /* Aggregate camera parameters first. */
             ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
-
-            QSet<QString> logins, passwords;
-        
-            ui->enableAudioCheckBox->setEnabled(true);
-    
             ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
             ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, true);
             ui->analogGroupBox->setVisible(false);
 
-            bool firstCamera = true;
+            
 
+            /* Update checkbox state based on camera value. */
+            auto setupCheckbox = [](QCheckBox* checkBox, bool firstCamera, bool value){
+                Qt::CheckState state = value ? Qt::Checked : Qt::Unchecked;
+                if (firstCamera) {
+                    checkBox->setTristate(false);
+                    checkBox->setCheckState(state);
+                }
+                else if (state != checkBox->checkState()) {
+                    checkBox->setTristate(true);
+                    checkBox->setCheckState(Qt::PartiallyChecked);
+                }
+            };
+
+            bool firstCamera = true; 
+            QSet<QString> logins, passwords;
+            bool audioSupported = false;
             bool sameArOverride = true;
-            QString arOverride;
+            qreal arOverride;
             QString rotFirst;
             bool sameRotation = true;
-            foreach (const QnVirtualCameraResourcePtr &camera, m_cameras) 
-            {
+            for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
                 logins.insert(camera->getAuth().user());
                 passwords.insert(camera->getAuth().password());
 
-                if (!camera->isAudioSupported())
-                    ui->enableAudioCheckBox->setEnabled(false);
+                audioSupported |= camera->isAudioSupported();
 
                 if (camera->isDtsBased()) {
                     ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
@@ -341,24 +371,15 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                     ui->analogGroupBox->setVisible(true);
                 }
 
-                Qt::CheckState recordingState = camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked;
-                if (firstCamera)
-                    ui->analogViewCheckBox->setCheckState(recordingState);
-                else if (recordingState != ui->analogViewCheckBox->checkState())
-                    ui->analogViewCheckBox->setCheckState(Qt::PartiallyChecked);
-
-                Qt::CheckState audioState = camera->isAudioEnabled() ? Qt::Checked : Qt::Unchecked;
-                if (firstCamera) {
-                    ui->enableAudioCheckBox->setCheckState(audioState);
-                } else if (audioState != ui->enableAudioCheckBox->checkState()) {
-                    ui->enableAudioCheckBox->setCheckState(Qt::PartiallyChecked);
-                }
-
-                QString changedAr = camera->getProperty(QnMediaResource::customAspectRatioKey());
+                setupCheckbox(ui->analogViewCheckBox,   firstCamera, !camera->isScheduleDisabled());
+                setupCheckbox(ui->enableAudioCheckBox,  firstCamera, camera->isAudioEnabled());
+                setupCheckbox(ui->fisheyeCheckBox,      firstCamera, camera->getDewarpingParams().enabled);
+      
+                qreal changedAr = camera->customAspectRatio();
                 if (firstCamera) {
                     arOverride = changedAr;
                 } else {
-                    sameArOverride &= changedAr == arOverride;
+                    sameArOverride &= qFuzzyEquals(changedAr, arOverride);
                 }
 
                 QString rotation = camera->getProperty(QnMediaResource::rotationKey());
@@ -371,12 +392,13 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 firstCamera = false;
             }
 
+            ui->enableAudioCheckBox->setEnabled(audioSupported);
             ui->arOverrideCheckBox->setTristate(!sameArOverride);
             if (sameArOverride) {
-                ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
+                ui->arOverrideCheckBox->setChecked(!qFuzzyIsNull(arOverride));
 
-                // float is important here
-                float ar = arOverride.toFloat();
+                /* Float is important here. */
+                float ar = QnAspectRatio::closestStandardRatio(arOverride).toFloat();
                 int idx = -1;
                 for (int i = 0; i < ui->arComboBox->count(); ++i) {
                     if (qFuzzyEquals(ar, ui->arComboBox->itemData(i).toFloat())) {
@@ -411,19 +433,48 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             ui->expertSettingsWidget->updateFromResources(m_cameras);
 
+            int maxFps = std::numeric_limits<int>::max();
+            int maxDualStreamingFps = maxFps;
+
+            Q_D(QnCameraSettingsWidget);
+            d->calculateMaxFps(&maxFps, &maxDualStreamingFps);
+
             bool isScheduleEqual = true;
             QList<QnScheduleTask::Data> scheduleTasksData;
             foreach (const QnScheduleTask& scheduleTask, m_cameras.front()->getScheduleTasks())
                 scheduleTasksData << scheduleTask.getData();
 
-            foreach (QnVirtualCameraResourcePtr camera, m_cameras) {
+            for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
                 QList<QnScheduleTask::Data> cameraScheduleTasksData;
-                foreach (const QnScheduleTask& scheduleTask, camera->getScheduleTasks())
+                foreach (const QnScheduleTask& scheduleTask, camera->getScheduleTasks()) {
                     cameraScheduleTasksData << scheduleTask.getData();
-                if (cameraScheduleTasksData != scheduleTasksData) {
+
+                    bool fpsValid = true;
+                    switch (scheduleTask.getRecordingType()) {
+                    case Qn::RT_Never:
+                        continue;
+                    case Qn::RT_MotionAndLowQuality:
+                        fpsValid = scheduleTask.getFps() <= maxDualStreamingFps;
+                        break;
+                    case Qn::RT_Always:
+                    case Qn::RT_MotionOnly:
+                        fpsValid = scheduleTask.getFps() <= maxFps;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (!fpsValid) {
+                        isScheduleEqual = false;
+                        break;
+                    }
+                }
+
+                if (!isScheduleEqual || cameraScheduleTasksData != scheduleTasksData) {
                     isScheduleEqual = false;
                     break;
                 }
+
             }
             ui->cameraScheduleWidget->setChangesDisabled(!isScheduleEqual);
             if(isScheduleEqual) {
@@ -434,10 +485,10 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             updateMaxFPS();
 
-        bool isMotionAvailable = true;
-        foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
-            isMotionAvailable &= camera->hasMotion();
-        ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
+            bool isMotionAvailable = true;
+            for (const QnVirtualCameraResourcePtr &camera: m_cameras) 
+                isMotionAvailable &= camera->hasMotion();
+            ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
 
             /* Write camera parameters out. */
 
@@ -479,6 +530,7 @@ void QnMultipleCameraSettingsWidget::setReadOnly(bool readOnly) {
     using ::setReadOnly;
     setReadOnly(ui->loginEdit, readOnly);
     setReadOnly(ui->enableAudioCheckBox, readOnly);
+    setReadOnly(ui->fisheyeCheckBox, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
     m_readOnly = readOnly;
@@ -549,6 +601,14 @@ void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked() {
     ui->enableAudioCheckBox->setTristate(false);
     if (state == Qt::PartiallyChecked)
         ui->enableAudioCheckBox->setCheckState(Qt::Checked);
+}
+
+void QnMultipleCameraSettingsWidget::at_fisheyeCheckBox_clicked() {
+    Qt::CheckState state = ui->fisheyeCheckBox->checkState();
+
+    ui->fisheyeCheckBox->setTristate(false);
+    if (state == Qt::PartiallyChecked)
+        ui->fisheyeCheckBox->setCheckState(Qt::Checked);
 }
 
 void QnMultipleCameraSettingsWidget::at_analogViewCheckBox_clicked() {

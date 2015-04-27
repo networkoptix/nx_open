@@ -6,12 +6,13 @@
 
 #include <nx_ec/ec_api.h>
 
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnAppServerFileCache : public QObject
 {
     Q_OBJECT
 public:
-    explicit QnAppServerFileCache(QString folderName, QObject *parent = 0);
+    explicit QnAppServerFileCache(const QString &folderName, QObject *parent = 0);
     virtual ~QnAppServerFileCache();
 
     /** Get full path to cached file with fixed filename */
@@ -35,32 +36,51 @@ public:
 
     virtual void deleteFile(const QString &filename);
 
+    /** Clear cache state. */
+    virtual void clear();
+
     static void clearLocalCache();
+
+    static qint64 maximumFileSize();
+
+    enum class OperationResult {
+        ok,
+        disconnected,
+        serverError,
+        fileSystemError,
+        sizeLimitExceeded,
+        invalidOperation
+        
+    };
+
 protected:
     void ensureCacheFolder();
     QString folderName() const;
+
+    bool isConnectedToServer() const;
 signals:
-    void fileDownloaded(const QString& filename, bool ok);
-    void delayedFileDownloaded(const QString& filename, bool ok);
+    void fileDownloaded(const QString& filename, OperationResult status);
+    void delayedFileDownloaded(const QString& filename, OperationResult status);
 
-    void fileUploaded(const QString& filename, bool ok);
-    void delayedFileUploaded(const QString& filename, bool ok);
+    void fileUploaded(const QString& filename, OperationResult status);
+    void delayedFileUploaded(const QString& filename, OperationResult status);
 
-    void fileDeleted(const QString& filename, bool ok);
-    void delayedFileDeleted(const QString& filename, bool ok);
+    void fileDeleted(const QString& filename, OperationResult status);
+    void delayedFileDeleted(const QString& filename, OperationResult status);
 
-    void fileListReceived(const QStringList& filenames, bool ok);
+    void fileListReceived(const QStringList& filenames, OperationResult status);
+    void delayedFileListReceived(const QStringList& filenames, OperationResult status);
 private slots:
     void at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data );
     void at_fileUploaded(int handle, ec2::ErrorCode errorCode);
     void at_fileDeleted(int handle, ec2::ErrorCode errorCode);
-    void at_fileListReceived(int handle, ec2::ErrorCode errorCode, const QStringList& filenames);
 private:
+    const QString m_folderName;
     QHash<int, QString> m_loading;
     QHash<int, QString> m_uploading;
     QHash<int, QString> m_deleting;
-    int m_fileListHandle;
-    QString m_folderName;
 };
+
+Q_DECLARE_METATYPE(QnAppServerFileCache::OperationResult)
 
 #endif // APP_SERVER_FILE_CACHE_H

@@ -1,7 +1,7 @@
  <assembly>
 	<id>${box}-${arch}-${release.version}.${buildNumber}</id>
 	<formats>
-		<format>zip</format>
+		<format>dir</format>
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
@@ -9,7 +9,7 @@
 			<directory>${project.build.directory}/bin</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
-				<include>${finalName}.msi</include>
+				<include>*-server-*.msi</include>
 			</includes>		
 		</fileSet>				
 		<fileSet>

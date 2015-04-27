@@ -184,7 +184,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         extraParams.setDewarpingParams(resource()->getDewarpingParams(), itemDewarpingParams);
         extraParams.setRotation(rotationAngle);
         extraParams.setCustomAR(customAR);
-        extraParams.setTimeCorner(timestamps, timeOffsetMs);
+        extraParams.setTimeCorner(timestamps, timeOffsetMs, 0);
         extraParams.setVideoLayout(resource()->getVideoLayout());
         m_exportRecorder->setExtraTranscodeParams(extraParams);
 

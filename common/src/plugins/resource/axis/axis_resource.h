@@ -20,9 +20,6 @@ class QnPlAxisResource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
-    static const int PRIMARY_ENCODER_INDEX = 0;
-    static const int SECONDARY_ENCODER_INDEX = 1;
-
     struct AxisResolution
     {
         AxisResolution() {}
@@ -36,6 +33,9 @@ public:
 
     QnPlAxisResource();
     ~QnPlAxisResource();
+
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
 
     virtual QString getDriverName() const override;
 
@@ -82,8 +82,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCroppingPhysical(QRect cropping);
-    virtual bool startInputPortMonitoring() override;
-    virtual void stopInputPortMonitoring() override;
+    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
+    virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
 
 private:

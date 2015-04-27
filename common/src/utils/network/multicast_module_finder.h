@@ -1,21 +1,16 @@
 #ifndef MULTICAST_MODULE_FINDER_H
 #define MULTICAST_MODULE_FINDER_H
 
-#include <QtCore/QHash>
 #include <QtCore/QMutex>
-#include <QtNetwork/QHostAddress>
+#include <QCache>
 
 #include <utils/common/long_runnable.h>
-#include <utils/common/software_version.h>
-#include <utils/common/system_information.h>
-
-#include "module_information.h"
-#include "network_address.h"
-#include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"
-#include "system_socket.h"
+#include "networkoptixmodulerevealcommon.h"
 
 class UDPSocket;
+struct QnModuleInformation;
+class SocketAddress;
 
 //!Searches for all Network Optix enterprise controllers in local network environment using multicast
 /*!
@@ -27,7 +22,7 @@ class UDPSocket;
 */
 class QnMulticastModuleFinder : public QnLongRunnable {
     Q_OBJECT
-public:
+    public:
     //!Creates socket and binds it to random unused udp port
     /*!
         One must call \a isValid after object instantiation to check whether it has been initialized successfully
@@ -40,7 +35,7 @@ public:
     QnMulticastModuleFinder(
         bool clientOnly,
         const QHostAddress &multicastGroupAddress = defaultModuleRevealMulticastGroup,
-        const unsigned int multicastGroupPort = defaultModuleRevealMulticastGroupPort,
+        const quint16 multicastGroupPort = defaultModuleRevealMulticastGroupPort,
         const unsigned int pingTimeoutMillis = 0,
         const unsigned int keepAliveMultiply = 0);
 
@@ -58,20 +53,12 @@ public:
     //! \param compatibilityMode         New compatibility mode state.
     void setCompatibilityMode(bool compatibilityMode);
 
-    QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
-    QList<QnModuleInformation> foundModules() const;
-
-    void addIgnoredModule(const QnNetworkAddress &address, const QnUuid &id);
-    void removeIgnoredModule(const QnNetworkAddress &address, const QnUuid &id);
-    QMultiHash<QnNetworkAddress, QnUuid> ignoredModules() const;
-
 public slots:
     virtual void pleaseStop() override;
-
+private slots:
+    void at_moduleInformationChanged();
 signals:
-    void moduleChanged(const QnModuleInformation &moduleInformation);
-    void moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
-    void moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
+    void responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 protected:
     virtual void run() override;
@@ -79,26 +66,23 @@ protected:
 private:
     bool processDiscoveryRequest(UDPSocket *udpSocket);
     bool processDiscoveryResponse(UDPSocket *udpSocket);
-
+    void updateInterfaces();
+    RevealResponse* getCachedValue(const quint8* buffer, const quint8* bufferEnd);
 private:
-    struct ModuleContext {
-        quint64 prevResponseReceiveClock;
-        QnUuid moduleId;
-
-        ModuleContext(const RevealResponse &response);
-    };
-
     mutable QMutex m_mutex;
     aio::PollSet m_pollSet;
-    QList<UDPSocket*> m_clientSockets;
+    QHash<QHostAddress, UDPSocket*> m_clientSockets;
     UDPSocket *m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
+    quint64 m_lastInterfacesCheckMs;
     bool m_compatibilityMode;
-    QHash<QnNetworkAddress, ModuleContext> m_foundAddresses;
-    QHash<QnUuid, QnModuleInformation> m_foundModules;
-    QMultiHash<QnNetworkAddress, QnUuid> m_ignoredModules;
+    QHostAddress m_multicastGroupAddress;
+    quint16 m_multicastGroupPort;
+    QCache<QByteArray, RevealResponse> m_cachedResponse;
+    QByteArray m_serializedModuleInfo;
+    mutable QMutex m_moduleInfoMutex;
 };
 
 #endif // MULTICAST_MODULE_FINDER_H

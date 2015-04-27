@@ -2,7 +2,7 @@
 #define PLUGIN_API_H
 
 
-//!Network Optix dynamic plugin API (c++)
+//!VMS dynamic plugin API (c++)
 /*!
     - inspired by COM
     - each plugin MUST export function of type \a nxpl::CreateNXPluginInstanceProc with name \a createNXPluginInstance with "C" linkage

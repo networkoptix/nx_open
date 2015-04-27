@@ -64,8 +64,6 @@ public:
     //bool bindToInterface( const QnInterfaceAndAddr& iface );
     //!Implementation of AbstractSocket::getLocalAddress
     SocketAddress getLocalAddress() const;
-    //!Implementation of AbstractSocket::getPeerAddress
-    SocketAddress getPeerAddress() const;
     //!Implementation of AbstractSocket::close
     virtual void close();
     //!Implementation of AbstractSocket::isClosed
@@ -99,20 +97,6 @@ public:
     //!Implementation of AbstractSocket::dispatchImpl
     bool dispatchImpl( std::function<void()>&& handler );
 
-
-    /**
-     *   Get the local address
-     *   @return local address of socket
-     */
-    QString getLocalHostAddress() const;
-
-    /**
-     *   Get the peer address
-     *   @return remove address of socket
-     */
-    QString getPeerHostAddress() const;
-    quint32 getPeerAddressUint() const;
-
     /**
      *   Get the local port
      *   @return local port of socket
@@ -125,16 +109,6 @@ public:
      *   @param localPort local port
      */
     bool setLocalPort(unsigned short localPort) ;
-
-    /**
-     *   Set the local port to the specified port and the local address
-     *   to the specified address.  If you omit the port, a random port
-     *   will be selected.
-     *   @param localAddress local address
-     *   @param localPort local port
-     */
-    bool setLocalAddressAndPort(const QString &localAddress,
-                                unsigned short localPort = 0) ;
 
     //!Returns socket write/connect timeout in millis
     unsigned int getWriteTimeOut() const;
@@ -164,7 +138,7 @@ public:
 
     bool failed() const;
 
-    bool fillAddr( const QString &address, unsigned short port, sockaddr_in &addr );
+    bool fillAddr( const SocketAddress& socketAddress, sockaddr_in &addr );
     bool createSocket( int type, int protocol );
 
 protected:
@@ -198,8 +172,7 @@ public:
 
     //!Implementation of AbstractCommunicatingSocket::connect
     bool connect(
-        const QString &foreignAddress,
-        unsigned short foreignPort,
+        const SocketAddress& remoteAddress,
         unsigned int timeoutMillis );
     //!Implementation of AbstractCommunicatingSocket::recv
     int recv( void* buffer, unsigned int bufferLen, int flags );
@@ -223,19 +196,6 @@ public:
 
     void shutdown();
     virtual void close() override;
-
-
-    /**
-     *   Get the foreign address.  Call connect() before calling recv()
-     *   @return foreign address
-     */
-    QString getForeignHostAddress() const;
-
-    /**
-     *   Get the foreign port.  Call connect() before calling recv()
-     *   @return foreign port
-     */
-    unsigned short getForeignPort() const;
 
 private:
     AsyncSocketImplHelper<Pollable>* m_aioHelper;
@@ -287,8 +247,6 @@ public:
     virtual bool bind( const SocketAddress& localAddress ) override { return m_implDelegate.bind( localAddress ); }
     //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override { return m_implDelegate.getLocalAddress(); }
-    //!Implementation of AbstractSocket::getPeerAddress
-    virtual SocketAddress getPeerAddress() const override { return m_implDelegate.getPeerAddress(); }
     //!Implementation of AbstractSocket::close
     virtual void close() override { return m_implDelegate.close(); }
     //!Implementation of AbstractSocket::isClosed
@@ -379,11 +337,10 @@ public:
 
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
-        const QString& foreignAddress,
-        unsigned short foreignPort,
+        const SocketAddress& remoteAddress,
         unsigned int timeoutMillis ) override
     {
-        return this->m_implDelegate.connect( foreignAddress, foreignPort, timeoutMillis );
+        return this->m_implDelegate.connect( remoteAddress, timeoutMillis );
     }
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return this->m_implDelegate.recv( buffer, bufferLen, flags ); }
@@ -432,13 +389,6 @@ public:
      */
     TCPSocket() ;
 
-    /**
-     *   Construct a TCP socket with a connection to the given foreign address
-     *   and port
-     *   @param foreignAddress foreign address (IP address or name)
-     *   @param foreignPort foreign port
-     */
-    TCPSocket(const QString &foreignAddress, unsigned short foreignPort);
     //!User by \a TCPServerSocket class
     TCPSocket( int newConnSD );
     virtual ~TCPSocket();
@@ -515,19 +465,6 @@ public:
      */
     UDPSocket() ;
 
-    /**
-     *   Construct a UDP socket with the given local port
-     *   @param localPort local port
-     */
-    UDPSocket(unsigned short localPort) ;
-
-    /**
-     *   Construct a UDP socket with the given local port and address
-     *   @param localAddress local address
-     *   @param localPort local port
-     */
-    UDPSocket(const QString &localAddress, unsigned short localPort);
-
     void setDestPort(unsigned short foreignPort);
 
     /**
@@ -566,12 +503,12 @@ public:
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
     //!Implementation of AbstractDatagramSocket::setDestAddr
-    virtual bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort ) override;
+    virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) override;
     //!Implementation of AbstractDatagramSocket::sendTo
     virtual bool sendTo(
         const void* buffer,
         unsigned int bufferLen,
-        const SocketAddress& foreignAddress ) override;
+        const SocketAddress& foreignEndpoint ) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     /*!
         Actually calls \a UDPSocket::recvFrom and saves datagram source address/port
@@ -581,8 +518,7 @@ public:
     virtual int recvFrom(
         void* buffer,
         unsigned int bufferLen,
-        QString& sourceAddress,
-        unsigned short& sourcePort ) override;
+        SocketAddress* const sourceAddress ) override;
     //!Implementation of AbstractDatagramSocket::lastDatagramSourceAddress
     virtual SocketAddress lastDatagramSourceAddress() const override;
     //!Implementation of AbstractDatagramSocket::hasData

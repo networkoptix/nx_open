@@ -61,6 +61,8 @@ namespace Qn {
 
     QRect resizeRect(const QRect &rect, const QSize &size, Qt::WindowFrameSection section);
 
+    Qt::WindowFrameSection rotateSection(Qt::WindowFrameSection section, qreal rotation);
+
 } // namespace Qn
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::WindowFrameSections);

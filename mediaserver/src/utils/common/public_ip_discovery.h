@@ -1,10 +1,8 @@
 #ifndef __PUBLIC_IP_DISCOVERY_H_
 #define __PUBLIC_IP_DISCOVERY_H_
 
-#include <QNetworkAccessManager>
 #include <QHostAddress>
-
-class QNetworkAccessManager;
+#include "utils/network/http/async_http_client_reply.h"
 
 class QnPublicIPDiscovery: public QObject
 {
@@ -17,13 +15,23 @@ public slots:
     void update();
 signals:
     void found(const QHostAddress& address);
-private slots:
-    void at_reply_finished(QNetworkReply* reply);
 private:
-    QNetworkAccessManager m_networkManager;
+    void handleReply(const nx_http::AsyncHttpClientPtr& httpClient);
+    void sendRequest(const QString &url);
+    void nextStage();
+private:
+    enum class Stage {
+        Idle,
+        PrimaryUrlsRequesting,
+        SecondaryUrlsRequesting,
+        PublicIpFound
+    };
+
     QHostAddress m_publicIP;
-    bool m_ipFound;
+    Stage m_stage;
     int m_replyInProgress;
+    QStringList m_primaryUrls;
+    QStringList m_secondaryUrls;
 };
 
 #endif // __PUBLIC_IP_DISCOVERY_H_

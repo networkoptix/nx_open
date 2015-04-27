@@ -9,17 +9,31 @@ QnDwPtzController::QnDwPtzController(const QnPlWatchDogResourcePtr &resource):
     base_type(resource),
     m_resource(resource)
 {
-    CLSimpleHTTPClient http(resource->getHostAddress(), HTTP_PORT, resource->getNetworkTimeout(), resource->getAuth());
+    connect(resource.data(), &QnPlWatchDogResource::physicalParamChanged, this, &QnDwPtzController::at_physicalParamChanged);
+    updateFlipState();
+}
+
+void QnDwPtzController::updateFlipState()
+{
+    CLSimpleHTTPClient http(m_resource->getHostAddress(), HTTP_PORT, m_resource->getNetworkTimeout(), m_resource->getAuth());
     http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=color"));
-    
+
     QByteArray data;
     http.readAll(data);
 
-    m_flip = 0;
+    Qt::Orientations flip = 0;
     if(data.contains("flipmode1: 1"))
-        m_flip ^= Qt::Vertical | Qt::Horizontal;
+        flip ^= Qt::Vertical | Qt::Horizontal;
     if(data.contains("mirrormode1: 1"))
-        m_flip ^= Qt::Horizontal;
+        flip ^= Qt::Horizontal;
+    m_flip = flip;
+}
+
+void QnDwPtzController::at_physicalParamChanged(const QString& name, const QString& value)
+{
+    Q_UNUSED(value)
+    if (name == lit("Flip") || name == lit("Mirror"))
+        QTimer::singleShot(500, this, SLOT(updateFlipState())); // DW cameras doesn't show actual settings if read it immediatly
 }
 
 QnDwPtzController::~QnDwPtzController() {

@@ -144,11 +144,12 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     
     if (resource->readDeviceInformation() && resource->getFullUrlInfo())
     {
+        if (resource->getMAC().isNull())
+            return resList; // MAC address is mandatory for manual search
+
         // Clarify resource type
-        QString fullName = resource->getName();
-        int manufacturerPos = fullName.indexOf(QLatin1String("-"));
-        QString manufacturer = fullName.mid(0,manufacturerPos).trimmed();
-        QString modelName = fullName.mid(manufacturerPos+1).trimmed();
+        QString manufacturer = resource->getVendor();
+        QString modelName = resource->getModel();
 
         if (NameHelper::instance().isSupported(modelName))
             return resList;
@@ -237,7 +238,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     return result;
 }
 
-QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 
@@ -258,7 +259,10 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     }
     */
     
-    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(resourceType->getName()); // use name instead of manufacture to instanciate child onvif resource
+    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
+        resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
+        ? params.vendor
+        : resourceType->getName() ); // use name instead of manufacture to instanciate child onvif resource
     if (!result )
         return result; // not found
 

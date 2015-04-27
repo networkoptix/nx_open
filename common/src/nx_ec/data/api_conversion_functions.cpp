@@ -167,7 +167,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.manuallyAdded = src->isManuallyAdded();
     dst.model = src->getModel();
     dst.groupId = src->getGroupId();
-    dst.groupName = src->getGroupName();
+    dst.groupName = src->getDefaultGroupName();
     dst.statusFlags = src->statusFlags();
     dst.vendor = src->getVendor();
 }
@@ -226,6 +226,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
 {
     dst->cameraID = src.cameraID;
     dst->name = src.cameraName;
+    dst->groupName = src.userDefinedGroupName;
     dst->scheduleDisabled = !src.scheduleEnabled;
     dst->motionType = src.motionType;
 
@@ -255,6 +256,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
 {
     dst.cameraID = src->cameraID;
     dst.cameraName = src->name;
+    dst.userDefinedGroupName = src->groupName;
     dst.scheduleEnabled = !src->scheduleDisabled;
     dst.motionType = src->motionType;
 
@@ -278,7 +280,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
 {
-    dst.reserve( dst.size()+src.size() );
+    dst.reserve( dst.size() + static_cast<int>(src.size()) );
     for( const ApiCameraAttributesData& cameraAttrs: src )
     {
         QnCameraUserAttributesPtr dstElement( new QnCameraUserAttributes() );
@@ -339,24 +341,24 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
 
 void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst) {
     dst.cameraUniqueId = src.cameraUniqueId;
-    dst.serverId = src.mediaServerGuid.toString().toLatin1();
+    dst.serverGuid = src.mediaServerGuid;
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
     dst.cameraUniqueId = src.cameraUniqueId;
-    dst.mediaServerGuid = QnUuid(src.serverId);
+    dst.mediaServerGuid = src.serverGuid;
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
 {
     /* CameraUniqueId -> (Timestamp -> ServerGuid). */
-    QMap<QString, QMap<qint64, QByteArray> > history;
+    QMap<QString, QMap<qint64, QnUuid> > history;
 
     /* Fill temporary history map. */
     for (auto pos = src.begin(); pos != src.end(); ++pos)
-        history[pos->cameraUniqueId][pos->timestamp] = pos->serverId;
+        history[pos->cameraUniqueId][pos->timestamp] = pos->serverGuid;
 
     for(auto pos = history.begin(); pos != history.end(); ++pos) {
         QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
@@ -364,7 +366,7 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         if (pos.value().isEmpty())
             continue;
 
-        QMapIterator<qint64, QByteArray> camit(pos.value());
+        QMapIterator<qint64, QnUuid> camit(pos.value());
         camit.toFront();
 
         cameraHistory->setCameraUniqueId(pos.key());
@@ -603,7 +605,6 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.networkAddresses = serializeNetAddrList(src->getNetAddrList());
     dst.apiUrl = src->getApiUrl();
     dst.flags = src->getServerFlags();
-    dst.panicMode = src->getPanicMode();
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
     dst.authKey = src->getAuthKey();
@@ -619,7 +620,6 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setApiUrl(src.apiUrl);
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
-    dst->setPanicMode(src.panicMode);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
     dst->setAuthKey(src.authKey);
@@ -679,7 +679,7 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
 }
 
 void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {
-    dst.reserve( dst.size()+src.size() );
+    dst.reserve( dst.size() + static_cast<int>(src.size()) );
     for( const ApiMediaServerUserAttributesData& serverAttrs: src )
     {
         QnMediaServerUserAttributesPtr dstElement( new QnMediaServerUserAttributes() );

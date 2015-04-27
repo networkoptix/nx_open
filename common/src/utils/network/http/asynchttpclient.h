@@ -78,7 +78,7 @@ namespace nx_http
         virtual void terminate();
 
         State state() const;
-        //!Returns true, if \a AsyncHttpClient::state() == \a AsyncHttpClient::sFailed
+        //!Returns true if no response has been recevied due to transport error
         bool failed() const;
         //!Start GET request to \a url
         /*!
@@ -138,6 +138,7 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addRequestHeader(const StringType& key, const StringType& value);
+        void removeAdditionalHeader( const StringType& key );
         void setAuthType(AuthType value);
 
     signals:
@@ -165,6 +166,7 @@ namespace nx_http
         State m_state;
         Request m_request;
         QSharedPointer<AbstractStreamSocket> m_socket;
+        bool m_connectionClosed;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
         QUrl m_url;
@@ -182,6 +184,8 @@ namespace nx_http
         unsigned int m_msgBodyReadTimeoutMs;
         AuthType m_authType;
         HttpHeaders m_additionalHeaders;
+        int m_awaitedMessageNumber;
+        SocketAddress m_remoteEndpoint;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );
@@ -189,6 +193,7 @@ namespace nx_http
 
         void resetDataBeforeNewRequest();
         bool initiateHttpMessageDelivery( const QUrl& url );
+        bool initiateTcpConnection();
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */
@@ -202,8 +207,28 @@ namespace nx_http
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::Response& response );
 
+        AsyncHttpClient( const AsyncHttpClient& );
+        AsyncHttpClient& operator=( const AsyncHttpClient& );
+
         static const char* toString( State state );
     };
+
+    //!Helper function that uses nx_http::AsyncHttpClient for file download
+    /*!
+        \param completionHandler <OS error code, status code, message body>.
+            "Status code" and "message body" are valid only if "OS error code" is \a SystemError::noError
+        \return \a true if started async download, \a false otherwise
+        \note It is strongly recommended to use this for downloading only small files (e.g., camera params).
+            For real files better to use \a nx_http::AsyncHttpClient directly
+    */
+    bool downloadFileAsync(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler );
+    //!Calls previous function and waits for completion
+    SystemError::ErrorCode downloadFileSync(
+        const QUrl& url,
+        int* const statusCode,
+        nx_http::BufferType* const msgBody );
 }
 
 #endif  //ASYNCHTTPCLIENT_H

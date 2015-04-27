@@ -15,12 +15,12 @@ public:
 
     /**
      * \param geometry                  Desired new geometry.
-     * \param pinCorner                 Corner that is currently pinned, if any.
-     * \param pinPoint                  If there is no pinned corner, 
+     * \param pinSection                Section that is currently pinned, if any.
+     * \param pinPoint                  If there is no pinned section,
      *                                  then parent coordinates of the pinned point are passed here.
      * \returns                         New geometry for the widget that satisfies the constraints.
      */
-    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QPointF &pinPoint = QPointF()) const = 0;
+    virtual QRectF constrainedGeometry(const QRectF &geometry, Qt::WindowFrameSection pinSection, const QPointF &pinPoint = QPointF()) const = 0;
 };
 
 

@@ -104,9 +104,19 @@ qreal frandom();
  */
 uint qt4Hash(const QString& key);
 
+/**
+ * Format JSon string to human readable format
+ */
+QByteArray formatJSonString(const QByteArray& data);
+
 #ifdef _DEBUG
 QString debugTime(qint64 timeMSec, const QString &fmt = QString());
 #endif
+
+/**
+ * Convert QDateTime to HTTP header date format
+ */
+QString dateTimeToHTTPFormat(const QDateTime& value);
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

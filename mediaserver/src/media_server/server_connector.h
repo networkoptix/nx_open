@@ -2,28 +2,41 @@
 #define SERVER_CONNECTOR_H
 
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 #include <utils/common/singleton.h>
+#include <utils/network/socket_common.h>
 
 class QnModuleFinder;
 struct QnModuleInformation;
+class SocketAddress;
 
 class QnServerConnector : public QObject, public Singleton<QnServerConnector> {
     Q_OBJECT
+
+    struct AddressInfo {
+        QString urlString;
+        QnUuid peerId;
+    };
+
 public:
     explicit QnServerConnector(QnModuleFinder *moduleFinder, QObject *parent = 0);
 
-    void addConnection(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void removeConnection(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void reconnect();
+    void addConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void removeConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+
+    void start();
+    void stop();
+    void restart();
 
 private slots:
-    void at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
-    void at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
+    void at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void at_moduleFinder_moduleAddressLost(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
 
 private:
-    QnModuleFinder *m_moduleFinder;
-    QHash<QUrl, QString> m_usedUrls;
+    QMutex m_mutex;
+    const QnModuleFinder *m_moduleFinder;
+    QHash<SocketAddress, AddressInfo> m_usedAddresses;
 };
 
 #endif // SERVER_CONNECTOR_H

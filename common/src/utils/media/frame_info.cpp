@@ -160,6 +160,11 @@ void CLVideoDecoderOutput::memZerro()
     }
 }
 
+void CLVideoDecoderOutput::reallocate(const QSize& size, int newFormat)
+{
+    reallocate(size.width(), size.height(), newFormat);
+}
+
 void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat)
 {
     clean();
@@ -368,6 +373,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, PixelFo
     CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
     dst->reallocate(newSize.width(), newSize.height(), newFormat);
     dst->assignMiscData(this);
+    dst->sample_aspect_ratio = 1.0;
 
     SwsContext* scaleContext = sws_getContext(
         width, height, (PixelFormat) format, 

@@ -81,7 +81,7 @@ public:
 
     virtual QnMediaContextPtr getCodecContext() const override;
 
-    virtual void startPaused() override;
+    virtual void startPaused(qint64 startTime) override;
 
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
@@ -169,7 +169,7 @@ private:
     QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
     QnMediaContextPtr m_codecContext;
 
-    QMutex m_playbackMaskSync;
+    mutable QMutex m_playbackMaskSync;
     QnPlaybackMaskHelper m_playbackMaskHelper;
     MediaQuality m_quality;
     bool m_qualityFastSwitch;

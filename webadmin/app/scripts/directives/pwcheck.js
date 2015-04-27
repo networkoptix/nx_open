@@ -1,20 +1,24 @@
 'use strict';
 
 angular.module('webadminApp')
-    .directive('nxEqualEx', function() {
+    .directive('nxEqualEx',['$log', function($log) {
         return {
             require: 'ngModel',
             link: function (scope, elem, attrs, model) {
                 if (!attrs.nxEqualEx) {
-                    console.error('nxEqualEx expects a model as an argument!');
+                    $log.error('nxEqualEx expects a model as an argument!');
                     return;
                 }
-                scope.$watch(attrs.nxEqualEx, function (value) {
+                function updateValidity(){
+                    console.log("updateValidity",model.$viewValue,scope.$eval(attrs.nxEqualEx));
                     // Only compare values if the second ctrl has a value.
                     if (model.$viewValue !== undefined && model.$viewValue !== '') {
-                        model.$setValidity('nxEqualEx', value === model.$viewValue);
+                        model.$setValidity('nxEqualEx', scope.$eval(attrs.nxEqualEx) === model.$viewValue);
                     }
-                });
+                }
+                scope.$watch(attrs.nxEqualEx, updateValidity);
+                scope.$watch("$viewValue", updateValidity);
+
                 model.$parsers.push(function (value) {
                     // Mute the nxEqual error if the second ctrl is empty.
                     if (value === undefined || value === '') {
@@ -23,8 +27,10 @@ angular.module('webadminApp')
                     }
                     var isValid = value === scope.$eval(attrs.nxEqualEx);
                     model.$setValidity('nxEqualEx', isValid);
-                    return isValid ? value : undefined;
+
+                    //We pretend, that parser is succeed always - in order to fix #4419
+                    return value; // isValid ? value : undefined;
                 });
             }
         };
-    });
+    }]);

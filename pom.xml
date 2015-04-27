@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.3.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -31,7 +31,9 @@
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
+        <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
+        <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
         <traytool.name>${product.name} Tray Assistant</traytool.name>
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
@@ -45,7 +47,8 @@
         <modification/>
         <beta>true</beta>
         <final.artifact.name>${project.artifactId}</final.artifact.name>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-beta</finalName>        
+        <build.suffix>${arch}</build.suffix>
+        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>        
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <!-- compile.option1. See profile no-webkit -->
@@ -58,9 +61,11 @@
         <compile.option2/>
         <compile.option3/>
         <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
+        <!-- Used for cross-compilation to add -m32 on Linux to compile x86 on x64 -->
+        <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>        
-        <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -82,6 +87,7 @@
         <toolchain.version>none</toolchain.version>            
 
         <additional.defines/>
+        <customization.defines/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -278,7 +284,6 @@
             </activation>
             <modules>
                 <module>build_variables</module>
-                <module>build_environment</module>
                 <module>common</module>
                 <!-- <module>hole_punching_mediator</module> -->
                 <module>appserver2</module>
@@ -336,9 +341,7 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->                   
                 <module>client</module>                     
-                <module>wixsetup/wixsetup-server-only</module>
-                <module>wixsetup/wixsetup-client-only</module>
-<!--                <module>wixsetup/wixsetup-full</module> -->
+                <module>wixsetup</module>
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
@@ -349,13 +352,18 @@
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
+                <box>windows</box>
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
-                <box>win78</box>
-                <modification>win78</modification>
                 <force_x86>false</force_x86>
-                <qt.spec>win32-msvc2012</qt.spec>
+                <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
+                <!-- <qt.spec>win32-msvc2012</qt.spec>
                 <PlatformToolSet>v110</PlatformToolSet>
+                <modification>win78</modification> -->
+                <qt.spec>win32-msvc2012xp</qt.spec>
+                <PlatformToolSet>v110_xp</PlatformToolSet>
+                <modification>winxp</modification>                
+                
                 <profile.classifier>${platform}</profile.classifier>                
                 <windows>true</windows>
                 <unix>false</unix>
@@ -363,7 +371,8 @@
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
             </properties>
         </profile>
-        <profile>
+        <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
+        <!--<profile>
             <id>windows-xp</id>
             <activation>
                 <os>
@@ -380,7 +389,7 @@
                 <PlatformToolSet>v110_xp</PlatformToolSet>
                 <modification>winxp</modification>
             </properties>
-        </profile>
+        </profile> -->
 
         <profile>
             <!-- Common Profile for Linux, Mac, Arm -->
@@ -480,6 +489,7 @@
                 </property>
             </activation>
             <properties>
+                <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <qt.classifier>${platform}-${arch}-${box}</qt.classifier>
                 <compile.option1/>
@@ -612,6 +622,8 @@
             </activation>
             <properties>
                 <arch>x64</arch>
+                <arch.dir>x86_64-linux-gnu/</arch.dir>
+		<target.arch>amd64</target.arch>
             </properties>
         </profile>
         <profile>
@@ -629,6 +641,8 @@
             </activation>
             <properties>
                 <arch>x86</arch>
+                <arch.dir>i386-linux-gnu/</arch.dir>
+		<target.arch>i386</target.arch>
             </properties>
         </profile>  
         <profile>
@@ -645,7 +659,10 @@
                 </property>
             </activation>
             <properties>
+                <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
+                <arch.dir>i386-linux-gnu/</arch.dir>
+		<target.arch>i386</target.arch>
             </properties>
         </profile>          
         <profile>
@@ -657,7 +674,7 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}</finalName>
+                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}</finalName>
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
             </properties>

@@ -221,17 +221,27 @@ QnOpenGLRendererManager::~QnOpenGLRendererManager() {
 
 void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )
 {
-    if ( texture_wigth >= image_width )
+   // if ( texture_wigth >= image_width )
     {
         glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , image_width, qMin(image_heigth,texture_height), gl_format, GL_UNSIGNED_BYTE, pixels );
-    } else if (texture_wigth < image_width)
+        glCheckError("glTexSubImage2D");
+    } 
+    
+    /* 
+       Following check reduces amount of data to be loaded to video card by the cost of increased GPU consumption.
+       On the practice, data difference is very low but GPU consumption is very high, especially on integrated video.
+       Disabling it. 
+       --gdm
+    */
+    /*else if (texture_wigth < image_width)
     {        
         int h = qMin(image_heigth,texture_height);
         for( int y = 0; y < h; y++ )
         {
             const uchar *row = pixels + (y*image_width) * gl_bytes_per_pixel;
             glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , texture_wigth, 1, gl_format, GL_UNSIGNED_BYTE, row );
+            glCheckError("glTexSubImage2D");
     	}   
 		 
-	}
+	}*/
 }

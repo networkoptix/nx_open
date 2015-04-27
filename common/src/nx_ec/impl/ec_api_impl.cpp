@@ -36,6 +36,8 @@ namespace ec2
                 return lit ("containsBecauseSequence");
             case ErrorCode::notImplemented:
                 return lit( "notImplemented" );
+            case ErrorCode::incompatiblePeer:
+                return lit( "incompatiblePeer" );
             default:
                 return lit( "unknown error" );
         }

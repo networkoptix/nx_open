@@ -1,11 +1,20 @@
 #include "aggregation_widget.h"
 #include "ui_aggregation_widget.h"
 
+namespace {
+    const int defaultOptimalWidth = 300;
+}
+
 QnAggregationWidget::QnAggregationWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AggregationWidget)
 {
     ui->setupUi(this);
+
+    QSize minSize(this->minimumSize());
+    minSize.setWidth(defaultOptimalWidth);
+    setMinimumSize(minSize);
+
     ui->periodComboBox->addItem(tr("sec"), 1);
     ui->periodComboBox->addItem(tr("min"), 60);
     ui->periodComboBox->addItem(tr("hrs"), 60*60);
@@ -48,4 +57,8 @@ int QnAggregationWidget::value() const {
 
 void QnAggregationWidget::setShort(bool value) {
     ui->longLabel->setVisible(!value);
+}
+
+int QnAggregationWidget::optimalWidth() {
+    return defaultOptimalWidth;
 }

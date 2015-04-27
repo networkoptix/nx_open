@@ -42,6 +42,7 @@ int QnTranslationListModel::rowCount(const QModelIndex &parent) const {
 }
 
 Qt::ItemFlags QnTranslationListModel::flags(const QModelIndex &index) const {
+    Q_UNUSED(index)
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 

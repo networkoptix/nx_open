@@ -6,27 +6,38 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
-class QnWorkbenchDesktopCameraWatcher: public QObject, public QnWorkbenchContextAware {
+/** Module maintaining connection between desktop resource and a server we are currently connected to. */
+class QnWorkbenchDesktopCameraWatcher: public QObject, public QnWorkbenchStateDelegate {
     Q_OBJECT
     typedef QObject base_type;
 public:
     QnWorkbenchDesktopCameraWatcher(QObject *parent);
     virtual ~QnWorkbenchDesktopCameraWatcher();
 
-private slots:
-    void at_server_serverIfFound(const QnMediaServerResourcePtr &resource);
-    void at_resource_statusChanged(const QnResourcePtr &resource);
+    /** Handle disconnect from server. */
+    virtual bool tryClose(bool force) override;
 
+    virtual void forcedUpdate() override;
+
+private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_recordingSettingsChanged();
 
 private:
-    void processServer(QnMediaServerResourcePtr server);
+    /** Setup connection (if available). */
+    void initialize();
+
+    /** Drop connection. */
+    void deinitialize();
+
+    /** Update current server. */
+    void setServer(const QnMediaServerResourcePtr &server);
 
 private:
-    QSet<QnMediaServerResourcePtr> m_serverList;
+    QnMediaServerResourcePtr m_server;
+    QnDesktopResourcePtr m_desktop;
 };
 
 #endif // QN_WORKBENCH_DESKTOP_CAMERA_WATCHER_H

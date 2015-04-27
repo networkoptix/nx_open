@@ -35,6 +35,7 @@ public:
 
     QString getEmail() const;
     void setEmail(const QString &email);
+    virtual Qn::ResourceStatus getStatus() const override;
 signals:
     void hashChanged(const QnResourcePtr &resource);
     void passwordChanged(const QnResourcePtr &resource);

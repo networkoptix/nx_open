@@ -4,6 +4,8 @@
 #include <update/task/network_peer_task.h>
 
 struct QnConfigureReply;
+struct QnModuleInformation;
+class QnMergeSystemsTool;
 
 class QnConfigurePeerTask : public QnNetworkPeerTask {
     Q_OBJECT
@@ -16,39 +18,27 @@ public:
 
     explicit QnConfigurePeerTask(QObject *parent = 0);
 
-    QString systemName() const;
-    void setSystemName(const QString &systemName);
-
-    int port() const;
-    void setPort(int port);
+    QString user() const;
+    void setUser(const QString &user);
 
     QString password() const;
     void setPassword(const QString &password);
-
-    QByteArray passwordHash() const;
-    QByteArray passwordDigest() const;
-    void setPasswordHash(const QByteArray &hash, const QByteArray &digest);
-
-    bool wholeSystem() const;
-    void setWholeSystem(bool wholeSystem);
 
 protected:
     virtual void doStart() override;
 
 private slots:
-    void processReply(int status, const QnConfigureReply &reply, int handle);
+    void at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation, int handle);
 
 private:
-    bool m_wholeSystem;
-    QString m_systemName;
-    int m_port;
-    QString m_password;
-    QByteArray m_passwordHash;
-    QByteArray m_passwordDigest;
+    QnMergeSystemsTool *m_mergeTool;
     int m_error;
+    QString m_user;
+    QString m_password;
 
-    QHash<int, QnUuid> m_pendingPeers;
+    QSet<QnUuid> m_pendingPeers;
     QSet<QnUuid> m_failedPeers;
+    QHash<int, QnUuid> m_peerIdByHandle;
 };
 
 #endif // CONFIGURE_PEER_TASK_H

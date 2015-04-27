@@ -29,6 +29,9 @@ public:
     using Singleton<QnCommonModule>::instance;
     using QnInstanceStorage::instance;
 
+    void bindModuleinformation(const QnMediaServerResourcePtr &server);
+    void bindModuleinformation(const QnUserResourcePtr &adminUser);
+
     QnResourceDataPool *dataPool() const {
         return m_dataPool;
     }
@@ -44,7 +47,15 @@ public:
 
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
-    
+
+    /*
+    * This timestamp is using for database backup/restore operation.
+    * Server has got systemIdentity time after DB restore operation
+    * This time help pushing database from current server to all others
+    */
+    void setSystemIdentityTime(qint64 value, const QnUuid& sender);
+    qint64 systemIdentityTime() const;
+
     void setRemoteGUID(const QnUuid& guid);
     QnUuid remoteGUID() const;
 
@@ -57,6 +68,18 @@ public:
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
 
+    /*
+    * This function should resolve issue with install new media servers and connect their to current system
+    * Installer tell media server change password after insllation.
+    * At this case admin user will rewritted. To keep other admin user field unchanged (email settings)
+    * we have to insert new transaction with low priority
+    */
+    void setUseLowPriorityAdminPasswordHach(bool value);
+    bool useLowPriorityAdminPasswordHach() const;
+
+    void setAdminPasswordData(const QByteArray& hash, const QByteArray& digest);
+    void adminPasswordData(QByteArray* hash, QByteArray* digest) const;
+
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
 
@@ -66,9 +89,19 @@ public:
     void setModuleInformation(const QnModuleInformation &moduleInformation);
     QnModuleInformation moduleInformation() const;
 
+    bool isTranscodeDisabled() const { return m_transcodingDisabled; }
+    void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
+
+    inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
+    inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
+
+    void updateModuleInformation();
+
 signals:
     void systemNameChanged(const QString &systemName);
+    void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
+    void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
 
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
@@ -76,7 +109,6 @@ protected:
 private:
     QnSessionManager *m_sessionManager;
     QnResourceDataPool *m_dataPool;
-    QString m_localSystemName;
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;
@@ -87,6 +119,13 @@ private:
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
     mutable QMutex m_mutex;
+    bool m_transcodingDisabled;
+    QSet<QnUuid> m_allowedPeers;
+    qint64 m_systemIdentityTime;
+    
+    QByteArray m_adminPaswdHash;
+    QByteArray m_adminPaswdDigest;
+    bool m_lowPriorityAdminPassword;
 };
 
 #define qnCommon (QnCommonModule::instance())

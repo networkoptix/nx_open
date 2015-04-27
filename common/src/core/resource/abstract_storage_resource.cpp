@@ -5,8 +5,7 @@ QnAbstractStorageResource::QnAbstractStorageResource():
     QnResource(),
     m_spaceLimit(0),
     m_maxStoreTime(0),
-    m_usedForWriting(false),
-    m_index(0)
+    m_usedForWriting(false)
 {
     setStatus(Qn::Offline);
 }
@@ -53,19 +52,7 @@ bool QnAbstractStorageResource::isUsedForWriting() const
 
 QString QnAbstractStorageResource::getUniqueId() const
 {
-    return QLatin1String("storage://") + getUrl();
-}
-
-void QnAbstractStorageResource::setIndex(quint16 value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_index = value;
-}
-
-quint16 QnAbstractStorageResource::getIndex() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_index;
+    return getId().toString();
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
@@ -109,27 +96,6 @@ float QnAbstractStorageResource::getAvarageWritingUsage() const
     return 0.0;
 }
 
-QnAbstractStorageResource::ProtocolDescription QnAbstractStorageResource::protocolDescription(const QString &protocol) {
-    ProtocolDescription result;
-
-    QString validIpPattern = lit("(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])");
-    QString validHostnamePattern = lit("(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])");
-
-    if(protocol == lit("smb")) {
-        result.protocol = protocol;
-        result.name = tr("Windows Network Shared Resource");
-        result.urlTemplate = tr("\\\\<Computer Name>\\<Folder>");
-        result.urlPattern = lit("\\\\\\\\%1\\\\.+").arg(validHostnamePattern);
-    } else if(protocol == lit("coldstore")) {
-        result.protocol = protocol;
-        result.name = tr("Coldstore Network Storage");
-        result.urlTemplate = tr("coldstore://<Address>");
-        result.urlPattern = lit("coldstore://%1/?").arg(validHostnamePattern);
-    }
-
-    return result;
-}
-
 void QnAbstractStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     Q_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
@@ -140,7 +106,6 @@ void QnAbstractStorageResource::updateInner(const QnResourcePtr &other, QSet<QBy
     m_spaceLimit = storage->m_spaceLimit;
     m_maxStoreTime = storage->m_maxStoreTime;
     m_usedForWriting = storage->m_usedForWriting;
-    m_index = storage->m_index;
 }
 
 void QnAbstractStorageResource::setUrl(const QString& value)

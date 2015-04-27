@@ -25,6 +25,8 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -41,15 +43,16 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/watchers/workbench_user_watcher.h>
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/network/module_finder.h>
-#include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include <utils/reconnect_helper.h>
 
@@ -87,8 +90,14 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         if(!watcher->hasMismatches())
             return;
 
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+            return;
+
         menu()->trigger(Qn::VersionMismatchMessageAction);
     });
+
+    QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
+    connect(userWatcher, &QnWorkbenchUserWatcher::reconnectRequired, this, &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
 
     connect(action(Qn::ConnectAction),              &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_connectAction_triggered);
     connect(action(Qn::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
@@ -116,8 +125,6 @@ QnLoginDialog * QnWorkbenchConnectHandler::loginDialog() const {
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     action(Qn::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
-
-    context()->instance<QnAppServerNotificationCache>()->getFileList();
 
     hideMessageBox();
 
@@ -264,18 +271,20 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     QnConnectionDiagnosticsHelper::Result status = silent
         ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, parentWidget);
-    
+
     switch (status) {
     case QnConnectionDiagnosticsHelper::Result::Failure:
-        return errCode;
+        return errCode == ec2::ErrorCode::ok 
+            ? ec2::ErrorCode::incompatiblePeer  /* Substitute value for incompatible peers. */
+            : errCode;
     case QnConnectionDiagnosticsHelper::Result::Restart:
-        menu()->trigger(Qn::ExitActionDelayed);
+        menu()->trigger(Qn::DelayedForcedExitAction);
         return ec2::ErrorCode::ok; // to avoid cycle
     default:    //success
         break;
     }
 
-    QnAppServerConnectionFactory::setUrl(appServerUrl);
+    QnAppServerConnectionFactory::setUrl(connectionInfo.ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
@@ -286,7 +295,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     context()->setUserName(appServerUrl.userName());
 
-    QnGlobalModuleFinder::instance()->setConnection(result.connection());
+    //QnRouter::instance()->setEnforcedConnection(QnRoutePoint(connectionInfo.ecsGuid, connectionInfo.ecUrl.host(), connectionInfo.ecUrl.port()));
 
     return ec2::ErrorCode::ok;
 }
@@ -302,10 +311,10 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 
     hideMessageBox();
 
-    QnGlobalModuleFinder::instance()->setConnection(NULL);
+    //QnRouter::instance()->setEnforcedConnection(QnRoutePoint());
     QnClientMessageProcessor::instance()->init(NULL);
-    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
+    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
@@ -372,7 +381,6 @@ void QnWorkbenchConnectHandler::clearConnection() {
     }
 
     qnLicensePool->reset();
-    context()->instance<QnAppServerNotificationCache>()->clear();
     qnCommon->setLocalSystemName(QString());
 }
 
@@ -382,28 +390,60 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         return false;
 
     QScopedPointer<QnReconnectHelper> reconnectHelper(new QnReconnectHelper());
+    if (reconnectHelper->servers().isEmpty())
+        return false;
+
     QPointer<QnReconnectInfoDialog> reconnectInfoDialog(new QnReconnectInfoDialog(mainWindow()));
     reconnectInfoDialog->setServers(reconnectHelper->servers());
 
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QDialog::hide);
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QObject::deleteLater);
     reconnectInfoDialog->show();
 
-    ec2::ErrorCode errCode = ec2::ErrorCode::ok;
+    bool success = false;
 
-    
-  
     /* Here we will wait for the reconnect or cancel. */
     while (reconnectInfoDialog && !reconnectInfoDialog->wasCanceled()) {
         reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
-        errCode = connectToServer(reconnectHelper->currentUrl(), true); /* Here inner event loop will be started. */
-        if (errCode == ec2::ErrorCode::ok || errCode == ec2::ErrorCode::unauthorized)   
+
+        /* Here inner event loop will be started. */
+        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), true);
+
+        /* Main window can be closed in the event loop so the dialog will be freed. */
+        if (!reconnectInfoDialog)
+            return true;
+
+        /* If user press cancel while we are connecting, connection should be broken. */
+        if (reconnectInfoDialog && reconnectInfoDialog->wasCanceled()) {
+            reconnectInfoDialog->hide();
+            reconnectInfoDialog->deleteLater();
+            return false;
+        }
+
+        if (errCode == ec2::ErrorCode::ok) {
+            success = true;
             break;
+        }
+
+        //TODO: #dklychkov #GDM When client tries to reconnect to a single server very often we can get "unauthorized" reply,
+        //      because we try to connect before the server initialized its auth classes.
+
+        if (errCode == ec2::ErrorCode::incompatiblePeer || errCode == ec2::ErrorCode::unauthorized)
+            reconnectHelper->markServerAsInvalid(reconnectHelper->currentServer());
 
         /* Find next valid server for reconnect. */
+        QnMediaServerResourceList allServers = reconnectHelper->servers();
+        bool found = true;
         do {
             reconnectHelper->next();
-        } while (!reconnectHelper->currentUrl().isValid());
+            /* We have found at least one correct interface for the server. */
+            found = reconnectHelper->currentUrl().isValid();
+            if (!found) /* Do not try to connect to invalid servers. */
+                allServers.removeOne(reconnectHelper->currentServer());
+        } while (!found && !allServers.isEmpty());
+
+        /* Break cycle if we cannot find any valid server. */
+        if (!found) 
+            break;
     }
 
     /* Main window can be closed in the event loop so the dialog will be freed. */
@@ -414,7 +454,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     reconnectInfoDialog->deleteLater();
     if (reconnectInfoDialog->wasCanceled())
         return false;
-    return errCode == ec2::ErrorCode::ok;
+    return success;
 }
 
 

@@ -310,6 +310,7 @@ void mac_showFullScreen(void *winId, bool fullScreen) {
         [nswindow toggleFullScreen:nil];
     } else {
         [nswindow toggleFullScreen:nil];
+        mac_disableFullscreenButton(winId);
     }
 }
 
@@ -334,4 +335,16 @@ void mac_setLimits() {
     if (limit.rlim_cur < wantedLimit)
         limit.rlim_cur = qMin(wantedLimit, limit.rlim_max);
     setrlimit(RLIMIT_NOFILE, &limit);
+}
+
+
+void mac_disableFullscreenButton(void *winId) {
+    NSView *nsview = (NSView *) winId;
+    NSWindow *nswindow = [nsview window];
+
+    NSButton *button = [nswindow standardWindowButton:NSWindowFullScreenButton];
+    if (button) {
+        [button setHidden:YES];
+        [button setEnabled:NO];
+    }
 }

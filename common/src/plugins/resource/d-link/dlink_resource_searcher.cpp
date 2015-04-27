@@ -90,12 +90,10 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             QByteArray datagram;
             datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-            QString sender;
-            quint16 senderPort;
+            SocketAddress remoteEndpoint;
+            int readed = recvSocket->recvFrom(datagram.data(), datagram.size(), &remoteEndpoint);
 
-            int readed = recvSocket->recvFrom(datagram.data(), datagram.size(),    sender, senderPort);
-
-            if (senderPort != 62976 || readed < 32) // minimum response size
+            if (remoteEndpoint.port != 62976 || readed < 32) // minimum response size
                 continue;
 
             QString name  = QLatin1String("DCS-");
@@ -147,7 +145,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setName(name);
             resource->setModel(name);
             resource->setMAC(QnMacAddress(smac));
-            resource->setHostAddress(sender);
+            resource->setHostAddress(remoteEndpoint.address.toString());
 
             result.push_back(resource);
 

@@ -66,11 +66,14 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
         port = nx_http::DEFAULT_HTTP_PORT;
 
     CLHttpStatus status;
-    QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
-
-    if (response.length()==0)
+    //QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
+    QByteArray response1 = downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=root.Network.Bonjour.FriendlyName"), host, port, timeout, auth);
+    if (response1.length()==0)
         return QList<QnResourcePtr>();
-
+    QByteArray response2 = downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=root.Network.eth0.MACAddress"), host, port, timeout, auth);
+    if (response2.length()==0)
+        return QList<QnResourcePtr>();
+    QString response = QString(QLatin1String(response1.append(response2)));
     QStringList lines = response.split(QLatin1String("\n"), QString::SkipEmptyParts);
 
 
@@ -129,8 +132,10 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     QnResourceList& result,
     const QByteArray& responseData,
     const QHostAddress& discoveryAddress,
-    const QHostAddress& /*foundHostAddress*/ )
+    const QHostAddress& foundHostAddress )
 {
+    Q_UNUSED(discoveryAddress)
+    Q_UNUSED(foundHostAddress)
 
     QString smac;
     QString name;

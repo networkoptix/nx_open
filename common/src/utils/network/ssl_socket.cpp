@@ -1292,13 +1292,12 @@ bool QnSSLSocket::getConnectionStatistics( StreamSocketInfo* info )
 }
 
 bool QnSSLSocket::connect(
-                     const QString& foreignAddress,
-                     unsigned short foreignPort,
-                     unsigned int timeoutMillis)
+    const SocketAddress& remoteAddress,
+    unsigned int timeoutMillis )
 {
     Q_D(QnSSLSocket);
     d->ecnryptionEnabled = true;
-    return d->wrappedSocket->connect(foreignAddress, foreignPort, timeoutMillis);
+    return d->wrappedSocket->connect(remoteAddress, timeoutMillis);
 }
 
 SocketAddress QnSSLSocket::getForeignAddress() const
@@ -1329,12 +1328,6 @@ SocketAddress QnSSLSocket::getLocalAddress() const
 {
     Q_D(const QnSSLSocket);
     return d->wrappedSocket->getLocalAddress();
-}
-
-SocketAddress QnSSLSocket::getPeerAddress() const
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->getPeerAddress();
 }
 
 void QnSSLSocket::close()
