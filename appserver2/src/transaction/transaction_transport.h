@@ -236,9 +236,6 @@ private:
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
     void fillAuthInfo();
-#ifdef USE_MULTIPART_CONTENT
-    void receivedTransaction( const QnByteArrayConstRef& tranData );
-#endif
     /*!
         \note MUST be called with \a m_mutex locked
     */
