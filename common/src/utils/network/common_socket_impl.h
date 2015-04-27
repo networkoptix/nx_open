@@ -19,12 +19,12 @@ class CommonSocketImpl
 public:
     std::atomic<aio::AIOThread<SocketType>*> aioThread;
     std::array<void*, aio::etMax> eventTypeToUserData;
-    std::atomic<int> terminated;
+    std::atomic<bool> terminated;
 
     CommonSocketImpl()
     :
         aioThread( nullptr ),
-        terminated( 0 )
+        terminated( false )
     {
         eventTypeToUserData.fill( nullptr );
     }

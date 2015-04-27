@@ -33,7 +33,7 @@ public:
 
     bool post( std::function<void()>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
+        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
         return aio::AIOService::instance()->post( m_socket, std::move(handler) );
@@ -41,7 +41,7 @@ public:
 
     bool dispatch( std::function<void()>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
+        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
         return aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
@@ -50,7 +50,7 @@ public:
     //!This call stops async I/O on socket and it can never be resumed!
     void terminateAsyncIO()
     {
-        ++m_socket->impl()->terminated;
+        m_socket->impl()->terminated.store( true, std::memory_order_relaxed );
     }
 
 protected:
@@ -140,7 +140,7 @@ public:
 
     bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
         {
             //socket has been terminated, no async call possible. 
             //Returning true to trick calling party: let it think everything OK and
@@ -173,7 +173,7 @@ public:
 
     bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
@@ -194,7 +194,7 @@ public:
 
     bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
         assert( buf.size() > 0 );
@@ -218,7 +218,7 @@ public:
 
     bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
         m_timerHandler = std::move( handler );
