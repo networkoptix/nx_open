@@ -570,9 +570,6 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
     int maxSize = std::max_element(nonEmptyPeriods.cbegin(), nonEmptyPeriods.cend(), [](const QnTimePeriodList &l, const QnTimePeriodList &r) {return l.size() < r.size(); })->size();
     result.reserve(maxSize);
 
-    if (maxSize > 10)
-        qDebug() << "starting merge of" << maxSize << "at" << QDateTime::currentDateTime().toString(lit("mm:ss.zzz"));
-
     int minIndex = 0;
     while (minIndex != -1) {
         qint64 minStartTime = 0x7fffffffffffffffll;
@@ -618,9 +615,6 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
             startIdx++;
         }
     }
-
-    if (maxSize > 10)
-        qDebug() << "merge complete at" << QDateTime::currentDateTime().toString(lit("mm:ss.zzz"));
     return result;
 }
 
