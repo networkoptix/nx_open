@@ -470,3 +470,96 @@ TEST( QnTimePeriodsListTest, serializationUnsigned )
 
     ASSERT_EQ(resultList, sourceList);
 }
+
+TEST( QnTimePeriodsListTest, overwriteEmptyListTail )
+{
+    QnTimePeriodList sourceList;
+
+    QnTimePeriodList tail;
+    tail << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 5);
+
+    QnTimePeriodList::overwriteTail(sourceList, tail, 10);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 5);
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
+TEST( QnTimePeriodsListTest, overwriteTailEmpty )
+{
+    QnTimePeriodList sourceList;
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 5);
+
+    QnTimePeriodList tail;
+
+    QnTimePeriodList::overwriteTail(sourceList, tail, 50);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 5);
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
+TEST( QnTimePeriodsListTest, overwriteTailByPeriodStart )
+{
+    QnTimePeriodList sourceList;
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+
+    QnTimePeriodList tail;
+    tail << QnTimePeriod(40, 5) << QnTimePeriod(50, QnTimePeriod::infiniteDuration());
+
+    QnTimePeriodList::overwriteTail(sourceList, tail, 40);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 5) << QnTimePeriod(50, QnTimePeriod::infiniteDuration());
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
+TEST( QnTimePeriodsListTest, overwriteTailByTrimLive )
+{
+    QnTimePeriodList sourceList;
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+
+    QnTimePeriodList tail;
+
+    QnTimePeriodList::overwriteTail(sourceList, tail, 50);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 10);
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
+TEST( QnTimePeriodsListTest, overwriteTailByTrimLiveAndAppend )
+{
+    QnTimePeriodList sourceList;
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
+
+    QnTimePeriodList tail;
+    tail << QnTimePeriod(55, QnTimePeriod::infiniteDuration());
+
+    QnTimePeriodList::overwriteTail(sourceList, tail, 50);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 10) << QnTimePeriod(55, QnTimePeriod::infiniteDuration());;
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
+TEST( QnTimePeriodsListTest, overwriteTailByTrimAndAppend )
+{
+    QnTimePeriodList sourceList;
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 20);
+
+    QnTimePeriodList tail;
+    tail << QnTimePeriod(55, QnTimePeriod::infiniteDuration());
+
+    QnTimePeriodList::overwriteTail(sourceList, tail, 50);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 10) << QnTimePeriod(55, QnTimePeriod::infiniteDuration());;
+
+    ASSERT_EQ(resultList, sourceList);
+}

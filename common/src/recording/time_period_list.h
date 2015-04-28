@@ -136,6 +136,15 @@ public:
      */
     static void updateTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &newPeriods, const QnTimePeriod &updatedPeriod);
 
+    /** Update tail of the period list with provided tail.
+     * 
+     * \param[in] periods               Base list.
+     * \param[in] tail                  List of updates.
+     * \param[in] dividerPoint          Point where the tail should be appended.
+     * \returns                         Updated list.
+     */
+    static void overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList &tail, qint64 dividerPoint);
+
     /** Union two time period lists. Does not delete periods from the base list.
      * 
      * \param[in] basePeriods           Base list.

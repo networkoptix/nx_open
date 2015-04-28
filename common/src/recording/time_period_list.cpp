@@ -438,6 +438,15 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
             }
 
         } else 
+        /* Check the case when the server changed its way to combine chunks (e.g. because of changed borders). */
+        if (insertIter->startTimeMs == appending->startTimeMs)
+        {
+            unionTimePeriods(basePeriods, newPeriods);
+#ifdef QN_TIME_PERIOD_LIST_DEBUG
+            Q_ASSERT(isValidList(basePeriods));
+#endif
+        }
+        else
         /* Other case. Usually that means that something goes wrong. */
         {
 #ifdef QN_TIME_PERIOD_LIST_DEBUG
@@ -455,10 +464,7 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
             updateTimePeriods(testPeriods, newPeriods, updatedPeriod);
             
 #endif
-            auto last = basePeriods.cend() - 1;
-            if (last->isInfinite())
-                basePeriods.removeLast();
-            basePeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << basePeriods << newPeriods);
+            basePeriods = mergeTimePeriods(QVector<QnTimePeriodList>() << basePeriods << newPeriods);
 #ifdef QN_TIME_PERIOD_LIST_DEBUG
         Q_ASSERT(isValidList(basePeriods));
 #endif
@@ -496,6 +502,35 @@ void QnTimePeriodList::updateTimePeriods(QnTimePeriodList& basePeriods, const Qn
 #ifdef QN_TIME_PERIOD_LIST_DEBUG
     qDebug() << "result is" << last5Of(basePeriods);
 #endif
+}
+
+void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList& tail, qint64 dividerPoint) {
+    if (periods.isEmpty() || dividerPoint <= periods.first().startTimeMs) {
+        periods = tail;
+        return;
+    }
+
+    auto eraseIter = std::lower_bound(periods.begin(), periods.end(), dividerPoint);
+
+    if (eraseIter == periods.end()) {
+        eraseIter--; /* We are sure, list is not empty. */
+        if (eraseIter->isInfinite() || eraseIter->endTimeMs() > dividerPoint)
+            eraseIter->durationMs = dividerPoint - eraseIter->startTimeMs;
+    } else {
+        while (eraseIter != periods.end())
+            eraseIter = periods.erase(eraseIter);
+    }
+
+    Q_ASSERT_X(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
+    Q_ASSERT_X(tail.isEmpty() || tail.first().startTimeMs >= periods.last().endTimeMs(), Q_FUNC_INFO, "Tail semantics");
+
+    if (!tail.isEmpty() && tail.first().startTimeMs < periods.last().endTimeMs()) {
+        /* Security fallback */
+        unionTimePeriods(periods, tail);
+    } else {
+       for (const auto &period: tail)
+            periods.push_back(period);
+    }
 }
 
 void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods) {   
