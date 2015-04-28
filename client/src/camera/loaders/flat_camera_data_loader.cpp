@@ -10,7 +10,7 @@
 
 #include <utils/common/warnings.h>
 
-#define QN_FLAT_CAMERA_DATA_LOADER_DEBUG
+//#define QN_FLAT_CAMERA_DATA_LOADER_DEBUG
 
 namespace {
     /** Fake handle for simultaneous load request. Initial value is big enough to not conflict with real request handles. */
