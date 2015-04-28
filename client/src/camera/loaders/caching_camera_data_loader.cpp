@@ -15,7 +15,7 @@
 #include "api/common_message_processor.h"
 
 namespace {
-    const qint64 requestIntervalMs = 10 * 1000;
+    const qint64 requestIntervalMs = 30 * 1000;
 }
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(QnAbstractCameraDataLoader **loaders, QObject *parent):
@@ -148,6 +148,7 @@ void QnCachingCameraDataLoader::setMotionRegions(const QList<QRegion> &motionReg
         m_cameraChunks[Qn::MotionContent].clear();
         emit periodsChanged(Qn::MotionContent);
     }
+    m_previousRequestTime[Qn::MotionContent] = 0;
     updateTimePeriods(Qn::MotionContent);
 }
 
@@ -323,7 +324,7 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodTy
 
     qint64 curTime = QDateTime::currentMSecsSinceEpoch();
     qint64 timeSpan = curTime - m_previousRequestTime[periodType];
-    if (periodType != Qn::RecordingContent || m_previousRequestTime[periodType] == 0 || timeSpan > requestIntervalMs) {
+    if (m_previousRequestTime[periodType] == 0 || timeSpan > requestIntervalMs) {
         loadInternal(periodType);
         m_previousRequestTime[periodType] = curTime;
     }
