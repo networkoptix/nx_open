@@ -57,7 +57,8 @@ public:
 
     QnTransactionTransport(
         const ApiPeerData &localPeer,
-        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>() );
+        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>(),
+        const QByteArray& contentEncoding = QByteArray() );
     ~QnTransactionTransport();
 
 signals:
@@ -230,9 +231,12 @@ private:
     bool m_incomingConnection;
     bool m_incomingTunnelOpened;
     nx_http::HttpStreamReader m_httpStreamReader;
-    nx_http::MultipartContentParser m_contentParser;
+    std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
     nx_http::HttpMessageStreamParser m_incomingTransactionsRequestsParser;
     ConnectionType m_connectionType;
+    QByteArray m_contentEncoding;
+    std::shared_ptr<AbstractByteStreamConverter> m_transactionReceivedAsResponseParser;
+    bool m_compressResponseMsgBody;
 
 private:
     void sendHttpKeepAlive();

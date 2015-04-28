@@ -7,6 +7,8 @@
 
 #include <nx_ec/ec_proto_version.h>
 #include <utils/media/custom_output_stream.h>
+#include <utils/gzip/gzip_compressor.h>
+#include <utils/gzip/gzip_uncompressor.h>
 
 #include "transaction_message_bus.h"
 #include "utils/common/log.h"
@@ -48,7 +50,8 @@ QMutex QnTransactionTransport::m_staticMutex;
 
 QnTransactionTransport::QnTransactionTransport(
     const ApiPeerData &localPeer,
-    const QSharedPointer<AbstractStreamSocket>& socket )
+    const QSharedPointer<AbstractStreamSocket>& socket,
+    const QByteArray& contentEncoding )
 :
     m_localPeer(localPeer),
     m_lastConnectTime(0), 
@@ -69,7 +72,9 @@ QnTransactionTransport::QnTransactionTransport(
     m_remoteIdentityTime(0),
     m_incomingConnection(socket),
     m_incomingTunnelOpened(false),
-    m_connectionType(incoming)
+    m_connectionType(incoming),
+    m_contentEncoding(contentEncoding),
+    m_compressResponseMsgBody(true)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
@@ -80,8 +85,19 @@ QnTransactionTransport::QnTransactionTransport(
         &QnTransactionTransport::receivedTransaction,
         this,
         std::placeholders::_1 );
-    m_contentParser.setNextFilter(
+    m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
+    m_multipartContentParser->setNextFilter(
         std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
+    if( m_contentEncoding == "gzip" )
+    {
+        //enabling decompression of received transactions
+        m_transactionReceivedAsResponseParser = std::make_shared<GZipUncompressor>();
+        m_transactionReceivedAsResponseParser->setNextFilter( m_multipartContentParser );
+    }
+    else
+    {
+        m_transactionReceivedAsResponseParser = m_multipartContentParser;
+    }
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     m_incomingTransactionsRequestsParser.setNextFilter(
         std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
@@ -443,7 +459,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     if( m_connectionType == outgoing )
 #endif
-        m_contentParser.processData( m_readBuffer );
+        m_transactionReceivedAsResponseParser->processData( m_readBuffer );
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     else    //m_connectionType == incoming
         m_incomingTransactionsRequestsParser.processData( m_readBuffer );
@@ -464,7 +480,7 @@ void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tra
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     if( m_connectionType == outgoing )
 #endif
-        processChunkExtensions( m_contentParser.prevFrameHeaders() );
+        processChunkExtensions( m_multipartContentParser->prevFrameHeaders() );
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     else    //m_connectionType == incoming
         processChunkExtensions( m_incomingTransactionsRequestsParser.currentMessage().headers() );
@@ -565,6 +581,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         if( m_connectionType == incoming )
         {
 #endif
+            //sending transactions as a response to GET request
             nx_http::HttpHeaders headers;
             headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
             headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
@@ -575,10 +592,17 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
             dataCtx.encodedSourceData += "\r\n";
             dataCtx.encodedSourceData += dataCtx.sourceData;
+
+            if( m_compressResponseMsgBody )
+            {
+                //encoding outgoing message body
+                dataCtx.encodedSourceData = GZipCompressor::compressData( dataCtx.encodedSourceData );
+            }
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
         }
         else    //m_connectionType == outgoing
         {
+            //sending transactions as a POST request
             nx_http::Request request;
             request.requestLine.method = nx_http::Method::POST;
             request.requestLine.url = 
@@ -708,12 +732,27 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
-    if( !m_contentParser.setContentType( contentTypeIter->second ) )
+    if( !m_multipartContentParser->setContentType( contentTypeIter->second ) )
     {
         NX_LOG( lit("Remote transaction server (%1) specified Content-Type (%2) which does not define multipart HTTP content")
             .arg(client->url().toString()).arg(QLatin1String(contentTypeIter->second)), cl_logWARNING );
         cancelConnecting();
         return;
+    }
+
+    auto contentEncodingIter = client->response()->headers.find("Content-Encoding");
+    if( contentEncodingIter != client->response()->headers.end() )
+    {
+        if( contentEncodingIter->second == "gzip" )
+        {
+            //enabling decompression of received transactions
+            m_transactionReceivedAsResponseParser = std::make_shared<GZipUncompressor>();
+            m_transactionReceivedAsResponseParser->setNextFilter( m_multipartContentParser );
+        }
+        else
+        {
+            //TODO #ak unsupported Content-Encoding ?
+        }
     }
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
@@ -784,7 +823,7 @@ void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPt
 
 void QnTransactionTransport::processTransactionData(const QByteArray& data)
 {
-    m_contentParser.processData( data );
+    m_transactionReceivedAsResponseParser->processData( data );
 }
 
 bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
@@ -984,7 +1023,7 @@ bool QnTransactionTransport::readCreateIncomingTunnelMessage()
                 return false;
             if( m_httpStreamReader.message().request->requestLine.method != nx_http::Method::POST )
                 return false;
-            if( !m_contentParser.setContentType(
+            if( !m_multipartContentParser->setContentType(
                     nx_http::getHeaderValue(
                         m_httpStreamReader.message().request->headers, "Content-Type" ) ) )
             {

@@ -46,7 +46,8 @@ namespace ec2
         void gotConnectionFromRemotePeer(
             const QSharedPointer<AbstractStreamSocket>& socket,
             const ApiPeerData &remotePeer,
-            qint64 remoteSystemIdentityTime );
+            qint64 remoteSystemIdentityTime,
+            const QByteArray& contentEncoding );
         void dropConnections();
         
         ApiPeerData localPeer() const;

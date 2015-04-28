@@ -132,6 +132,20 @@ void QnTransactionTcpProcessor::run()
         }
     }
 
+    //checking content encoding requested by remote peer
+    auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
+    QByteArray contentEncoding;
+    if( acceptEncodingHeaderIter != d->request.headers.end() )
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
+        if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
+            contentEncoding = "gzip";
+        else if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
+            contentEncoding = "identity";
+        //else
+            //TODO #ak not supported encoding requested
+    }
+
     query = QUrlQuery(d->request.requestLine.url.query());
     bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
 
@@ -147,11 +161,12 @@ void QnTransactionTcpProcessor::run()
     }
     else
     {
-        sendResponse( CODE_OK, QnTransactionTransport::TUNNEL_CONTENT_TYPE );
+        sendResponse( CODE_OK, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             d->socket,
             remotePeer,
-            remoteSystemIdentityTime );
+            remoteSystemIdentityTime,
+            contentEncoding );
         d->socket.clear();
     }
 }
