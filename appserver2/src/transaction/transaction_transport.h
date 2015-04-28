@@ -61,12 +61,15 @@ public:
     ~QnTransactionTransport();
 
 signals:
-    void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
+    void gotTransaction(
+        Qn::SerializationFormat tranFormat,
+        const QByteArray &data,
+        const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
     void remotePeerUnauthorized(const QnUuid& id);
     void peerIdDiscovered(const QUrl& url, const QnUuid& id);
-public:
 
+public:
     template<class T> 
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
     {
@@ -88,7 +91,10 @@ public:
 
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:
-            addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            if( m_remotePeer.peerType == Qn::PT_MobileClient )
+                addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction, header));
+            else
+                addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         //case Qn::BnsFormat:
         //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));

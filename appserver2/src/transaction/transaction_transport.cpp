@@ -303,6 +303,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 
     QUrlQuery q = QUrlQuery(remoteAddr.query());
+    q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
 
     // Client reconnects to the server
     if( m_localPeer.isClient() ) {
@@ -476,19 +477,38 @@ void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tra
 
     QByteArray serializedTran;
     QnTransactionTransportHeader transportHeader;
-    if( !QnUbjsonTransactionSerializer::deserializeTran(
-            reinterpret_cast<const quint8*>(tranData.constData()),
-            tranData.size(),
-            transportHeader,
-            serializedTran ) )
+
+    switch( m_remotePeer.dataFormat )
     {
-        Q_ASSERT( false );
-        return;
+        case Qn::JsonFormat:
+            if( !QnJsonTransactionSerializer::deserializeTran(
+                    reinterpret_cast<const quint8*>(tranData.constData()),
+                    tranData.size(),
+                    transportHeader,
+                    serializedTran ) )
+            {
+                Q_ASSERT( false );
+                return;
+            }
+            break;
+
+        case Qn::UbjsonFormat:
+            if( !QnUbjsonTransactionSerializer::deserializeTran(
+                    reinterpret_cast<const quint8*>(tranData.constData()),
+                    tranData.size(),
+                    transportHeader,
+                    serializedTran ) )
+            {
+                Q_ASSERT( false );
+                return;
+            }
+            break;
     }
+
     Q_ASSERT( !transportHeader.processedPeers.empty() );
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::receivedTransaction. Got transaction with seq %1 from %2").
         arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
-    emit gotTransaction(serializedTran, transportHeader);
+    emit gotTransaction(m_remotePeer.dataFormat, serializedTran, transportHeader);
     ++m_postedTranCount;
 }
 
@@ -666,6 +686,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         m_remotePeer.instanceId = QnUuid(itrRuntimeGuid->second);
     Q_ASSERT(!m_remotePeer.instanceId.isNull());
     m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
+    m_remotePeer.dataFormat = Qn::JsonFormat;
     emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
 
     if (statusCode != nx_http::StatusCode::ok)
@@ -845,7 +866,10 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
     header.fillSequence();
     switch (m_remotePeer.dataFormat) {
     case Qn::JsonFormat:
-        addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+        if( m_remotePeer.peerType == Qn::PT_MobileClient )
+            addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(serializedTran, header));
+        else
+            addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
         break;
     //case Qn::BnsFormat:
     //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));

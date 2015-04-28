@@ -225,7 +225,10 @@ namespace ec2
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
-        void at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader);
+        void at_gotTransaction(
+            Qn::SerializationFormat tranFormat,
+            const QByteArray &serializedTran,
+            const QnTransactionTransportHeader &transportHeader);
         void doPeriodicTasks();
         bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
         void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
