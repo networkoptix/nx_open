@@ -337,33 +337,40 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period) {
 }
 
 void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList& tail, qint64 dividerPoint) {
-    if (periods.isEmpty() || dividerPoint <= periods.first().startTimeMs) {
+    qint64 erasePoint = dividerPoint;
+    if (!tail.isEmpty())
+        erasePoint = std::min(dividerPoint, tail.cbegin()->startTimeMs);
+
+    if (periods.isEmpty() || erasePoint <= periods.first().startTimeMs) {
         periods = tail;
         return;
     }
 
-    qint64 erasePoint = dividerPoint;
-    if (!tail.isEmpty())
-        erasePoint = std::min(dividerPoint, tail.last().startTimeMs);
-
     auto eraseIter = std::lower_bound(periods.begin(), periods.end(), erasePoint);
 
-    if (eraseIter == periods.end()) {
+    Q_ASSERT_X(eraseIter != periods.begin(), Q_FUNC_INFO, "Invalid semantics");
+
+    if (eraseIter != periods.begin() && 
+        (eraseIter == periods.end() || eraseIter->startTimeMs > erasePoint)
+        ) {
         eraseIter--; /* We are sure, list is not empty. */
         if (eraseIter->isInfinite() || eraseIter->endTimeMs() > erasePoint)
             eraseIter->durationMs = std::max(0ll, erasePoint - eraseIter->startTimeMs);
         if (!eraseIter->isValid())
-            periods.erase(eraseIter);
-    } else {
-        while (eraseIter != periods.end())
             eraseIter = periods.erase(eraseIter);
-    }
+        else
+            eraseIter++;
+    } 
+
+    while (eraseIter != periods.end())
+        eraseIter = periods.erase(eraseIter);
+
 
     Q_ASSERT_X(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
 
     auto last = periods.end() - 1;
     if (!tail.isEmpty() && tail.first().startTimeMs < last->endTimeMs()) {
-        /* Here we receiving overlapped periods and can merge them faster. */ //TODO: #GDM #implement later
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should not get here, security fallback");
         unionTimePeriods(periods, tail);
     } else {
        for (const auto &period: tail)
