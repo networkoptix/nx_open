@@ -127,3 +127,9 @@ void QnMultiServerCameraDataLoader::onLoadingFailed(int status, int handle) {
 
     }
 }
+
+QnMultiServerCameraDataLoader::LoadingInfo::LoadingInfo() :
+    startTimeMs(DATETIME_NOW)
+{
+
+}

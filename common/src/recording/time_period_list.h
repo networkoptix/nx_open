@@ -127,15 +127,6 @@ public:
     /** Merge some time period lists into one. */
     static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
 
-    /** Update base period list with information from appendingPeriods.
-     *  Should not be used for appending different or overlapping periods (e.g. from different cameras).
-     * 
-     * \param[in] basePeriods           Base list.
-     * \param[in] newPeriods            List of updates.
-     * \returns                         Updated list.
-     */
-    static void updateTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &newPeriods, const QnTimePeriod &updatedPeriod);
-
     /** Update tail of the period list with provided tail.
      * 
      * \param[in] periods               Base list.
@@ -153,12 +144,6 @@ public:
      */
     static void unionTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods);
 
-    /** Make very quick comparison. Does not guarantee that lists are the same.
-     *  Recommended to compare chunk lists from the same camera and the same server.
-     *  \returns                        False if lists are different for certain, true otherwise.
-     */
-    static bool quickCompareEquals(const QnTimePeriodList &left, const QnTimePeriodList &right);
-    
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
 
 private:

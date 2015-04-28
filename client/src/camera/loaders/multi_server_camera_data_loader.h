@@ -38,7 +38,7 @@ private:
         QList<QnAbstractCameraDataPtr> data;
         qint64 startTimeMs;
 
-        LoadingInfo(): startTimeMs(0) {}
+        LoadingInfo();
     };
 
     QMap<QString, QnAbstractCameraDataLoader *> m_cache;
