@@ -7,6 +7,7 @@
 #include <QtCore/QtAlgorithms>
 
 #include "shared_resource_pointer.h"
+#include <functional>
 
 class QnResourceCriterion;
 
@@ -50,6 +51,14 @@ public:
         for(const QnSharedResourcePointer<Resource> &resource: *this)
             if(QnSharedResourcePointer<OtherResource> derived = resource.template dynamicCast<OtherResource>())
                 result.push_back(derived);
+        return result;
+    }
+
+    QnSharedResourcePointerList<Resource> filtered(std::function<bool(const QnSharedResourcePointer<Resource>&)> filter) const {
+        QnSharedResourcePointerList<Resource> result;
+        for(const QnSharedResourcePointer<Resource> &resource: *this)
+            if(filter(resource))
+                result.push_back(resource);
         return result;
     }
 };

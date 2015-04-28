@@ -78,6 +78,7 @@
                                 <exec dir="${project.build.directory}" executable="${project.build.directory}/build-dist.sh" failifexecutionfails="true" />                                        
                             </target>
                         </configuration>
+                        <skip>skip-deb</skip>                        
                     </execution>					
                 </executions>
             </plugin>	

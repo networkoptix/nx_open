@@ -48,7 +48,7 @@ public:
 
     void start();
     void stop();
-    bool isCameraRecoring(const QnResourcePtr& camera);
+    bool isCameraRecoring(const QnResourcePtr& camera) const;
 
     Recorders findRecorders(const QnResourcePtr& res) const;
 
