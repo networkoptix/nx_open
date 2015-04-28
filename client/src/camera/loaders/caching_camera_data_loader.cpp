@@ -15,26 +15,7 @@
 #include "api/common_message_processor.h"
 
 namespace {
-    const qint64 minTimePeriodLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
-
-    const qint64 requestIntervalMs = 30 * 1000;
-}
-
-QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnResourcePtr &resource, QObject *parent):
-    base_type(parent),
-    m_resource(resource)
-{
-    init();
-
-    if(!m_resource) {
-        qnNullWarning(m_resource);
-    } else {
-        if(createLoaders(m_resource, m_loaders)) {
-            initLoaders(m_loaders);
-        } else {
-            qnWarning("Could not create time period loader for resource '%1'.", m_resource->getName());
-        }
-    }
+    const qint64 requestIntervalMs = 10 * 1000;
 }
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(QnAbstractCameraDataLoader **loaders, QObject *parent):
@@ -53,34 +34,16 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(QnAbstractCameraDataLoader 
     loadTimer->setInterval(requestIntervalMs);  // time period will be loaded no often than once in 30 seconds
     loadTimer->setSingleShot(false);
     connect(loadTimer, &QTimer::timeout, this, [this] {
-
-        for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
-            Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
-
-#ifndef QN_ENABLE_BOOKMARKS
-        if (timePeriodType == Qn::BookmarksContent)
-            continue;
-#endif
-
-            QVector<QnTimePeriodList> allPersiodsToLoad;
-            for (const auto &timePeriod: m_queuedToLoadTimePeriods[timePeriodType])
-                allPersiodsToLoad << QnTimePeriodList(timePeriod);
-            QnTimePeriodList periodsToLoad = QnTimePeriodList::mergeTimePeriods(allPersiodsToLoad);
-            for (const auto &timePeriod: periodsToLoad)
-                load(timePeriodToDataType(timePeriodType), timePeriod);
-        }
-
-
+        load();
     });
     loadTimer->start();
+    load();
 }
 
 QnCachingCameraDataLoader::~QnCachingCameraDataLoader() {
-    return;
 }
 
 void QnCachingCameraDataLoader::init() {
-    m_loadingMargin = 1.0;
     m_resourceIsLocal = !m_resource.dynamicCast<QnNetworkResource>();
 
     for(int i = 0; i < Qn::CameraDataTypeCount; i++) {
@@ -104,7 +67,8 @@ void QnCachingCameraDataLoader::initLoaders(QnAbstractCameraDataLoader **loaders
 
             connect(loader, &QnAbstractCameraDataLoader::ready,         this,  [this, dataType](const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle){ 
                 Q_UNUSED(handle);
-                at_loader_ready(data, updatedPeriod, dataType);
+                Q_ASSERT_X(updatedPeriod.isInfinite(), Q_FUNC_INFO, "We are always loading till very end.");
+                at_loader_ready(data, updatedPeriod.startTimeMs, dataType);
             });
 
             connect(loader, &QnAbstractCameraDataLoader::failed,        this,  &QnCachingCameraDataLoader::loadingFailed);
@@ -162,43 +126,13 @@ QnResourcePtr QnCachingCameraDataLoader::resource() const {
     return m_resource;
 }
 
-qreal QnCachingCameraDataLoader::loadingMargin() const {
-    return m_loadingMargin;
-}
-
-void QnCachingCameraDataLoader::setLoadingMargin(qreal loadingMargin) {
-    m_loadingMargin = loadingMargin;
-}
-
-QnTimePeriod QnCachingCameraDataLoader::boundingPeriod() const {
-    return m_boundingPeriod;
-}
-
-void QnCachingCameraDataLoader::setBoundingPeriod(const QnTimePeriod &boundingPeriod) {
-    m_boundingPeriod = boundingPeriod;
-}
-
-QnTimePeriod QnCachingCameraDataLoader::targetPeriod(Qn::CameraDataType dataType) const {
-    return m_targetPeriod[dataType];
-}
-
-void QnCachingCameraDataLoader::setTargetPeriod(const QnTimePeriod &targetPeriod, Qn::CameraDataType dataType) {
-    m_targetPeriod[dataType] = targetPeriod;
-
-    switch (dataType) {
-    case Qn::RecordedTimePeriod:
-    case Qn::MotionTimePeriod:
-    case Qn::BookmarkTimePeriod:
-        updateTimePeriods(dataType);
-        break;
-    case Qn::BookmarkData:
-        updateBookmarks();
-        break;
-    default:
-        assert(false); //should never get here
-        break;
+void QnCachingCameraDataLoader::load() {
+    for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
+        Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
+        updateTimePeriods(timePeriodType);
     }
 }
+
 
 const QList<QRegion> &QnCachingCameraDataLoader::motionRegions() const {
     return m_motionRegions;
@@ -209,13 +143,12 @@ void QnCachingCameraDataLoader::setMotionRegions(const QList<QRegion> &motionReg
         return;
 
     m_motionRegions = motionRegions;
-    m_requestedTimePeriods[Qn::MotionContent].clear();
 
     if(!m_cameraChunks[Qn::MotionContent].isEmpty()) {
         m_cameraChunks[Qn::MotionContent].clear();
         emit periodsChanged(Qn::MotionContent);
     }
-    updateTimePeriods(Qn::MotionTimePeriod);
+    updateTimePeriods(Qn::MotionContent);
 }
 
 bool QnCachingCameraDataLoader::isMotionRegionsEmpty() const {
@@ -244,11 +177,10 @@ void QnCachingCameraDataLoader::setBookmarksTextFilter(const QString &filter) {
     m_bookmarksTextFilter = filter;
 
     //TODO: #GDM #Bookmarks clearing cache too often, possibly search in cache by name/tags will be faster
-    m_requestedTimePeriods[Qn::BookmarksContent].clear();
     m_cameraChunks[Qn::BookmarksContent].clear();
     if (m_loaders[Qn::BookmarkTimePeriod])
         m_loaders[Qn::BookmarkTimePeriod]->discardCachedData();
-    updateTimePeriods(Qn::BookmarkTimePeriod);
+    updateTimePeriods(Qn::BookmarksContent);
     emit periodsChanged(Qn::BookmarksContent);
 
     m_requestedBookmarkPeriodsByResolution.clear();
@@ -267,7 +199,7 @@ void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
 
     m_cameraChunks[Qn::BookmarksContent] = m_bookmarkCameraData.dataSource();;
 
-    emit periodsChanged(Qn::BookmarksContent, bookmarkPeriod);
+//    emit periodsChanged(Qn::BookmarksContent, bookmarkPeriod);
     emit bookmarksChanged();
 }
 
@@ -280,11 +212,10 @@ void QnCachingCameraDataLoader::updateBookmark(const QnCameraBookmark &bookmark)
 void QnCachingCameraDataLoader::removeBookmark(const QnCameraBookmark & bookmark) {
     m_bookmarkCameraData.removeBookmark(bookmark);
 
-    m_requestedTimePeriods[Qn::BookmarksContent].clear();
     m_cameraChunks[Qn::BookmarksContent].clear();
     if (m_loaders[Qn::BookmarkTimePeriod])
         m_loaders[Qn::BookmarkTimePeriod]->discardCachedData();
-    updateTimePeriods(Qn::BookmarkTimePeriod);
+    updateTimePeriods(Qn::BookmarksContent);
 
     emit bookmarksChanged();
 }
@@ -293,25 +224,14 @@ QnCameraBookmark QnCachingCameraDataLoader::bookmarkByTime(qint64 position) cons
     return m_bookmarkCameraData.find(position);
 }
 
-QnTimePeriod QnCachingCameraDataLoader::addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod, const qint64 minMargin) const {
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
+#ifndef QN_ENABLE_BOOKMARKS
+    if (periodType == Qn::BookmarksContent)
+        return;
+#endif
 
-    qint64 startTime = targetPeriod.startTimeMs;
-    qint64 endTime = targetPeriod.isInfinite() ? currentTime : targetPeriod.startTimeMs + targetPeriod.durationMs;
+    Qn::CameraDataType type = timePeriodToDataType(periodType);
 
-    qint64 minStartTime = boundingPeriod.startTimeMs;
-    qint64 maxEndTime = boundingPeriod.isInfinite() ? currentTime : boundingPeriod.startTimeMs + boundingPeriod.durationMs;
-
-    /* Adjust for margin. */
-    qint64 margin = qMax(minMargin, static_cast<qint64>((endTime - startTime) * m_loadingMargin));
-    
-    startTime = qMax(startTime - margin, minStartTime);
-    endTime = qMin(endTime + margin, maxEndTime + requestIntervalMs);
-
-    return QnTimePeriod(startTime, endTime - startTime);
-}
-
-void QnCachingCameraDataLoader::load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod, const qint64 resolutionMs) {
     QnAbstractCameraDataLoader *loader = m_loaders[type];
     if(!loader) {
         qnWarning("No valid loader in scope.");
@@ -321,64 +241,43 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type, const QnTimePeriod
 
     switch (type) {
     case Qn::RecordedTimePeriod:
-        loader->load(targetPeriod);
+        loader->load();
         break;
-#ifdef QN_ENABLE_BOOKMARKS
-    case Qn::BookmarkTimePeriod:
-    case Qn::BookmarkData:
-        loader->load(targetPeriod, m_bookmarksTextFilter, resolutionMs);  //TODO: #GDM #Bookmarks process tags list on the server side
-        break;
-#else
-        Q_UNUSED(resolutionMs);
-#endif
     case Qn::MotionTimePeriod:
         if(!isMotionRegionsEmpty()) {
             QString filter = serializeRegionList(m_motionRegions);
-            loader->load(targetPeriod, filter);
+            loader->load(filter);
         } else if(!m_cameraChunks[Qn::MotionContent].isEmpty()) {
-            m_requestedTimePeriods[Qn::MotionContent].clear();
             m_cameraChunks[Qn::MotionContent].clear();
             emit periodsChanged(Qn::MotionContent);
         }
         break;
     default:
-        assert(false); //should never get here
+        break;
     }
 }
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, Qn::CameraDataType dataType) {
+void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &data, qint64 startTimeMs, Qn::CameraDataType dataType) {
     switch (dataType) {
     case Qn::RecordedTimePeriod:
     case Qn::MotionTimePeriod:
     case Qn::BookmarkTimePeriod:
         {
-            Qn::TimePeriodContent timePeriodType = dataTypeToPeriod(dataType);
-            if (!QnTimePeriodList::quickCompareEquals(m_cameraChunks[timePeriodType], data->dataSource())) {
-                m_cameraChunks[timePeriodType] = data->dataSource();
-    #ifdef QN_ENABLE_BOOKMARKS
-                if (dataType == Qn::BookmarkTimePeriod)
-                    updateBookmarks();
-    #endif
-                emit periodsChanged(timePeriodType, updatedPeriod);
-            }
-            break;
-        }
-    case Qn::BookmarkData:
-        {
-            if (m_bookmarkCameraData.contains(data))
-                return;
-            m_bookmarkCameraData.update(data, updatedPeriod);
-            emit bookmarksChanged();
+            auto timePeriodType = dataTypeToPeriod(dataType);
+            QnTimePeriodList::overwriteTail(m_cameraChunks[timePeriodType], data->dataSource(), startTimeMs);
+#ifdef QN_ENABLE_BOOKMARKS
+            if (dataType == Qn::BookmarkTimePeriod)
+                updateBookmarks();
+#endif
+            emit periodsChanged(timePeriodType, startTimeMs);
             break;
         }
     default:
         break;
     }
-
-
 }
 
 void QnCachingCameraDataLoader::discardCachedData() {
@@ -390,10 +289,8 @@ void QnCachingCameraDataLoader::discardCachedData() {
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
         m_previousRequestTime[timePeriodType] = 0;
-        m_requestedTimePeriods[timePeriodType].clear();
-        m_queuedToLoadTimePeriods[timePeriodType].clear();
         m_cameraChunks[timePeriodType].clear();
-        updateTimePeriods(timePeriodToDataType(timePeriodType));
+        updateTimePeriods(timePeriodType);
         emit periodsChanged(timePeriodType);
     }
 
@@ -418,28 +315,18 @@ qint64 QnCachingCameraDataLoader::bookmarkResolution(qint64 periodDuration) cons
     return *step;
 }
 
-void QnCachingCameraDataLoader::updateTimePeriods(Qn::CameraDataType dataType) {
+void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodType) {
 #ifndef QN_ENABLE_BOOKMARKS
-    if (dataType == Qn::BookmarkTimePeriod || dataType == Qn::BookmarkData)
+    if (periodType == Qn::BookmarksContent)
         return;
 #endif
 
-    auto periodType = dataTypeToPeriod(dataType);
-
-    QnTimePeriodList& requestedPeriods = m_requestedTimePeriods[periodType];
-    if (requestedPeriods.containPeriod(m_targetPeriod[dataType]))
-        return;
-
-    QnTimePeriod requestedPeriod = addLoadingMargins(m_targetPeriod[dataType], m_boundingPeriod, minTimePeriodLoadingMargin);
-    requestedPeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << requestedPeriods << QnTimePeriodList(requestedPeriod));
-
     qint64 curTime = QDateTime::currentMSecsSinceEpoch();
     qint64 timeSpan = curTime - m_previousRequestTime[periodType];
-    if (periodType != Qn::RecordingContent || m_previousRequestTime[periodType] == 0 || timeSpan > requestIntervalMs)
-        load(dataType, requestedPeriod);
-    else
-        m_queuedToLoadTimePeriods[periodType].push_back(requestedPeriod);
-    m_previousRequestTime[periodType] = curTime;
+    if (periodType != Qn::RecordingContent || m_previousRequestTime[periodType] == 0 || timeSpan > requestIntervalMs) {
+        loadInternal(periodType);
+        m_previousRequestTime[periodType] = curTime;
+    }
 }
 
 void QnCachingCameraDataLoader::updateBookmarks() {

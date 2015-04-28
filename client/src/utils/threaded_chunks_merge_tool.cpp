@@ -3,6 +3,7 @@
 #include <utils/common/synctime.h>
 
 QnThreadedChunksMergeTool::QnThreadedChunksMergeTool():
+    m_startTimeMs(0),
     m_handle(-1),
     m_queuedData(false)
 {
@@ -25,11 +26,11 @@ void QnThreadedChunksMergeTool::run() {
     }
 }
 
-void QnThreadedChunksMergeTool::queueMerge(const QVector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, const QnTimePeriod &updatedPeriod, int handle) {
+void QnThreadedChunksMergeTool::queueMerge(const QVector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, qint64 startTimeMs, int handle) {
     QMutexLocker lock(&m_mutex);
     m_periodsList = periodsList;
     m_syncedPeriods = syncedPeriods;
-    m_updatedPeriod = updatedPeriod;
+    m_startTimeMs = startTimeMs;
     m_handle = handle;
     m_queuedData = true;
 }
@@ -38,27 +39,29 @@ void QnThreadedChunksMergeTool::processData() {
 
     QVector<QnTimePeriodList> periodsList;
     QnTimePeriodList syncedPeriods;
-    QnTimePeriod updatedPeriod;
+    qint64 startTimeMs;
     int handle;
 
     {
         QMutexLocker lock(&m_mutex);
         periodsList = m_periodsList;
         syncedPeriods = m_syncedPeriods;
-        updatedPeriod = m_updatedPeriod;
+        startTimeMs = m_startTimeMs;
         handle = m_handle;
         m_queuedData = false;
     }
 
-    QnTimePeriod syncedPeriodsBounding = syncedPeriods.boundingPeriod(qnSyncTime->currentMSecsSinceEpoch());
+    /* Using current time to estimate update length */
+    qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    QnTimePeriod syncedPeriodsBounding = syncedPeriods.boundingPeriod(currentTimeMs);
 
-    qreal relativeDuration = (!updatedPeriod.isNull() && syncedPeriodsBounding.isValid())
-        ? updatedPeriod.durationMs / syncedPeriodsBounding.durationMs
+    qreal relativeDuration = (startTimeMs > 0 && syncedPeriodsBounding.isValid())
+        ? (currentTimeMs - startTimeMs) / syncedPeriodsBounding.durationMs
         : 1.0;
     /* Here cost of intersecting and union becomes too high. */
     const auto magicCoeff = 0.5;
 
-    if (updatedPeriod.isNull() || relativeDuration > magicCoeff) {
+    if (startTimeMs == 0 || relativeDuration > magicCoeff) {
         auto result = QnTimePeriodList::mergeTimePeriods(periodsList);
         emit finished(handle, result);
     } else {
@@ -66,7 +69,7 @@ void QnThreadedChunksMergeTool::processData() {
 
         QVector<QnTimePeriodList> intersectedPeriods;
         for(const auto& list: periodsList)
-            intersectedPeriods.push_back(list.intersectedPeriods(updatedPeriod));
+            intersectedPeriods.push_back(list.intersectedPeriods(QnTimePeriod(startTimeMs, QnTimePeriod::infiniteDuration())));
 
         auto syncedAppending = QnTimePeriodList::mergeTimePeriods(intersectedPeriods);
         QnTimePeriodList::unionTimePeriods(result, syncedAppending);

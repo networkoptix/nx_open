@@ -158,9 +158,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
             auto loader = m_loaderByResource[syncedResource];
             if (!loader)
                 continue;
-//            if (resource->getStatus() == Qn::Offline)
-//                loader->discardCachedData();
-            loader->forcedUpdate();
+            loader->discardCachedData();
         }
 
     });
@@ -626,8 +624,8 @@ QnCachingCameraDataLoader *QnWorkbenchNavigator::loader(const QnResourcePtr &res
 
     QnCachingCameraDataLoader *loader = QnCachingCameraDataLoader::newInstance(resource, this);
     if(loader) {
-        connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod) {
-            updateLoaderPeriods(checked_cast<QnCachingCameraDataLoader *>(sender()), type, updatedPeriod);
+        connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type, qint64 startTimeMs) {
+            updateLoaderPeriods(checked_cast<QnCachingCameraDataLoader *>(sender()), type, startTimeMs);
         } );
 #ifdef QN_ENABLE_BOOKMARKS
         connect(loader, &QnCachingCameraDataLoader::bookmarksChanged, this, [this]() {updateLoaderBookmarks(checked_cast<QnCachingCameraDataLoader *>(sender()));} );
@@ -1050,7 +1048,7 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
 
     /* Update target time period for time period loaders. */
     QnTimePeriod timeSliderPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
-    QnTimePeriod boundingPeriod(m_timeSlider->minimum(), m_timeSlider->maximum() - m_timeSlider->minimum());
+    QnTimePeriod boundingPeriod(0, m_timeSlider->maximum());
     //TODO: #Elric Invalid boundingPeriod near daylight time
     boundingPeriod = boundingPeriod.intersected(QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()));
 
@@ -1070,14 +1068,15 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
         QnCachingCameraDataLoader *loader = this->loader(widget);
         if (!loader)
             continue;
+        loader->load();
 
-        loader->setBoundingPeriod(boundingPeriod);
+        //loader->setBoundingPeriod(boundingPeriod);
         for (int i = 0; i < Qn::CameraDataTypeCount; ++i) {
             Qn::CameraDataType dataType = static_cast<Qn::CameraDataType>(i);
             switch (dataType) {
             case Qn::RecordedTimePeriod:
             case Qn::MotionTimePeriod:
-                loader->setTargetPeriod(calendarPeriod, dataType);
+         //       loader->setTargetPeriod(calendarPeriod, dataType);
                 break;
 #ifdef QN_ENABLE_BOOKMARKS
             case Qn::BookmarkTimePeriod:
@@ -1132,12 +1131,12 @@ void QnWorkbenchNavigator::resetSyncedPeriods() {
     }
 }
 
-void QnWorkbenchNavigator::updateSyncedPeriods(const QnTimePeriod &updatedPeriod) {
+void QnWorkbenchNavigator::updateSyncedPeriods(qint64 startTimeMs) {
     for(int i = 0; i < Qn::TimePeriodContentCount; i++)
-        updateSyncedPeriods(static_cast<Qn::TimePeriodContent>(i), updatedPeriod);
+        updateSyncedPeriods(static_cast<Qn::TimePeriodContent>(i), startTimeMs);
 }
 
-void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, const QnTimePeriod &updatedPeriod) {
+void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, qint64 startTimeMs) {
 #ifndef QN_ENABLE_BOOKMARKS
     if (timePeriodType == Qn::BookmarksContent)
         return;
@@ -1160,7 +1159,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
     }
     QnTimePeriodList syncedPeriods = m_timeSlider->timePeriods(SyncedLine, timePeriodType);
 
-    m_threadedChunksMergeTool[timePeriodType]->queueMerge(periodsList, syncedPeriods, updatedPeriod, m_chunkMergingProcessHandle);
+    m_threadedChunksMergeTool[timePeriodType]->queueMerge(periodsList, syncedPeriods, startTimeMs, m_chunkMergingProcessHandle);
 }
 
 void QnWorkbenchNavigator::updateLines() {
@@ -1449,7 +1448,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     }
 }
 
-void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod) {
+void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type, qint64 startTimeMs) {
     if (!loader)
         return;
 
@@ -1459,7 +1458,7 @@ void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader
         updateCurrentPeriods(type);
     
     if(m_syncedResources.contains(resource))
-        updateSyncedPeriods(type, updatedPeriod);
+        updateSyncedPeriods(type, startTimeMs);
 
     if(m_centralWidget && m_centralWidget->resource() == resource && type == Qn::RecordingContent)
         updateThumbnailsLoader();

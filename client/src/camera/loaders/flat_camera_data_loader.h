@@ -42,34 +42,32 @@ public:
      */
     static QnFlatCameraDataLoader *newInstance(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
     
-    virtual int load(const QnTimePeriod &timePeriod, const QString &filter, const qint64 resolutionMs) override;
+    virtual int load(const QString &filter, const qint64 resolutionMs) override;
 
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;
 
 private slots:
     void at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle);
-    void at_bookmarksReceived(int status, const QnCameraBookmarkList &bookmarks, int requestHandle);
 
 private:
-    int sendRequest(const QnTimePeriod &periodToLoad);
+    int sendRequest(qint64 startTimeMs);
     void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle);
-    void updateLoadedPeriod(const QnTimePeriod &loadedPeriod);
 private:
     struct LoadingInfo 
     {
-        LoadingInfo(const QnTimePeriod &period, int handle): 
-            period(period),
-            handle(handle) {}
-
-        /** Period for which chunks are being loaded. */
-        QnTimePeriod period;
-
         /** Real loading handle, provided by the server connection object. */
         int handle;
+
+        /** Starting time of the request. */
+        qint64 startTimeMs;
 
         /** List of local (fake) handles for requests to this time period loader
          * that are waiting for the same time period to be loaded. */
         QList<int> waitingHandles;
+
+        LoadingInfo();
+
+        void clear();
     };
 
     /** Video server connection that this loader uses. */
@@ -77,11 +75,9 @@ private:
 
     QString m_filter;
     
-    QList<LoadingInfo> m_loading;
+    LoadingInfo m_loading;
 
     /** Loaded data. */
     QnAbstractCameraDataPtr m_loadedData;
 
-    /** Loaded period. */
-    QnTimePeriod m_loadedPeriod;
 };

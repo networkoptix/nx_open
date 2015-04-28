@@ -2,22 +2,18 @@
 
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
-#include <camera/data/bookmark_camera_data.h>
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/camera_bookmark.h>
 
 #include <recording/time_period_list.h>
 
 #include <utils/common/warnings.h>
-#include <utils/common/synctime.h>
-#include <utils/math/math.h>
 
-//#define QN_FLAT_CAMERA_DATA_LOADER_DEBUG
+#define QN_FLAT_CAMERA_DATA_LOADER_DEBUG
 
 namespace {
+    /** Fake handle for simultaneous load request. Initial value is big enough to not conflict with real request handles. */
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 
     /** Minimum time (in milliseconds) for overlapping time periods requests.  */
@@ -49,79 +45,42 @@ QnFlatCameraDataLoader *QnFlatCameraDataLoader::newInstance(const QnMediaServerR
     return new QnFlatCameraDataLoader(serverConnection, camera, dataType, parent);
 }
 
-int QnFlatCameraDataLoader::load(const QnTimePeriod &targetPeriod, const QString &filter, const qint64 resolutionMs) {
+int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
     Q_ASSERT_X(resolutionMs == detailLevel, Q_FUNC_INFO, "this loader is supposed to load only flat data");
-    Q_ASSERT_X(!targetPeriod.isInfinite(), Q_FUNC_INFO, "requesting infinite period is invalid");
     Q_UNUSED(resolutionMs);
 
     if (filter != m_filter)
         discardCachedData();
     m_filter = filter;
 
+    /* Check whether data is currently being loaded. */
+    if (m_loading.handle > 0) {
 #ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-    qDebug() << "QnFlatCameraDataLoader::" << "load" << targetPeriod;
+        qDebug() << "QnFlatCameraDataLoader::" << "data is already being loaded";
 #endif
-
-    /* Check whether the requested data is already loaded. */
-    if (m_loadedPeriod.contains(targetPeriod)) {
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-        qDebug() << "QnFlatCameraDataLoader::" << "data already loaded";
-#endif
-
-        /* Data already loaded. */
-        int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-
-        /* Must pass the ready signal through the event queue here as
-        * the caller doesn't know request handle yet, and therefore 
-        * cannot handle the signal. */
-        emit delayedReady(m_loadedData, targetPeriod, handle);
-        return handle; 
+        auto handle = qn_fakeHandle.fetchAndAddAcquire(1);
+        m_loading.waitingHandles << handle;
+        return handle;
     }
 
-    /* Check whether requested data is currently being loaded. */
-    for (int i = 0; i < m_loading.size(); ++i)
-    {
-        if (m_loading[i].period.contains(targetPeriod)) 
-        {
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-            qDebug() << "QnFlatCameraDataLoader::" << "data is already being loaded";
-#endif
-
-            int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-
-            m_loading[i].waitingHandles << handle;
-            return handle;
-        }
-    }
-
-    /* We need to load all data between the already loaded piece and target piece. */
-    QnTimePeriod periodToLoad = targetPeriod;
-    if (!m_loadedPeriod.isEmpty()) {
-        if (targetPeriod < m_loadedPeriod) {
-            periodToLoad.startTimeMs = targetPeriod.startTimeMs;
-            periodToLoad.durationMs = m_loadedPeriod.startTimeMs - targetPeriod.startTimeMs + minOverlapDuration;
-        } else {
-            periodToLoad.startTimeMs = m_loadedPeriod.endTimeMs() - minOverlapDuration;
-            periodToLoad.durationMs = targetPeriod.endTimeMs() - periodToLoad.startTimeMs;
-        }
-    }
-
-    /* If there is a recording period, we should load at least from its start. */
+    /* We need to load all data after the already loaded piece, assuming there were no periods before already loaded. */
+    qint64 startTimeMs = 0;
     if (m_loadedData && !m_loadedData->dataSource().isEmpty()) {
         auto last = m_loadedData->dataSource().last();
-        if (last.isInfinite() && periodToLoad.startTimeMs >= last.startTimeMs)
-            periodToLoad.addPeriod(QnTimePeriod(last.startTimeMs, 1));
+        if (last.isInfinite())
+            startTimeMs = last.startTimeMs;
+        else
+            startTimeMs = last.endTimeMs() - minOverlapDuration;
     }
 
 #ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-    qDebug() << "QnFlatCameraDataLoader::" << "already loaded period" << m_loadedPeriod;
-    qDebug() << "QnFlatCameraDataLoader::" << "loading period" << periodToLoad;
+    qDebug() << "QnFlatCameraDataLoader::" << "loading period from" << startTimeMs;
 #endif
 
-    int handle = sendRequest(periodToLoad);
-
-    m_loading << LoadingInfo(periodToLoad, handle);
-    return handle;
+    m_loading.clear(); /* Just in case. */
+    m_loading.startTimeMs = startTimeMs;
+    m_loading.handle = sendRequest(startTimeMs);
+    return m_loading.handle;
 }
 
 void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
@@ -132,46 +91,20 @@ void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
     Q_UNUSED(resolutionMs);
     m_loading.clear();
     m_loadedData.clear();
-    m_loadedPeriod.clear();
 }
 
-int QnFlatCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad) {
+int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
     Q_ASSERT_X(m_dataType != Qn::BookmarkData, Q_FUNC_INFO, "this loader should NOT be used to load bookmarks");
-
-    switch (m_dataType) {
-    case Qn::RecordedTimePeriod:
-    case Qn::MotionTimePeriod: 
-    case Qn::BookmarkTimePeriod:
-        return m_connection->getTimePeriodsAsync(
-            QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
-            periodToLoad.startTimeMs, 
-            periodToLoad.startTimeMs + periodToLoad.durationMs, 
-            detailLevel, /* Always load data on most detailed level. */
-            dataTypeToPeriod(m_dataType),
-            m_filter,
-            this, 
-            SLOT(at_timePeriodsReceived(int, const QnTimePeriodList &, int))
+    return m_connection->getTimePeriodsAsync(
+        QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
+        startTimeMs, 
+        DATETIME_NOW,   /* Always load data to the end. */ 
+        detailLevel,    /* Always load data on most detailed level. */
+        dataTypeToPeriod(m_dataType),
+        m_filter,
+        this, 
+        SLOT(at_timePeriodsReceived(int, const QnTimePeriodList &, int))
         );
-    case Qn::BookmarkData:
-        {
-            QnCameraBookmarkSearchFilter bookmarkFilter;
-            bookmarkFilter.minStartTimeMs = periodToLoad.startTimeMs;
-            bookmarkFilter.maxStartTimeMs = periodToLoad.startTimeMs + periodToLoad.durationMs;
-            bookmarkFilter.minDurationMs = detailLevel;
-            bookmarkFilter.text = m_filter;
-
-            return m_connection->getBookmarksAsync( 
-                m_resource.dynamicCast<QnNetworkResource>(),
-                bookmarkFilter,
-                this,
-                SLOT(at_bookmarksReceived(int, const QnCameraBookmarkList &, int))
-                );
-        }
-    default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "should never get here");
-        break;
-    }
-    return -1;
 }
 
 void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle) {
@@ -179,66 +112,46 @@ void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeri
     handleDataLoaded(status, data, requestHandle);
 }
 
-void QnFlatCameraDataLoader::at_bookmarksReceived(int status, const QnCameraBookmarkList &bookmarks, int requestHandle) {
-    QnAbstractCameraDataPtr data(new QnBookmarkCameraData(bookmarks));
-    handleDataLoaded(status, data, requestHandle);
-}
-
-void QnFlatCameraDataLoader::updateLoadedPeriod(const QnTimePeriod &loadedPeriod) {
-    Q_ASSERT_X(!loadedPeriod.isInfinite(), Q_FUNC_INFO, "we are not supposed to get infinite period here");
-
-    if (m_loadedPeriod.isEmpty()) {
-        m_loadedPeriod = loadedPeriod;
-    } else {
-        qint64 startTimeMs = qMin(m_loadedPeriod.startTimeMs, loadedPeriod.startTimeMs);
-        qint64 endTimeMs = qMax(m_loadedPeriod.endTimeMs(), loadedPeriod.endTimeMs());
-        m_loadedPeriod.startTimeMs = startTimeMs;
-        m_loadedPeriod.durationMs = endTimeMs - startTimeMs;
-    }
-
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-    qDebug() << "QnFlatCameraDataLoader::" << "loaded period updated to" << m_loadedPeriod;
-#endif
-}
-
 void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle) {
-
-    auto loadingInfoIter = std::find_if(m_loading.begin(), m_loading.end(), [requestHandle](const LoadingInfo &info) {return info.handle == requestHandle; } );
-    if (loadingInfoIter == m_loading.end())
+    if (m_loading.handle != requestHandle)
         return;
-
-    auto loadingInfo = *loadingInfoIter;
-    m_loading.erase(loadingInfoIter);
 
     if (status != 0) {
-        foreach(int handle, loadingInfo.waitingHandles)
+        for(auto handle: m_loading.waitingHandles)
             emit failed(status, handle);
         emit failed(status, requestHandle);
+        m_loading.clear();
         return;
     }
 
 #ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-    qDebug() << "QnFlatCameraDataLoader::" << "loaded data for" << loadingInfo.period;
+    qDebug() << "QnFlatCameraDataLoader::" << "loaded data for" << m_loading.startTimeMs;
 #endif
 
-    if (!m_loadedPeriod.contains(loadingInfo.period) && data) {
+    QnTimePeriod loadedPeriod(m_loading.startTimeMs, QnTimePeriod::infiniteDuration());
+
+    if (data) {
         if (!m_loadedData) {
             m_loadedData = data;
         }
         else if (!data->isEmpty()) {
-            m_loadedData->update(data, loadingInfo.period);
+            m_loadedData->update(data, loadedPeriod);
         }
-        updateLoadedPeriod(loadingInfo.period);
-
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-        qDebug() << "QnFlatCameraDataLoader::" << "loaded period updated to" << m_loadedPeriod;
-#endif
     }
 
-    foreach(int handle, loadingInfo.waitingHandles)
-        emit ready(m_loadedData, loadingInfo.period, handle);
-    emit ready(m_loadedData, loadingInfo.period, requestHandle);
+    for(auto handle: m_loading.waitingHandles)
+        emit ready(m_loadedData, loadedPeriod, handle);
+    emit ready(m_loadedData, loadedPeriod, requestHandle);
+    m_loading.clear();
 }
 
+QnFlatCameraDataLoader::LoadingInfo::LoadingInfo():
+    handle(0),
+    startTimeMs(0)
+{}
 
-
+void QnFlatCameraDataLoader::LoadingInfo::clear() {
+    handle = 0;
+    startTimeMs = 0;
+    waitingHandles.clear();
+}

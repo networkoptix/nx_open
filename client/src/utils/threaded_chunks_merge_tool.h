@@ -10,7 +10,7 @@ class QnThreadedChunksMergeTool: public QnLongRunnable {
 public:
     QnThreadedChunksMergeTool();
 
-    void queueMerge(const QVector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, const QnTimePeriod &updatedPeriod, int handle);
+    void queueMerge(const QVector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, qint64 startTimeMs, int handle);
 signals:
     void finished(int handle, const QnTimePeriodList &result);
 
@@ -23,7 +23,7 @@ private:
 private:
     QVector<QnTimePeriodList> m_periodsList;
     QnTimePeriodList m_syncedPeriods;
-    QnTimePeriod m_updatedPeriod;
+    qint64 m_startTimeMs;
     int m_handle;
     bool m_queuedData;
 

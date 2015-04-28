@@ -157,8 +157,8 @@ protected slots:
     void resetSyncedPeriods();
 
     /** Update synced line. Empty period means the whole line. Infinite period is not allowed. */
-    void updateSyncedPeriods(const QnTimePeriod &updatedPeriod = QnTimePeriod());
-    void updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, const QnTimePeriod &updatedPeriod = QnTimePeriod());
+    void updateSyncedPeriods(qint64 startTimeMs = 0);
+    void updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, qint64 startTimeMs = 0);
 
     void updateCurrentBookmarks();
     void updateTargetPeriod();
@@ -192,7 +192,7 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod);
+    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type, qint64 startTimeMs);
     void updateLoaderBookmarks(QnCachingCameraDataLoader *loader);
 
     void at_timeSlider_valueChanged(qint64 value);

@@ -20,33 +20,20 @@ class QnAbstractCameraDataLoader;
 
 class QnCachingCameraDataLoader: public Connective<QObject> {
     Q_OBJECT;
-    Q_PROPERTY(qreal loadingMargin READ loadingMargin WRITE setLoadingMargin);
     
     typedef Connective<QObject> base_type;
-public:
-    QnCachingCameraDataLoader(const QnResourcePtr &networkResource, QObject *parent = NULL);
+public: 
     virtual ~QnCachingCameraDataLoader();
 
     static QnCachingCameraDataLoader *newInstance(const QnResourcePtr &resource, QObject *parent = NULL);
 
     QnResourcePtr resource() const;
-
-    qreal loadingMargin() const;
-    void setLoadingMargin(qreal loadingMargin);
-
-    QnTimePeriod boundingPeriod() const;
-    void setBoundingPeriod(const QnTimePeriod &boundingPeriod);
-
-    QnTimePeriod targetPeriod(Qn::CameraDataType dataType) const;
-    void setTargetPeriod(const QnTimePeriod &targetPeriod, Qn::CameraDataType dataType);
-    
+        
     const QList<QRegion> &motionRegions() const;
     void setMotionRegions(const QList<QRegion> &motionRegions);
     bool isMotionRegionsEmpty() const;
 
-    void forcedUpdate();
-
-    QnTimePeriodList periods(Qn::TimePeriodContent type) const;
+    QnTimePeriodList periods(Qn::TimePeriodContent periodType) const;
     QnCameraBookmarkList bookmarks() const;
 
     QString bookmarksTextFilter() const;
@@ -56,20 +43,20 @@ public:
     void updateBookmark(const QnCameraBookmark &bookmark);
     void removeBookmark(const QnCameraBookmark & bookmark);
     QnCameraBookmark bookmarkByTime(qint64 position) const;
+
+    void load();
 signals:
-    void periodsChanged(Qn::TimePeriodContent type, const QnTimePeriod &updatedPeriod = QnTimePeriod());
+    void periodsChanged(Qn::TimePeriodContent type, qint64 startTimeMs = 0);
     void bookmarksChanged();
     void loadingFailed();
 public slots:
     void discardCachedData();
 private slots:
-    void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, const QnTimePeriod &updatedPeriod, Qn::CameraDataType dataType);
+    void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, qint64 startTimeMs, Qn::CameraDataType dataType);
 
 protected:
-    void load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod, const qint64 resolutionMs = 1);
+    void loadInternal(Qn::TimePeriodContent periodType);
     
-    QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod, const qint64 minMargin) const;
-
 private:
     QnCachingCameraDataLoader(QnAbstractCameraDataLoader **loaders, QObject *parent);
 
@@ -78,22 +65,15 @@ private:
     static bool createLoaders(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders);
     
     qint64 bookmarkResolution(qint64 periodDuration) const;
-    void updateTimePeriods(Qn::CameraDataType dataType);
+    void updateTimePeriods(Qn::TimePeriodContent dataType);
     void updateBookmarks();
     
 private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;
-
-    qreal m_loadingMargin;
-    
+  
     qint64 m_previousRequestTime[Qn::TimePeriodContentCount];
 
-    QnTimePeriod m_targetPeriod[Qn::CameraDataTypeCount];
-    QnTimePeriod m_boundingPeriod;
-
-    QnTimePeriodList m_requestedTimePeriods[Qn::TimePeriodContentCount];
-    QnTimePeriodList m_queuedToLoadTimePeriods[Qn::TimePeriodContentCount];
     QnTimePeriodList m_cameraChunks[Qn::TimePeriodContentCount];
 
     QMap<qint64, QnTimePeriodList> m_requestedBookmarkPeriodsByResolution;  //TODO: #GDM #Bookmarks should we enumerate by resolution set index?

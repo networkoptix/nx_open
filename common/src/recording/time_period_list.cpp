@@ -522,10 +522,9 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     }
 
     Q_ASSERT_X(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
-    Q_ASSERT_X(tail.isEmpty() || tail.first().startTimeMs >= periods.last().endTimeMs(), Q_FUNC_INFO, "Tail semantics");
 
     if (!tail.isEmpty() && tail.first().startTimeMs < periods.last().endTimeMs()) {
-        /* Security fallback */
+        /* Here we receiving overlapped periods and can merge them faster. */ //TODO: #GDM #implement later
         unionTimePeriods(periods, tail);
     } else {
        for (const auto &period: tail)
