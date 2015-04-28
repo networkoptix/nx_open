@@ -44,7 +44,7 @@ public:
     void removeBookmark(const QnCameraBookmark & bookmark);
     QnCameraBookmark bookmarkByTime(qint64 position) const;
 
-    void load();
+    void load(bool forced = false);
 signals:
     void periodsChanged(Qn::TimePeriodContent type, qint64 startTimeMs = 0);
     void bookmarksChanged();
@@ -65,14 +65,14 @@ private:
     static bool createLoaders(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders);
     
     qint64 bookmarkResolution(qint64 periodDuration) const;
-    void updateTimePeriods(Qn::TimePeriodContent dataType);
+    void updateTimePeriods(Qn::TimePeriodContent dataType, bool forced = false);
     void updateBookmarks();
     
 private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;
   
-    qint64 m_previousRequestTime[Qn::TimePeriodContentCount];
+    QElapsedTimer m_previousRequestTime[Qn::TimePeriodContentCount];
 
     QnTimePeriodList m_cameraChunks[Qn::TimePeriodContentCount];
 

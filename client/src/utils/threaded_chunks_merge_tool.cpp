@@ -30,7 +30,13 @@ void QnThreadedChunksMergeTool::queueMerge(const QVector<QnTimePeriodList> &peri
     QMutexLocker lock(&m_mutex);
     m_periodsList = periodsList;
     m_syncedPeriods = syncedPeriods;
-    m_startTimeMs = startTimeMs;
+
+    /* If we are loading chunks for the same layout, make sure we do not skip already queued startTimeMs. */
+    if (m_queuedData && m_handle == handle)
+        m_startTimeMs = std::min(startTimeMs, m_startTimeMs);
+    else
+        m_startTimeMs = startTimeMs;
+
     m_handle = handle;
     m_queuedData = true;
 }
@@ -72,17 +78,7 @@ void QnThreadedChunksMergeTool::processData() {
             intersectedPeriods.push_back(list.intersectedPeriods(QnTimePeriod(startTimeMs, QnTimePeriod::infiniteDuration())));
 
         auto syncedAppending = QnTimePeriodList::mergeTimePeriods(intersectedPeriods);
-        QnTimePeriodList::unionTimePeriods(result, syncedAppending);
-
-        /* Trim live if recording was stopped. We are not checking if updated chunks are really appended to the end and hope for the best =) */
-        if (!result.isEmpty() && !syncedAppending.isEmpty() && result.last().isInfinite() && !syncedAppending.last().isInfinite())
-        {
-            auto last = result.takeLast();
-            last.durationMs = std::max(0ll, syncedAppending.last().endTimeMs() - last.startTimeMs);
-            if (last.isValid())
-                result.push_back(last);
-        }
-
+        QnTimePeriodList::overwriteTail(result, syncedAppending, startTimeMs);
         emit finished(handle, result);
     }
 }
