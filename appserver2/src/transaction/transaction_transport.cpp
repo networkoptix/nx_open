@@ -528,6 +528,7 @@ void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tra
                     serializedTran ) )
             {
                 Q_ASSERT( false );
+                setStateNoLock( State::Error );
                 return;
             }
             break;
@@ -540,9 +541,13 @@ void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tra
                     serializedTran ) )
             {
                 Q_ASSERT( false );
+                setStateNoLock( State::Error );
                 return;
             }
             break;
+
+        default:
+            setStateNoLock( State::Error );
     }
 
     Q_ASSERT( !transportHeader.processedPeers.empty() );
