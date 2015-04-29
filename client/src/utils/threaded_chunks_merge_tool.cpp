@@ -43,19 +43,15 @@ void QnThreadedChunksMergeTool::queueMerge(const QVector<QnTimePeriodList> &peri
 
 void QnThreadedChunksMergeTool::processData() {
 
-    QVector<QnTimePeriodList> periodsList;
-    QnTimePeriodList syncedPeriods;
-    qint64 startTimeMs;
-    int handle;
-
-    {
-        QMutexLocker lock(&m_mutex);
-        periodsList = m_periodsList;
-        syncedPeriods = m_syncedPeriods;
-        startTimeMs = m_startTimeMs;
-        handle = m_handle;
-        m_queuedData = false;
-    }
+    /* Synchronization block */
+    QMutexLocker lock(&m_mutex);
+    const QVector<QnTimePeriodList> periodsList(m_periodsList);
+    const QnTimePeriodList syncedPeriods(m_syncedPeriods);
+    const qint64 startTimeMs(m_startTimeMs);
+    const int handle(m_handle);
+    m_queuedData = false;
+    lock.unlock();
+    /* End of synchronization block */
 
     /* Using current time to estimate update length */
     qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
@@ -79,6 +75,12 @@ void QnThreadedChunksMergeTool::processData() {
 
         auto syncedAppending = QnTimePeriodList::mergeTimePeriods(intersectedPeriods);
         QnTimePeriodList::overwriteTail(result, syncedAppending, startTimeMs);
+
+#ifdef _DEBUG
+        auto test = QnTimePeriodList::mergeTimePeriods(periodsList);
+        Q_ASSERT_X(test == result, Q_FUNC_INFO, "Check that merging was correct");
+#endif
+        
         emit finished(handle, result);
     }
 }

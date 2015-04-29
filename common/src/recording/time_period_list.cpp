@@ -368,14 +368,26 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
 
 
     Q_ASSERT_X(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
+    if (periods.isEmpty()) {
+        periods = tail;
+        return;
+    }
 
     auto last = periods.end() - 1;
     if (!tail.isEmpty() && tail.first().startTimeMs < last->endTimeMs()) {
         Q_ASSERT_X(false, Q_FUNC_INFO, "Should not get here, security fallback");
         unionTimePeriods(periods, tail);
-    } else {
-       for (const auto &period: tail)
-            periods.push_back(period);
+    } else if (!tail.isEmpty()) {
+        auto appending = tail.cbegin();
+        /* Combine chunks if new chunk starts when the previous ends. */
+        if (last->endTimeMs() == appending->startTimeMs) {
+            last->addPeriod(*appending);
+            ++appending;
+        }
+        while (appending != tail.cend()) {
+            periods.push_back(*appending);
+            ++appending;
+        }
     }
 }
 
