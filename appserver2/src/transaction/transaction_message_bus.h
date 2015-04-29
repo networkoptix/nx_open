@@ -44,10 +44,22 @@ namespace ec2
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(
+            const QnUuid& connectionGuid,
             const QSharedPointer<AbstractStreamSocket>& socket,
             const ApiPeerData &remotePeer,
             qint64 remoteSystemIdentityTime,
             const QByteArray& contentEncoding );
+        //!Report socket to receive transactions from
+        /*!
+            \param requestBuf Contains serialized \a request and (possibly) partial (or full) message body
+        */
+        void gotIncomingTransactionsConnectionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            const QSharedPointer<AbstractStreamSocket>& socket,
+            const ApiPeerData &remotePeer,
+            qint64 remoteSystemIdentityTime,
+            const nx_http::Request& request,
+            const QByteArray& requestBuf );
         void dropConnections();
         
         ApiPeerData localPeer() const;

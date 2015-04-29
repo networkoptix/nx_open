@@ -1347,6 +1347,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 }
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
+    const QnUuid& connectionGuid,
     const QSharedPointer<AbstractStreamSocket>& socket,
     const ApiPeerData &remotePeer,
     qint64 remoteSystemIdentityTime,
@@ -1362,6 +1363,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
         return; // reject incoming connection because of media server is about to restart
 
     QnTransactionTransport* transport = new QnTransactionTransport(
+        connectionGuid,
         m_localPeer,
         socket,
         contentEncoding );
@@ -1378,7 +1380,38 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     Q_ASSERT(!m_connections.contains(remotePeer.id));
 }
 
-QUrl addCurrentPeerInfo(const QUrl& srcUrl)
+void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
+    const QnUuid& connectionGuid,
+    const QSharedPointer<AbstractStreamSocket>& socket,
+    const ApiPeerData &remotePeer,
+    qint64 remoteSystemIdentityTime,
+    const nx_http::Request& request,
+    const QByteArray& requestBuf )
+{
+    if (!dbManager)
+    {
+        qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
+        return;
+    }
+
+    if (m_restartPending)
+        return; // reject incoming connection because of media server is about to restart
+
+    QMutexLocker lock(&m_mutex);
+    for(QnTransactionTransport* transport: m_connections.values())
+    {
+        if( transport->connectionGuid() == connectionGuid )
+        {
+            transport->setIncomingTransactionChannelSocket(
+                socket,
+                request,
+                requestBuf );
+            return;
+        }
+    }
+}
+
+static QUrl addCurrentPeerInfo(const QUrl& srcUrl)
 {
     QUrl url(srcUrl);
     QUrlQuery q(url.query());
