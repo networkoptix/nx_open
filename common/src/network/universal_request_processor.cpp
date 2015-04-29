@@ -58,6 +58,10 @@ QByteArray QnUniversalRequestProcessor::unauthorizedPageBody()
 bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
 {
     Q_D(QnUniversalRequestProcessor);
+
+    if( d->request.requestLine.method == nx_http::Method::POST )
+        return true;
+
     int retryCount = 0;
     if (d->needAuth)
     {

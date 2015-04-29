@@ -667,6 +667,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
             addHttpChunkExtensions( &request.headers );
             request.headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
+            request.headers.emplace( "X-Nx-Connection-Guid", m_connectionGuid.toByteArray() );
+            request.headers.emplace( "X-Nx-Connection-Direction", "outgoing" );
             request.messageBody = dataCtx.sourceData;
             dataCtx.encodedSourceData = request.serialized();
         }
@@ -679,7 +681,11 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 
     if( !m_outgoingDataSocket )
     {
-        assert( m_connectionType == outgoing );
+        //assert( m_connectionType == outgoing );
+        //nx_http::AsyncHttpClientPtr outgoingConnectionClient = std::make_shared<nx_http::AsyncHttpClient>();
+        //outgoingConnectionClient->
+
+
         //establishing connection
         m_outgoingDataSocket.reset( SocketFactory::createStreamSocket() );
         if( !m_outgoingDataSocket->setNonBlockingMode( true ) ||
@@ -869,6 +875,8 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             //request.headers.emplace( "Content-Length", "3276701" );
             request.headers.emplace( "Connection", "keep-alive" );
             request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
+            request.headers.emplace( "X-Nx-Connection-Guid", m_connectionGuid.toByteArray() );
+            request.headers.emplace( "X-Nx-Connection-Direction", "outgoing" );
             addEncodedData( request.serialized() );
 #endif
 
