@@ -341,7 +341,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 
     QUrlQuery q = QUrlQuery(remoteAddr.query());
-    q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
+    //q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
     m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid.toByteArray() );
     m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME, "incoming" );
 
@@ -637,7 +637,9 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 #endif
             //sending transactions as a response to GET request
             nx_http::HttpHeaders headers;
-            headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
+            headers.emplace(
+                "Content-Type",
+                Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
             headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
             addHttpChunkExtensions( &headers );
 
@@ -646,6 +648,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
             dataCtx.encodedSourceData += "\r\n";
             dataCtx.encodedSourceData += dataCtx.sourceData;
+            dataCtx.encodedSourceData += "\r\n";
 
             if( m_compressResponseMsgBody )
             {
@@ -790,7 +793,8 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         m_remotePeer.instanceId = QnUuid(itrRuntimeGuid->second);
     Q_ASSERT(!m_remotePeer.instanceId.isNull());
     m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
-    m_remotePeer.dataFormat = Qn::JsonFormat;
+    //m_remotePeer.dataFormat = Qn::JsonFormat;
+    m_remotePeer.dataFormat = Qn::UbjsonFormat;
     emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
 
     if (statusCode != nx_http::StatusCode::ok)
@@ -960,8 +964,8 @@ QString QnTransactionTransport::toString( State state )
 
 void QnTransactionTransport::addHttpChunkExtensions( nx_http::HttpHeaders* const headers )
 {
-    for( auto val: m_beforeSendingChunkHandlers )
-        val.second( this, headers );
+    //for( auto val: m_beforeSendingChunkHandlers )
+    //    val.second( this, headers );
 }
 
 void QnTransactionTransport::processChunkExtensions( const nx_http::HttpHeaders& headers )
