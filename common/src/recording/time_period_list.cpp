@@ -104,7 +104,8 @@ QnTimePeriodList QnTimePeriodList::intersectedPeriods(const QnTimePeriod &period
         return result;
 
     qint64 endTimeMs = period.endTimeMs();
-    auto iter = findNearestPeriod(period.startTimeMs, false);
+    auto iter = findNearestPeriod(period.startTimeMs, true);
+
     while (iter != cend() && iter->startTimeMs < endTimeMs) {
         result.push_back(*iter);
         ++iter;
