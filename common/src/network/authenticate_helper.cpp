@@ -144,7 +144,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
             : nx_http::getHeaderValue( request.headers, "Authorization" );
         if( authorization.isEmpty() )
         {
-            const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, "NX-User-Name" );
+            const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, "X-NX-User-Name" );
             if( !nxUserName.isEmpty() )
             {
                 QMutexLocker lock(&m_mutex);
