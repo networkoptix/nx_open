@@ -45,6 +45,9 @@ public:
     QnCameraBookmark bookmarkByTime(qint64 position) const;
 
     void load(bool forced = false);
+
+    void setEnabled(bool value);
+    bool enabled() const;
 signals:
     void periodsChanged(Qn::TimePeriodContent type, qint64 startTimeMs = 0);
     void bookmarksChanged();
@@ -69,6 +72,8 @@ private:
     void updateBookmarks();
     
 private:
+    bool m_enabled;
+
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;
   

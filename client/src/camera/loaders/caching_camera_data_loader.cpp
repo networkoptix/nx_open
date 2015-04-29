@@ -20,6 +20,7 @@ namespace {
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(QnAbstractCameraDataLoader **loaders, QObject *parent):
     base_type(parent),
+    m_enabled(true),
     m_resource(loaders[0]->resource())
 {
     init();
@@ -29,7 +30,8 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(QnAbstractCameraDataLoader 
     loadTimer->setInterval(requestIntervalMs / 10);  // time period will be loaded no often than once in 30 seconds, but timer should check it much more often
     loadTimer->setSingleShot(false);
     connect(loadTimer, &QTimer::timeout, this, [this] {
-        load();
+        if (m_enabled)
+            load();
     });
     loadTimer->start();
     load(true);
@@ -115,6 +117,18 @@ QnCachingCameraDataLoader *QnCachingCameraDataLoader::newInstance(const QnResour
     } else {
         return NULL;
     }
+}
+
+void QnCachingCameraDataLoader::setEnabled(bool value) {
+    if (m_enabled == value)
+        return;
+    m_enabled = value;
+    if (value)
+        load(true);
+}
+
+bool QnCachingCameraDataLoader::enabled() const {
+    return m_enabled;
 }
 
 QnResourcePtr QnCachingCameraDataLoader::resource() const {
@@ -284,8 +298,10 @@ void QnCachingCameraDataLoader::discardCachedData() {
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
         m_cameraChunks[timePeriodType].clear();
-        updateTimePeriods(timePeriodType, true);
-        emit periodsChanged(timePeriodType);
+        if (m_enabled) {
+            updateTimePeriods(timePeriodType, true);
+            emit periodsChanged(timePeriodType);
+        }
     }
 
 #ifdef QN_ENABLE_BOOKMARKS
@@ -315,6 +331,7 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodTy
         return;
 #endif
 
+    //TODO: #GDM #2.4 make sure we are not sending requests while loader is disabled
     if (forced || m_previousRequestTime[periodType].hasExpired(requestIntervalMs)) {
         loadInternal(periodType);
         m_previousRequestTime[periodType].restart();

@@ -529,10 +529,16 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
         return;
     }
 
-    m_syncedWidgets.insert(widget);
-    m_syncedResources.insert(widget->resource()->toResourcePtr(), QHashDummyValue());
+    auto syncedResource = widget->resource()->toResourcePtr();
 
-    connect(widget->resource()->toResource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+    m_syncedWidgets.insert(widget);
+    m_syncedResources.insert(syncedResource, QHashDummyValue());
+
+    connect(syncedResource, &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+
+    if(QnCachingCameraDataLoader *loader = this->loader(syncedResource)) {
+        loader->setEnabled(true);
+    }
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
@@ -543,7 +549,9 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     if(!m_syncedWidgets.remove(widget))
         return;
 
-    disconnect(widget->resource()->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+    auto syncedResource = widget->resource()->toResourcePtr();
+
+    disconnect(syncedResource, &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
     if (display() && !display()->isChangingLayout()){
         if(m_syncedWidgets.contains(m_currentMediaWidget))
@@ -552,11 +560,14 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
 
     /* QHash::erase does nothing when called for container's end, 
      * and is therefore perfectly safe. */
-    m_syncedResources.erase(m_syncedResources.find(widget->resource()->toResourcePtr()));
+    m_syncedResources.erase(m_syncedResources.find(syncedResource));
     m_motionIgnoreWidgets.remove(widget);
 
-    if(QnCachingCameraDataLoader *loader = this->loader(widget->resource()->toResourcePtr()))
+    if(QnCachingCameraDataLoader *loader = this->loader(syncedResource)) {
         loader->setMotionRegions(QList<QRegion>());
+        if (!m_syncedResources.contains(syncedResource))
+            loader->setEnabled(false);
+    }
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
