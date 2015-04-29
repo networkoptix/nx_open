@@ -661,6 +661,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
+    //TODO #ak this is a work around for BitDefender Free Edition
+    QThread::msleep( 250 );
+
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
 
     if (getState() == ConnectingStage1) {
