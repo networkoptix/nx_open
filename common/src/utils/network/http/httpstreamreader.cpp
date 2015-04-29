@@ -306,7 +306,8 @@ namespace nx_http
         Q_ASSERT( m_httpMessage.type != MessageType::none );
 
         HttpHeaders::const_iterator contentEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Content-Encoding") );
-        if( contentEncodingIter != m_httpMessage.headers().end() )
+        if( contentEncodingIter != m_httpMessage.headers().end() &&
+            contentEncodingIter->second != "identity" )
         {
             AbstractByteStreamConverter* contentDecoder = createContentDecoder( contentEncodingIter->second );
             if( contentDecoder == nullptr )
