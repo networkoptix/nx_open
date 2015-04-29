@@ -537,7 +537,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         addHttpChunkExtensions( &headers );
 
         dataCtx.encodedSourceData.clear();
-        dataCtx.encodedSourceData += QByteArray("--")+TUNNEL_MULTIPART_BOUNDARY+"\r\n"; //TODO #ak move to some variable
+        dataCtx.encodedSourceData += "\r\n"+QByteArray("--")+TUNNEL_MULTIPART_BOUNDARY+"\r\n"; //TODO #ak move to some variable
         nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
         dataCtx.encodedSourceData += "\r\n";
 #ifdef SEND_4BYTE_TRANSACTION_SIZE
