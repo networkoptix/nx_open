@@ -14,6 +14,7 @@
 #include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
+#include "utils/network/socket_factory.h"
 #include "transaction_log.h"
 #include <transaction/chunked_transfer_encoder.h>
 #include "common/common_module.h"
@@ -226,6 +227,7 @@ void QnTransactionTransport::setStateNoLock(State state)
         m_connected = true;
     }
     else if (state == Error) {
+        int x = 0;
     }
     else if (state == ReadyForStreaming) {
     }
@@ -677,10 +679,25 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 
     if( !m_outgoingDataSocket )
     {
+        assert( m_connectionType == outgoing );
+        //establishing connection
+        m_outgoingDataSocket.reset( SocketFactory::createStreamSocket() );
+        if( !m_outgoingDataSocket->setNonBlockingMode( true ) ||
+            !m_outgoingDataSocket->connectAsync(
+                SocketAddress(m_remoteAddr.host(), m_remoteAddr.port(nx_http::DEFAULT_HTTP_PORT)),
+                std::bind(&QnTransactionTransport::outgoingConnectionEstablished, this, _1) ) )
+        {
+           setStateNoLock( State::Error );
+        }
+        return;
     }
 
-    if( !m_outgoingDataSocket->sendAsync( dataCtx.encodedSourceData, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
+    if( !m_outgoingDataSocket->sendAsync(
+            dataCtx.encodedSourceData,
+            std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
+    {
         return setStateNoLock( State::Error );
+    }
 }
 
 void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent )
@@ -1117,6 +1134,31 @@ void QnTransactionTransport::startListeningNonSafe()
                 setStateNoLock( Error );
                 return;
             }
+    }
+}
+
+void QnTransactionTransport::outgoingConnectionEstablished( SystemError::ErrorCode errorCode )
+{
+    QMutexLocker lk( &m_mutex );
+
+    if( errorCode )
+    {
+        NX_LOG( lit("Failed to establish outgoing connection to %1. %2").
+            arg(SocketAddress(m_remoteAddr.host(), m_remoteAddr.port(nx_http::DEFAULT_HTTP_PORT)).toString()).
+            arg(SystemError::toString(errorCode)),
+            cl_logWARNING );
+        return setStateNoLock( State::Error );
+    }
+
+    assert( !m_dataToSend.empty() );
+
+    using namespace std::placeholders;
+    const DataToSend& dataCtx = m_dataToSend.front();
+    if( !m_outgoingDataSocket->sendAsync(
+            dataCtx.encodedSourceData,
+            std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
+    {
+        return setStateNoLock( State::Error );
     }
 }
 

@@ -277,6 +277,7 @@ private:
     bool readCreateIncomingTunnelMessage();
     void receivedTransaction( const QnByteArrayConstRef& tranData );
     void startListeningNonSafe();
+    void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );

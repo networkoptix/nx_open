@@ -138,7 +138,7 @@ void QnTransactionTcpProcessor::run()
         // 1-st stage
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
         d->response.headers.emplace( "Content-Length", "0" );   //only declaring content-type
-        sendResponse(lockOK ? CODE_OK : CODE_INVALID_PARAMETER , QnTransactionTransport::TUNNEL_CONTENT_TYPE);
+        sendResponse(lockOK ? nx_http::StatusCode::ok : nx_http::StatusCode::forbidden , QnTransactionTransport::TUNNEL_CONTENT_TYPE);
         if (!lockOK)
             return;
 
@@ -216,12 +216,12 @@ void QnTransactionTcpProcessor::run()
     d->response.headers.emplace( "Connection", "close" );
     if( fail )
     {
-        sendResponse( CODE_INVALID_PARAMETER, nx_http::StringType() );
+        sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
     else
     {
-        sendResponse( CODE_OK, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
+        sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
             d->socket,
