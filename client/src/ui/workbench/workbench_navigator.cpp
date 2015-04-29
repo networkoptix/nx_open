@@ -1142,6 +1142,9 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
         return;
 #endif
     
+    /* Check if no chunks were updated. */
+    if (startTimeMs == DATETIME_NOW)
+        return;
 
     /* We don't want duplicate loaders. */
     QSet<QnCachingCameraDataLoader *> loaders;

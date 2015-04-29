@@ -347,24 +347,26 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
         return;
     }
 
-    auto eraseIter = std::lower_bound(periods.begin(), periods.end(), erasePoint);
+    if (erasePoint < DATETIME_NOW) {
+        auto eraseIter = std::lower_bound(periods.begin(), periods.end(), erasePoint);
 
-    Q_ASSERT_X(eraseIter != periods.begin(), Q_FUNC_INFO, "Invalid semantics");
+        Q_ASSERT_X(eraseIter != periods.begin(), Q_FUNC_INFO, "Invalid semantics");
 
-    if (eraseIter != periods.begin() && 
-        (eraseIter == periods.end() || eraseIter->startTimeMs > erasePoint)
-        ) {
-        eraseIter--; /* We are sure, list is not empty. */
-        if (eraseIter->isInfinite() || eraseIter->endTimeMs() > erasePoint)
-            eraseIter->durationMs = std::max(0ll, erasePoint - eraseIter->startTimeMs);
-        if (!eraseIter->isValid())
+        if (eraseIter != periods.begin() && 
+            (eraseIter == periods.end() || eraseIter->startTimeMs > erasePoint)
+            ) {
+                eraseIter--; /* We are sure, list is not empty. */
+                if (eraseIter->isInfinite() || eraseIter->endTimeMs() > erasePoint)
+                    eraseIter->durationMs = std::max(0ll, erasePoint - eraseIter->startTimeMs);
+                if (!eraseIter->isValid())
+                    eraseIter = periods.erase(eraseIter);
+                else
+                    eraseIter++;
+        } 
+
+        while (eraseIter != periods.end())
             eraseIter = periods.erase(eraseIter);
-        else
-            eraseIter++;
-    } 
-
-    while (eraseIter != periods.end())
-        eraseIter = periods.erase(eraseIter);
+    }
 
 
     Q_ASSERT_X(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
