@@ -78,7 +78,7 @@ void QnTransactionTcpProcessor::run()
 
     if( d->request.requestLine.method == nx_http::Method::POST )
     {
-        auto connectionGuidIter = d->request.headers.find( "X-Nx-Connection-Guid" );
+        auto connectionGuidIter = d->request.headers.find( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == d->request.headers.end() )
         {
             sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
@@ -86,7 +86,7 @@ void QnTransactionTcpProcessor::run()
         }
         const QnUuid connectionGuid( connectionGuidIter->second );
 
-        auto connectionDirectionIter = d->request.headers.find( "X-Nx-Connection-Direction" );
+        auto connectionDirectionIter = d->request.headers.find( nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME );
         if( connectionDirectionIter == d->request.headers.end() )
         {
             sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
@@ -112,9 +112,9 @@ void QnTransactionTcpProcessor::run()
     }
 
 
-    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader("runtime-guid", qnCommon->runningInstanceGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader("system-identity-time", QByteArray::number(qnCommon->systemIdentityTime())));
+    d->response.headers.insert(nx_http::HttpHeader(nx_ec::EC2_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader(nx_ec::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader(nx_ec::EC2_SYSTEM_IDENTITY_HEADER_NAME, QByteArray::number(qnCommon->systemIdentityTime())));
     d->response.headers.insert(nx_http::HttpHeader(
         nx_ec::EC2_PROTO_VERSION_HEADER_NAME,
         nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
@@ -149,9 +149,9 @@ void QnTransactionTcpProcessor::run()
         }
         parseRequest();
 
-        d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-        d->response.headers.insert(nx_http::HttpHeader("runtime-guid", qnCommon->runningInstanceGUID().toByteArray()));
-        d->response.headers.insert(nx_http::HttpHeader("system-identity-time", QByteArray::number(qnCommon->systemIdentityTime())));
+        d->response.headers.insert(nx_http::HttpHeader(nx_ec::EC2_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader(nx_ec::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader(nx_ec::EC2_SYSTEM_IDENTITY_HEADER_NAME, QByteArray::number(qnCommon->systemIdentityTime())));
         d->response.headers.insert(nx_http::HttpHeader(
             nx_ec::EC2_PROTO_VERSION_HEADER_NAME,
             nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
@@ -169,7 +169,7 @@ void QnTransactionTcpProcessor::run()
         }
     }
 
-    auto connectionGuidIter = d->request.headers.find( "X-Nx-Connection-Guid" );
+    auto connectionGuidIter = d->request.headers.find( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME );
     if( connectionGuidIter == d->request.headers.end() )
     {
         sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
@@ -178,7 +178,7 @@ void QnTransactionTcpProcessor::run()
     }
     const QnUuid connectionGuid( connectionGuidIter->second );
 
-    auto connectionDirectionIter = d->request.headers.find( "X-Nx-Connection-Direction" );
+    auto connectionDirectionIter = d->request.headers.find( nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME );
     if( connectionDirectionIter == d->request.headers.end() )
     {
         sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
@@ -198,10 +198,10 @@ void QnTransactionTcpProcessor::run()
     if( acceptEncodingHeaderIter != d->request.headers.end() )
     {
         nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
-        if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
-            contentEncoding = "gzip";
-        else if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
+        if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
             contentEncoding = "identity";
+        else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
+            contentEncoding = "gzip";
         //else
             //TODO #ak not supported encoding requested
     }

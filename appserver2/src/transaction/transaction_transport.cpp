@@ -342,8 +342,8 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
 
     QUrlQuery q = QUrlQuery(remoteAddr.query());
     q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
-    m_httpClient->addRequestHeader( "X-Nx-Connection-Guid", m_connectionGuid.toByteArray() );
-    m_httpClient->addRequestHeader( "X-Nx-Connection-Direction", "incoming" );
+    m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid.toByteArray() );
+    m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME, "incoming" );
 
     // Client reconnects to the server
     if( m_localPeer.isClient() ) {
@@ -672,8 +672,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
             addHttpChunkExtensions( &request.headers );
             request.headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
-            request.headers.emplace( "X-Nx-Connection-Guid", m_connectionGuid.toByteArray() );
-            request.headers.emplace( "X-Nx-Connection-Direction", "outgoing" );
+            request.headers.emplace( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid.toByteArray() );
+            request.headers.emplace( nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME, "outgoing" );
             request.messageBody = dataCtx.sourceData;
             dataCtx.encodedSourceData = request.serialized();
         }
@@ -746,7 +746,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             QTimer::singleShot(0, this, SLOT(repeatDoGet()));
         }
         else {
-            QnUuid guid(nx_http::getHeaderValue( client->response()->headers, "x-server-guid" ));
+            QnUuid guid(nx_http::getHeaderValue( client->response()->headers, nx_ec::EC2_SERVER_GUID_HEADER_NAME ));
             if (!guid.isNull()) {
                 emit peerIdDiscovered(m_remoteAddr, guid);
                 emit remotePeerUnauthorized(guid);
@@ -757,9 +757,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     }
 
 
-    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
-    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find("runtime-guid");
-    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find("system-identity-time");
+    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(nx_ec::EC2_GUID_HEADER_NAME);
+    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(nx_ec::EC2_RUNTIME_GUID_HEADER_NAME);
+    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(nx_ec::EC2_SYSTEM_IDENTITY_HEADER_NAME);
     if (itrSystemIdentityTime != client->response()->headers.end())
         setRemoteIdentityTime(itrSystemIdentityTime->second.toLongLong());
 
@@ -880,8 +880,8 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             //request.headers.emplace( "Content-Length", "3276701" );
             request.headers.emplace( "Connection", "keep-alive" );
             request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
-            request.headers.emplace( "X-Nx-Connection-Guid", m_connectionGuid.toByteArray() );
-            request.headers.emplace( "X-Nx-Connection-Direction", "outgoing" );
+            request.headers.emplace( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid.toByteArray() );
+            request.headers.emplace( nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME, "outgoing" );
             addEncodedData( request.serialized() );
 #endif
 
