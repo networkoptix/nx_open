@@ -464,6 +464,7 @@ void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tra
             serializedTran ) )
     {
         Q_ASSERT( false );
+        setStateNoLock( State::Error );
         return;
     }
     Q_ASSERT( !transportHeader.processedPeers.empty() );
