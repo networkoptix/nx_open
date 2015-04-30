@@ -143,6 +143,8 @@ namespace ite
 
         void open()
         {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
             resetWanted();
             m_responses.clear();
             m_ready.store(false);
@@ -150,6 +152,8 @@ namespace ite
 
         void close()
         {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
             resetWanted();
             m_ready.store(false);
         }

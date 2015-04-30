@@ -59,7 +59,11 @@ namespace ite
             if (error != ReturnChannelError::NO_ERROR)
                 return;
 
-            resetWanted(cmdID, code);
+            {
+                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+                resetWanted(cmdID, code);
+            }
         }
 #if 1
         else
@@ -91,11 +95,7 @@ namespace ite
         if (cmd)
         {
             if (m_wantedCmd.compare_exchange_strong(cmd, 0))
-            {
-                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
                 m_responses[cmd] = code;
-            }
         }
         else
             m_wantedCmd.store(0);
