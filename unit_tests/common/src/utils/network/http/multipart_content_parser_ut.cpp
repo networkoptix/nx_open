@@ -35,9 +35,10 @@ TEST( HttpMultipartContentParser, genericTest )
         "3xxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx"
         "xxxxxxxxxxxxxxx\r\r\rx\rxxxxxxxxxxxxxxxxxx"
         "xxxxxxxxxxxxxxxxxxxxx\n\n\n\nxxx\r\n\r\nxxxxxxxxx4";
-    //const nx::Buffer frame3 = 
+    const nx::Buffer frame3 = "";
+    //const nx::Buffer frame4 = 
     //    "5xxxxxxxxxx\r\n\r\n\r\n\r\n\r\r\r\r\r\n\n\n\n6";
-    const nx::Buffer frame3 = 
+    const nx::Buffer frame4 = 
         "5xxxxxxxxxx\r\n\r\n\r\n\r\n\r\r\r\r\r\n\n\n\nyyyyyyyyyyyyyy6";
 
     const nx::Buffer testData = 
@@ -52,17 +53,24 @@ TEST( HttpMultipartContentParser, genericTest )
         +frame2+
         "\r\n"
         "--fbdr\r\n"
+        "Content-Length: "+nx::Buffer::number(frame3.size())+"\r\n"
         "Content-Type: image/jpeg\r\n"
         "\r\n"
         +frame3+
+        "\r\n"
+        "--fbdr\r\n"
+        "Content-Type: image/jpeg\r\n"
+        "\r\n"
+        +frame4+
         "\r\n";
     parser.processData( testData );
     parser.flush();
 
-    ASSERT_EQ( frames.size(), 3 );
+    ASSERT_EQ( frames.size(), 4 );
     ASSERT_EQ( frames[0], frame1 );
     ASSERT_EQ( frames[1], frame2 );
     ASSERT_EQ( frames[2], frame3 );
+    ASSERT_EQ( frames[3], frame4 );
 
     //TODO #ak test with Content-Length specified
 }

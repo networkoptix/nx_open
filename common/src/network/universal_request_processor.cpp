@@ -3,11 +3,13 @@
 #include <QtCore/QElapsedTimer>
 #include <QList>
 #include <QByteArray>
+#include "utils/gzip/gzip_compressor.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "universal_request_processor_p.h"
 #include "authenticate_helper.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
+
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
@@ -76,7 +78,28 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
             if (nx_http::getHeaderValue( d->response.headers, "x-server-guid" ).isEmpty())
                 d->response.headers.insert(nx_http::HttpHeader("x-server-guid", qnCommon->moduleGUID().toByteArray()));
-            sendResponse(isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED, "text/html");
+
+            auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
+            QByteArray contentEncoding;
+            if( acceptEncodingHeaderIter != d->request.headers.end() )
+            {
+                nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
+                if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
+                    ;   //preferring identity
+                else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
+                {
+                    contentEncoding = "gzip";
+                    d->responseBody = GZipCompressor::compressData(d->responseBody);
+                }
+                else
+                {
+                    //TODO #ak not supported encoding requested
+                }
+            }
+            sendResponse(
+                isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
+                "text/html",
+                contentEncoding );
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT)
                 return false;

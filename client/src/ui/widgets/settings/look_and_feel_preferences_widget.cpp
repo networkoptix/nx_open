@@ -25,6 +25,7 @@
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+#include <utils/common/app_info.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
 #include <utils/local_file_cache.h>
@@ -90,7 +91,8 @@ void QnLookAndFeelPreferencesWidget::updateFromSettings() {
 
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
 
-    m_oldLanguage = 0;
+    m_oldLanguage = -1;
+    int defaultLanguageIndex = -1;
     QString translationPath = qnSettings->translationPath();
     for(int i = 0; i < ui->languageComboBox->count(); i++) {
         QnTranslation translation = ui->languageComboBox->itemData(i, Qn::TranslationRole).value<QnTranslation>();
@@ -98,7 +100,16 @@ void QnLookAndFeelPreferencesWidget::updateFromSettings() {
             m_oldLanguage = i;
             break;
         }
+
+        if (translation.localeCode() == QnAppInfo::defaultLanguage())
+            defaultLanguageIndex = i;
     }
+
+    if (m_oldLanguage < 0) {
+        Q_ASSERT_X(defaultLanguageIndex >= 0, Q_FUNC_INFO, "default language must definitely be present in translations");
+        m_oldLanguage = std::max(defaultLanguageIndex, 0);
+    }
+
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
 
     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
