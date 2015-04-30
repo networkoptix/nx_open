@@ -25,13 +25,13 @@ bool QnTimePeriodCameraData::isEmpty() const {
     return m_data.isEmpty();
 }
 
-void QnTimePeriodCameraData::append(const QnAbstractCameraDataPtr &other) {
+void QnTimePeriodCameraData::update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) {
     if (!other)
         return;
-    append(other->dataSource());
+    update(other->dataSource(), updatedPeriod);
 }
 
-void QnTimePeriodCameraData::append(const QList<QnAbstractCameraDataPtr> &other) {
+void QnTimePeriodCameraData::mergeInto(const QList<QnAbstractCameraDataPtr> &other) {
     if (other.isEmpty())
         return;
 
@@ -44,17 +44,9 @@ void QnTimePeriodCameraData::append(const QList<QnAbstractCameraDataPtr> &other)
     m_data = QnTimePeriodList::mergeTimePeriods(allPeriods);
 }
 
-void QnTimePeriodCameraData::append(const QnTimePeriodList &other) {
-    if (other.isEmpty())
-        return;
-
-    /* Check if the current last piece marked as Live. */ 
-    QVector<QnTimePeriodList> allPeriods;
-    if (!m_data.isEmpty() && m_data.last().durationMs == -1) 
-        if (other.last().startTimeMs >= m_data.last().startTimeMs)
-            m_data.removeLast();    //cut "recording" piece
-    allPeriods << m_data << other;
-    m_data = QnTimePeriodList::mergeTimePeriods(allPeriods); // union data
+void QnTimePeriodCameraData::update(const QnTimePeriodList &other, const QnTimePeriod &updatedPeriod) {
+    /* Update data, received from one server and related to one camera. */
+    QnTimePeriodList::overwriteTail(m_data, other, updatedPeriod.startTimeMs);
 }
 
 void QnTimePeriodCameraData::clear() {
@@ -79,7 +71,7 @@ bool QnTimePeriodCameraData::trim(qint64 trimTime) {
         return false;
 
     QnTimePeriod period = m_data.last();
-    if(period.durationMs != -1)
+    if(!period.isInfinite())
         return false;
 
     qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);

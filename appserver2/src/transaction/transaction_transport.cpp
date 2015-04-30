@@ -281,12 +281,12 @@ void QnTransactionTransport::fillAuthInfo()
     else {
         QUrl url = QnAppServerConnectionFactory::url();
         m_httpClient->setUserName(url.userName());
-		if (dbManager) {
-	        QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
-	        if (adminUser) {
-	            m_httpClient->setUserPassword(adminUser->getDigest());
-	            m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
-	        }
+        if (dbManager) {
+            QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
+            if (adminUser) {
+                m_httpClient->setUserPassword(adminUser->getDigest());
+                m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+            }
         }
         else {
             m_httpClient->setUserPassword(url.password());
@@ -588,7 +588,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             addHttpChunkExtensions( &headers );
 
             dataCtx.encodedSourceData.clear();
-            dataCtx.encodedSourceData += QByteArray("--")+TUNNEL_MULTIPART_BOUNDARY+"\r\n"; //TODO #ak move to some variable
+            dataCtx.encodedSourceData += QByteArray("\r\n--")+TUNNEL_MULTIPART_BOUNDARY+"\r\n"; //TODO #ak move to some variable
             nx_http::serializeHeaders( headers, &dataCtx.encodedSourceData );
             dataCtx.encodedSourceData += "\r\n";
             dataCtx.encodedSourceData += dataCtx.sourceData;
