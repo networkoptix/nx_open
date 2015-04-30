@@ -27,7 +27,7 @@
 #include "http/custom_headers.h"
 #include "version.h"
 
-#define USE_SINGLE_TWO_WAY_CONNECTION
+//#define USE_SINGLE_TWO_WAY_CONNECTION
 #define SEND_EACH_TRANSACTION_AS_POST_REQUEST
 //!if not defined, ubjson is used
 //#define USE_JSON
@@ -112,7 +112,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_connectionGuid(connectionGuid)
 {
     if( m_connectionType == ConnectionType::bidirectional )
-        m_incomingDataSocket = m_outgoingDataSocket;
+        m_incomingDataSocket = socket;
 
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
@@ -654,6 +654,8 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     QMutexLocker lk( &m_mutex );
 
     assert( m_peerRole == prAccepting );
+    assert( m_connectionType != ConnectionType::bidirectional );
+    
     m_incomingDataSocket = socket;
 
     //checking transactions format
@@ -721,9 +723,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             //sending transactions as a POST request
             nx_http::Request request;
             request.requestLine.method = nx_http::Method::POST;
-            request.requestLine.url = 
-                m_remoteAddr.path() /*+ 
-                (m_remoteAddr.hasQuery() ? (lit("?") + m_remoteAddr.query()) : QString())*/;
+            //request.requestLine.url = lit("/ec2/forward_events");
+            request.requestLine.url = m_remoteAddr.path();
             request.requestLine.version = nx_http::http_1_1;
             request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             request.headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
@@ -1031,8 +1032,8 @@ QString QnTransactionTransport::toString( State state )
 
 void QnTransactionTransport::addHttpChunkExtensions( nx_http::HttpHeaders* const headers )
 {
-    //for( auto val: m_beforeSendingChunkHandlers )
-    //    val.second( this, headers );
+    for( auto val: m_beforeSendingChunkHandlers )
+        val.second( this, headers );
 }
 
 void QnTransactionTransport::processChunkExtensions( const nx_http::HttpHeaders& headers )
