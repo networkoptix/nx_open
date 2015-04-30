@@ -547,10 +547,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
-    else if (!hasDualStreaming2())
-    //    setMotionType(Qn::MT_NoMotion);
-        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QString() );   //no motion supported by camera
-
     
     if (addFlags != Qn::NoCapabilities)
         setCameraCapabilities(getCameraCapabilities() | addFlags);

@@ -46,7 +46,7 @@ struct CameraInfo: public EndpointAdditionalInfo
 
 class OnvifResourceSearcherWsdd
 {
-    static QString& LOCAL_ADDR;
+    static QString LOCAL_ADDR;
     static const char SCOPES_NAME_PREFIX[];
     static const char SCOPES_LOCATION_PREFIX[];
     static const char SCOPES_HARDWARE_PREFIX[];

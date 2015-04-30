@@ -278,7 +278,9 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     QnUuid ownGuid = qnCommon->moduleGUID();
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
-    if (!mServer || !ownServer)
+    if (!mServer)
+        return true; // can take foreign camera is camera's server is absent
+    if (!ownServer)
         return false;
 
     if (camera->hasFlags(Qn::desktop_camera))

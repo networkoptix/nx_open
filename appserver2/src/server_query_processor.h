@@ -330,6 +330,26 @@ namespace ec2
             return processUpdateSync( tran, transactionsToSend, 0 );
         }
 
+        ErrorCode processUpdateSync(
+            QnTransaction<ApiResetBusinessRuleData>& tran,
+            std::list<std::function<void()>>* const transactionsToSend,
+            int /*dummy*/ = 0 )
+        {
+            ErrorCode errorCode = processMultiUpdateSync(
+                ApiCommand::removeBusinessRule,
+                tran.isLocal,
+                dbManager->getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
+                transactionsToSend );
+            if( errorCode != ErrorCode::ok )
+                return errorCode;
+
+            return processMultiUpdateSync(
+                ApiCommand::saveBusinessRule,
+                tran.isLocal,
+                tran.params.defaultRules,
+                transactionsToSend );
+        }
+
         template<class QueryDataType>
         ErrorCode processUpdateSync(
             QnTransaction<QueryDataType>& tran,

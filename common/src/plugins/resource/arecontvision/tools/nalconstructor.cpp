@@ -171,6 +171,13 @@ int create_sps_pps(
 				   int deblock_filter,
 				   unsigned char* data, int max_datalen)
 {
+
+    int bottomCrop = 0;
+    if (frameHeight == 1088)
+        bottomCrop = 8;
+    else if (frameHeight == 1088/2)
+        bottomCrop = 4;
+
 	bs_t stream;
 	bs_init(&stream,data,max_datalen); // just stream init
 
@@ -214,7 +221,17 @@ int create_sps_pps(
 
 	bs_write( &stream, 1, 1); // direct_8x8_inference_flag
 
-	bs_write( &stream, 1, 0 ); //frame_cropping_flag; in first version = 0;
+    if (bottomCrop) {
+        bs_write( &stream, 1, 1); //frame_cropping_flag exists
+
+        bs_write_ue( &stream, 0); // crop_left
+        bs_write_ue( &stream, 0); // crop_right
+        bs_write_ue( &stream, 0); // crop_top
+        bs_write_ue( &stream, bottomCrop / 2); // crop_bottom
+    }
+    else {
+	    bs_write( &stream, 1, 0 ); //no frame_cropping_flag;
+    }
 
 	bs_write( &stream, 1, 0 ); //vui_parameters_present_flag
 

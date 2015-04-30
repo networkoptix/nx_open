@@ -85,8 +85,8 @@ typedef QHash<QString, DWCameraSetting> DWCameraSettings;
 
 class DWCameraSettingReader: public CameraSettingReader
 {
-    static const QString& IMAGING_GROUP_NAME;
-    static const QString& MAINTENANCE_GROUP_NAME;
+    static const QString IMAGING_GROUP_NAME;
+    static const QString MAINTENANCE_GROUP_NAME;
 
     DWCameraSettings& m_settings;
 

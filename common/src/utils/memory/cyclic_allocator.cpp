@@ -98,6 +98,15 @@ CyclicAllocator::CyclicAllocator( size_t arenaSize )
 CyclicAllocator::~CyclicAllocator()
 {
     assert( m_leftMostAllocatedBlock == m_freeMemStart );   //all blocks have been freed
+    
+    Arena* arena = m_leftMostAllocatedBlock.arena;
+    while (arena) {
+        Arena* next = arena->next;
+        delete arena;
+        arena = next;
+        if (arena == m_leftMostAllocatedBlock.arena)
+            break;
+    }
 }
 
 #ifdef CA_DEBUG

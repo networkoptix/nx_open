@@ -35,14 +35,16 @@ namespace {
      */
     bool resourceExistsInPool(const QnResourcePtr &resource) {
         bool existResource = false;
-        if (qnResPool->hasSuchResource(resource->getUniqueId())) { 
-            existResource = true; // already in resource pool 
+        QnResourcePtr res = qnResPool->getResourceByUniqId(resource->getUniqueId());
+        if (res && qnResPool->getResourceById(res->getParentId())) {
+            existResource = true; // already in resource pool
         }
         else {
             // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition checking for IP address
             QnSecurityCamResourcePtr netRes = resource.dynamicCast<QnSecurityCamResource>();
             if (netRes) {
                 QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+                existResList = existResList.filtered(([](const QnNetworkResourcePtr& res) { return qnResPool->getResourceById(res->getParentId());} ));
                 for(const QnNetworkResourcePtr& existRes: existResList) 
                 {
                     QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();

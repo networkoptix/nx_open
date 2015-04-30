@@ -18,6 +18,7 @@ namespace {
     const QString dynamicVideoLayoutKey         = lit("dynamicVideoLayout");
     const QString motionStreamKey               = lit("motionStream");
     const QString rotationKey                   = lit("rotation");
+    const QString panicRecordingKey             = lit("panic_mode");
 
     /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
     const qreal noCustomAspectRatio = 0.0;
@@ -207,6 +208,10 @@ QString QnMediaResource::dontRecordSecondaryStreamKey() {
 
 QString QnMediaResource::rtpTransportKey() {
     return ::rtpTransportKey;
+}
+
+QString QnMediaResource::panicRecordingKey() {
+    return ::panicRecordingKey;
 }
 
 QString QnMediaResource::dynamicVideoLayoutKey() {
