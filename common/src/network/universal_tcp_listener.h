@@ -10,8 +10,10 @@
 #include "utils/network/http/httptypes.h"
 
 
+class QnUniversalTcpListener;
+
 template <class T>
-QnTCPConnectionProcessor* handlerInstance(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+QnTCPConnectionProcessor* handlerInstance(QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner)
 {
     return new T(socket, owner);
 };
@@ -20,7 +22,7 @@ class QnUniversalTcpListener: public QnTcpListener
 {
 private:
 public:
-    typedef QnTCPConnectionProcessor* (*InstanceFunc)(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    typedef QnTCPConnectionProcessor* (*InstanceFunc)(QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner);
     struct HandlerInfo
     {
         QByteArray protocol;
@@ -62,46 +64,51 @@ public:
         m_proxyInfo.proxyCond = cond;
     }
 
-    InstanceFunc findHandler(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const nx_http::Request& request);
-    QnTCPConnectionProcessor* createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const nx_http::Request& request);
+    InstanceFunc findHandler(const QByteArray& protocol, const nx_http::Request& request);
 
     /* proxy support functions */
 
-    void setProxyParams(const QUrl& proxyServerUrl, const QString& selfId);
-    void addProxySenderConnections(int size);
+    void setProxySelfId(const QString& selfId);
+    void addProxySenderConnections(const SocketAddress& proxyUrl, int securityCode, int size);
 
-    bool registerProxyReceiverConnection(const QString& url, QSharedPointer<AbstractStreamSocket> socket);
-    QSharedPointer<AbstractStreamSocket> getProxySocket(const QString& guid, int timeout);
-    void setProxyPoolSize(int value);
+    bool registerProxyReceiverConnection(const QString& url, int securityCode,
+                                         QSharedPointer<AbstractStreamSocket> socket);
+
+    typedef std::function<void(int, int)> SocketRequest;
+    QSharedPointer<AbstractStreamSocket> getProxySocket(
+            const QString& guid, int timeout, const SocketRequest& socketRequest = SocketRequest());
 
     void disableAuth();
 
     bool isProxy(const nx_http::Request& request);
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket) override;
     virtual void doPeriodicTasks() override;
+
 private:
     struct AwaitProxyInfo
     {
-        explicit AwaitProxyInfo(QSharedPointer<AbstractStreamSocket> _socket): socket(_socket) { timer.restart(); }
-        AwaitProxyInfo() { timer.restart(); }
+        explicit AwaitProxyInfo(const QSharedPointer<AbstractStreamSocket>& _socket)
+            : socket(_socket) { timer.restart(); }
 
         QSharedPointer<AbstractStreamSocket> socket;
         QElapsedTimer timer;
     };
 
+    struct AwaitProxyStack
+    {
+         AwaitProxyStack() : securityCode(qrand()) {}
+
+         int securityCode;
+         QList<AwaitProxyInfo> socketStack;
+    };
+
     QList<HandlerInfo> m_handlers;
     ProxyInfo m_proxyInfo;
-    QUrl m_proxyServerUrl;
     QString m_selfIdForProxy;
     QMutex m_proxyMutex;
-    QWaitCondition m_proxyWaitCond;
-
-    typedef QMultiMap<QString, AwaitProxyInfo> ProxyList;
-    ProxyList m_awaitingProxyConnections;
-
-    QSet<QString> m_proxyConExists;
-    int m_proxyPoolSize;
+    QMap<QString, AwaitProxyStack> m_proxyPool;
+    QWaitCondition m_proxyCondition;
     bool m_needAuth;
 };
 

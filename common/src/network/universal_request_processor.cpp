@@ -4,7 +4,6 @@
 #include <QList>
 #include <QByteArray>
 #include "utils/network/tcp_connection_priv.h"
-#include "universal_tcp_listener.h"
 #include "universal_request_processor_p.h"
 #include "authenticate_helper.h"
 #include "utils/common/synctime.h"
@@ -21,8 +20,10 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
     stop();
 }
 
-QnUniversalRequestProcessor::QnUniversalRequestProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth):
-QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket)
+QnUniversalRequestProcessor::QnUniversalRequestProcessor(
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnUniversalTcpListener* owner, bool needAuth)
+    : QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
@@ -32,8 +33,10 @@ QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket)
     setObjectName( QLatin1String("QnUniversalRequestProcessor") );
 }
 
-QnUniversalRequestProcessor::QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth):
-QnTCPConnectionProcessor(priv, socket)
+QnUniversalRequestProcessor::QnUniversalRequestProcessor(
+        QnUniversalRequestProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
+        QnUniversalTcpListener* owner, bool needAuth)
+    : QnTCPConnectionProcessor(priv, socket)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
@@ -56,11 +59,16 @@ QByteArray QnUniversalRequestProcessor::unauthorizedPageBody()
 bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
 {
     Q_D(QnUniversalRequestProcessor);
+
+    // Reverse proxy connection has it's own authentification mode
+    if (!nx_http::getHeaderValue(d->request.headers, "x-security-code").isEmpty())
+        return true;
+
     int retryCount = 0;
     if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
-        const bool isProxy = static_cast<QnUniversalTcpListener*>(d->owner)->isProxy(d->request);
+        const bool isProxy = d->owner->isProxy(d->request);
         QElapsedTimer t;
         t.restart();
         while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId) && d->socket->isConnected())
@@ -93,7 +101,7 @@ void QnUniversalRequestProcessor::run()
 
     initSystemThreadId();
 
-    if (!readRequest()) 
+    if (!readRequest())
         return;
 
     QElapsedTimer t;
@@ -107,8 +115,11 @@ void QnUniversalRequestProcessor::run()
         {
             parseRequest();
 
-            bool isHandlerExist = dynamic_cast<QnUniversalTcpListener*>(d->owner)->findHandler(d->socket, d->request.requestLine.version.protocol, d->request) != 0;
-            if (isHandlerExist && !authenticate(&d->authUserId))
+            auto handler = d->owner->findHandler(d->protocol, d->request);
+            if (!handler)
+                return;
+
+            if (!authenticate(&d->authUserId))
                 return;
 
             d->response.headers.clear();
@@ -117,7 +128,8 @@ void QnUniversalRequestProcessor::run()
                 d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
                 d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
             }
-            if( !processRequest() )
+
+            if (!processRequest(handler))
             {
                 QByteArray contentType;
                 int rez = redirectTo(QnTcpListener::defaultPage(), contentType);
@@ -137,16 +149,20 @@ void QnUniversalRequestProcessor::run()
         d->socket->close();
 }
 
-bool QnUniversalRequestProcessor::processRequest()
+bool QnUniversalRequestProcessor::processRequest(QnUniversalTcpListener::InstanceFunc handler)
 {
     Q_D(QnUniversalRequestProcessor);
 
     QMutexLocker lock(&d->mutex);
-    d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, d->request.requestLine.version.protocol, d->request);
-    if( !d->processor )
+    if (!handler)
+        handler = d->owner->findHandler(d->protocol, d->request);
+
+    if (!handler)
         return false;
 
-    if (d->processor && !needToStop()) 
+    d->processor = handler(d->socket, d->owner);
+
+    if ( !needToStop() )
     {
         copyClientRequestTo(*d->processor);
         d->processor->execute(d->mutex);
@@ -155,6 +171,7 @@ bool QnUniversalRequestProcessor::processRequest()
         else 
             d->processor->releaseSocket();
     }
+
     delete d->processor;
     d->processor = 0;
     return true;

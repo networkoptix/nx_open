@@ -23,6 +23,7 @@
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
+#include "nx_ec/data/api_reverse_connection_data.h"
 #include "managers/time_manager.h"
 
 #include <utils/common/checked_cast.h>
@@ -173,6 +174,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::updatePersistentSequence:          return handleTransactionParams<ApiUpdateSequenceData>         (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::markLicenseOverflow:     return handleTransactionParams<ApiLicenseOverflowData>         (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::openReverseConnection:   return handleTransactionParams<ApiReverseConnectionData>         (serializedTransaction, &stream, transaction, function, fastFunction);
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
         Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
@@ -675,7 +677,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         break;
     default:
         // general transaction
-        if (!tran.persistentInfo.isNull() && dbManager)
+        if (ec2::ApiCommand::isPersistent(tran.command) && !tran.persistentInfo.isNull()
+                && dbManager)
         {
             QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
             ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );

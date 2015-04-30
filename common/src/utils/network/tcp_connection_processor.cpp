@@ -332,6 +332,7 @@ bool QnTCPConnectionProcessor::readRequest()
             break;
         }
     }
+
     return false;
 }
 

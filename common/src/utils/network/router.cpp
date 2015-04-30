@@ -41,8 +41,13 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     }
 
     QnUuid routeVia = connection->routeToPeerVia(id);
-    if (routeVia == id || routeVia.isNull())
+    if (routeVia.isNull())
         return result; // can't route
+    if (routeVia == id) {
+        result.reverseConnect = true;
+        return result; // need backwards connection
+    }
+
     result.addr = m_moduleFinder->primaryAddress(routeVia);
     if (!result.addr.isNull())
         result.gatewayId = routeVia; // route gateway is found

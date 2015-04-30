@@ -2,6 +2,7 @@
 #include "network/universal_request_processor_p.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
+#include "utils/common/log.h"
 #include "universal_tcp_listener.h"
 
 #include <QtCore/QElapsedTimer>
@@ -15,16 +16,21 @@ static const int PROXY_KEEP_ALIVE_INTERVAL = 60 * 1000;
 class QnProxySenderConnectionPrivate: public QnUniversalRequestProcessorPrivate
 {
 public:
-    QUrl proxyServerUrl;
+    SocketAddress proxyServerUrl;
     QString guid;
+    int securityCode;
 };
 
-QnProxySenderConnection::QnProxySenderConnection(const QUrl& proxyServerUrl, const QString& guid, QnTcpListener* owner):
-    QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate, QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket()), owner, false)
+QnProxySenderConnection::QnProxySenderConnection(
+        const SocketAddress& proxyServerUrl, const QString& guid, int securityCode,
+        QnUniversalTcpListener* owner)
+    : QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate,
+        QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket()), owner, false)
 {
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;
     d->guid = guid;
+    d->securityCode = securityCode;
     setObjectName( lit("QnProxySenderConnection") );
 }
 
@@ -49,13 +55,14 @@ QByteArray QnProxySenderConnection::readProxyResponse()
         if (QnTCPConnectionProcessor::isFullMessage(result))
             return result;
     }
+
     return QByteArray();
 }
 
 void QnProxySenderConnection::addNewProxyConnect()
 {
     Q_D(QnProxySenderConnection);
-    (dynamic_cast<QnUniversalTcpListener*>(d->owner))->addProxySenderConnections(1);
+    d->owner->addProxySenderConnections(d->proxyServerUrl, d->securityCode, 1);
 }
 
 void QnProxySenderConnection::doDelay()
@@ -75,8 +82,9 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
     while (!m_needStop && d->socket->isConnected() && totalSend < data.length())
     {
         int sended = d->socket->send(data.mid(totalSend));
-        if (sended > 0)
-            totalSend += sended;
+        if (sended <= 0)
+            return sended;
+        totalSend += sended;
     }
     return totalSend;
 }
@@ -87,31 +95,31 @@ void QnProxySenderConnection::run()
 
     initSystemThreadId();
 
-    if (!d->socket->connect(d->proxyServerUrl.host(), d->proxyServerUrl.port(), SOCKET_TIMEOUT)) {
-        doDelay();
-        addNewProxyConnect();
+    if (!d->socket->connect(d->proxyServerUrl, SOCKET_TIMEOUT))
         return;
-    }
 
     d->socket->setSendTimeout(SOCKET_TIMEOUT);
     d->socket->setRecvTimeout(SOCKET_TIMEOUT);
 
-    QByteArray proxyRequest = QString(lit("CONNECT %1 PROXY/1.0\r\n\r\n")).arg(d->guid).toUtf8();
+    auto proxyRequest = QString(lit(
+        "CONNECT /proxy-reverse HTTP/1.1\r\n" \
+        "X-Server-Uuid: %1\r\n"
+        "X-Security-Code: %2\r\n"
+        "\r\n")).arg(d->guid).arg(d->securityCode).toUtf8();
 
-    // send proxy response
     int sended = sendRequest(proxyRequest);
-    if (sended < proxyRequest.length()) {
-        doDelay();
-        addNewProxyConnect();
+    if (sended < proxyRequest.length())
+    {
+        NX_LOG(lit("QnProxySenderConnection: can not connect to %1")
+               .arg(d->proxyServerUrl.toString()), cl_logWARNING);
         return;
     }
 
-
-    // read proxy response
     QByteArray response = readProxyResponse();
-    if (response.isEmpty() && !response.startsWith("PROXY")) {
-        doDelay();
-        addNewProxyConnect();
+    if (response.isEmpty())
+    {
+        NX_LOG(lit("QnProxySenderConnection: no response from %1")
+               .arg(d->proxyServerUrl.toString()), cl_logWARNING);
         return;
     }
 
@@ -125,7 +133,7 @@ void QnProxySenderConnection::run()
         if (gotRequest)
         {
             timer.restart();
-            if (d->clientRequest.startsWith("PROXY"))
+            if (d->clientRequest.startsWith("HTTP 200 OK"))
                 gotRequest = false; // proxy keep-alive packets
             else
                 break;
