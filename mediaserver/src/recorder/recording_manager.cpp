@@ -418,6 +418,8 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
 
 void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
 {
+    if (!cameraRes)
+        return;
     if (cameraRes->hasFlags(Qn::foreigner) && !m_recordMap.contains(cameraRes))
         return;
 
@@ -494,6 +496,19 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         camera->setDataProviderFactory(QnServerDataProviderFactory::instance());
         updateCamera(camera);
+    }
+
+    QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);
+    if (server) {
+        connect(server.data(), &QnResource::propertyChanged,  this, &QnRecordingManager::at_serverPropertyChanged);
+    }
+}
+
+void QnRecordingManager::at_serverPropertyChanged(const QnResourcePtr &, const QString &key)
+{
+    if (key == QnMediaResource::panicRecordingKey()) {
+        for (const auto& camera: m_recordMap.keys())
+            updateCamera(camera.dynamicCast<QnSecurityCamResource>());
     }
 }
 
