@@ -94,6 +94,7 @@ public:
 
     virtual void pause() override;
     virtual void resume() override;
+    virtual bool isPaused() const override;
 
     virtual bool isRealTimeSource() const override;
 protected:
@@ -186,7 +187,7 @@ private:
     qint64 m_latPacketTime;
     
     bool m_stopCond;
-    QMutex m_stopMutex;
+    mutable QMutex m_stopMutex;
     QWaitCondition m_stopWaitCond;
 
     qint64 determineDisplayTime(bool reverseMode);
