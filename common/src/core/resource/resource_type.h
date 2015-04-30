@@ -20,20 +20,20 @@ public:
     virtual ~QnResourceType();
 
     void setId(const QnUuid& value) { m_id = value; }
-    QnUuid getId() const { return m_id;}
+    const QnUuid& getId() const { return m_id;}
 
     void setParentId(const QnUuid &value);
-    QnUuid getParentId() const { return m_parentId;}
+    const QnUuid& getParentId() const { return m_parentId;}
 
     void setName(const QString& value) { m_name = value; }
-    QString getName() const { return m_name;}
+    const QString& getName() const { return m_name;}
 
     void setManufacture(const QString& value) { m_manufacture = value; }
-    QString getManufacture() const { return m_manufacture;}
+    const QString& getManufacture() const { return m_manufacture;}
 
     bool isCamera() const;
 
-    void addAdditionalParent(QnUuid parent);
+    void addAdditionalParent(const QnUuid& parent);
     QList<QnUuid> allParentList() const;
 
     void addParamType(const QString& name, const QString& defaultValue);

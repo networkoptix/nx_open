@@ -7,10 +7,14 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     exclude-result-prefixes="clitype fn iso4217 ix java link xbrldi xbrli xlink xs xsi">
-    <xsl:output method="html" omit-xml-declaration="yes" indent="yes" encoding="UTF-8"/>
+    <xsl:output
+            method="html"
+            doctype-system="about:legacy-compat"
+            indent="yes"
+            encoding="UTF-8"/>
+
     <xsl:variable name="XML" select="/"/>
     <xsl:template match="/">
-        <xsl:text disable-output-escaping="yes">&lt;!DOCTYPE html></xsl:text>
         <html>
             <head>
                 <meta charset="utf-8"/>
@@ -36,7 +40,7 @@
                     <div class="container">
                         <div class="navbar-header">
                             <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" >
-                                <img src="customization/hdw_logo.png" height="48"/>
+                                <img src="customization/webadmin_logo.png" height="48"/>
                                 API Reference
                             </a>
                         </div>

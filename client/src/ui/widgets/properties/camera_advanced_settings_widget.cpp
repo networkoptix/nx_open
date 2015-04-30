@@ -48,7 +48,7 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
 
     initWebView();
 
-    ui->manualLoadingWidget->setText(tr("Please wait while settings are being loaded.\nThis can take a lot of time."));
+    ui->manualLoadingWidget->setText(tr("Please wait while settings are being loaded.") + L'\n' + tr("This can take a lot of time."));
     setWarningStyle(ui->manualWarningLabel);
     updateApplyingParamsLabel();
 }
@@ -347,7 +347,7 @@ void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, 
         if (!it->second) {
             QString formattedParam(lit("Advanced->") + it->first.right(it->first.length() - 2));
             failedParams += lit("\n");
-            failedParams += formattedParam.replace(lit("%%"), lit("->")); // TODO: #Elric #TR
+            failedParams += formattedParam.replace(lit("%%"), lit("->"));
         }
     }
 

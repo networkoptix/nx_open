@@ -69,7 +69,7 @@ void QnRtspH264Encoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 {
     if (media->dataType != QnAbstractMediaData::VIDEO)
     {
-        m_media.clear();
+        m_media.reset();
         return;
     }
 

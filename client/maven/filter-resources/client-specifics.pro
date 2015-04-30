@@ -26,3 +26,5 @@ mac {
 unix:!mac {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }
+
+OTHER_FILES += ${root.dir}/client/src/ui/help/help_topics.i

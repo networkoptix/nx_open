@@ -145,8 +145,11 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     QnResourceList& result,
     const QByteArray& responseData,
     const QHostAddress& discoveryAddress,
-    const QHostAddress& /*foundHostAddress*/ )
+    const QHostAddress& foundHostAddress )
 {
+    Q_UNUSED(discoveryAddress)
+    Q_UNUSED(foundHostAddress)
+
     QList<QnNetworkResourcePtr> local_result;
 
 

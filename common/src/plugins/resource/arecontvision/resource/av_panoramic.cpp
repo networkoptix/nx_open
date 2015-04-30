@@ -16,6 +16,7 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
     m_isRotated = false;
+    m_flipTimer.invalidate();
 }
 
 QnArecontPanoramicResource::~QnArecontPanoramicResource()
@@ -183,6 +184,7 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout(
 
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
+    Q_UNUSED(dataProvider)
     QMutexLocker lock(&m_mutex);
 
     const QnConstResourceVideoLayoutPtr layout = QnArecontPanoramicResource::getDefaultVideoLayout();

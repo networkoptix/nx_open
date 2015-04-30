@@ -14,6 +14,7 @@ CLVideoDecoderOutputPtr QnScaleImageFilter::updateImage(const CLVideoDecoderOutp
 
 QSize QnScaleImageFilter::updatedResolution(const QSize& srcSize)
 {
+    Q_UNUSED(srcSize)
     return m_size;
 }
 

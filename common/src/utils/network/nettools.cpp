@@ -347,7 +347,7 @@ struct PinagableT
 
 QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
 {
-    NX_LOG(QLatin1String("about to find all ip responded to ping...."), cl_logALWAYS);
+    NX_LOG(QLatin1String("about to find all ip responded to ping...."), cl_logINFO);
     QTime time;
     time.restart();
 
@@ -380,7 +380,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
             result.push_back(QHostAddress(addr.addr));
     }
 
-    NX_LOG(lit("Done. time elapsed = %1").arg(time.elapsed()), cl_logALWAYS);
+    NX_LOG(lit("Done. time elapsed = %1").arg(time.elapsed()), cl_logINFO);
 
     CL_LOG(cl_logDEBUG1)
     {
@@ -605,10 +605,14 @@ int strEqualAmount(const char* str1, const char* str2)
     return rez;
 }
 
-bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress)
+bool isNewDiscoveryAddressBetter(
+    const HostAddress& host,
+    const QHostAddress& newAddress,
+    const QHostAddress& oldAddress )
 {
-    int eq1 = strEqualAmount(host.toLatin1().constData(), newAddress.toLatin1().constData());
-    int eq2 = strEqualAmount(host.toLatin1().constData(), oldAddress.toLatin1().constData());
+    //TODO #ak compare binary values, not strings!
+    int eq1 = strEqualAmount(host.toString().toLatin1().constData(), newAddress.toString().toLatin1().constData());
+    int eq2 = strEqualAmount(host.toString().toLatin1().constData(), oldAddress.toString().toLatin1().constData());
     return eq1 > eq2;
 }
 

@@ -114,18 +114,6 @@ SocketAddress Socket::getLocalAddress() const
     return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 
-//!Implementation of AbstractSocket::getPeerAddress
-SocketAddress Socket::getPeerAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-        return SocketAddress();
-
-    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
-}
-
 //!Implementation of AbstractSocket::close
 void Socket::close()
 {
@@ -312,44 +300,6 @@ bool Socket::postImpl( std::function<void()>&& handler )
 bool Socket::dispatchImpl( std::function<void()>&& handler )
 {
     return m_baseAsyncHelper->dispatch( std::move(handler) );
-}
-
-
-QString Socket::getLocalHostAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getsockname(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        return QString();
-    }
-
-    return QLatin1String(inet_ntoa(addr.sin_addr));
-}
-
-QString Socket::getPeerHostAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        return QString();
-    }
-
-    return QLatin1String(inet_ntoa(addr.sin_addr));
-}
-
-quint32 Socket::getPeerAddressUint() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-        return 0;
-
-    return ntohl(addr.sin_addr.s_addr);
 }
 
 unsigned short Socket::getLocalPort() const
@@ -795,31 +745,6 @@ void CommunicatingSocket::shutdown()
 #else
     ::shutdown(m_fd, SHUT_RDWR);
 #endif
-}
-
-QString CommunicatingSocket::getForeignHostAddress() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
-        qnWarning("Fetch of foreign address failed (getpeername()).");
-        return QString();
-    }
-    return QLatin1String(inet_ntoa(addr.sin_addr));
-}
-
-unsigned short CommunicatingSocket::getForeignPort() const
-{
-    sockaddr_in addr;
-    unsigned int addr_len = sizeof(addr);
-
-    if (getpeername(m_fd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-    {
-        qWarning()<<"Fetch of foreign port failed (getpeername()). "<<SystemError::getLastOSErrorText();
-        return -1;
-    }
-    return ntohs(addr.sin_port);
 }
 
 void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
@@ -1393,18 +1318,18 @@ int UDPSocket::send( const void* buffer, unsigned int bufferLen )
 }
 
 //!Implementation of AbstractDatagramSocket::setDestAddr
-bool UDPSocket::setDestAddr( const QString& foreignAddress, unsigned short foreignPort )
+bool UDPSocket::setDestAddr( const SocketAddress& foreignEndpoint )
 {
-    return m_implDelegate.fillAddr( SocketAddress(foreignAddress, foreignPort), m_destAddr );
+    return m_implDelegate.fillAddr( foreignEndpoint, m_destAddr );
 }
 
 //!Implementation of AbstractDatagramSocket::sendTo
 bool UDPSocket::sendTo(
     const void* buffer,
     unsigned int bufferLen,
-    const SocketAddress& foreignAddress )
+    const SocketAddress& foreignEndpoint )
 {
-    setDestAddr( foreignAddress.address.toString(), foreignAddress.port );  //TODO #ak optimize, remove (to QString); (from QString) operations
+    setDestAddr( foreignEndpoint );
     return sendTo( buffer, bufferLen );
 }
 
@@ -1417,8 +1342,7 @@ int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
 int UDPSocket::recvFrom(
     void *buffer,
     unsigned int bufferLen,
-    QString& sourceAddress,
-    unsigned short &sourcePort )
+    SocketAddress* const sourceAddress )
 {
     int rtn = recvFrom(
         buffer,
@@ -1426,10 +1350,8 @@ int UDPSocket::recvFrom(
         &m_prevDatagramAddress.address,
         &m_prevDatagramAddress.port );
 
-    if (rtn >= 0) {
-        sourceAddress = QLatin1String(inet_ntoa(m_prevDatagramAddress.address.inAddr()));
-        sourcePort = m_prevDatagramAddress.port;
-    }
+    if( rtn >= 0 && sourceAddress )
+        *sourceAddress = m_prevDatagramAddress;
     return rtn;
 }
 

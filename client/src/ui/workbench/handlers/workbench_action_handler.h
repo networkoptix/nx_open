@@ -221,7 +221,7 @@ protected slots:
     void at_preferencesNotificationTabAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
-    void at_pictureSettingsAction_triggered();
+    void at_mediaFileSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
     void at_cameraDiagnosticsAction_triggered();
@@ -253,7 +253,7 @@ protected slots:
     void at_createZoomWindowAction_triggered();
 
     void at_setAsBackgroundAction_triggered();
-    void at_backgroundImageStored(const QString &filename, bool success);
+    void setCurrentLayoutBackground(const QString &filename);
 
     void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources );
     void at_resources_properties_saved( int handle, ec2::ErrorCode errorCode );

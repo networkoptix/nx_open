@@ -8,17 +8,19 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-class QnPictureSettingsDialog;
+class QnMediaFileSettingsDialog;
 }
 
-class QnPictureSettingsDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware
+class QnImageProvider;
+
+class QnMediaFileSettingsDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef QnButtonBoxDialog base_type;
 public:
-    explicit QnPictureSettingsDialog(QWidget *parent = 0);
-    ~QnPictureSettingsDialog();
+    explicit QnMediaFileSettingsDialog(QWidget *parent = 0);
+    ~QnMediaFileSettingsDialog();
 
     void updateFromResource(const QnMediaResourcePtr &resource);
     void submitToResource(const QnMediaResourcePtr &resource);
@@ -28,10 +30,11 @@ private slots:
 
     void paramsChanged();
 private:
-    QScopedPointer<Ui::QnPictureSettingsDialog> ui;
+    QScopedPointer<Ui::QnMediaFileSettingsDialog> ui;
 
     bool m_updating;
     QnMediaResourcePtr m_resource;
+    QnImageProvider* m_imageProvider;
 };
 
 #endif // PICTURE_SETTINGS_DIALOG_H

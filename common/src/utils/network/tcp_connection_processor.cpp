@@ -3,11 +3,15 @@
 #include <QtCore/QTime>
 
 #include <utils/common/log.h>
+#include <utils/common/util.h>
 #include <utils/network/http/httptypes.h>
 
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
 #include "err.h"
+
+#include "version.h"
+
 
 #ifndef Q_OS_WIN
 #   include <netinet/tcp.h>
@@ -100,7 +104,7 @@ int QnTCPConnectionProcessor::isFullMessage(
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-//    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
+//    qDebug() << "Client request from " << d->socket->getForeignAddress().address.toString();
 //    qDebug() << d->clientRequest;
 
     d->request = nx_http::Request();
@@ -195,8 +199,15 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     d->response.statusLine.statusCode = httpStatusCode;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
 
+    nx_http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx_http::HttpHeader("User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION) );
+    nx_http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
+
     // this header required to perform new HTTP requests if server port has been on the fly changed
-    nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) ); 
+    nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) );
 
     if (d->chunkedMode)
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );
@@ -205,7 +216,7 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );
-    if (!d->chunkedMode)
+    if (!d->chunkedMode && (contentType.indexOf("multipart") == -1))
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
 
     QByteArray response = d->response.toString();
@@ -215,10 +226,10 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     }
 
     if (displayDebug)
-        NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getPeerAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
+        NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
 
     NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
-        arg(d->socket->getPeerAddress().toString()).
+        arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->responseBody.size() : 0)))), cl_logDEBUG1 );
 
     QMutexLocker lock(&d->sockMutex);
@@ -314,13 +325,14 @@ bool QnTCPConnectionProcessor::readRequest()
             if (isFullMessage(d->clientRequest, &fullHttpMessageSize))
             {
                 NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
-                    arg(d->socket->getPeerAddress().toString()).
+                    arg(d->socket->getForeignAddress().toString()).
                     arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
                 return true;
             }
             else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
             {
-                qWarning() << "Too large HTTP client request. Ignoring";
+                qWarning() << "Too large HTTP client request ("<<d->clientRequest.size()<<" bytes"
+                    ", "<<MAX_REQUEST_SIZE<<" allowed). Ignoring...";
                 return false;
             }
             if( fullHttpMessageSize )
@@ -359,7 +371,7 @@ void QnTCPConnectionProcessor::execute(QMutex& mutex)
 SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    return d->socket ? d->socket->getPeerAddress() : SocketAddress();
+    return d->socket ? d->socket->getForeignAddress() : SocketAddress();
 }
 
 void QnTCPConnectionProcessor::releaseSocket()

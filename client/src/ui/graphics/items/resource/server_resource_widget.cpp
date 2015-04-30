@@ -35,6 +35,15 @@
 #include <utils/license_usage_helper.h>
 
 namespace {
+
+    class QnNetworkSpeedStrings {
+        Q_DECLARE_TR_FUNCTIONS(QnNetworkSpeedStrings)
+    public:
+        static QString bytesPerSecond() { return tr("b/s"); }
+        static QString kiloBytesPerSecond() { return tr("Kb/s"); }
+        static QString megaBytesPerSecond() { return tr("Mb/s"); }
+    };
+
     /** Convert angle from radians to degrees */
     qreal radiansToDegrees(qreal radian) {
         return (180 * radian) / M_PI;
@@ -65,10 +74,9 @@ namespace {
 
     QList<QString> initNetworkSuffixes() {
         QList<QString> result;
-        result << QObject::tr("b/s"); // TODO: #Elric #TR add propert context.
-        result << QObject::tr("Kb/s");
-        result << QObject::tr("Mb/s");
-   //     result << QObject::tr("Gb/s");
+        result << QnNetworkSpeedStrings::bytesPerSecond();
+        result << QnNetworkSpeedStrings::kiloBytesPerSecond();
+        result << QnNetworkSpeedStrings::megaBytesPerSecond();
         return result;
     }
     const QList<QString> networkSuffixes = initNetworkSuffixes();

@@ -29,6 +29,9 @@ public:
     using Singleton<QnCommonModule>::instance;
     using QnInstanceStorage::instance;
 
+    void bindModuleinformation(const QnMediaServerResourcePtr &server);
+    void bindModuleinformation(const QnUserResourcePtr &adminUser);
+
     QnResourceDataPool *dataPool() const {
         return m_dataPool;
     }
@@ -91,17 +94,21 @@ public:
 
     inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
     inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
+
+    void updateModuleInformation();
+
 signals:
     void systemNameChanged(const QString &systemName);
+    void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
+
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
     QnSessionManager *m_sessionManager;
     QnResourceDataPool *m_dataPool;
-    QString m_localSystemName;
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;

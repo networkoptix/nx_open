@@ -6,6 +6,7 @@
 #include "ui_storage_url_dialog.h"
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource/abstract_storage_resource.h>
 
 #include <api/media_server_connection.h>
 #include "common/common_module.h"
@@ -36,8 +37,8 @@ void QnStorageUrlDialog::setProtocols(const QList<QString> &protocols) {
     m_protocols = protocols;
 
     m_descriptions.clear();
-    foreach(const QString &protocol, m_protocols) {
-        QnAbstractStorageResource::ProtocolDescription description = QnAbstractStorageResource::protocolDescription(protocol);
+    for(const QString &protocol: m_protocols) {
+        ProtocolDescription description = protocolDescription(protocol);
         if(!description.name.isNull())
             m_descriptions.push_back(description);
     }
@@ -58,6 +59,27 @@ QString QnStorageUrlDialog::normalizePath(QString path) {
     result = path.replace(L'\\', separator);
     if (result.endsWith(separator))
         result.chop(1);
+    return result;
+}
+
+QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(const QString &protocol) {
+    ProtocolDescription result;
+
+    QString validIpPattern = lit("(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])");
+    QString validHostnamePattern = lit("(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])");
+
+    if(protocol == lit("smb")) {
+        result.protocol = protocol;
+        result.name = tr("Windows Network Shared Resource");
+        result.urlTemplate = tr("\\\\<Computer Name>\\<Folder>");
+        result.urlPattern = lit("\\\\\\\\%1\\\\.+").arg(validHostnamePattern);
+    } else if(protocol == lit("coldstore")) {
+        result.protocol = protocol;
+        result.name = tr("Coldstore Network Storage");
+        result.urlTemplate = tr("coldstore://<Address>");
+        result.urlPattern = lit("coldstore://%1/?").arg(validHostnamePattern);
+    }
+
     return result;
 }
 
@@ -102,7 +124,7 @@ void QnStorageUrlDialog::updateComboBox() {
     QString lastProtocol = m_lastProtocol;
 
     ui->protocolComboBox->clear();
-    foreach(QnAbstractStorageResource::ProtocolDescription description, m_descriptions) {
+    for(const ProtocolDescription &description: m_descriptions) {
         ui->protocolComboBox->addItem(description.name);
 
         if(description.protocol == lastProtocol)
@@ -136,4 +158,3 @@ void QnStorageUrlDialog::at_protocolComboBox_currentIndexChanged() {
     ui->browseButton->setVisible(false);
 #endif
 }
-

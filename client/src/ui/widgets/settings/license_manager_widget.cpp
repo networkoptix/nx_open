@@ -134,7 +134,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         foreach (QnLicenseUsageHelper* helper, helpers) {
             foreach (Qn::LicenseType lt, helper->licenseTypes()) {
                 if (helper->totalLicenses(lt) > 0)
-                    msg += tr("\n%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                    msg += L'\n' + tr("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
             }
         }
 
@@ -144,13 +144,13 @@ void QnLicenseManagerWidget::updateLicenses() {
                 useRedLabel = true;
                 foreach (Qn::LicenseType lt, helper->licenseTypes()) {
                     if (helper->usedLicenses(lt) > 0)
-                        msg += tr("\nAt least %n %2 are required", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                        msg += L'\n' + tr("At least %n %2 are required", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
                 }
             }
             else {
                 foreach (Qn::LicenseType lt, helper->licenseTypes()) {
                     if (helper->usedLicenses(lt) > 0)
-                        msg += tr("\n%n %2 are currently in use", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                        msg += L'\n' + tr("%n %2 are currently in use", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
                 }
             }
         }
@@ -161,8 +161,8 @@ void QnLicenseManagerWidget::updateLicenses() {
             useRedLabel = false;
         } else {
             QString text = (qnProductFeatures().freeLicenseCount > 0) ?
-                tr("You do not have a valid license installed.\nPlease activate your commercial or trial license.") :
-                tr("You do not have a valid license installed.\nPlease activate your commercial license.");
+                tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial or trial license.") :
+                tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial license.");
             ui->infoLabel->setText(text);
             useRedLabel = true;
         }
@@ -193,12 +193,12 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
 
 void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url) 
 {
-    const QList<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
-    const QList<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
+    const QVector<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
+    const QVector<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
 
-    if (!QnRuntimeInfoManager::instance()->items()->hasItem(qnCommon->remoteGUID())) {
+    if (QnRuntimeInfoManager::instance()->remoteInfo().isNull()) {
         emit showMessageLater(tr("License Activation"),
-            tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
+            tr("Network error has occurred during automatic license activation.") + L'\n' + tr("Try to activate your license manually."),
             true);
         ui->licenseWidget->setOnline(false);
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
@@ -243,7 +243,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         hw++;
     }
 
-    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(qnCommon->remoteGUID()).data;
+    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->remoteInfo().data;
 
     params.addQueryItem(QLatin1String("box"), runtimeData.box);
     params.addQueryItem(QLatin1String("brand"), runtimeData.brand);

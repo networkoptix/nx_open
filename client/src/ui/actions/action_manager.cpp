@@ -503,7 +503,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Control Video Wall")). //TODO: #VW #TR
+        text(tr("Control Video Wall")).
         condition(new QnStartVideoWallControlActionCondition(this));
 
     factory(Qn::PushMyScreenToVideowallAction).
@@ -518,6 +518,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SelectTimeServerAction).
         flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Select time server"));
 
     factory(Qn::PtzActivatePresetAction).
@@ -692,7 +693,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SaveCurrentVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Save Video Wall View")). //TODO: #VW #TR
+        text(tr("Save Video Wall View")).
         shortcut(tr("Ctrl+S")).
         autoRepeat(false).
         condition(new QnSaveVideowallReviewActionCondition(true, this));
@@ -954,7 +955,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenVideoWallsReviewAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-       text(tr("Open Video Wall(s)")). //TODO: #VW #TR
+       text(tr("Open Video Wall(s)")).
        condition(hasFlags(Qn::videowall));
 
     factory(Qn::OpenInFolderAction).
@@ -982,13 +983,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::StartVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Switch to Video Wall mode...")).  //TODO: #VW #TR
+        text(tr("Switch to Video Wall mode...")).
         autoRepeat(false).
         condition(new QnStartVideowallActionCondition(this));
 
     factory(Qn::SaveVideoWallReviewAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Save Video Wall View")). //TODO: #VW #TR
+        text(tr("Save Video Wall View")).
         shortcut(tr("Ctrl+S")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         autoRepeat(false).
@@ -1336,11 +1337,11 @@ QnActionManager::QnActionManager(QObject *parent):
              new QnPreviewSearchModeCondition(true, this),
              this));
 
-    factory(Qn::PictureSettingsAction).
+    factory(Qn::MediaFileSettingsAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Picture Settings...")).
-        condition(new QnResourceActionCondition(hasFlags(Qn::still_image), Qn::Any, this));
+        text(tr("File Settings...")).
+        condition(new QnResourceActionCondition(hasFlags(Qn::local_media), Qn::Any, this));
 
     factory(Qn::LayoutSettingsAction).
         mode(QnActionTypes::DesktopMode).
@@ -1351,7 +1352,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::VideowallSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Video Wall Settings...")).     //TODO: #VW #TR
+        text(tr("Video Wall Settings...")).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::videowall), Qn::ExactlyOne, this),
             new QnAutoStartAllowedActionCodition(this),
@@ -1412,11 +1413,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
-            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::Any, this),
-            new QnDisjunctionActionCondition(
-                      new QnResourceStatusActionCondition(Qn::Incompatible, false, this),
-                      new QnResourceStatusActionCondition(Qn::Unauthorized, false, this),
-                      this),
+            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::All, this),
+            new QnResourceStatusActionCondition(QSet<Qn::ResourceStatus>() << Qn::Incompatible << Qn::Unauthorized, true, this),
+            new QnTreeNodeTypeCondition(Qn::ResourceNode, this),
             this));
 
     factory().

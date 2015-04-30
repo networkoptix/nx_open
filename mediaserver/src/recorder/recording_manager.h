@@ -17,6 +17,8 @@
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
+class QnDualStreamingHelper;
+
 namespace ec2 {
     class QnDistributedMutex;
 }
@@ -24,10 +26,10 @@ namespace ec2 {
 struct Recorders
 {
     Recorders(): recorderHiRes(0), recorderLowRes(0) {}
-    Recorders(QnServerStreamRecorder* _recorderHiRes, QnServerStreamRecorder* _recorderLowRes):
-    recorderHiRes(_recorderHiRes), recorderLowRes(_recorderLowRes) {}
+
     QnServerStreamRecorder* recorderHiRes;
     QnServerStreamRecorder* recorderLowRes;
+    QSharedPointer<QnDualStreamingHelper> dualStreamingHelper;
 };
 
 class QnRecordingManager: public QThread
@@ -46,7 +48,7 @@ public:
 
     void start();
     void stop();
-    bool isCameraRecoring(const QnResourcePtr& camera);
+    bool isCameraRecoring(const QnResourcePtr& camera) const;
 
     Recorders findRecorders(const QnResourcePtr& res) const;
 
@@ -67,7 +69,8 @@ private slots:
 private:
     void updateCamera(const QnSecurityCamResourcePtr& camera);
 
-    QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, QnVideoCamera* camera, QnServer::ChunksCatalog catalog);
+    QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader, 
+                                           QnServer::ChunksCatalog catalog, const QSharedPointer<QnDualStreamingHelper>& dualStreamingHelper);
     bool startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(const QnResourcePtr& res) const;
     QnVirtualCameraResourceList getLocalControlledCameras() const;

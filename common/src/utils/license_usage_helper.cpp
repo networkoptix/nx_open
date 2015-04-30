@@ -171,7 +171,7 @@ void QnLicenseUsageHelper::updateCache() const {
 
     /* Used licenses without proposed cameras. */
     licensesArray basicUsedLicenses;
-    boost::fill(basicUsedLicenses, 0);
+    
 
     /* Borrowed licenses count without proposed cameras. */
     licensesArray basicBorrowedLicenses;
@@ -182,10 +182,7 @@ void QnLicenseUsageHelper::updateCache() const {
         m_cache.total[lt] = m_cache.licenses.totalLicenseByType(lt);
 
     /* Calculate used licenses with and without proposed cameras (to get proposed value as difference). */
-    for (Qn::LicenseType lt: licenseTypes()) {
-        basicUsedLicenses[lt] = calculateUsedLicenses(lt, false);
-        m_cache.used[lt] = calculateUsedLicenses(lt, true);
-    }
+    calculateUsedLicenses2(basicUsedLicenses, m_cache.used);
 
     /* Borrow some licenses (if available). Also repeating with and without proposed cameras. */
     for(const LicenseCompatibility& c: compatibleLicenseType) {
@@ -325,22 +322,6 @@ void QnCamLicenseUsageHelper::init() {
     connect(usageWatcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, &QnLicenseUsageHelper::invalidate);
 }
 
-bool QnCamLicenseUsageHelper::cameraRequiresLicense(const QnVirtualCameraResourcePtr &camera, Qn::LicenseType licenseType, bool countProposed) const {
-    if (camera->licenseType() != licenseType) 
-        return false;
-
-    QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
-    if (!server || server->getStatus() != Qn::Online)
-        return false;
-
-    bool requiresLicense = !camera->isScheduleDisabled();
-    if (countProposed) {
-        requiresLicense &= !m_proposedToDisable.contains(camera);
-        requiresLicense |= m_proposedToEnable.contains(camera);
-    }
-    return requiresLicense;
-}
-
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {
     if (proposedEnable) {
         m_proposedToEnable.unite(proposedCameras.toSet());
@@ -367,83 +348,27 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
         ;
 }
 
-int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed) const {
-    if (licenseType == Qn::LC_AnalogEncoder) {
+void QnCamLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
+{
+    boost::fill(basicUsedLicenses, 0);
+    boost::fill(proposedToUse, 0);
 
-        QList<int> cameraSets = analogEncoderCameraSets(countProposed);
-        int total = totalLicenses(licenseType);
+    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) 
+    {
+        QnResourcePtr server = camera->getParentResource();
+        if (!server || server->getStatus() != Qn::Online)
+            continue;
+        
+        Qn::LicenseType lt = camera->licenseType();
+        bool requiresLicense = !camera->isScheduleDisabled();
+        if (requiresLicense)
+            basicUsedLicenses[lt]++;
 
-        /* If we have enough licenses for all the encoders, return max value. */
-        int required = cameraSets.size();
-        if (required <= total)
-            return required;
-
-        /* Use licenses for the maximum possible number of cameras. */ 
-        return total + std::accumulate(cameraSets.cbegin() + total, cameraSets.cend(), 0);      
-    } else {
-        int count = 0;
-        for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) {
-            if (cameraRequiresLicense(camera, licenseType, countProposed))
-                count++;
-        }
-        return count;
+        requiresLicense &= !m_proposedToDisable.contains(camera);
+        requiresLicense |= m_proposedToEnable.contains(camera);
+        if (requiresLicense)
+            proposedToUse[lt]++;
     }
-}
-
-int QnCamLicenseUsageHelper::calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const {
-    if (licenseType != Qn::LC_AnalogEncoder)
-        return base_type::calculateOverflowLicenses(licenseType, borrowedLicenses);
-
-    QList<int> cameraSets = analogEncoderCameraSets(true);
-    int total = totalLicenses(licenseType);
-
-    /* If we have enough licenses for all the encoders, return max value. */
-    int required = cameraSets.size();
-    if (required <= total)
-        return 0;
-
-    /* Count existing licenses. */
-    for (int i = 0; i < total; ++i)
-        cameraSets.removeFirst();
-  
-    /* Check how many licenses are borrowed. */
-    int borrowed = borrowedLicenses;
-
-    /* Use borrowed licenses for the maximum possible sets of cameras. */    
-    while (!cameraSets.empty() && borrowed >= cameraSets.last())
-        borrowed -= cameraSets.takeLast();
-
-    return cameraSets.size();
-}
-
-QList<int> QnCamLicenseUsageHelper::analogEncoderCameraSets(bool countProposed) const {
-    QHash<QString, int> m_camerasByGroupId;
-
-    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) {
-        if (cameraRequiresLicense(camera, Qn::LC_AnalogEncoder, countProposed))
-            m_camerasByGroupId[camera->getGroupId()]++;
-    }
-
-    int limit = QnLicensePool::camerasPerAnalogEncoder();
-
-    QList<int> cameraSets;
-
-    /* Calculate how many encoders use full set of cameras. */
-    for (int camerasInGroup: m_camerasByGroupId) {
-        int fullSets = camerasInGroup / limit;
-        int remainder = camerasInGroup % limit;
-
-        for (int i = 0; i < fullSets; ++i)
-            cameraSets << limit;
-
-        /* Get all encoders that require license for non-full set of cameras. */
-        if (remainder > 0)
-            cameraSets << remainder;
-    }
-
-    boost::sort(cameraSets | boost::adaptors::reversed);
-
-    return cameraSets;
 }
 
 /************************************************************************/
@@ -492,12 +417,16 @@ QList<Qn::LicenseType> QnVideoWallLicenseUsageHelper::calculateLicenseTypes() co
     return QList<Qn::LicenseType>() << Qn::LC_VideoWall;
 }
 
-int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed) const {
-    Q_ASSERT(licenseType == Qn::LC_VideoWall);
-   
+
+void QnVideoWallLicenseUsageHelper::calculateUsedLicenses2(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const
+{
+    boost::fill(basicUsedLicenses, 0);
+    boost::fill(proposedToUse, 0);
+
     int usedScreens = 0;
     int controlSessions = 0;
-    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>()) {
+    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>()) 
+    {
         /* Calculating total screens. */
         usedScreens += videowall->items()->getItems().size();
 
@@ -507,10 +436,8 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
                 ++controlSessions;
     }
 
-    int result = qMax(controlSessions, QnVideoWallLicenseUsageHelper::licensesForScreens(usedScreens));
-    if (countProposed)
-        return result + m_proposed;
-    return result;
+    basicUsedLicenses[Qn::LC_VideoWall] = qMax(controlSessions, QnVideoWallLicenseUsageHelper::licensesForScreens(usedScreens));
+    proposedToUse[Qn::LC_VideoWall] = basicUsedLicenses[Qn::LC_VideoWall] + m_proposed;
 }
 
 void QnVideoWallLicenseUsageHelper::propose(int count) {

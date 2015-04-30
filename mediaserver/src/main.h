@@ -48,6 +48,7 @@ private slots:
     void at_storageManager_rebuildFinished();
     void at_timer();
     void at_connectionOpened();
+    void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);

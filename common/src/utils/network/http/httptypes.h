@@ -249,7 +249,8 @@ namespace nx_http
 
         bool operator==( const MimeProtoVersion& right ) const
         {
-            return protocol == right.protocol && version == right.version;
+            return protocol == right.protocol
+                && version == right.version;
         }
     };
 
@@ -262,7 +263,7 @@ namespace nx_http
         StringType method;
         QUrl url;
         MimeProtoVersion version;
-        QString urlPostfix;
+        nx::Buffer urlPostfix;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
@@ -282,6 +283,8 @@ namespace nx_http
         void serialize( BufferType* const dstBuffer ) const;
     };
 
+    void serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer );
+
     class Request
     {
     public:
@@ -291,7 +294,11 @@ namespace nx_http
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
+        /*!
+            \note Adds \r\n headers/body separator
+        */
         void serialize( BufferType* const dstBuffer ) const;
+        BufferType serialized() const;
 
         BufferType getCookieValue(const BufferType& name) const;
     };

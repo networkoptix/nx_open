@@ -47,7 +47,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
     if (m_media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         m_ctxSended.clear();
 
-    QnConstMetaDataV1Ptr metadata = qSharedPointerDynamicCast<const QnMetaDataV1>(m_media);
+    QnConstMetaDataV1Ptr metadata = std::dynamic_pointer_cast<const QnMetaDataV1>(m_media);
     if (!metadata && m_media->compressionType)
     {
         QnMediaContextPtr currentContext = m_media->context;
@@ -102,8 +102,8 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     if (m_curDataBuffer == m_media->data())
     {
         // send data with RTP headers
-        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.data());
-        const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(m_media.data());
+        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.get());
+        const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(m_media.get());
         int ffHeaderSize = RTSP_FFMPEG_GENERIC_HEADER_SIZE;
         if (video)
             ffHeaderSize += RTSP_FFMPEG_VIDEO_HEADER_SIZE;
@@ -149,7 +149,7 @@ quint32 QnRtspFfmpegEncoder::getSSRC()
 
 bool QnRtspFfmpegEncoder::getRtpMarker()
 {
-    int dataRest = m_media->data() + m_media->dataSize() - m_curDataBuffer;
+    int dataRest = m_media->data() + static_cast<int>(m_media->dataSize()) - m_curDataBuffer;
     return m_isLastDataContext || dataRest == 0;
 }
 

@@ -37,7 +37,7 @@ private:
     void sendRequest(const QnMediaServerResourcePtr &server);
 
 private slots:
-    void at_server_serverIfFound(const QnMediaServerResourcePtr &resource);
+    void at_server_apiUrlChanged(const QnResourcePtr &resource);
     void at_resource_statusChanged(const QnResourcePtr &resource);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);

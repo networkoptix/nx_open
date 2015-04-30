@@ -24,6 +24,7 @@ static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
 static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
 static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10*1000;
 static const quint64 MSEC_PER_SEC = 1000;
+static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 
@@ -108,7 +109,7 @@ static CyclicAllocator gopKeeperKeyFramesAllocator;
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QMutexLocker lock(&m_queueMtx);
-    if (QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(nonConstData))
+    if (QnConstCompressedVideoDataPtr video = std::dynamic_pointer_cast<const QnCompressedVideoData>(nonConstData))
     {
         if (video->flags & AV_PKT_FLAG_KEY)
         {
@@ -123,18 +124,18 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames[ch].empty() || m_lastKeyFrames[ch].back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));
-            while (!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold || 
-                    m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE)
+            while ((!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold) || 
+                    (m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE))
                 m_lastKeyFrames[ch].pop_front();
         }
 
         if (m_dataQueue.size() < m_dataQueue.maxSize()) {
             //TODO #ak MUST NOT modify video packet here! It can be used by other threads concurrently and flags value can be undefined in other threads
-            static_cast<QnAbstractMediaData*>(nonConstData.data())->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            static_cast<QnAbstractMediaData*>(nonConstData.get())->flags |= QnAbstractMediaData::MediaFlags_LIVE;
             QnAbstractDataConsumer::putData( nonConstData );
         }
     }
-    else if (QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(nonConstData))
+    else if (QnConstCompressedAudioDataPtr audio = std::dynamic_pointer_cast<const QnCompressedAudioData>(nonConstData))
     {
         m_lastAudioData = std::move(audio);
     }
@@ -152,7 +153,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, 
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
         const QnConstAbstractDataPacketPtr& data = m_dataQueue.atUnsafe(i);
-        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.data());
+        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.get());
         if (video)
         {
             QnCompressedVideoData* newData = video->clone();
@@ -162,7 +163,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, 
             dstQueue.push(QnAbstractMediaDataPtr(newData));
         }
         else { 
-            dstQueue.push(data.constCast<QnAbstractDataPacket>());    //TODO: #ak remove const_cast
+            dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data));    //TODO: #ak remove const_cast
         }
         rez++;
     }
@@ -207,7 +208,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
             lastKeyTime = m_lastKeyFrame[0]->timestamp;
     }
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
-       (lastKeyTime == AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL))
+       (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL))
     {
         if (m_nextMinTryTime == 0)
             m_nextMinTryTime = usecTime + (rand()%5000 + 5000) * 1000ll; // get first screenshot after minor delay
@@ -241,7 +242,7 @@ void QnVideoCameraGopKeeper::clearVideoData()
     QMutexLocker lock(&m_queueMtx);
 
     for( QnConstCompressedVideoDataPtr& frame: m_lastKeyFrame )
-        frame.clear();
+        frame.reset();
     for( auto& lastKeyFramesForChannel: m_lastKeyFrames )
         lastKeyFramesForChannel.clear();
     m_nextMinTryTime = 0;
@@ -264,6 +265,7 @@ QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
 
     m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
+    m_lastActivityTimer.invalidate();
 }
 
 void QnVideoCamera::beforeStop()
@@ -440,12 +442,14 @@ void QnVideoCamera::inUse(void* user)
 {
     QMutexLocker lock(&m_getReaderMutex);
     m_cameraUsers << user;
+    m_lastActivityTimer.restart();
 }
 
 void QnVideoCamera::notInUse(void* user)
 {
     QMutexLocker lock(&m_getReaderMutex);
     m_cameraUsers.remove(user);
+    m_lastActivityTimer.restart();
 }
 
 bool QnVideoCamera::isSomeActivity() const
@@ -499,6 +503,8 @@ void QnVideoCamera::stopIfNoActivity()
     }
 
     if (isSomeActivity())
+        return;
+	else if (m_lastActivityTimer.isValid() && m_lastActivityTimer.elapsed() < CAMERA_PULLING_STOP_TIMEOUT)
         return;
 
     const bool needStopPrimary = m_primaryReader && m_primaryReader->isRunning();

@@ -24,18 +24,12 @@ class DeviceFileCatalog: public QObject
 {
     Q_OBJECT
 public:
-    // TODO: #Elric #enum
-    enum RebuildMethod {
-        Rebuild_None,    // do not rebuild chunk's database
-        Rebuild_Canceled,
-        Rebuild_LQ,      // rebuild LQ chunks only
-        Rebuild_HQ,      // rebuild HQ chunks only
-        Rebuild_All      // rebuild whole chunks
-    };
 
     struct Chunk
     {
-        Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1) {}
+        static const quint16 FILE_INDEX_NONE = 0xffff;
+
+        Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1), fileSizeHi(0), fileSizeLo(0) {}
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) : 
             startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex), timeZone(_timeZone), fileSizeHi(fileSizeHi), fileSizeLo(fileSizeLo)
         {
@@ -48,6 +42,8 @@ public:
         void truncate(qint64 timeMs);
         qint64 getFileSize() const { return ((qint64) fileSizeHi << 32) + fileSizeLo; } // 256Tb as max file size
         void setFileSize(qint64 value) { fileSizeHi = quint16(value >> 32); fileSizeLo = quint32(value); } // 256Tb as max file size
+
+        QString fileName() const;
 
 
         qint64 startTimeMs; // chunk startTime at ms
@@ -114,7 +110,6 @@ public:
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 
-    static void setRebuildArchive(RebuildMethod value);
     static void cancelRebuildArchive();
     static bool needRebuildPause();
     static void rebuildPause(void*);
@@ -180,7 +175,6 @@ private:
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
     QMutex m_IOMutex;
-    static RebuildMethod m_rebuildArchive;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

@@ -493,12 +493,16 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
+    DeviceSoapWrapper deviceSoapWrapper(getDeviceOnvifUrl().toStdString(), getAuth().user(), getAuth().password(), m_timeDrift);
+    CapabilitiesResp capabilitiesResponse;
+    auto result = fetchOnvifCapabilities( &deviceSoapWrapper, &capabilitiesResponse );
+    if( !result )
+        return result;
+
     //if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isNull() || m_needUpdateOnvifUrl)
     {
         updateFirmware();
-        CameraDiagnostics::Result result = getFullUrlInfo();
-        if (!result)
-            return result;
+        fillFullUrlInfo( capabilitiesResponse );
         
         if( getMediaUrl().isEmpty() )
         {
@@ -512,7 +516,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    CameraDiagnostics::Result result = fetchAndSetVideoSource();
+    result = fetchAndSetVideoSource();
     if (!result)
         return result;
 
@@ -543,10 +547,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
-    else if (!hasDualStreaming2())
-    //    setMotionType(Qn::MT_NoMotion);
-        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QString() );   //no motion supported by camera
-
     
     if (addFlags != Qn::NoCapabilities)
         setCameraCapabilities(getCameraCapabilities() | addFlags);
@@ -574,7 +574,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    fetchRelayInputInfo();
+    fetchRelayInputInfo( capabilitiesResponse );
 
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
@@ -1318,10 +1318,21 @@ QStringList QnPlOnvifResource::getInputPortList() const
     return QStringList();
 }
 
-bool QnPlOnvifResource::fetchRelayInputInfo()
+bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitiesResponse )
 {
     if( m_deviceIOUrl.empty() )
         return false;
+
+    if( capabilitiesResponse.Capabilities &&
+        capabilitiesResponse.Capabilities->Device &&
+        capabilitiesResponse.Capabilities->Device->IO &&
+        capabilitiesResponse.Capabilities->Device->IO->InputConnectors &&
+        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0 )
+    {
+        //camera has input port
+        setCameraCapability( Qn::RelayInputCapability, true );
+        return true;
+    }
 
     const QAuthenticator& auth = getAuth();
     DeviceIOWrapper soapWrapper(
@@ -2070,7 +2081,7 @@ bool QnPlOnvifResource::detectVideoSourceCount()
         if (soapRes != SOAP_OK)
             return false;
         if ( (int)confResponse.Configurations.size() < m_maxChannels)
-            m_maxChannels = confResponse.Configurations.size();
+            m_maxChannels = static_cast<int>(confResponse.Configurations.size());
     }
 
     return true;
@@ -2131,7 +2142,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
 
         if ( (int)confResponse.Configurations.size() < m_maxChannels)
-            m_maxChannels = confResponse.Configurations.size();
+            m_maxChannels = static_cast<int>(confResponse.Configurations.size());
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -2160,7 +2171,10 @@ QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
         return QRect();
     }
     onvifXsd__IntRectangleRange* br = response.Options->BoundsRange;
-    return QRect(qMax(0, br->XRange->Min), qMax(0, br->YRange->Min), br->WidthRange->Max, br->HeightRange->Max);
+    QRect result(qMax(0, br->XRange->Min), qMax(0, br->YRange->Min), br->WidthRange->Max, br->HeightRange->Max);
+    if (result.isEmpty())
+        return QRect();
+    return result;
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
@@ -2207,7 +2221,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 
         QRect currentRect(conf->Bounds->x, conf->Bounds->y, conf->Bounds->width, conf->Bounds->height);
         QRect maxRect = getVideoSourceMaxSize(QString::fromStdString(conf->token));
-        m_videoSourceSize = QSize(maxRect.width(), maxRect.height());
+        if (maxRect.isValid())
+            m_videoSourceSize = QSize(maxRect.width(), maxRect.height());
         if (maxRect.isValid() && currentRect != maxRect && !isCameraControlDisabled())
         {
             updateVideoSource(conf, maxRect);
@@ -2602,6 +2617,11 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>
         m_inputMonitored = true;
     }
 
+    return subscribeToCameraNotifications();
+}
+
+bool QnPlOnvifResource::subscribeToCameraNotifications()
+{
     if( m_eventCapabilities->WSPullPointSupport )
         return createPullPointSubscription();
     else if( QnSoapServer::instance()->initialized() )
@@ -3307,7 +3327,6 @@ void QnPlOnvifResource::afterConfigureStream()
     m_streamConfCond.wakeAll();
     while (m_streamConfCounter > 0)
         m_streamConfCond.wait(&m_streamConfMutex);
-
 }
 
 void QnPlOnvifResource::updateFirmware()
@@ -3328,56 +3347,14 @@ void QnPlOnvifResource::updateFirmware()
 
 CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
 {
-    QAuthenticator auth(getAuth());
-    //TODO: #vasilenko UTF unuse StdString
-    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
-
-    //Trying to get onvif URLs
-    CapabilitiesReq request;
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), getAuth().user(), getAuth().password(), m_timeDrift);
     CapabilitiesResp response;
-
-    int soapRes = soapWrapper.getCapabilities(request, response);
-    if (soapRes != SOAP_OK) 
-    {
-#ifdef PL_ONVIF_DEBUG
-        qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch media and device URLs. Reason: SOAP to endpoint "
-            << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-#endif
-        if (soapWrapper.isNotAuthenticated())
-        {
-            if (!getId().isNull())
-                setStatus(Qn::Unauthorized);
-            return CameraDiagnostics::NotAuthorisedResult( getDeviceOnvifUrl() );
-        }
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("getCapabilities"), soapWrapper.getLastError());
-    }
+    auto result = fetchOnvifCapabilities( &soapWrapper, &response );
+    if( !result )
+        return result;
 
     if (response.Capabilities) 
-    {
-        //TODO: #vasilenko UTF unuse std::string
-        if (response.Capabilities->Events)
-            m_eventCapabilities.reset( new onvifXsd__EventCapabilities( *response.Capabilities->Events ) );
-
-        if (response.Capabilities->Media) 
-        {
-            setMediaUrl(fromOnvifDiscoveredUrl(response.Capabilities->Media->XAddr));
-        }
-        if (response.Capabilities->Imaging)
-        {
-            setImagingUrl(fromOnvifDiscoveredUrl(response.Capabilities->Imaging->XAddr));
-        }
-        if (response.Capabilities->Device) 
-        {
-            setDeviceOnvifUrl(fromOnvifDiscoveredUrl(response.Capabilities->Device->XAddr));
-        }
-        if (response.Capabilities->PTZ) 
-        {
-            setPtzUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
-        }
-        m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
-            ? response.Capabilities->Extension->DeviceIO->XAddr
-            : getDeviceOnvifUrl().toStdString();
-    }
+        fillFullUrlInfo( response );
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -3388,6 +3365,63 @@ void QnPlOnvifResource::updateOnvifUrls(const QnPlOnvifResourcePtr& other)
     setMediaUrl(other->getMediaUrl());
     setImagingUrl(other->getImagingUrl());
     setPtzUrl(other->getPtzUrl());
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::fetchOnvifCapabilities(
+    DeviceSoapWrapper* const soapWrapper,
+    CapabilitiesResp* const response )
+{
+    QAuthenticator auth(getAuth());
+
+    //Trying to get onvif URLs
+    CapabilitiesReq request;
+
+    int soapRes = soapWrapper->getCapabilities(request, *response);
+    if (soapRes != SOAP_OK) 
+    {
+#ifdef PL_ONVIF_DEBUG
+        qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch media and device URLs. Reason: SOAP to endpoint "
+            << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+#endif
+        if (soapWrapper->isNotAuthenticated())
+        {
+            if (!getId().isNull())
+                setStatus(Qn::Unauthorized);
+            return CameraDiagnostics::NotAuthorisedResult( getDeviceOnvifUrl() );
+        }
+        return CameraDiagnostics::RequestFailedResult(lit("getCapabilities"), soapWrapper->getLastError());
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+void QnPlOnvifResource::fillFullUrlInfo( const CapabilitiesResp& response )
+{
+    if (!response.Capabilities) 
+        return;
+
+    if (response.Capabilities->Events)
+        m_eventCapabilities.reset( new onvifXsd__EventCapabilities( *response.Capabilities->Events ) );
+
+    if (response.Capabilities->Media) 
+    {
+        setMediaUrl(fromOnvifDiscoveredUrl(response.Capabilities->Media->XAddr));
+    }
+    if (response.Capabilities->Imaging)
+    {
+        setImagingUrl(fromOnvifDiscoveredUrl(response.Capabilities->Imaging->XAddr));
+    }
+    if (response.Capabilities->Device) 
+    {
+        setDeviceOnvifUrl(fromOnvifDiscoveredUrl(response.Capabilities->Device->XAddr));
+    }
+    if (response.Capabilities->PTZ) 
+    {
+        setPtzUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
+    }
+    m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
+        ? response.Capabilities->Extension->DeviceIO->XAddr
+        : getDeviceOnvifUrl().toStdString();
 }
 
 #endif //ENABLE_ONVIF

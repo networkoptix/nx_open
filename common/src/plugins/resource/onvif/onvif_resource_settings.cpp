@@ -28,16 +28,6 @@ OnvifCameraSettingsResp::OnvifCameraSettingsResp(const std::string& deviceUrl, c
 
 OnvifCameraSettingsResp::~OnvifCameraSettingsResp()
 {
-    delete m_valsResponse;
-    m_valsResponse = NULL;
-    delete m_rangesResponse;
-    m_rangesResponse = NULL;
-    delete m_valsSoapWrapper;
-    m_valsSoapWrapper = NULL;
-    delete m_rangesSoapWrapper;
-    m_rangesSoapWrapper = NULL;
-    delete m_deviceSoapWrapper;
-    m_deviceSoapWrapper = NULL;
 }
 
 bool OnvifCameraSettingsResp::isEmpty() const
@@ -148,18 +138,18 @@ QString OnvifCameraSettingsResp::getUniqueId() const
 
 DeviceSoapWrapper* OnvifCameraSettingsResp::getDeviceSoapWrapper()
 {
-    return m_deviceSoapWrapper;
+    return m_deviceSoapWrapper.get();
 }
 
 //
 // class OnvifCameraSettingOperationAbstract
 // 
 
-const QString& CommonStringValues::ON = *(new QString(QLatin1String("On")));
-const QString& CommonStringValues::OFF = *(new QString(QLatin1String("Off")));
-const QString& CommonStringValues::SEPARATOR = *(new QString(QLatin1String(",")));
+const QString CommonStringValues::ON(QString(QLatin1String("On")));
+const QString CommonStringValues::OFF(QString(QLatin1String("Off")));
+const QString CommonStringValues::SEPARATOR(QString(QLatin1String(",")));
 
-const OnvifCameraSettingOperationAbstract& OnvifCameraSettingOperationAbstract::EMPTY_OPERATION = *(new OnvifCameraSettingOperationEmpty());
+const OnvifCameraSettingOperationEmpty OnvifCameraSetting::EMPTY_OPERATION = OnvifCameraSettingOperationEmpty();
 
 static QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > createOnvifCameraSettingOperationAbstract()
 {
@@ -367,9 +357,9 @@ bool ImagingWideDynamicRangeModeOperation::set(const CameraSetting& input, Onvif
         input.getCurrent() == CommonStringValues::OFF? onvifXsd__WideDynamicMode__OFF : onvifXsd__WideDynamicMode__ON, src);
 }
 
-const QString& ImagingWhiteBalanceModeOperation::AUTO_STR = *(new QString(QLatin1String("Auto")));
-const QString& ImagingWhiteBalanceModeOperation::MANUAL_STR = *(new QString(QLatin1String("Manual")));
-const QString& ImagingWhiteBalanceModeOperation::ALL_VALUES_STR = *(new QString(AUTO_STR + CommonStringValues::SEPARATOR + MANUAL_STR));
+const QString ImagingWhiteBalanceModeOperation::AUTO_STR(QString(QLatin1String("Auto")));
+const QString ImagingWhiteBalanceModeOperation::MANUAL_STR(QString(QLatin1String("Manual")));
+const QString ImagingWhiteBalanceModeOperation::ALL_VALUES_STR(QString(AUTO_STR + CommonStringValues::SEPARATOR + MANUAL_STR));
 
 bool ImagingWhiteBalanceModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
 {
@@ -546,9 +536,9 @@ bool ImagingContrastOperation::set(const CameraSetting& input, OnvifCameraSettin
     return true;
 }
 
-const QString& ImagingExposurePriorityOperation::LOW_NOISE_STR = *(new QString(QLatin1String("LowNoise")));
-const QString& ImagingExposurePriorityOperation::FRAME_RATE_STR = *(new QString(QLatin1String("FrameRate")));
-const QString& ImagingExposurePriorityOperation::ALL_VALUES_STR = *(new QString(LOW_NOISE_STR + CommonStringValues::SEPARATOR + FRAME_RATE_STR));
+const QString ImagingExposurePriorityOperation::LOW_NOISE_STR(QString(QLatin1String("LowNoise")));
+const QString ImagingExposurePriorityOperation::FRAME_RATE_STR(QString(QLatin1String("FrameRate")));
+const QString ImagingExposurePriorityOperation::ALL_VALUES_STR(QString(LOW_NOISE_STR + CommonStringValues::SEPARATOR + FRAME_RATE_STR));
 
 bool ImagingExposurePriorityOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
 {
@@ -618,8 +608,8 @@ bool ImagingSharpnessOperation::set(const CameraSetting& input, OnvifCameraSetti
     return compareAndSendToCamera(valsResp.ImagingSettings->Sharpness, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-const QString& ImagingIrCutFilterModesOperation::AUTO_STR = *(new QString(QLatin1String("Auto")));
-const QString& ImagingIrCutFilterModesOperation::ALL_VALUES_STR = *(new QString(CommonStringValues::OFF + CommonStringValues::SEPARATOR +
+const QString ImagingIrCutFilterModesOperation::AUTO_STR(QString(QLatin1String("Auto")));
+const QString ImagingIrCutFilterModesOperation::ALL_VALUES_STR(QString(CommonStringValues::OFF + CommonStringValues::SEPARATOR +
     CommonStringValues::ON + CommonStringValues::SEPARATOR + AUTO_STR));
 
 bool ImagingIrCutFilterModesOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
@@ -788,9 +778,9 @@ bool ImagingExposureGainOperation::set(const CameraSetting& input, OnvifCameraSe
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->Gain, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-const QString& ImagingExposureModeOperation::AUTO_STR = *(new QString(QLatin1String("Auto")));
-const QString& ImagingExposureModeOperation::MANUAL_STR = *(new QString(QLatin1String("Manual")));
-const QString& ImagingExposureModeOperation::ALL_VALUES_STR = *(new QString(AUTO_STR + CommonStringValues::SEPARATOR + MANUAL_STR));
+const QString ImagingExposureModeOperation::AUTO_STR(QString(QLatin1String("Auto")));
+const QString ImagingExposureModeOperation::MANUAL_STR(QString(QLatin1String("Manual")));
+const QString ImagingExposureModeOperation::ALL_VALUES_STR(QString(AUTO_STR + CommonStringValues::SEPARATOR + MANUAL_STR));
 
 bool ImagingExposureModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
 {
@@ -1173,8 +1163,8 @@ OnvifCameraSetting& OnvifCameraSetting::operator=(const OnvifCameraSetting& rhs)
 // class OnvifCameraSettingReader
 //
 
-const QString& OnvifCameraSettingReader::IMAGING_GROUP_NAME = *(new QString(QLatin1String("%%Imaging")));
-const QString& OnvifCameraSettingReader::MAINTENANCE_GROUP_NAME = *(new QString(QLatin1String("%%Maintenance")));
+const QString OnvifCameraSettingReader::IMAGING_GROUP_NAME(QString(QLatin1String("%%Imaging")));
+const QString OnvifCameraSettingReader::MAINTENANCE_GROUP_NAME(QString(QLatin1String("%%Maintenance")));
 
 OnvifCameraSettingReader::OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings):
     CameraSettingReader(lit("ONVIF")),

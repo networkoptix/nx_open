@@ -81,10 +81,6 @@
         <translation>イベント</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;イベント&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>at</source>
         <translation>カメラ</translation>
     </message>
@@ -101,16 +97,20 @@
         <translation>アクション</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;アクション&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>&lt;Select at least one camera&gt;</source>
         <translation>&lt;最低1つのカメラを選択してください&gt;</translation>
     </message>
     <message>
         <source>Comments:</source>
         <translation>コメント:</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <translation>何時</translation>
+    </message>
+    <message>
+        <source>Do</source>
+        <translation>動作</translation>
     </message>
 </context>
 <context>
@@ -146,10 +146,6 @@
 </context>
 <context>
     <name>CameraAdditionDialog</name>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
     <message>
         <source>IP, hostname, RTSP link...</source>
         <translation>IPアドレス,　 ホスト名,　 RTSPのURL等...</translation>
@@ -199,10 +195,6 @@
         <translation>検索中...</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;カメラ検索:&lt;/b&gt;</translation>
-    </message>
-    <message>
         <source>Manuf.</source>
         <translation>メーカー.</translation>
     </message>
@@ -237,6 +229,10 @@
     <message>
         <source>New scan...</source>
         <translation>新規検索...</translation>
+    </message>
+    <message>
+        <source>Discovered Cameras:</source>
+        <translation>検索されたカメラ:</translation>
     </message>
 </context>
 <context>
@@ -329,10 +325,6 @@
         <source>High quality</source>
         <translation>高画質</translation>
     </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;低画質は低解像度になります.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
     <message utf8="true">
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation>高画質はサーバーのCPU負荷およびネットワーク負荷を考慮してください.</translation>
@@ -376,6 +368,14 @@
     <message>
         <source>Restore Defaults</source>
         <translation>初期設定に戻す</translation>
+    </message>
+    <message>
+        <source>Warning! Low quality may result in low resolution image.</source>
+        <translation>注意　低画質は低解像度が適応されます.</translation>
+    </message>
+    <message>
+        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation>&quot;システムによるカメラ設定最適化&quot;はシステムアドミニストレーションで無効になっています.</translation>
     </message>
 </context>
 <context>
@@ -673,10 +673,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>自動一時停止:</translation>
     </message>
     <message>
-        <source>Restart required.</source>
-        <translation>要再起動.</translation>
-    </message>
-    <message>
         <source>Misc</source>
         <translation>その他</translation>
     </message>
@@ -697,10 +693,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>ダブルバッファリング:</translation>
     </message>
     <message>
-        <source>Disable only if the client takes too much CPU.</source>
-        <translation>クライアントのCPU負荷が高い場合のみ無効にしてください.</translation>
-    </message>
-    <message>
         <source>Browse logs</source>
         <translation>ログ参照</translation>
     </message>
@@ -711,6 +703,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Run application when PC boots up:</source>
         <translation>PC起動時にアプリケーション起動:</translation>
+    </message>
+    <message>
+        <source>Restart required</source>
+        <translation>要再起動</translation>
     </message>
 </context>
 <context>
@@ -736,24 +732,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;アラーム/イベントログ管理を開く (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>&amp;Camera List</source>
         <translation>カメラリスト(&amp;C)</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;イベントログを開く (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;カメラリストを開く (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&amp;Health Monitoring</source>
@@ -836,6 +820,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Loading image... Please wait.</source>
         <translation>ローディング中...お待ちください.</translation>
+    </message>
+    <message>
+        <source>&lt;No image&gt;</source>
+        <translation>&lt;No image&gt;</translation>
     </message>
 </context>
 <context>
@@ -1088,12 +1076,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>秒</translation>
     </message>
     <message>
-        <source>This option will not affect Recording Schedule.
-Recording Schedule is always based on Server Time.</source>
-        <translation>このオプションは録画スケジュースには影響しません.
-録画スケジュールはサーバー時間が適応されます.</translation>
-    </message>
-    <message>
         <source>Background Animation</source>
         <translation>アニメーション背景</translation>
     </message>
@@ -1337,18 +1319,6 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QObject</name>
     <message>
-        <source>b/s</source>
-        <translation>b/s</translation>
-    </message>
-    <message>
-        <source>Kb/s</source>
-        <translation>kb/s</translation>
-    </message>
-    <message>
-        <source>Mb/s</source>
-        <translation>Mb/s</translation>
-    </message>
-    <message>
         <source>Stops</source>
         <translation>停止</translation>
     </message>
@@ -1431,57 +1401,44 @@ Recording Schedule is always based on Server Time.</source>
         <translation>クリップボードにコピー</translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
-Built for %5-%6 with %7.&lt;br/&gt;
-</source>
-        <translation>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
-Built for %5-%6 with %7.&lt;br/&gt;</translation>
+        <source>%1 uses the following external libraries:</source>
+        <translation>%1 外部ライブラリーフォロー:</translation>
     </message>
     <message>
-        <source>Server at %2: v%1&lt;br/&gt;</source>
-        <translation>サーバー %2: v%1&lt;br/&gt;</translation>
+        <source>OpenGL version</source>
+        <translation></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</source>
-        <translation>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</translation>
+        <source>OpenGL renderer</source>
+        <translation></translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br/&gt;
-&lt;br /&gt;
-&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
-&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
-&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
-&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
-&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
-&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
-</source>
-        <translation>&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br/&gt;
-&lt;br /&gt;
-&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
-&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
-&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
-&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
-&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
-&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;</translation>
+        <source>OpenGL vendor</source>
+        <translation></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</source>
-        <translation>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</translation>
+        <source>OpenGL max texture size</source>
+        <translation></translation>
     </message>
     <message>
-        <source>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br/&gt;
-&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;
-&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br/&gt;
-&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br/&gt;
-</source>
-        <translation>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br/&gt;
-&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;
-&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br/&gt;
-&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br/&gt;</translation>
+        <source>Support</source>
+        <translation>サポート</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Support&lt;/b&gt;: %1</source>
-        <translation>&lt;b&gt;サポート&lt;/b&gt;: %1</translation>
+        <source>Server at %2: v%1</source>
+        <translation>サーバー %2: v%1</translation>
+    </message>
+    <message>
+        <source>%1 version %2 (%3).</source>
+        <translation>%1 バージョン %2 (%3).</translation>
+    </message>
+    <message>
+        <source>Built for %1-%2 with %3.</source>
+        <translation>ビルド %1-%2 　 %3.</translation>
+    </message>
+    <message>
+        <source>Client is not connected to any server</source>
+        <translation>クライアントはどのサーバーにも接続していません</translation>
     </message>
 </context>
 <context>
@@ -1493,17 +1450,6 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <source>Saving...</source>
         <translation>保存中...</translation>
-    </message>
-</context>
-<context>
-    <name>QnAction</name>
-    <message>
-        <source>%n</source>
-        <translation>%n</translation>
-    </message>
-    <message>
-        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation>%n (&lt;b&gt;%s&lt;/b&gt;)</translation>
     </message>
 </context>
 <context>
@@ -2217,10 +2163,6 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation>カメラ設定...</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>画像設定...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>レイアウト設定...</translation>
     </message>
@@ -2560,6 +2502,10 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <source>Hide Search Panel</source>
         <translation>検索パネル非表示</translation>
     </message>
+    <message>
+        <source>File Settings...</source>
+        <translation>ファイル設定...</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2600,31 +2546,6 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <source>Preview</source>
         <translation>プレビュー</translation>
-    </message>
-</context>
-<context>
-    <name>QnAutoTester</name>
-    <message>
-        <source>Time to wait before finishing the test, in milliseconds. Default is %1.</source>
-        <translation>Time to wait before finishing the test, in milliseconds. Default is %1.</translation>
-    </message>
-    <message>
-        <source>Substring that must be present in one of the resources.</source>
-        <translation>Substring that must be present in one of the resources.</translation>
-    </message>
-    <message>
-        <source>Show this help screen.</source>
-        <translation>ヘルプの表示.</translation>
-    </message>
-    <message>
-        <source>All tests completed successfully.
-</source>
-        <translation>全てのテストに成功しました.</translation>
-    </message>
-    <message>
-        <source>Test for resource substring &apos;%1&apos; failed.
-</source>
-        <translation>Test for resource substring &apos;%1&apos; failed.</translation>
     </message>
 </context>
 <context>
@@ -2842,12 +2763,6 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation>ルールのリセット</translation>
     </message>
     <message>
-        <source>Are you sure you want to reset rules to the defaults?
-This action CANNOT be undone!</source>
-        <translation>Are you sure you want to reset rules to the defaults?
-This action CANNOT be undone!</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
@@ -2890,6 +2805,14 @@ This action CANNOT be undone!</translation>
     <message>
         <source>Some rules are not valid. Should they be disabled?</source>
         <translation>あるルールが無効になっていませんか?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to reset rules to the defaults?</source>
+        <translation>ルールを初期設定に戻しますか?</translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation>このアクションは取消せません!</translation>
     </message>
 </context>
 <context>
@@ -2942,12 +2865,6 @@ This action CANNOT be undone!</translation>
         <translation>エラー</translation>
     </message>
     <message>
-        <source>Server is offline.
-Camera addition is possible for online servers only.</source>
-        <translation>サーバーオフライン
-カメラ追加はオンラインサーバーのみ有効です.</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>終了</translation>
     </message>
@@ -2991,20 +2908,6 @@ Camera addition is possible for online servers only.</source>
         <source>Success</source>
         <translation>成功</translation>
     </message>
-    <message numerus="yes">
-        <source>%n camera(s) added successfully.
-It might take a few moments to populate them in the tree.</source>
-        <translation>
-            <numerusform>%n カメラが正常に追加されました
-ルチーに表示されるまで暫くかかります.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Error while adding camera(s).</source>
-        <translation>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Server went offline, search aborted.</source>
         <translation>サーバーオフライン　検索は異常終了しました.</translation>
@@ -3045,14 +2948,37 @@ It might take a few moments to populate them in the tree.</source>
         <source>Select target server...</source>
         <translation>ターゲットサーバー選択...</translation>
     </message>
+    <message>
+        <source>Examples:</source>
+        <translation>例:</translation>
+    </message>
+    <message>
+        <source>Server is offline.</source>
+        <translation>サーバーオフライン.</translation>
+    </message>
+    <message>
+        <source>Camera addition is possible for online servers only.</source>
+        <translation>カメラの追加はオンラインサーバーのみ可能です.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras added successfully.</source>
+        <translation>
+            <numerusform>%n カメラが追加されました.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>It might take a few moments to populate them in the tree.</source>
+        <translation>ツリーに表示されるまで少し時間が掛かるかもしれません.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding %n cameras.</source>
+        <translation>
+            <numerusform> %n カメラの追加中にエラーが発生しました.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
-    <message>
-        <source>Please wait while settings are being loaded.
-This can take a lot of time.</source>
-        <translation>設定がロードされるまでお待ちください.</translation>
-    </message>
     <message>
         <source>Applying settings...</source>
         <translation>設定適応...</translation>
@@ -3074,6 +3000,14 @@ This can take a lot of time.</source>
 %2</source>
         <translation>次のパラメーターを保存できません (%1):
 %2</translation>
+    </message>
+    <message>
+        <source>Please wait while settings are being loaded.</source>
+        <translation>設定がロードされるまでお待ちください.</translation>
+    </message>
+    <message>
+        <source>This can take a lot of time.</source>
+        <translation>時間が掛かるかもしれません..</translation>
     </message>
 </context>
 <context>
@@ -3453,16 +3387,6 @@ This can take a lot of time.</source>
         <translation>入力したログイン情報は無効です.</translation>
     </message>
     <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation>サーバーとの通信が確立できません.
-接続設定が間違っています.
-
-解決できない場合は管理者にお問い合わせください.</translation>
-    </message>
-    <message>
         <source>You are trying to connect to incompatible Server.</source>
         <translation>互換性のないサーバーに接続を試みています.</translation>
     </message>
@@ -3479,96 +3403,96 @@ If this error persists, please contact your VMS administrator.</source>
         <translation>クライアント</translation>
     </message>
     <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
-        <translation>異なったバージョンのサーバーに接続しています:
- - クライアントバージョン: %1.
- - サーバーバージョン: %2.
-これらのバージョンとは互換性がありません。　%3 を更新してください </translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation>異なったバージョンのサーバーに接続しています:
- - クライアントバージョン: %1.
- - サーバーバージョン: %2.
-バージョン%3 以下のバージョンでは互換性はありません.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-An error has occurred while trying to restart in compatibility mode.</source>
-        <translation>選択したサーバーのバージョンが異なります:
- - クライアントバージョン: %1.
- - サーバーバージョン: %2.
-互換性モードで再起動中にエラーが発生しました.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - EC version: %2.
-You need to download client %3 to connect</source>
-        <translation>サーバーのバージョンが異なります:
- - クライアントバージョン: %1.
- - エンタープライズコントローラーバージョン: %2.
-You need to download client %3 to connect</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation>選択したサーバーのバージョンが異なります:
- - クライアントバージョン: %1.
- - サーバーバージョン: %2.
-サーバーとの接続には他のバージョンのクライアントが必要です.</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Client version %3 is required to connect to this Server.
-Download version %3?</source>
-        <translation>異なるバージョンのサーバーに接続しています:
- - クライアントバージョン: %1.
- - サーバーバージョン: %2.
-サーバーとの接続にはクライアントバージョン %3 が必要です.
-バージョン %3　をダウンロードしますか?</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Would you like to restart the Client in compatibility mode?</source>
-        <translation>異なるバージョンのサーバーに接続しています:
- - クライアントバージョン: %1.
- - サーバーバージョン: %2.
-クライアントを互換性モードで再起動しますか?</translation>
-    </message>
-    <message>
         <source>Launcher process is not found</source>
         <translation>起動プロセスが見つかりません</translation>
-    </message>
-    <message>
-        <source>Cannot restart the Client in compatibility mode.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>互換性モードでクライアントを再起動できませんでした.
-プログラムを停止して、再度スタートメニューより起動してください.</translation>
     </message>
     <message>
         <source>Failure</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <source>Failed to launch compatibility version %1
-Try to restore version %1?</source>
-        <translation>バージョン %1 起動エラー
-バージョン %1 に戻しますか?</translation>
+        <source>Connection to the Server could not be established.</source>
+        <translation>サーバーと接続できませんでした.</translation>
+    </message>
+    <message>
+        <source>Connection details that you have entered are incorrect, please try again.</source>
+        <translation>接続設定が間違っているかもしれません　確認してください.</translation>
+    </message>
+    <message>
+        <source>If this error persists, please contact your VMS administrator.</source>
+        <translation>エラーが継続しているのであれば管理者にお問合せ下さい.</translation>
+    </message>
+    <message>
+        <source> - Client version: %1.</source>
+        <translation> - クライアントバージョン: %1.</translation>
+    </message>
+    <message>
+        <source> - Server version: %1.</source>
+        <translation> - サーバーバージョン: %1.</translation>
+    </message>
+    <message>
+        <source>You are about to connect to Server which has a different version:</source>
+        <translation>異なるﾊﾞｰｼﾞｮﾝのサーバーに接続:</translation>
+    </message>
+    <message>
+        <source>These versions are not compatible. Please update your %1.</source>
+        <translation>このバージョンは互換性がありません　%1を更新してください.</translation>
+    </message>
+    <message>
+        <source>Compatibility mode for versions lower than %1 is not supported.</source>
+        <translation> %1以下のバージョンでは互換性モードがサポートされません.</translation>
+    </message>
+    <message>
+        <source>Selected Server has a different version:</source>
+        <translation>選択したサーバーのバージョンが異なります:</translation>
+    </message>
+    <message>
+        <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
+        <translation>サーバーとの接続には他のバージョンのクライアントが必要です.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to restart in compatibility mode.</source>
+        <translation>互換性モードでの再起動中にエラーが発生しました.</translation>
+    </message>
+    <message>
+        <source>Client version %1 is required to connect to this Server.</source>
+        <translation>サーバーとの接続にはクライアントバージョン %1　が必要です.</translation>
+    </message>
+    <message>
+        <source>Download version %1?</source>
+        <translation>バージョン %1をダウンロードしますか？</translation>
+    </message>
+    <message>
+        <source>Would you like to restart the Client in compatibility mode?</source>
+        <translation>互換性モードで再起動しますか?</translation>
+    </message>
+    <message>
+        <source>Cannot restart the Client in compatibility mode.</source>
+        <translation>互換性モードで再起動できません.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>一度アプリケーションを閉じてスタートメニューのショートカットで起動してください.</translation>
+    </message>
+    <message>
+        <source>Failed to launch compatibility version %1</source>
+        <translation>互換性モードバージョン %1起動失敗</translation>
+    </message>
+    <message>
+        <source>Try to restore version %1?</source>
+        <translation>バージョン %1をリストアしますか?</translation>
+    </message>
+    <message>
+        <source>Server has a different version:</source>
+        <translation>サーバーは異なるバージョン:</translation>
+    </message>
+    <message>
+        <source>You will be asked to restart the client in compatibility mode.</source>
+        <translation>互換性モードで再起動.</translation>
+    </message>
+    <message>
+        <source>You will be asked to update your %1</source>
+        <translation> %1を更新</translation>
     </message>
 </context>
 <context>
@@ -3576,62 +3500,6 @@ Try to restore version %1?</source>
     <message>
         <source>Request timed out.</source>
         <translation>リクエストタイムアウト.</translation>
-    </message>
-    <message>
-        <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation>入力したログイン情報は無効です.</translation>
-    </message>
-    <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation>サーバーとの通信を確立できません.
-接続設定が間違っています.
-
-解決できない場合は管理者にお問合せ下さい.</translation>
-    </message>
-    <message>
-        <source>You are trying to connect to incompatible Server.</source>
-        <translation>互換性のサーバーに接続を試みています.</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation>異なるバージョン:
- - クライアントバージョン: %1.
- - サーバーバージョン: %2.
-バージョン %3 以下のバージョンでは互換性がありません.</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-You will be asked to restart the client in compatibility mode.</source>
-        <translation>異なるバージョン:
- - クライアントバージョン: %1.
- - サーバーバージョン: %2.
-互換性モードで再起動を行ってください.</translation>
-    </message>
-    <message>
-        <source>Server</source>
-        <translation>サーバー</translation>
-    </message>
-    <message>
-        <source>Client</source>
-        <translation>クライアント</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
-        <translation>異なるバージョン:
- - クライアントバージョン: %1.
- - サーバーバージョン: %2.
-このバージョンは互換性がありません　 %3 を更新してください</translation>
     </message>
     <message>
         <source>Success</source>
@@ -3878,15 +3746,6 @@ These versions are not compatible. Please update your %3</source>
         <translation>モーションビデオ</translation>
     </message>
     <message>
-        <source>
-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source> (%1 times)</source>
-        <translation> (%1 回)</translation>
-    </message>
-    <message>
         <source>Date/Time</source>
         <translation>日時</translation>
     </message>
@@ -3917,6 +3776,10 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <source>Administrators Only</source>
         <translation>アドミニストレーターのみ</translation>
+    </message>
+    <message>
+        <source>%1 times</source>
+        <translation>%1 時間</translation>
     </message>
 </context>
 <context>
@@ -3979,6 +3842,25 @@ These versions are not compatible. Please update your %3</source>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation>フォルダー &apos;%1&apos; は存在しません.</translation>
     </message>
+    <message>
+        <source>Disable only if the client takes too much CPU</source>
+        <translation>クライアントのCPU負荷が高い場合に無効にする</translation>
+    </message>
+</context>
+<context>
+    <name>QnGeneralSystemAdministrationWidget</name>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation>アラーム/イベントルールを開く</translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation>イベントログを開く</translation>
+    </message>
+    <message>
+        <source>Open Camera List</source>
+        <translation>カメラリストを開く</translation>
+    </message>
 </context>
 <context>
     <name>QnGenericTabbedDialog</name>
@@ -3991,9 +3873,8 @@ These versions are not compatible. Please update your %3</source>
         <translation>確認して終了</translation>
     </message>
     <message>
-        <source>Unsaved changes will be lost. Save the following pages?
-</source>
-        <translation>保存していない変更は反映されません　保存しますか?</translation>
+        <source>Unsaved changes will be lost. Save the following pages?</source>
+        <translation>保存されていない変更内容は反映されません　保存しますか?</translation>
     </message>
 </context>
 <context>
@@ -4071,28 +3952,16 @@ These versions are not compatible. Please update your %3</source>
         <translation>出力ファイルを作成できません %1</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%2&quot;...</source>
-        <translation>&quot;%2&quot;にエクスポート中...</translation>
-    </message>
-    <message>
         <source>Could not export camera %1</source>
         <translation>カメラ%1をエクスポートできません</translation>
+    </message>
+    <message>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation>エクスポート中 &quot;%1&quot;...</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
-    <message>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;No image&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be loaded&gt;</source>
-        <translation>&lt;Image cannot be loaded&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be uploaded&gt;</source>
-        <translation>&lt;Image cannot be uploaded&gt;</translation>
-    </message>
     <message>
         <source>Select file...</source>
         <translation>ファイル選択...</translation>
@@ -4100,6 +3969,38 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <source>Pictures %1</source>
         <translation>ピクチャ %1</translation>
+    </message>
+    <message>
+        <source>&lt;No picture&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;Error while loading picture&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;Error while uploading picture&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be read&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be loaded&gt;</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutTabBar</name>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>%1&apos; スクリーン</translation>
     </message>
 </context>
 <context>
@@ -4205,40 +4106,8 @@ These versions are not compatible. Please update your %3</source>
         <translation>ソフトウェアライセンス: </translation>
     </message>
     <message>
-        <source>
-%1 %2</source>
-        <translation>
-%1 %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>
-At least %n %2 are required</source>
-        <translation>
-            <numerusform>最低でも %n %2 が必要</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>
-%n %2 are currently in use</source>
-        <translation>
-            <numerusform>%n %2  が使用されています</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Obtaining licenses from Server...</source>
         <translation>サーバーからライセンス取得...</translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial or trial license.</source>
-        <translation>ライセンスがインストールされていません.
-正規ライセンスまたはトライアルライセンスをアクティベートしてください.</translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial license.</source>
-        <translation>ライセンスがインストールされていません.
-正規ライセンスをアクティベートしてください.</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
@@ -4297,10 +4166,40 @@ Please activate your commercial license.</source>
         <translation>ライセンスは正常にアクティベートされました.</translation>
     </message>
     <message>
-        <source>Network error has occurred during automatic license activation.
-Try to activate your license manually.</source>
-        <translation>自動ライセンスアクティベート中にネットワークエラーが発生しました
-マニュアルでアクティベートを行ってください.</translation>
+        <source>%1 %2</source>
+        <translation>%1% {1 %2?}</translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %2 are required</source>
+        <translation>
+            <numerusform>最低 %n %2 が必要</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %2 are currently in use</source>
+        <translation>
+            <numerusform>%n %2 が現在使用中</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed.</source>
+        <translation>有効なライセンスがインストールされていません.</translation>
+    </message>
+    <message>
+        <source>Please activate your commercial or trial license.</source>
+        <translation>ライセンスをアクティベートしてください.</translation>
+    </message>
+    <message>
+        <source>Please activate your commercial license.</source>
+        <translation>ライセンスをアクティベートしてください.</translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation.</source>
+        <translation>ライセンスのアクティベート中にネットワークエラーが発生しました.</translation>
+    </message>
+    <message>
+        <source>Try to activate your license manually.</source>
+        <translation>マニュアルでライセンスをアクティベートしてください.</translation>
     </message>
 </context>
 <context>
@@ -4428,10 +4327,8 @@ Try to activate your license manually.</source>
         <translation>接続設定の削除</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete the connection
-%1?</source>
-        <translation>接続設定を削除しますか
-%1?</translation>
+        <source>Are you sure you want to delete this connection: %1?</source>
+        <translation>: %1との接続を削除しますか?</translation>
     </message>
 </context>
 <context>
@@ -4492,6 +4389,25 @@ Try to activate your license manually.</source>
         <source>Crop</source>
         <translation>横に合す</translation>
     </message>
+    <message>
+        <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
+        <translation>このオプションは録画スケジュールには反映されません　録画スケジュールはサーバー時間で行われます.</translation>
+    </message>
+</context>
+<context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation>ファイル設定</translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation>静止画がロードされませんでした</translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation>魚眼レンズファイル</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
@@ -4532,10 +4448,6 @@ Try to activate your license manually.</source>
         <translation>高解像度</translation>
     </message>
     <message>
-        <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7</translation>
-    </message>
-    <message>
         <source>LIVE</source>
         <translation>ライブ</translation>
     </message>
@@ -4565,16 +4477,6 @@ Try to activate your license manually.</source>
     <message>
         <source>The new system will have password and name from the system:</source>
         <translation>新規システムには既存システムより名前とパスワードが引継がれます:</translation>
-    </message>
-    <message>
-        <source>Success!
-
-The system was configured successfully.
-The servers from the remote system should appear in your system soon.</source>
-        <translation>成功!
-
-システムは正常に構成されました.
-このシステムに表示されるようになります.</translation>
     </message>
     <message>
         <source>http(s)://host:port</source>
@@ -4643,6 +4545,18 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <source>Cannot merge systems.</source>
         <translation>システム統合できません.</translation>
+    </message>
+    <message>
+        <source>Success!</source>
+        <translation>成功!</translation>
+    </message>
+    <message>
+        <source>The system was configured successfully.</source>
+        <translation>システムは正常に構成されました.</translation>
+    </message>
+    <message>
+        <source>The servers from the remote system should appear in your system soon.</source>
+        <translation>リモートシステムのサーバーは直ぐに表示されます.</translation>
     </message>
 </context>
 <context>
@@ -4730,6 +4644,21 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
 </context>
 <context>
+    <name>QnNetworkSpeedStrings</name>
+    <message>
+        <source>b/s</source>
+        <translation>b/s</translation>
+    </message>
+    <message>
+        <source>Kb/s</source>
+        <translation>kb/s</translation>
+    </message>
+    <message>
+        <source>Mb/s</source>
+        <translation>Mb/s</translation>
+    </message>
+</context>
+<context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
         <source>%n more item(s)</source>
@@ -4773,10 +4702,6 @@ The servers from the remote system should appear in your system soon.</source>
         <translation>クリップサウンドは最大 %1秒</translation>
     </message>
     <message>
-        <source>Custom Title:</source>
-        <translation>カスタムタイトル:</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
@@ -4804,6 +4729,10 @@ The servers from the remote system should appear in your system soon.</source>
         <source>Confirm file deletion</source>
         <translation>フィイル削除の確認</translation>
     </message>
+    <message>
+        <source>Custom title:</source>
+        <translation>カスタムタイトル:</translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundModel</name>
@@ -4827,8 +4756,12 @@ The servers from the remote system should appear in your system soon.</source>
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
-        <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
-        <translation>閉じる (&lt;b&gt;右クリック&lt;/b&gt;)</translation>
+        <source>Close</source>
+        <translation>閉じる</translation>
+    </message>
+    <message>
+        <source>Right Click</source>
+        <translation>右クリック</translation>
     </message>
 </context>
 <context>
@@ -4883,29 +4816,18 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
 </context>
 <context>
-    <name>QnPerformance</name>
+    <name>QnPerformanceTest</name>
+    <message>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <translation>このコンピューターのパフォーマンスでは %1のコンフィグレーションモードのみ許可されます.</translation>
+    </message>
+    <message>
+        <source>For full-featured mode please use another computer.</source>
+        <translation>フル機能モードを使用するには他のコンピューターを使用してください.</translation>
+    </message>
     <message>
         <source>Warning</source>
         <translation>警告</translation>
-    </message>
-    <message>
-        <source>Performance of this computer allows running %1 in configuration mode only. For full-featured mode please use another computer.</source>
-        <translation>このPCのスペックでは%1　のコンフィグレーションモードでのみ動作します　全ての機能を使用するには他のPCを使用して下さい.</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>画像設定</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>イメージがロードされません</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>魚眼レンズイメージ</translation>
     </message>
 </context>
 <context>
@@ -4931,20 +4853,20 @@ The servers from the remote system should appear in your system soon.</source>
         <translation>変更した内容は再起動後に有効になります　再起動を行いますか?</translation>
     </message>
     <message>
-        <source>Settings file is read-only. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation>Settings file is read-only. Please contact your system administrator.
-All changes will be lost after program exit.</translation>
-    </message>
-    <message>
-        <source>Settings cannot be saved. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation>Settings cannot be saved. Please contact your system administrator.
-All changes will be lost after program exit.</translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation>情報</translation>
+    </message>
+    <message>
+        <source>Settings file is read-only. Please contact your system administrator.</source>
+        <translation>設定ファイルは読取のみです　システム管理者にお問合せください.</translation>
+    </message>
+    <message>
+        <source>All changes will be lost after program exit.</source>
+        <translation>全ての変更はプログラムを閉じると適応されません.</translation>
+    </message>
+    <message>
+        <source>Settings cannot be saved. Please contact your system administrator.</source>
+        <translation>設定は保存されません　システム管理者にお問合せください.</translation>
     </message>
 </context>
 <context>
@@ -4961,34 +4883,12 @@ All changes will be lost after program exit.</translation>
         <translation>カメラからポジションを取得できません</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>カメラ %1.のポジション取得中にエラーが発生しました
-
-カメラがオンラインになるまでお待ちください.</translation>
-    </message>
-    <message>
         <source>Could not set position for camera</source>
         <translation>カメラにポジションを登録できません</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>カメラ %1.のポジション登録中にエラーが発生しました
-
-カメラがオンラインになるまでお待ちください.</translation>
-    </message>
-    <message>
         <source>Remove preset</source>
         <translation>プリセット削除</translation>
-    </message>
-    <message>
-        <source>This preset is used in some tours.
-These tours will become invalid if you remove it.</source>
-        <translation>プリセットはツアーに使用されています.
-削除するとツアーは無効になります.</translation>
     </message>
     <message>
         <source>Do not show again.</source>
@@ -5005,6 +4905,26 @@ These tours will become invalid if you remove it.</source>
     <message>
         <source>Changes are not saved. Do you want to save them?</source>
         <translation>変更内容が保存されていません　保存しますか?</translation>
+    </message>
+    <message>
+        <source>This preset is used in some tours.</source>
+        <translation>このプリセットは他のツアーで使用されています.</translation>
+    </message>
+    <message>
+        <source>These tours will become invalid if you remove it.</source>
+        <translation>削除するとこれらのツアーは無効になります.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation>カメラ %1.のポジション取得中にエラーが発生しました.</translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation>カメラがオンラインになるまでお待ちください.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
+        <translation>カメラ %1.のポジション設定中にエラーが発生しました.</translation>
     </message>
 </context>
 <context>
@@ -5445,18 +5365,6 @@ These tours will become invalid if you remove it.</source>
         <translation>警告</translation>
     </message>
     <message>
-        <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation>再同期中にディスクの使用領域が増加します　容量にもよりますが数時間掛かります　このプロセスはアーカイブフォルダーの移動、名前変更、交換の場合に実行されます　実行中はデータを紛失する事なくキャンセルを行えますが実行しますか？</translation>
-    </message>
-    <message>
-        <source>Rebuild archive index</source>
-        <translation>アーカイブインデックスのリビルド</translation>
-    </message>
-    <message>
-        <source>Fast initial scan in progress</source>
-        <translation>イニシャルスキャン処理中</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>終了</translation>
     </message>
@@ -5483,6 +5391,30 @@ These tours will become invalid if you remove it.</source>
     <message>
         <source>Add external Storage...</source>
         <translation>外部ストレージの追加...</translation>
+    </message>
+    <message>
+        <source>You are about to launch the archive re-synchronization routine.</source>
+        <translation>アーカイブ再同期ルーチンを行おうとしています.</translation>
+    </message>
+    <message>
+        <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
+        <translation>注意!　再同期プロセスの過程でHDD使用率が増加します　サイズによっても異なりますが数時間を要します.</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
+        <translation>このプロセスはアーカイブフォルダーの移動、名前の変更または入替を行った場合のみ行います　キャンセルしてもﾃﾞｰﾀを紛失する事はありません.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to continue?</source>
+        <translation>実行すますか?</translation>
+    </message>
+    <message>
+        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
+        <translation>ストレージ &apos;%1&apos;のアーカイブインデックスのリビルド中</translation>
+    </message>
+    <message>
+        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
+        <translation>ストレージ &apos;%1&apos; のアーカイブスキャン中</translation>
     </message>
 </context>
 <context>
@@ -5611,12 +5543,6 @@ These tours will become invalid if you remove it.</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <source>Cannot cancel update at this state.
-Please wait until update is finished</source>
-        <translation>この段階では更新をキャンセルできません.
-更新が終了するまでお待ちください</translation>
-    </message>
-    <message>
         <source>Update finished... 100%</source>
         <translation>更新終了... 100%</translation>
     </message>
@@ -5643,12 +5569,6 @@ Please wait until update is finished</source>
     <message>
         <source>Launcher process is not found</source>
         <translation>起動プロセスが見つかりません</translation>
-    </message>
-    <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>クライアントの再起動ができません.
-アプリケーションを閉じて再度起動して下さい.</translation>
     </message>
     <message>
         <source>Update cancelled</source>
@@ -5778,6 +5698,26 @@ Please close the application and start it again using the shortcut in the start 
         <source>Installing updates... %1%</source>
         <translation>更新インストール中.. %1%</translation>
     </message>
+    <message>
+        <source>Cannot cancel update at this state.</source>
+        <translation>この段階ではキャンセルできません.</translation>
+    </message>
+    <message>
+        <source>Please wait until update is finished</source>
+        <translation>更新が終了するまでお待ちください</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation>クライアントの再起動ができません.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>一度アプリケーションを閉じてスタートメニューのショートカットで起動してください.</translation>
+    </message>
+    <message>
+        <source>Check for updates automatically</source>
+        <translation>更新を自動でチェックする</translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -5849,9 +5789,12 @@ Please close the application and start it again using the shortcut in the start 
         <translation>モーションエリアのリセット</translation>
     </message>
     <message>
-        <source>Are you sure you want to reset motion regions to the defaults?
-This action CANNOT be undone!</source>
+        <source>Are you sure you want to reset motion regions to the defaults?</source>
         <translation>モーションエリアを初期設定に戻しますか?</translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation>このアクションは取消せません!</translation>
     </message>
 </context>
 <context>
@@ -5988,6 +5931,22 @@ This action CANNOT be undone!</source>
         <source>Provided storage path does not define a valid external storage.</source>
         <translation>このストレージパスでは外部ストレージを設定できません.</translation>
     </message>
+    <message>
+        <source>Windows Network Shared Resource</source>
+        <translation>Windowsネットワーク共有リソース</translation>
+    </message>
+    <message>
+        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Coldstore Network Storage</source>
+        <translation>COLDSTOREネットワークストレージ</translation>
+    </message>
+    <message>
+        <source>coldstore://&lt;Address&gt;</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
@@ -6069,98 +6028,115 @@ This action CANNOT be undone!</source>
 <context>
     <name>QnTimeSlider</name>
     <message>
-        <source>NO THUMBNAILS
-AVAILABLE</source>
-        <translation>サムネイルなし
-有効</translation>
-    </message>
-    <message>
-        <source>ms</source>
-        <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <source>NO THUMBNAILS AVAILABLE</source>
+        <translation>サムネイルがありません</translation>
     </message>
     <message>
         <source>auto</source>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>AM/PM usage based on user&apos;s system locale.</comment>
+        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>自動</translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>s</source>
-        <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Suffix for displaying seconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>s</translation>
     </message>
     <message>
         <source>m</source>
-        <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying minutes on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>h</source>
-        <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying hours on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>d</source>
-        <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>M</source>
-        <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Suffix for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>M</translation>
     </message>
     <message>
         <source>y</source>
-        <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying years on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>dd MMMM</source>
-        <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>MMMM</source>
-        <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>yyyy</source>
-        <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
-----------
-Format for displaying year caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying years on timeline</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>MINUTES</comment>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>HOURS</comment>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
 </context>
@@ -6546,26 +6522,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>Enter new name for the selected item:</source>
         <translation>選択したアイテムの名前:</translation>
     </message>
-    <message numerus="yes">
-        <source>These %n cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform> %n カメラが自動検索されました.
-削除後も自動検索されます.
-削除しますか?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these %1 cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>%n / %1 カメラが自動検索されました.
-削除後も自動検索されます.
-削除しますか?</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Delete Resources</source>
         <translation>リソース削除</translation>
@@ -6575,14 +6531,6 @@ Are you sure you want to delete them?</source>
         <translation>
             <numerusform> %n アイテムを保存できません.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. 
-
-Error description: &apos;%2&apos;</source>
-        <translation>リソース削除中にエラーが発生しました. 
-
-エラー詳細: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Server v%1 at %2&lt;br/&gt;</source>
@@ -6619,12 +6567,6 @@ Error description: &apos;%2&apos;</source>
         <translation>起動プロセスが見つかりません</translation>
     </message>
     <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>クライアントの再起動ができません.
-アプリケーションを閉じて再度起動して下さい.</translation>
-    </message>
-    <message>
         <source>User Settings</source>
         <translation>ユーザー設定</translation>
     </message>
@@ -6635,10 +6577,6 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation>イメージプロセッッシングには時間を要します.</translation>
-    </message>
-    <message>
-        <source>Image cannot be uploaded</source>
-        <translation>イメージを更新できません</translation>
     </message>
     <message>
         <source>Could not delete resource</source>
@@ -6661,6 +6599,50 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <source>New layout</source>
         <translation>新規レイアウト</translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n cameras are auto-discovered.</source>
+        <translation>
+            <numerusform>%n カメラが検索されました.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>They may be auto-discovered again after removing.</source>
+        <translation>削除後も再度検索されます.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete them?</source>
+        <translation>削除しますか?</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these %1 cameras are auto-discovered.</source>
+        <translation>
+            <numerusform>%n 中 %1 カメラが検索されました.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to delete a resource from Server. </source>
+        <translation>サーバーからリソース削除中にエラーが発生しました.</translation>
+    </message>
+    <message>
+        <source>Error description: &apos;%1&apos;</source>
+        <translation>エラー　&apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation>クライアントの再起動ができません.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>一度アプリケーションを閉じてスタートメニューのショートカットで起動してください.</translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation>サイズが大きすぎます　最大 %1 Mb</translation>
+    </message>
+    <message>
+        <source>Error while uploading picture.</source>
+        <translation>アップロード中にエラーが発生しました.</translation>
     </message>
 </context>
 <context>
@@ -6793,13 +6775,6 @@ Please close the application and start it again using the shortcut in the start 
         <translation>警告</translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation>30分超のビデオファイルのエクスポートを実行しようとしています 
-ＨＤＤ空き容量は1GB以上必要となり、接続速度によっても異なりますが数分間必要になります実行しますか？</translation>
-    </message>
-    <message>
         <source>AVI (*.avi)</source>
         <translation>AVI (*.avi)</translation>
     </message>
@@ -6834,10 +6809,6 @@ Do you want to continue?</source>
     <message>
         <source>Timestamps:</source>
         <translation>タイムスタンプ:</translation>
-    </message>
-    <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>WYSIWYGを保障しているトランスコードビデオ</translation>
     </message>
     <message>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
@@ -6908,19 +6879,32 @@ Do you want to continue?</source>
         <translation>読取り専用</translation>
     </message>
     <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation>30分超のビデオファイルのエクスポートを実行しようとしています 
-ＨＤＤ空き容量は1GB以上必要となり、接続速度によっても異なりますが数分間必要になります実行しますか？</translation>
-    </message>
-    <message>
         <source>Could not export video</source>
         <translation>ビデオをエクスポートできません</translation>
     </message>
     <message>
         <source>Export successfully finished.</source>
         <translation>エクスポートは正常に終了しました.</translation>
+    </message>
+    <message>
+        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
+        <translation>ビデオシーケンスのエクスポートには30分以上掛かります.</translation>
+    </message>
+    <message>
+        <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
+        <translation>1GB以上のHDD空き容量が必要です、また接続速度にもよりますが終了までには数分掛かります.</translation>
+    </message>
+    <message>
+        <source>Do you want to continue?</source>
+        <translation>実行しますか?</translation>
+    </message>
+    <message>
+        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
+        <translation>30分を超える幾つかのビデオシーケンスをエクスポートしようとしています.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation>フィルター、回転、歪み補正、拡張イメージ、カスタムアスペクトの適用（トランスコード必要）</translation>
     </message>
 </context>
 <context>
@@ -6958,20 +6942,24 @@ Do you want to continue?</source>
         <translation>選択したサーバーは正常にシステムに接続されました！</translation>
     </message>
     <message>
-        <source>Authentification failed.
-Please, check the password you have entered.</source>
-        <translation>認証エラー.
-入力したパスワードを確認してください.</translation>
-    </message>
-    <message>
         <source>Could not configure the selected servers.</source>
         <translation>サーバーの構成ができません.</translation>
     </message>
     <message>
-        <source>Could not update the selected servers.
-You can try to update the servers again in the System Administration.</source>
-        <translation>サーバーの更新ができません.
-システムアドミニストレーション権限で再度更新を行ってください.</translation>
+        <source>Authentication failed.</source>
+        <translation>認証エラー.</translation>
+    </message>
+    <message>
+        <source>Please, check the password you have entered.</source>
+        <translation>パスワードを確認してください.</translation>
+    </message>
+    <message>
+        <source>Could not update the selected servers.</source>
+        <translation>選択したサーバーの更新ができません.</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration.</source>
+        <translation>システムアドミニストレーション中の更新タブでも行えます.</translation>
     </message>
 </context>
 <context>
@@ -6982,8 +6970,7 @@ You can try to update the servers again in the System Administration.</source>
     </message>
     <message>
         <source>Layout with the same name already exists and you do not have the rights to overwrite it.</source>
-        <translation>同じ名前のレイアウトは既に存在します
-また上書きする権限がありません.</translation>
+        <translation>同じ名前のレイアウトは既に存在しますまた上書きする権限がありません.</translation>
     </message>
     <message>
         <source>Save Layout As</source>
@@ -7061,25 +7048,24 @@ You can try to update the servers again in the System Administration.</source>
         <translation>全てのカメラ</translation>
     </message>
     <message>
-        <source>&apos;Live&apos;</source>
-        <extracomment>Time slider&apos;s tooltip for position on live. Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for. That&apos;s where these single quotes come from.</extracomment>
-        <translation>ライブ</translation>
-    </message>
-    <message>
-        <source>yyyy MMM dd
-hh:mm:ss</source>
+        <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <source>mm:ss</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for short local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <source>yyyy MMM dd</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Live</source>
+        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
+        <translation>ライブ</translation>
     </message>
 </context>
 <context>
@@ -7089,24 +7075,8 @@ hh:mm:ss</source>
         <translation>カメラからポジションを取得できません</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>カメラ %1.のポジション取得中にエラーが発生しました
-
-カメラがオンラインになるまでお待ちください.</translation>
-    </message>
-    <message>
         <source>Could not set position for camera</source>
         <translation>カメラからポジションを登録できません</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>カメラ %1.のポジション登録中にエラーが発生しました
-
-カメラがオンラインになるまでお待ちください.</translation>
     </message>
     <message>
         <source>Could not set position to camera</source>
@@ -7115,6 +7085,18 @@ Please wait for the camera to go online.</source>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation>PTZキャリブレーション_%1.jpg</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation>カメラ%1.のポジション取得中にエラーが発生しました.</translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation>カメラがオンラインになるまでお待ちください.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
+        <translation>カメラ %1.のポジション設定中にエラーが発生しました.</translation>
     </message>
 </context>
 <context>
@@ -7195,10 +7177,6 @@ Please wait for the camera to go online.</source>
         <translation>新規バージョンに更新できます</translation>
     </message>
     <message>
-        <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
-        <translation>新規バージョン &lt;b&gt;%1&lt;/b&gt; に更新できます.</translation>
-    </message>
-    <message>
         <source>Would you like to update?</source>
         <translation>更新しますか?</translation>
     </message>
@@ -7222,18 +7200,20 @@ Please wait for the camera to go online.</source>
         <source>Release Notes</source>
         <translation>リリースノート</translation>
     </message>
+    <message>
+        <source>Please update %1 Client.</source>
+        <translation>%1 クライアントを更新してください.</translation>
+    </message>
+    <message>
+        <source>New version %1 is available.</source>
+        <translation>新規バージョン %1に更新できます.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
         <source>Control session is already running</source>
         <translation>コントロールセッションは既に起動しています</translation>
-    </message>
-    <message>
-        <source>Could not start control session.
-Another user is already controlling this screen.</source>
-        <translation>コントロールセッションが起動できません.
-他ユーザーが既にコントロールしています.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7332,11 +7312,6 @@ Another user is already controlling this screen.</source>
         <translation>ビデオウォール停止確認</translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?
-You&apos;ll have to start it manually.</source>
-        <translation>ビデオウォールを停止しますか?.</translation>
-    </message>
-    <message>
         <source>New Matrix %1</source>
         <translation>次のマトリックス %1</translation>
     </message>
@@ -7357,6 +7332,22 @@ You&apos;ll have to start it manually.</source>
         <translation>
             <numerusform> %n マトリックスを削除しますか？</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Could not start control session.</source>
+        <translation>コントロールセッションを開始できません.</translation>
+    </message>
+    <message>
+        <source>Another user is already controlling this screen.</source>
+        <translation>他ユーザーがこのスクリーンをコントロールしています.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop the Video Wall?</source>
+        <translation>ビデオウォールを停止しますか?</translation>
+    </message>
+    <message>
+        <source>You&apos;ll have to start it manually.</source>
+        <translation>マニュアルで開始してください.</translation>
     </message>
 </context>
 <context>
@@ -7868,10 +7859,6 @@ You&apos;ll have to start it manually.</source>
         <translation>安全でない接続</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>Secure connection using TLS</source>
         <translation>TLSでの安全な接続</translation>
     </message>
@@ -7910,6 +7897,10 @@ You&apos;ll have to start it manually.</source>
     <message>
         <source>Cancel</source>
         <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
+        <translation>(推奨)</translation>
     </message>
 </context>
 <context>

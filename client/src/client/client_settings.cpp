@@ -233,7 +233,6 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     //case SHOWCASE_ENABLED:
     case SETTINGS_URL:
     case DEV_MODE:
-    case AUTO_CHECK_FOR_UPDATES:
     case GL_VSYNC:
     case LIGHT_MODE:
     case LIGHT_MODE_OVERRIDE:

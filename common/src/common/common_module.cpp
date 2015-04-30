@@ -39,7 +39,17 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
 
 QnCommonModule::~QnCommonModule() {
     delete m_sessionManager;
-    return;
+}
+
+void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &server) {
+    /* Can't use resourceChanged signal because it's not emited when we are saving server locally. */
+    connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::updateModuleInformation);
+    connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::updateModuleInformation);
+}
+
+void QnCommonModule::bindModuleinformation(const QnUserResourcePtr &adminUser) {
+    connect(adminUser.data(),   &QnUserResource::resourceChanged,   this,   &QnCommonModule::updateModuleInformation);
+    connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
 }
 
 void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
@@ -57,23 +67,6 @@ QnUuid QnCommonModule::remoteGUID() const {
     return m_remoteUuid;
 }
 
-void QnCommonModule::setLocalSystemName(const QString &value) {
-    if (m_localSystemName == value)
-        return;
-
-    {
-        QMutexLocker lk(&m_mutex);
-        m_localSystemName = value;
-    }
-    emit systemNameChanged(m_localSystemName);
-}
-
-QString QnCommonModule::localSystemName() const
-{
-    QMutexLocker lk(&m_mutex);
-    return m_localSystemName;
-}
-
 QnSoftwareVersion QnCommonModule::engineVersion() const {
     QMutexLocker lk(&m_mutex);
     return m_engineVersion;
@@ -84,58 +77,67 @@ void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
     m_engineVersion = version;
 }
 
-void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation) {
-    QMutexLocker lk(&m_mutex);
-    m_moduleInformation = moduleInformation;
+void QnCommonModule::setLocalSystemName(const QString& value)
+{
+    QnModuleInformation info = moduleInformation();
+    info.systemName = value;
+    setModuleInformation(info);
 }
 
-QnModuleInformation QnCommonModule::moduleInformation() const 
+QString QnCommonModule::localSystemName() const
 {
-    QnModuleInformation moduleInformationCopy;
+    return moduleInformation().systemName;
+}
+
+void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInformation)
+{
+    bool isSystemNameChanged = false;
     {
         QMutexLocker lk(&m_mutex);
-        moduleInformationCopy = m_moduleInformation;
-        moduleInformationCopy.systemName = m_localSystemName;
+        if (m_moduleInformation == moduleInformation)
+            return;
+
+        isSystemNameChanged = m_moduleInformation.systemName != moduleInformation.systemName;
+        m_moduleInformation = moduleInformation;
     }
-    //filling dynamic fields
-    if (qnResPool) {
-        moduleInformationCopy.remoteAddresses.clear();
-        const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-        if (server) {
-            QSet<QString> ignoredHosts;
-            for (const QUrl &url: server->getIgnoredUrls())
-                ignoredHosts.insert(url.host());
+    if (isSystemNameChanged)
+        emit systemNameChanged(moduleInformation.systemName);
+    emit moduleInformationChanged();
+}
 
-            for(const QHostAddress &address: server->getNetAddrList()) {
-                QString addressString = address.toString();
-                if (!ignoredHosts.contains(addressString))
-                    moduleInformationCopy.remoteAddresses.insert(addressString);
-            }
-            for(const QUrl &url: server->getAdditionalUrls()) {
-                if (!ignoredHosts.contains(url.host()))
-                    moduleInformationCopy.remoteAddresses.insert(url.host());
-            }
-            moduleInformationCopy.port = server->getPort();
-            moduleInformationCopy.name = server->getName();
-        }
-
-        QnUserResourcePtr admin = qnResPool->getAdministrator();
-        if (admin) {
-            QCryptographicHash md5(QCryptographicHash::Md5);
-            md5.addData(admin->getHash());
-            md5.addData(moduleInformationCopy.systemName.toUtf8());
-            moduleInformationCopy.authHash = md5.result();
-        }
-
-    }
-
-    return moduleInformationCopy;
+QnModuleInformation QnCommonModule::moduleInformation() const
+{
+    QMutexLocker lk(&m_mutex);
+    return m_moduleInformation;
 }
 
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
     
     Q_ASSERT_X(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an assert here? Something is wrong with resource data json file. */
+}
+
+void QnCommonModule::updateModuleInformation() {
+    QMutexLocker lk(&m_mutex);
+    QnModuleInformation moduleInformationCopy = m_moduleInformation;
+    lk.unlock();
+
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (server) {
+        QnModuleInformation moduleInformation = server->getModuleInformation();
+        moduleInformationCopy.port = moduleInformation.port;
+        moduleInformationCopy.name = moduleInformation.name;
+    }
+
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (admin) {
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        md5.addData(admin->getHash());
+        md5.addData(moduleInformationCopy.systemName.toUtf8());
+        moduleInformationCopy.authHash = md5.result();
+    }
+
+    setModuleInformation(moduleInformationCopy);
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)

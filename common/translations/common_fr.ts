@@ -15,26 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnAbstractStorageResource</name>
-    <message>
-        <source>Windows Network Shared Resource</source>
-        <translation>Ressource partagé de réseau Windows</translation>
-    </message>
-    <message>
-        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>\\&lt;Nom Ordinateur&gt;\&lt;Dossier&gt;</translation>
-    </message>
-    <message>
-        <source>Coldstore Network Storage</source>
-        <translatorcomment>There&apos;s no word in French for ColdStore, we&apos;ve added (NAS) for explanation purpose</translatorcomment>
-        <translation>Stockage réseau &apos;ColdStore&apos; (NAS)</translation>
-    </message>
-    <message>
-        <source>coldstore://&lt;Address&gt;</source>
-        <translation>coldstore://&lt;Adresse&gt;</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>User Defined (%1)</source>
@@ -293,6 +273,10 @@
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
         <translation>HDD/SSD %1 est plein. Le disque contient trop de données qui ne sont pas gérés par le VMS.</translation>
     </message>
+    <message>
+        <source>Conflicting Server: %1</source>
+        <translation>Conflit de serveur: %1</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -305,80 +289,8 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Server %1 is not available.
- Check that Server is up and running.</source>
-        <translation>Serveur %1 n&apos;est pas disponible.
-Vérifier que le serveur est opérationnel.</translation>
-    </message>
-    <message>
-        <source>Received bad response from Server %1: &quot;%2&quot;.
- Check if Server is up and has the proper version.</source>
-        <translation>Reçue mauvaise réponse du serveur %1: &quot;%2&quot;.
-Vérifier si le serveur est opérationnel et a la bonne version.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to http port %1.
- Make sure the camera is plugged into the network.</source>
-        <translation>Impossible de se connecter sur le port http %1.
-Assurez-vous que la caméra est branchée sur le réseau.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.
- Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>Impossible d&apos;ouvrir l&apos;URL média %1. Échec de connexion sur le port média %2.
-Assurez-vous que le port %2 est accessible (redirigé, etc.) S.V.P, essayez de redémarrer la caméra, puis restaurer les valeurs par défaut sur la page web.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>Impossible d&apos;ouvrir l&apos;URL média %1. La connexion au port %2 a été fermé de façon inattendue.
-Assurez-vous que la caméra est branchée sur le réseau. Essayez de redémarrer la caméra.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Ne peut pas analyser la réponse de la caméra. URL %1, nom de  requête %2.
- S.V.P, redémarrer la caméra et restaurer les paramètres par défaut à partir de la page web. Ensuite, mettre à jour le micrologiciel. Si le problème persiste, contactez le support.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Aucune piste média supporté à l&apos;URL %1.
-S.V.P, redémarrer la caméra et restaurer les paramètres par défaut à partir de la page web. Ensuite, mettre à jour le micrologiciel. Si le problème persiste, contactez le support.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>Non autorisé. URL %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.
- Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Ne peut pas ouvrir l&apos;URL média %1. Protocole média %2 non supporté. 
-S.V.P, restaurer les valeurs par défaut sur la page web. Ensuite, essayez de mettre à jour le micrologiciel. Si le problème persiste, contacter le support.</translation>
-    </message>
-    <message>
-        <source>Failed to configure parameter %1.
- First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>Échec de la configuration du paramètre %1.
-Activer l&apos;enregistrement (si désactivé) et diminuer l&apos;IPS dans la configurations caméra. Sinon, restaurer les paramètres par défaut à partir de la page web. Si le problème persiste, contacter le support.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>Échec de la requête de caméra &quot;%1&quot; avec erreur &quot;%2&quot;.
-S.V.P, redémarrer la caméra et restaurer les paramètres par défaut à partir de la page web. Ensuite, essayer de mettre à jour le micrologiciel. Si le problème persiste, contactez le support.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.
- Please contact support.</source>
-        <translation>Problème de caméra inconnu.
-S.V.P, contactez le support.</translation>
-    </message>
-    <message>
-        <source>An input/output error has occurred. OS message: &quot;%1&quot;.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>Une erreur I/O s&apos;est produite. Message &apos;OS&apos;:&quot;%1&quot;.
-Assurez-vous que la caméra est branchée sur le réseau. Essayez de redémarrer la caméra.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -397,20 +309,104 @@ Assurez-vous que la caméra est branchée sur le réseau. Essayez de redémarrer
         <translation>Processus d&apos;initialisation de la caméra en cours</translation>
     </message>
     <message>
-        <source>
-
-Parameters: </source>
-        <translation>
-
-Paramètres: </translation>
-    </message>
-    <message>
         <source>Server has been stopped.</source>
         <translation>Le serveur a été arrêté.</translation>
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
         <translation>Erreur inconnue. S’il vous plait, contactez le support.</translation>
+    </message>
+    <message>
+        <source>Server %1 is not available.</source>
+        <translation>Serveur %1 n&apos;est pas disponible.</translation>
+    </message>
+    <message>
+        <source>Check that Server is up and running.</source>
+        <translation>Vérifiez que le serveur est opérationnel.</translation>
+    </message>
+    <message>
+        <source>Received bad response from Server %1: &quot;%2&quot;.</source>
+        <translation>Mauvaise réponse reçue du Serveur %1: &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Check if Server is up and has the proper version.</source>
+        <translation>Vérifiez si le serveur est fonctionnel et à la bonne version.</translation>
+    </message>
+    <message>
+        <source>Cannot connect to http port %1.</source>
+        <translation>Ne peut pas se connecter au port HTTP %1.</translation>
+    </message>
+    <message>
+        <source>Make sure the camera is plugged into the network.</source>
+        <translation>Assurez-vous que la caméra est branchée au réseau.</translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
+        <translation>Ne peut pas ouvrir l&apos;URL média %1. Échec de connexion sur le port Média %2.</translation>
+    </message>
+    <message>
+        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation>Assurez-vous que le port %2 soit accessible (redirigé). S.V.P. essayez de redémarrer la caméra et restaurer par défaut depuis la page web.</translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation>Ne peut pas ouvrir l&apos;URL média %1. La connexion au port %2 s&apos;est fermé de façon inattendue.</translation>
+    </message>
+    <message>
+        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation>Assurez-vous que la caméra est branchée au réseau. Essayez de redémarrer la caméra.</translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. Url %1, request name %2.</source>
+        <translation>Ne peut pas analyser la réponse de la caméra. URL %1, nom de requête: %2.</translation>
+    </message>
+    <message>
+        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation>Essayez de redémarrer la caméra, ensuite restaurer par défaut depuis la page web.</translation>
+    </message>
+    <message>
+        <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
+        <translation>Finalement, essayez de faire la MàJ micrologiciel. Si le problème persiste, contactez le support.</translation>
+    </message>
+    <message>
+        <source>No supported media tracks at url %1.</source>
+        <translation>Aucune piste média supporté au URL %1.</translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
+        <translation>Ne peut pas ouvrir l&apos;URL média %1. Protocole Média non supporté %2.</translation>
+    </message>
+    <message>
+        <source>Failed to configure parameter %1.</source>
+        <translation>Échec de configuration paramètre %1.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
+        <translation>D&apos;abord, essayez d&apos;activer l&apos;enreg. et diminuer l&apos;IPS dans la configuration de caméra.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
+        <translation>Si cela n&apos;aide pas, restaurez les réglages d&apos;usine par la page web de la caméra. Si le problème persiste, S.V.P. contactez le support.</translation>
+    </message>
+    <message>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>Requête caméra &quot;%1&quot; échec avec erreur &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Unknown Camera Issue.</source>
+        <translation>Problème de caméra inconnue.</translation>
+    </message>
+    <message>
+        <source>Please contact support.</source>
+        <translation>S.V.P. contactez le support.</translation>
+    </message>
+    <message>
+        <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
+        <translation>Erreur entrée/sortie survenue. Message OS: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <source>Parameters:</source>
+        <translation>Paramètres:</translation>
     </message>
 </context>
 <context>
@@ -798,10 +794,6 @@ Paramètres: </translation>
         <translation>Connexion au serveur perdu</translation>
     </message>
     <message>
-        <source>Select server for others to synchronise time with</source>
-        <translation>Sélectionner un serveur sur lequel les autres vont synchroniser l&apos;heure</translation>
-    </message>
-    <message>
         <source>Error while sending email</source>
         <translation>Erreur lors de l&apos;envoi de courriel</translation>
     </message>
@@ -814,58 +806,60 @@ Paramètres: </translation>
         <translation>Les périphériques de stockages ne sont pas configurés</translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation>La reconstruction de l&apos;index de l&apos;archive est complétée.</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>Adresse courriel non définie pour l&apos;usager %1</translation>
-    </message>
-    <message>
-        <source>Email address is not set.
-You cannot receive system notifications via email.</source>
-        <translation>Adresse courriel non définie.
-Vous ne pouvez pas recevoir des notifications système par courriel.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.
-You cannot receive system notifications via email.</source>
-        <translation>Serveur courriel non définie.
-Vous ne pouvez pas recevoir des notifications système par courriel.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.
-They cannot receive system notifications via email.</source>
-        <translation>Certains usagers n&apos;ont pas défini leurs adresses courriel.
-Ils ne pourront pas recevoir de notification système par courriel.</translation>
     </message>
     <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
         <translation>Plusieurs serveurs ont l&apos;heure différente et la bonne heure ne peut pas être détectée automatiquement.</translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:
-%1.</source>
-        <translation>Stockages plein sur le serveur suivant :
-%1.</translation>
+        <source>Select server for others to synchronize time with</source>
+        <translation>Choisir un serveur pour que les autres se synchronisent avec</translation>
     </message>
     <message>
-        <source>Storages are not configured on the following Server:
-%1.</source>
-        <translation>Stockages non configurés sur le serveur suivant :
-%1.</translation>
+        <source>Rebuilding archive index is completed</source>
+        <translation>Reconstruction de l&apos;index d&apos;archive est complété</translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed on the following Server:
-%1.</source>
-        <translation>Reconstruction de l&apos;index d&apos;archive est complétée sur le serveur suivant:
-%1.</translation>
+        <source>Email address is not set.</source>
+        <translation>Adresse courriel non définie.</translation>
     </message>
     <message>
-        <source>You have no licenses.
-You cannot record video from cameras.</source>
-        <translation>Vous n&apos;avez pas de licences.
-Vous ne pouvez pas enregistrer du vidéo à partir des caméras.</translation>
+        <source>You cannot receive system notifications via email.</source>
+        <translation>Vous ne pouvez pas recevoir de notification système par courriel.</translation>
+    </message>
+    <message>
+        <source>Email server is not set.</source>
+        <translation>Serveur de courriel non défini.</translation>
+    </message>
+    <message>
+        <source>Some users have not set their email addresses.</source>
+        <translation>Certains usagers n&apos;ont pas défini leurs adresses courriel.</translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications via email.</source>
+        <translation>Ils ne peuvent pas recevoir de notification système par courriel.</translation>
+    </message>
+    <message>
+        <source>Storages are full on the following Server:</source>
+        <translation>Stockages pleins sur les serveurs suivants:</translation>
+    </message>
+    <message>
+        <source>Storages are not configured on the following Server:</source>
+        <translation>Stockages non configurés sur les serveurs suivants:</translation>
+    </message>
+    <message>
+        <source>You have no licenses.</source>
+        <translation>Vous n&apos;avez aucune licences.</translation>
+    </message>
+    <message>
+        <source>You cannot record video from cameras.</source>
+        <translation>Vous ne pouvez pas enregistrer la vidéo des caméras.</translation>
+    </message>
+    <message>
+        <source>Rebuilding archive index is completed on the following Server:</source>
+        <translation>Reconstruction de l&apos;index d&apos;archive est complété sur les serveurs suivants:</translation>
     </message>
 </context>
 <context>

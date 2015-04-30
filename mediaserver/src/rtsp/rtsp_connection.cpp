@@ -333,7 +333,7 @@ bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
 QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return QHostAddress(d->socket->getPeerAddress().address.ipv4());
+    return QHostAddress(d->socket->getForeignAddress().address.ipv4());
 }
 
 void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
@@ -365,6 +365,7 @@ void QnRtspConnectionProcessor::generateSessionId()
     d->sessionId += QString::number(rand());
 }
 
+
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
     QnTCPConnectionProcessor::sendResponse(code, "application/sdp", "", true);
@@ -386,14 +387,14 @@ int QnRtspConnectionProcessor::getAVTcpChannel(int trackNum) const
         return -1;
 }
 
-RtspServerTrackInfoPtr QnRtspConnectionProcessor::getTrackInfo(int trackNum) const
+RtspServerTrackInfo* QnRtspConnectionProcessor::getTrackInfo(int trackNum) const
 {
     Q_D(const QnRtspConnectionProcessor);
     ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
     if (itr != d->trackInfo.end())
-        return itr.value();
+        return itr.value().data();
     else
-        return RtspServerTrackInfoPtr();
+        return nullptr;
 }
 
 int QnRtspConnectionProcessor::getTracksCount() const
@@ -438,22 +439,22 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     return layout ? layout->channelCount() : -1;
 }
 
-QByteArray QnRtspConnectionProcessor::getRangeStr(QnArchiveStreamReader* archiveDP)
+QByteArray QnRtspConnectionProcessor::getRangeStr()
 {
     Q_D(QnRtspConnectionProcessor);
     QByteArray range;
-    if (archiveDP) 
+    if (d->archiveDP) 
     {
-        qint64 archiveEndTime = archiveDP->endTime();
-        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()); // && !endTimeInFuture;
+        qint64 archiveEndTime = d->archiveDP->endTime();
+        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
             range = "npt=";
-            if (archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
+            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += "now";
             else
-                range += QByteArray::number(archiveDP->startTime());
+                range += QByteArray::number(d->archiveDP->startTime());
 
             range += "-";
             if (endTimeIsNow)
@@ -465,15 +466,15 @@ QByteArray QnRtspConnectionProcessor::getRangeStr(QnArchiveStreamReader* archive
         {
             // use 'clock' attrubute. see RFC 2326
             range = "clock=";
-            if (archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
+            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             else
-                range += QDateTime::fromMSecsSinceEpoch(archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             range += "-";
-            if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
+            if (QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()))
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
             else
-                range += QDateTime::fromMSecsSinceEpoch(archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
         }
     }
     return range;
@@ -486,7 +487,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     if (d->archiveDP && !d->archiveDP->offlineRangeSupported())
         d->archiveDP->open();
 
-    QByteArray range = getRangeStr(d->archiveDP.data());
+    QByteArray range = getRangeStr();
     if (!range.isEmpty())
     {
         nx_http::insertOrReplaceHeader(
@@ -807,7 +808,7 @@ int QnRtspConnectionProcessor::composeSetup()
                     trackInfo->clientPort = ports[0].toInt();
                     trackInfo->clientRtcpPort = ports[1].toInt();
                     if (!d->tcpMode) {
-                        if (trackInfo->openServerSocket(d->socket->getPeerAddress().address.toString())) {
+                        if (trackInfo->openServerSocket(d->socket->getForeignAddress().address.toString())) {
                             transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket->getLocalAddress().port));
                             transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalAddress().port));
                         }
@@ -1501,4 +1502,10 @@ bool QnRtspConnectionProcessor::isTcpMode() const
 {
     Q_D(const QnRtspConnectionProcessor);
     return d->tcpMode;
+}
+
+QSharedPointer<QnArchiveStreamReader> QnRtspConnectionProcessor::getArchiveDP()
+{
+    Q_D(QnRtspConnectionProcessor);
+    return d->archiveDP;
 }

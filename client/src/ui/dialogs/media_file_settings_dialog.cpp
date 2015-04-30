@@ -1,5 +1,5 @@
-#include "picture_settings_dialog.h"
-#include "ui_picture_settings_dialog.h"
+#include "media_file_settings_dialog.h"
+#include "ui_media_file_settings_dialog.h"
 
 #include <core/resource/media_resource.h>
 #include <core/ptz/media_dewarping_params.h>
@@ -14,42 +14,59 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
-#include <utils/image_provider.h>
+#include <utils/ffmpeg_image_provider.h>
 #include <utils/common/scoped_value_rollback.h>
 
-QnPictureSettingsDialog::QnPictureSettingsDialog(QWidget *parent) :
+QnMediaFileSettingsDialog::QnMediaFileSettingsDialog(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnPictureSettingsDialog),
-    m_updating(false)
+    ui(new Ui::QnMediaFileSettingsDialog),
+    m_updating(false),
+    m_imageProvider(NULL)
 {
     ui->setupUi(this);
 
-    connect(ui->fisheyeCheckBox,    &QCheckBox::toggled,                    this,   &QnPictureSettingsDialog::at_fisheyeCheckbox_toggled);
+    connect(ui->fisheyeCheckBox,    &QCheckBox::toggled,                    this,   &QnMediaFileSettingsDialog::at_fisheyeCheckbox_toggled);
 
-    connect(ui->fisheyeCheckBox,    &QCheckBox::toggled,                    this,   &QnPictureSettingsDialog::paramsChanged);
-    connect(ui->fisheyeWidget,      &QnFisheyeSettingsWidget::dataChanged,  this,   &QnPictureSettingsDialog::paramsChanged);
+    connect(ui->fisheyeCheckBox,    &QCheckBox::toggled,                    this,   &QnMediaFileSettingsDialog::paramsChanged);
+    connect(ui->fisheyeWidget,      &QnFisheyeSettingsWidget::dataChanged,  this,   &QnMediaFileSettingsDialog::paramsChanged);
+
+    //File Settings....
 }
 
-QnPictureSettingsDialog::~QnPictureSettingsDialog()
+QnMediaFileSettingsDialog::~QnMediaFileSettingsDialog()
 {}
 
-void QnPictureSettingsDialog::updateFromResource(const QnMediaResourcePtr &resource) {
+void QnMediaFileSettingsDialog::updateFromResource(const QnMediaResourcePtr &resource) {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
+    if (m_imageProvider) {
+        delete m_imageProvider;
+        m_imageProvider = NULL;
+    }
 
     m_resource = resource;
 
-    QImage image(resource->toResource()->getUrl());
-    ui->fisheyeCheckBox->setEnabled(!image.isNull());
+    if (m_resource->toResourcePtr()->hasFlags(Qn::still_image)) {
+        QImage image(m_resource->toResourcePtr()->getUrl());
+        m_imageProvider = new QnBasicImageProvider(image, this);
+    } else {
+        m_imageProvider = new QnFfmpegImageProvider(resource->toResourcePtr(), this);
+    }
 
-    ui->imageLabel->setPixmap(QPixmap::fromImage(image).scaled(ui->imageLabel->contentSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    connect(m_imageProvider, &QnImageProvider::imageChanged, this, [this](const QImage &image) {
+        if (image.isNull())
+            return;
+        ui->imageLabel->setPixmap(QPixmap::fromImage(image).scaled(ui->imageLabel->contentSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    });
+    m_imageProvider->loadAsync();
 
     QnMediaDewarpingParams params = resource->getDewarpingParams();
     ui->fisheyeCheckBox->setChecked(params.enabled);
-    ui->fisheyeWidget->updateFromParams(params, new QnBasicImageProvider(image, this));
+    ui->fisheyeWidget->updateFromParams(params, m_imageProvider);
 }
 
-void QnPictureSettingsDialog::submitToResource(const QnMediaResourcePtr &resource) {
+void QnMediaFileSettingsDialog::submitToResource(const QnMediaResourcePtr &resource) {
     if (!ui->fisheyeCheckBox->isEnabled())
         return;
 
@@ -59,11 +76,11 @@ void QnPictureSettingsDialog::submitToResource(const QnMediaResourcePtr &resourc
     resource->setDewarpingParams(params);
 }
 
-void QnPictureSettingsDialog::at_fisheyeCheckbox_toggled(bool checked) {
+void QnMediaFileSettingsDialog::at_fisheyeCheckbox_toggled(bool checked) {
     ui->stackedWidget->setCurrentWidget(checked ? ui->fisheyePage : ui->imagePage);
 }
 
-void QnPictureSettingsDialog::paramsChanged() {
+void QnMediaFileSettingsDialog::paramsChanged() {
     if (m_updating)
         return;
 

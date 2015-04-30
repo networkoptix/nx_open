@@ -532,7 +532,7 @@ namespace Qn {
         /**
          * Opens picture settings dialog.
          */
-        PictureSettingsAction,
+        MediaFileSettingsAction,
 
         /**
          * Opens videowall settings dialog.

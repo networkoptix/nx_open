@@ -20,7 +20,7 @@ QnDesktopDataProviderWrapper::~QnDesktopDataProviderWrapper()
 
 void QnDesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& data)
 {
-    const QnAbstractMediaData* media  = dynamic_cast<QnAbstractMediaData*>(data.data());
+    const QnAbstractMediaData* media  = dynamic_cast<QnAbstractMediaData*>(data.get());
     if (!media)
         return;
 

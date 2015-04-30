@@ -22,15 +22,15 @@ QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
     base_type(folder, parent),
     m_model(new QnNotificationSoundModel(this))
 {
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(fileAdded(QString)),     this, SLOT(at_fileAddedEvent(QString)));
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(fileUpdated(QString)),   this, SLOT(at_fileUpdatedEvent(QString)));
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(fileRemoved(QString)),   this, SLOT(at_fileRemovedEvent(QString)));
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::fileAdded,                   this,   &QnAppServerNotificationCache::at_fileAddedEvent);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::fileUpdated,                 this,   &QnAppServerNotificationCache::at_fileUpdatedEvent);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::fileRemoved,                 this,   &QnAppServerNotificationCache::at_fileRemovedEvent);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnAppServerNotificationCache::getFileList);
 
-    connect(this, SIGNAL(fileListReceived(QStringList,bool)),   this, SLOT(at_fileListReceived(QStringList,bool)));
-    connect(this, SIGNAL(fileDownloaded(QString,bool)),         this, SLOT(at_fileAdded(QString,bool)));
-    connect(this, SIGNAL(fileUploaded(QString,bool)),           this, SLOT(at_fileAdded(QString, bool)));
-    connect(this, SIGNAL(fileDeleted(QString,bool)),            this, SLOT(at_fileRemoved(QString, bool)));
+    connect(this, &QnAppServerFileCache::fileListReceived,  this,   &QnAppServerNotificationCache::at_fileListReceived);
+    connect(this, &QnAppServerFileCache::fileDownloaded,    this,   &QnAppServerNotificationCache::at_fileAdded);
+    connect(this, &QnAppServerFileCache::fileUploaded,      this,   &QnAppServerNotificationCache::at_fileAdded);
+    connect(this, &QnAppServerFileCache::fileDeleted,       this,   &QnAppServerNotificationCache::at_fileRemoved);
 }
 
 QnAppServerNotificationCache::~QnAppServerNotificationCache() {
@@ -154,8 +154,8 @@ void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
     uploadFile(filename);
 }
 
-void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filenames, bool ok) {
-    if (!ok || !isConnectedToServer())
+void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filenames, OperationResult status) {
+    if (status != OperationResult::ok || !isConnectedToServer())
         return;
 
     m_model->loadList(filenames);
@@ -164,8 +164,8 @@ void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filena
     }
 }
 
-void QnAppServerNotificationCache::at_fileAdded(const QString &filename, bool ok) {
-    if (!ok || !isConnectedToServer())
+void QnAppServerNotificationCache::at_fileAdded(const QString &filename, OperationResult status) {
+    if (status != OperationResult::ok || !isConnectedToServer())
         return;
 
     //TODO: #GDM #Business think about getTagValueAsync
@@ -174,8 +174,8 @@ void QnAppServerNotificationCache::at_fileAdded(const QString &filename, bool ok
         m_model->updateTitle(filename, title);
 }
 
-void QnAppServerNotificationCache::at_fileRemoved(const QString &filename, bool ok) {
-    if (!ok || !isConnectedToServer())
+void QnAppServerNotificationCache::at_fileRemoved(const QString &filename, OperationResult status) {
+    if (status != OperationResult::ok || !isConnectedToServer())
         return;
 
     int row = m_model->rowByFilename(filename);

@@ -57,8 +57,8 @@ void QnRtpAudioStreamParser::processStringParam(const QByteArray& checkName, QBy
 QnAbstractMediaDataPtr QnRtpVideoStreamParser::nextData()
 {
     if (m_mediaData) {
-        QnAbstractMediaDataPtr result = m_mediaData;
-        m_mediaData.clear();
+        QnAbstractMediaDataPtr result;
+        result.swap( m_mediaData );
         return result;
     }
     else {

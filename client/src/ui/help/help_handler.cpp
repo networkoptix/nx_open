@@ -97,7 +97,7 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
 
     switch(event->type()) {
     case QEvent::QueryWhatsThis: {
-        bool accepted = QnHelpTopicAccessor::helpTopicAt(widget, widget->mapFromGlobal(QCursor::pos())) != -1;
+        bool accepted = QnHelpTopicAccessor::helpTopicAt(widget, widget->mapFromGlobal(QCursor::pos())) != Qn::Empty_Help;
         event->setAccepted(accepted);
         return accepted;
     }
@@ -106,7 +106,7 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
 
         int topicId = QnHelpTopicAccessor::helpTopicAt(widget, e->pos(), true);
 
-        if(topicId != -1) {
+        if(topicId != Qn::Empty_Help) {
             event->accept();
 
             setHelpTopic(topicId);

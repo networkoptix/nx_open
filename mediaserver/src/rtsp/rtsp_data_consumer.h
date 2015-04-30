@@ -76,7 +76,7 @@ protected:
     qint64 dataQueueDuration();
     void sendMetadata(const QByteArray& metadata);
     void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const;
-    QByteArray getRangeHeaderIfChanged(const QnConstAbstractMediaDataPtr& media);
+    QByteArray getRangeHeaderIfChanged();
 private:
     //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
@@ -124,6 +124,8 @@ private:
     bool m_someDataIsDropped;
     qint64 m_previousRtpTimestamp;
     qint64 m_previousScaledRtpTimestamp;
+
+    int m_framesSinceRangeCheck;
     qint64 m_prevStartTime;
     qint64 m_prevEndTime;
 };

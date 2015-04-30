@@ -280,7 +280,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
 {
-    dst.reserve( dst.size()+src.size() );
+    dst.reserve( dst.size() + static_cast<int>(src.size()) );
     for( const ApiCameraAttributesData& cameraAttrs: src )
     {
         QnCameraUserAttributesPtr dstElement( new QnCameraUserAttributes() );
@@ -679,7 +679,7 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
 }
 
 void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {
-    dst.reserve( dst.size()+src.size() );
+    dst.reserve( dst.size() + static_cast<int>(src.size()) );
     for( const ApiMediaServerUserAttributesData& serverAttrs: src )
     {
         QnMediaServerUserAttributesPtr dstElement( new QnMediaServerUserAttributes() );

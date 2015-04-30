@@ -53,7 +53,6 @@
 #include <utils/common/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/network/module_finder.h>
-#include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include <utils/reconnect_helper.h>
 
@@ -304,8 +303,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     context()->setUserName(appServerUrl.userName());
 
-    QnGlobalModuleFinder::instance()->setConnection(result.connection());
-    QnRouter::instance()->setEnforcedConnection(QnRoutePoint(connectionInfo.ecsGuid, connectionInfo.ecUrl.host(), connectionInfo.ecUrl.port()));
+    //QnRouter::instance()->setEnforcedConnection(QnRoutePoint(connectionInfo.ecsGuid, connectionInfo.ecUrl.host(), connectionInfo.ecUrl.port()));
 
     return ec2::ErrorCode::ok;
 }
@@ -321,8 +319,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 
     hideMessageBox();
 
-    QnRouter::instance()->setEnforcedConnection(QnRoutePoint());
-    QnGlobalModuleFinder::instance()->setConnection(NULL);
+    //QnRouter::instance()->setEnforcedConnection(QnRoutePoint());
     QnClientMessageProcessor::instance()->init(NULL);
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setUrl(QUrl());

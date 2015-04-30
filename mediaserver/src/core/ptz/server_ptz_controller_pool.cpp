@@ -19,6 +19,8 @@ QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
     base_type(parent) 
 {
     setConstructionMode(ThreadedControllerConstruction);
+    connect(this, &QnServerPtzControllerPool::controllerAboutToBeChanged, this, &QnServerPtzControllerPool::at_controllerAboutToBeChanged);
+    connect(this, &QnServerPtzControllerPool::controllerChanged, this, &QnServerPtzControllerPool::at_controllerChanged);
 }
 
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
@@ -80,5 +82,36 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
 
 void QnServerPtzControllerPool::at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
 {
+}
 
+void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource) {
+    QnPtzControllerPtr oldController = controller(resource);
+    if(oldController) {
+        QnPtzObject object;
+        if(oldController->getActiveObject(&object) && object.type != Qn::InvalidPtzObject) {
+            QMutexLocker lock(&m_mutex);
+            activeObjectByResource.insert(resource, object);
+        }
+    }
+}
+
+void QnServerPtzControllerPool::at_controllerChanged(const QnResourcePtr &resource) {
+    QnPtzControllerPtr controller = this->controller(resource);
+    if(!controller)
+        return;
+
+    QnPtzObject object;
+    {
+        QMutexLocker lock(&m_mutex);
+        object = activeObjectByResource.take(resource);
+    }
+    if(object.type != Qn::TourPtzObject)
+        controller->getHomeObject(&object);
+
+    if(object.type == Qn::TourPtzObject)
+        controller->activateTour(object.id);
+    else if(object.type == Qn::PresetPtzObject)
+        controller->activatePreset(object.id, 1.0);
+
+    qDebug() << "activate" << object.id << object.type;
 }

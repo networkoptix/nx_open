@@ -66,7 +66,13 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
     d->executorThread->start();
 
     d->commandThreadPool = new QThreadPool(this);
-    d->commandThreadPool->setMaxThreadCount(128); /* This should be enough. TODO #ak this is certainly enough to kill mediaserver on some ARM-based platform */
+#ifdef __arm__
+    const int maxThreads = 8;
+#else
+    const int maxThreads = 32;
+#endif
+    d->commandThreadPool->setMaxThreadCount(maxThreads);
+    d->commandThreadPool->setExpiryTimeout(-1); // default experation timeout is 30 second. But it has a bug in QT < v.5.3
 
     connect(d->resourcePool,    &QnResourcePool::resourceAdded,             this,   &QnPtzControllerPool::registerResource);
     connect(d->resourcePool,    &QnResourcePool::resourceRemoved,           this,   &QnPtzControllerPool::unregisterResource);
@@ -140,24 +146,30 @@ void QnPtzControllerPool::updateController(const QnResourcePtr &resource) {
 
 void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource) {
     QnPtzControllerPtr controller = q->createController(resource);
+    QnPtzControllerPtr oldController;
     {
         QMutexLocker locker(&mutex);
-        if(controllerByResource.value(resource) == controller)
-            return;
-
-        controllerByResource.insert(resource, controller);
+        oldController = controllerByResource.value(resource);
     }
+
+    if(oldController == controller)
+        return;
+
+    emit q->controllerAboutToBeChanged(resource);
+
+    controllerByResource.insert(resource, controller);
 
     /* Some controller require an event loop to function, so we move them
      * to executor thread. Note that controllers don't run synchronous requests 
      * in their associated thread, so this won't present any problems for
      * other users of the executor thread. */
-    while(controller) {
-        controller->moveToThread(executorThread);
-        if(QnProxyPtzControllerPtr proxyController = controller.dynamicCast<QnProxyPtzController>()) {
-            controller = proxyController->baseController();
+    QnPtzControllerPtr controllerIt = controller;
+    while(controllerIt) {
+        controllerIt->moveToThread(executorThread);
+        if(QnProxyPtzControllerPtr proxyController = controllerIt.dynamicCast<QnProxyPtzController>()) {
+            controllerIt = proxyController->baseController();
         } else {
-            controller.clear();
+            controllerIt.clear();
         }
     }
 

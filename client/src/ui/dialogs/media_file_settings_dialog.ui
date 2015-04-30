@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnPictureSettingsDialog</class>
- <widget class="QDialog" name="QnPictureSettingsDialog">
+ <class>QnMediaFileSettingsDialog</class>
+ <widget class="QDialog" name="QnMediaFileSettingsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Picture Settings</string>
+   <string>File Settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -39,7 +39,7 @@
           <number>4</number>
          </property>
          <property name="text">
-          <string>Image is not loaded</string>
+          <string>Picture is not loaded</string>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -75,7 +75,7 @@
    <item>
     <widget class="QCheckBox" name="fisheyeCheckBox">
      <property name="text">
-      <string>This is a fish-eye lens image</string>
+      <string>This is a fish-eye lens file</string>
      </property>
     </widget>
    </item>

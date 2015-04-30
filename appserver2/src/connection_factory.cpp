@@ -334,8 +334,8 @@ namespace ec2
 #if 1
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::connect, loginInfo, func );
+        m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
+            addr, ApiCommand::connect, std::nullptr_t(), func );
 #else
         //TODO: #ak following does not compile due to msvc2012 restriction: no more than 6 arguments to std::bind
         using namespace std::placeholders;
@@ -416,6 +416,9 @@ namespace ec2
         const QUrl& ecURL,
         impl::ConnectHandlerPtr handler)
     {
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("Ec2DirectConnectionFactory::remoteConnectionFinished. errorCode = %1, ecURL = %2").
+            arg((int)errorCode).arg(ecURL.toString()), cl_logDEBUG2 );
+
         //TODO #ak async ssl is working now, make async request to old ec here
 
         if( (errorCode != ErrorCode::ok) && (errorCode != ErrorCode::unauthorized) )
@@ -448,6 +451,9 @@ namespace ec2
         QnConnectionInfo connectionInfoCopy(connectionInfo);
         connectionInfoCopy.ecUrl = ecURL;
         connectionInfoCopy.ecUrl.setScheme( connectionInfoCopy.allowSslConnections ? lit("https") : lit("http") );
+
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecURL = %2").
+            arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString()), cl_logDEBUG2 );
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
             std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, connectionInfoCopy.ecUrl),
@@ -528,8 +534,8 @@ namespace ec2
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::testConnection, loginInfo, func );
+        m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
+            addr, ApiCommand::testConnection, std::nullptr_t(), func );
         return reqID;
     }
 

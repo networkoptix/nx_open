@@ -115,9 +115,9 @@ void QnAction::removeChild(QnAction *action) {
 
 QString QnAction::defaultToolTipFormat() const {
     if(shortcuts().empty()) {
-        return tr("%n");
+        return lit("%n");
     } else {
-        return tr("%n (<b>%s</b>)");
+        return lit("%n (<b>%s</b>)");
     }
 }
 

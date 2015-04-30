@@ -290,6 +290,7 @@ private:
 
     bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
     CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
+
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc
@@ -308,6 +309,10 @@ protected:
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     void updateFirmware();
+    virtual bool subscribeToCameraNotifications();
+
+    bool createPullPointSubscription();
+
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 
@@ -469,7 +474,6 @@ private:
     qint64 m_prevPullMessageResponseClock;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
-    bool createPullPointSubscription();
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
@@ -480,7 +484,7 @@ private:
         //!Reads relay output list from resource
     bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
-    bool fetchRelayInputInfo();
+    bool fetchRelayInputInfo( const CapabilitiesResp& capabilitiesResponse );
     bool fetchPtzInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
@@ -492,6 +496,10 @@ private:
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
     QnAbstractPtzController* createSpecialPtzController();
     bool trustMaxFPS();
+    CameraDiagnostics::Result fetchOnvifCapabilities(
+        DeviceSoapWrapper* const soapWrapper,
+        CapabilitiesResp* const response );
+    void fillFullUrlInfo( const CapabilitiesResp& response );
 };
 
 #endif //ENABLE_ONVIF

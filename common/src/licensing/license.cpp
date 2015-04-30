@@ -611,16 +611,16 @@ bool QnLicensePool::isEmpty() const
 }
 
 
-QList<QByteArray> QnLicensePool::mainHardwareIds() const {
+QVector<QByteArray> QnLicensePool::mainHardwareIds() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::compatibleHardwareIds() const {
+QVector<QByteArray> QnLicensePool::compatibleHardwareIds() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
 }
 
 QByteArray QnLicensePool::currentHardwareId() const {
-    QList<QByteArray> hwIds = mainHardwareIds();
+    QVector<QByteArray> hwIds = mainHardwareIds();
     return hwIds.isEmpty() 
         ? QByteArray() 
         : hwIds.last();

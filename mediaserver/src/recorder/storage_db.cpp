@@ -5,6 +5,7 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <utils/serialization/sql.h>
+#include "utils/common/log.h"
 #include "utils/common/util.h"
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 1;
@@ -12,7 +13,8 @@ static const int COMMIT_INTERVAL = 1000 * 60 * 1;
 QnStorageDb::QnStorageDb(int storageIndex):
     QnDbHelper(),
     m_storageIndex(storageIndex),
-    m_tran(m_sdb, m_mutex)
+    m_tran(m_sdb, m_mutex),
+    m_needReopenDB(false)
 {
     m_lastTranTime.restart();
 }
@@ -35,7 +37,12 @@ void QnStorageDb::afterDelete()
             return; // keep record list to delete. try to the next time
         }
     }
-    tran.commit();
+    if( !tran.commit() )
+    {
+        NX_LOG( lit("Error commiting to storage DB %1. %2").
+            arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        m_needReopenDB = true;
+    }
 
     m_recordsToDelete.clear();
 }
@@ -63,39 +70,47 @@ bool QnStorageDb::deleteRecordsInternal(const DeleteRecordInfo& delRecord)
     if (!query.exec())
     {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
     return true;
 }
 
-void QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
+bool QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
 {
     QMutexLocker locker(&m_syncMutex);
 
     if (chunk.durationMs <= 0)
-        return;
+        return true;
 
     m_delayedData << DelayedData(cameraUniqueId, catalog, chunk);
     if (m_lastTranTime.elapsed() < COMMIT_INTERVAL) 
-        return;
+        return true;
 
-    flushRecordsNoLock();
+    return flushRecordsNoLock();
 }
 
-void QnStorageDb::flushRecords()
+bool QnStorageDb::flushRecords()
 {
     QMutexLocker locker(&m_syncMutex);
-    flushRecordsNoLock();
+    return flushRecordsNoLock();
 }
 
-void QnStorageDb::flushRecordsNoLock()
+bool QnStorageDb::flushRecordsNoLock()
 {
     QnDbTransactionLocker tran(getTransaction());
     for(const DelayedData& data: m_delayedData)
-        addRecordInternal(data.cameraUniqueId, data.catalog, data.chunk);
-    tran.commit();
+        if( !addRecordInternal(data.cameraUniqueId, data.catalog, data.chunk) )
+            return false;
+    if( !tran.commit() )
+    {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        m_needReopenDB = true;
+        return false;
+    }
     m_lastTranTime.restart();
     m_delayedData.clear();
+    return true;
 }
 
 bool QnStorageDb::addRecordInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
@@ -113,8 +128,10 @@ bool QnStorageDb::addRecordInternal(const QString& cameraUniqueId, QnServer::Chu
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
+
     return true;
 }
 
@@ -129,6 +146,7 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -142,7 +160,12 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
         }
     }
 
-    tran.commit();
+    if( !tran.commit() )
+    {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        m_needReopenDB = true;
+        return false;
+    }
     return true;
 }
 
@@ -155,7 +178,7 @@ bool QnStorageDb::open(const QString& fileName)
 
 bool QnStorageDb::createDatabase()
 {
-    QnDbTransactionLocker tran(getTransaction());
+    QnDbTransactionLocker tran(&m_tran);
     if (!isObjectExists(lit("table"), lit("storage_data"), m_sdb))
     {
         if (!execSQLFile(lit(":/01_create_storage_db.sql"), m_sdb)) {
@@ -170,7 +193,11 @@ bool QnStorageDb::createDatabase()
     if (!initializeBookmarksFtsTable())
         return false;
 
-    tran.commit();
+    if( !tran.commit() )
+    {
+        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
+        return false;
+    }
 
     m_lastTranTime.restart();
     return true;
@@ -232,6 +259,7 @@ bool QnStorageDb::removeCameraBookmarks(const QString& cameraUniqueId) {
         delQuery.bindValue(":id", cameraUniqueId);
         if (!delQuery.exec()) {
             qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+            m_needReopenDB = true;
             return false;
         }
     }
@@ -242,6 +270,7 @@ bool QnStorageDb::removeCameraBookmarks(const QString& cameraUniqueId) {
         delQuery.bindValue(":id", cameraUniqueId);
         if (!delQuery.exec()) {
             qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+            m_needReopenDB = true;
             return false;
         }
     }
@@ -262,6 +291,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
     insQuery.bindValue(":cameraUniqueId", cameraUniqueId); // unique_id
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -270,6 +300,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
     cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
     if (!cleanTagQuery.exec()) {
         qWarning() << Q_FUNC_INFO << cleanTagQuery.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -280,6 +311,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
         tagQuery.bindValue(":name", tag);
         if (!tagQuery.exec()) {
             qWarning() << Q_FUNC_INFO << tagQuery.lastError().text();
+            m_needReopenDB = true;
             return false;
         }
     }
@@ -293,6 +325,7 @@ bool QnStorageDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
     cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
     if (!cleanTagQuery.exec()) {
         qWarning() << Q_FUNC_INFO << cleanTagQuery.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -301,6 +334,7 @@ bool QnStorageDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
     cleanQuery.addBindValue(bookmark.guid.toRfc4122());
     if (!cleanQuery.exec()) {
         qWarning() << Q_FUNC_INFO << cleanQuery.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -366,6 +400,7 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return false;
     }
 
@@ -397,11 +432,13 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
     QVector<DeviceFileCatalogPtr> result;
 
     QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
     query.prepare("SELECT * FROM storage_data WHERE role <= :max_role ORDER BY unique_id, role, start_time");
     query.bindValue(":max_role", (int)QnServer::HiQualityCatalog);
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return result;
     }
     QSqlRecord queryInfo = query.record();
@@ -452,9 +489,11 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
     QVector<DeviceFileCatalogPtr> result;
 
     QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
     query.prepare("SELECT unique_id, start_time, duration FROM storage_bookmark ORDER BY unique_id, start_time");
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
+        m_needReopenDB = true;
         return result;
     }
     QSqlRecord queryInfo = query.record();
@@ -492,5 +531,11 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
 
 QnStorageDb::QnDbTransaction* QnStorageDb::getTransaction()
 {
+    if( m_needReopenDB )
+    {
+        if( m_sdb.open() && createDatabase())
+            m_needReopenDB = false;
+    }
+
     return &m_tran;
 }

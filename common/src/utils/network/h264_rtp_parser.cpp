@@ -283,6 +283,8 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
     }
     m_prevSequenceNum = sequenceNum;
+    if (isPacketLost)
+        return false;
 
     if (rtpHeader->padding)
         bufferEnd -= bufferEnd[-1];

@@ -24,7 +24,7 @@ static const int CHECK_HELLO_RETRY_COUNT = 50;
 //extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 //extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
-QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString(QLatin1String("127.0.0.1"));
+QString OnvifResourceSearcherWsdd::LOCAL_ADDR(QLatin1String("127.0.0.1"));
 const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.org/name/";
 const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
 const char OnvifResourceSearcherWsdd::SCOPES_LOCATION_PREFIX[] = "onvif://www.onvif.org/location/";
@@ -35,11 +35,9 @@ const char OnvifResourceSearcherWsdd::WSDD_ACTION[] = "http://schemas.xmlsoap.or
 
 const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp://239.255.255.250:3702";
 
-int WSDD_MULTICAST_PORT = 3702;
-const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
-
-#define WSDD_GROUP_ADDRESS QHostAddress(QLatin1String(WSDD_MULTICAST_ADDRESS))
-
+static const int WSDD_MULTICAST_PORT = 3702;
+static const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
+static const SocketAddress WSDD_MULTICAST_ENDPOINT( WSDD_MULTICAST_ADDRESS, WSDD_MULTICAST_PORT );
 
 
 namespace
@@ -59,7 +57,7 @@ namespace
     int gsoapFsend(struct soap *soap, const char *s, size_t n)
     {
         AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-        qSocket->sendTo(s, n, QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+        qSocket->sendTo(s, static_cast<unsigned int>(n), WSDD_MULTICAST_ENDPOINT);
         return SOAP_OK;
     }
 
@@ -89,7 +87,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
     size_t gsoapFrecv(struct soap* soap, char* data, size_t maxSize)
     {
         AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-        int readed = qSocket->recv(data, maxSize, 0);
+        int readed = qSocket->recv(data, static_cast<unsigned int>(maxSize), 0);
         return (size_t) qMax(0, readed);
     }
 
@@ -98,12 +96,10 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
     int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
     {
         //avoiding sending numerous data
-        if (!QByteArray::fromRawData(s, n).startsWith("<?xml")) {
+        if (!QByteArray::fromRawData(s, static_cast<int>(n)).startsWith("<?xml")) {
             return SOAP_OK;
         }
 
-        Q_UNUSED(s)
-        Q_UNUSED(n)
         QString msgId;
         AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
 
@@ -111,19 +107,17 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
         guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
         QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLatin1();
 
-        qSocket->sendTo(data.data(), data.size(), QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+        qSocket->sendTo(data.data(), data.size(), WSDD_MULTICAST_ENDPOINT);
         return SOAP_OK;
     }
 
     int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
     {
         //avoiding sending numerous data
-        if (!QByteArray::fromRawData(s, n).startsWith("<?xml")) {
+        if (!QByteArray::fromRawData(s, static_cast<int>(n)).startsWith("<?xml")) {
             return SOAP_OK;
         }
 
-        Q_UNUSED(s)
-        Q_UNUSED(n)
         QString msgId;
         AbstractDatagramSocket* socket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
 
@@ -133,7 +127,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 
         //socket.connectToHost(QHostAddress(QString::fromLatin1(soap->host)), WSDD_MULTICAST_PORT);
         //socket.write(data);
-        socket->sendTo(data.data(), data.size(), QString::fromLatin1(soap->host), WSDD_MULTICAST_PORT);
+        socket->sendTo(data.data(), data.size(), SocketAddress( soap->host, WSDD_MULTICAST_PORT ) );
         return SOAP_OK;
     }
 }
@@ -608,6 +602,9 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
         qSwap(name, manufacturer);
     }
     else if(lowerName == lit("sentry")) {
+        qSwap(name, manufacturer);
+    }
+    else if(lowerName == lit("vivotek") && manufacturer.toLower().startsWith(lit("sd"))) {
         qSwap(name, manufacturer);
     }
 }

@@ -1,6 +1,8 @@
 #ifndef __DB_MANAGER_H_
 #define __DB_MANAGER_H_
 
+#include <QSqlError>
+
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include <nx_ec/data/api_lock_data.h>
@@ -8,6 +10,8 @@
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
+#include <utils/common/log.h>
+
 
 namespace ec2
 {
@@ -95,7 +99,11 @@ namespace ec2
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
             if (result == ErrorCode::ok) {
                 if (!lock.commit())
+                {
+                    NX_LOG( QnLog::EC2_TRAN_LOG, lit("Commit error while executing transaction %1: %2").
+                        arg(ec2::toString(result)).arg(m_sdb.lastError().text()), cl_logWARNING );
                     return ErrorCode::dbError;
+                }
             }
             return result;
         }
@@ -116,6 +124,56 @@ namespace ec2
         //dumpDatabase
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
         ErrorCode doQuery(const ApiStoredFilePath& path, qint64& dumpFileSize);
+
+		// --------- misc -----------------------------
+        QnUuid getID() const;
+
+        ApiOjectType getObjectType(const QnUuid& objectId)
+        {
+            QWriteLocker lock( &m_mutex );
+            return getObjectTypeNoLock( objectId );
+        }
+        /*!
+            \note This overload should be called within transaction
+        */
+        ApiOjectType getObjectTypeNoLock(const QnUuid& objectId);
+        ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
+        ApiObjectInfoList getObjectsNoLock(const ApiOjectType& objectType);
+
+        bool saveMiscParam( const QByteArray& name, const QByteArray& value );
+        bool readMiscParam( const QByteArray& name, QByteArray* value );
+
+        //!Reads settings (properties of user 'admin')
+        ErrorCode readSettings(ApiResourceParamDataList& settings);
+
+        virtual QnDbTransaction* getTransaction() override;
+
+    signals:
+        //!Emitted after \a QnDbManager::init was successfully executed
+        void initialized();
+
+    private:
+        enum FilterType
+        {
+            RES_ID_FIELD,
+            RES_TYPE_FIELD,
+            RES_PARENT_ID_FIELD
+        };
+
+        //!query filter
+        class QnQueryFilter
+        {
+        public:
+            //filtered field, 
+            QMap<int, QVariant> fields;
+        };
+
+
+        friend class QnTransactionLog;
+        QSqlDatabase& getDB() { return m_sdb; }
+        QReadWriteLock& getMutex() { return m_mutex; }
+
+        // ------------ data retrieval --------------------------------------
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -186,43 +244,6 @@ namespace ec2
         //getTransactionLog
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList);
 
-		// --------- misc -----------------------------
-        QnUuid getID() const;
-
-        ApiOjectType getObjectType(const QnUuid& objectId);
-        ApiObjectInfoList getNestedObjects(const ApiObjectInfo& parentObject);
-
-        bool saveMiscParam( const QByteArray& name, const QByteArray& value );
-        bool readMiscParam( const QByteArray& name, QByteArray* value );
-
-        //!Reads settings (properties of user 'admin')
-        ErrorCode readSettings(ApiResourceParamDataList& settings);
-
-        virtual QnDbTransaction* getTransaction() override;
-    signals:
-        //!Emitted after \a QnDbManager::init was successfully executed
-        void initialized();
-
-    private:
-        enum FilterType
-        {
-            RES_ID_FIELD,
-            RES_TYPE_FIELD,
-            RES_PARENT_ID_FIELD
-        };
-
-        //!query filter
-        class QnQueryFilter
-        {
-        public:
-            //filtered field, 
-            QMap<int, QVariant> fields;
-        };
-
-
-        friend class QnTransactionLog;
-        QSqlDatabase& getDB() { return m_sdb; }
-        QReadWriteLock& getMutex() { return m_mutex; }
 
         // ------------ transactions --------------------------------------
 
@@ -242,7 +263,10 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& tran) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This transaction can't be executed directly!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
@@ -507,6 +531,8 @@ namespace ec2
         bool tuneDBAfterOpen();
         bool updateCameraHistoryGuids();
         bool migrateServerGUID(const QString& table, const QString& field);
+        bool removeWrongSupportedMotionTypeForONVIF();
+        bool fixBusinessRules();
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
@@ -532,6 +558,8 @@ namespace ec2
         bool m_needResyncCameraUserAttributes;
         bool m_dbJustCreated;
         bool m_isBackupRestore;
+        bool m_needResyncLayout;
+        bool m_needResyncbRules;
     };
 };
 

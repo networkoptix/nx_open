@@ -59,9 +59,6 @@ public:
 
         UPDATE_FEED_URL,
 
-        /** Check for updates automatically. */
-        AUTO_CHECK_FOR_UPDATES,
-
         /** Disable client updates. */
         NO_CLIENT_UPDATE,
 
@@ -152,6 +149,9 @@ public:
         /** A list of the urls that were discovered by QnDirectModuleFinder. */
         KNOWN_SERVER_URLS,
 
+        LOG_LEVEL,
+        EC2_TRAN_LOG_LEVEL,
+
         VARIABLE_COUNT
     };
 
@@ -204,7 +204,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setTranslationPath,         TRANSLATION_PATH,           QLatin1String(":/translations/common_en_US.qm"))
         QN_DECLARE_RW_PROPERTY(QString,                     updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QString())
-        QN_DECLARE_RW_PROPERTY(bool,                        isAutoCheckForUpdates,  setAutoCheckForUpdates,     AUTO_CHECK_FOR_UPDATES,     true)
         QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,           ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
         QN_DECLARE_RW_PROPERTY(bool,                        ignoreUnsavedLayouts,   setIgnoreUnsavedLayouts,    IGNORE_UNSAVED_LAYOUTS,     false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
@@ -246,6 +245,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
         QN_DECLARE_RW_PROPERTY(bool,                        isActiveXMode,          setActiveXMode,             ACTIVE_X_MODE,              false)
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
+        QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
+        QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
     QN_END_PROPERTY_STORAGE()
 
 private:

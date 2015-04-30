@@ -20,6 +20,7 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include "utils/common/uuid.h"
+#include "api/model/rebuild_archive_reply.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -31,14 +32,6 @@ class QnStorageManager: public QObject
 {
     Q_OBJECT
 public:
-    // TODO: #Elric #enum
-    enum RebuildState {
-        RebuildState_None,
-        RebuildState_WaitForRecordersStopped,
-        RebuildState_Started,
-        RebuildState_Initial
-    };
-
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
@@ -79,7 +72,6 @@ public:
     QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs);
 
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
-    bool loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild = false, qreal progressCoeff = 1.0);
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
@@ -100,12 +92,12 @@ public:
     bool isArchiveTimeExists(const QString& cameraUniqueId, qint64 timeMs);
     void stopAsyncTasks();
 
-    void rebuildCatalogAsync();
+    QnStorageScanData rebuildCatalogAsync();
     void cancelRebuildCatalogAsync();
-    double rebuildProgress() const;
 
-    void setRebuildState(RebuildState state);
-    RebuildState rebuildState() const;
+    void setRebuildInfo(const QnStorageScanData& data);
+    QnStorageScanData rebuildInfo() const;
+    bool needToStopMediaScan() const;
     
     /*
     * Return full path list from storage_index.csv (include absent in DB storages)
@@ -128,6 +120,7 @@ public slots:
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
     void at_storageChanged(const QnResourcePtr &storage);
+    void testOfflineStorages();
 private:
     friend class TestStorageThread;
 
@@ -137,12 +130,7 @@ private:
     void getTimePeriodInternal(QVector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const;
     void updateStorageStatistics();
-    void testOfflineStorages();
-    void rebuildCatalogIndexInternal();
-    bool isCatalogLoaded() const;
 
-    int getFileNumFromCache(const QString& base, const QString& folder);
-    void putFileNumToCache(const QString& base, int fileNum);
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
     QSet<QnStorageResourcePtr> getWritableStorages() const;
@@ -161,42 +149,44 @@ private:
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
+    void testStoragesDone();
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
 
     mutable QMutex m_mutexStorages;
     mutable QMutex m_mutexCatalog;
+    mutable QMutex m_mutexRebuild;
+    mutable QMutex m_rebuildStateMtx;
 
     QMap<QString, QSet<int> > m_storageIndexes;
     bool m_storagesStatisticsReady;
     QTimer m_timer;
 
-    typedef QMap<QString, QPair<QString, int > > FileNumCache;
-    FileNumCache m_fileNumCache;
-    QMutex m_cacheMutex;
-    bool m_catalogLoaded;
     bool m_warnSended;
     bool m_isWritableStorageAvail;
-    QElapsedTimer m_lastTestTime;
     QElapsedTimer m_storageWarnTimer;
     static TestStorageThread* m_testStorageThread;
     QMap<QnUuid, bool> m_diskFullWarned;
-    RebuildState m_rebuildState;
-    double m_rebuildProgress;
+    
+    //RebuildState m_rebuildState;
+    //QnStorageResourcePtr m_rebuildStorage;
+    //double m_rebuildProgress;
+    QnStorageScanData m_archiveRebuildInfo;
     bool m_rebuildCancelled;
 
     friend class RebuildAsyncTask;
     friend class ScanMediaFilesTask;
 
-    RebuildAsyncTask* m_asyncRebuildTask;
-    ScanMediaFilesTask* m_asyncPartialScan;
+    ScanMediaFilesTask* m_rebuildArchiveThread;
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     bool m_initInProgress;
     mutable QMutex m_sdbMutex;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
     mutable QMutex m_csvMigrationMutex;
+    bool m_firstStorageTestDone;
+    QElapsedTimer m_clearMotionTimer;
 };
 
 #define qnStorageMan QnStorageManager::instance()

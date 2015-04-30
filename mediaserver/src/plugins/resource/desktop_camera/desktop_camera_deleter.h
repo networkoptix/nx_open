@@ -11,6 +11,13 @@ class QnDesktopCameraDeleter: public QObject {
 public:
     QnDesktopCameraDeleter(QObject *parent = NULL);
 private:
+
+    /** Remove desktop cameras that have been offline for more than one iteration. */
+    void deleteQueuedResources();
+
+    /** Queue to removing all resources that went offline since the last check. */
+    void updateQueue();
+private:
     QnResourceList m_queuedToDelete;
 };
 

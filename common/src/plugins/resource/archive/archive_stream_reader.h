@@ -169,7 +169,7 @@ private:
     QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
     QnMediaContextPtr m_codecContext;
 
-    QMutex m_playbackMaskSync;
+    mutable QMutex m_playbackMaskSync;
     QnPlaybackMaskHelper m_playbackMaskHelper;
     MediaQuality m_quality;
     bool m_qualityFastSwitch;
