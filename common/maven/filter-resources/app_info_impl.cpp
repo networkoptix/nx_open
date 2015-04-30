@@ -88,6 +88,10 @@ QString QnAppInfo::customizationName() {
     return QStringLiteral("${customization}");
 }
 
+QString QnAppInfo::defaultLanguage() {
+    return QStringLiteral("${translation1}");
+}
+
 QString QnAppInfo::clientExecutableName() {
 #ifdef _WIN32
     return QStringLiteral("${product.name}.exe"); // TODO: #Boris probably there exists a variable for this?

@@ -25,6 +25,8 @@ struct QnAppInfo {
     static QString productNameLong();
     static QString customizationName();
     
+    static QString defaultLanguage();
+    
     static QString clientExecutableName();
     static QString applauncherExecutableName();
     
