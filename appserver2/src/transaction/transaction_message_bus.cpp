@@ -1348,7 +1348,8 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     const QnUuid& connectionGuid,
     const QSharedPointer<AbstractStreamSocket>& socket,
-    const ApiPeerData &remotePeer,
+    ConnectionType::Type connectionType,
+    const ApiPeerData& remotePeer,
     qint64 remoteSystemIdentityTime,
     const QByteArray& contentEncoding )
 {
@@ -1365,6 +1366,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
         connectionGuid,
         m_localPeer,
         socket,
+        connectionType,
         contentEncoding );
     transport->setRemotePeer(remotePeer);
     transport->setRemoteIdentityTime(remoteSystemIdentityTime);

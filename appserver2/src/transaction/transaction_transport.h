@@ -30,6 +30,22 @@
 namespace ec2
 {
 
+namespace ConnectionType
+{
+    enum Type
+    {
+        none,
+        incoming,
+        //!this peer is originating one
+        outgoing,
+        bidirectional
+    };
+
+    const char* toString( Type val );
+    Type fromString( const QnByteArrayConstRef& str );
+}
+
+
 class QnTransactionTransport
 :
     public QObject
@@ -60,6 +76,7 @@ public:
         const QnUuid& connectionGuid,
         const ApiPeerData &localPeer,
         const QSharedPointer<AbstractStreamSocket>& socket,
+        ConnectionType::Type connectionType,
         const QByteArray& contentEncoding );
     //!Initializer for outgoing connection
     QnTransactionTransport( const ApiPeerData &localPeer );
@@ -193,11 +210,12 @@ private:
         DataToSend( QByteArray&& _sourceData ) : sourceData( std::move(_sourceData) ) {}
     };
 
-    enum ConnectionType
+    enum PeerRole
     {
-        incoming,
-        //!this peer is originating one
-        outgoing
+        //!peer has established connection
+        prOriginating,
+        //!peer has accepted connection
+        prAccepting
     };
 
     ApiPeerData m_localPeer;
@@ -241,7 +259,8 @@ private:
     nx_http::HttpStreamReader m_httpStreamReader;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
     nx_http::HttpMessageStreamParser m_incomingTransactionsRequestsParser;
-    ConnectionType m_connectionType;
+    ConnectionType::Type m_connectionType;
+    PeerRole m_peerRole;
     QByteArray m_contentEncoding;
     std::shared_ptr<AbstractByteStreamConverter> m_transactionReceivedAsResponseParser;
     bool m_compressResponseMsgBody;

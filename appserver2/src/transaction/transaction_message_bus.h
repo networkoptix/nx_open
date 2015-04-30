@@ -46,7 +46,8 @@ namespace ec2
         void gotConnectionFromRemotePeer(
             const QnUuid& connectionGuid,
             const QSharedPointer<AbstractStreamSocket>& socket,
-            const ApiPeerData &remotePeer,
+            ConnectionType::Type connectionType,
+            const ApiPeerData& remotePeer,
             qint64 remoteSystemIdentityTime,
             const QByteArray& contentEncoding );
         //!Report socket to receive transactions from

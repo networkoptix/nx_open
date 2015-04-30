@@ -92,8 +92,8 @@ void QnTransactionTcpProcessor::run()
             sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
             return;
         }
-        const QByteArray connectionDirection( connectionDirectionIter->second );
-        if( connectionDirection != "outgoing" )
+        const ConnectionType::Type connectionDirection = ConnectionType::fromString( connectionDirectionIter->second );
+        if( connectionDirection != ConnectionType::outgoing )
         {
             sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
             return;
@@ -185,12 +185,8 @@ void QnTransactionTcpProcessor::run()
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
         return;
     }
-    if( connectionDirectionIter->second != "incoming" )
-    {
-        sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-        QnTransactionTransport::connectingCanceled(remoteGuid, false);
-        return;
-    }
+    const ConnectionType::Type requestedConnectionType = 
+        ConnectionType::fromString(connectionDirectionIter->second);
     
     //checking content encoding requested by remote peer
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
@@ -225,6 +221,7 @@ void QnTransactionTcpProcessor::run()
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
             d->socket,
+            requestedConnectionType,
             remotePeer,
             remoteSystemIdentityTime,
             contentEncoding );
