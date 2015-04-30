@@ -258,12 +258,12 @@ void QnTransactionTransport::fillAuthInfo()
     else {
         QUrl url = QnAppServerConnectionFactory::url();
         m_httpClient->setUserName(url.userName());
-		if (dbManager) {
-	        QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
-	        if (adminUser) {
-	            m_httpClient->setUserPassword(adminUser->getDigest());
-	            m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
-	        }
+        if (dbManager) {
+            QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
+            if (adminUser) {
+                m_httpClient->setUserPassword(adminUser->getDigest());
+                m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+            }
         }
         else {
             m_httpClient->setUserPassword(url.password());
@@ -660,9 +660,6 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         cancelConnecting();
         return;
     }
-
-    //TODO #ak this is a work around for BitDefender Free Edition
-    QThread::msleep( 250 );
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
 
