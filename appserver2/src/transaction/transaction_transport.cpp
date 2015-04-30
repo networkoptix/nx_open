@@ -28,6 +28,8 @@
 #include "version.h"
 
 #define SEND_EACH_TRANSACTION_AS_POST_REQUEST
+//!if not defined, ubjson is used
+//#define USE_JSON
 
 
 /*!
@@ -341,7 +343,9 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 
     QUrlQuery q = QUrlQuery(remoteAddr.query());
-    //q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
+#ifdef USE_JSON
+    q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
+#endif
     m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid.toByteArray() );
     m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME, "incoming" );
 
@@ -792,8 +796,11 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         m_remotePeer.instanceId = QnUuid(itrRuntimeGuid->second);
     Q_ASSERT(!m_remotePeer.instanceId.isNull());
     m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
-    //m_remotePeer.dataFormat = Qn::JsonFormat;
+#ifdef USE_JSON
+    m_remotePeer.dataFormat = Qn::JsonFormat;
+#else
     m_remotePeer.dataFormat = Qn::UbjsonFormat;
+#endif
     emit peerIdDiscovered(m_remoteAddr, m_remotePeer.id);
 
     if (statusCode != nx_http::StatusCode::ok)
