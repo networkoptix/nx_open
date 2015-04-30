@@ -180,7 +180,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 
 bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
 {
-    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( "x-server-guid" );
+    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( "X-server-guid" );
     if( xServerGuidIter != request.headers.end() )
     {
         const nx_http::BufferType& desiredServerGuid = xServerGuidIter->second;

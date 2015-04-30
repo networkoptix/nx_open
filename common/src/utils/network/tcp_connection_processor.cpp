@@ -212,7 +212,7 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     if (d->chunkedMode)
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );
 
-    if (!contentEncoding.isEmpty())
+    if (!contentEncoding.isEmpty() && contentEncoding != "identity")
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );

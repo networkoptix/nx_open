@@ -30,6 +30,22 @@
 namespace ec2
 {
 
+namespace ConnectionType
+{
+    enum Type
+    {
+        none,
+        incoming,
+        //!this peer is originating one
+        outgoing,
+        bidirectional
+    };
+
+    const char* toString( Type val );
+    Type fromString( const QnByteArrayConstRef& str );
+}
+
+
 class QnTransactionTransport
 :
     public QObject
@@ -55,10 +71,15 @@ public:
     };
     static QString toString( State state );
 
+    //!Initializer for incoming connection
     QnTransactionTransport(
+        const QnUuid& connectionGuid,
         const ApiPeerData &localPeer,
-        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>(),
-        const QByteArray& contentEncoding = QByteArray() );
+        const QSharedPointer<AbstractStreamSocket>& socket,
+        ConnectionType::Type connectionType,
+        const QByteArray& contentEncoding );
+    //!Initializer for outgoing connection
+    QnTransactionTransport( const ApiPeerData &localPeer );
     ~QnTransactionTransport();
 
 signals:
@@ -171,6 +192,12 @@ public:
 
     void transactionProcessed();
 
+    QnUuid connectionGuid() const;
+    void setIncomingTransactionChannelSocket(
+        const QSharedPointer<AbstractStreamSocket>& socket,
+        const nx_http::Request& request,
+        const QByteArray& requestBuf );
+
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
 private:
@@ -183,10 +210,12 @@ private:
         DataToSend( QByteArray&& _sourceData ) : sourceData( std::move(_sourceData) ) {}
     };
 
-    enum ConnectionType
+    enum PeerRole
     {
-        incoming,
-        outgoing
+        //!peer has established connection
+        prOriginating,
+        //!peer has accepted connection
+        prAccepting
     };
 
     ApiPeerData m_localPeer;
@@ -201,13 +230,11 @@ private:
     bool m_needResync; // sync request should be send int the future as soon as possible
 
     mutable QMutex m_mutex;
-    QSharedPointer<AbstractStreamSocket> m_socket;
+    QSharedPointer<AbstractStreamSocket> m_incomingDataSocket;
+    QSharedPointer<AbstractStreamSocket> m_outgoingDataSocket;
     nx_http::AsyncHttpClientPtr m_httpClient;
     State m_state;
     /*std::vector<quint8>*/ nx::Buffer m_readBuffer;
-    int m_chunkHeaderLen;
-    size_t m_chunkLen;
-    int m_sendOffset;
     //!Holds raw data. It is serialized to http chunk just before sending to socket
     std::deque<DataToSend> m_dataToSend;
     QUrl m_remoteAddr;
@@ -228,15 +255,16 @@ private:
     int m_postedTranCount;
     bool m_asyncReadScheduled;
     qint64 m_remoteIdentityTime;
-    bool m_incomingConnection;
     bool m_incomingTunnelOpened;
     nx_http::HttpStreamReader m_httpStreamReader;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
     nx_http::HttpMessageStreamParser m_incomingTransactionsRequestsParser;
-    ConnectionType m_connectionType;
+    ConnectionType::Type m_connectionType;
+    PeerRole m_peerRole;
     QByteArray m_contentEncoding;
     std::shared_ptr<AbstractByteStreamConverter> m_transactionReceivedAsResponseParser;
     bool m_compressResponseMsgBody;
+    QnUuid m_connectionGuid;
 
 private:
     void sendHttpKeepAlive();
@@ -267,6 +295,8 @@ private:
     void scheduleAsyncRead();
     bool readCreateIncomingTunnelMessage();
     void receivedTransaction( const QnByteArrayConstRef& tranData );
+    void startListeningNonSafe();
+    void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );

@@ -58,6 +58,11 @@ QByteArray QnUniversalRequestProcessor::unauthorizedPageBody()
 bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
 {
     Q_D(QnUniversalRequestProcessor);
+
+    //TODO #ak 5511 firewall following is a temporary hack!
+    if( d->request.requestLine.method == nx_http::Method::POST )
+        return true;
+
     int retryCount = 0;
     if (d->needAuth)
     {
@@ -68,22 +73,22 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId) && d->socket->isConnected())
         {
             d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
-            if (nx_http::getHeaderValue( d->response.headers, "x-server-guid" ).isEmpty())
-                d->response.headers.insert(nx_http::HttpHeader("x-server-guid", qnCommon->moduleGUID().toByteArray()));
+            if (nx_http::getHeaderValue( d->response.headers, "X-server-guid" ).isEmpty())
+                d->response.headers.insert(nx_http::HttpHeader("X-server-guid", qnCommon->moduleGUID().toByteArray()));
 
             auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
             QByteArray contentEncoding;
             if( acceptEncodingHeaderIter != d->request.headers.end() )
             {
                 nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
-                if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
+                if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
+                {
+                    contentEncoding = "identity";
+                }
+                else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
                 {
                     contentEncoding = "gzip";
                     d->responseBody = GZipCompressor::compressData(d->responseBody);
-                }
-                else if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
-                {
-                    contentEncoding = "identity";
                 }
                 else
                 {

@@ -54,7 +54,7 @@ int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnReques
 
     QnRequestParamList locParams = params;
 
-    QnRequestParamList::iterator serverGuidIter = locParams.find(lit("x-server-guid"));
+    QnRequestParamList::iterator serverGuidIter = locParams.find(lit("X-server-guid"));
     if (serverGuidIter != locParams.end())
         locParams.erase(serverGuidIter);
 
