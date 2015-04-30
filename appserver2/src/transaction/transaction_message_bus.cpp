@@ -161,7 +161,6 @@ bool handleTransaction2(
     case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::addLicense:            
     case ApiCommand::removeLicense:         return handleTransactionParams<ApiLicenseData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
-    case ApiCommand::resetBusinessRules:    return handleTransactionParams<ApiResetBusinessRuleData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::installUpdate:         return handleTransactionParams<ApiUpdateInstallData>    (serializedTransaction, serializationSupport, transaction, function, fastFunction);

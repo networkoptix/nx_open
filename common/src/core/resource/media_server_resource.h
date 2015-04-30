@@ -102,6 +102,7 @@ private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
+    void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:

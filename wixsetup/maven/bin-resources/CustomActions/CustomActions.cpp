@@ -473,6 +473,9 @@ UINT __stdcall CopyHostedFiles(MSIHANDLE hInstall)
         fromFile = params.Tokenize(_T(";"), curPos);
         toFile = params.Tokenize(_T(";"), curPos);
 
+        CString localAppDataFolder = GetAppDataLocalFolderPath();
+        toFile.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+
         if (!PathFileExists(toFile)) {
             SHFILEOPSTRUCT s = { 0 };
             s.hwnd = 0;

@@ -186,6 +186,7 @@ private:
     QMap<QString, QSet<int>> m_oldStorageIndexes;
     mutable QMutex m_csvMigrationMutex;
     bool m_firstStorageTestDone;
+    QElapsedTimer m_clearMotionTimer;
 };
 
 #define qnStorageMan QnStorageManager::instance()

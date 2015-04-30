@@ -144,7 +144,7 @@ void QnStreamRecorder::close()
 
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
         {
-            if (m_formatCtx->streams[i]->codec->codec)
+            if (m_formatCtx->streams[i]->codec)
                 avcodec_close(m_formatCtx->streams[i]->codec);
         }
         

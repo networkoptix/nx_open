@@ -64,6 +64,7 @@ public:
     static QString dontRecordPrimaryStreamKey();
     static QString dontRecordSecondaryStreamKey();
     static QString rtpTransportKey();
+    static QString panicRecordingKey();
     static QString dynamicVideoLayoutKey();
     static QString motionStreamKey();
 protected:
