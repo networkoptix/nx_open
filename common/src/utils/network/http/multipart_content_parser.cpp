@@ -11,9 +11,9 @@ namespace nx_http
     MultipartContentParser::MultipartContentParser()
     :
         m_state( waitingBoundary ),
+        m_nextState( none ),
         m_contentLength( (unsigned int)-1 ),   //-1 means no content-length is given
-        m_chunkParseState( waitingEndOfLine ),
-        m_nextState( none )
+        m_chunkParseState( waitingEndOfLine )
     {
     }
 
