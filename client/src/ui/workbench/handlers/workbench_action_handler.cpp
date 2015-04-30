@@ -1482,9 +1482,18 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
-    if(!server)
+    QnMediaServerResourceList servers;
+    for (const auto &resource: menu()->currentParameters(sender()).resources()) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (server && server->getStatus() != Qn::Incompatible)
+            servers << server;
+    }
+
+    Q_ASSERT_X(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");
+    if(servers.isEmpty())
         return;
+
+    QnMediaServerResourcePtr server = servers.first();
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
     connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::clearLoaderCache);
