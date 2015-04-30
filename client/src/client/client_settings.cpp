@@ -57,12 +57,16 @@ namespace {
 
 } // anonymous namespace
 
-QnClientSettings::QnClientSettings(QObject *parent):
+QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
     base_type(parent),
     m_accessManager(new QNetworkAccessManager(this)),
-    m_settings(new QSettings(this)),
     m_loading(true)
 {
+    if (localSettings)
+        m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName(), this);
+    else
+        m_settings = new QSettings(this);
+
     connect(m_accessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(at_accessManager_finished(QNetworkReply *)));
 
     init();
