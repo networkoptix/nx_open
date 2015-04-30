@@ -117,7 +117,6 @@ private:
 
     QScopedPointer<QnModuleFinder> m_moduleFinder;
     QScopedPointer<QnRouter> m_router;
-    QScopedPointer<QnGlobalModuleFinder> m_globalModuleFinder;
     QScopedPointer<QnServerInterfaceWatcher> m_serverInterfaceWatcher;
 
     QScopedPointer<QnResourcePropertyDictionary> m_dictionary;

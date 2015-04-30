@@ -41,7 +41,6 @@
 #include "decoders/video/ipp_h264_decoder.h"
 
 #include "utils/network/module_finder.h"
-#include "utils/network/global_module_finder.h"
 #include "utils/network/router.h"
 #include <utils/common/command_line_parser.h>
 #include <utils/common/app_info.h>
@@ -513,15 +512,13 @@ bool AxHDWitness::doInitialize()
     QnSessionManager::instance()->start();
     
     ffmpegInit();
-    
-    
+      
     m_moduleFinder.reset(new QnModuleFinder(true));
-    m_moduleFinder->setCompatibilityMode(qnSettings->isDevMode());  
+    m_moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
     m_moduleFinder->start();
-    
-    
-    m_router.reset(new QnRouter(m_moduleFinder.data(), true));
-    m_globalModuleFinder.reset(new QnGlobalModuleFinder());
+
+    m_router.reset(new QnRouter(m_moduleFinder.data()));
+
     m_serverInterfaceWatcher.reset(new QnServerInterfaceWatcher(m_router.data()));
 
     //===========================================================================
@@ -563,10 +560,9 @@ void AxHDWitness::doFinalize()
     m_context.reset(NULL);
 
     m_serverInterfaceWatcher.reset(NULL);
-    m_globalModuleFinder.reset(NULL);
     m_router.reset(NULL);
  
-    m_moduleFinder->stop();
+    m_moduleFinder->pleaseStop();
     m_moduleFinder.reset(NULL);
 
     QnSessionManager::instance()->stop();
