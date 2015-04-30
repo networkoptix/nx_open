@@ -681,7 +681,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             request.requestLine.version = nx_http::http_1_1;
             request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             request.headers.emplace( "Content-Type", TUNNEL_CONTENT_TYPE );
-            request.headers.emplace( "Host", request.requestLine.url.host().toLatin1() );
+            request.headers.emplace( "Host", client->url().host().toLatin1() );
             addEncodedData( request.serialized() );
 
             setState(QnTransactionTransport::Connected);
