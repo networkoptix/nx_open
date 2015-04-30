@@ -69,10 +69,10 @@ bool QnBookmarkCameraData::isEmpty() const {
     return m_data.isEmpty();
 }
 
-void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
+void QnBookmarkCameraData::update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) {
     if (!other)
         return;
-
+    //TODO: #GDM #Bookmarks use updatedPeriod
     QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data());
     if (!other_casted)
         return;
@@ -88,7 +88,7 @@ void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
     m_dataSource = QnTimePeriodList::mergeTimePeriods(periods);
 }
 
-void QnBookmarkCameraData::append(const QList<QnAbstractCameraDataPtr> &other) {
+void QnBookmarkCameraData::mergeInto(const QList<QnAbstractCameraDataPtr> &other) {
     if (other.isEmpty())
         return;
 
@@ -131,7 +131,7 @@ bool QnBookmarkCameraData::trim(qint64 trimTime) {
         return false;
 
     QnTimePeriod period = m_dataSource.last();
-    if(period.durationMs != -1)
+    if(!period.isInfinite())
         return false;
 
     qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
