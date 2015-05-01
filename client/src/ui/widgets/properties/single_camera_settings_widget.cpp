@@ -193,6 +193,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateIpAddressText()));
         connect(m_camera, &QnResource::urlChanged,      this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM also listen to hostAddress changes?
         connect(m_camera, &QnResource::resourceChanged, this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM why?
+        connect(m_camera, &QnResource::resourceChanged,   this, &QnSingleCameraSettingsWidget::updateMotionCapabilities);
     }
 
     updateFromResource(!isVisible());
@@ -455,9 +456,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
             ui->cameraMotionButton->setChecked(m_camera->getMotionType() != Qn::MT_SoftwareGrid);
             ui->softwareMotionButton->setChecked(m_camera->getMotionType() == Qn::MT_SoftwareGrid);
 
-            m_cameraSupportsMotion = m_camera->hasMotion();
-            ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
-            ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
+            updateMotionCapabilities();
 
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
@@ -645,6 +644,12 @@ void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
         return;
     
     ui->cameraScheduleWidget->setRecordingParamsAvailability(!m_camera->hasParam(lit("noRecordingParams")));
+}
+
+void QnSingleCameraSettingsWidget::updateMotionCapabilities() {
+    m_cameraSupportsMotion = m_camera ? m_cameraSupportsMotion = m_camera->hasMotion() : false;
+    ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
+    ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {

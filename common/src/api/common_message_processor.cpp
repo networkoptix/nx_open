@@ -446,10 +446,10 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 {
     QnServerAdditionalAddressesDictionary::instance()->clear();
     //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
-    resetResources(fullData.resources);
-    resetPropertyList(fullData.allProperties);
     resetServerUserAttributesList( fullData.serverUserAttributesList );
     resetCameraUserAttributesList( fullData.cameraUserAttributesList );
+    resetResources(fullData.resources);
+    resetPropertyList(fullData.allProperties);
     resetLicenses(fullData.licenses);
     resetCameraServerItems(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
