@@ -82,6 +82,7 @@ static void *dvdalign_lbmalloc(dvd_reader_t *device, quint32 num_lbs)
   if(a == NULL) {
     a = (dvdalign_t*) malloc(sizeof(dvdalign_t));
     if(a == NULL) {
+      free(m);
       return a;
     }
     a->ptrs = NULL;
