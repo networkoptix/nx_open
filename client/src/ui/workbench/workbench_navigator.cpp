@@ -1144,8 +1144,10 @@ void QnWorkbenchNavigator::resetSyncedPeriods() {
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods(qint64 startTimeMs) {
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++)
-        updateSyncedPeriods(static_cast<Qn::TimePeriodContent>(i), startTimeMs);
+    if (m_timeSlider) {
+        for(int i = 0; i < Qn::TimePeriodContentCount; i++)
+            updateSyncedPeriods(static_cast<Qn::TimePeriodContent>(i), startTimeMs);
+    }
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, qint64 startTimeMs) {
