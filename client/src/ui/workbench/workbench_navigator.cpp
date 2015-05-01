@@ -1134,7 +1134,8 @@ void QnWorkbenchNavigator::updateCurrentBookmarks() {
 void QnWorkbenchNavigator::resetSyncedPeriods() {
     for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
         auto periodsType = static_cast<Qn::TimePeriodContent>(i);
-        m_timeSlider->setTimePeriods(SyncedLine, periodsType, QnTimePeriodList());
+        if (m_timeSlider)
+            m_timeSlider->setTimePeriods(SyncedLine, periodsType, QnTimePeriodList());
         if(m_calendar)
             m_calendar->setSyncedTimePeriods(periodsType, QnTimePeriodList());
         if(m_dayTimeWidget)
