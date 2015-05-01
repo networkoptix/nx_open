@@ -4,10 +4,14 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
+#include <array>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
 #include <client/client_globals.h>
+
+#include <recording/time_period.h>
 
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -30,6 +34,7 @@ class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 class QnSearchLineEdit;
+class QnThreadedChunksMergeTool;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -147,8 +152,14 @@ protected slots:
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodContent type);
-    void updateSyncedPeriods();
-    void updateSyncedPeriods(Qn::TimePeriodContent type);
+
+    /** Clean synced line. */
+    void resetSyncedPeriods();
+
+    /** Update synced line. Empty period means the whole line. Infinite period is not allowed. */
+    void updateSyncedPeriods(qint64 startTimeMs = 0);
+    void updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, qint64 startTimeMs = 0);
+
     void updateCurrentBookmarks();
     void updateTargetPeriod();
     void updateLines();
@@ -181,7 +192,7 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type);
+    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type, qint64 startTimeMs);
     void updateLoaderBookmarks(QnCachingCameraDataLoader *loader);
 
     void at_timeSlider_valueChanged(qint64 value);
@@ -248,12 +259,14 @@ private:
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
-    QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
-    
+    QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;   
     QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
     QnCameraBookmarkTags m_bookmarkTags;
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
+
+    int m_chunkMergingProcessHandle;
+    std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

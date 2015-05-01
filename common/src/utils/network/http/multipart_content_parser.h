@@ -41,9 +41,12 @@ namespace nx_http
     private:
         enum ParsingState
         {
+            none,
             waitingBoundary,
             readingHeaders,
             readingTextData,
+            //!reading trailing CR of LF before binary data
+            depleteLineFeedBeforeBinaryData,
             //!reading data with Content-Length known
             readingSizedBinaryData,
             //!reading data with Content-Length not known: searching for boundary
@@ -57,6 +60,7 @@ namespace nx_http
         };
 
         ParsingState m_state;
+        ParsingState m_nextState;
         LineSplitter m_lineSplitter;
         nx_http::BufferType m_currentFrame;
         StringType m_boundary;
