@@ -1221,7 +1221,8 @@ QSet<QnUuid> QnTransactionMessageBus::checkAlivePeerRouteTimeout()
     {
         AlivePeerInfo& peerInfo = itr.value();
         for (auto itr = peerInfo.routingInfo.begin(); itr != peerInfo.routingInfo.end();) {
-            if (m_currentTimeTimer.elapsed() - itr.value().lastRecvTime > ALIVE_UPDATE_TIMEOUT)
+            const RoutingRecord& routingRecord = itr.value();
+            if (routingRecord.distance > 0 && m_currentTimeTimer.elapsed() - routingRecord.lastRecvTime > ALIVE_UPDATE_TIMEOUT)
                 itr = peerInfo.routingInfo.erase(itr);
             else
                 ++itr;
