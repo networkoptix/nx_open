@@ -34,8 +34,8 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="CompanyDir" Name="Network Optix">
-          <Directory Id="INSTALLDIR" Name="Nx Witness">
+        <Directory Id="CompanyDir" Name="${company.name}">
+          <Directory Id="INSTALLDIR" Name="${display.product.name}">
             <Directory Id="AxClientDir" Name="AxClient">
               <Directory Id="AxClient23Dir" Name="2.3">
               </Directory>
@@ -70,7 +70,7 @@
 
     <ComponentGroup Id="OemDriverComponents" Directory="DvrMiniDriversDir">
       <Component Id="OemMiniDriverComponent">
-        <File Id="NetworkOptix.OemDvrMiniDriver.dll" Source="..\..\paxton\x86\bin\Release\${ax.className}.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
+        <File Id="${ax.className}.OemDvrMiniDriver.dll" Source="..\..\paxton\x86\bin\Release\${ax.className}.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
       </Component>
     </ComponentGroup>
   </Fragment>
