@@ -62,6 +62,7 @@
 #include "core/resource/resource_directory_browser.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
 
 #include "tests/auto_tester.h"
 #include "utils/network/socket.h"
@@ -458,6 +459,7 @@ bool AxHDWitness::doInitialize()
 
     m_dictionary.reset(new QnResourcePropertyDictionary());
     m_statusDictionary.reset(new QnResourceStatusDictionary());
+	m_serverAdditionalAddressesDictionary.reset(new QnServerAdditionalAddressesDictionary());
 
     m_platform.reset(new QnPlatformAbstraction());
     m_runnablePool.reset(new QnLongRunnablePool());
@@ -579,6 +581,7 @@ void AxHDWitness::doFinalize()
     m_runnablePool.reset(NULL);
     m_platform.reset(NULL);
 
+	m_serverAdditionalAddressesDictionary.reset(NULL);
     m_statusDictionary.reset(NULL);
     m_dictionary.reset(NULL);
 

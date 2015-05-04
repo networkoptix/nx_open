@@ -34,6 +34,7 @@ class QnCameraUserAttributePool;
 class QnMediaServerUserAttributesPool;
 class TimerManager;
 class QnServerCameraFactory;
+class QnServerAdditionalAddressesDictionary;
 
 class AxHDWitness : public QWidget
 {
@@ -121,6 +122,7 @@ private:
 
     QScopedPointer<QnResourcePropertyDictionary> m_dictionary;
     QScopedPointer<QnResourceStatusDictionary> m_statusDictionary;
+	QScopedPointer<QnServerAdditionalAddressesDictionary> m_serverAdditionalAddressesDictionary;
 
     QScopedPointer<QnCameraUserAttributePool> m_cameraUserAttributePool;
     QScopedPointer<QnMediaServerUserAttributesPool> m_mediaServerUserAttributesPool;
