@@ -133,7 +133,7 @@ public:
 
     bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, const QnTransactionTransportHeader& _header);
 
-    void doOutgoingConnect(QUrl remoteAddr);
+    void doOutgoingConnect(const QUrl& remotePeerUrl);
     void close();
 
     // these getters/setters are using from a single thread
@@ -265,6 +265,9 @@ private:
     std::shared_ptr<AbstractByteStreamConverter> m_transactionReceivedAsResponseParser;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
+    nx_http::AsyncHttpClientPtr m_outgoingTranClient;
+    bool m_authOutgoingConnectionByServerKey;
+    QUrl m_postTranUrl;
 
 private:
     void sendHttpKeepAlive();
@@ -288,7 +291,7 @@ private:
     void serializeAndSendNextDataBuffer();
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
     void setExtraDataBuffer(const QByteArray& data);
-    void fillAuthInfo();
+    void fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey );
     /*!
         \note MUST be called with \a m_mutex locked
     */
@@ -302,6 +305,7 @@ private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
     void repeatDoGet();
+    void openPostTransactionConnectionDone( const nx_http::AsyncHttpClientPtr& );
 };
 
 }

@@ -109,7 +109,8 @@ QnTransactionTransport::QnTransactionTransport(
     m_peerRole(prAccepting),
     m_contentEncoding(contentEncoding),
     m_compressResponseMsgBody(false),
-    m_connectionGuid(connectionGuid)
+    m_connectionGuid(connectionGuid),
+    m_authOutgoingConnectionByServerKey(true)
 {
     if( m_connectionType == ConnectionType::bidirectional )
         m_incomingDataSocket = socket;
@@ -145,6 +146,7 @@ QnTransactionTransport::QnTransactionTransport(
 
 QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
 :
+//TODO #ak delegate constructor
     m_localPeer(localPeer),
     m_lastConnectTime(0), 
     m_readSync(false), 
@@ -168,7 +170,8 @@ QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
         ),
     m_peerRole(prOriginating),
     m_compressResponseMsgBody(true),
-    m_connectionGuid(QnUuid::createUuid())
+    m_connectionGuid(QnUuid::createUuid()),
+    m_authOutgoingConnectionByServerKey(true)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
@@ -316,7 +319,7 @@ void QnTransactionTransport::removeEventHandler( int eventHandlerID )
 AbstractStreamSocket* QnTransactionTransport::getSocket() const
 {
     //return m_socket.data();
-    //TODO #ak wrong
+    //TODO #ak wrong: can return different sockets 
     return m_incomingDataSocket
         ? m_incomingDataSocket.data()
         : m_outgoingDataSocket.data();
@@ -336,38 +339,39 @@ void QnTransactionTransport::close()
     }
 }
 
-void QnTransactionTransport::fillAuthInfo()
+void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey )
 {
     if (!QnAppServerConnectionFactory::videowallGuid().isNull()) {
-        m_httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+        httpClient->addAdditionalHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
         return;
     }
 
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-    if (ownServer && m_authByKey) 
+    if (ownServer && authByKey) 
     {
-        m_httpClient->setUserName(ownServer->getId().toString().toLower());    
-        m_httpClient->setUserPassword(ownServer->getAuthKey());
+        httpClient->setUserName(ownServer->getId().toString().toLower());    
+        httpClient->setUserPassword(ownServer->getAuthKey());
     }
     else {
         QUrl url = QnAppServerConnectionFactory::url();
-        m_httpClient->setUserName(url.userName());
+        httpClient->setUserName(url.userName());
         if (dbManager) {
             QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
             if (adminUser) {
-                m_httpClient->setUserPassword(adminUser->getDigest());
-                m_httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+                httpClient->setUserPassword(adminUser->getDigest());
+                httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
             }
         }
         else {
-            m_httpClient->setUserPassword(url.password());
+            httpClient->setUserPassword(url.password());
         }
     }
 }
 
-void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
+void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
 {
-    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::doOutgoingConnect. remoteAddr = %1").arg(remoteAddr.toString()), cl_logDEBUG2 );
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::doOutgoingConnect. remotePeerUrl = %1").
+        arg(remotePeerUrl.toString()), cl_logDEBUG2 );
 
     setState(ConnectingStage1);
 
@@ -382,26 +386,27 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
         this, &QnTransactionTransport::at_httpClientDone,
         Qt::DirectConnection);
     
-    fillAuthInfo();
+    fillAuthInfo( m_httpClient, m_authByKey );
     if( m_localPeer.isServer() )
-        m_httpClient->addRequestHeader(
+        m_httpClient->addAdditionalHeader(
             nx_ec::EC2_SYSTEM_NAME_HEADER_NAME,
             QnCommonModule::instance()->localSystemName().toUtf8() );
 
-    if (!remoteAddr.userName().isEmpty())
+    m_remoteAddr = remotePeerUrl;
+    if (!m_remoteAddr.userName().isEmpty())
     {
-        remoteAddr.setUserName(QString());
-        remoteAddr.setPassword(QString());
+        m_remoteAddr.setUserName(QString());
+        m_remoteAddr.setPassword(QString());
     }
 
-    QUrlQuery q = QUrlQuery(remoteAddr.query());
+    QUrlQuery q = QUrlQuery(m_remoteAddr.query());
 #ifdef USE_JSON
     q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
 #endif
-    m_httpClient->addRequestHeader(
+    m_httpClient->addAdditionalHeader(
         nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
         m_connectionGuid.toByteArray() );
-    m_httpClient->addRequestHeader(
+    m_httpClient->addAdditionalHeader(
         nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
         ConnectionType::toString(m_connectionType) );   //incoming means this peer wants to receive data via this connection
 
@@ -413,11 +418,12 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
         setReadSync(true);
     }
 
-    remoteAddr.setQuery(q);
-    m_remoteAddr = remoteAddr;
+    m_remoteAddr.setQuery(q);
     m_httpClient->removeAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME );
-    m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
-    if (!m_httpClient->doGet(remoteAddr)) {
+    m_httpClient->addAdditionalHeader(
+        nx_ec::EC2_CONNECTION_STATE_HEADER_NAME,
+        toString(getState()).toLatin1() );
+    if (!m_httpClient->doGet(m_remoteAddr)) {
         qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
         setState(Error);
     }
@@ -483,7 +489,7 @@ void QnTransactionTransport::connectDone(const QnUuid& id)
 void QnTransactionTransport::repeatDoGet()
 {
     m_httpClient->removeAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME );
-    m_httpClient->addRequestHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
+    m_httpClient->addAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
     if (!m_httpClient->doGet(m_remoteAddr))
         cancelConnecting();
 }
@@ -720,6 +726,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         }
         else    //m_peerRole == prOriginating
         {
+#if 1
             //sending transactions as a POST request
             nx_http::Request request;
             request.requestLine.method = nx_http::Method::POST;
@@ -735,12 +742,11 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
             addHttpChunkExtensions( &request.headers );
             request.headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
-            request.headers.emplace( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid.toByteArray() );
-            request.headers.emplace(
-                nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
-                ConnectionType::toString(ConnectionType::outgoing) );
             request.messageBody = dataCtx.sourceData;
             dataCtx.encodedSourceData = request.serialized();
+#else
+            dataCtx.encodedSourceData = dataCtx.sourceData;
+#endif
         }
 #endif
     }
@@ -749,28 +755,47 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     NX_LOG( lit("Sending data buffer (%1 bytes) to the peer %2").
         arg(dataCtx.encodedSourceData.size()).arg(m_remotePeer.id.toString()), cl_logDEBUG2 );
 
-    if( !m_outgoingDataSocket )
+    //if( m_peerRole == prAccepting || m_connectionType == ConnectionType::bidirectional )
+    if( m_outgoingDataSocket )
     {
-        assert( m_peerRole == prOriginating );
-        assert( m_connectionType != ConnectionType::bidirectional );
-
-        //establishing connection
-        m_outgoingDataSocket.reset( SocketFactory::createStreamSocket() );
-        if( !m_outgoingDataSocket->setNonBlockingMode( true ) ||
-            !m_outgoingDataSocket->connectAsync(
-                SocketAddress(m_remoteAddr.host(), m_remoteAddr.port(nx_http::DEFAULT_HTTP_PORT)),
-                std::bind(&QnTransactionTransport::outgoingConnectionEstablished, this, _1) ) )
+        if( !m_outgoingDataSocket->sendAsync(
+                dataCtx.encodedSourceData,
+                std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
         {
             setStateNoLock( State::Error );
         }
-        return;
     }
-
-    if( !m_outgoingDataSocket->sendAsync(
-            dataCtx.encodedSourceData,
-            std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
+    else  //m_peerRole == prOriginating
     {
-        return setStateNoLock( State::Error );
+        assert( m_peerRole == prOriginating && m_connectionType != ConnectionType::bidirectional );
+
+        //using http client just to authenticate on server
+        if( !m_outgoingTranClient )
+        {
+            m_outgoingTranClient = std::make_shared<nx_http::AsyncHttpClient>();
+            connect(
+                m_outgoingTranClient.get(), &nx_http::AsyncHttpClient::done,
+                this, &QnTransactionTransport::openPostTransactionConnectionDone,
+                Qt::DirectConnection );
+            fillAuthInfo( m_outgoingTranClient, true );
+
+            m_postTranUrl = m_remoteAddr;
+        }
+        m_outgoingTranClient->addAdditionalHeader(
+            nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
+            m_connectionGuid.toByteArray() );
+        m_outgoingTranClient->addAdditionalHeader(
+            nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
+            ConnectionType::toString(ConnectionType::outgoing) );
+        if( !m_outgoingTranClient->doPost(
+                m_postTranUrl,
+                Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
+                nx_http::BufferType() ) )
+        {
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("Failed to initiate POST transaction request to %1. %2").
+                arg(m_postTranUrl.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+            setStateNoLock( Error );
+        }
     }
 }
 
@@ -796,7 +821,7 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
 
 void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
 {
-    int statusCode = client->response()->statusLine.statusCode;
+    const int statusCode = client->response()->statusLine.statusCode;
 
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::at_responseReceived. statusCode = %1").
         arg(statusCode), cl_logDEBUG2 );
@@ -805,7 +830,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     {
         if (m_authByKey) {
             m_authByKey = false;
-            fillAuthInfo();
+            fillAuthInfo( m_httpClient, m_authByKey );
             QTimer::singleShot(0, this, SLOT(repeatDoGet()));
         }
         else {
@@ -818,7 +843,6 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         }
         return;
     }
-
 
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(nx_ec::EC2_GUID_HEADER_NAME);
     nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(nx_ec::EC2_RUNTIME_GUID_HEADER_NAME);
@@ -1147,6 +1171,7 @@ void QnTransactionTransport::scheduleAsyncRead()
     }
 }
 
+#ifndef SEND_EACH_TRANSACTION_AS_POST_REQUEST
 bool QnTransactionTransport::readCreateIncomingTunnelMessage()
 {
     m_httpStreamReader.setBreakAfterReadingHeaders( true );
@@ -1192,6 +1217,7 @@ bool QnTransactionTransport::readCreateIncomingTunnelMessage()
 
     return true;
 }
+#endif
 
 void QnTransactionTransport::startListeningNonSafe()
 {
@@ -1222,18 +1248,52 @@ void QnTransactionTransport::startListeningNonSafe()
     }
 }
 
-void QnTransactionTransport::outgoingConnectionEstablished( SystemError::ErrorCode errorCode )
+void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::AsyncHttpClientPtr& client )
 {
     QMutexLocker lk( &m_mutex );
 
-    if( errorCode )
+    assert( client == m_outgoingTranClient );
+
+    if( client->failed() || !client->response() )
     {
-        NX_LOG( lit("Failed to establish outgoing connection to %1. %2").
-            arg(SocketAddress(m_remoteAddr.host(), m_remoteAddr.port(nx_http::DEFAULT_HTTP_PORT)).toString()).
-            arg(SystemError::toString(errorCode)),
-            cl_logWARNING );
-        return setStateNoLock( State::Error );
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("Unknown network error posting transaction to %1").
+            arg(m_postTranUrl.toString()), cl_logWARNING );
+        setStateNoLock( Error );
+        return;
     }
+    
+    if( client->response()->statusLine.statusCode == nx_http::StatusCode::unauthorized &&
+        m_authOutgoingConnectionByServerKey )
+    {
+        NX_LOG(
+            QnLog::EC2_TRAN_LOG,
+            lit("Failed to authenticate on peer %1 by key. Retrying using admin credentials...").arg(m_postTranUrl.toString()),
+            cl_logDEBUG2 );
+        m_authOutgoingConnectionByServerKey = false;
+        fillAuthInfo( m_outgoingTranClient, m_authOutgoingConnectionByServerKey );
+        if( !m_outgoingTranClient->doPost(
+                m_postTranUrl,
+                Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
+                nx_http::BufferType() ) )
+        {
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("Failed (2) to initiate POST transaction request to %1. %2").
+                arg(m_postTranUrl.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+            setStateNoLock( Error );
+        }
+        return;
+    }
+
+    if( client->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+    {
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("Server %1 returned %2 (%3) response while posting transaction").
+            arg(m_postTranUrl.toString()).arg(client->response()->statusLine.statusCode).
+            arg(QLatin1String(client->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        setStateNoLock( Error );
+        return;
+    }
+
+    m_outgoingTranClient.reset();
+    m_outgoingDataSocket = client->takeSocket();
 
     assert( !m_dataToSend.empty() );
 

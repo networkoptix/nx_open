@@ -59,10 +59,6 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
 {
     Q_D(QnUniversalRequestProcessor);
 
-    //TODO #ak 5511 firewall following is a temporary hack!
-    if( d->request.requestLine.method == nx_http::Method::POST )
-        return true;
-
     int retryCount = 0;
     if (d->needAuth)
     {

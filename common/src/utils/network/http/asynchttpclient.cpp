@@ -696,7 +696,7 @@ namespace nx_http
         nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
     }
 
-    void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
+    void AsyncHttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
     {
         m_additionalHeaders.emplace( key, value );
     }

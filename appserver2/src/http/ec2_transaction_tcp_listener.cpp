@@ -98,6 +98,7 @@ void QnTransactionTcpProcessor::run()
             sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
             return;
         }
+        sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
 
         QnTransactionMessageBus::instance()->gotIncomingTransactionsConnectionFromRemotePeer(
             connectionGuid,
@@ -107,7 +108,6 @@ void QnTransactionTcpProcessor::run()
             d->request,
             d->clientRequest );
         d->socket.clear();
-        //not sending response!
         return;
     }
 
