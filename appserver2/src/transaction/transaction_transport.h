@@ -270,6 +270,7 @@ private:
     QUrl m_postTranUrl;
 
 private:
+    void default_initializer();
     void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();

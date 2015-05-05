@@ -83,36 +83,45 @@ QSet<QnUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
 QMutex QnTransactionTransport::m_staticMutex;
 
+void QnTransactionTransport::default_initializer()
+{
+    m_lastConnectTime = 0;
+    m_readSync = false;
+    m_writeSync = false;
+    m_syncDone = false;
+    m_syncInProgress = false;
+    m_needResync = false;
+    m_state = NotDefined; 
+    m_connected = false;
+    m_prevGivenHandlerID = 0;
+    m_authByKey = true;
+    m_postedTranCount = 0;
+    m_asyncReadScheduled = false;
+    m_remoteIdentityTime = 0;
+    m_incomingTunnelOpened = false;
+    m_connectionType = ConnectionType::none;
+    m_peerRole = prOriginating;
+    m_compressResponseMsgBody = false;
+    m_authOutgoingConnectionByServerKey = true;
+}
+
 QnTransactionTransport::QnTransactionTransport(
     const QnUuid& connectionGuid,
     const ApiPeerData& localPeer,
     const QSharedPointer<AbstractStreamSocket>& socket,
     ConnectionType::Type connectionType,
     const QByteArray& contentEncoding )
-:
-    m_localPeer(localPeer),
-    m_lastConnectTime(0), 
-    m_readSync(false), 
-    m_writeSync(false),
-    m_syncDone(false),
-    m_syncInProgress(false),
-    m_needResync(false),
-    m_outgoingDataSocket(socket),
-    m_state(NotDefined), 
-    m_connected(false),
-    m_prevGivenHandlerID(0),
-    m_authByKey(true),
-    m_postedTranCount(0),
-    m_asyncReadScheduled(false),
-    m_remoteIdentityTime(0),
-    m_incomingTunnelOpened(false),
-    m_connectionType(connectionType),
-    m_peerRole(prAccepting),
-    m_contentEncoding(contentEncoding),
-    m_compressResponseMsgBody(false),
-    m_connectionGuid(connectionGuid),
-    m_authOutgoingConnectionByServerKey(true)
 {
+    default_initializer();
+
+    m_localPeer = localPeer;
+    m_outgoingDataSocket = socket;
+    m_connectionType = connectionType;
+    m_peerRole = prAccepting;
+    m_contentEncoding = contentEncoding;
+    m_connectionGuid = connectionGuid;
+
+
     if( m_connectionType == ConnectionType::bidirectional )
         m_incomingDataSocket = socket;
 
@@ -131,14 +140,7 @@ QnTransactionTransport::QnTransactionTransport(
     if( m_contentEncoding == "gzip" )
     {
         m_compressResponseMsgBody = true;
-        ////enabling decompression of received transactions
-        //m_transactionReceivedAsResponseParser = std::make_shared<GZipUncompressor>();
-        //m_transactionReceivedAsResponseParser->setNextFilter( m_multipartContentParser );
     }
-    //else
-    //{
-    //    m_transactionReceivedAsResponseParser = m_multipartContentParser;
-    //}
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     m_incomingTransactionsRequestsParser.setNextFilter(
         std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
@@ -146,34 +148,22 @@ QnTransactionTransport::QnTransactionTransport(
 }
 
 QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
-:
-//TODO #ak delegate constructor
-    m_localPeer(localPeer),
-    m_lastConnectTime(0), 
-    m_readSync(false), 
-    m_writeSync(false),
-    m_syncDone(false),
-    m_syncInProgress(false),
-    m_needResync(false),
-    m_state(NotDefined), 
-    m_connected(false),
-    m_prevGivenHandlerID(0),
-    m_postedTranCount(0),
-    m_asyncReadScheduled(false),
-    m_remoteIdentityTime(0),
-    m_incomingTunnelOpened(false),
-    m_connectionType(
+{
+    //TODO #ak msvc2013 delegate constructor
+    default_initializer();
+
+    m_localPeer = localPeer;
+    m_connectionType = 
 #ifdef USE_SINGLE_TWO_WAY_CONNECTION
         ConnectionType::bidirectional
 #else
         ConnectionType::incoming
 #endif
-        ),
-    m_peerRole(prOriginating),
-    m_compressResponseMsgBody(true),
-    m_connectionGuid(QnUuid::createUuid()),
-    m_authOutgoingConnectionByServerKey(true)
-{
+        ;
+    m_peerRole = prOriginating;
+    m_connectionGuid = QnUuid::createUuid();
+
+
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
