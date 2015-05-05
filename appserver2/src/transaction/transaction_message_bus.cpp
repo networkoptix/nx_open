@@ -174,6 +174,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::updatePersistentSequence:          return handleTransactionParams<ApiUpdateSequenceData>         (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::markLicenseOverflow:     return handleTransactionParams<ApiLicenseOverflowData>         (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::restoreDatabase:         return true;
     case ApiCommand::openReverseConnection:   return handleTransactionParams<ApiReverseConnectionData>         (serializedTransaction, &stream, transaction, function, fastFunction);
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
@@ -1224,7 +1225,8 @@ QSet<QnUuid> QnTransactionMessageBus::checkAlivePeerRouteTimeout()
     {
         AlivePeerInfo& peerInfo = itr.value();
         for (auto itr = peerInfo.routingInfo.begin(); itr != peerInfo.routingInfo.end();) {
-            if (m_currentTimeTimer.elapsed() - itr.value().lastRecvTime > ALIVE_UPDATE_TIMEOUT)
+            const RoutingRecord& routingRecord = itr.value();
+            if (routingRecord.distance > 0 && m_currentTimeTimer.elapsed() - routingRecord.lastRecvTime > ALIVE_UPDATE_TIMEOUT)
                 itr = peerInfo.routingInfo.erase(itr);
             else
                 ++itr;

@@ -54,6 +54,7 @@ private:
     QScopedPointer<Ui::SmtpSettingsWidget> ui;
 
     int m_testHandle;
+    bool m_updating;
 
     QTimer *m_timeoutTimer;
 };

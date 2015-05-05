@@ -408,7 +408,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         return;
 
     QThreadPool tp;
-    tp.setMaxThreadCount(16);
+    tp.setMaxThreadCount(4);
     QMutex scanFilesMutex;
     for(const auto& fi: files)
     {
