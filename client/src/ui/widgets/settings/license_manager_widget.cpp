@@ -488,6 +488,9 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
             case QnLicense::InvalidType:
                 message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
                 break;
+            case QnLicense::TooManyLicensesPerDevice:
+                message = QnLicense::errorMessage(errCode);
+                break;
             default:
                 break;
             }

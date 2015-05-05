@@ -863,4 +863,5 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedSupportedMotionType.reset();
     m_cachedCameraCapabilities.reset();
     m_cachedIsDtsBased.reset();
+    m_motionType.reset();
 }

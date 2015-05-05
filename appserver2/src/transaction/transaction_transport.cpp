@@ -63,6 +63,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_sendOffset(0), 
     m_connected(false),
     m_prevGivenHandlerID(0),
+    m_authByKey(true),
     m_postedTranCount(0),
     m_asyncReadScheduled(false),
     m_remoteIdentityTime(0),
