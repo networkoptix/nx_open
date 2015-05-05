@@ -320,15 +320,15 @@ void QnVideoCamera::at_camera_resourceChanged()
 			if ( m_secondaryReader->isRunning() )
 				m_secondaryReader->pleaseStop();
 		}
-	}
 
-    if( cameraResource->flags() & Qn::foreigner )
-    {
-        //clearing saved key frames
-        if (m_primaryGopKeeper)
-            m_primaryGopKeeper->clearVideoData();
-        if (m_secondaryGopKeeper)
-            m_secondaryGopKeeper->clearVideoData();
+        if( cameraResource->flags() & Qn::foreigner )
+        {
+            //clearing saved key frames
+            if (m_primaryGopKeeper)
+                m_primaryGopKeeper->clearVideoData();
+            if (m_secondaryGopKeeper)
+                m_secondaryGopKeeper->clearVideoData();
+        }
     }
 }
 

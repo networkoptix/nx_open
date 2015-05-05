@@ -491,16 +491,21 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
             // add chunk to merged data
             if (result.empty()) {
                 result.push_back(startPeriod);
+                if (startPeriod.isInfinite())
+                    return result;
             } else {
                 QnTimePeriod &last = result.last();
+                Q_ASSERT_X(last.startTimeMs <= startPeriod.startTimeMs, Q_FUNC_INFO, "Algorithm semantics failure, order failed");
                 if (startPeriod.isInfinite()) {
+                    Q_ASSERT_X(!last.isInfinite(), Q_FUNC_INFO, "This should never happen");
                     if (last.isInfinite())
                         last.startTimeMs = qMin(last.startTimeMs, startPeriod.startTimeMs);
                     else if (startPeriod.startTimeMs > last.startTimeMs+last.durationMs)
                         result.push_back(startPeriod);
                     else 
                         last.durationMs = QnTimePeriod::infiniteDuration();
-                    break;
+                    /* Last element is live and starts before all of rest - no need to process other elements. */
+                    return result;
                 } else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime) {
                     last.durationMs = qMax(last.durationMs, minStartTime + startPeriod.durationMs - last.startTimeMs);
                 } else {

@@ -101,6 +101,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_state(NotDefined), 
     m_connected(false),
     m_prevGivenHandlerID(0),
+    m_authByKey(true),
     m_postedTranCount(0),
     m_asyncReadScheduled(false),
     m_remoteIdentityTime(0),
@@ -628,6 +629,7 @@ void QnTransactionTransport::receivedTransaction( const QnByteArrayConstRef& tra
 
         default:
             setStateNoLock( State::Error );
+            return;
     }
 
     Q_ASSERT( !transportHeader.processedPeers.empty() );
@@ -943,6 +945,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     }
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
+
+    //TODO #ak work around for Bitdefender free edition
+    QThread::msleep( 250 );
 
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
