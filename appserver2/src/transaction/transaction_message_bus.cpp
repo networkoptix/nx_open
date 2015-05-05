@@ -173,6 +173,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::updatePersistentSequence:          return handleTransactionParams<ApiUpdateSequenceData>         (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::markLicenseOverflow:     return handleTransactionParams<ApiLicenseOverflowData>         (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::restoreDatabase: return true;
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
         Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
