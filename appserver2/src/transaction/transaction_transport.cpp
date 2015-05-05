@@ -736,8 +736,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             //sending transactions as a POST request
             nx_http::Request request;
             request.requestLine.method = nx_http::Method::POST;
-            //request.requestLine.url = lit("/ec2/forward_events");
-            request.requestLine.url = m_remoteAddr.path();
+            request.requestLine.url = lit("/ec2/forward_events");
+            //request.requestLine.url = m_remoteAddr.path();
             request.requestLine.version = nx_http::http_1_1;
             request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             request.headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
@@ -1288,8 +1288,8 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("Failed (2) to initiate POST transaction request to %1. %2").
                 arg(m_postTranUrl.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
             setStateNoLock( Error );
+            m_outgoingTranClient.reset();
         }
-        m_outgoingTranClient.reset();
         return;
     }
 
