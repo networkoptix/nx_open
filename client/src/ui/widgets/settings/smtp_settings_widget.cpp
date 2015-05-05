@@ -20,6 +20,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/email.h>
+#include <utils/common/scoped_value_rollback.h>
 
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
@@ -75,6 +76,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     QnWorkbenchContextAware(parent),
     ui(new Ui::SmtpSettingsWidget),
     m_testHandle(-1),
+    m_updating(false),
     m_timeoutTimer(new QTimer(this))
 {
     ui->setupUi(this);
@@ -121,6 +123,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     declareMandatoryField(ui->userLabel, ui->userLineEdit);
     declareMandatoryField(ui->passwordLabel, ui->passwordLineEdit);
 
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     const QString autoPort = tr("Auto");
     ui->portComboBox->addItem(autoPort, 0);
     for (QnEmail::ConnectionType type: connectionTypesAllowed()) {
@@ -142,6 +145,7 @@ void QnSmtpSettingsWidget::updateFromSettings() {
 
     QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
 
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     loadSettings(settings.server, settings.connectionType, settings.port);
     ui->userLineEdit->setText(settings.user);
     ui->emailLineEdit->setText(settings.email);
@@ -238,7 +242,8 @@ void QnSmtpSettingsWidget::loadSettings(const QString &server, QnEmail::Connecti
     }
     if (!portFound) {
         ui->portComboBox->setEditText(QString::number(port));
-        at_portComboBox_currentIndexChanged(ui->portComboBox->count());
+        ui->tlsRecommendedLabel->show();
+        ui->sslRecommendedLabel->hide();
     }
 
     switch(connectionType) {
@@ -255,6 +260,9 @@ void QnSmtpSettingsWidget::loadSettings(const QString &server, QnEmail::Connecti
 }
 
 void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
+    if (m_updating)
+        return;
+
     int port = ui->portComboBox->itemData(index).toInt();
     if (port == QnEmailSettings::defaultPort(QnEmail::Ssl)) {
         ui->tlsRecommendedLabel->hide();
@@ -266,6 +274,10 @@ void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
 }
 
 void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
+    if (m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     if (toggled) {
         QString value = ui->simpleEmailLineEdit->text();
         QnEmailAddress email(value);
@@ -373,6 +385,8 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
 }
 
 void QnSmtpSettingsWidget::validateEmailSimple() {
+    if (m_updating)
+        return;
 
     QString errorText;
 
@@ -397,6 +411,9 @@ void QnSmtpSettingsWidget::validateEmailSimple() {
 }
 
 void QnSmtpSettingsWidget::validateEmailAdvanced() {
+    if (m_updating)
+        return;
+
     QString errorText;
 
     const QString targetEmail = ui->emailLineEdit->text();
