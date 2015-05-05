@@ -162,6 +162,7 @@ public:
     void update(const QnWorkbenchState &state);
     void submit(QnWorkbenchState &state);
 
+    bool isInLayoutChangeProcess() const;
 signals:
     /**
      * This signal is emitted while the workbench is still intact, but is about
@@ -206,6 +207,16 @@ signals:
      */
     void cellSpacingChanged();
 
+    /**
+     * This signal is emitted whenever the layout change process is about to be started.
+     */
+    void layoutChangeProcessStarted();
+
+    /**
+     * This signal is emitted whenever the layout change process is fully finished.
+     */
+    void layoutChangeProcessFinished();
+
 private slots:
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
@@ -232,6 +243,9 @@ private:
 
     /** Stored dummy layout. It is used to ensure that current layout is never NULL. */
     QnWorkbenchLayout *m_dummyLayout;
+
+    /** Whether current layout is being changed. */
+    bool m_inLayoutChangeProcess;
 };
 
 #endif // QN_WORKBENCH_H

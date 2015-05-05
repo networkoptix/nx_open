@@ -32,7 +32,7 @@ public:
     static QList<QDate> recordedMonth(const QString& cameraUniqueId);
 
     QnMotionHelper();
-
+    static QString getBaseDir();
 private:
     static QString getBaseDir(const QString& cameraUniqueId);
 

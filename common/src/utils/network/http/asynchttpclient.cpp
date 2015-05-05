@@ -11,6 +11,7 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QMutexLocker>
 
+#include <utils/common/util.h>
 #include "utils/network/socket_factory.h"
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
@@ -659,6 +660,11 @@ namespace nx_http
         m_request.requestLine.method = httpMethod;
         m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
         m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
+
+        nx_http::insertOrReplaceHeader(
+            &m_request.headers,
+            HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
+        nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("Connection", "keep-alive") );
         if( !m_userAgent.isEmpty() )
             m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )
@@ -668,7 +674,7 @@ namespace nx_http
                 m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip;q=1.0, identity;q=0.5, *;q=0") );
             else
                 m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
-            m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
+            //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
             //m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }

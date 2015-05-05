@@ -419,7 +419,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
 
 {
     QString request(lit("SELECT * FROM runtime_actions where"));
-    if (period.durationMs != -1) {
+    if (!period.isInfinite()) {
         request += QString(lit(" timestamp between '%1' and '%2'")).arg(period.startTimeMs/1000).arg(period.endTimeMs()/1000);
     }
     else {

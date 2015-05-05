@@ -142,7 +142,6 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::addLicense:            
     case ApiCommand::removeLicense:         return handleTransactionParams<ApiLicenseData>          (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::resetBusinessRules:    return handleTransactionParams<ApiResetBusinessRuleData>(serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::installUpdate:         return handleTransactionParams<ApiUpdateInstallData>    (serializedTransaction, &stream, transaction, function, fastFunction);
@@ -688,7 +687,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                 case ErrorCode::containsBecauseSequence:
                     return; // do not proxy if transaction already exists
                 default:
-                    qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
+                    NX_LOG( QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1: %2. Reopening connection...").
+                        arg(ApiCommand::toString(tran.command)).arg(ec2::toString(errorCode)), cl_logWARNING );
                     sender->setState(QnTransactionTransport::Error);
                     return;
             }
@@ -1221,7 +1221,8 @@ QSet<QnUuid> QnTransactionMessageBus::checkAlivePeerRouteTimeout()
     {
         AlivePeerInfo& peerInfo = itr.value();
         for (auto itr = peerInfo.routingInfo.begin(); itr != peerInfo.routingInfo.end();) {
-            if (m_currentTimeTimer.elapsed() - itr.value().lastRecvTime > ALIVE_UPDATE_TIMEOUT)
+            const RoutingRecord& routingRecord = itr.value();
+            if (routingRecord.distance > 0 && m_currentTimeTimer.elapsed() - routingRecord.lastRecvTime > ALIVE_UPDATE_TIMEOUT)
                 itr = peerInfo.routingInfo.erase(itr);
             else
                 ++itr;
@@ -1269,7 +1270,10 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
         transport->sendTransaction(tran, transportHeader);
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer, qint64 remoteSystemIdentityTime)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(
+    const QSharedPointer<AbstractStreamSocket>& socket,
+    const ApiPeerData &remotePeer,
+    qint64 remoteSystemIdentityTime )
 {
     if (!dbManager)
     {
@@ -1280,7 +1284,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
     if (m_restartPending)
         return; // reject incoming connection because of media server is about to restart
 
-    QnTransactionTransport* transport = new QnTransactionTransport(m_localPeer, socket);
+    QnTransactionTransport* transport = new QnTransactionTransport( m_localPeer, socket );
     transport->setRemotePeer(remotePeer);
     transport->setRemoteIdentityTime(remoteSystemIdentityTime);
     connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);

@@ -1,14 +1,19 @@
 #ifndef QN_TIME_PERIOD_LIST_H
 #define QN_TIME_PERIOD_LIST_H
 
-#include <vector>
+//#define QN_TIME_PERIODS_STD
 
+#ifdef QN_TIME_PERIODS_STD
+#include <vector>
+#else
 #include <QtCore/QVector>
+#endif
 
 #include <api/api_fwd.h>
 
 #include "time_period.h"
 #include "utils/common/uuid.h"
+
 
 class QnTimePeriodListTimeIterator;
 
@@ -16,9 +21,21 @@ class QnTimePeriodListTimeIterator;
  * A sorted list of time periods that basically is an implementation of 
  * an interval container concept.
  */
-class QnTimePeriodList: public std::vector<QnTimePeriod> {
+class QnTimePeriodList: 
+#ifdef QN_TIME_PERIODS_STD
+    public std::vector<QnTimePeriod>
+#else
+    public QVector<QnTimePeriod> 
+#endif
+{
+#ifdef QN_TIME_PERIODS_STD
+    typedef std::vector<QnTimePeriod> base_type;
+#else
+    typedef QVector<QnTimePeriod> base_type;
+#endif
+
 public:
-    QnTimePeriodList(): std::vector<QnTimePeriod>() {}
+    QnTimePeriodList();
     QnTimePeriodList(const QnTimePeriod &singlePeriod);
 
     /**
@@ -44,6 +61,9 @@ public:
 
     QnTimePeriodList intersected(const QnTimePeriod &period) const;
 
+    /** Get list of periods, that starts in the target period. */
+    QnTimePeriodList intersectedPeriods(const QnTimePeriod &period) const;
+
     /**
      * \returns                         Total duration of all periods in this list,
      *                                  or -1 if the last time period of this list is infinite.
@@ -52,8 +72,24 @@ public:
      */
     qint64 duration() const;
 
+    /**
+     * \returns                         Bounding period for this period list.
+     * \param truncateInfinite          Whether the infinite period should be truncated to fixed value.
+     */
+    QnTimePeriod boundingPeriod(qint64 truncateInfinite = QnTimePeriod::infiniteDuration()) const;
+
     inline QnTimePeriodListTimeIterator timeBegin() const;
     inline QnTimePeriodListTimeIterator timeEnd() const;
+
+#ifdef QN_TIME_PERIODS_STD
+    const QnTimePeriod &first() const { return *begin(); }
+    QnTimePeriod &first() { return *begin(); }
+
+    const QnTimePeriod &last() const { return *(end() - 1); }
+    QnTimePeriod &last() { return *(end() - 1); }
+
+    bool isEmpty() const { return empty(); }
+#endif
 
     /** 
      * Encode (compress) data to a byte array. 
@@ -92,19 +128,42 @@ public:
      */
     qint64 roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const;
 
-    static QnTimePeriodList mergeTimePeriods(const std::vector<QnTimePeriodList>& periods);
+    /** Merge some time period lists into one. */
+    static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
+
+    /** Update tail of the period list with provided tail.
+     * 
+     * \param[in] periods               Base list.
+     * \param[in] tail                  List of updates.
+     * \param[in] dividerPoint          Point where the tail should be appended.
+     * \returns                         Updated list.
+     */
+    static void overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList &tail, qint64 dividerPoint);
+
+    /** Union two time period lists. Does not delete periods from the base list.
+     * 
+     * \param[in] basePeriods           Base list.
+     * \param[in] appendingPeriods      Appending list.
+     * \returns                         Merged list.
+     */
+    static void unionTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods);
+
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
+
+private:
+    void excludeTimePeriod(const QnTimePeriod &period);
 };
 
 struct MultiServerPeriodData
 {
     QnUuid guid;
     QnTimePeriodList periods;
-};
+
 
 QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData, (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time)(eq));
 
 Q_DECLARE_METATYPE(QnTimePeriodList);
 Q_DECLARE_METATYPE(MultiServerPeriodDataList);
+
 
 #endif // QN_TIME_PERIOD_LIST_H

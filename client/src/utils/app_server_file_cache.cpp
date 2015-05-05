@@ -166,6 +166,11 @@ void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, 
         return;
     }
 
+    if (data.size() <= 0) {
+        emit fileDownloaded(filename, OperationResult::serverError);
+        return;
+    }
+
     ensureCacheFolder();
     QString filePath = getFullPath(filename);
     QFile file(filePath);

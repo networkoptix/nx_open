@@ -1036,6 +1036,12 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   CHECK_VALUE(vts_ptt_srpt->nr_of_srpts < 100); // ??
   
   info_length = vts_ptt_srpt->last_byte + 1 - VTS_PTT_SRPT_SIZE;
+
+  if (info_length < 1) {
+      free(vts_ptt_srpt);
+      ifofile->vts_ptt_srpt = 0;
+      return 0;
+  }
   
   data = (quint32 *)malloc(info_length); 
   if(!data) {
@@ -1179,6 +1185,13 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
   CHECK_VALUE(ptl_mait->nr_of_vtss < 100); // ??  
   CHECK_VALUE(ptl_mait->nr_of_countries * PTL_MAIT_COUNTRY_SIZE 
               <= ptl_mait->last_byte + 1 - PTL_MAIT_SIZE);
+
+  if (!(ptl_mait->nr_of_countries * PTL_MAIT_COUNTRY_SIZE <= ptl_mait->last_byte + 1 - PTL_MAIT_SIZE))
+  {
+      free(ptl_mait);
+      ifofile->ptl_mait = 0;
+      return 0;
+  }
   
   info_length = ptl_mait->nr_of_countries * sizeof(ptl_mait_country_t);
   ptl_mait->countries = (ptl_mait_country_t *)malloc(info_length);
@@ -1335,6 +1348,11 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
   CHECK_ZERO(vts_tmapt->zero_1);
   
   info_length = vts_tmapt->nr_of_tmaps * 4;
+  if (info_length < 1) {
+      free(vts_tmapt);
+      ifofile->vts_tmapt = NULL;
+      return 0;
+  }
   
   vts_tmap_srp = (quint32 *)malloc(info_length);
   if(!vts_tmap_srp) {
@@ -1861,6 +1879,12 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
   CHECK_VALUE((quint32)pgci_ut->nr_of_lus * PGCI_LU_SIZE < pgci_ut->last_byte);
 
   info_length = pgci_ut->nr_of_lus * PGCI_LU_SIZE;
+  if (info_length < 1) {
+      free(pgci_ut);
+      ifofile->pgci_ut = 0;
+      return 0;
+  }
+  
   data = (quint8*) malloc(info_length);
   if(!data) {
     free(pgci_ut);
@@ -2044,6 +2068,12 @@ int ifoRead_VTS_ATRT(ifo_handle_t *ifofile) {
               VTS_ATRT_SIZE < vts_atrt->last_byte + 1);
 
   info_length = vts_atrt->nr_of_vtss * sizeof(quint32);
+  if (info_length < 1) {
+    free(vts_atrt);
+    ifofile->vts_atrt = 0;
+    return 0;
+  }
+  
   data = (quint32 *)malloc(info_length);
   if(!data) {
     free(vts_atrt);

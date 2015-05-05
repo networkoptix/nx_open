@@ -24,7 +24,7 @@ static const int CHECK_HELLO_RETRY_COUNT = 50;
 //extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 //extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
-QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString(QLatin1String("127.0.0.1"));
+QString OnvifResourceSearcherWsdd::LOCAL_ADDR(QLatin1String("127.0.0.1"));
 const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.org/name/";
 const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
 const char OnvifResourceSearcherWsdd::SCOPES_LOCATION_PREFIX[] = "onvif://www.onvif.org/location/";
@@ -602,6 +602,9 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
         qSwap(name, manufacturer);
     }
     else if(lowerName == lit("sentry")) {
+        qSwap(name, manufacturer);
+    }
+    else if(lowerName == lit("vivotek") && manufacturer.toLower().startsWith(lit("sd"))) {
         qSwap(name, manufacturer);
     }
 }

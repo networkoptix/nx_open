@@ -1,9 +1,6 @@
 #include "direct_module_finder.h"
 
 #include <QtCore/QTimer>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkProxy>
 
 #include <utils/common/model_functions.h>
 #include <utils/common/log.h>

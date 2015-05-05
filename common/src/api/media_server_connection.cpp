@@ -376,6 +376,13 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnVirtualCameraResourcePt
     params << QnRequestParam("periodsType", QString::number(static_cast<int>(periodsType)));
     params << QnRequestParam("filter", filter);
 
+#ifdef QN_MEDIA_SERVER_API_DEBUG
+    QString path = url().toDisplayString() + lit("/api/RecordedTimePeriods?t=1"); 
+    for (const QnRequestParam &param: params)
+        path += L'&' + param.first + L'=' + param.second;
+    qDebug() << "Requesting chunks" << path;
+#endif
+
     return sendAsyncGetRequest(TimePeriodsObject, params, QN_STRINGIZE_TYPE(QnTimePeriodList), target, slot);
 }
 

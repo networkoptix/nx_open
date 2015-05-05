@@ -8,6 +8,7 @@
 #include "client_settings.h"
 
 #include <utils/common/app_info.h>
+#include <utils/common/command_line_parser.h>
 
 #include "version.h"
 
@@ -28,7 +29,16 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
 
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(argc, argv, this);
-    common->instance<QnClientSettings>();
+
+    
+    bool isLocalSettings = false;
+    QnCommandLineParser commandLineParser;
+    commandLineParser.addParameter(&isLocalSettings, "--local-settings",  NULL, QString());
+    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
+
+    QnClientSettings *settings = new QnClientSettings(isLocalSettings);
+    common->store<QnClientSettings>(settings);
+
     common->setModuleGUID(QnUuid::createUuid());
 }
 

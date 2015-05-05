@@ -1484,9 +1484,18 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
-    if(!server)
+    QnMediaServerResourceList servers;
+    for (const auto &resource: menu()->currentParameters(sender()).resources()) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (server && server->getStatus() != Qn::Incompatible)
+            servers << server;
+    }
+
+    Q_ASSERT_X(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");
+    if(servers.isEmpty())
         return;
+
+    QnMediaServerResourcePtr server = servers.first();
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
     connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->instance<QnCameraDataManager>(), &QnCameraDataManager::clearCache);
@@ -1638,7 +1647,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
     foreach (const QnResourcePtr &resource, qnResPool->getResources()) {
         if (!resource->hasFlags(checkedFlags))
             continue;
-        if (resource->getName() != newName)
+        if (resource->getName().compare(newName, Qt::CaseInsensitive) != 0)
             continue;
 
         QString title = checkedFlags == Qn::user

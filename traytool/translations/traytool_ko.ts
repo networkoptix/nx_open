@@ -9,11 +9,11 @@
     </message>
     <message>
         <source>There is no system tray on this system.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 시스템에는 시스템 트레이가 존재하지 않습니다.</translation>
     </message>
     <message>
         <source>Application will now quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>프로그램이 종료 됩니다.</translation>
     </message>
 </context>
 <context>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
-        <translation type="unfinished"></translation>
+        <translation>설치된 서비스에 접근하는 동안 오류가 발생하였음:</translation>
     </message>
 </context>
 </TS>

@@ -45,7 +45,8 @@ namespace ec2
 
         QUrl url(m_queryProcessor->getUrl());
         url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
-        url.setPath("ec2/events");
+        //url.setPath("ec2/events");
+        url = QUrl( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
         QUrlQuery q;
         url.setQuery(q);
         m_peerUrl = url;

@@ -4,10 +4,14 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
+#include <array>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
 #include <client/client_globals.h>
+
+#include <recording/time_period.h>
 
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -32,6 +36,7 @@ class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 class QnSearchLineEdit;
 class QnSearchQueryStrategy;
+class QnThreadedChunksMergeTool;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -143,8 +148,14 @@ protected slots:
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodContent type);
-    void updateSyncedPeriods();
-    void updateSyncedPeriods(Qn::TimePeriodContent type);
+
+    /** Clean synced line. */
+    void resetSyncedPeriods();
+
+    /** Update synced line. Empty period means the whole line. Infinite period is not allowed. */
+    void updateSyncedPeriods(qint64 startTimeMs = 0);
+    void updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, qint64 startTimeMs = 0);
+
     void updateCurrentBookmarks();
     void updateTargetPeriod();
     void updateLines();
@@ -177,7 +188,7 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(const QnResourcePtr &resource, Qn::TimePeriodContent type);
+    void updateLoaderPeriods(const QnResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
     void updateLoaderBookmarks(const QnResourcePtr &resource);
 
     void at_timeSlider_valueChanged(qint64 value);
@@ -259,6 +270,8 @@ private:
 
     QnCameraDataManager* m_cameraDataManager;
 
+    int m_chunkMergingProcessHandle;
+    std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
 };

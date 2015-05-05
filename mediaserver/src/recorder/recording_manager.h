@@ -49,7 +49,7 @@ public:
 
     void start();
     void stop();
-    bool isCameraRecoring(const QnResourcePtr& camera);
+    bool isCameraRecoring(const QnResourcePtr& camera) const;
 
     Recorders findRecorders(const QnResourcePtr& res) const;
 
@@ -65,6 +65,7 @@ private slots:
     void at_camera_initializationChanged(const QnResourcePtr &resource);
     void at_camera_resourceChanged(const QnResourcePtr &resource);
     void at_checkLicenses();
+    void at_serverPropertyChanged(const QnResourcePtr &, const QString &key);
 private:
     void updateCamera(const QnSecurityCamResourcePtr& camera);
 

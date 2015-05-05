@@ -22,43 +22,31 @@ QnAbstractCameraDataPtr QnTimePeriodCameraData::clone() const {
 }
 
 bool QnTimePeriodCameraData::isEmpty() const {
-    return m_data.empty();
+    return m_data.isEmpty();
 }
 
-void QnTimePeriodCameraData::append(const QnAbstractCameraDataPtr &other) {
+void QnTimePeriodCameraData::update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) {
     if (!other)
         return;
-    append(other->dataSource());
+    update(other->dataSource(), updatedPeriod);
 }
 
-void QnTimePeriodCameraData::append(const QList<QnAbstractCameraDataPtr> &other) {
+void QnTimePeriodCameraData::mergeInto(const QList<QnAbstractCameraDataPtr> &other) {
     if (other.isEmpty())
         return;
 
-    std::vector<QnTimePeriodList> allPeriods;
-    allPeriods.push_back(m_data);
+    QVector<QnTimePeriodList> allPeriods;
+    allPeriods << m_data;
 
-    for (const QnAbstractCameraDataPtr &other_data: other) {
+    foreach (const QnAbstractCameraDataPtr &other_data, other)
         if (other_data)
-            allPeriods.push_back(other_data->dataSource());
-    }
+            allPeriods << other_data->dataSource();
     m_data = QnTimePeriodList::mergeTimePeriods(allPeriods);
 }
 
-void QnTimePeriodCameraData::append(const QnTimePeriodList &other) {
-    if (other.empty())
-        return;
-
-    /* Check if the current last piece marked as Live. */ 
-    if (!m_data.empty() && m_data.rbegin()->durationMs == -1) {
-        if (other.rbegin()->startTimeMs >= m_data.rbegin()->startTimeMs)
-            m_data.pop_back();    //cut "recording" piece
-    }
-    std::vector<QnTimePeriodList> allPeriods;
-    for(const auto& p: m_data)
-        allPeriods.push_back(p);
-    allPeriods.push_back(other);
-    m_data = QnTimePeriodList::mergeTimePeriods(allPeriods); // union data
+void QnTimePeriodCameraData::update(const QnTimePeriodList &other, const QnTimePeriod &updatedPeriod) {
+    /* Update data, received from one server and related to one camera. */
+    QnTimePeriodList::overwriteTail(m_data, other, updatedPeriod.startTimeMs);
 }
 
 void QnTimePeriodCameraData::clear() {
@@ -79,14 +67,15 @@ QnTimePeriodList QnTimePeriodCameraData::dataSource() const  {
 }
 
 bool QnTimePeriodCameraData::trim(qint64 trimTime) {
-    if(m_data.empty())
+    if(m_data.isEmpty())
         return false;
 
-    QnTimePeriod& period = *m_data.rbegin();
-    if(period.durationMs != -1)
+    QnTimePeriod& period = m_data.last();
+    if(!period.isInfinite())
         return false;
 
     qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
+    period.durationMs = trimmedDurationMs;
     if(trimmedDurationMs == 0) {
         m_data.pop_back();
     } else {

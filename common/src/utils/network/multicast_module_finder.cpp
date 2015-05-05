@@ -268,7 +268,7 @@ void QnMulticastModuleFinder::run() {
             continue;
         }
 
-        currentClock = QDateTime::currentMSecsSinceEpoch();
+        //currentClock = QDateTime::currentMSecsSinceEpoch();
 
         /* some sockets changed state */
         for (auto it = m_pollSet.begin(); it != m_pollSet.end(); ++it) {

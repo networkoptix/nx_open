@@ -437,12 +437,11 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     }
 }
 
-QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged(const QnConstAbstractMediaDataPtr& media)
+QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged()
 {
-    QnArchiveStreamReader* archiveDP = dynamic_cast<QnArchiveStreamReader*>(media->dataProvider);
+    QSharedPointer<QnArchiveStreamReader> archiveDP = m_owner->getArchiveDP();
     if (!archiveDP)
         return QByteArray();
-
     qint64 endTime = archiveDP->endTime();
     if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
         endTime = DATETIME_NOW;
@@ -450,7 +449,7 @@ QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged(const QnConstAbstractMedi
     if (archiveDP->startTime() != m_prevStartTime || endTime != m_prevEndTime) {
         m_prevStartTime = archiveDP->startTime();
         m_prevEndTime = endTime;
-        return m_owner->getRangeStr(archiveDP);
+        return m_owner->getRangeStr();
     }
     else {
         return QByteArray();
@@ -618,7 +617,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if( (++m_framesSinceRangeCheck) > FRAMES_BETWEEN_PLAY_RANGE_CHECK )
     {
         m_framesSinceRangeCheck = 0;
-        const QByteArray& newRange = getRangeHeaderIfChanged(media);
+        const QByteArray& newRange = getRangeHeaderIfChanged();
         if (!newRange.isEmpty())
             sendMetadata(newRange);
     }
@@ -659,7 +658,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
         camera = qnCameraPool->getVideoCamera(res);
     }
     int copySize = 0;
-    //if (camera && !res->hasFlags(Qn::no_last_gop))
+    if (camera) // && !res->hasFlags(Qn::no_last_gop))
         copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;

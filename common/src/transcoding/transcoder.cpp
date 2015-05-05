@@ -115,7 +115,7 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
-    bool lineAmountSpecified = false;
+    //bool lineAmountSpecified = false;
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
         m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),8)); // round resolution height
@@ -125,7 +125,7 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_resolution.setWidth(m_resolution.height() * ar);
         m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
         m_resolution.setWidth(qMin(decoder.getContext()->width, m_resolution.width())); // strict to source frame width
-        lineAmountSpecified = true;
+        //lineAmountSpecified = true;
     }
     else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty()) {
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
@@ -176,15 +176,20 @@ int QnTranscoder::suggestMediaStreamParams(
     {
         case Qn::QualityLowest:
             hiEnd = 1024;
+            break;
         case Qn::QualityLow:
             hiEnd = 1024 + 512;
+            break;
         case Qn::QualityNormal:
             hiEnd = 1024*2;
+            break;
         case Qn::QualityHigh:
             hiEnd = 1024*3;
+            break;
         case Qn::QualityHighest:
         default:
             hiEnd = 1024*5;
+            break;
     }
 
     float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;

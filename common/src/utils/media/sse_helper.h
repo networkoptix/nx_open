@@ -2,7 +2,13 @@
 #define QN_SSE_HELPER_H
 
 #include <QtCore/QString>
+#if QT_VERSION == 0x050201
 #include <QtCore/5.2.1/QtCore/private/qsimd_p.h>
+#elif QT_VERSION == 0x050401
+#include <QtCore/5.4.1/QtCore/private/qsimd_p.h>
+#else
+#error "Include proper header here!"
+#endif
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 #include <xmmintrin.h>

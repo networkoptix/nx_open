@@ -30,6 +30,7 @@ public:
 
     using Singleton<QnCommonModule>::instance;
     using QnInstanceStorage::instance;
+    using QnInstanceStorage::store;
 
     void bindModuleinformation(const QnMediaServerResourcePtr &server);
     void bindModuleinformation(const QnUserResourcePtr &adminUser);

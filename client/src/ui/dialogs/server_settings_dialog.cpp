@@ -318,7 +318,7 @@ static const int EDGE_SERVER_MAX_CAMERAS = 1;
 
 void QnServerSettingsDialog::updateFromResources() 
 {
-    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    sendStorageSpaceRequest();
     updateRebuildUi(QnStorageScanData());
 
     if (m_server->getStatus() == Qn::Online)
@@ -523,6 +523,10 @@ void QnServerSettingsDialog::at_updateRebuildInfo()
         updateRebuildUi(QnStorageScanData());
 }
 
+void QnServerSettingsDialog::sendStorageSpaceRequest() {
+    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+}
+
 void QnServerSettingsDialog::sendNextArchiveRequest()
 {
     m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
@@ -595,6 +599,8 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnStorageS
 
     if (reply.state > Qn::RebuildState_None)
         QTimer::singleShot(500, this, SLOT(sendNextArchiveRequest()));
+    else
+        sendStorageSpaceRequest();
 }
 
 void QnServerSettingsDialog::at_pingButton_clicked() {
