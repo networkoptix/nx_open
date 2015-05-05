@@ -1,4 +1,4 @@
-#include "flat_camera_data_loader.h"
+#include "bookmark_camera_data_loader.h"
 
 #include <api/helpers/chunks_request_data.h>
 
@@ -14,7 +14,7 @@
 
 #include <utils/common/warnings.h>
 
-//#define QN_FLAT_CAMERA_DATA_LOADER_DEBUG
+//#define QN_BOOKMARK_CAMERA_DATA_LOADER_DEBUG
 
 namespace {
     /** Fake handle for simultaneous load request. Initial value is big enough to not conflict with real request handles. */
@@ -24,14 +24,15 @@ namespace {
     const int minOverlapDuration = 120*1000;
 }
 
-QnFlatCameraDataLoader::QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
-    QnAbstractCameraDataLoader(camera, dataType, parent)
+QnBookmarkCameraDataLoader::QnBookmarkCameraDataLoader(const QnVirtualCameraResourcePtr &camera, QObject *parent):
+    QnAbstractCameraDataLoader(camera, Qn::BookmarkData, parent)
 {
     if(!camera)
         qnNullWarning(camera);
 }
 
-int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
+
+int QnBookmarkCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
     Q_UNUSED(resolutionMs);
 
     if (filter != m_filter)
@@ -40,8 +41,8 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
 
     /* Check whether data is currently being loaded. */
     if (m_loading.handle > 0) {
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-        qDebug() << "QnFlatCameraDataLoader::" << "data is already being loaded";
+#ifdef QN_BOOKMARK_CAMERA_DATA_LOADER_DEBUG
+        qDebug() << "QnBookmarkCameraDataLoader::" << "data is already being loaded";
 #endif
         auto handle = qn_fakeHandle.fetchAndAddAcquire(1);
         m_loading.waitingHandles << handle;
@@ -58,8 +59,8 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
             startTimeMs = last.endTimeMs() - minOverlapDuration;
     }
 
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-    qDebug() << "QnFlatCameraDataLoader::" << "loading period from" << startTimeMs;
+#ifdef QN_BOOKMARK_CAMERA_DATA_LOADER_DEBUG
+    qDebug() << "QnBookmarkCameraDataLoader::" << "loading period from" << startTimeMs;
 #endif
 
     m_loading.clear(); /* Just in case. */
@@ -68,9 +69,9 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
     return m_loading.handle;
 }
 
-void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-    qDebug() << "QnFlatCameraDataLoader::" << "discarding cached data";
+void QnBookmarkCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
+#ifdef QN_BOOKMARK_CAMERA_DATA_LOADER_DEBUG
+    qDebug() << "QnBookmarkCameraDataLoader::" << "discarding cached data";
 #endif
 
     Q_UNUSED(resolutionMs);
@@ -78,8 +79,8 @@ void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
     m_loadedData.clear();
 }
 
-int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
-    Q_ASSERT_X(m_dataType != Qn::BookmarkData, Q_FUNC_INFO, "this loader should NOT be used to load bookmarks");
+int QnBookmarkCameraDataLoader::sendRequest(qint64 startTimeMs) {
+    Q_ASSERT_X(m_dataType == Qn::BookmarkData, Q_FUNC_INFO, "this loader must be used to load bookmarks only");
 
     auto server = qnCommon->currentServer();
     if (!server)
@@ -96,10 +97,11 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
     requestData.filter = m_filter;
     requestData.periodsType = dataTypeToPeriod(m_dataType);
 
+    //TODO: #GDM #IMPLEMENT ME
     return connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int)));
 }
 
-void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle) {
+void QnBookmarkCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle) {
 
     std::vector<QnTimePeriodList> rawPeriods;
 
@@ -110,7 +112,7 @@ void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServe
     handleDataLoaded(status, data, requestHandle);
 }
 
-void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle) {
+void QnBookmarkCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle) {
     if (m_loading.handle != requestHandle)
         return;
 
@@ -122,8 +124,8 @@ void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCamera
         return;
     }
 
-#ifdef QN_FLAT_CAMERA_DATA_LOADER_DEBUG
-    qDebug() << "QnFlatCameraDataLoader::" << "loaded data for" << m_loading.startTimeMs;
+#ifdef QN_BOOKMARK_CAMERA_DATA_LOADER_DEBUG
+    qDebug() << "QnBookmarkCameraDataLoader::" << "loaded data for" << m_loading.startTimeMs;
 #endif
 
     QnTimePeriod loadedPeriod(m_loading.startTimeMs, QnTimePeriod::infiniteDuration());
@@ -143,12 +145,12 @@ void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCamera
     m_loading.clear();
 }
 
-QnFlatCameraDataLoader::LoadingInfo::LoadingInfo():
+QnBookmarkCameraDataLoader::LoadingInfo::LoadingInfo():
     handle(0),
     startTimeMs(0)
 {}
 
-void QnFlatCameraDataLoader::LoadingInfo::clear() {
+void QnBookmarkCameraDataLoader::LoadingInfo::clear() {
     handle = 0;
     startTimeMs = 0;
     waitingHandles.clear();

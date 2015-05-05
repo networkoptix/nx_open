@@ -1,10 +1,13 @@
 #ifndef QN_CACHING_CAMERA_DATA_LOADER_H
 #define QN_CACHING_CAMERA_DATA_LOADER_H
 
+#include <array>
+
 #include <QtCore/QObject>
 
 #include <camera/data/bookmark_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
+#include <camera/loaders/camera_data_loader_fwd.h>
 
 #include <common/common_globals.h>
 
@@ -16,8 +19,6 @@
 
 #include <utils/common/connective.h>
 
-class QnAbstractCameraDataLoader;
-
 class QnCachingCameraDataLoader: public Connective<QObject> {
     Q_OBJECT;
     
@@ -25,7 +26,7 @@ class QnCachingCameraDataLoader: public Connective<QObject> {
 public: 
     virtual ~QnCachingCameraDataLoader();
 
-    static QnCachingCameraDataLoader *newInstance(const QnResourcePtr &resource, QObject *parent = NULL);
+    QnCachingCameraDataLoader(const QnResourcePtr &resource, QObject *parent = NULL);
 
     QnResourcePtr resource() const;
         
@@ -63,11 +64,10 @@ protected:
     void loadInternal(Qn::TimePeriodContent periodType);
     
 private:
-    QnCachingCameraDataLoader(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders, QObject *parent);
+    
 
     void init();
-    void initLoaders(QnAbstractCameraDataLoader **loaders);
-    static bool createLoaders(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders);
+    void initLoaders();
     
     qint64 bookmarkResolution(qint64 periodDuration) const;
     void updateTimePeriods(Qn::TimePeriodContent dataType, bool forced = false);
@@ -81,11 +81,9 @@ private:
     QElapsedTimer m_previousRequestTime[Qn::TimePeriodContentCount];
 
     QnTimePeriodList m_cameraChunks[Qn::TimePeriodContentCount];
+    QnCameraBookmarkList m_bookmarks;
 
-    QMap<qint64, QnTimePeriodList> m_requestedBookmarkPeriodsByResolution;  //TODO: #GDM #Bookmarks should we enumerate by resolution set index?
-    QnBookmarkCameraData m_bookmarkCameraData;
-
-    QnAbstractCameraDataLoader *m_loaders[Qn::CameraDataTypeCount];
+    std::array<QnAbstractCameraDataLoaderPtr, Qn::CameraDataTypeCount> m_loaders;
 
     QList<QRegion> m_motionRegions;
     QString m_bookmarksTextFilter;

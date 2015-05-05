@@ -69,4 +69,6 @@ signals:
     void delayedReady(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle);
 };
 
+typedef QSharedPointer<QnAbstractCameraDataLoader> QnAbstractCameraDataLoaderPtr;
+
 #endif // __QN_ABSTRACT_CAMERA_DATA_LOADER_H__

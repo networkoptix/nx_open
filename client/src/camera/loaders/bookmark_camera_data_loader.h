@@ -19,7 +19,7 @@
  * Uses flat structure. Data is loaded with the most detailed level.
  * Source data period is solid, no spaces are allowed.
  */
-class QnFlatCameraDataLoader: public QnAbstractCameraDataLoader
+class QnBookmarkCameraDataLoader: public QnAbstractCameraDataLoader
 {
     Q_OBJECT
 public:
@@ -30,8 +30,8 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
-  
+    QnBookmarkCameraDataLoader(const QnVirtualCameraResourcePtr &camera, QObject *parent = NULL);
+    
     virtual int load(const QString &filter, const qint64 resolutionMs) override;
 
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;

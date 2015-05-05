@@ -4,8 +4,8 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <camera/loaders/generic_camera_data_loader.h>
 #include <camera/data/bookmark_camera_data.h>
+#include <camera/loaders/bookmark_camera_data_loader.h>
 
 namespace
 {
@@ -42,7 +42,7 @@ private:
 
 private:
     typedef std::list<BookmarkRequestHolder> RequestsContainer;
-    typedef QHash<QnResourcePtr, QnGenericCameraDataLoader *> LoadersContainer;
+    typedef QHash<QnResourcePtr, QnBookmarkCameraDataLoader *> LoadersContainer;
 
     LoadersContainer m_loaders;
     RequestsContainer m_requests;
@@ -73,26 +73,19 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
         if (it == m_loaders.end())
         {
             const QnMediaServerResourcePtr mediaServer = camera->getParentResource().dynamicCast<QnMediaServerResource>();
-            if (QnGenericCameraDataLoader *loader = QnGenericCameraDataLoader::newInstance(
-                mediaServer, camera, Qn::BookmarkData, this))
-            {
+            QnBookmarkCameraDataLoader *loader = new QnBookmarkCameraDataLoader(camera, this);
+
                 connect(loader, &QnAbstractCameraDataLoader::ready, this, &Impl::bookmarksDataEvent);
                 connect(loader, &QnAbstractCameraDataLoader::failed, this
                     , [this](int, int handle) { bookmarksDataEvent(QnAbstractCameraDataPtr(), QnTimePeriod(), handle); } );
 
                 it = m_loaders.insert(camera, loader);
-            } 
-            else
-            {
-                /// If we don't have such loader and can't create it we should mark request as failed and skip this camera
-                request.success = false;
-                continue;
-            }
+
         }
 
         enum { kMinimumResolution = 1 };    /// We should use not zero resolution to 
                                             /// prevent all cashes to be discarded when discardCachedData() called
-        QnGenericCameraDataLoader * const loader = it.value();
+        QnBookmarkCameraDataLoader * const loader = it.value();
         
         if (clearBookmarksCache)
             loader->discardCachedData(kMinimumResolution);
