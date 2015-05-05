@@ -439,20 +439,17 @@ CameraRecordsProvider.prototype.findNearestPosition = function (position,parent)
     }
 
     if(parent.start >= position ){
-
         console.log("start 2" , parent);
         return parent.start;
     }
 
     if(parent.end < position){ //After the last chunk
-
         console.log("start live" , parent);
         return (new Date()).getTime(); //Go to live!
     }
 
     //Here we may want to request better detailization
-    console.warn("request deeper detailization", parent);
+    //console.warn("request deeper detailization", parent);
 
     return position; // Position is inside the chunk
-
 };

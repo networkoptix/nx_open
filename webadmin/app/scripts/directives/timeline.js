@@ -54,8 +54,7 @@ angular.module('webadminApp')
                     dateFormat:'dd.mm.yyyy',
                     timeFormat:'HH:MM:ss'
                 };
-
-                scope.$watch('position', function(newValue, oldValue){
+                function positionMarker(){
                     if(scope.records) {
                         var nearestPosition = scope.records.findNearestPosition(scope.position);
                         if (nearestPosition != scope.position) {
@@ -68,17 +67,22 @@ angular.module('webadminApp')
                     var lastCoord = scope.positionCoordinate;
                     scope.positionCoordinate = dateToScreenPosition(scope.position).toFixed(1);
 
-//                    console.log("positionCoordinate ",timeMarker,lastCoord,scope.positionCoordinate);
-
                     if(scope.positionCoordinate != lastCoord){
                         console.log("positionCoordinate ",timeMarker,lastCoord,scope.positionCoordinate);
-                        timeMarker.css("left",scope.positionCoordinate + "px");
+                        if(scope.positionCoordinate > 0 && scope.positionCoordinate < viewportWidth) {
+                            timeMarker.removeClass("hiddenTimemarker");
+                            timeMarker.css("left", scope.positionCoordinate + "px");
+                        }else{
+                            timeMarker.addClass("hiddenTimemarker");
+                        }
                     }
 
                     var date = new Date(scope.position);
                     scope.playingDate = dateFormat(date, timelineConfig.dateFormat);
                     scope.playingTime= dateFormat(date, timelineConfig.timeFormat);
-                });
+                }
+
+                scope.$watch('position',positionMarker);
                 var chunksVertStart = timelineConfig.topLabelHeight +
                     5 * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize
                     + timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * 3
@@ -454,19 +458,16 @@ angular.module('webadminApp')
                 }
 
                 function drawMarker(){
+                    positionMarker();
                     var context = canvas.getContext('2d');
-
 
                     context.strokeStyle = timelineConfig.timeMarkerColor;
                     context.fillStyle = timelineConfig.timeMarkerColor;
-
-
 
                     context.beginPath();
                     context.moveTo(scope.positionCoordinate, 0);
                     context.lineTo(scope.positionCoordinate, canvas.height);
                     context.stroke();
-
                 }
                 function drawRuler(){
                     //1. Create context for drawing
