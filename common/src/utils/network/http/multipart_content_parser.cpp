@@ -11,6 +11,7 @@ namespace nx_http
     MultipartContentParser::MultipartContentParser()
     :
         m_state( waitingBoundary ),
+        m_nextState( none ),
         m_contentLength( (unsigned int)-1 ),   //-1 means no content-length is given
         m_chunkParseState( waitingEndOfLine )
     {
@@ -44,15 +45,20 @@ namespace nx_http
                     {
                         case waitingBoundary:
                             if( lineBuffer == m_startBoundaryLine || lineBuffer == m_endBoundaryLine )
+                            {
                                 m_state = readingHeaders;
+                                m_currentFrameHeaders.clear();
+                            }
                             continue;
 
                         case readingTextData:
                             if( lineBuffer == m_startBoundaryLine || lineBuffer == m_endBoundaryLine )
                             {
-                                m_state = readingHeaders;
                                 m_nextFilter->processData( m_currentFrame );
                                 m_currentFrame.clear();
+
+                                m_state = readingHeaders;
+                                m_currentFrameHeaders.clear();
                                 continue;
                             }
                             m_currentFrame += lineBuffer;
@@ -68,17 +74,22 @@ namespace nx_http
                                 {
                                     //Content-Length known
                                     m_contentLength = contentLengthIter->second.toUInt();
-                                    m_state = readingSizedBinaryData;
+                                    m_state = depleteLineFeedBeforeBinaryData;
+                                    m_nextState = readingSizedBinaryData;
                                 }
                                 else
                                 {
                                     const nx_http::StringType& contentType = nx_http::getHeaderValue( m_currentFrameHeaders, "Content-Type" );
                                     if( contentType == "application/text" || contentType == "text/plain" )
+                                    {
                                         m_state = readingTextData;
+                                    }
                                     else
-                                        m_state = readingUnsizedBinaryData;
+                                    {
+                                        m_state = depleteLineFeedBeforeBinaryData;
+                                        m_nextState = readingUnsizedBinaryData;
+                                    }
                                 }
-                                m_currentFrameHeaders.clear();
                                 continue;
                             }
                             QnByteArrayConstRef headerName;
@@ -91,6 +102,16 @@ namespace nx_http
                         default:
                             break;
                     }
+                    break;
+                }
+
+                case depleteLineFeedBeforeBinaryData:
+                {
+                    assert( offset < data.size() );
+                    size_t bytesRead = 0;
+                    m_lineSplitter.finishCurrentLineEnding( data.mid( offset ), &bytesRead );
+                    offset += bytesRead;
+                    m_state = m_nextState;
                     break;
                 }
 
@@ -130,16 +151,15 @@ namespace nx_http
 
     bool MultipartContentParser::setContentType( const StringType& contentType )
     {
-        static const char* multipartContentType = "multipart/x-mixed-replace";
+        static const char multipartContentType[] = "multipart/";
 
         //analyzing response headers (if needed)
         const nx_http::StringType::value_type* sepPos = std::find( contentType.constData(), contentType.constData()+contentType.size(), ';' );
-        if( sepPos == contentType.constData()+contentType.size() ||
-            nx_http::ConstBufferRefType(contentType, 0, sepPos-contentType.constData()) != multipartContentType )
-        {
-            //unexpected content type
-            return false;
-        }
+        if( sepPos == contentType.constData()+contentType.size() )
+            return false;   //unexpected content type
+
+        if( nx_http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType)-1) != multipartContentType )
+            return false;   //unexpected content type
 
         const nx_http::StringType::value_type* boundaryStart = std::find_if(
             sepPos+1,
@@ -173,6 +193,11 @@ namespace nx_http
         m_startBoundaryLine = "--" + m_boundary/*+"\r\n"*/; //--boundary\r\n
         m_boundaryForUnsizedBinaryParsing = "\r\n"+m_startBoundaryLine+"\r\n";
         m_endBoundaryLine = "--"+m_boundary+"--" /*"\r\n"*/;
+    }
+
+    const nx_http::HttpHeaders& MultipartContentParser::prevFrameHeaders() const
+    {
+        return m_currentFrameHeaders;
     }
 
     void MultipartContentParser::readUnsizedBinaryData(
@@ -239,6 +264,7 @@ namespace nx_http
                     m_currentFrame.clear();
 
                     m_state = readingHeaders;
+                    m_currentFrameHeaders.clear();
                 }
                 else
                 {

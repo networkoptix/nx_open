@@ -600,6 +600,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(translation.isEmpty()) /* By path. */
         translation = translationManager->loadTranslation(qnSettings->translationPath());
 
+    /* Check if qnSettings value is invalid. */
+    if (translation.isEmpty()) 
+        translation = translationManager->defaultTranslation();
+
     translationManager->installTranslation(translation);
 
     /* Create workbench context. */

@@ -107,7 +107,7 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResou
     currentParts[2] = fileDate.date().day();
     currentParts[3] = fileDate.time().hour();
 
-    bool sameDir = true;
+    //bool sameDir = true;
 
     IOCacheMap::iterator itr = m_prevPartsMap->find(chunk.storageIndex);
     if (itr == m_prevPartsMap->end()) {
@@ -125,7 +125,7 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResou
         }
         else 
         {
-            sameDir = false;
+            //sameDir = false;
             // new folder. check it
 
             for (int j = i; j < 4; ++j) {
@@ -408,7 +408,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         return;
 
     QThreadPool tp;
-    tp.setMaxThreadCount(16);
+    tp.setMaxThreadCount(4);
     QMutex scanFilesMutex;
     for(const auto& fi: files)
     {
@@ -802,7 +802,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         return result;
 
     size_t firstIndex = itr - m_chunks.begin();
-    result << QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs);
+    result.push_back(QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs));
 
     for (size_t i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
     {
@@ -813,7 +813,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         else {
             if (last.durationMs < detailLevel && result.size() > 1)
                 result.pop_back();
-            result << QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs);
+            result.push_back(QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs));
         }
     }
     //if (!result.isEmpty())
@@ -839,7 +839,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
     if (headerLine.contains("timezone"))
         timeZoneExist = 1;
     QByteArray line;
-    bool checkDirOnly = false;
+    //bool checkDirOnly = false;
     do {
         line = file.readLine();
         QList<QByteArray> fields = line.split(';');

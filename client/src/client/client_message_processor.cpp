@@ -170,4 +170,7 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);
+
+    /* Get server time as soon as we setup connection. */
+    qnSyncTime->currentMSecsSinceEpoch();
 }

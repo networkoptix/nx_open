@@ -526,6 +526,13 @@ namespace nx_http
         dstBuffer->append( messageBody );
     }
 
+    BufferType Request::serialized() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
+
     BufferType Request::getCookieValue(const BufferType& name) const
     {
         nx_http::HttpHeaders::const_iterator cookieIter = headers.find( "cookie" );

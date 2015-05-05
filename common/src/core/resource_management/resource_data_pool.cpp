@@ -45,6 +45,9 @@ QnResourceData QnResourceDataPool::data(const QString &key) const {
 }
 
 QnResourceData QnResourceDataPool::data(const QnSecurityCamResourcePtr &camera) const {
+    if (!camera)
+        return QnResourceData();
+
     QString vendor = camera->getVendor().toLower();
     vendor = m_shortVendorByName.value(vendor, vendor);
     QString model = camera->getModel().toLower();

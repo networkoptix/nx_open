@@ -272,7 +272,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 충돌 : %1</translation>
     </message>
 </context>
 <context>
@@ -315,95 +315,95 @@
     </message>
     <message>
         <source>Server %1 is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 %1 을 사용할 수 없습니다.</translation>
     </message>
     <message>
         <source>Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버가 실행되고 동작하는지 확인하세요.</translation>
     </message>
     <message>
         <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 서버로 부터 잘못된 응답이 접수됨 : &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버가 동작하고 있다면, 적절한 버전인지 확인하세요.</translation>
     </message>
     <message>
         <source>Cannot connect to http port %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>http 포트 %1에 연결할 수 없습니다.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라가 네트워크에 연결이 되어있는지 확인 하세요.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 미디어 URL을 열수 없습니다. %2 미디어 포트의 연결에 실패하였습니다.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>%2 포트에 접근할 수 있는지 확인하세요. 그리고 카메라를 재시작하십시오, 그런 다음 웹페이지에서 공장 초기화값으로 복원해주세요.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>미디어 URL %1 을 열수 없습니다. %2 포트의 연결이 예기치 못한 문제로 종료되었습니다.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라가 네트워크에 연결되어있는지 확인하세요. 그리고 카메라의 재부팅을 시도해주세요.</translation>
     </message>
     <message>
         <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 응답을 분석할 수 없습니다. URL %1, %2 이름으로 요청하세요.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라를 재 시작하세요, 그리고 웹페이지를 통해 공장초기화로 복원해 주세요.</translation>
     </message>
     <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>마지막으로, 카메라 업데잍를 시도합니다. 만약 문제가 지속될 경우 고객지원으로 연락해 주세요.</translation>
     </message>
     <message>
         <source>No supported media tracks at url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>URL %1의 미디어트랙을 지원하지 않습니다.</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 미디어 URL을 열수 없습니다. %2 미디어 프로토콜을 지원하지 않습니다.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 변수 구성에 실패하였습니다.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>먼저, 녹화설정을 시작해주세요. (만약 OFF라면) 그리고 카메라 설정의 프레임을 감소시켜주세요.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>만약 도움이 되지 않는다면, 카메라 웹페이지에서 공장 초기화값을 복원해주세요. 그래도 문제가 지속될 경우 고객 지원으로 연락해주세요.</translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%2&quot; 오류와 함께 &quot;%1&quot;의 카메라 요청이 실패하였습니다.</translation>
     </message>
     <message>
         <source>Unknown Camera Issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>알수없는 카메라 이슈.</translation>
     </message>
     <message>
         <source>Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>고객 지원으로 연락해 주세요.</translation>
     </message>
     <message>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>입, 출력 오류가 발생하였습니다. OS 메세지 : &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>변수:</translation>
     </message>
 </context>
 <context>
@@ -808,51 +808,51 @@
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation>타 위치에서 시간 동기화 서버로 선택 함</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>저장기 인덱서의 재 설정이 완료됨</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>이메일 주소를 설정하지 않았습니다.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>이메일을 통해 시스템 알람을 받을 수 없습니다.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>이메일 서버가 설정되어있지 않습니다.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>일부 사용자가 이메일 주소를 설정하지 않았습니다.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>그들은 이메일을 통해 시스템 알람을 받을 수 없습니다.</translation>
     </message>
     <message>
         <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>용량이 부족한 서버 목록:</translation>
     </message>
     <message>
         <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>저장기 설정이 되지 않은 서버 목록:</translation>
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>인증키가 없습니다.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라에서 비디오를 저장할 수 없습니다.</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>저장기 인덱스 재 설정이 완료된 서버 목록:</translation>
     </message>
 </context>
 <context>

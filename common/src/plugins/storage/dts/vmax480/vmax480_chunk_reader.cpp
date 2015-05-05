@@ -253,7 +253,7 @@ void QnVMax480ChunkReader::addChunk(QnTimePeriodList& chunks, const QnTimePeriod
     if (!chunks.isEmpty() && chunks.last().endTimeMs() == period.startTimeMs)
         chunks.last().addPeriod(period);
     else
-        chunks << period;
+        chunks.push_back(period);
 }
 
 #endif // #ifdef ENABLE_VMAX

@@ -324,6 +324,9 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     if(m_cameras == cameras)
         return;
 
+    foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
+        disconnect(camera.data(), &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons);
+
     m_cameras = cameras;
 
     int enabledCount = 0, disabledCount = 0;
@@ -334,6 +337,8 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
 
     foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
     {
+        connect(camera.data(), &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons, Qt::QueuedConnection);
+
         (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
 
         if (firstCamera) {

@@ -298,8 +298,8 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     bool isArmBox = checkForARMBox(info.data.box);
     if (isArmBox && !licenseTypeInfo[type()].allowedForARM)
         return gotError(errCode, InvalidType); // strict allowed license type for ARM devices
-#if 0
-    if (isEdgeBox && type() == Qn::LC_Edge) 
+#if 1
+    if (isArmBox && type() == Qn::LC_Edge) 
     {
         for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
             if (license->hardwareId() == hardwareId() && license->type() == type()) 

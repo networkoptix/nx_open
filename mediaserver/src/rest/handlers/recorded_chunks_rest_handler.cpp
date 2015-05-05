@@ -12,6 +12,79 @@
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
 
+//#define QN_PERIODS_HIGHLOAD_TEST
+
+#ifdef QN_PERIODS_HIGHLOAD_TEST
+namespace {
+
+    /* 1.5 years of chunks. */
+    qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 547;
+
+    /* 60 seconds each. */
+    qint64 chunkLengthMs = 1000ll * 60;
+
+    /* 5 seconds spacing. */
+    qint64 chunkSpaceMs = 1000ll * 5;
+
+    /* Align chunks. */
+    qint64 startAlignMs = chunkLengthMs + chunkSpaceMs;
+
+    QnTimePeriodList generateAlotOfPeriods(qint64 startTimeMs, int offset) {
+        qint64 baseStartTimeMs = QDateTime::currentMSecsSinceEpoch();
+
+        QnTimePeriodList result;
+        qint64 start = startTimeMs > 0 ? startTimeMs : baseStartTimeMs - totalLengthMs;
+        // align to make sure results will be the same for different requests
+        start = start - (start % startAlignMs) + offset;
+
+        while (start + chunkLengthMs < baseStartTimeMs) {
+            result.push_back(QnTimePeriod(start, chunkLengthMs));
+            start += (chunkLengthMs + chunkSpaceMs);
+        }
+        return result;
+    }
+
+    QString now() {
+        return QDateTime::currentDateTime().toString(lit("hh:mm:ss.zzz"));
+    }
+
+    QString dt(qint64 ms) {
+        return QDateTime::fromMSecsSinceEpoch(ms).toString(lit("yyyy dd MM hh:mm:ss.zzz"));
+    }
+
+    void testPeriods(const QnTimePeriodList &periods) {
+        if (periods.isEmpty())
+            return;
+
+        const int callsCount = 1000*1000;      
+        qint64 result = QDateTime::currentMSecsSinceEpoch();        
+        qint64 test = periods.last().startTimeMs;
+        int N = periods.size();
+
+        for (int i = 0; i < callsCount; ++i)
+            test = std::min<qint64>(test, periods[i % N].startTimeMs);
+        result =  QDateTime::currentMSecsSinceEpoch() - result;
+        qDebug() << now() << "test 1 finished for" << result << "ms" << test;
+
+        std::vector<QnTimePeriod> stdPeriods;
+        stdPeriods.reserve(N);
+        for (const QnTimePeriod &p: periods)
+            stdPeriods.push_back(p);
+
+        result = QDateTime::currentMSecsSinceEpoch();
+        test = periods.last().startTimeMs;
+
+        qDebug() << now() << "starting test 2";
+        for (int i = 0; i < callsCount; ++i)
+            test = std::min<qint64>(test, stdPeriods[i % N].startTimeMs);
+        result =  QDateTime::currentMSecsSinceEpoch() - result;
+        qDebug() << now() << "test 2 finished for" << result << "ms" << test;
+
+    }
+
+}
+#endif
+
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
@@ -95,7 +168,18 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     QnTimePeriodList periods;
     switch (periodsType) {
     case Qn::RecordingContent:
-        periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
+        {
+            periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
+#ifdef QN_PERIODS_HIGHLOAD_TEST
+            qDebug() << now() << "chunks requested for" << physicalId << "for period" << dt(startTime) << " - " << dt(endTime);
+
+            auto resourceId = resList.filtered<QnVirtualCameraResource>().first()->getId().toByteArray();
+            int offset = 0;
+            for (char c: resourceId)
+                offset += c;
+            periods = generateAlotOfPeriods(startTime, offset);
+#endif
+        }
         break;
     case Qn::MotionContent:
         {

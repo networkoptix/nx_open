@@ -65,6 +65,7 @@ private slots:
     void sendNextArchiveRequest();
     void at_updateRebuildInfo();
 
+    void sendStorageSpaceRequest();
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;

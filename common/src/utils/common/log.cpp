@@ -77,10 +77,10 @@ public:
         ostr << curDateTime.date().toString(Qt::ISODate).toUtf8().constData()<<" "
             <<curTime.toString(Qt::ISODate).toUtf8().constData()<<"."<<std::setw(3)<<std::setfill('0')<<curTime.msec()<<std::setfill(' ')
             << " " << std::setw(6) <<
-#ifdef _WIN32
-            QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
-#else
+#ifdef Q_OS_LINUX
             gettid()
+#else
+            QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
 #endif
             << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << "\r\n";
         ostr.flush();
