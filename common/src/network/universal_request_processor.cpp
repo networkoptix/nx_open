@@ -68,7 +68,11 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         t.restart();
         while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId) && d->socket->isConnected())
         {
-            d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
+            if( d->request.requestLine.method == nx_http::Method::GET ||
+                d->request.requestLine.method == nx_http::Method::HEAD )
+            {
+                d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
+            }
             if (nx_http::getHeaderValue( d->response.headers, "X-server-guid" ).isEmpty())
                 d->response.headers.insert(nx_http::HttpHeader("X-server-guid", qnCommon->moduleGUID().toByteArray()));
 
@@ -84,7 +88,8 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
                 else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
                 {
                     contentEncoding = "gzip";
-                    d->responseBody = GZipCompressor::compressData(d->responseBody);
+                    if( !d->responseBody.isEmpty() )
+                        d->responseBody = GZipCompressor::compressData(d->responseBody);
                 }
                 else
                 {
