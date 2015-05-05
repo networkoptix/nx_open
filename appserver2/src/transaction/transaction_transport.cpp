@@ -192,8 +192,16 @@ QnTransactionTransport::~QnTransactionTransport()
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
-    if( m_httpClient )
-        m_httpClient->terminate();
+    {
+        auto httpClientLocal = m_httpClient;
+        if( httpClientLocal )
+            httpClientLocal->terminate();
+    }
+    {
+        auto outgoingTranClientLocal = m_outgoingTranClient;
+        if( outgoingTranClientLocal )
+            outgoingTranClientLocal->terminate();
+    }
 
     {
         QMutexLocker lk( &m_mutex );
@@ -318,11 +326,17 @@ void QnTransactionTransport::removeEventHandler( int eventHandlerID )
 
 AbstractStreamSocket* QnTransactionTransport::getSocket() const
 {
-    //return m_socket.data();
-    //TODO #ak wrong: can return different sockets 
-    return m_incomingDataSocket
-        ? m_incomingDataSocket.data()
-        : m_outgoingDataSocket.data();
+    if( m_connectionType == ConnectionType::bidirectional )
+    {
+        return m_incomingDataSocket.data();
+    }
+    else
+    {
+        if( m_peerRole == prOriginating )
+            return m_incomingDataSocket.data();
+        else
+            return m_outgoingDataSocket.data();
+    }
 }
 
 void QnTransactionTransport::close()
@@ -1280,6 +1294,7 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
                 arg(m_postTranUrl.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
             setStateNoLock( Error );
         }
+        m_outgoingTranClient.reset();
         return;
     }
 
@@ -1289,11 +1304,12 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
             arg(m_postTranUrl.toString()).arg(client->response()->statusLine.statusCode).
             arg(QLatin1String(client->response()->statusLine.reasonPhrase)), cl_logWARNING );
         setStateNoLock( Error );
+        m_outgoingTranClient.reset();
         return;
     }
 
-    m_outgoingTranClient.reset();
     m_outgoingDataSocket = client->takeSocket();
+    m_outgoingTranClient.reset();
 
     assert( !m_dataToSend.empty() );
 
