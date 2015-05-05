@@ -332,8 +332,14 @@ bool QnStorageManager::needToStopMediaScan() const
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
-    QMutexLocker lock(&m_rebuildStateMtx);
-    m_archiveRebuildInfo = data;
+    bool isRebuildFinished = false;
+    {
+        QMutexLocker lock(&m_rebuildStateMtx);
+        isRebuildFinished = (data.state == Qn::RebuildState_None && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
+        m_archiveRebuildInfo = data;
+    }
+    if (isRebuildFinished)
+        emit rebuildFinished();
 }
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff)
