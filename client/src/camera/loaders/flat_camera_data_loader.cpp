@@ -1,9 +1,11 @@
 #include "flat_camera_data_loader.h"
 
+#include <api/helpers/chunks_request_data.h>
+
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
 
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <recording/time_period_list.h>
@@ -95,20 +97,25 @@ void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
 
 int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
     Q_ASSERT_X(m_dataType != Qn::BookmarkData, Q_FUNC_INFO, "this loader should NOT be used to load bookmarks");
-    return m_connection->getTimePeriodsAsync(
-        QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
-        startTimeMs, 
-        DATETIME_NOW,   /* Always load data to the end. */ 
-        detailLevel,    /* Always load data on most detailed level. */
-        dataTypeToPeriod(m_dataType),
-        m_filter,
-        this, 
-        SLOT(at_timePeriodsReceived(int, const QnTimePeriodList &, int))
-        );
+
+    QnChunksRequestData requestData;
+    requestData.resList << m_resource.dynamicCast<QnVirtualCameraResource>();
+    requestData.startTimeMs = startTimeMs;
+    requestData.endTimeMs = DATETIME_NOW,   /* Always load data to the end. */ 
+    requestData.filter = m_filter;
+    requestData.periodsType = dataTypeToPeriod(m_dataType);
+
+    return m_connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int)));
 }
 
-void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle) {
-    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(timePeriods));
+void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle) {
+
+    std::vector<QnTimePeriodList> rawPeriods;
+
+    for(auto period: timePeriods)
+        rawPeriods.push_back(period.periods);
+    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(QnTimePeriodList::mergeTimePeriods(rawPeriods)));
+
     handleDataLoaded(status, data, requestHandle);
 }
 

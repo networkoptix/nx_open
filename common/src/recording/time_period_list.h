@@ -14,9 +14,6 @@
 #include "time_period.h"
 #include "utils/common/uuid.h"
 
-
-class QnTimePeriodListTimeIterator;
-
 /**
  * A sorted list of time periods that basically is an implementation of 
  * an interval container concept.
@@ -78,9 +75,6 @@ public:
      */
     QnTimePeriod boundingPeriod(qint64 truncateInfinite = QnTimePeriod::infiniteDuration()) const;
 
-    inline QnTimePeriodListTimeIterator timeBegin() const;
-    inline QnTimePeriodListTimeIterator timeEnd() const;
-
 #ifdef QN_TIME_PERIODS_STD
     const QnTimePeriod &first() const { return *begin(); }
     QnTimePeriod &first() { return *begin(); }
@@ -129,7 +123,7 @@ public:
     qint64 roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const;
 
     /** Merge some time period lists into one. */
-    static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
+    static QnTimePeriodList mergeTimePeriods(const std::vector<QnTimePeriodList>& periods);
 
     /** Update tail of the period list with provided tail.
      * 
@@ -156,9 +150,10 @@ private:
 
 struct MultiServerPeriodData
 {
+    /** Guid of the server, owning this periods. */
     QnUuid guid;
     QnTimePeriodList periods;
-
+};
 
 QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData, (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time)(eq));
 

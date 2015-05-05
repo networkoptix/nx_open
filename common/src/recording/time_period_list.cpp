@@ -447,7 +447,7 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
 }
 
 
-QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periodLists)
+QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeriodList>& periodLists)
 {
     QVector<QnTimePeriodList> nonEmptyPeriods;
     for (const QnTimePeriodList &periodList: periodLists)

@@ -130,7 +130,7 @@ bool QnBookmarkCameraData::trim(qint64 trimTime) {
     if(m_dataSource.empty())
         return false;
 
-    QnTimePeriod& period = *m_dataSource.rbegin();
+    QnTimePeriod& period = m_dataSource.last();
     if(!period.isInfinite())
         return false;
 

@@ -1235,7 +1235,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             period.durationMs -= startDelta;
         }
 
-        qint64 endDelta = period.endTimeMs() - localPeriods.rbegin()->endTimeMs();
+        qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
         if (endDelta > 0) { // user selected period after the last chunk
             period.durationMs -= endDelta;
         }       

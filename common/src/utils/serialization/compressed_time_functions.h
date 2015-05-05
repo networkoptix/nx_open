@@ -127,6 +127,8 @@ bool deserialize(QnCompressedTimeReader<Input> *stream, TYPE<BOOST_PP_TUPLE_ENUM
 }
 
 QN_DEFINE_COLLECTION_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), collection);
+QN_DEFINE_COLLECTION_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS(QVector, (class T), (T), collection);
+
 #undef QN_DEFINE_COLLECTION_COMPRESSED_TIME_SERIALIZATION_FUNCTIONS
 #endif // Q_MOC_RUN
 

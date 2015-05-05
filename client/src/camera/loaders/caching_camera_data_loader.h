@@ -63,7 +63,7 @@ protected:
     void loadInternal(Qn::TimePeriodContent periodType);
     
 private:
-    QnCachingCameraDataLoader(QnAbstractCameraDataLoader **loaders, QObject *parent);
+    QnCachingCameraDataLoader(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders, QObject *parent);
 
     void init();
     void initLoaders(QnAbstractCameraDataLoader **loaders);
@@ -77,7 +77,6 @@ private:
     bool m_enabled;
 
     QnResourcePtr m_resource;
-    bool m_resourceIsLocal;
   
     QElapsedTimer m_previousRequestTime[Qn::TimePeriodContentCount];
 

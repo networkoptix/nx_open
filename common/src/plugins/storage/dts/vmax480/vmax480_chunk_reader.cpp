@@ -250,8 +250,8 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
 
 void QnVMax480ChunkReader::addChunk(QnTimePeriodList& chunks, const QnTimePeriod& period)
 {
-    if (!chunks.empty() && chunks.rbegin()->endTimeMs() == period.startTimeMs)
-        chunks.rbegin()->addPeriod(period);
+    if (!chunks.empty() && chunks.last().endTimeMs() == period.startTimeMs)
+        chunks.last().addPeriod(period);
     else
         chunks.push_back(period);
 }

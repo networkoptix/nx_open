@@ -209,7 +209,7 @@ protected slots:
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
-    QnCachingCameraDataLoader* loaderByWidget(const QnResourceWidget* widget);
+    QnCachingCameraDataLoader* loaderByWidget(const QnResourceWidget* widget, bool createIfNotExists = true);
 
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
     void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);

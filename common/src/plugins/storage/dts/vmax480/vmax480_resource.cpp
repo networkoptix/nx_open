@@ -252,7 +252,7 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
 {
     Q_UNUSED(detailLevel)
     if (!m_chunks.empty())
-        startTimeMs = qMin(startTimeMs, m_chunks.rbegin()->startTimeMs);
+        startTimeMs = qMin(startTimeMs, m_chunks.last().startTimeMs);
 
     QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
     

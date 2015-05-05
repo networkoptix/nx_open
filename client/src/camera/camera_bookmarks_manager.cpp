@@ -37,6 +37,7 @@ public:
 private:
     /// @brief Callback for bookmarks. If data is nullptr it means error occurred
     void bookmarksDataEvent(const QnAbstractCameraDataPtr &data
+        , const QnTimePeriod &period
         , int handle);
 
 private:
@@ -77,7 +78,7 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
             {
                 connect(loader, &QnAbstractCameraDataLoader::ready, this, &Impl::bookmarksDataEvent);
                 connect(loader, &QnAbstractCameraDataLoader::failed, this
-                    , [this](int, int handle) { bookmarksDataEvent(QnAbstractCameraDataPtr(), handle); } );
+                    , [this](int, int handle) { bookmarksDataEvent(QnAbstractCameraDataPtr(), QnTimePeriod(), handle); } );
 
                 it = m_loaders.insert(camera, loader);
             } 
@@ -95,9 +96,9 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
         
         if (clearBookmarksCache)
             loader->discardCachedData(kMinimumResolution);
-
-        const int handle = loader->load(request.targetPeriod, filter.text, kMinimumResolution);
-        request.answers.insert(std::make_pair(loader, handle));
+            //TODO: #GDM #Bookmarks IMPLEMENT ME
+       // const int handle = loader->load(request.targetPeriod, filter.text, kMinimumResolution);
+      //  request.answers.insert(std::make_pair(loader, handle));
     }
 
     if (!request.answers.empty())
@@ -105,6 +106,7 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
 }
 
 void QnCameraBookmarksManager::Impl::bookmarksDataEvent(const QnAbstractCameraDataPtr &data
+    , const QnTimePeriod &period
     , int handle)
 {
     const QnAbstractCameraDataLoader * const loader = static_cast<QnAbstractCameraDataLoader *>(sender());

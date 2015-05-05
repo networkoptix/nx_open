@@ -636,7 +636,7 @@ void QnStorageManager::getTimePeriodInternal(std::vector<QnTimePeriodList> &peri
         periods.push_back(catalog->getTimePeriods(startTime, endTime, detailLevel));
         if (!periods.rbegin()->empty())
         {
-            QnTimePeriod& lastPeriod = *periods.rbegin()->rbegin();
+            QnTimePeriod& lastPeriod = periods.rbegin()->last();
             bool isActive = !camera->hasFlags(Qn::foreigner) && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
             if (lastPeriod.durationMs == -1 && !isActive)
             {

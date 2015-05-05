@@ -35,12 +35,12 @@ void QnTimePeriodCameraData::mergeInto(const QList<QnAbstractCameraDataPtr> &oth
     if (other.isEmpty())
         return;
 
-    QVector<QnTimePeriodList> allPeriods;
-    allPeriods << m_data;
+    std::vector<QnTimePeriodList> allPeriods;
+    allPeriods.push_back(m_data);
 
     foreach (const QnAbstractCameraDataPtr &other_data, other)
         if (other_data)
-            allPeriods << other_data->dataSource();
+            allPeriods.push_back(other_data->dataSource());
     m_data = QnTimePeriodList::mergeTimePeriods(allPeriods);
 }
 

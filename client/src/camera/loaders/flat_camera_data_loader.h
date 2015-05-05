@@ -47,7 +47,7 @@ public:
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;
 
 private slots:
-    void at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle);
+    void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
 
 private:
     int sendRequest(qint64 startTimeMs);

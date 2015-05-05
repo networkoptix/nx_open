@@ -181,22 +181,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         resetSyncedPeriods();
         updateSyncedPeriods(); 
     });
-
-    connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
-    {
-        if (!resource->hasFlags(Qn::server))
-            return;
-
-        for (const auto &syncedResource: m_syncedResources.keys()) {
-            if (!m_loaderByResource.contains(syncedResource))
-                continue;
-            auto loader = m_loaderByResource[syncedResource];
-            if (!loader)
-                continue;
-            loader->discardCachedData();
-        }
-
-    });
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -594,7 +578,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
 
     connect(syncedResource, &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    if(QnCachingCameraDataLoader *loader = this->loader(syncedResource)) {
+    if(QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(syncedResource, false)) {
         loader->setEnabled(true);
     }
 
@@ -623,7 +607,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     m_motionIgnoreWidgets.remove(widget);
     m_updateHistoryQueue.remove(widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>());
 
-    if(QnCachingCameraDataLoader *loader = loaderByWidget(widget))
+    if(QnCachingCameraDataLoader *loader = loaderByWidget(widget, false)) {
         loader->setMotionRegions(QList<QRegion>());
         if (!m_syncedResources.contains(syncedResource))
             loader->setEnabled(false);
@@ -688,9 +672,6 @@ void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget, bo
     m_timeSlider->setSelection(selection.startTimeMs, selection.startTimeMs + selection.durationMs);
 }
 
-        connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type, qint64 startTimeMs) {
-            updateLoaderPeriods(checked_cast<QnCachingCameraDataLoader *>(sender()), type, startTimeMs);
-        } );
 QnThumbnailsLoader *QnWorkbenchNavigator::thumbnailLoader(const QnResourcePtr &resource) {
     QHash<QnResourcePtr, QnThumbnailsLoader *>::const_iterator pos = m_thumbnailLoaderByResource.find(resource);
     if(pos != m_thumbnailLoaderByResource.end())
@@ -727,7 +708,7 @@ void QnWorkbenchNavigator::jumpBackward() {
             qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
 
             if (currentTime == DATETIME_NOW) {
-                pos = periods.rbegin()->startTimeMs * 1000;
+                pos = periods.last().startTimeMs * 1000;
             } else {
                 QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime/1000, true);
                 itr = qMax(itr - 1, periods.cbegin());
@@ -1127,7 +1108,7 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
          //       loader->setTargetPeriod(calendarPeriod, dataType);
                 break;
             case Qn::BookmarkData:
-                loader->setTargetPeriod(timeSliderPeriod, dataType);
+         //       loader->setTargetPeriod(timeSliderPeriod, dataType);
                 break;
             default:
                 break;
@@ -1543,13 +1524,13 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     }
 }
 
-QnCachingCameraDataLoader* QnWorkbenchNavigator::loaderByWidget(const QnResourceWidget* widget) {
+QnCachingCameraDataLoader* QnWorkbenchNavigator::loaderByWidget(const QnResourceWidget* widget, bool createIfNotExists) {
     if (!widget || !widget->resource())
         return NULL;
-    return m_cameraDataManager->loader(widget->resource());
+    return m_cameraDataManager->loader(widget->resource(), createIfNotExists);
 }
 
-void QnWorkbenchNavigator::updateLoaderPeriods(const QnResourcePtr &resource, Qn::TimePeriodContent type) {
+void QnWorkbenchNavigator::updateLoaderPeriods(const QnResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs) {
     if(m_currentWidget && m_currentWidget->resource() == resource)
         updateCurrentPeriods(type);
     

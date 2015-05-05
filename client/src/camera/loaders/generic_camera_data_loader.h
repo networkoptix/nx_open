@@ -41,7 +41,7 @@ public:
      */
     static QnGenericCameraDataLoader *newInstance(const QnMediaServerResourcePtr &server, const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
     
-    virtual int load(const QnTimePeriod &timePeriod, const QString &filter, const qint64 resolutionMs) override;
+    virtual int load(const QString &filter = QString(), const qint64 resolutionMs = 1) override;
 
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;
 
@@ -49,7 +49,6 @@ protected:
     QnVirtualCameraResourcePtr camera() const;
 
 private slots:
-    void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
     void at_bookmarksReceived(int status, const QnCameraBookmarkList &bookmarks, int requestHandle);
 
 private:

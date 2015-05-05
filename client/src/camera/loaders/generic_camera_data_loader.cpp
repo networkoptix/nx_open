@@ -51,29 +51,35 @@ QnVirtualCameraResourcePtr QnGenericCameraDataLoader::camera() const {
 }
 
 
-int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QString &filter, const qint64 resolutionMs) {
+int QnGenericCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
+    //TODO: #GDM #Bookmarks IMPLEMENT ME
+    return 0;
+
+/*
     if (filter != m_filter)
         discardCachedData(resolutionMs);
     m_filter = filter;
 
-    const QnTimePeriodList &loadedPeriodList = m_loadedPeriods[resolutionMs];
+    
 
+    const QnTimePeriodList &loadedPeriodList = m_loadedPeriods[resolutionMs];
+*/
     /* Check whether the requested data is already loaded. */
-    foreach(const QnTimePeriod &loadedPeriod, loadedPeriodList) {
+/*    foreach(const QnTimePeriod &loadedPeriod, loadedPeriodList) {
         if (loadedPeriod.contains(timePeriod)) {
             /* Data already loaded. */
-            int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-
+/*            int handle = qn_fakeHandle.fetchAndAddAcquire(1);
+*/
             /* Must pass the ready signal through the event queue here as
              * the caller doesn't know request handle yet, and therefore 
              * cannot handle the signal. */
-            emit delayedReady(m_loadedData[resolutionMs], handle);
+/*            emit delayedReady(m_loadedData[resolutionMs], handle);
             return handle; 
         }
     }
-
+*/
     /* Check whether requested data is currently being loaded. */
-    for (int i = 0; i < m_loading.size(); ++i)
+/*    for (int i = 0; i < m_loading.size(); ++i)
     {
         if (m_loading[i].period.contains(timePeriod)) 
         {
@@ -83,23 +89,23 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
             return handle;
         }
     }
-
+*/
     /* Try to reduce duration of the period to load. */
-    QnTimePeriod periodToLoad = timePeriod;
+/*    QnTimePeriod periodToLoad = timePeriod;
     if (!loadedPeriodList.empty())
     {
         QnTimePeriodList::const_iterator itr = qUpperBound(loadedPeriodList.cbegin(), loadedPeriodList.cend(), periodToLoad.startTimeMs);
         if (itr != loadedPeriodList.cbegin())
             itr--;
-
+*/
         /* If last period is still recording, request at least from its start. */
-        if (itr->durationMs == -1) {
+ /*       if (itr->durationMs == -1) {
             qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
             periodToLoad.startTimeMs = itr->startTimeMs;
             periodToLoad.durationMs = endPoint - periodToLoad.startTimeMs;
         } 
-        /* If we are requesting start time which is already loaded, move it to end of recorded period minus minOverlapDuration. */
-        else if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs, itr->startTimeMs + itr->durationMs))
+ */       /* If we are requesting start time which is already loaded, move it to end of recorded period minus minOverlapDuration. */
+ /*       else if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs, itr->startTimeMs + itr->durationMs))
         {
             qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
             periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - minOverlapDuration; // add addition 40 sec (may server does not flush data e.t.c)
@@ -110,8 +116,8 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
                     periodToLoad.durationMs = itr->startTimeMs - periodToLoad.startTimeMs;
             }
         }
-        /* Check if end point is overlapped and move it. */
-        else if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs + periodToLoad.durationMs, itr->startTimeMs + itr->durationMs))
+ */       /* Check if end point is overlapped and move it. */
+ /*       else if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs + periodToLoad.durationMs, itr->startTimeMs + itr->durationMs))
         {
             periodToLoad.durationMs = itr->startTimeMs - periodToLoad.startTimeMs;
         }
@@ -120,7 +126,7 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
     int handle = sendRequest(periodToLoad, resolutionMs);
 
     m_loading << LoadingInfo(periodToLoad, resolutionMs, handle);
-    return handle;
+    return handle;*/
 }
 
 void QnGenericCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
@@ -141,15 +147,7 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
     case Qn::MotionTimePeriod: 
     case Qn::BookmarkTimePeriod: 
         {
-            QnChunksRequestData requestData;
-            requestData.resList << camera();
-            requestData.startTimeMs = periodToLoad.startTimeMs;
-            requestData.endTimeMs = periodToLoad.endTimeMs();
-            requestData.filter = m_filter;
-            requestData.periodsType = dataTypeToPeriod(m_dataType);
 
-            return m_connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int))
-            );
         }
     case Qn::BookmarkData:
         {
@@ -173,22 +171,14 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
     return -1;
 }
 
-void QnGenericCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle) {
-    std::vector<QnTimePeriodList> rawPeriods;
-
-    for(auto period: timePeriods)
-        rawPeriods.push_back(period.periods);
-
-    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(QnTimePeriodList::mergeTimePeriods(rawPeriods)));
-    handleDataLoaded(status, data, requestHandle);
-}
-
 void QnGenericCameraDataLoader::at_bookmarksReceived(int status, const QnCameraBookmarkList &bookmarks, int requestHandle) {
     QnAbstractCameraDataPtr data(new QnBookmarkCameraData(bookmarks));
     handleDataLoaded(status, data, requestHandle);
 }
 
 void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPeriod, const qint64 resolutionMs) {
+        //TODO: #GDM #Bookmarks IMPLEMENT ME
+
     QnTimePeriod newPeriod(loadedPeriod);
     const QnAbstractCameraDataPtr &loadedData = m_loadedData[resolutionMs];
     QnTimePeriodList loadedPeriods = m_loadedPeriods[resolutionMs];
@@ -198,7 +188,7 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
 
     // limit the loaded period to the right edge of the loaded data
     if(!loadedData->isEmpty())
-        newPeriod.durationMs = qMin(newPeriod.durationMs, loadedData->dataSource().rbegin()->endTimeMs() - newPeriod.startTimeMs);
+        newPeriod.durationMs = qMin(newPeriod.durationMs, loadedData->dataSource().last().endTimeMs() - newPeriod.startTimeMs);
 
     // union loaded time range info 
     if(newPeriod.durationMs > 0) {
@@ -214,13 +204,13 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
     }
 
     // reduce right edge of loaded period info if last period under writing now
-    if (!loadedPeriods.empty() && !loadedData->isEmpty() && loadedData->dataSource().rbegin()->durationMs == -1)
+    if (!loadedPeriods.empty() && !loadedData->isEmpty() && loadedData->dataSource().last().isInfinite())
     {
-        qint64 lastDataTime = loadedData->dataSource().rbegin()->startTimeMs;
-        while (!loadedPeriods.empty() && loadedPeriods.rbegin()->startTimeMs > lastDataTime)
+        qint64 lastDataTime = loadedData->dataSource().last().startTimeMs;
+        while (!loadedPeriods.empty() && loadedPeriods.last().startTimeMs > lastDataTime)
             loadedPeriods.pop_back();
         if (!loadedPeriods.empty()) {
-            QnTimePeriod& lastPeriod = *loadedPeriods.rbegin();
+            QnTimePeriod& lastPeriod = loadedPeriods.last();
             lastPeriod.durationMs = qMin(lastPeriod.durationMs, lastDataTime - lastPeriod.startTimeMs);
         }
     }
@@ -231,6 +221,7 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
 //#define CHUNKS_LOADER_DEBUG
 
 void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requstHandle) {
+        //TODO: #GDM #Bookmarks IMPLEMENT ME
     for (int i = 0; i < m_loading.size(); ++i) {
         if (m_loading[i].handle != requstHandle)
             continue;
@@ -260,7 +251,7 @@ void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCam
             }
             else
             if (data && !data->isEmpty()) {
-                m_loadedData[resolutionMs]->append(data);
+//                m_loadedData[resolutionMs]->append(data);
 #ifdef CHUNKS_LOADER_DEBUG
                 qDebug() << debugName << "CHUNK total after" << m_loadedData[resolutionMs]->dataSource(); 
 #endif
@@ -273,8 +264,8 @@ void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCam
             }
 
             foreach(int handle, m_loading[i].waitingHandles)
-                emit ready(m_loadedData[resolutionMs], handle);
-            emit ready(m_loadedData[resolutionMs], requstHandle);
+                emit ready(m_loadedData[resolutionMs], QnTimePeriod(), handle);
+            emit ready(m_loadedData[resolutionMs], QnTimePeriod(), requstHandle);
         }
         else {
             foreach(int handle, m_loading[i].waitingHandles)
