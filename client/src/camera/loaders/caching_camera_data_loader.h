@@ -28,7 +28,7 @@ public:
 
     QnCachingCameraDataLoader(const QnResourcePtr &resource, QObject *parent = NULL);
 
-    QnResourcePtr resource() const;
+    
         
     const QList<QRegion> &motionRegions() const;
     void setMotionRegions(const QList<QRegion> &motionRegions);
@@ -64,9 +64,8 @@ protected:
     void loadInternal(Qn::TimePeriodContent periodType);
     
 private:
-    
+    QnResourcePtr resource() const;
 
-    void init();
     void initLoaders();
     
     qint64 bookmarkResolution(qint64 periodDuration) const;

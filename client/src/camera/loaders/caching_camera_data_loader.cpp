@@ -26,8 +26,11 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnResourcePtr &resour
     m_enabled(true),
     m_resource(resource)
 {
-    init();
     initLoaders();
+
+    if(m_resource.dynamicCast<QnNetworkResource>()) {
+        connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
+    }
 
     QTimer* loadTimer = new QTimer(this);
     loadTimer->setInterval(requestIntervalMs / 10);  // time period will be loaded no often than once in 30 seconds, but timer should check it much more often
@@ -41,12 +44,6 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnResourcePtr &resour
 }
 
 QnCachingCameraDataLoader::~QnCachingCameraDataLoader() {
-}
-
-void QnCachingCameraDataLoader::init() {
-    if(m_resource.dynamicCast<QnNetworkResource>()) {
-        connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
-    }
 }
 
 void QnCachingCameraDataLoader::initLoaders() {
