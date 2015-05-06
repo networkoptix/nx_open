@@ -5,8 +5,6 @@
 
 #include <queue>
 
-#include <utils/network/socket_factory.h>
-
 #include "messaging.h"
 
 static const int AFORT_COUNT = 3;
@@ -14,9 +12,55 @@ static const quint32 LIFETIME = 1 * 60 * 60; // 1 hour
 
 namespace pcp {
 
+InterfaceClient::InterfaceClient(const QHostAddress& address)
+    : m_interface(address)
+    , m_server() // FIXME: find out NAT IP
+    , m_sender(SocketFactory::createDatagramSocket())
+    , m_reciever(SocketFactory::createDatagramSocket())
+{
+    m_sender->setDestAddr(SocketAddress(m_server.toString(), SERVER_PORT));
+    m_reciever->setDestAddr(SocketAddress(m_interface.toString(), CLIENT_PORT));
+}
+
+void InterfaceClient::mapPort(quint16 port, const MapCallback& callback)
+{
+    {
+        auto mapping = m_mappings.find(port);
+        if (mapping != m_mappings.end())
+            return; // already forwarded
+    }
+
+    auto& mapping = m_mappings[port];
+
+    m_sender->sendAsync(makeMapRequest())
+
+
+
+    m_mappings
+    m_nonce = makeRandomNonce();
+
+    SocketAddress serverPort(HostAddress(m_server.toString()), SERVER_PORT);
+    QByteArray request = makeMapRequest();
+    if (request.size() != socket->sendAsync(request.data(), request.size(), serverPort))
+        return false;
+
+    SocketAddress clientPort(HostAddress(m_address.toString()), SERVER_PORT);
+    for (int aforts = AFORT_COUNT; aforts; --aforts)
+    {
+        QByteArray response;
+        socket->recvFrom(response.data(), response.size(), &clientPort);
+        if (parseMapResponce(response))
+            return true;
+    }
+
+    return false;
+}
+
+// ---
+
 Client::Client(const QHostAddress& address, int port)
     : m_address(address), m_port(m_port)
-    , m_server()
+    , m_server() // TODO: find out router address
     , m_lifeTime(0)
 {
 }
@@ -24,14 +68,17 @@ Client::Client(const QHostAddress& address, int port)
 bool Client::mapExternalPort()
 {
     if (QDateTime::currentDateTime().toTime_t() < m_lifeTime)
-        return true; // already forwarded
+    {
+        emit
+        return; // already forwarded
+    }
 
-    QScopedPointer<AbstractDatagramSocket> socket(SocketFactory::createDatagramSocket());
+    QSharedPointer<AbstractDatagramSocket> socket(SocketFactory::createDatagramSocket());
     m_nonce = makeRandomNonce();
 
     SocketAddress serverPort(HostAddress(m_server.toString()), SERVER_PORT);
     QByteArray request = makeMapRequest();
-    if (request.size() != socket->sendTo(request.data(), request.size(), serverPort))
+    if (request.size() != socket->sendAsync(request.data(), request.size(), serverPort))
         return false;
 
     SocketAddress clientPort(HostAddress(m_address.toString()), SERVER_PORT);
