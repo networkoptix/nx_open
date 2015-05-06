@@ -36,8 +36,7 @@ QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider
     return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
-
-bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& name, QVariant &val)
+bool QnArecontPanoramicResource::getParamPhysical2(int channel, const QString& name, QVariant &val)
 {
     m_mutex.lock();
     m_mutex.unlock();
