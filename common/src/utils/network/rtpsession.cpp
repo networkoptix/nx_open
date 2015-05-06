@@ -953,7 +953,7 @@ bool RTPSession::sendSetup()
         {
             request.requestLine.url = mUrl;
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
-            request.requestLine.urlPostfix = QString(lit("/")) + trackInfo->setupURL;
+            request.requestLine.urlPostfix = "/" + trackInfo->setupURL.toLatin1();
         }
         request.requestLine.version = nx_rtsp::rtsp_1_0;
         request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );

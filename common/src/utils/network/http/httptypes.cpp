@@ -263,6 +263,7 @@ namespace nx_http
     namespace Method
     {
         const StringType GET( "GET" );
+        const StringType HEAD( "HEAD" );
         const StringType POST( "POST" );
         const StringType PUT( "PUT" );
     }
@@ -284,13 +285,14 @@ namespace nx_http
 
     bool MimeProtoVersion::parse( const ConstBufferRefType& data )
     {
-        int sepPos = data.indexOf( '/' );
-        //const ConstBufferRefType& trimmedData = data.trimmed();
-        const ConstBufferRefType& trimmedData = data;
+        protocol.clear();
+        version.clear();
+
+        const int sepPos = data.indexOf( '/' );
         if( sepPos == -1 )
             return false;
-        protocol = trimmedData.mid( 0, sepPos );
-        version = trimmedData.mid( sepPos+1 );
+        protocol.append( data.constData(), sepPos );
+        version.append( data.constData()+sepPos+1, data.size()-(sepPos+1) );
         return true;
     }
 
@@ -312,23 +314,66 @@ namespace nx_http
 
     bool RequestLine::parse( const ConstBufferRefType& data )
     {
-        const BufferType& str = data.toByteArrayWithRawData();
-        const QList<QByteArray>& elems = str.split( ' ' );
-        if( elems.size() != 3 )
-            return false;
+        enum ParsingState
+        {
+            psMethod,
+            psUrl,
+            psVersion,
+            psDone
+        }
+        parsingState = psMethod;
 
-        method = elems[0];
-        url = QUrl( QLatin1String(elems[1]) );
-        if( !version.parse(elems[2]) )
-            return false;
-        return true;
+        const char* str = data.constData();
+        const char* strEnd = str + data.size();
+        const char* tokenStart = nullptr;
+        bool waitingNextToken = true;
+        for( ; str <= strEnd; ++str )
+        {
+            if( (*str == ' ') || (str == strEnd) )
+            {
+                if( !waitingNextToken ) //waiting end of token
+                {
+                    //found new token [tokenStart, str)
+                    switch( parsingState )
+                    {
+                        case psMethod:
+                            method.append( tokenStart, str-tokenStart );
+                            parsingState = psUrl;
+                            break;
+                        case psUrl:
+                            url.setUrl( QLatin1String( tokenStart, str-tokenStart ) );
+                            parsingState = psVersion;
+                            break;
+                        case psVersion:
+                            version.parse( data.mid( tokenStart-data.constData(), str-tokenStart ) );
+                            parsingState = psDone;
+                            break;
+                        default:
+                            return false;
+                    }
+
+                    waitingNextToken = true;
+                }
+            }
+            else
+            {
+                if( waitingNextToken )
+                {
+                    tokenStart = str;
+                    waitingNextToken = false;   //waiting token end
+                }
+            }
+        }
+
+        return parsingState == psDone;
     }
 
     void RequestLine::serialize( BufferType* const dstBuffer ) const
     {
         *dstBuffer += method;
         *dstBuffer += " ";
-        *dstBuffer += url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        QByteArray path = url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        *dstBuffer += path.isEmpty() ? "/" : path;
         *dstBuffer += urlPostfix;
         *dstBuffer += " ";
         version.serialize( dstBuffer );

@@ -232,6 +232,7 @@ namespace nx_http
     namespace Method
     {
         extern const StringType GET;
+        extern const StringType HEAD;
         extern const StringType POST;
         extern const StringType PUT;
     }
@@ -249,7 +250,8 @@ namespace nx_http
 
         bool operator==( const MimeProtoVersion& right ) const
         {
-            return protocol == right.protocol && version == right.version;
+            return protocol == right.protocol
+                && version == right.version;
         }
     };
 
@@ -262,7 +264,7 @@ namespace nx_http
         StringType method;
         QUrl url;
         MimeProtoVersion version;
-        QString urlPostfix;
+        nx::Buffer urlPostfix;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer

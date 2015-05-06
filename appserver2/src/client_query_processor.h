@@ -117,7 +117,7 @@ namespace ec2
 
             //TODO #ak videowall looks strange here
             if (!QnAppServerConnectionFactory::videowallGuid().isNull())
-                httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+                httpClient->addAdditionalHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
