@@ -81,7 +81,7 @@ public:
     static int decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);
     //!Decodes from Annex B (removes emulation_prevention_three_byte)
     static QByteArray decodeNAL( const QByteArray& srcBuf );
-    virtual int deserialize(quint8* buffer, quint8* end);
+    int deserialize(quint8* buffer, quint8* end);
     virtual int serializeBuffer(quint8* dstBuffer, quint8* dstEnd, bool writeStartCode) const;
     virtual int serialize(quint8* dstBuffer);
     //void setBuffer(quint8* buffer, quint8* end);

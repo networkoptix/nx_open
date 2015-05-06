@@ -622,8 +622,8 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media,
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
     m_outputPos(0),
     packetIndex(0),
-    m_firstTime(0),
-    m_isFirstPacket(true),
+    //m_firstTime(0),
+    //m_isFirstPacket(true),
     m_isOpened(false)
 {
     if( m_transcoder.setContainer("rtp") != 0 )

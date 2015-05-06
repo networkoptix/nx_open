@@ -17,8 +17,8 @@ QnCodecAudioFormat::QnCodecAudioFormat()
     bitrate(0),
     channel_layout(0),
     block_align(0),
-    m_bitsPerSample(0),
-    m_frequency(0)
+    m_bitsPerSample(0)
+    //m_frequency(0)
 {
 }
 

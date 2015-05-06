@@ -88,7 +88,7 @@ namespace {
         (TestEmailSettingsObject,  "testEmailSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
     );
-
+#if 0
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
     {
         QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
@@ -105,7 +105,7 @@ namespace {
         else
             return QByteArray();
     }
-
+#endif
 } // anonymous namespace
 
 

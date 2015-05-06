@@ -27,7 +27,7 @@ QVector4D linearCombine(qreal a, const QVector4D &x, qreal b, const QVector4D &y
 QColor linearCombine(qreal a, const QColor &x, qreal b, const QColor &y);
 
 template<class T>
-T linearCombine(qreal a, const T &x, qreal b, const T &y) {
+T linearCombine(qreal , const T& , qreal , const T& ) {
     qnWarning("linearCombine function is not implemented for type '%1'.", typeid(T).name());
     return T();
 }
