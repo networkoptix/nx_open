@@ -132,9 +132,6 @@ QnTransactionTransport::QnTransactionTransport(
         &QnTransactionTransport::receivedTransaction,
         this,
         std::placeholders::_1 );
-    m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
-    m_multipartContentParser->setNextFilter(
-        std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
     if( m_contentEncoding == "gzip" )
     {
         m_compressResponseMsgBody = true;
@@ -142,6 +139,11 @@ QnTransactionTransport::QnTransactionTransport(
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     m_incomingTransactionsRequestsParser.setNextFilter(
         std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
+#else
+    m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
+    m_multipartContentParser->setNextFilter(
+        std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
+    m_transactionReceivedAsResponseParser = m_multipartContentParser;
 #endif
 }
 
@@ -549,6 +551,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 #endif
 
     //parsing and processing input data
+    //TODO #ak get rid of conditional compilation here
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     if( m_peerRole == prOriginating )
 #endif
@@ -677,8 +680,6 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     //checking transactions format
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     m_incomingTransactionsRequestsParser.processData( requestBuf );
-#else
-    static_assert( false, "Read POST and parse message body" );
 #endif
 
     startListeningNonSafe();
@@ -741,13 +742,12 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             nx_http::Request request;
             request.requestLine.method = nx_http::Method::POST;
             request.requestLine.url = lit("/ec2/forward_events");
-            //request.requestLine.url = m_remoteAddr.path();
             request.requestLine.version = nx_http::http_1_1;
-            request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
+            //request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             request.headers.emplace( "Content-Type", Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
             request.headers.emplace( "Host", m_remoteAddr.host().toLatin1() );
-            request.headers.emplace( "Pragma", "no-cache" );
-            request.headers.emplace( "Cache-Control", "no-cache" );
+            //request.headers.emplace( "Pragma", "no-cache" );
+            //request.headers.emplace( "Cache-Control", "no-cache" );
             request.headers.emplace( "Connection", "keep-alive" );
             request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
             addHttpChunkExtensions( &request.headers );
@@ -940,9 +940,6 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
 
-    //TODO #ak work around for Bitdefender free edition
-    QThread::msleep( 250 );
-
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
         if (lockOK) {
@@ -970,9 +967,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             //opening forward tunnel: sending POST with infinite body
             nx_http::Request request;
             request.requestLine.method = nx_http::Method::POST;
-            request.requestLine.url = 
-                client->url().path() + 
-                (client->url().hasQuery() ? (lit("?") + client->url().query()) : QString());
+            request.requestLine.url = lit("/ec2/forward_events");
             request.requestLine.version = nx_http::http_1_1;
             request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             request.headers.emplace( "Content-Type", TUNNEL_CONTENT_TYPE );
@@ -985,7 +980,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             //    proxy servers, so it is possible to send more than this amount of data in the form
             //    of RTSP requests. The QuickTime Server ignores the content-length header
             //request.headers.emplace( "Content-Length", "3276701" );
-            request.headers.emplace( "Connection", "keep-alive" );
+            request.headers.emplace( "Connection", "close" );
             request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
             request.headers.emplace( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid.toByteArray() );
             request.headers.emplace(
@@ -1311,7 +1306,9 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
 
     using namespace std::placeholders;
     const DataToSend& dataCtx = m_dataToSend.front();
-    if( !m_outgoingDataSocket->sendAsync(
+    if( !m_outgoingDataSocket->setSendTimeout(SOCKET_TIMEOUT) ||
+        !m_outgoingDataSocket->setRecvTimeout(SOCKET_TIMEOUT) ||
+        !m_outgoingDataSocket->sendAsync(
             dataCtx.encodedSourceData,
             std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
     {
