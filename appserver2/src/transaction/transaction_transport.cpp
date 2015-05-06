@@ -152,13 +152,15 @@ QnTransactionTransport::QnTransactionTransport(
         m_compressResponseMsgBody = true;
     }
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
-    m_incomingTransactionsRequestsParser.setNextFilter(
+    m_incomingTransactionsRequestsParser = std::make_shared<nx_http::HttpMessageStreamParser>();
+    m_incomingTransactionsRequestsParser->setNextFilter(
         std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
+    m_incomingTransactionStreamParser = m_incomingTransactionsRequestsParser;
 #else
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
     m_multipartContentParser->setNextFilter(
         std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
-    m_transactionReceivedAsResponseParser = m_multipartContentParser;
+    m_incomingTransactionStreamParser = m_multipartContentParser;
 #endif
 
     startSendKeepAliveTimerNonSafe();
@@ -204,7 +206,7 @@ QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
     m_multipartContentParser->setNextFilter(
         std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
-    m_transactionReceivedAsResponseParser = m_multipartContentParser;
+    m_incomingTransactionStreamParser = m_multipartContentParser;
 }
 
 QnTransactionTransport::~QnTransactionTransport()
@@ -597,15 +599,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 #endif
 
     //parsing and processing input data
-    //TODO #ak get rid of conditional compilation here
-#ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
-    if( m_peerRole == prOriginating )
-#endif
-        m_transactionReceivedAsResponseParser->processData( m_readBuffer );
-#ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
-    else    //m_peerRole == prAccepting
-        m_incomingTransactionsRequestsParser.processData( m_readBuffer );
-#endif
+    m_incomingTransactionStreamParser->processData( m_readBuffer );
 
     m_readBuffer.resize(0);
 
@@ -627,7 +621,7 @@ void QnTransactionTransport::receivedTransactionViaInternalTunnel( const QnByteA
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
     else    //m_peerRole == prAccepting
         receivedTransactionNonSafe(
-            m_incomingTransactionsRequestsParser.currentMessage().headers(),
+            m_incomingTransactionsRequestsParser->currentMessage().headers(),
             tranDataWithHeader );
 #endif
 }
@@ -757,7 +751,7 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
 
     //checking transactions format
 #ifdef SEND_EACH_TRANSACTION_AS_POST_REQUEST
-    m_incomingTransactionsRequestsParser.processData( requestBuf );
+    m_incomingTransactionStreamParser->processData( requestBuf );
 #endif
 
     startListeningNonSafe();
@@ -1089,8 +1083,8 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         if( contentEncodingIter->second == "gzip" )
         {
             //enabling decompression of received transactions
-            m_transactionReceivedAsResponseParser = std::make_shared<GZipUncompressor>();
-            m_transactionReceivedAsResponseParser->setNextFilter( m_multipartContentParser );
+            m_incomingTransactionStreamParser = std::make_shared<GZipUncompressor>();
+            m_incomingTransactionStreamParser->setNextFilter( m_multipartContentParser );
         }
         else
         {
@@ -1193,7 +1187,7 @@ void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPt
 void QnTransactionTransport::processTransactionData(const QByteArray& data)
 {
     Q_ASSERT( m_peerRole == prOriginating );
-    m_transactionReceivedAsResponseParser->processData( data );
+    m_incomingTransactionStreamParser->processData( data );
 }
 
 bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const

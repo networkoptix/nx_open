@@ -252,11 +252,11 @@ private:
     bool m_incomingTunnelOpened;
     nx_http::HttpStreamReader m_httpStreamReader;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
-    nx_http::HttpMessageStreamParser m_incomingTransactionsRequestsParser;
+    std::shared_ptr<nx_http::HttpMessageStreamParser> m_incomingTransactionsRequestsParser;
     ConnectionType::Type m_connectionType;
     PeerRole m_peerRole;
     QByteArray m_contentEncoding;
-    std::shared_ptr<AbstractByteStreamConverter> m_transactionReceivedAsResponseParser;
+    std::shared_ptr<AbstractByteStreamConverter> m_incomingTransactionStreamParser;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
