@@ -89,8 +89,8 @@ private:
     DecoderContext m_decoderContext;
 #endif
 
-    int m_width;
-    int m_height;
+    //int m_width;
+    //int m_height;
 
     static bool m_first_instance;
     CodecID m_codecId;

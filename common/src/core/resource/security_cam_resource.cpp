@@ -26,7 +26,7 @@ namespace {
     static const int defaultMaxFps = 15;
     static const int defaultReservedSecondStreamFps = 2;
     static const Qn::StreamFpsSharingMethod defaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
-    static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
+    //static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
 
     static const int defaultSecondStreamFpsLow = 2;
     static const int defaultSecondStreamFpsMedium = 7;

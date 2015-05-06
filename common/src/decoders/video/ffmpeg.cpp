@@ -42,8 +42,8 @@ struct FffmpegLog
 CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
-    m_width(0),
-    m_height(0),
+    //m_width(0),
+    //m_height(0),
     m_codecId(codec_id),
     m_showmotion(false),
     m_decodeMode(DecodeMode_Full),

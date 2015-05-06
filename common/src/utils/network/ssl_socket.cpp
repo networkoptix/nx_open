@@ -21,7 +21,7 @@
 #undef min
 #endif
 
-static const int BUFFER_SIZE = 1024;
+//static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
 // TODO: public methods are visible to all, quite bad
@@ -174,7 +174,7 @@ namespace {
     // dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
     static std::unique_ptr<std::mutex[]> kOpenSSLGlobalLock;
-
+#if 0
     void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
         Q_UNUSED(file);
         Q_UNUSED(line);
@@ -185,7 +185,7 @@ namespace {
             kOpenSSLGlobalLock.get()[type].unlock();
         }
     }
-
+#endif
     static std::once_flag kOpenSSLGlobalLockFlag;
 
     void OpenSSLInitGlobalLock() {
@@ -1824,7 +1824,7 @@ int QnSSLSocket::mode() const {
 }
 
 // ------------------------------ QnMixedSSLSocket -------------------------------------------------------
-static const int TEST_DATA_LEN = 3;
+//static const int TEST_DATA_LEN = 3;
 class QnMixedSSLSocketPrivate: public QnSSLSocketPrivate
 {
 public:

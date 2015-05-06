@@ -23,7 +23,7 @@
 
 static const int DEFAULT_CONNECT_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
-static const int DEFAULT_HTTP_PORT = 80;
+//static const int DEFAULT_HTTP_PORT = 80;
 
 using std::make_pair;
 

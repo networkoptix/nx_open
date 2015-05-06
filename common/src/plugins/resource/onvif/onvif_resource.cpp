@@ -46,7 +46,7 @@
 
 const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 static const float MAX_EPS = 0.01f;
-static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
+//static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
@@ -676,7 +676,8 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 
     for (const QSize& resolution: m_resolutionList) {
         float aspect = getResolutionAspectRatio(resolution);
-        if (abs(aspect - currentAspect) < MAX_EPS) {
+
+        if (std::abs(aspect - currentAspect) < MAX_EPS) {
             continue;
         }
         currentAspect = aspect;
@@ -3023,8 +3024,8 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
             std::move(soapWrapper),
             &PullPointSubscriptionWrapper::pullMessages ),
         [memToFreeOnResponseDone](GSoapAsyncPullMessagesCallWrapper* ptr){
-            for( void* ptr: memToFreeOnResponseDone )
-                ::free( ptr );
+            for( void* pObj: memToFreeOnResponseDone )
+                ::free( pObj );
             delete ptr;
         }
     );

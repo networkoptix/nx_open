@@ -6,10 +6,12 @@
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
 
+#if 0
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
 static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
 static const int DEFAULT_MJPEG_HEADER_SIZE = 1024;
+#endif
 
 #if 0
 

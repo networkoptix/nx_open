@@ -11,7 +11,7 @@
 #endif
 
 static const int NAL_RESERVED_SPACE = 16;
-static const double FRAME_RATE_EPS = 3e-5;
+//static const double FRAME_RATE_EPS = 3e-5;
 
 int NALUnit::calc_rbsp_trailing_bits_cnt(uint8_t val)
 {
