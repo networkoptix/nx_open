@@ -347,6 +347,8 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
 
 CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper, const QString& profileToken, bool isPrimary, QString* const mediaUrl) const
 {
+    Q_UNUSED( isPrimary );
+
     StreamUriResp response;
     StreamUriReq request;
     onvifXsd__StreamSetup streamSetup;

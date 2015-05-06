@@ -3051,7 +3051,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         }
 
         m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
-            [this]( qint64 timerID )
+            [this]( quint64 timerID )
             {
                 QMutexLocker lk(&m_ioPortMutex);
                 if( timerID != m_renewSubscriptionTimerID )
