@@ -1,13 +1,17 @@
+#include "common/common_globals.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/user_resource.h"
 #include "proxy_sender_connection_processor.h"
 #include "network/universal_request_processor_p.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
 #include "utils/common/log.h"
+#include "utils/network/http/asynchttpclient.h"
+#include "utils/common/synctime.h"
+
 #include "universal_tcp_listener.h"
 
 #include <QtCore/QElapsedTimer>
-
-#include <common/common_globals.h>
 
 
 static const int SOCKET_TIMEOUT = 1000 * 5;
@@ -18,11 +22,10 @@ class QnProxySenderConnectionPrivate: public QnUniversalRequestProcessorPrivate
 public:
     SocketAddress proxyServerUrl;
     QString guid;
-    int securityCode;
 };
 
 QnProxySenderConnection::QnProxySenderConnection(
-        const SocketAddress& proxyServerUrl, const QString& guid, int securityCode,
+        const SocketAddress& proxyServerUrl, const QString& guid,
         QnUniversalTcpListener* owner)
     : QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate,
         QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket()), owner, false)
@@ -30,7 +33,6 @@ QnProxySenderConnection::QnProxySenderConnection(
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;
     d->guid = guid;
-    d->securityCode = securityCode;
     setObjectName( lit("QnProxySenderConnection") );
 }
 
@@ -62,7 +64,7 @@ QByteArray QnProxySenderConnection::readProxyResponse()
 void QnProxySenderConnection::addNewProxyConnect()
 {
     Q_D(QnProxySenderConnection);
-    d->owner->addProxySenderConnections(d->proxyServerUrl, d->securityCode, 1);
+    d->owner->addProxySenderConnections(d->proxyServerUrl, 1);
 }
 
 void QnProxySenderConnection::doDelay()
@@ -89,6 +91,40 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
     return totalSend;
 }
 
+static QByteArray makeProxyRequest(const QString& serverUuid, const QUrl& url)
+{
+    const QByteArray H_REALM("NX");
+    const QByteArray H_METHOD("CONNECT");
+    const QByteArray H_PATH("/proxy-reverse");
+    const QByteArray H_AUTH("auth-int");
+
+    const auto admin = qnResPool->getAdministrator();
+    const auto time = qnSyncTime->currentUSecsSinceEpoch();
+
+    nx_http::header::WWWAuthenticate authHeader;
+    authHeader.authScheme = nx_http::header::AuthScheme::digest;
+    authHeader.params["nonce"] = QString::number(time, 16).toLatin1();
+    authHeader.params["realm"] = H_REALM;
+
+    nx_http::header::DigestAuthorization digestHeader;
+    if (!nx_http::AsyncHttpClient::calcDigestResponse(
+                H_METHOD, admin->getName(), boost::none, admin->getDigest(),
+                url, authHeader, &digestHeader))
+        return QByteArray();
+
+    return QString(QLatin1String(
+       "%1 %2 HTTP/1.1\r\n" \
+       "Host: %3\r\n" \
+       "Authorization: %4\r\n" \
+       "NX-User-Name: %5\r\n" \
+       "X-Server-Uuid: %6\r\n" \
+       "\r\n"))
+            .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
+            .arg(url.toString()).arg(QString::fromUtf8(digestHeader.toString()))
+            .arg(admin->getName()).arg(serverUuid)
+            .toUtf8();
+}
+
 void QnProxySenderConnection::run()
 {
     Q_D(QnProxySenderConnection);
@@ -101,11 +137,13 @@ void QnProxySenderConnection::run()
     d->socket->setSendTimeout(SOCKET_TIMEOUT);
     d->socket->setRecvTimeout(SOCKET_TIMEOUT);
 
-    auto proxyRequest = QString(lit(
-        "CONNECT /proxy-reverse HTTP/1.1\r\n" \
-        "X-Server-Uuid: %1\r\n"
-        "X-Security-Code: %2\r\n"
-        "\r\n")).arg(d->guid).arg(d->securityCode).toUtf8();
+    auto proxyRequest = makeProxyRequest(d->guid, QUrl(d->proxyServerUrl.address.toString()));
+    if (proxyRequest.isEmpty())
+    {
+        NX_LOG(lit("QnProxySenderConnection: can not generate request")
+               .arg(d->proxyServerUrl.toString()), cl_logWARNING);
+        return;
+    }
 
     int sended = sendRequest(proxyRequest);
     if (sended < proxyRequest.length())

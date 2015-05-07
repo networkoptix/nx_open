@@ -113,11 +113,10 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
 
     if (route.reverseConnect)
         d->dstSocket = d->owner->getProxySocket(route.id.toString(), CONNECT_TIMEOUT,
-                                                [&](int securityCode, int socketCount)
+                                                [&](int socketCount)
         {
             ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
             tran.params.targetServer = qnCommon->moduleGUID();
-            tran.params.securityCode = securityCode;
             tran.params.socketCount = socketCount;
             qnTransactionBus->sendTransaction(tran, route.id);
         });

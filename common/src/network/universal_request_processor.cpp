@@ -62,10 +62,6 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
 {
     Q_D(QnUniversalRequestProcessor);
 
-    // Reverse proxy connection has it's own authentification mode
-    if (!nx_http::getHeaderValue(d->request.headers, "x-security-code").isEmpty())
-        return true;
-
     int retryCount = 0;
     if (d->needAuth)
     {

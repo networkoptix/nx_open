@@ -10,7 +10,7 @@
 
 
 static const int PROXY_KEEP_ALIVE_INTERVAL = 40 * 1000;
-static const int PROXY_CONNECTIONS_TO_REQUEST = 1;
+static const int PROXY_CONNECTIONS_TO_REQUEST = 5;
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
@@ -88,13 +88,13 @@ void QnUniversalTcpListener::setProxySelfId(const QString& selfId)
     m_selfIdForProxy = selfId;
 }
 
-void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& proxyUrl, int securityCode, int size)
+void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& proxyUrl, int size)
 {
     if (m_needStop)
         return;
 
     for (int i = 0; i < size; ++i) {
-        QnProxySenderConnection* connect = new QnProxySenderConnection(proxyUrl, m_selfIdForProxy, securityCode, this);
+        auto connect = new QnProxySenderConnection(proxyUrl, m_selfIdForProxy, this);
         connect->start();
         addOwnership(connect);
     }
@@ -105,24 +105,24 @@ QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
 {
     QMutexLocker lock(&m_proxyMutex);
     auto& serverPool = m_proxyPool[guid]; // get or create with new code
-    if (serverPool.socketStack.isEmpty())
+    if (serverPool.isEmpty())
     {
         if (socketRequest)
-            socketRequest(serverPool.securityCode, PROXY_CONNECTIONS_TO_REQUEST);
+            socketRequest(PROXY_CONNECTIONS_TO_REQUEST);
 
-        while (serverPool.socketStack.isEmpty())
+        while (serverPool.isEmpty())
             if (!m_proxyCondition.wait(&m_proxyMutex, timeout))
                 return QSharedPointer<AbstractStreamSocket>();
     }
 
-    auto socket = serverPool.socketStack.front().socket;
+    auto socket = serverPool.front().socket;
     socket->setNonBlockingMode(false);
-    serverPool.socketStack.pop_front();
+    serverPool.pop_front();
     return socket;
 }
 
 bool QnUniversalTcpListener::registerProxyReceiverConnection(
-        const QString& guid, int securityCode, QSharedPointer<AbstractStreamSocket> socket)
+        const QString& guid, QSharedPointer<AbstractStreamSocket> socket)
 {
     QMutexLocker lock(&m_proxyMutex);
     auto serverPool = m_proxyPool.find(guid);
@@ -132,20 +132,14 @@ bool QnUniversalTcpListener::registerProxyReceiverConnection(
         return false;
     }
 
-    if (serverPool->securityCode != securityCode) {
-        NX_LOG(lit("QnUniversalTcpListener: wrong security code from %2, possible DOS")
-               .arg(guid), cl_logERROR);
-        return false;
-    }
-
-    if (serverPool->socketStack.size() > PROXY_CONNECTIONS_TO_REQUEST * 2) {
+    if (serverPool->size() > PROXY_CONNECTIONS_TO_REQUEST * 2) {
         NX_LOG(lit("QnUniversalTcpListener: too many proxies from %2")
                .arg(guid), cl_logINFO);
         return false;
     }
 
     socket->setNonBlockingMode(true);
-    serverPool->socketStack.push_back(AwaitProxyInfo(socket));
+    serverPool->push_back(AwaitProxyInfo(socket));
     m_proxyCondition.wakeAll();
     return true;
 }
@@ -156,14 +150,12 @@ void QnUniversalTcpListener::doPeriodicTasks()
 
     QMutexLocker lock(&m_proxyMutex);
     for (auto& serverPool : m_proxyPool)
-    {
-        auto& stack = serverPool.socketStack;
-        while(!stack.isEmpty() && stack.front().timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)
+        while(!serverPool.isEmpty() &&
+              serverPool.front().timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)
         {
-            stack.front().socket->send(QByteArray("HTTP 200 OK\r\n\r\n"));
-            stack.pop_front();
+            serverPool.front().socket->send(QByteArray("HTTP 200 OK\r\n\r\n"));
+            serverPool.pop_front();
         }
-    }
 }
 
 void QnUniversalTcpListener::disableAuth()

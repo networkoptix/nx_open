@@ -105,7 +105,6 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     if( allowedAuthMethods & AuthMethod::noAuth )
         return true;
 
-
     if( allowedAuthMethods & AuthMethod::videowall )
     {
         const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
@@ -178,6 +177,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
             authType = authorization.left(pos).toLower();
             authData = authorization.mid(pos+1);
         }
+
         if (authType == "digest")
             return doDigestAuth(request.requestLine.method, authData, response, isProxy, authUserId, ',', std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1));
         else if (authType == "basic")

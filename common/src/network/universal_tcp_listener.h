@@ -69,12 +69,11 @@ public:
     /* proxy support functions */
 
     void setProxySelfId(const QString& selfId);
-    void addProxySenderConnections(const SocketAddress& proxyUrl, int securityCode, int size);
+    void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
 
-    bool registerProxyReceiverConnection(const QString& url, int securityCode,
-                                         QSharedPointer<AbstractStreamSocket> socket);
+    bool registerProxyReceiverConnection(const QString& url, QSharedPointer<AbstractStreamSocket> socket);
 
-    typedef std::function<void(int, int)> SocketRequest;
+    typedef std::function<void(int count)> SocketRequest;
     QSharedPointer<AbstractStreamSocket> getProxySocket(
             const QString& guid, int timeout, const SocketRequest& socketRequest = SocketRequest());
 
@@ -95,19 +94,11 @@ private:
         QElapsedTimer timer;
     };
 
-    struct AwaitProxyStack
-    {
-         AwaitProxyStack() : securityCode(qrand()) {}
-
-         int securityCode;
-         QList<AwaitProxyInfo> socketStack;
-    };
-
     QList<HandlerInfo> m_handlers;
     ProxyInfo m_proxyInfo;
     QString m_selfIdForProxy;
     QMutex m_proxyMutex;
-    QMap<QString, AwaitProxyStack> m_proxyPool;
+    QMap<QString, QList<AwaitProxyInfo>> m_proxyPool;
     QWaitCondition m_proxyCondition;
     bool m_needAuth;
 };

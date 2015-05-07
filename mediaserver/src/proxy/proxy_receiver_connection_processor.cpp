@@ -45,8 +45,7 @@ void QnProxyReceiverConnection::run()
     sendResponse(nx_http::StatusCode::ok, QByteArray());
 
     auto guid = nx_http::getHeaderValue(d->request.headers, "x-server-uuid");
-    auto code = nx_http::getHeaderValue(d->request.headers, "x-security-code").toInt();
-    if (d->owner->registerProxyReceiverConnection(guid, code, d->socket)) {
+    if (d->owner->registerProxyReceiverConnection(guid, d->socket)) {
         d->takeSocketOwnership = true; // remove ownership from socket
         d->socket.clear();
     }

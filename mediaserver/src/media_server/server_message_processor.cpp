@@ -230,7 +230,7 @@ void QnServerMessageProcessor::at_reverseConnectionRequested(const ec2::ApiRever
     if (m_universalTcpListener) {
         auto addr = QnRouter::instance()->routeTo(data.targetServer).addr;
         if (!addr.isNull())
-            m_universalTcpListener->addProxySenderConnections(addr, data.securityCode, data.socketCount);
+            m_universalTcpListener->addProxySenderConnections(addr, data.socketCount);
     }
 }
 

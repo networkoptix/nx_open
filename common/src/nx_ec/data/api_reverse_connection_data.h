@@ -13,11 +13,10 @@ namespace ec2 {
     struct ApiReverseConnectionData: ApiData
     {
         QnUuid targetServer;
-        int securityCode;
         int socketCount;
     };
 
-    #define ApiReverseConnectionData_Fields (targetServer)(securityCode)(socketCount)
+    #define ApiReverseConnectionData_Fields (targetServer)(socketCount)
 
 } // namespace ec2
 
