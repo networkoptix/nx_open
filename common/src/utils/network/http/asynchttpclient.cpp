@@ -118,7 +118,6 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Type", contentType) );
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
-        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = messageBody;
         return initiateHttpMessageDelivery( url );
     }
@@ -669,11 +668,14 @@ namespace nx_http
             m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )
         {
-            m_request.headers.insert( std::make_pair("Accept", "*/*") );
-            if( m_contentEncodingUsed )
-                m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip;q=1.0, identity;q=0.5, *;q=0") );
-            else
-                m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
+            if( httpMethod == nx_http::Method::GET || httpMethod == nx_http::Method::HEAD )
+            {
+                m_request.headers.insert( std::make_pair("Accept", "*/*") );
+                if( m_contentEncodingUsed )
+                    m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip;q=1.0, identity;q=0.5, *;q=0") );
+                else
+                    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
+            }
             //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
             //m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );

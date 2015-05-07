@@ -212,11 +212,11 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     if (d->chunkedMode)
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );
 
-    if (!contentEncoding.isEmpty())
+    if (!contentEncoding.isEmpty() && contentEncoding != "identity")
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );
-    if (!d->chunkedMode && (contentType.indexOf("multipart") == -1))
+    if (!d->chunkedMode /*&& !contentType.isEmpty()*/ && (contentType.indexOf("multipart") == -1))
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
 
     QByteArray response = d->response.toString();
@@ -331,7 +331,8 @@ bool QnTCPConnectionProcessor::readRequest()
             }
             else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
             {
-                qWarning() << "Too large HTTP client request. Ignoring";
+                qWarning() << "Too large HTTP client request ("<<d->clientRequest.size()<<" bytes"
+                    ", "<<MAX_REQUEST_SIZE<<" allowed). Ignoring...";
                 return false;
             }
             if( fullHttpMessageSize )
