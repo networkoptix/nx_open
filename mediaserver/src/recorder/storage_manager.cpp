@@ -636,13 +636,13 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const 
     return text;
 }
 
-void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
+void QnStorageManager::getTimePeriodInternal(std::vector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
 {
     if (catalog) {
-        periods << catalog->getTimePeriods(startTime, endTime, detailLevel);
-        if (!periods.last().isEmpty())
+        periods.push_back(catalog->getTimePeriods(startTime, endTime, detailLevel));
+        if (!periods.rbegin()->empty())
         {
-            QnTimePeriod& lastPeriod = periods.last().last();
+            QnTimePeriod& lastPeriod = periods.rbegin()->last();
             bool isActive = !camera->hasFlags(Qn::foreigner) && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
             if (lastPeriod.durationMs == -1 && !isActive)
             {
@@ -669,7 +669,7 @@ bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, qint64
 
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs) {
-    QVector<QnTimePeriodList> periods;
+    std::vector<QnTimePeriodList> periods;
     for (const QnVirtualCameraResourcePtr &camera: cameras) {
         QString cameraUniqueId = camera->getUniqueId();
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
@@ -680,7 +680,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
             //TODO: #GDM #Bookmarks forbid bookmarks for the DTS cameras
             if (camera->isDtsBased()) {
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
-                    periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
+                    periods.push_back(camera->getDtsTimePeriods(startTime, endTime, detailLevel));
             } else {
                 getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(cameraUniqueId, catalog));
             }
@@ -818,12 +818,12 @@ void QnStorageManager::clearCameraHistory()
             itr.value() == DATETIME_NOW; // delete all history if catalog is empty
     }
 
-    QList<QnCameraHistoryItem> itemsToRemove = QnCameraHistoryPool::instance()->getUnusedItems(minTimes, qnCommon->moduleGUID());
+    QList<QnCameraHistoryItem> itemsToRemove = qnCameraHistoryPool->getUnusedItems(minTimes, qnCommon->moduleGUID());
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     for(const QnCameraHistoryItem& item: itemsToRemove) {
         ec2::ErrorCode errCode = ec2Connection->getCameraManager()->removeCameraHistoryItemSync(item);
         if (errCode == ec2::ErrorCode::ok)
-            QnCameraHistoryPool::instance()->removeCameraHistoryItem(item);
+            qnCameraHistoryPool->removeCameraHistoryItem(item);
     }
 }
 
@@ -1394,29 +1394,39 @@ bool QnStorageManager::isStorageAvailable(const QnStorageResourcePtr& storage) c
     return storage && storage->getStatus() == Qn::Online;
 }
 
-bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
-
+bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark, bool forced) {
+    //TODO: #GDM #Bookmarks #API #High make sure guid is absent in the database, fill if not exists
     QnDualQualityHelper helper;
     helper.openCamera(cameraGuid);
 
     DeviceFileCatalog::Chunk chunkBegin, chunkEnd;
     DeviceFileCatalogPtr catalog;
     helper.findDataForTime(bookmark.startTimeMs, chunkBegin, catalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
-    if (chunkBegin.startTimeMs < 0)
-        return false; //recorded chunk was not found
+    if (chunkBegin.startTimeMs < 0) {
+        if (!forced)
+            return false; //recorded chunk was not found
+
+        /* If we are forced, try to find any chunk. */
+        helper.findDataForTime(bookmark.startTimeMs, chunkBegin, catalog, DeviceFileCatalog::OnRecordHole_PrevChunk, false);
+        if (chunkBegin.startTimeMs < 0)
+            return false; // no recorded chunk were found at all
+    }
 
     helper.findDataForTime(bookmark.endTimeMs(), chunkEnd, catalog, DeviceFileCatalog::OnRecordHole_PrevChunk, false);
-    if (chunkEnd.startTimeMs < 0)
+    if (chunkEnd.startTimeMs < 0 && !forced)
         return false; //recorded chunk was not found
 
     qint64 endTimeMs = bookmark.endTimeMs();
 
-    bookmark.startTimeMs = qMax(bookmark.startTimeMs, chunkBegin.startTimeMs);  // move bookmark start to the start of the chunk in case of hole
-    endTimeMs = qMin(endTimeMs, chunkEnd.endTimeMs());
-    bookmark.durationMs = endTimeMs - bookmark.startTimeMs;                     // move bookmark end to the end of the closest chunk in case of hole
+    /* For usual case move bookmark borders to the chunk borders. */
+    if (!forced) {
+        bookmark.startTimeMs = qMax(bookmark.startTimeMs, chunkBegin.startTimeMs);  // move bookmark start to the start of the chunk in case of hole
+        endTimeMs = qMin(endTimeMs, chunkEnd.endTimeMs());
+        bookmark.durationMs = endTimeMs - bookmark.startTimeMs;                     // move bookmark end to the end of the closest chunk in case of hole
 
-    if (bookmark.durationMs <= 0)
-        return false;   // bookmark ends before the chunk starts
+        if (bookmark.durationMs <= 0)
+            return false;   // bookmark ends before the chunk starts
+    }
 
     // this chunk will be added to the bookmark catalog
     chunkBegin.startTimeMs = bookmark.startTimeMs;
@@ -1444,6 +1454,7 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
 }
 
 bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
+    //TODO: #GDM #Bookmarks #API #High make sure guid is present and exists in the database
     DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
     int idx = catalog->findFileIndex(bookmark.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
     if (idx < 0)
@@ -1467,6 +1478,7 @@ bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBook
 
 
 bool QnStorageManager::deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
+    //TODO: #GDM #Bookmarks #API #High make sure guid is present and exists in the database
     DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
     if (!catalog)
         return false;
@@ -1500,4 +1512,29 @@ bool QnStorageManager::getBookmarks(const QByteArray &cameraGuid, const QnCamera
             return false;
     }
     return true;
+}
+
+std::vector<QnUuid> QnStorageManager::getCamerasWithArchive() const
+{
+    QMutexLocker locker(&m_mutexCatalog);
+    std::set<QString> internalData;
+    std::vector<QnUuid> result;
+    getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::LowQualityCatalog]);
+    getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::HiQualityCatalog]);
+    for(const QString& uniqueId: internalData) {
+        const QnResourcePtr cam = qnResPool->getResourceByUniqId(uniqueId);
+        if (cam)
+            result.push_back(cam->getId());
+    }
+    return result;
+}
+
+void QnStorageManager::getCamerasWithArchiveInternal(std::set<QString>& result, const FileCatalogMap& catalogMap ) const
+{
+    for(auto itr = catalogMap.begin(); itr != catalogMap.end(); ++itr)
+    {
+        const DeviceFileCatalogPtr& catalog = itr.value();
+        if (!catalog->isEmpty())
+            result.insert(catalog->cameraUniqueId());
+    }
 }

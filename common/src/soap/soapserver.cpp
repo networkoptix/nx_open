@@ -16,9 +16,7 @@
 static const unsigned int ERROR_SKIP_TIMEOUT_MS = 500;
 static const int SOAP_CONNECTION_ACCEPT_TIMEOUT = 1;    //one second
 
-static QnSoapServer* QnSoapServer_instance = nullptr;
-
-QnSoapServer::QnSoapServer( unsigned int port, const char* path )
+QnSoapServer::QnSoapServer(unsigned int port, const char* path )
 :
     m_port( port ),
     m_path( path ),
@@ -26,14 +24,10 @@ QnSoapServer::QnSoapServer( unsigned int port, const char* path )
     m_initialized( false )
 {
     setObjectName(QLatin1String("QnSoapServer"));
-
-    assert( QnSoapServer_instance == nullptr );
-    QnSoapServer_instance = this;
 }
 
 QnSoapServer::~QnSoapServer()
 {
-    QnSoapServer_instance = nullptr;
     stop();
     m_service.soap_force_close_socket();
 }
@@ -100,11 +94,6 @@ OnvifNotificationConsumer* QnSoapServer::getService()
 const OnvifNotificationConsumer* QnSoapServer::getService() const
 {
     return &m_service;
-}
-
-QnSoapServer* QnSoapServer::instance()
-{
-    return QnSoapServer_instance;
 }
 
 void QnSoapServer::run()

@@ -12,6 +12,7 @@ class QnlTimeSource;
 class QnStatistics;
 class QnResource;
 class QnAbstractArchiveReader;
+class QnTimePeriod;
 
 class QnClientVideoCamera : public QObject {
     Q_OBJECT
@@ -50,9 +51,7 @@ public:
 
     void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
 
-    // TODO: #Elric remove these
-    bool isVisible() const { return m_isVisible; }
-    void setVisible(bool value) { m_isVisible = value; }
+
 
     /*
     * Export motion stream to separate file
@@ -61,15 +60,13 @@ public:
     QSharedPointer<QBuffer> motionIODevice(int channel);
 
     //TODO: #GDM Refactor parameter set to the structure
-    void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, 
-                                 QnStorageResourcePtr storage = QnStorageResourcePtr(), QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport, 
-                                 Qn::Corner timestamps = Qn::NoCorner,
-                                 qint64 timeOffsetMs = 0, qint64 serverTimeZoneMs = Qn::InvalidUtcOffset,
-                                 QRectF srcRect = QRectF(),
-                                 const ImageCorrectionParams& contrastParams = ImageCorrectionParams(),
-                                 const QnItemDewarpingParams& itemDewarpingParams = QnItemDewarpingParams(),
-                                 int rotationAngle = 0,
-                                 qreal customAR= 0.0);
+    void exportMediaPeriodToFile(const QnTimePeriod &timePeriod, 
+                                 const QString& fileName,
+                                 const QString& format, 
+                                 const QnStorageResourcePtr &storage,
+                                 QnStreamRecorder::Role role, 
+                                 const QnImageFilterHelper &imageParameters,
+                                 qint64 serverTimeZoneMs = Qn::InvalidUtcOffset);
 
     void setResource(QnMediaResourcePtr resource);
     QString exportedFileName() const;
@@ -93,7 +90,6 @@ private:
     QnAbstractMediaStreamDataProvider* m_reader;
 
     QnlTimeSource* m_extTimeSrc;
-    bool m_isVisible;
     QnStreamRecorder* m_exportRecorder;
     QnAbstractArchiveReader* m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];

@@ -2,7 +2,11 @@
 
 #include <utils/common/util.h>
 #include <utils/math/math.h>
-#include <QElapsedTimer>
+#include <utils/common/model_functions.h>
+#include <utils/serialization/compressed_time_functions.h>
+
+QN_FUSION_ADAPT_STRUCT(MultiServerPeriodData, (guid)(periods))
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((MultiServerPeriodData), (json)(ubjson)(xml)(csv_record)(compressed_time)(eq))
 
 namespace {
     static const qint64 InvalidValue = INT64_MAX;
@@ -443,7 +447,7 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
 }
 
 
-QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periodLists)
+QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeriodList>& periodLists)
 {
     QVector<QnTimePeriodList> nonEmptyPeriods;
     for (const QnTimePeriodList &periodList: periodLists)

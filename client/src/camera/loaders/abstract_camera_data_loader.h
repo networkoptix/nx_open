@@ -30,9 +30,9 @@ public:
     virtual int load(const QString &filter = QString(), const qint64 resolutionMs = 1) = 0;
 
     /**
-     * \returns                         Resource that this loader works with.
+     * \returns                         Resource that this loader works with (camera or archive).
      */
-    QnResourcePtr resource() const { return m_resource; }
+    QnResourcePtr resource() const;
 
     /**
      * Discards cached data, if any.
@@ -68,5 +68,7 @@ protected:
 signals:
     void delayedReady(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle);
 };
+
+typedef QSharedPointer<QnAbstractCameraDataLoader> QnAbstractCameraDataLoaderPtr;
 
 #endif // __QN_ABSTRACT_CAMERA_DATA_LOADER_H__

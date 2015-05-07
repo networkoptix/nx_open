@@ -13,10 +13,9 @@ typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 class QnMediaServerConnection;
 typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
-typedef QList<QPair<QString, bool> > QnStringBoolPairList;
-typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
+struct QnChunksRequestData;
 
-Q_DECLARE_METATYPE(QnStringBoolPairList);
-Q_DECLARE_METATYPE(QnStringVariantPairList);
+struct MultiServerPeriodData;
+typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
 
 #endif // QN_API_FWD_H

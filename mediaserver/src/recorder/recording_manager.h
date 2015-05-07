@@ -4,6 +4,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QObject>
 #include <QtCore/QMap>
+#include <QtCore/QElapsedTimer>
 
 #include "core/resource/resource_fwd.h"
 #include "business/business_fwd.h"
@@ -64,8 +65,6 @@ private slots:
     void at_camera_initializationChanged(const QnResourcePtr &resource);
     void at_camera_resourceChanged(const QnResourcePtr &resource);
     void at_checkLicenses();
-    void at_historyMutexLocked();
-    void at_historyMutexTimeout();
     void at_serverPropertyChanged(const QnResourcePtr &, const QString &key);
 private:
     void updateCamera(const QnSecurityCamResourcePtr& camera);
@@ -79,30 +78,16 @@ private:
     void beforeDeleteRecorder(const Recorders& recorders);
     void stopRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
-    void updateCameraHistory(const QnResourcePtr& res);
+    bool updateCameraHistory();
 
     void at_licenseMutexLocked();
     void at_licenseMutexTimeout();
 private:
-    struct LockData 
-    {
-        LockData(LockData&& other);
-        LockData();
-        LockData(ec2::QnDistributedMutex* mutex, QnVirtualCameraResourcePtr cameraResource, qint64 currentTime);
-        ~LockData();
-
-        ec2::QnDistributedMutex* mutex;
-        QnVirtualCameraResourcePtr cameraResource;
-        qint64 currentTime;
-    private:
-        LockData(const LockData& other);
-    };
-    std::map<QString, LockData> m_lockInProgress;
-
     mutable QMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
     QTimer m_licenseTimer;
+    QElapsedTimer m_updateCameraHistoryTimer;
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;

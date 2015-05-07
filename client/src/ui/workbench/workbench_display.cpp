@@ -1989,7 +1989,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
-    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId());
+    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().eventResourceId);
     if (!resource)
         return;
 
@@ -2000,7 +2000,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if(thumbnailed)
         return;
 
-    int type = businessAction->getRuntimeParams().getEventType();
+    int type = businessAction->getRuntimeParams().eventType;
 
     at_notificationTimer_timeout(resource, type);
     QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);

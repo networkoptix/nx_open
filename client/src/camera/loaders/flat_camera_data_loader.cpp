@@ -1,9 +1,13 @@
 #include "flat_camera_data_loader.h"
 
+#include <api/helpers/chunks_request_data.h>
+
+#include <common/common_module.h>
+
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
 
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <recording/time_period_list.h>
@@ -18,35 +22,16 @@ namespace {
 
     /** Minimum time (in milliseconds) for overlapping time periods requests.  */
     const int minOverlapDuration = 120*1000;
-
-    /** Detail level for data loading - most precise value is used. */
-    const int detailLevel = 1;
 }
 
-QnFlatCameraDataLoader::QnFlatCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
-    QnAbstractCameraDataLoader(camera, dataType, parent),
-    m_connection(connection)
+QnFlatCameraDataLoader::QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
+    QnAbstractCameraDataLoader(camera, dataType, parent)
 {
-    if(!connection)
-        qnNullWarning(connection);
-
     if(!camera)
         qnNullWarning(camera);
 }
 
-QnFlatCameraDataLoader *QnFlatCameraDataLoader::newInstance(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera,  Qn::CameraDataType dataType, QObject *parent) {
-    if (!server || !camera)
-        return NULL;
-    
-    QnMediaServerConnectionPtr serverConnection = server->apiConnection();
-    if (!serverConnection)
-        return NULL;
-
-    return new QnFlatCameraDataLoader(serverConnection, camera, dataType, parent);
-}
-
 int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
-    Q_ASSERT_X(resolutionMs == detailLevel, Q_FUNC_INFO, "this loader is supposed to load only flat data");
     Q_UNUSED(resolutionMs);
 
     if (filter != m_filter)
@@ -95,20 +80,33 @@ void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
 
 int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
     Q_ASSERT_X(m_dataType != Qn::BookmarkData, Q_FUNC_INFO, "this loader should NOT be used to load bookmarks");
-    return m_connection->getTimePeriodsAsync(
-        QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
-        startTimeMs, 
-        DATETIME_NOW,   /* Always load data to the end. */ 
-        detailLevel,    /* Always load data on most detailed level. */
-        dataTypeToPeriod(m_dataType),
-        m_filter,
-        this, 
-        SLOT(at_timePeriodsReceived(int, const QnTimePeriodList &, int))
-        );
+
+    auto server = qnCommon->currentServer();
+    if (!server)
+        return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
+
+    auto connection = server->apiConnection();
+    if (!connection)
+        return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
+
+    QnChunksRequestData requestData;
+    requestData.resList << m_resource.dynamicCast<QnVirtualCameraResource>();
+    requestData.startTimeMs = startTimeMs;
+    requestData.endTimeMs = DATETIME_NOW,   /* Always load data to the end. */ 
+    requestData.filter = m_filter;
+    requestData.periodsType = dataTypeToPeriod(m_dataType);
+
+    return connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int)));
 }
 
-void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle) {
-    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(timePeriods));
+void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle) {
+
+    std::vector<QnTimePeriodList> rawPeriods;
+
+    for(auto period: timePeriods)
+        rawPeriods.push_back(period.periods);
+    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(QnTimePeriodList::mergeTimePeriods(rawPeriods)));
+
     handleDataLoaded(status, data, requestHandle);
 }
 

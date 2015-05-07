@@ -27,13 +27,15 @@ class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveReader;
-class QnCachingCameraDataLoader;
 class QnThumbnailsLoader;
+class QnCameraDataManager;
+class QnCachingCameraDataLoader;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 class QnSearchLineEdit;
+class QnSearchQueryStrategy;
 class QnThreadedChunksMergeTool;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
@@ -101,8 +103,6 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
-    QnCachingCameraDataLoader *loader(const QnResourcePtr &resource);
-
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
@@ -135,12 +135,8 @@ protected:
 
     void setPlayingTemporary(bool playing);
 
-    QnCachingCameraDataLoader *loader(QnResourceWidget *widget);
-
     QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoader(QnResourceWidget *widget);
-public slots:
-    void clearLoaderCache();
 protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
@@ -192,8 +188,8 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type, qint64 startTimeMs);
-    void updateLoaderBookmarks(QnCachingCameraDataLoader *loader);
+    void updateLoaderPeriods(const QnResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
+    void updateLoaderBookmarks(const QnResourcePtr &resource);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
@@ -201,6 +197,7 @@ protected slots:
     void at_timeSlider_selectionPressed();
     void at_timeSlider_selectionReleased();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
+    void at_timeSlider_bookmarksUnderCursorUpdated(const QPointF& pos);
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_thumbnailClicked();
 
@@ -212,6 +209,12 @@ protected slots:
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
+    QnCachingCameraDataLoader* loaderByWidget(const QnResourceWidget* widget, bool createIfNotExists = true);
+
+    bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
+    void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
+
+private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
     QnTimeSlider *m_timeSlider;
@@ -219,6 +222,7 @@ private:
     QnCalendarWidget *m_calendar;
     QnDayTimeWidget *m_dayTimeWidget;
     QnSearchLineEdit *m_bookmarksSearchWidget;
+    QnSearchQueryStrategy *m_searchQueryStrategy;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
@@ -258,15 +262,18 @@ private:
     qint64 m_lastCameraTime;
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
-
-    QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;   
+   
     QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
     QnCameraBookmarkTags m_bookmarkTags;
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 
+    QnCameraDataManager* m_cameraDataManager;
+
     int m_chunkMergingProcessHandle;
     std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
+    /** Set of cameras, for which history was not loaded and should be updated again. */
+    QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

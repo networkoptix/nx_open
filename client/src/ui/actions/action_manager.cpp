@@ -481,9 +481,11 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this));
 
     factory(Qn::OpenBusinessLogAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget 
+            | Qn::LayoutItemTarget | Qn::WidgetTarget | Qn::GlobalHotkey).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         icon(qnSkin->icon("events/log.png")).
+        shortcut(tr("Ctrl+L")).
         text(tr("Event Log..."));
 
     factory(Qn::OpenBusinessRulesAction).
@@ -794,12 +796,10 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+E")).
         autoRepeat(false);
 
-    factory(Qn::BusinessEventsLogAction).
+    factory(Qn::OpenBookmarksSearchAction).
         flags(Qn::GlobalHotkey).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Event Log...")).
-        icon(qnSkin->icon("events/log.png")).
-        shortcut(tr("Ctrl+L")).
+        text(tr("Bookmarks...")).
+        shortcut(tr("Ctrl+B")).
         autoRepeat(false);
 
     factory(Qn::CameraListAction).
@@ -1658,6 +1658,14 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Unpin Tree")).
         condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
+    factory(Qn::PinCalendarAction).
+        text(tr("Pin Calendar")).
+        toggledText(tr("Unpin Calendar"));
+
+    factory(Qn::MinimizeDayTimeViewAction).
+        text(tr("Minimize")).
+        icon(qnSkin->icon("titlebar/dropdown.png"));
+
     factory(Qn::ToggleTreeAction).
         flags(Qn::NoTarget).
         text(tr("Show Tree")).
@@ -1682,14 +1690,12 @@ QnActionManager::QnActionManager(QObject *parent):
         checked(true).
         autoRepeat(false);
 
-#ifdef QN_ENABLE_BOOKMARKS
     factory(Qn::ToggleBookmarksSearchAction).
         flags(Qn::GlobalHotkey).
         text(tr("Show Search Panel")).
         toggledText(tr("Hide Search Panel")).
         shortcut(tr("Ctrl+F")).
         autoRepeat(false);
-#endif
 }
 
 QnActionManager::~QnActionManager() {

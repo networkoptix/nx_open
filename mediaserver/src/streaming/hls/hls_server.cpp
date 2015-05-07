@@ -266,7 +266,7 @@ namespace nx_hls
         const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
 
         //searching for requested resource
-        QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( shortFileName.toString() );
+        QnResourcePtr resource = qnResPool->getResourceByUniqId( shortFileName.toString() );
         if( !resource )
         {
             NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Requested resource %1 not found").

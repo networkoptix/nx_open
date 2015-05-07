@@ -61,7 +61,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         if (params[i].first == "res_id" || params[i].first == "physicalId")
         {
             resParamFound = true;
-            res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getNetResourceByPhysicalId(params[i].second));
+            res = qSharedPointerDynamicCast<QnVirtualCameraResource> (qnResPool->getNetResourceByPhysicalId(params[i].second));
             if (!res)
                 errStr = QString("Camera resource %1 not found").arg(params[i].second);
         }

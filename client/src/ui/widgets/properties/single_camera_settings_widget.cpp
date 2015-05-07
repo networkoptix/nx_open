@@ -14,6 +14,7 @@
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -463,7 +464,14 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);
+                m_imageProvidersByResourceId[m_camera->getId()] = new QnSingleThumbnailLoader(
+                    m_camera, 
+                    m_camera->getParentResource().dynamicCast<QnMediaServerResource>(),
+                    -1,
+                    -1,
+                    fisheyeThumbnailSize, 
+                    QnSingleThumbnailLoader::JpgFormat,
+                    this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }

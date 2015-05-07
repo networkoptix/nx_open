@@ -833,16 +833,12 @@ int main(int argc, char **argv)
     QnSessionManager::instance();
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    QnResourcePool::initStaticInstance( new QnResourcePool() );
 
 #ifdef Q_OS_MAC
     mac_restoreFileAccess();
 #endif
 
     int result = runApplication(application.data(), argc, argv);
-
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
 
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher::initStaticInstance( NULL );

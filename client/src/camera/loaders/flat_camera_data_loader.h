@@ -30,24 +30,14 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    QnFlatCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = NULL);
-
-    /**
-     * Creates a new time period loader for the given camera resource. Returns NULL
-     * pointer in case loader cannot be created.
-     * 
-     * \param camera                    Camera resource to create time period loader for.
-     * \param parent                    Parent object for the loader to create.
-     * \returns                         Newly created time period loader.
-     */
-    static QnFlatCameraDataLoader *newInstance(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
-    
+    QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
+  
     virtual int load(const QString &filter, const qint64 resolutionMs) override;
 
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;
 
 private slots:
-    void at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle);
+    void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
 
 private:
     int sendRequest(qint64 startTimeMs);
@@ -69,9 +59,6 @@ private:
 
         void clear();
     };
-
-    /** Video server connection that this loader uses. */
-    QnMediaServerConnectionPtr m_connection;
 
     QString m_filter;
     

@@ -194,7 +194,7 @@ void QnIncompatibleServerWatcher::addResource(const QnModuleInformationWithAddre
     } else {
         // update the resource
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
+        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO); //TODO: #GDM Fix assert
         updateServer(server, moduleInformation);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")

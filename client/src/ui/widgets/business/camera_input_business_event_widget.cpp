@@ -54,7 +54,7 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewMo
     }
 
     if (fields & QnBusiness::EventParamsField) {
-        QString text = model->eventParams().getInputPortId();
+        QString text = model->eventParams().inputPortId;
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
     }

@@ -67,6 +67,19 @@ public:
     QnCameraBookmark find(const qint64 position) const;
 
     /**
+     * @brief find                                  Searches all bookmarks covering the certain moment of time.
+     * @param position                              Time in milliseconds since epoch.
+     * @return                                      List of acceptable bookmarks
+     */
+    QnCameraBookmarkList findAll(const qint64 position) const;
+
+    /**
+     * @brief data                                  Get raw data list using specified time period
+     * @return                                      List of filtered by specified period bookmarks sorted by their start time.
+     */
+    QnCameraBookmarkList data(const QnTimePeriod &period) const;
+
+    /**
      * @brief data                                  Get raw data list.
      * @return                                      List of all stored bookmarks sorted by their start time.
      */

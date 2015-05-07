@@ -342,9 +342,9 @@ namespace Qn {
         BusinessEventsAction,
 
         /**
-         * Opens business events log dialog.
+         * Opens bookmarks dialog.
          */
-        BusinessEventsLogAction,
+        OpenBookmarksSearchAction,
 
         /**
          * Opens camera list dialog.
@@ -944,6 +944,16 @@ namespace Qn {
          * Pins/unpins tree.
          */
         PinTreeAction,
+
+        /**
+         * Pins/unpins calendar and day/time view
+         */
+        PinCalendarAction,
+
+        /** 
+         * Minimazes day/time view
+         */
+        MinimizeDayTimeViewAction,
 
         /**
          * Shows/hides slider.

@@ -144,7 +144,7 @@ bool handleTransaction2(
     case ApiCommand::removeCamera:          
     case ApiCommand::removeMediaServer:     return handleTransactionParams<ApiIdData>               (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::removeCameraHistoryItem:
-    case ApiCommand::addCameraHistoryItem:  return handleTransactionParams<ApiCameraServerItemData> (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::addCameraHistoryItem:  return handleTransactionParams<ApiServerFootageData>    (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::saveMediaServer:       return handleTransactionParams<ApiMediaServerData>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::saveStorage:           return handleTransactionParams<ApiStorageData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::saveUser:              return handleTransactionParams<ApiUserData>             (serializedTransaction, serializationSupport, transaction, function, fastFunction);
@@ -1016,7 +1016,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
             return false;
         }
 
-        QnTransaction<ApiCameraServerItemDataList> tranCameraHistory;
+        QnTransaction<ApiServerFootageDataList> tranCameraHistory;
         tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
         tranCameraHistory.peerID = m_localPeer.id;
         if (dbManager->doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok) {

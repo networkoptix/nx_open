@@ -3,6 +3,7 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 
+#include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -23,6 +24,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
+#include "core/resource/camera_history.h"
 
 QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NULL */):
     base_type(parent),
@@ -74,11 +76,7 @@ QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const
     if (time == DATETIME_NOW)
         return currentServer;
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
-    if (!history)
-        return currentServer;
-
-    QnMediaServerResourcePtr mediaServer = history->getMediaServerOnTime(time, false);
+    QnMediaServerResourcePtr mediaServer = qnCameraHistoryPool->getMediaServerOnTime(camera, time);
     if (!mediaServer)
         return currentServer;
 
@@ -185,7 +183,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
 
-    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
+    if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
         loader->addBookmark(bookmark);
 }
 
@@ -199,7 +197,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraB
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
 
-    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
+    if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
         loader->updateBookmark(bookmark);
 }
 
@@ -208,7 +206,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraB
     if (status != 0 || !camera)
         return;
 
-    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
+    if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
         loader->removeBookmark(bookmark);
 }
 

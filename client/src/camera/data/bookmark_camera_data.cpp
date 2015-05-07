@@ -82,9 +82,9 @@ void QnBookmarkCameraData::update(const QnAbstractCameraDataPtr &other, const Qn
     lists.append(other_casted->m_data);
     m_data = mergeBookmarks(lists);
 
-    QVector<QnTimePeriodList> periods;
-    periods.append(m_dataSource);
-    periods.append(other_casted->m_dataSource);
+    std::vector<QnTimePeriodList> periods;
+    periods.push_back(m_dataSource);
+    periods.push_back(other_casted->m_dataSource);
     m_dataSource = QnTimePeriodList::mergeTimePeriods(periods);
 }
 
@@ -127,19 +127,18 @@ QnTimePeriodList QnBookmarkCameraData::dataSource() const {
 }
 
 bool QnBookmarkCameraData::trim(qint64 trimTime) {
-    if(m_dataSource.isEmpty())
+    if(m_dataSource.empty())
         return false;
 
-    QnTimePeriod period = m_dataSource.last();
+    QnTimePeriod& period = m_dataSource.last();
     if(!period.isInfinite())
         return false;
 
     qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
-    period.durationMs = trimmedDurationMs;
-    if(period.durationMs == 0) {
+    if(trimmedDurationMs == 0) {
         m_dataSource.pop_back();
     } else {
-        m_dataSource.back() = period;
+        period.durationMs = trimmedDurationMs;
     }
 
     return true;
@@ -154,6 +153,34 @@ QnCameraBookmark QnBookmarkCameraData::find(const qint64 position) const {
 
         if (bookmark.endTimeMs() >= position && bookmark.durationMs > result.durationMs)
             result = bookmark;
+    }
+    return result;
+}
+
+QnCameraBookmarkList QnBookmarkCameraData::findAll(const qint64 position) const
+{
+    QnCameraBookmarkList result;
+    foreach (const QnCameraBookmark &bookmark, m_data)
+    {
+        if (bookmark.startTimeMs > position)
+            break;
+
+        if (position <= bookmark.endTimeMs())
+            result.push_back(bookmark);
+    }
+
+    return result;
+}
+
+QnCameraBookmarkList QnBookmarkCameraData::data(const QnTimePeriod &period) const
+{
+    QnCameraBookmarkList result;
+    foreach (const QnCameraBookmark &bookmark, m_data)
+    {
+        if (period.contains(bookmark.startTimeMs))
+        {
+            result.push_back(bookmark);
+        }
     }
     return result;
 }
@@ -208,9 +235,9 @@ void QnBookmarkCameraData::removeBookmark(const QnCameraBookmark & bookmark) {
 }
 
 void QnBookmarkCameraData::updateDataSource() {
-    QVector<QnTimePeriodList> periods;
+    std::vector<QnTimePeriodList> periods;
     foreach (const QnCameraBookmark &bookmark, m_data)
-        periods.append(QnTimePeriodList(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs)));
+        periods.push_back(QnTimePeriodList(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs)));
     m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM #Bookmarks need an analogue for the single periods
 }
 

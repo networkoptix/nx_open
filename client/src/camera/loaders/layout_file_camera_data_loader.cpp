@@ -1,7 +1,5 @@
 #include "layout_file_camera_data_loader.h"
 
-#include <api/serializer/serializer.h>
-
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
 #include <camera/data/bookmark_camera_data.h>
@@ -11,17 +9,20 @@
 
 #include <recording/time_period_list.h>
 
+#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
+
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
 
-QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
     QnAbstractCameraDataLoader(resource, dataType, parent)
 {
 
 }
 
-QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent):
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent):
     QnAbstractCameraDataLoader(resource, dataType, parent),
     m_data(data)
 {
@@ -34,12 +35,9 @@ QnLayoutFileCameraDataLoader::~QnLayoutFileCameraDataLoader()
     //qFreeAligned(m_motionData);
 }
 
-QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent)
+QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent)
 {
-    QnAviResourcePtr localFile = resource.dynamicCast<QnAviResource>();
-    if (!localFile)
-        return NULL;
-    QnLayoutFileStorageResourcePtr storage = localFile->getStorage().dynamicCast<QnLayoutFileStorageResource>();
+    QnLayoutFileStorageResourcePtr storage = resource->getStorage().dynamicCast<QnLayoutFileStorageResource>();
     if (!storage)
         return NULL;
 
@@ -73,18 +71,18 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
     QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
     if (!aviRes)
         return -1;
-    QVector<QnTimePeriodList> periods;
+    std::vector<QnTimePeriodList> periods;
     for (int channel = 0; channel < motionRegions.size(); ++channel)
     {
         const QnMetaDataLightVector& m_motionData = aviRes->getMotionBuffer(channel);
         if (!m_motionData.empty())
         {
-            periods << QnTimePeriodList();
+            periods.push_back(QnTimePeriodList());
 
             for (auto itr = m_motionData.begin(); itr != m_motionData.end(); ++itr)
             {
                 if (itr->channel <= motionRegions.size() && QnMetaDataV1::matchImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
-                    periods.last().push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
+                    periods.rbegin()->push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
             }
         }
     }
@@ -108,18 +106,18 @@ int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resol
         return loadChunks();
     case Qn::MotionTimePeriod:
         {
-            QList<QRegion> motionRegions;
-            parseRegionList(motionRegions, filter);
-            for (int i = 0; i < motionRegions.size(); ++i) 
+            QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
+            for (const QRegion &region: motionRegions) 
             {
-                if (!motionRegions[i].isEmpty())
+                if (!region.isEmpty())
                     return loadMotion(motionRegions);
             }
             qWarning() << "empty motion region";
         }
         //TODO: #GDM #Bookmarks intended fall-through to get assert, implement saving and loading bookmarks in layouts and files
     default:
-        Q_ASSERT(false);
+      ///  Q_ASSERT(false);
+        return 0;
     }
     return -1; //should never get here
 }

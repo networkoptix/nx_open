@@ -119,7 +119,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(m_rulesViewModel,                               &QnBusinessRulesActualModel::beforeModelChanged, this, &QnBusinessRulesDialog::at_beforeModelChanged);
     connect(m_rulesViewModel,                               &QnBusinessRulesActualModel::afterModelChanged, this, &QnBusinessRulesDialog::at_afterModelChanged);
 
-    connect(ui->eventLogButton,                             &QPushButton::clicked,  context()->action(Qn::BusinessEventsLogAction), &QAction::trigger);
+    connect(ui->eventLogButton,                             &QPushButton::clicked,  context()->action(Qn::OpenBusinessLogAction), &QAction::trigger);
 
     connect(ui->filterLineEdit,                             &QLineEdit::textChanged, this, &QnBusinessRulesDialog::updateFilter);
     connect(ui->clearFilterButton,                          &QToolButton::clicked, this, &QnBusinessRulesDialog::at_clearFilterButton_clicked);

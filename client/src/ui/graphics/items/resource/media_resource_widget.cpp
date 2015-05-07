@@ -28,13 +28,16 @@
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/fisheye_home_ptz_controller.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
@@ -59,17 +62,20 @@
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
+#include <core/resource/camera_history.h>
 
 //TODO: #Elric remove
 #include <camera/loaders/caching_camera_data_loader.h>
-#include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 
 #include <utils/license_usage_helper.h>
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
-namespace {
+namespace 
+{
+    enum { kInvalidTime = 0 };
+
     bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &object, QString *name) {
         switch(object.type) {
         case Qn::PresetPtzObject: {
@@ -108,19 +114,47 @@ namespace {
 } // anonymous namespace
 
 
-QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
-    QnResourceWidget(context, item, parent),
-    m_display(NULL),
-    m_renderer(NULL),
-    m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false),
-    m_homePtzController(NULL)
+QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent)
+    : QnResourceWidget(context, item, parent)
+    , m_resource(base_type::resource().dynamicCast<QnMediaResource>())
+    , m_camera(base_type::resource().dynamicCast<QnVirtualCameraResource>())
+    , m_display(nullptr)
+    , m_renderer(nullptr)
+    , m_motionSelection()
+    , m_motionSelectionPathCache()
+    , m_paintedChannels()
+    , m_motionSensitivity()
+    , m_motionSensitivityValid(false)
+    , m_binaryMotionMask()
+    , m_binaryMotionMaskValid(false)
+    , m_motionSelectionCacheValid(false)
+    , m_sensStaticText()
+    , m_ptzController(nullptr)
+    , m_homePtzController(nullptr)
+    , m_dewarpingParams()
+
+    , m_currentTime(kInvalidTime)
+    , m_bookmarks()
+    , m_bookmarksBeginPosition(m_bookmarks.cbegin())
+    , m_dataLoader(context->instance<QnCameraDataManager>()->loader(m_resource->toResourcePtr()))
 {
-    m_resource = base_type::resource().dynamicCast<QnMediaResource>();
+    updateBookmarks();
+    connect(m_dataLoader, &QnCachingCameraDataLoader::bookmarksChanged, this, &QnMediaResourceWidget::updateBookmarks);
+    connect(m_dataLoader, &QnCachingCameraDataLoader::loadingFailed, this, [this]()
+    {
+        m_bookmarks = QnCameraBookmarkList();
+        m_bookmarksBeginPosition = m_bookmarks.cbegin();
+    });
+    connect(m_dataLoader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type)
+    {
+        if (type == Qn::BookmarksContent)
+        {
+            updateBookmarks();
+        }
+    });
+
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
-    m_camera = base_type::resource().dynamicCast<QnVirtualCameraResource>();
-
 
     // TODO: #Elric
     // Strictly speaking, this is a hack.
@@ -178,86 +212,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up buttons. */
-
-    {
-        QnImageButtonWidget *screenshotButton = new QnImageButtonWidget();
-        screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
-        screenshotButton->setCheckable(false);
-        screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
-        screenshotButton->setToolTip(tr("Screenshot"));
-        setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
-        connect(screenshotButton, &QnImageButtonWidget::clicked, this, &QnMediaResourceWidget::at_screenshotButton_clicked);
-        buttonBar()->addButton(ScreenshotButton, screenshotButton);
-    }
-
-    {
-        QnImageButtonWidget *searchButton = new QnImageButtonWidget();
-        searchButton->setIcon(qnSkin->icon("item/search.png"));
-        searchButton->setCheckable(true);
-        searchButton->setProperty(Qn::NoBlockMotionSelection, true);
-        searchButton->setToolTip(tr("Smart Search"));
-        setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
-        connect(searchButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_searchButton_toggled);
-        buttonBar()->addButton(MotionSearchButton, searchButton);
-    }
-
-    {
-        QnImageButtonWidget *ptzButton = new QnImageButtonWidget();
-        ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
-        ptzButton->setCheckable(true);
-        ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
-        ptzButton->setToolTip(tr("PTZ"));
-        setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
-        connect(ptzButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ptzButton_toggled);
-        buttonBar()->addButton(PtzButton, ptzButton);
-    }
-
-    {
-        QnImageButtonWidget *fishEyeButton = new QnImageButtonWidget();
-        fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
-        fishEyeButton->setCheckable(true);
-        fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
-        fishEyeButton->setToolTip(tr("Dewarping"));
-        fishEyeButton->setChecked(item->dewarpingParams().enabled);
-        setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
-        connect(fishEyeButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_fishEyeButton_toggled);
-        buttonBar()->addButton(FishEyeButton, fishEyeButton);
-    }
-
-    {
-        QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
-        zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
-        zoomWindowButton->setCheckable(true);
-        zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
-        zoomWindowButton->setToolTip(tr("Create Zoom Window"));
-        setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
-        connect(zoomWindowButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_zoomWindowButton_toggled);
-        buttonBar()->addButton(ZoomWindowButton, zoomWindowButton);
-    }
-
-    {
-        QnImageButtonWidget *enhancementButton = new QnImageButtonWidget();
-        enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
-        enhancementButton->setCheckable(true);
-        enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
-        enhancementButton->setToolTip(tr("Image Enhancement"));
-        enhancementButton->setChecked(item->imageEnhancement().enabled);
-        setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
-        connect(enhancementButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_histogramButton_toggled);
-        buttonBar()->addButton(EnhancementButton, enhancementButton);
-    }
-
-    if (qnSettings->isDevMode()) {
-        QnImageButtonWidget *debugScreenshotButton = new QnImageButtonWidget();
-        debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
-        debugScreenshotButton->setCheckable(false);
-        debugScreenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
-        debugScreenshotButton->setToolTip(lit("Debug set of screenshots"));
-        connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this, [this] {
-            menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(this).withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
-        });
-        buttonBar()->addButton(DbgScreenshotButton, debugScreenshotButton);
-    }
+    createButtons();
 
     if(m_camera) {
         QTimer *timer = new QTimer(this);
@@ -300,7 +255,92 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
     foreach(__m128i *data, m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
+}
 
+void QnMediaResourceWidget::createButtons() {
+    {
+        QnImageButtonWidget *screenshotButton = new QnImageButtonWidget();
+        screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
+        screenshotButton->setCheckable(false);
+        screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
+        screenshotButton->setToolTip(tr("Screenshot"));
+        setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
+        connect(screenshotButton, &QnImageButtonWidget::clicked, this, &QnMediaResourceWidget::at_screenshotButton_clicked);
+        buttonBar()->addButton(ScreenshotButton, screenshotButton);
+    }
+
+    {
+        QnImageButtonWidget *searchButton = new QnImageButtonWidget();
+        searchButton->setIcon(qnSkin->icon("item/search.png"));
+        searchButton->setCheckable(true);
+        searchButton->setProperty(Qn::NoBlockMotionSelection, true);
+        searchButton->setToolTip(tr("Smart Search"));
+        setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
+        connect(searchButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_searchButton_toggled);
+        buttonBar()->addButton(MotionSearchButton, searchButton);
+    }
+
+    {
+        QnImageButtonWidget *ptzButton = new QnImageButtonWidget();
+        ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
+        ptzButton->setCheckable(true);
+        ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
+        ptzButton->setToolTip(tr("PTZ"));
+        setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
+        connect(ptzButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ptzButton_toggled);
+        buttonBar()->addButton(PtzButton, ptzButton);
+    }
+
+    {
+        QnImageButtonWidget *fishEyeButton = new QnImageButtonWidget();
+        fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
+        fishEyeButton->setCheckable(true);
+        fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
+        fishEyeButton->setToolTip(tr("Dewarping"));
+        fishEyeButton->setChecked(item()->dewarpingParams().enabled);
+        setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
+        connect(fishEyeButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_fishEyeButton_toggled);
+        buttonBar()->addButton(FishEyeButton, fishEyeButton);
+    }
+
+    {
+        QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
+        zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+        zoomWindowButton->setCheckable(true);
+        zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
+        zoomWindowButton->setToolTip(tr("Create Zoom Window"));
+        setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
+        connect(zoomWindowButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_zoomWindowButton_toggled);
+        buttonBar()->addButton(ZoomWindowButton, zoomWindowButton);
+    }
+
+    {
+        QnImageButtonWidget *enhancementButton = new QnImageButtonWidget();
+        enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
+        enhancementButton->setCheckable(true);
+        enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
+        enhancementButton->setToolTip(tr("Image Enhancement"));
+        enhancementButton->setChecked(item()->imageEnhancement().enabled);
+        setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
+        connect(enhancementButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_histogramButton_toggled);
+        buttonBar()->addButton(EnhancementButton, enhancementButton);
+    }
+
+    if (qnSettings->isDevMode()) {
+        QnImageButtonWidget *debugScreenshotButton = new QnImageButtonWidget();
+        debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
+        debugScreenshotButton->setCheckable(false);
+        debugScreenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
+        debugScreenshotButton->setToolTip(lit("Debug set of screenshots"));
+        connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this, [this] {
+            menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(this).withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
+        });
+        buttonBar()->addButton(DbgScreenshotButton, debugScreenshotButton);
+    }
+}
+
+void QnMediaResourceWidget::createCustomOverlays() {
+    /* Bookmarks text overlay. */ 
 }
 
 const QnMediaResourcePtr &QnMediaResourceWidget::resource() const {
@@ -609,7 +649,25 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
     if(isOverlayVisible() && isInfoVisible())
+    {
+        if (m_resource->toResource()->flags() & Qn::utc)
+        { 
+            // get timestamp from the first channel that was painted
+            int channel = std::distance(m_paintedChannels.cbegin(),
+                std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
+            if (channel >= channelCount())
+                channel = 0;
+            
+            enum { kFactor = 1000 };
+            updateCurrentTime(m_renderer->getTimestampOfNextFrameToRender(channel) / kFactor);
+        }
+        else
+        {
+            updateCurrentTime(kInvalidTime);
+        }
+
         updateInfoTextLater();
+    }
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
@@ -928,22 +986,12 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 #endif
 
     QString timeString;
-    if (m_resource->toResource()->flags() & Qn::utc) { /* Do not show time for regular media files. */
-
-        // get timestamp from the first channel that was painted
-        int channel = std::distance(m_paintedChannels.cbegin(),
-            std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
-        if (channel >= channelCount())
-            channel = 0;
-
-        qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(channel) / 1000;
-        if(qnSettings->timeMode() == Qn::ServerTimeMode)
-            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
-
+    if (m_resource->toResource()->flags() & Qn::utc)
+    { 
+        /* Do not show time for regular media files. */
         timeString = m_display->camDisplay()->isRealTimeSource() 
             ? tr("LIVE") 
-            : QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"));
-        
+            : QDateTime::fromMSecsSinceEpoch(m_currentTime).toString(lit("hh:mm:ss.zzz"));
     }
 
     return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
@@ -1063,7 +1111,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
-        QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
+        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online);
         else
@@ -1274,4 +1322,43 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
+}
+
+void QnMediaResourceWidget::updateBookmarks()
+{
+    m_bookmarks = m_dataLoader->bookmarks();
+    m_bookmarksBeginPosition = m_bookmarks.cbegin();
+
+    if (m_currentTime != kInvalidTime)
+        updateCurrentTime(m_currentTime);
+}
+
+void QnMediaResourceWidget::updateCurrentTime(qreal timeMs)
+{
+    if (m_bookmarks.empty())
+    {
+        int i = 0;
+    }
+    if (timeMs < m_currentTime)
+        m_bookmarksBeginPosition = m_bookmarks.cbegin();
+
+    m_bookmarksBeginPosition = std::find_if(m_bookmarksBeginPosition, m_bookmarks.cend()
+        , [timeMs](const QnCameraBookmark &bookmark) -> bool
+    {
+        return (bookmark.endTimeMs() >= timeMs);
+    });
+
+    m_currentTime = timeMs;
+
+    static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
+
+    QString text;
+    auto itBookmark = m_bookmarksBeginPosition;
+    while((itBookmark != m_bookmarks.cend()) && (itBookmark->startTimeMs <= timeMs))
+    {
+        text += outputTemplate.arg(itBookmark->name, itBookmark->description);
+        ++itBookmark;
+    }
+
+    setBookmarksLabelText(text);
 }

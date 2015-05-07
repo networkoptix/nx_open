@@ -33,6 +33,7 @@ extern "C"
 #include "plugins/resource/avi/avi_resource.h"
 
 #include <recording/time_period.h>
+#include "core/resource/media_server_resource.h"
 
 namespace {
     const qint64 defaultUpdateInterval = 10 * 1000; /* 10 seconds. */
@@ -396,9 +397,11 @@ void QnThumbnailsLoader::process() {
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
-        QnMediaServerResourceList servers = QnCameraHistoryPool::instance()->getOnlineCameraServers(camera, period);
-        for (int i = 0; i < servers.size(); ++i) 
+        QnMediaServerResourceList servers = qnCameraHistoryPool->getCameraFootageData(camera, period);        
+        for(const QnMediaServerResourcePtr &server: servers)
         {
+            if (server->getStatus() != Qn::Online)
+                continue;
             QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
             rtspDelegate->setMultiserverAllowed(false);
             if (m_mode == Mode::Default)
@@ -407,7 +410,7 @@ void QnThumbnailsLoader::process() {
                 rtspDelegate->setQuality(MEDIA_Quality_High, true);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
             rtspDelegate->setCamera(camera);
-            rtspDelegate->setFixedServer(servers[i]);
+            rtspDelegate->setFixedServer(server);
             delegates << thumbnailDelegate;
         }
     }

@@ -26,7 +26,7 @@ void QnThreadedChunksMergeTool::run() {
     }
 }
 
-void QnThreadedChunksMergeTool::queueMerge(const QVector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, qint64 startTimeMs, int handle) {
+void QnThreadedChunksMergeTool::queueMerge(const std::vector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, qint64 startTimeMs, int handle) {
     QMutexLocker lock(&m_mutex);
     m_periodsList = periodsList;
     m_syncedPeriods = syncedPeriods;
@@ -45,7 +45,7 @@ void QnThreadedChunksMergeTool::processData() {
 
     /* Synchronization block */
     QMutexLocker lock(&m_mutex);
-    const QVector<QnTimePeriodList> periodsList(m_periodsList);
+    const std::vector<QnTimePeriodList> periodsList(m_periodsList);
     const QnTimePeriodList syncedPeriods(m_syncedPeriods);
     const qint64 startTimeMs(m_startTimeMs);
     const int handle(m_handle);
@@ -69,7 +69,7 @@ void QnThreadedChunksMergeTool::processData() {
     } else {
         auto result = syncedPeriods;
 
-        QVector<QnTimePeriodList> intersectedPeriods;
+        std::vector<QnTimePeriodList> intersectedPeriods;
         for(const auto& list: periodsList)
             intersectedPeriods.push_back(list.intersectedPeriods(QnTimePeriod(startTimeMs, QnTimePeriod::infiniteDuration())));
 

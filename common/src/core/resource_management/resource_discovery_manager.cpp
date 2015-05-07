@@ -78,8 +78,8 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager()
     m_discoveryUpdateIdx(0),
     m_serverOfflineTimeout(20 * 1000)
 {
-    connect(QnResourcePool::instance(), &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
-    connect(QnResourcePool::instance(), &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 

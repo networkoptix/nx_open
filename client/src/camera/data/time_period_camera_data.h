@@ -60,9 +60,9 @@ public:
     /**
      * @brief trim                                  Trim the last time period if it is not finished.
      * @param trimTime                              Value to be set as the end time of the last time period.
-     * @return                                      True if the list was modifed, false otherwise.
+     * @return                                      True if the list was modified, false otherwise.
      */
-    bool trim(qint64 trimTime);
+    virtual bool trim(qint64 trimTime) override;
 private:
     /** List of the stored time periods. */
     QnTimePeriodList m_data;
