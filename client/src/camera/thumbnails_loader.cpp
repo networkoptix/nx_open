@@ -430,6 +430,11 @@ void QnThumbnailsLoader::process() {
     m_mutex.unlock();
 
 
+    QnTimePeriod boundingPeriod(period);
+    boundingPeriod.startTimeMs = qMax(0ll, period.startTimeMs - timeStep);
+    if (boundingPeriod.durationMs != QnTimePeriod::infiniteDuration())
+        boundingPeriod.durationMs = period.endTimeMs() + timeStep - boundingPeriod.startTimeMs;
+
     bool invalidated = false;
     for( const QnAbstractArchiveDelegatePtr &client: delegates) 
     {
@@ -465,6 +470,8 @@ void QnThumbnailsLoader::process() {
                     {
                         outFrame->pkt_dts = timingsQueue.dequeue();
                         thumbnail = generateThumbnail(*outFrame, boundingSize, timeStep, generation);
+                        if (!boundingPeriod.contains(thumbnail.time()))
+                            break;
                         time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                     }
                 } else {
