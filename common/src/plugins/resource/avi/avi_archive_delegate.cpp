@@ -12,7 +12,6 @@ extern "C"
 }
 
 #include <utils/media/ffmpeg_helper.h>
-#include <utils/media/nalUnits.h>
 #include <utils/common/log.h>
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
@@ -29,6 +28,7 @@ extern "C"
 
 #include <motion/light_motion_archive_connection.h>
 #include <export/sign_helper.h>
+#include "utils/media/nalUnits.h"
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {

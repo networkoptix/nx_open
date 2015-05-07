@@ -62,6 +62,7 @@ static qreal qSlowCos(qreal angle) {
 #define cos qSlowCos
 #endif // Q_CC_GNU
 
+#if 0
 static bool saveTransformImage(const QPointF *transform, int width, int height, const QString &fileName) {
     QImage image(width, height, QImage::Format_ARGB32);
 
@@ -78,7 +79,7 @@ static bool saveTransformImage(const QPointF *transform, int width, int height, 
     
     return image.save(fileName);
 }
-
+#endif
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 // constant values that will be needed

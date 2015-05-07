@@ -138,10 +138,15 @@ namespace nx_http
 
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
-        void addRequestHeader(const StringType& key, const StringType& value);
+        void addAdditionalHeader( const StringType& key, const StringType& value );
         void addRequestHeaders(const HttpHeaders& headers);
         void removeAdditionalHeader( const StringType& key );
-        void setAuthType(AuthType value);
+        template<class HttpHeadersRef>
+        void setAdditionalHeaders( HttpHeadersRef&& additionalHeaders )
+        {
+            m_additionalHeaders = std::forward<HttpHeadersRef>(additionalHeaders);
+        }
+        void setAuthType( AuthType value );
 
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );

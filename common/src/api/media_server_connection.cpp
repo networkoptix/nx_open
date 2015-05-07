@@ -95,7 +95,7 @@ namespace {
         (ec2CameraHistoryObject,   "ec2/cameraHistory")
         (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
     );
-
+#if 0
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
     {
         QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
@@ -112,7 +112,7 @@ namespace {
         else
             return QByteArray();
     }
-
+#endif
 } // anonymous namespace
 
 
@@ -288,12 +288,12 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     QString guid = mserver->getProperty(lit("guid")); // todo: wtf?
 
     QnRequestHeaderList queryParameters;
-	queryParameters.insert(lit("x-server-guid"), mserver->getId().toString());
+	queryParameters.insert(lit("X-server-guid"), mserver->getId().toString());
 
     setExtraQueryParameters(queryParameters);
 
     QnRequestHeaderList extraHeaders;
-	extraHeaders.insert(lit("x-server-guid"), guid.isEmpty() ? mserver->getId().toString() : guid);
+	extraHeaders.insert(lit("X-server-guid"), guid.isEmpty() ? mserver->getId().toString() : guid);
 
     if (!videowallGuid.isNull())
         extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());

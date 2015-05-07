@@ -304,7 +304,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
         for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
             if (license->hardwareId() == hardwareId() && license->type() == type()) 
             {
-                if (mode == VM_CheckInfo && license->key() != key())
+                if (mode == VM_JustCreated && license->key() != key())
                     return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
                 else if (license->key() < key())
                     return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed

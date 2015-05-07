@@ -110,14 +110,14 @@ void QnResourceDisplay::beforeDisconnectFromResource() {
 }
 
 void QnResourceDisplay::disconnectFromResource() {
-    if(m_dataProvider == NULL)
+    if(!m_dataProvider)
         return; 
 
-    if(m_mediaProvider != NULL)
+    if(m_mediaProvider && m_camera)
         m_mediaProvider->removeDataProcessor(m_camera->getCamDisplay());
 
     cleanUp(m_dataProvider);
-    if(m_camera != NULL)
+    if(m_camera)
         m_camera->beforeStopDisplay();
 
     m_mediaResource.clear();

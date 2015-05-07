@@ -42,7 +42,7 @@ using namespace nx_http;
 namespace nx_hls
 {
     static const size_t READ_BUFFER_SIZE = 64*1024;
-    static const int MIN_CHUNK_COUNT_IN_PLAYLIST = 3;
+    //static const int MIN_CHUNK_COUNT_IN_PLAYLIST = 3;
     static const int CHUNK_COUNT_IN_ARCHIVE_PLAYLIST = 3;
     static const QLatin1String HLS_PREFIX( "/hls/" );
     static const quint64 MSEC_IN_SEC = 1000;
@@ -51,7 +51,7 @@ namespace nx_hls
     static const unsigned int DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * 7;
     static const int COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO = 5;
     static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
-    static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
+    //static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
 
     QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*owner*/ )
     :

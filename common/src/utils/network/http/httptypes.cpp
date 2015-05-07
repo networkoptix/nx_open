@@ -263,6 +263,7 @@ namespace nx_http
     namespace Method
     {
         const StringType GET( "GET" );
+        const StringType HEAD( "HEAD" );
         const StringType POST( "POST" );
         const StringType PUT( "PUT" );
     }

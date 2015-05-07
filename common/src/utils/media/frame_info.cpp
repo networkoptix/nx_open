@@ -253,6 +253,7 @@ bool CLVideoDecoderOutput::equalPlanes(const unsigned char* plane1, const unsign
     return true;
 }
 
+#if 0
 void CLVideoDecoderOutput::saveToFile(const char* filename)
 {
 
@@ -294,6 +295,7 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
     }
 
 }
+#endif
 
 bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
 {
