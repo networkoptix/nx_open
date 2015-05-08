@@ -44,7 +44,7 @@ void QnRestUpdatePeerTask::doStart() {
 
     foreach (const QnUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
-        Q_ASSERT_X(server, "An incompatible server resource is expected here.", Q_FUNC_INFO);
+        Q_ASSERT_X(QnMediaServerResource::isFakeServer(server), "An incompatible server resource is expected here.", Q_FUNC_INFO);
 
         NX_LOG(lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
                .arg(m_updateId).arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
