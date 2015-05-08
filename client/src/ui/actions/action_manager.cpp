@@ -881,7 +881,7 @@ QnActionManager::QnActionManager(QObject *parent):
         conditionalText(tr("Monitor in a New Tab"), hasFlags(Qn::server), Qn::All).
         condition(new QnConjunctionActionCondition(
                       new QnOpenInNewEntityActionCondition(this),
-                      new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
+                      new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
 
     factory(Qn::OpenInNewWindowAction).
@@ -891,7 +891,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
                       new QnOpenInNewEntityActionCondition(this),
                       new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
-                      new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
+                      new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
 
     factory(Qn::OpenSingleLayoutAction).
@@ -1330,7 +1330,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
-                      new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
+                      new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
 
     factory(Qn::CameraListByServerAction).
@@ -1339,7 +1339,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
-                      new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
+                      new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
 
     factory(Qn::PingAction).
@@ -1351,7 +1351,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Server Logs...")).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
-                      new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
+                      new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
 
     factory(Qn::ServerIssuesAction).
@@ -1359,7 +1359,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Server Diagnostics...")).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
-                      new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
+                      new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
 
     factory(Qn::ServerSettingsAction).
@@ -1368,7 +1368,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::WritePermission).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
-                      new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
+                      new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
 
     factory(Qn::ConnectToCurrentSystem).
@@ -1376,7 +1376,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::All, this),
-            new QnResourceStatusActionCondition(QSet<Qn::ResourceStatus>() << Qn::Incompatible << Qn::Unauthorized, true, this),
+            new QnFakeServerActionCondition(true, this),
             new QnTreeNodeTypeCondition(Qn::ResourceNode, this),
             this));
 

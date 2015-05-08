@@ -824,7 +824,6 @@ void QnWorkbenchNavigator::updateCentralWidget() {
         connect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
     updateCurrentWidget();
-    updateThumbnailsLoader();
 }
 
 void QnWorkbenchNavigator::updateCurrentWidget() {
@@ -839,6 +838,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
 
     if(m_currentWidget) {
+        m_timeSlider->setThumbnailsLoader(NULL, -1);
         if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
             foreach(QnResourceWidget *widget, m_syncedWidgets)
                 updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
@@ -898,6 +898,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updatePlaying();
     updateSpeedRange();
     updateSpeed();
+    updateThumbnailsLoader();
 
     emit currentWidgetChanged();
 }

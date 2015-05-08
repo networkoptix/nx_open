@@ -144,12 +144,6 @@ void QnStreamRecorder::close()
             fileFinished(fileDuration, m_fileName, m_mediaProvider, QnFfmpegHelper::getFileSizeByIOContext(m_ioContext));
         }
 
-        for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
-        {
-            if (m_formatCtx->streams[i]->codec)
-                avcodec_close(m_formatCtx->streams[i]->codec);
-        }
-        
         if (m_ioContext)
         {
             QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);

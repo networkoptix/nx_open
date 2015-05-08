@@ -21,7 +21,7 @@ def getChangelog(revision):
     changelog = subprocess.check_output(command, shell=True)
     changes = sorted(set(changelog.split('\n\n')))
     
-    return '\n'.join(changes)
+    return '\n'.join(changes).strip('\n')
       
 def main():
     parser = argparse.ArgumentParser()
@@ -38,8 +38,8 @@ def main():
         sys.exit(0)
         
     execCommand('hg up prod_2.3.1')     
-    execCommand('hg merge {0}').format(revision)
-    execCommand('hg ci -m"{0}"'.format(getChangelog()))
+    execCommand('hg merge {0}'.format(revision))
+    execCommand('hg ci -m"{0}"'.format(getChangelog(revision)))
     sys.exit(0)
     
 if __name__ == "__main__":
