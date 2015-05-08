@@ -24,10 +24,8 @@ namespace {
         QString sep(QLatin1String(";;"));
         int i = f.indexOf(sep, 0);
         if (i == -1) {
-            if (f.indexOf(QLatin1Char('\n'), 0) != -1) {
+            if (f.indexOf(QLatin1Char('\n'), 0) != -1)
                 sep = QLatin1Char('\n');
-                i = f.indexOf(sep, 0);
-            }
         }
 
         return f.split(sep);
