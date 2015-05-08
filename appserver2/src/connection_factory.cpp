@@ -27,6 +27,7 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
+#include "http/http_transaction_receiver.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
@@ -110,6 +111,7 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
     {
         universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
+        universalTcpListener->addHandler<QnHttpTransactionReceiver>("HTTP", "ec2/forward_events");
 
         m_sslEnabled = universalTcpListener->isSslEnabled();
     }

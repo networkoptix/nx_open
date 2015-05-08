@@ -61,6 +61,11 @@ namespace ec2
             qint64 remoteSystemIdentityTime,
             const nx_http::Request& request,
             const QByteArray& requestBuf );
+        //!Process transaction received via standard HTTP server interface
+        bool gotTransactionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            const nx_http::Request& request,
+            const QByteArray& requestMsgBody );
         void dropConnections();
         
         ApiPeerData localPeer() const;

@@ -1279,6 +1279,36 @@ void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
     }
 }
 
+bool QnTransactionMessageBus::gotTransactionFromRemotePeer(
+    const QnUuid& connectionGuid,
+    const nx_http::Request& request,
+    const QByteArray& requestMsgBody )
+{
+    if (!dbManager)
+    {
+        qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
+        return false;
+    }
+
+    if (m_restartPending)
+        return false; // reject incoming connection because of media server is about to restart
+
+    QMutexLocker lock(&m_mutex);
+
+    for( QnTransactionTransport* transport: m_connections.values() )
+    {
+        if( transport->connectionGuid() == connectionGuid )
+        {
+            transport->receivedTransaction(
+                request.headers,
+                requestMsgBody );
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static QUrl addCurrentPeerInfo(const QUrl& srcUrl)
 {
     QUrl url(srcUrl);

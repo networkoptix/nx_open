@@ -180,6 +180,10 @@ public:
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
 
+    void receivedTransaction(
+        const nx_http::HttpHeaders& headers,
+        const QnByteArrayConstRef& tranData );
+
     void transactionProcessed();
 
     QnUuid connectionGuid() const;
@@ -286,7 +290,10 @@ private:
     */
     void scheduleAsyncRead();
     bool readCreateIncomingTunnelMessage();
-    void receivedTransaction( const QnByteArrayConstRef& tranData );
+    void receivedTransactionViaInternalTunnel( const QnByteArrayConstRef& tranDataWithHeader );
+    void receivedTransactionNonSafe(
+        const nx_http::HttpHeaders& headers,
+        const QnByteArrayConstRef& tranData );
     void startListeningNonSafe();
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
 
@@ -295,6 +302,7 @@ private slots:
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
     void repeatDoGet();
     void openPostTransactionConnectionDone( const nx_http::AsyncHttpClientPtr& );
+    void postTransactionDone( const nx_http::AsyncHttpClientPtr& );
 };
 
 }
