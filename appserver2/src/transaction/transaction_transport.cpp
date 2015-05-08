@@ -9,6 +9,7 @@
 #include <utils/media/custom_output_stream.h>
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
+#include <utils/common/timermanager.h>
 
 #include "transaction_message_bus.h"
 #include "utils/common/log.h"
@@ -104,6 +105,7 @@ void QnTransactionTransport::default_initializer()
     m_peerRole = prOriginating;
     m_compressResponseMsgBody = false;
     m_authOutgoingConnectionByServerKey = true;
+    m_sendKeepAliveTask = 0;
 }
 
 QnTransactionTransport::QnTransactionTransport(
@@ -117,6 +119,7 @@ QnTransactionTransport::QnTransactionTransport(
 
     m_localPeer = localPeer;
     m_outgoingDataSocket = socket;
+    startSendKeepAliveTimerNonSafe();
     m_connectionType = connectionType;
     m_peerRole = prAccepting;
     m_contentEncoding = contentEncoding;
@@ -185,6 +188,17 @@ QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
 QnTransactionTransport::~QnTransactionTransport()
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+
+#ifdef USE_HTTP_CLIENT_TO_SEND_POST
+    quint64 sendKeepAliveTaskLocal = 0;
+    {
+        QMutexLocker lock(&m_mutex);
+        sendKeepAliveTaskLocal = m_sendKeepAliveTask;
+        m_sendKeepAliveTask = 0;    //no new task can be added
+    }
+    if( sendKeepAliveTaskLocal )
+        TimerManager::instance()->joinAndDeleteTimer( sendKeepAliveTaskLocal );
+#endif
 
     {
         auto httpClientLocal = m_httpClient;
@@ -708,19 +722,54 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     startListeningNonSafe();
 }
 
-void QnTransactionTransport::sendHttpKeepAlive()
+void QnTransactionTransport::sendHttpKeepAlive( quint64 taskID )
 {
     QMutexLocker lock(&m_mutex);
+
+#ifdef USE_HTTP_CLIENT_TO_SEND_POST
+    if( m_sendKeepAliveTask != taskID )
+        return; //task has been cancelled
+#endif
+
     if (m_dataToSend.empty())
     {
         m_dataToSend.push_back( QByteArray() );
         serializeAndSendNextDataBuffer();
     }
+
+    startSendKeepAliveTimerNonSafe();
+}
+
+void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
+{
+    if( !m_remotePeer.isServer() )
+        return; //not sending keep-alive to a client
+
 #ifdef USE_HTTP_CLIENT_TO_SEND_POST
     //TODO #ak keep-alive timer 
+    if( m_peerRole == prAccepting )
+    {
+        assert( m_outgoingDataSocket );
+        if( !m_outgoingDataSocket->registerTimer(
+                TCP_KEEPALIVE_TIMEOUT,
+                std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, 0) ) )
+            setStateNoLock( State::Error );
+    }
+    else
+    {
+        //we using http client to send transactions
+        m_sendKeepAliveTask = TimerManager::instance()->addTimer(
+            std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, std::placeholders::_1),
+            TCP_KEEPALIVE_TIMEOUT );
+    }
 #else
-    if( !m_outgoingDataSocket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
+    assert( m_outgoingDataSocket );
+    if( !m_outgoingDataSocket->registerTimer(
+            TCP_KEEPALIVE_TIMEOUT,
+            std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, 0) ) )
+    {
         setStateNoLock( State::Error );
+    }
 #endif
 }
 
@@ -998,9 +1047,19 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     }
     else {
         m_incomingDataSocket = m_httpClient->takeSocket();
-        //m_incomingDataSocket->setNoDelay( true );
         if( m_connectionType == ConnectionType::bidirectional )
+        {
             m_outgoingDataSocket = m_incomingDataSocket;
+            QMutexLocker lk( &m_mutex );
+            startSendKeepAliveTimerNonSafe();
+        }
+#ifdef USE_HTTP_CLIENT_TO_SEND_POST
+        else
+        {
+            QMutexLocker lk( &m_mutex );
+            startSendKeepAliveTimerNonSafe();
+        }
+#endif
 
         m_httpClient.reset();
         if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
@@ -1289,13 +1348,6 @@ void QnTransactionTransport::startListeningNonSafe()
             setStateNoLock( Error );
             return;
         }
-        if( m_remotePeer.isServer() )
-            if( !m_incomingDataSocket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
-            {
-                m_lastReceiveTimer.invalidate();
-                setStateNoLock( Error );
-                return;
-            }
     }
 }
 
@@ -1346,6 +1398,7 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
     }
 
     m_outgoingDataSocket = client->takeSocket();
+    startSendKeepAliveTimerNonSafe();
     m_outgoingTranClient.reset();
 
     assert( !m_dataToSend.empty() );
@@ -1409,8 +1462,6 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
         m_outgoingTranClient.reset();
         return;
     }
-
-    //taking next transaction
 
     m_dataToSend.pop_front();
     if( m_dataToSend.empty() )

@@ -260,10 +260,11 @@ private:
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranUrl;
+    quint64 m_sendKeepAliveTask;
 
 private:
     void default_initializer();
-    void sendHttpKeepAlive();
+    void sendHttpKeepAlive( quint64 taskID );
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray&& data);
@@ -296,6 +297,7 @@ private:
         const QnByteArrayConstRef& tranData );
     void startListeningNonSafe();
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
+    void startSendKeepAliveTimerNonSafe();
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
