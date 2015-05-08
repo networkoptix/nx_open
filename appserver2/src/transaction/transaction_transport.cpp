@@ -913,7 +913,9 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         }
         if( !m_outgoingTranClient->doPost(
                 m_postTranUrl,
-                Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
+                m_base64EncodeOutgoingTransactions
+                    ? "application/text"
+                    : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
 #ifdef USE_HTTP_CLIENT_TO_SEND_POST
                 dataCtx.encodedSourceData
 #else
@@ -1339,7 +1341,9 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
         fillAuthInfo( m_outgoingTranClient, m_authOutgoingConnectionByServerKey );
         if( !m_outgoingTranClient->doPost(
                 m_postTranUrl,
-                Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
+                m_base64EncodeOutgoingTransactions
+                    ? "application/text"
+                    : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
                 nx_http::BufferType() ) )
         {
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("Failed (2) to initiate POST transaction request to %1. %2").
@@ -1405,7 +1409,9 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
         fillAuthInfo( m_outgoingTranClient, m_authOutgoingConnectionByServerKey );
         if( !m_outgoingTranClient->doPost(
                 m_postTranUrl,
-                Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
+                m_base64EncodeOutgoingTransactions
+                    ? "application/text"
+                    : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
                 dataCtx.encodedSourceData ) )
         {
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("Failed (2) to initiate POST transaction request to %1. %2").
