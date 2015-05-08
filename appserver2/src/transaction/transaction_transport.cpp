@@ -10,6 +10,7 @@
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/common/timermanager.h>
+#include <utils/network/http/base64_decoder_filter.h>
 
 #include "transaction_message_bus.h"
 #include "utils/common/log.h"
@@ -35,6 +36,7 @@
 #endif
 //!if not defined, ubjson is used
 //#define USE_JSON
+#define ENCODE_TO_BASE64
 
 
 /*!
@@ -106,29 +108,34 @@ void QnTransactionTransport::default_initializer()
     m_compressResponseMsgBody = false;
     m_authOutgoingConnectionByServerKey = true;
     m_sendKeepAliveTask = 0;
+    m_base64EncodeOutgoingTransactions = false;
 }
 
 QnTransactionTransport::QnTransactionTransport(
     const QnUuid& connectionGuid,
     const ApiPeerData& localPeer,
     const ApiPeerData& remotePeer,
-    const QSharedPointer<AbstractStreamSocket>& socket,
+    QSharedPointer<AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
+    const nx_http::Request& request,
     const QByteArray& contentEncoding )
 {
     default_initializer();
 
     m_localPeer = localPeer;
     m_remotePeer = remotePeer;
-    m_outgoingDataSocket = socket;
+    m_outgoingDataSocket = std::move(socket);
     m_connectionType = connectionType;
     m_peerRole = prAccepting;
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
 
+    //TODO #ak use binary filter stream for serializing transactions
+    m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
+        request.headers, nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
 
     if( m_connectionType == ConnectionType::bidirectional )
-        m_incomingDataSocket = socket;
+        m_incomingDataSocket = m_outgoingDataSocket;
 
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
@@ -180,6 +187,9 @@ QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
         ;
     m_peerRole = prOriginating;
     m_connectionGuid = QnUuid::createUuid();
+#ifdef ENCODE_TO_BASE64
+    m_base64EncodeOutgoingTransactions = true;
+#endif
 
 
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
@@ -238,7 +248,10 @@ QnTransactionTransport::~QnTransactionTransport()
 void QnTransactionTransport::addData(QByteArray&& data)
 {
     QMutexLocker lock(&m_mutex);
-    m_dataToSend.push_back( std::move( data ) );
+    if( m_base64EncodeOutgoingTransactions )
+        m_dataToSend.push_back( data.toBase64() );
+    else
+        m_dataToSend.push_back( std::move( data ) );
     if( m_dataToSend.size() == 1 )
         serializeAndSendNextDataBuffer();
 }
@@ -425,6 +438,10 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_httpClient->addAdditionalHeader(
             nx_ec::EC2_SYSTEM_NAME_HEADER_NAME,
             QnCommonModule::instance()->localSystemName().toUtf8() );
+    if( m_base64EncodeOutgoingTransactions )    //requesting server to encode transactions
+        m_httpClient->addAdditionalHeader(
+            nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME,
+            "true" );
 
     m_remoteAddr = remotePeerUrl;
     if (!m_remoteAddr.userName().isEmpty())
@@ -686,9 +703,21 @@ void QnTransactionTransport::receivedTransaction(
     const QnByteArrayConstRef& tranData )
 {
     QMutexLocker lock(&m_mutex);
-    receivedTransactionNonSafe(
-        headers,
-        tranData );
+
+    if( nx_http::getHeaderValue(
+            headers,
+            nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
+    {
+        receivedTransactionNonSafe(
+            headers,
+            QByteArray::fromBase64( tranData.toByteArrayWithRawData() ) );
+    }
+    else
+    {
+        receivedTransactionNonSafe(
+            headers,
+            tranData );
+    }
 }
 
 void QnTransactionTransport::transactionProcessed()
@@ -861,6 +890,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
             addHttpChunkExtensions( &request.headers );
             request.headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
+            if( m_base64EncodeOutgoingTransactions )    //informing server that transaction is encoded
+                request.headers.emplace( nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME, "true" );
             request.messageBody = dataCtx.sourceData;
             dataCtx.encodedSourceData = request.serialized();
 #else
@@ -901,6 +932,10 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             m_outgoingTranClient->addAdditionalHeader(
                 nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
                 ConnectionType::toString(ConnectionType::outgoing) );
+            if( m_base64EncodeOutgoingTransactions )    //informing server that transaction is encoded
+                m_outgoingTranClient->addAdditionalHeader(
+                    nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME,
+                    "true" );
             connect(
                 m_outgoingTranClient.get(), &nx_http::AsyncHttpClient::done,
 #ifdef USE_HTTP_CLIENT_TO_SEND_POST
@@ -1079,6 +1114,17 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         QTimer::singleShot(0, this, SLOT(repeatDoGet()));
     }
     else {
+        if( nx_http::getHeaderValue(
+                m_httpClient->response()->headers,
+                nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
+        {
+            //inserting base64 decoder after m_multipartContentParser
+            std::shared_ptr<AbstractByteStreamFilter> lastFilterBak = m_multipartContentParser->nextFilter();
+            auto base64DecoderFilter = std::make_shared<Base64DecoderFilter>();
+            m_multipartContentParser->setNextFilter( base64DecoderFilter );
+            base64DecoderFilter->setNextFilter( lastFilterBak );
+        }
+
         m_incomingDataSocket = m_httpClient->takeSocket();
         if( m_connectionType == ConnectionType::bidirectional )
         {

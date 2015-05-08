@@ -45,10 +45,11 @@ namespace ec2
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(
             const QnUuid& connectionGuid,
-            const QSharedPointer<AbstractStreamSocket>& socket,
+            QSharedPointer<AbstractStreamSocket> socket,
             ConnectionType::Type connectionType,
             const ApiPeerData& remotePeer,
             qint64 remoteSystemIdentityTime,
+            const nx_http::Request& request,
             const QByteArray& contentEncoding );
         //!Report socket to receive transactions from
         /*!

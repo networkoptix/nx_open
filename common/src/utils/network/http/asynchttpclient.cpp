@@ -663,7 +663,6 @@ namespace nx_http
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
             HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
-        //nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("Connection", "keep-alive") );
         if( !m_userAgent.isEmpty() )
             m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )

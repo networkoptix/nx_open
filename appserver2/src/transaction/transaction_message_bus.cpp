@@ -1214,10 +1214,11 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     const QnUuid& connectionGuid,
-    const QSharedPointer<AbstractStreamSocket>& socket,
+    QSharedPointer<AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
     const ApiPeerData& remotePeer,
     qint64 remoteSystemIdentityTime,
+    const nx_http::Request& request,
     const QByteArray& contentEncoding )
 {
     if (!dbManager)
@@ -1233,8 +1234,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
         connectionGuid,
         m_localPeer,
         remotePeer,
-        socket,
+        std::move(socket),
         connectionType,
+        request,
         contentEncoding );
     transport->setRemoteIdentityTime(remoteSystemIdentityTime);
     connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);

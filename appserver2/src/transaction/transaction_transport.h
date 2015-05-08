@@ -51,6 +51,7 @@ class QnTransactionTransport
     public QObject
 {
     Q_OBJECT
+
 public:
     static const char* TUNNEL_MULTIPART_BOUNDARY;
     static const char* TUNNEL_CONTENT_TYPE;
@@ -76,11 +77,12 @@ public:
         const QnUuid& connectionGuid,
         const ApiPeerData& localPeer,
         const ApiPeerData& remotePeer,
-        const QSharedPointer<AbstractStreamSocket>& socket,
+        QSharedPointer<AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
+        const nx_http::Request& request,
         const QByteArray& contentEncoding );
     //!Initializer for outgoing connection
-    QnTransactionTransport( const ApiPeerData &localPeer );
+    QnTransactionTransport( const ApiPeerData& localPeer );
     ~QnTransactionTransport();
 
 signals:
@@ -262,6 +264,7 @@ private:
     QUrl m_postTranUrl;
     quint64 m_sendKeepAliveTask;
     nx::Buffer m_dummyReadBuffer;
+    bool m_base64EncodeOutgoingTransactions;
 
 private:
     void default_initializer();
