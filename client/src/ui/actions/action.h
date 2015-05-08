@@ -91,6 +91,12 @@ public:
 
     void setForbiddenPermissions(Qn::Permissions forbiddenPermissions);
 
+    QnActionTypes::ClientModes mode() const {
+        return m_mode;
+    }
+
+    void setMode(QnActionTypes::ClientModes mode);
+
     Qn::ActionFlags flags() const {
         return m_flags;
     }
@@ -214,6 +220,7 @@ private:
 
     const Qn::ActionId m_id;
     Qn::ActionFlags m_flags;
+    QnActionTypes::ClientModes m_mode;
     QHash<int, Permissions> m_permissions;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;

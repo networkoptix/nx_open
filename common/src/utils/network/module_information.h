@@ -28,6 +28,10 @@ struct QnModuleInformation {
     bool isCompatibleToCurrentSystem() const;
     bool hasCompatibleVersion() const;
     void fixRuntimeId();
+
+    static QString nxMediaServerId();
+    static QString nxECId();
+    static QString nxClientId();
 };
 
 struct QnModuleInformationWithAddresses : QnModuleInformation {

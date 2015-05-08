@@ -66,7 +66,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
 
-    instance<QnWorkbenchLicenseNotifier>(); // TODO: #Elric belongs here?
+	if (!qnSettings->isActiveXMode())
+		instance<QnWorkbenchLicenseNotifier>(); // TODO: #Elric belongs here?
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
