@@ -23,6 +23,8 @@ public:
      */
     void keepServer(const QnUuid &id, bool keep);
 
+    void createModules(const QList<QnModuleInformationWithAddresses> &modules);
+
 private:
     void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
     void at_moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive);
