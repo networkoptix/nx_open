@@ -10,10 +10,12 @@
 
 #include "stardot_resource.h"
 
+#if 0
 static const char STARDOT_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int STARDOT_SEI_PRODUCT_INFO = 0x0a00;
 static const int STARDOT_SEI_TIMESTAMP = 0x0a01;
 static const int STARDOT_SEI_TRIGGER_DATA = 0x0a03;
+#endif
 static const QByteArray STARDOT_MOTION_UUID = QByteArray::fromHex("bed9b7e0f06032a1bb7e7d4c6d82d249");
 
 

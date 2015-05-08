@@ -14,7 +14,7 @@ namespace {
 const QString infoEntryName = lit("update.json");
 const char passwordChars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
 const int passwordLength = 6;
-const int readBufferSize = 1024 * 16;
+//const int readBufferSize = 1024 * 16;
 const QString updatesCacheDirName = QnAppInfo::productNameShort() + lit("_updates");
 
 bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *version = 0, QnSystemInformation *sysInfo = 0, bool *isClient = 0) {

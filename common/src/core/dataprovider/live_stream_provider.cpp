@@ -200,7 +200,7 @@ void QnLiveStreamProvider::setFps(float f)
     {
         QMutexLocker mtx(&m_livemutex);
 
-        if (abs(m_fps - f) < 0.1)
+        if (std::abs(m_fps - f) < 0.1)
             return; // same fps?
 
 

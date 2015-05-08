@@ -19,7 +19,7 @@
 
 static const size_t RESERVED_TRANSCODED_PACKET_SIZE = 4096;
 static const qint64 EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS = 1000;
-static const size_t USEC_IN_MSEC = 1000;
+//static const size_t USEC_IN_MSEC = 1000;
 
 using namespace std;
 

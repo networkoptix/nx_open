@@ -47,20 +47,20 @@ public:
     int getWidth() const  { return m_context->width;  }
     int getHeight() const { return m_context->height; }
     //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
-    virtual QSize getOriginalPictureSize() const;
+    virtual QSize getOriginalPictureSize() const override;
     double getSampleAspectRatio() const;
     virtual PixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
-    virtual const AVFrame* lastFrame() const { return m_frame; }
+    virtual const AVFrame* lastFrame() const override { return m_frame; }
     void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
-    virtual void setMTDecoding(bool value);
-    virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data);
-    virtual void setOutPictureSize( const QSize& outSize );
+    virtual void setMTDecoding(bool value) override;
+    virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
+    virtual void setOutPictureSize( const QSize& outSize ) override;
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     /*!
         Supports \a multiThreadedMode
     */
-    virtual unsigned int getDecoderCaps() const;
+    virtual unsigned int getDecoderCaps() const override;
     virtual void setSpeed( float newValue ) override;
     void forceMtDecoding(bool value);
 private:
@@ -89,8 +89,8 @@ private:
     DecoderContext m_decoderContext;
 #endif
 
-    int m_width;
-    int m_height;
+    //int m_width;
+    //int m_height;
 
     static bool m_first_instance;
     CodecID m_codecId;

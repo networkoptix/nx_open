@@ -67,7 +67,7 @@ private:
     //double m_lastResultInSec;
     QElapsedTimer m_timer;
     qint64 m_localStartTime;
-    qint64 m_cameraTimeDrift;
+    //qint64 m_cameraTimeDrift;
     double m_rtcpReportTimeDiff;
 
     struct CamSyncInfo {
