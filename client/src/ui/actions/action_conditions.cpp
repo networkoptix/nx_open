@@ -334,7 +334,8 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
                 return Qn::InvisibleAction;
 
             /* Incompatible resources cannot be renamed */
-            if (target->getStatus() == Qn::Incompatible)
+            QnMediaServerResourcePtr server = target.dynamicCast<QnMediaServerResource>();
+            if (server && !server->getProperty(lit("guid")).isEmpty())
                 return Qn::InvisibleAction;
 
             return Qn::EnabledAction;
@@ -658,11 +659,12 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     bool isExportedLayout = snapshotManager()->isFile(layout);
 
     foreach (const QnResourcePtr &resource, resources) {
-        if (resource->getStatus() == Qn::Incompatible)
-            continue;
-
         //TODO: #GDM #Common refactor duplicated code
         bool isServer = resource->hasFlags(Qn::server);
+
+        if (isServer && !resource->getProperty(lit("guid")).isEmpty())
+            continue;
+
         bool isMediaResource = resource->hasFlags(Qn::media);
         bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
@@ -1071,4 +1073,20 @@ Qn::ActionVisibility QnItemsCountActionCondition::check(const QnActionParameters
     int count = workbench()->currentLayout()->items().size();
 
     return (m_count == MultipleItems && count > 1) || (m_count == count) ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+
+Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources) {
+    bool found = false;
+    foreach (const QnResourcePtr &resource, resources) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        if (!resource->getProperty(lit("guid")).isEmpty())
+            found = true;
+        else if (m_all)
+            return Qn::InvisibleAction;
+    }
+    return found ? Qn::EnabledAction : Qn::InvisibleAction;
 }
