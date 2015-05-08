@@ -249,7 +249,6 @@ private:
     int m_postedTranCount;
     bool m_asyncReadScheduled;
     qint64 m_remoteIdentityTime;
-    bool m_incomingTunnelOpened;
     nx_http::HttpStreamReader m_httpStreamReader;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
     std::shared_ptr<nx_http::HttpMessageStreamParser> m_incomingTransactionsRequestsParser;
