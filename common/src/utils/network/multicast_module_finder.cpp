@@ -197,7 +197,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return false;
     }
 
-    if (response->type != nxMediaServerId && response->type != nxECId)
+    if (response->type != QnModuleInformation::nxMediaServerId() && response->type != QnModuleInformation::nxECId())
         return true;
 
         NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Ignoring %1 (%2) with different customization %3 on local address %4").

@@ -444,7 +444,7 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
 
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     QnModuleInformation moduleInformation;
-    moduleInformation.type = nxMediaServerId;
+    moduleInformation.type = QnModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = false;
     moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
