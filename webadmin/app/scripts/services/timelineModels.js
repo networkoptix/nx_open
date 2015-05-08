@@ -221,6 +221,8 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
                 if(data.data.length == 0){
                     console.log("no chunks for this camera");
+
+                    //Todo: find next chunk with a request.
                 }
                 for (var i = 0; i < data.data.length; i++) {
                     var endChunk = data.data[i][0] + data.data[i][1];
@@ -444,8 +446,7 @@ CameraRecordsProvider.prototype.findNearestPosition = function (position,parent)
     }
 
     if(parent.end < position){ //After the last chunk
-        console.log("start live" , parent);
-        return (new Date()).getTime(); //Go to live!
+        return null; //Go to live!
     }
 
     //Here we may want to request better detailization
@@ -453,3 +454,147 @@ CameraRecordsProvider.prototype.findNearestPosition = function (position,parent)
 
     return position; // Position is inside the chunk
 };
+
+
+/**
+ * ShortCache - special collection for short cunks with best detailization for calculating position
+ * @param start
+ * @constructor
+ */
+function ShortCache(cameras,mediaserver,$q){
+
+    this.mediaserver = mediaserver;
+    this.cameras = cameras;
+
+    this.start = 0; // Very start of video request
+    this.played = 0;
+    this.playedPosition = 0;
+    this.lastRequestPosition = null;
+    this.currentDetailization = [];
+    this.checkPoints = {};
+    this.requestInterval = 90 * 1000;//90 seconds to request
+    this.updateInterval = 60 * 1000;//every 60 seconds update
+    this.updating = false; // flag to prevent updating twice
+    this.requestDetailization = 1;//the deepest detailization possible
+    this.limitChunks = 10; // limit for number of chunks
+}
+ShortCache.prototype.init = function(start){
+    this.start = start;
+    this.playedPosition = start;
+
+    this.update();
+};
+
+ShortCache.prototype.update = function(requestPosition,position){
+    //Request from current moment to 1.5 minutes to future
+
+    // Save them to this.currentDetailization
+    if(this.updating && !requestPosition){ //Do not send request twice
+        return;
+    }
+    console.log("update detailization",this.updating, requestPosition);
+
+    requestPosition = requestPosition || this.playedPosition;
+
+    this.updating = true;
+    var self = this;
+    this.lastRequestDate = requestPosition;
+    this.lastRequestPosition = position || this.played;
+
+    console.log("lastRequestPosition ",position, this.played, new Date(this.lastRequestDate));
+
+    this.mediaserver.getRecords('/',
+            this.cameras[0],
+            requestPosition,
+            (new Date()).getTime()+1000,
+            this.requestDetailization,
+            this.limitChunks).
+        then(function(data){
+            self.updating = false;
+            if(data.data.length == 0){
+                console.log("no chunks for this camera and interval");
+            }
+            self.currentDetailization = data.data;
+
+
+            var lastCheckPointDate = self.lastRequestDate;
+            var lastCheckPointPosition = self.lastRequestPosition;
+            for(var i=0; i<self.currentDetailization.length; i++){
+                lastCheckPointPosition += self.currentDetailization[i][1];// Duration of chunks count
+                lastCheckPointDate = self.currentDetailization[i][0] + self.currentDetailization[i][1];
+            }
+            self.checkPoints[lastCheckPointPosition] = lastCheckPointDate;
+        });
+};
+// Check playing date - return videoposition if possible
+ShortCache.prototype.checkPlayingDate = function(positionDate){
+    if(positionDate < this.start){ //Check left boundaries
+        return false; // Return negative value - outer code should request new videocache
+    }
+
+    var lastPosition;
+    for (var key in  this.checkPoints) {
+        if ( this.checkPoints[key] > positionDate) {
+            break;
+        }
+        lastPosition = key;
+    }
+
+    if(typeof(lastPosition)=='undefined' || lastPosition == key){// Right boundaries
+        return false;
+    }
+
+    return lastPosition + positionDate - this.checkPoints[key]; // Video should jump to this position
+};
+
+ShortCache.prototype.setPlayingPosition = function(position){
+// This function translate playing position (in millisecond) into actual date. Should be used while playing video only. Position must be in current buffered video
+    this.played = position;
+    this.playedPosition = 0;
+
+
+    if(position < this.lastRequestPosition) { // Somewhere back on timeline
+        var lastPosition;
+        for (var key in  this.checkPoints) {
+            if (key > position) {
+                break;
+            }
+            lastPosition = key;
+        }
+        // lastPosition  is the nearest position in checkpoints
+        // Estimate current playing position
+        this.playedPosition = lastPosition + position - this.checkPoints[lastPosition];
+
+        this.update(this.checkPoints[lastPosition], lastPosition);// Request detailization from that position and to the future - restore track
+    }
+
+
+    var intervalToEat = position - this.lastRequestPosition;
+    this.playedPosition = this.lastRequestDate + intervalToEat;
+
+    for(var i=0; i<this.currentDetailization.length; i++){
+        intervalToEat -= this.currentDetailization[i][1];// Duration of chunks count
+        this.playedPosition = this.currentDetailization[i][0] + this.currentDetailization[i][1] + intervalToEat;
+        if(intervalToEat <= 0){
+            break;
+        }
+    }
+
+    if(i == this.currentDetailization.length){ // We have no good detailization for this moment
+        console.error("impossible situation");
+    }
+
+    if(this.currentDetailization.length>0) {
+        if (this.currentDetailization[this.currentDetailization.length - 1][1]
+            + this.currentDetailization[this.currentDetailization.length - 1][0]
+            > this.playedPosition + this.updateInterval) { // It's time to update
+            this.update();
+        }
+    }
+
+    //console.log("new played position",new Date(this.playedPosition),i,this.currentDetailization.length);
+
+    return this.playedPosition;
+};
+
+

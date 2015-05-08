@@ -36,7 +36,6 @@
             </vg-controls>
             <vg-buffering></vg-buffering>
         </videogular>
-        <timeline records="activeVideoRecords" handler="switchPosition" position="playingPosition" ></timeline>
-        {{playingPosition}}
+        <timeline records="activeVideoRecords" handler="switchPosition" position-provider="positionProvider" ></timeline>
     </div>
 </div>

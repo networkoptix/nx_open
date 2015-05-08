@@ -140,7 +140,7 @@ angular.module('webadminApp')
                 }
                 return cacheCurrentUser;
             },
-            getRecords:function(serverUrl,physicalId,startTime,endTime,detail,periodsType){
+            getRecords:function(serverUrl,physicalId,startTime,endTime,detail,limit,periodsType){
 
                 //console.log("getRecords",serverUrl,physicalId,startTime,endTime,detail,periodsType);
                 var d = new Date();
@@ -158,6 +158,9 @@ angular.module('webadminApp')
                     periodsType = 0;
                 }
 
+                if(typeof(limit)=='undefined'){
+                    limit = Number.MAX_VALUE;
+                }
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
@@ -167,7 +170,8 @@ angular.module('webadminApp')
                     '&startTime=' + startTime +
                     '&endTime=' + endTime +
                     '&detail=' + detail +
-                    '&periodsType=' + periodsType));
+                    '&periodsType=' + periodsType +
+                    '&limit=' + limit));
             }
         };
     });

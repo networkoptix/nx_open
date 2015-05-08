@@ -11,6 +11,10 @@
                     ng-click="zoom(true)"
                     ng-disabled="disableZoomIn"><span class="glyphicon glyphicon-plus"></span></button>
         </div>
+        <button type="button" class="btn btn-xs"
+                ng-class="{'btn-success':liveMode}"
+                ng-disabled="liveMode"
+                ng-click="goToLive()">Live</button>
     </div>
 
     <div class="popover fade top timeMarker" >

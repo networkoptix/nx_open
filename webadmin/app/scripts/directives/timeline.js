@@ -7,7 +7,7 @@ angular.module('webadminApp')
             scope: {
                 records: '=',
                 ngClick: '&',
-                position: '=',
+                positionProvider: '=',
                 handler: '='
             },
             templateUrl: 'views/components/timeline.html',
@@ -55,20 +55,17 @@ angular.module('webadminApp')
                     timeFormat:'HH:MM:ss'
                 };
                 function positionMarker(){
-                    if(scope.records) {
-                        var nearestPosition = scope.records.findNearestPosition(scope.position);
-                        if (nearestPosition != scope.position) {
-                            console.log("Will jump to position", nearestPosition, "from", scope.position);
-                            scope.handler(nearestPosition);
-                            return;
-                        }
-                    }
-
                     var lastCoord = scope.positionCoordinate;
-                    scope.positionCoordinate = dateToScreenPosition(scope.position).toFixed(1);
+                    if(!scope.positionProvider){
+                        console.log("no position provider");
+                        return;
+                    }
+                    var playedPosition = scope.positionProvider.playedPosition;
+
+                    scope.positionCoordinate = dateToScreenPosition(playedPosition).toFixed(1);
 
                     if(scope.positionCoordinate != lastCoord){
-                        console.log("positionCoordinate ",timeMarker,lastCoord,scope.positionCoordinate);
+                        //console.log("positionCoordinate ",new Date(playedPosition),scope.positionCoordinate);
                         if(scope.positionCoordinate > 0 && scope.positionCoordinate < viewportWidth) {
                             timeMarker.removeClass("hiddenTimemarker");
                             timeMarker.css("left", scope.positionCoordinate + "px");
@@ -77,9 +74,9 @@ angular.module('webadminApp')
                         }
                     }
 
-                    var date = new Date(scope.position);
+                    var date = new Date(playedPosition);
                     scope.playingDate = dateFormat(date, timelineConfig.dateFormat);
-                    scope.playingTime= dateFormat(date, timelineConfig.timeFormat);
+                    scope.playingTime = dateFormat(date, timelineConfig.timeFormat);
                 }
 
                 scope.$watch('position',positionMarker);
@@ -195,7 +192,6 @@ angular.module('webadminApp')
 
                 });
 
-
                 var mouseDate = null;
                 var mouseCoordinate = null;
                 var highlightchunk = false;
@@ -308,8 +304,6 @@ angular.module('webadminApp')
                         animateScope.progress(scope,'labelDisappearance');
                     }
                 }
-
-
 
                 function screenStartPosition(){
                     return viewPortScrollRelative() * (scope.frameWidth - viewportWidth);
@@ -588,8 +582,6 @@ angular.module('webadminApp')
                     updateView();
                 }
 
-
-
                 scope.positionToKeep = 0.5;//Position on screen to keep while zooming
                 scope.levels = RulerModel.levels;
                 scope.actualZoomLevel = timelineConfig.initialZoom;
@@ -721,6 +713,12 @@ angular.module('webadminApp')
                 scope.log = function(data){
                     console.log(data);
                 };
+
+                scope.goToLive = function(){
+                    console.log("gotolive");
+                    scope.liveMode = true;
+                    scope.handler(null);
+                }
             }
 
         };

@@ -6,7 +6,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.cameras = {};
         $scope.activeCamera = null;
 
-        $scope.playingPosition = 0;
         $scope.activeResolution = '320p';
         $scope.availableResolutions = ['1080p', '720p', '640p', '320p', '240p'];
 
@@ -30,40 +29,46 @@ angular.module('webadminApp').controller('ViewCtrl',
             return server.apiUrl.replace('http://', '').replace('https://', '');
         }
 
-        function updateVideoSource() {
+        function updateVideoSource(playing) {
+
+            console.log("init positionProvider ", playing);
+
+            var live = !playing;
+            if(live){
+                playing = (new Date()).getTime();
+            }
+
+            $scope.positionProvider.init(playing);
+
             var cameraId = $scope.activeCamera.physicalId;
             var server = getCamerasServer($scope.activeCamera);
             var serverUrl = '';
             if ($scope.settings.id !== server.id.replace('{', '').replace('}', '')) {
                 serverUrl = '/proxy/' + getServerUrl(server);
             }
-            //$scope.playingPosition
-            var positionMedia = $scope.playingPosition>=0?"&pos=" + ($scope.playingPosition):"";
-            var positionHls = $scope.playingPosition>=0?"&startTimestamp=" + ($scope.playingPosition):"";
-
-            $scope.startPosition = $scope.playingPosition;
+            var positionMedia = !live ? "&pos=" + (playing) : "";
+            var positionHls = !live ? "&startTimestamp=" + (playing) : "";
 
             $scope.acitveVideoSource = [
-                { src: serverUrl + '/media/' + cameraId + '.webm?resolution=' + $scope.activeResolution + positionMedia, type: 'video/webm' },
-                { src: serverUrl + '/media/' + cameraId + '.mp4?resolution=' + $scope.activeResolution+ positionMedia, type: 'video/mp4' },
-                { src: serverUrl + '/hls/' + cameraId + '.m3u?resolution=' + $scope.activeResolution + positionHls},
-                { src: serverUrl + '/hls/' + cameraId + '.m3u8?resolution=' + $scope.activeResolution + positionHls},
+                { src: serverUrl + '/media/' + cameraId + '.webm?resolution='   + $scope.activeResolution + positionMedia, type: 'video/webm' },
+                { src: serverUrl + '/media/' + cameraId + '.mp4?resolution='    + $scope.activeResolution + positionMedia, type: 'video/mp4' },
+                { src: serverUrl + '/hls/'   + cameraId + '.m3u?resolution='    + $scope.activeResolution + positionHls},
+                { src: serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   + $scope.activeResolution + positionHls},
                 { src: serverUrl + '/media/' + cameraId + '.mpegts?resolution=' + $scope.activeResolution + positionMedia},
-                { src: serverUrl + '/media/' + cameraId + '.3gp?resolution=' + $scope.activeResolution + positionMedia},
+                { src: serverUrl + '/media/' + cameraId + '.3gp?resolution='    + $scope.activeResolution + positionMedia},
                 { src: serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia }
             ];
         }
 
         $scope.activeVideoRecords = null;
+        $scope.positionProvider = null;
 
         $scope.updateTime = function(currentTime, duration){
-
             currentTime = currentTime || 0;
-            $scope.playingPosition = $scope.startPosition + currentTime*1000;
+            $scope.positionProvider.setPlayingPosition(currentTime*1000);
         };
 
         $scope.playerReady = function(API){
-            console.log("playerReady",API);
             $scope.playerAPI = API;
             API.play();
         };
@@ -76,9 +81,11 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return camera.id === $scope.cameraId;
             });
 
-            if (!!$scope.activeCamera) {
-                updateVideoSource();
+            if ($scope.activeCamera) {
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId]);
+
+                updateVideoSource(false); //live
             }
         };
         $scope.selectCamera = function (activeCamera) {
@@ -91,10 +98,16 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         $scope.switchPosition = function( val ){
-            console.log("switchPosition", val);
 
-            $scope.playingPosition = val;
-            updateVideoSource();
+            var playing = $scope.positionProvider.checkPlayingDate(val);
+
+
+            console.log("switchPosition", new Date(val), playing);
+            if(playing === false) {
+                updateVideoSource(val);//We have nothing more to do with it.
+            }else{
+                $scope.playerAPI.seekTime(playing); // Jump to buffered video
+            }
         };
 
         function extractDomain(url) {
