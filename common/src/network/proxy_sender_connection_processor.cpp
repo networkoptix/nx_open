@@ -131,12 +131,6 @@ void QnProxySenderConnection::run()
 
     initSystemThreadId();
 
-    if (!d->socket->connect(d->proxyServerUrl, SOCKET_TIMEOUT))
-        return;
-
-    d->socket->setSendTimeout(SOCKET_TIMEOUT);
-    d->socket->setRecvTimeout(SOCKET_TIMEOUT);
-
     auto proxyRequest = makeProxyRequest(d->guid, QUrl(d->proxyServerUrl.address.toString()));
     if (proxyRequest.isEmpty())
     {
@@ -145,11 +139,18 @@ void QnProxySenderConnection::run()
         return;
     }
 
+    if (!d->socket->connect(d->proxyServerUrl, SOCKET_TIMEOUT))
+        return;
+
+    d->socket->setSendTimeout(SOCKET_TIMEOUT);
+    d->socket->setRecvTimeout(SOCKET_TIMEOUT);
+
     int sended = sendRequest(proxyRequest);
     if (sended < proxyRequest.length())
     {
-        NX_LOG(lit("QnProxySenderConnection: can not connect to %1")
+        NX_LOG(lit("QnProxySenderConnection: can not send request to %1")
                .arg(d->proxyServerUrl.toString()), cl_logWARNING);
+        d->socket->close();
         return;
     }
 
@@ -158,6 +159,7 @@ void QnProxySenderConnection::run()
     {
         NX_LOG(lit("QnProxySenderConnection: no response from %1")
                .arg(d->proxyServerUrl.toString()), cl_logWARNING);
+        d->socket->close();
         return;
     }
 
@@ -185,12 +187,9 @@ void QnProxySenderConnection::run()
     if (!gotRequest && timer.elapsed() < PROXY_KEEP_ALIVE_INTERVAL)
         doDelay();
 
-    if (!m_needStop) {
-        addNewProxyConnect();
-        if (gotRequest)
-        {
-            parseRequest();
-            processRequest();
-        }
+    if (!m_needStop && gotRequest)
+    {
+        parseRequest();
+        processRequest();
     }
 }
