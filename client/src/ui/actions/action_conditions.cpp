@@ -334,8 +334,7 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
                 return Qn::InvisibleAction;
 
             /* Incompatible resources cannot be renamed */
-            QnMediaServerResourcePtr server = target.dynamicCast<QnMediaServerResource>();
-            if (server && !server->getProperty(lit("guid")).isEmpty())
+            if (QnMediaServerResource::isFakeServer(target))
                 return Qn::InvisibleAction;
 
             return Qn::EnabledAction;
@@ -662,7 +661,7 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
         //TODO: #GDM #Common refactor duplicated code
         bool isServer = resource->hasFlags(Qn::server);
 
-        if (isServer && !resource->getProperty(lit("guid")).isEmpty())
+        if (isServer && QnMediaServerResource::isFakeServer(resource))
             continue;
 
         bool isMediaResource = resource->hasFlags(Qn::media);
@@ -1083,7 +1082,7 @@ Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &re
         if (!server)
             continue;
 
-        if (!resource->getProperty(lit("guid")).isEmpty())
+        if (QnMediaServerResource::isFakeServer(resource))
             found = true;
         else if (m_all)
             return Qn::InvisibleAction;

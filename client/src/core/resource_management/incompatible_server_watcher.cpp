@@ -34,7 +34,7 @@ QnMediaServerResourcePtr makeResource(const QnModuleInformationWithAddresses &mo
 
     server->setId(QnUuid::createUuid());
     server->setStatus(initialStatus, true);
-    server->setProperty(lit("guid"), moduleInformation.id.toString());
+    server->setOriginalGuid(moduleInformation.id.toString());
 
     updateServer(server, moduleInformation);
 
