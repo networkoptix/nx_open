@@ -884,6 +884,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         if( !m_outgoingTranClient )
         {
             m_outgoingTranClient = std::make_shared<nx_http::AsyncHttpClient>();
+            m_outgoingTranClient->setResponseReadTimeoutMs( 10000 );
             m_outgoingTranClient->setUserAgent( QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             m_outgoingTranClient->addAdditionalHeader(
                 nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
