@@ -135,10 +135,11 @@ QnTransactionTransport::QnTransactionTransport(
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
+    using namespace std::placeholders;
     auto processTranFunc = std::bind(
         &QnTransactionTransport::receivedTransactionViaInternalTunnel,
         this,
-        std::placeholders::_1 );
+        _1 );
     if( m_contentEncoding == "gzip" )
     {
         m_compressResponseMsgBody = true;
@@ -154,6 +155,14 @@ QnTransactionTransport::QnTransactionTransport(
 #endif
 
     startSendKeepAliveTimerNonSafe();
+
+#ifdef USE_HTTP_CLIENT_TO_SEND_POST
+    //monitoring m_outgoingDataSocket for connection close
+    m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
+    m_outgoingDataSocket->readSomeAsync(
+        &m_dummyReadBuffer,
+        std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
+#endif
 }
 
 QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
@@ -775,6 +784,27 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
     }
 #endif
 }
+
+#ifdef USE_HTTP_CLIENT_TO_SEND_POST
+void QnTransactionTransport::monitorConnectionForClosure(
+    SystemError::ErrorCode errorCode,
+    size_t bytesRead )
+{
+    QMutexLocker lock(&m_mutex);
+
+    if( (errorCode != SystemError::noError && errorCode != SystemError::timedOut) ||
+        (bytesRead == 0) )   //error or connection closed
+    {
+        return setStateNoLock( State::Error );
+    }
+
+    using namespace std::placeholders;
+    m_dummyReadBuffer.resize( 0 );
+    m_outgoingDataSocket->readSomeAsync(
+        &m_dummyReadBuffer,
+        std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
+}
+#endif
 
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 {

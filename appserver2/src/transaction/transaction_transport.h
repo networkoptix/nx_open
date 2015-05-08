@@ -226,7 +226,7 @@ private:
     QSharedPointer<AbstractStreamSocket> m_outgoingDataSocket;
     nx_http::AsyncHttpClientPtr m_httpClient;
     State m_state;
-    /*std::vector<quint8>*/ nx::Buffer m_readBuffer;
+    nx::Buffer m_readBuffer;
     //!Holds raw data. It is serialized to http chunk just before sending to socket
     std::deque<DataToSend> m_dataToSend;
     QUrl m_remoteAddr;
@@ -261,6 +261,7 @@ private:
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranUrl;
     quint64 m_sendKeepAliveTask;
+    nx::Buffer m_dummyReadBuffer;
 
 private:
     void default_initializer();
@@ -298,6 +299,7 @@ private:
     void startListeningNonSafe();
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
     void startSendKeepAliveTimerNonSafe();
+    void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
