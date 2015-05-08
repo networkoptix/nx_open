@@ -119,7 +119,6 @@ QnTransactionTransport::QnTransactionTransport(
 
     m_localPeer = localPeer;
     m_outgoingDataSocket = socket;
-    startSendKeepAliveTimerNonSafe();
     m_connectionType = connectionType;
     m_peerRole = prAccepting;
     m_contentEncoding = contentEncoding;
@@ -151,6 +150,8 @@ QnTransactionTransport::QnTransactionTransport(
         std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
     m_transactionReceivedAsResponseParser = m_multipartContentParser;
 #endif
+
+    startSendKeepAliveTimerNonSafe();
 }
 
 QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
