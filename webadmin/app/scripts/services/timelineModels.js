@@ -146,9 +146,10 @@ var RulerModel = {
         { name:'1 second'   , format:'ss"s"'    , interval:  new Interval( 1, 0, 0, 0, 0, 0)  , width: 30 }
     ],
 
-    getLevelIndex: function(searchdetailization){
+    getLevelIndex: function(searchdetailization,width){
+        width = width || 1;
         var targetLevel = _.find(RulerModel.levels, function(level){
-            return level.interval.getSeconds()*1000 < searchdetailization;
+            return level.interval.getSeconds()*1000 < searchdetailization/width;
         }) ;
 
         return typeof(targetLevel)!=='undefined' ? RulerModel.levels.indexOf(targetLevel) : RulerModel.levels.length-1;
@@ -167,12 +168,13 @@ var RulerModel = {
 
 
 //Provider for records from mediaserver
-function CameraRecordsProvider(cameras,mediaserver,$q) {
+function CameraRecordsProvider(cameras,mediaserver,$q,width) {
 
     this.cameras = cameras;
     this.mediaserver = mediaserver;
     this.$q = $q;
     this.chunksTree = null;
+    this.width = width;
     var self = this;
     //1. request first detailization to get initial bounds
 
@@ -181,7 +183,7 @@ function CameraRecordsProvider(cameras,mediaserver,$q) {
             return; //No chunks for this camera
         }
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start);
+        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,self.width);
         console.log("record boundaries", self.chunksTree.title);
         self.requestInterval(self.chunksTree.start, self.now(), nextLevel);
     });
@@ -472,15 +474,22 @@ function ShortCache(cameras,mediaserver,$q){
     this.lastRequestPosition = null;
     this.currentDetailization = [];
     this.checkPoints = {};
+    this.updating = false; // flag to prevent updating twice
+
+
     this.requestInterval = 90 * 1000;//90 seconds to request
     this.updateInterval = 60 * 1000;//every 60 seconds update
-    this.updating = false; // flag to prevent updating twice
     this.requestDetailization = 1;//the deepest detailization possible
     this.limitChunks = 10; // limit for number of chunks
 }
 ShortCache.prototype.init = function(start){
     this.start = start;
     this.playedPosition = start;
+    this.played = 0;
+    this.lastRequestPosition = null;
+    this.currentDetailization = [];
+    this.checkPoints = {};
+    this.updating = false;
 
     this.update();
 };
@@ -548,7 +557,7 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
 };
 
 ShortCache.prototype.setPlayingPosition = function(position){
-// This function translate playing position (in millisecond) into actual date. Should be used while playing video only. Position must be in current buffered video
+    // This function translate playing position (in millisecond) into actual date. Should be used while playing video only. Position must be in current buffered video
     this.played = position;
     this.playedPosition = 0;
 
@@ -580,14 +589,14 @@ ShortCache.prototype.setPlayingPosition = function(position){
         }
     }
 
-    if(i == this.currentDetailization.length){ // We have no good detailization for this moment
-        console.error("impossible situation");
+    if(i == this.currentDetailization.length){ // We have no good detailization for this moment - pretend to be live
+        return (new Date()).getTime();
     }
 
     if(this.currentDetailization.length>0) {
         if (this.currentDetailization[this.currentDetailization.length - 1][1]
             + this.currentDetailization[this.currentDetailization.length - 1][0]
-            > this.playedPosition + this.updateInterval) { // It's time to update
+            < this.playedPosition + this.updateInterval) { // It's time to update
             this.update();
         }
     }

@@ -260,7 +260,7 @@ angular.module('webadminApp')
                     for(var i=1; i < RulerModel.levels.length ; i ++ ){
                         var level = RulerModel.levels[i];
 
-                        var secondsPerLevel =(level.interval.getSeconds() / secsPerPixel);
+                        var secondsPerLevel = (level.interval.getSeconds() / secsPerPixel);
 
                         if(typeof(level.topWidth)!=='undefined' &&
                             secondsPerLevel >= level.topWidth){
@@ -275,12 +275,18 @@ angular.module('webadminApp')
                             scope.increasedLevel = i;
                         }
 
-                        if(secondsPerLevel < timelineConfig.minimumMarkWidth){
+                        if(secondsPerLevel > timelineConfig.minimumMarkWidth){
+                            scope.actualLevel = i;
+                        }
+
+                        if(secondsPerLevel >= 1) {
+                            scope.chunksLevel = i;
+                        }
+
+                        if(secondsPerLevel <= 1) {
                             break;
                         }
                     }
-
-                    scope.actualLevel = i-1;
 
                     scope.disableZoomIn  = Math.ceil(scope.actualZoomLevel) >= scope.maxZoomLevel;//scope.actualLevel >= RulerModel.levels.length-1;
                     scope.disableZoomOut = scope.actualZoomLevel <= 0;
@@ -352,7 +358,7 @@ angular.module('webadminApp')
 
                     if(scope.records && scope.records.chunksTree) {
                         // 1. Splice events
-                        var events = scope.records.setInterval(start, end, scope.actualLevel);
+                        var events = scope.records.setInterval(start, end, scope.chunksLevel);
 
                         // 2. Draw em!
                         for(var i=0;i<events.length;i++){
