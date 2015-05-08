@@ -135,10 +135,7 @@ void QnUniversalRequestProcessor::run()
             parseRequest();
 
             auto handler = d->owner->findHandler(d->protocol, d->request);
-            if (!handler)
-                return;
-
-            if (!authenticate(&d->authUserId))
+            if (handler && !authenticate(&d->authUserId))
                 return;
 
             d->response.headers.clear();
@@ -148,7 +145,9 @@ void QnUniversalRequestProcessor::run()
                 d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
             }
 
-            if (!processRequest(handler))
+            // getting a new handler inside is necessary due to possibility of
+            // changing request during authentication
+            if (!processRequest())
             {
                 QByteArray contentType;
                 int rez = redirectTo(QnTcpListener::defaultPage(), contentType);
@@ -168,18 +167,15 @@ void QnUniversalRequestProcessor::run()
         d->socket->close();
 }
 
-bool QnUniversalRequestProcessor::processRequest(QnUniversalTcpListener::InstanceFunc handler)
+bool QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
 
-    QMutexLocker lock(&d->mutex);
-    if (!handler)
-        handler = d->owner->findHandler(d->protocol, d->request);
-
-    if (!handler)
+    QMutexLocker lock(&d->mutex); 
+    if (auto handler = d->owner->findHandler(d->protocol, d->request))
+        d->processor = handler(d->socket, d->owner);
+    else
         return false;
-
-    d->processor = handler(d->socket, d->owner);
 
     if ( !needToStop() )
     {

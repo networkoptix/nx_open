@@ -24,7 +24,7 @@ public:
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
-    bool processRequest(QnUniversalTcpListener::InstanceFunc handler = nullptr);
+    bool processRequest();
     bool authenticate(QnUuid* userId);
 
 private:
