@@ -111,6 +111,7 @@ void QnTransactionTransport::default_initializer()
 QnTransactionTransport::QnTransactionTransport(
     const QnUuid& connectionGuid,
     const ApiPeerData& localPeer,
+    const ApiPeerData& remotePeer,
     const QSharedPointer<AbstractStreamSocket>& socket,
     ConnectionType::Type connectionType,
     const QByteArray& contentEncoding )
@@ -118,6 +119,7 @@ QnTransactionTransport::QnTransactionTransport(
     default_initializer();
 
     m_localPeer = localPeer;
+    m_remotePeer = remotePeer;
     m_outgoingDataSocket = socket;
     m_connectionType = connectionType;
     m_peerRole = prAccepting;

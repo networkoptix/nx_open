@@ -1232,10 +1232,10 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     QnTransactionTransport* transport = new QnTransactionTransport(
         connectionGuid,
         m_localPeer,
+        remotePeer,
         socket,
         connectionType,
         contentEncoding );
-    transport->setRemotePeer(remotePeer);
     transport->setRemoteIdentityTime(remoteSystemIdentityTime);
     connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);

@@ -74,7 +74,8 @@ public:
     //!Initializer for incoming connection
     QnTransactionTransport(
         const QnUuid& connectionGuid,
-        const ApiPeerData &localPeer,
+        const ApiPeerData& localPeer,
+        const ApiPeerData& remotePeer,
         const QSharedPointer<AbstractStreamSocket>& socket,
         ConnectionType::Type connectionType,
         const QByteArray& contentEncoding );
@@ -176,7 +177,6 @@ public:
 
     void processExtraData();
     void startListening();
-    void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
 
