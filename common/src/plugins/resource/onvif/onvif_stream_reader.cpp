@@ -123,7 +123,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
 
     if (!m_streamUrl.isEmpty() && !isCameraControlRequired)
     {
-        m_cachedFps = -1;
         *streamUrl = m_streamUrl;
         return CameraDiagnostics::NoErrorResult();
     }
@@ -145,10 +144,15 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     if (result.errorCode == CameraDiagnostics::ErrorCode::noError) {
         // cache value
         m_streamUrl = *streamUrl;
-        m_cachedQuality = currentQuality;
-        m_cachedFps = currentFps;
-        m_cachedTimer.restart();
-        m_cachedSecondaryQuality = secondaryQuality;
+        if (isCameraControlRequired) {
+            m_cachedQuality = currentQuality;
+            m_cachedFps = currentFps;
+            m_cachedTimer.restart();
+            m_cachedSecondaryQuality = secondaryQuality;
+        }
+        else {
+            m_cachedFps = -1;
+        }
     }
     return result;
 }
