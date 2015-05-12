@@ -430,7 +430,6 @@
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
-                <module>plugins/it930x_plugin</module>
             </modules>            
         </profile>  
         <profile>
