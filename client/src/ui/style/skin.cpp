@@ -118,9 +118,12 @@ QPixmap QnSkin::pixmap(const char *name, const QSize &size, Qt::AspectRatioMode 
 }
 
 QStyle *QnSkin::newStyle() {
+    //QMessageBox::information(nullptr, tr("Waiting for debugger to settle"), QString());
     QStyle *baseStyle = QStyleFactory::create(QLatin1String("Bespin"));
-    if (!baseStyle)
+    if (!baseStyle) {
         qWarning() << "Bespin style could not be loaded";
+        return NULL;
+    }
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
     return style;
 }
