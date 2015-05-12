@@ -101,7 +101,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             var playing = $scope.positionProvider.checkPlayingDate(val);
 
-
             console.log("switchPosition", new Date(val), playing);
             if(playing === false) {
                 updateVideoSource(val);//We have nothing more to do with it.

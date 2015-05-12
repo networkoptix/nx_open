@@ -475,12 +475,14 @@ function ShortCache(cameras,mediaserver,$q){
     this.currentDetailization = [];
     this.checkPoints = {};
     this.updating = false; // flag to prevent updating twice
-
+    this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
+    this.lastPlayedDate = 0;
 
     this.requestInterval = 90 * 1000;//90 seconds to request
     this.updateInterval = 60 * 1000;//every 60 seconds update
     this.requestDetailization = 1;//the deepest detailization possible
     this.limitChunks = 10; // limit for number of chunks
+    this.checkpointsFrequency = 1 * 60 * 1000;//Checkpoints - not often that 5 once in minutes
 }
 ShortCache.prototype.init = function(start){
     this.start = start;
@@ -490,6 +492,9 @@ ShortCache.prototype.init = function(start){
     this.currentDetailization = [];
     this.checkPoints = {};
     this.updating = false;
+
+    this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
+    this.lastPlayedDate = start;
 
     this.update();
 };
@@ -523,22 +528,38 @@ ShortCache.prototype.update = function(requestPosition,position){
             if(data.data.length == 0){
                 console.log("no chunks for this camera and interval");
             }
+            if(data.data.length>0 && data.data[0][0] < requestPosition){ // Crop first chunk.
+                data.data[0][1] -= requestPosition - data.data[0][0];
+                data.data[0][0] = requestPosition;
+            }
             self.currentDetailization = data.data;
 
 
             var lastCheckPointDate = self.lastRequestDate;
             var lastCheckPointPosition = self.lastRequestPosition;
+            var lastSavedCheckpoint = 0; // First chunk will be forced to save
+
             for(var i=0; i<self.currentDetailization.length; i++){
                 lastCheckPointPosition += self.currentDetailization[i][1];// Duration of chunks count
                 lastCheckPointDate = self.currentDetailization[i][0] + self.currentDetailization[i][1];
+
+                if( lastCheckPointDate - lastSavedCheckpoint > self.checkpointsFrequency) {
+                    lastSavedCheckpoint = lastCheckPointDate;
+                    self.checkPoints[lastCheckPointPosition] = lastCheckPointDate; // Too many checkpoints at this point
+                }
             }
-            self.checkPoints[lastCheckPointPosition] = lastCheckPointDate;
         });
 };
 // Check playing date - return videoposition if possible
 ShortCache.prototype.checkPlayingDate = function(positionDate){
     if(positionDate < this.start){ //Check left boundaries
+        console.log("too left!",new Date(positionDate), new Date(this.start), positionDate - this.start);
         return false; // Return negative value - outer code should request new videocache
+    }
+
+    if(positionDate > this.lastPlayedDate ){
+        console.log("too right!",new Date(positionDate), new Date(this.lastPlayedDate), positionDate - this.lastPlayedDate);
+        return false;
     }
 
     var lastPosition;
@@ -549,8 +570,9 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
         lastPosition = key;
     }
 
-    if(typeof(lastPosition)=='undefined' || lastPosition == key){// Right boundaries
-        return false;
+    if(typeof(lastPosition)=='undefined'){// No checkpoints - go to live
+        console.log("no checkpoints found - use the start point!");
+        return positionDate - this.start;
     }
 
     return lastPosition + positionDate - this.checkPoints[key]; // Video should jump to this position
@@ -560,7 +582,6 @@ ShortCache.prototype.setPlayingPosition = function(position){
     // This function translate playing position (in millisecond) into actual date. Should be used while playing video only. Position must be in current buffered video
     this.played = position;
     this.playedPosition = 0;
-
 
     if(position < this.lastRequestPosition) { // Somewhere back on timeline
         var lastPosition;
@@ -573,6 +594,8 @@ ShortCache.prototype.setPlayingPosition = function(position){
         // lastPosition  is the nearest position in checkpoints
         // Estimate current playing position
         this.playedPosition = lastPosition + position - this.checkPoints[lastPosition];
+
+        console.log("back on timeline");
 
         this.update(this.checkPoints[lastPosition], lastPosition);// Request detailization from that position and to the future - restore track
     }
@@ -589,19 +612,27 @@ ShortCache.prototype.setPlayingPosition = function(position){
         }
     }
 
-    if(i == this.currentDetailization.length){ // We have no good detailization for this moment - pretend to be live
-        return (new Date()).getTime();
+    var liveMode = false;
+    if(i == this.currentDetailization.length){ // We have no good detailization for this moment - pretend to be playing live
+        this.playedPosition = (new Date()).getTime();
+        liveMode = true;
     }
 
-    if(this.currentDetailization.length>0) {
-        if (this.currentDetailization[this.currentDetailization.length - 1][1]
+    if(!liveMode && this.currentDetailization.length>0
+        && (this.currentDetailization[this.currentDetailization.length - 1][1]
             + this.currentDetailization[this.currentDetailization.length - 1][0]
-            < this.playedPosition + this.updateInterval) { // It's time to update
-            this.update();
-        }
+            < this.playedPosition + this.updateInterval)) { // It's time to update
+        this.update();
     }
 
     //console.log("new played position",new Date(this.playedPosition),i,this.currentDetailization.length);
+
+
+    if(position > this.lastPlayedPosition){
+        this.lastPlayedPosition = position; // Save the boundaries of uploaded cache
+        this.lastPlayedDate =  this.playedPosition; // Save the boundaries of uploaded cache
+    }
+
 
     return this.playedPosition;
 };
