@@ -377,7 +377,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 #endif
 
     /* Debug overlay */
-    createDebugWidget();
+//    createDebugWidget();
 
     initGraphicsMessageBox();
 
