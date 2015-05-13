@@ -11,7 +11,7 @@
 #endif
 
 static const int NAL_RESERVED_SPACE = 16;
-static const double FRAME_RATE_EPS = 3e-5;
+//static const double FRAME_RATE_EPS = 3e-5;
 
 int NALUnit::calc_rbsp_trailing_bits_cnt(uint8_t val)
 {
@@ -332,6 +332,9 @@ void NALUnit::scaling_list(int* scalingList, int sizeOfScalingList, bool& useDef
 int ceil_log2(double val)
 {
     int iVal = (int) val;
+    if(iVal <= 0)
+        return 0;
+
     double frac = val - iVal;
     int bits = 0;
     for(;iVal > 0; iVal>>=1) {
@@ -1291,7 +1294,7 @@ void SliceUnit::dec_ref_pic_marking()
 
 void SliceUnit::ref_pic_list_reordering()
 {
-    int reordering_of_pic_nums_idc;
+    int reordering_of_pic_nums_idc = 0;
     if( slice_type != I_TYPE && slice_type !=  SI_TYPE ) {
         ref_pic_list_reordering_flag_l0 = bitReader.getBit();
         if( ref_pic_list_reordering_flag_l0 )
@@ -1316,14 +1319,14 @@ void SliceUnit::ref_pic_list_reordering()
         ref_pic_list_reordering_flag_l1 = bitReader.getBit();
         if( ref_pic_list_reordering_flag_l1 )
             do {
-                int reordering_of_pic_nums_idc2 = extractUEGolombCode();
+                reordering_of_pic_nums_idc = extractUEGolombCode();
                 quint32 tmp = extractUEGolombCode();
                 if( reordering_of_pic_nums_idc  ==  0  ||
                     reordering_of_pic_nums_idc  ==  1 )
                     abs_diff_pic_num_minus1 = tmp;
                 else if( reordering_of_pic_nums_idc  ==  2 )
                     long_term_pic_num = tmp;
-                m_ref_pic_vect2.push_back(reordering_of_pic_nums_idc2);
+                m_ref_pic_vect2.push_back(reordering_of_pic_nums_idc);
                 m_ref_pic_vect2.push_back(tmp);
             } while(reordering_of_pic_nums_idc  !=  3);
     }

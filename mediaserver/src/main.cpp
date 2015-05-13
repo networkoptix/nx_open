@@ -185,7 +185,7 @@ static const char COMPONENT_NAME[] = "MediaServer";
 static QString SERVICE_NAME = lit("%1 Server").arg(QnAppInfo::organizationName());
 static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
-static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
+//static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
 static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
@@ -215,7 +215,7 @@ namespace {
 
 //#define TEST_RTSP_SERVER
 
-static const int PROXY_POOL_SIZE = 8;
+//static const int PROXY_POOL_SIZE = 8;
 #ifdef EDGE_SERVER
 static const int DEFAULT_MAX_CAMERAS = 1;
 #else
@@ -582,7 +582,7 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     userAttrsData.serverID = savedServer->getId();
     auto defaultServerAttrs = QnMediaServerUserAttributesPtr(new QnMediaServerUserAttributes());
     fromApiToResource(userAttrsData, defaultServerAttrs);
-    ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveUserAttributesSync(QnMediaServerUserAttributesList() << defaultServerAttrs);
+    rez =  QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveUserAttributesSync(QnMediaServerUserAttributesList() << defaultServerAttrs);
     if (rez != ec2::ErrorCode::ok)
     {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
@@ -1520,6 +1520,7 @@ void QnMain::run()
     qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
+    QScopedPointer<TimerManager> timerManager(new TimerManager());
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 
     ec2::ApiRuntimeData runtimeData;

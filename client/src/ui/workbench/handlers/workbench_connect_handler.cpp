@@ -171,13 +171,21 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     // ask user if he wants to save changes
-    if (connected() && !disconnectFromServer(false))
+    bool force = qnSettings->isActiveXMode() || qnSettings->isVideoWallMode();
+    if (connected() && !disconnectFromServer(force))
         return; 
 
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     if (url.isValid()) {
+        /* ActiveX plugin */
+        if (qnSettings->isActiveXMode()) {
+            if (connectToServer(url, true) != ec2::ErrorCode::ok) {
+                QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
+                menu()->trigger(Qn::ExitAction);
+            }
+        } else
         /* Videowall item */
         if (qnSettings->isVideoWallMode()) {
             //TODO: #GDM #High videowall should try indefinitely

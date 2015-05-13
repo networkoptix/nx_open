@@ -26,7 +26,7 @@ namespace {
     static const int defaultMaxFps = 15;
     static const int defaultReservedSecondStreamFps = 2;
     static const Qn::StreamFpsSharingMethod defaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
-    static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
+    //static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
 
     static const int defaultSecondStreamFpsLow = 2;
     static const int defaultSecondStreamFpsMedium = 7;
@@ -70,11 +70,11 @@ QnSecurityCamResource::QnSecurityCamResource():
         Qt::DirectConnection);
     connect(
         this, &QnResource::resourceChanged,
-        this, &QnSecurityCamResource::updateCachedValues,
+        this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
     connect(
         this, &QnResource::propertyChanged,
-        this, &QnSecurityCamResource::updateCachedValues,
+        this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
     connect(
         this, &QnSecurityCamResource::motionRegionChanged,
@@ -856,11 +856,12 @@ Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const {
     return result;
 }
 
-void QnSecurityCamResource::updateCachedValues()
+void QnSecurityCamResource::resetCachedValues()
 {
     //resetting cached values
-    m_cachedHasDualStreaming2.update();
-    m_cachedSupportedMotionType.update();
-    m_cachedCameraCapabilities.update();
-    m_cachedIsDtsBased.update();
+    m_cachedHasDualStreaming2.reset();
+    m_cachedSupportedMotionType.reset();
+    m_cachedCameraCapabilities.reset();
+    m_cachedIsDtsBased.reset();
+    m_motionType.reset();
 }

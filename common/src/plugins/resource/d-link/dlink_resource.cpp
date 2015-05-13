@@ -348,7 +348,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
     float apectRatio = apectRatio_0;
 
-    if (abs(apectRatio_0 - apectRatio_1) > 0.01)
+    if (std::abs(apectRatio_0 - apectRatio_1) > 0.01)
         apectRatio = apectRatio_1; // 
             
    

@@ -55,7 +55,7 @@ int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &
     if (!server || server->getStatus() != Qn::Online)
         return -1;
 
-    QnAbstractCameraDataLoader *loader;
+    QnAbstractCameraDataLoader *loader = NULL;
     QString cacheKey = server->getId().toString() + camera->getId().toString();
     auto itr = m_cache.find(cacheKey);
     if (itr != m_cache.end()) {

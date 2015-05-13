@@ -11,6 +11,7 @@ namespace nx_http
     MultipartContentParser::MultipartContentParser()
     :
         m_state( waitingBoundary ),
+        m_nextState( none ),
         m_contentLength( (unsigned int)-1 ),   //-1 means no content-length is given
         m_chunkParseState( waitingEndOfLine )
     {
@@ -73,15 +74,21 @@ namespace nx_http
                                 {
                                     //Content-Length known
                                     m_contentLength = contentLengthIter->second.toUInt();
-                                    m_state = readingSizedBinaryData;
+                                    m_state = depleteLineFeedBeforeBinaryData;
+                                    m_nextState = readingSizedBinaryData;
                                 }
                                 else
                                 {
                                     const nx_http::StringType& contentType = nx_http::getHeaderValue( m_currentFrameHeaders, "Content-Type" );
                                     if( contentType == "application/text" || contentType == "text/plain" )
+                                    {
                                         m_state = readingTextData;
+                                    }
                                     else
-                                        m_state = readingUnsizedBinaryData;
+                                    {
+                                        m_state = depleteLineFeedBeforeBinaryData;
+                                        m_nextState = readingUnsizedBinaryData;
+                                    }
                                 }
                                 continue;
                             }
@@ -95,6 +102,16 @@ namespace nx_http
                         default:
                             break;
                     }
+                    break;
+                }
+
+                case depleteLineFeedBeforeBinaryData:
+                {
+                    assert( offset < data.size() );
+                    size_t bytesRead = 0;
+                    m_lineSplitter.finishCurrentLineEnding( data.mid( offset ), &bytesRead );
+                    offset += bytesRead;
+                    m_state = m_nextState;
                     break;
                 }
 

@@ -21,6 +21,7 @@ bool QnWorkbenchStateManager::tryClose(bool force) {
     bool canSaveState = 
            !qnCommon->remoteGUID().isNull()
         && !qnSettings->isVideoWallMode()
+        && !qnSettings->isActiveXMode()
         &&  context()->user();
 
     QnWorkbenchState state;

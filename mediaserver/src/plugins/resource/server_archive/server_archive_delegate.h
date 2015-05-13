@@ -78,7 +78,7 @@ private:
     QnAviResourcePtr m_newQualityFileRes;
     QnAviArchiveDelegatePtr m_newQualityAviDelegate;
 
-    bool m_sendMotion;
+    //bool m_sendMotion;
     bool m_eof;
     MediaQuality m_quality;
     QnDualQualityHelper m_dialQualityHelper;

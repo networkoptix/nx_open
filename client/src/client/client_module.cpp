@@ -5,7 +5,6 @@
 #include <common/common_module.h>
 
 #include "client_meta_types.h"
-#include "client_settings.h"
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
@@ -23,10 +22,10 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));    
     if (QApplication::applicationVersion().isEmpty())
         QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
-
+ 
     /* We don't want changes in desktop color settings to mess up our custom style. */
     QApplication::setDesktopSettingsAware(false);
-
+ 
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(argc, argv, this);
 
@@ -43,6 +42,9 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
 }
 
 QnClientModule::~QnClientModule() {
-    return;
+    QApplication::setOrganizationName(QString());
+    QApplication::setApplicationName(QString());
+    QApplication::setApplicationDisplayName(QString());
+    QApplication::setApplicationVersion(QString());     
 }
 
