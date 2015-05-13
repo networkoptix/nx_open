@@ -97,13 +97,10 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resour
 		if (id.isNull())
 			id = server->getId();
         QnRoute route = QnRouter::instance()->routeTo(id);
-        if (!route.addr.isNull()) {
-            /* Requests to cameras should be always proxied.
-               Requests to servers should be proxied wher the server is not directly available from the client. */
-            if (camera || !route.gatewayId.isNull()) {
-                return QNetworkProxy(QNetworkProxy::HttpProxy, route.addr.address.toString(), route.addr.port,
-                                     QnAppServerConnectionFactory::url().userName(), QnAppServerConnectionFactory::url().password());
-            }
+        if (!route.gatewayId.isNull()) {
+            Q_ASSERT(!route.addr.isNull());
+            return QNetworkProxy(QNetworkProxy::HttpProxy, route.addr.address.toString(), route.addr.port,
+                                    QnAppServerConnectionFactory::url().userName(), QnAppServerConnectionFactory::url().password());
         }
     }
 

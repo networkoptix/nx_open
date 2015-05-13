@@ -21,11 +21,11 @@ class QnProxySenderConnectionPrivate: public QnUniversalRequestProcessorPrivate
 {
 public:
     SocketAddress proxyServerUrl;
-    QString guid;
+    QnUuid guid;
 };
 
 QnProxySenderConnection::QnProxySenderConnection(
-        const SocketAddress& proxyServerUrl, const QString& guid,
+        const SocketAddress& proxyServerUrl, const QnUuid& guid,
         QnUniversalTcpListener* owner)
     : QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate,
         QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket()), owner, false)
@@ -91,7 +91,7 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
     return totalSend;
 }
 
-static QByteArray makeProxyRequest(const QString& serverUuid, const QUrl& url)
+static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
 {
     const QByteArray H_REALM("NX");
     const QByteArray H_METHOD("CONNECT");
@@ -121,7 +121,7 @@ static QByteArray makeProxyRequest(const QString& serverUuid, const QUrl& url)
        "\r\n"))
             .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
             .arg(url.toString()).arg(QString::fromUtf8(digestHeader.toString()))
-            .arg(admin->getName()).arg(serverUuid)
+            .arg(admin->getName()).arg(serverUuid.toString())
             .toUtf8();
 }
 

@@ -7,6 +7,7 @@
 #include "universal_request_processor.h"
 #include "proxy_sender_connection_processor.h"
 #include "utils/network/socket.h"
+#include "common/common_module.h"
 
 
 static const int PROXY_KEEP_ALIVE_INTERVAL = 40 * 1000;
@@ -83,18 +84,13 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(QShared
     return new QnUniversalRequestProcessor(clientSocket, this, m_needAuth);
 }
 
-void QnUniversalTcpListener::setProxySelfId(const QString& selfId)
-{
-    m_selfIdForProxy = selfId;
-}
-
 void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& proxyUrl, int size)
 {
     if (m_needStop)
         return;
 
     for (int i = 0; i < size; ++i) {
-        auto connect = new QnProxySenderConnection(proxyUrl, m_selfIdForProxy, this);
+        auto connect = new QnProxySenderConnection(proxyUrl, qnCommon->moduleGUID(), this);
         connect->start();
         addOwnership(connect);
     }
@@ -152,10 +148,7 @@ void QnUniversalTcpListener::doPeriodicTasks()
     for (auto& serverPool : m_proxyPool)
         while(!serverPool.isEmpty() &&
               serverPool.front().timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)
-        {
-            serverPool.front().socket->send(QByteArray("HTTP 200 OK\r\n\r\n"));
             serverPool.pop_front();
-        }
 }
 
 void QnUniversalTcpListener::disableAuth()

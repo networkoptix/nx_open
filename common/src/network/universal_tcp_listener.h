@@ -68,7 +68,6 @@ public:
 
     /* proxy support functions */
 
-    void setProxySelfId(const QString& selfId);
     void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
 
     bool registerProxyReceiverConnection(const QString& url, QSharedPointer<AbstractStreamSocket> socket);
@@ -96,7 +95,6 @@ private:
 
     QList<HandlerInfo> m_handlers;
     ProxyInfo m_proxyInfo;
-    QString m_selfIdForProxy;
     QMutex m_proxyMutex;
     QMap<QString, QList<AwaitProxyInfo>> m_proxyPool;
     QWaitCondition m_proxyCondition;

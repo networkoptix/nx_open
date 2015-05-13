@@ -34,9 +34,10 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     bool isknownServer = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>() != 0;
     bool isClient = qnCommon->remoteGUID() != qnCommon->moduleGUID();
     if (!isknownServer && isClient) {
-        result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
-        result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
+        result.addr = m_moduleFinder->primaryAddress(qnCommon->remoteGUID());
         Q_ASSERT_X(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
+        if (!result.addr.isNull())
+            result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
         return result;
     }
 

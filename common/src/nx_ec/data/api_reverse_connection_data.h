@@ -12,6 +12,8 @@ namespace ec2 {
     //! Request to open @var count proxy connections to @var target server.
     struct ApiReverseConnectionData: ApiData
     {
+        ApiReverseConnectionData(): socketCount(0) {}
+
         QnUuid targetServer;
         int socketCount;
     };
