@@ -20,9 +20,6 @@
  *                                      error checking only.
  */
 inline bool qnHasEventLoop(QThread *thread) {
-	//ax23
-	return true;
-
     int loopLevel = QThreadData::get2(thread)->loopLevel;
     return loopLevel > 0;
 }
