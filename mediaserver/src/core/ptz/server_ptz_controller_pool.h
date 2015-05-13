@@ -11,7 +11,7 @@ class QnServerPtzControllerPool: public QnPtzControllerPool {
 
 public:
     QnServerPtzControllerPool(QObject *parent = NULL);
-
+    ~QnServerPtzControllerPool();
 protected:
     virtual void registerResource(const QnResourcePtr &resource) override;
     virtual void unregisterResource(const QnResourcePtr &resource) override;
