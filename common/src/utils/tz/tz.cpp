@@ -68,12 +68,12 @@ namespace nx_tz
 
 
 
-    static const int MIN_PER_HOUR = 60;
-    static const int SEC_PER_MIN = 60;
+    //static const int SEC_PER_MIN = 60;
 
     int getLocalTimeZoneOffset()
     {
 #ifdef _WIN32
+        static const int MIN_PER_HOUR = 60;
         struct _timeb timeB;
         memset( &timeB, 0, sizeof(timeB) );
         _ftime( &timeB );

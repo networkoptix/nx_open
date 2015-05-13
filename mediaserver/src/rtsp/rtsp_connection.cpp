@@ -46,14 +46,14 @@ class QnTcpListener;
 
 static const QByteArray ENDL("\r\n");
 
-static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
+//static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
 
 // ------------- ServerTrackInfo --------------------
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
 
 enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
-static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
+//static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
 static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 

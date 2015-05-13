@@ -50,6 +50,7 @@ static const QString DEFAULT_REALM(lit("NetworkOptix"));
 QByteArray RTPSession::m_guid;
 QMutex RTPSession::m_guidMutex;
 
+#if 0
 static QString getValueFromString(const QString& line)
 {
     int index = line.indexOf(QLatin1Char('='));
@@ -57,6 +58,7 @@ static QString getValueFromString(const QString& line)
         return QString();
     return line.mid(index+1);
 }
+#endif
 
 // --------------------- RTPIODevice --------------------------
 

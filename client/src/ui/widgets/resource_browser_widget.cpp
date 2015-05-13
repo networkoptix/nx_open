@@ -768,7 +768,7 @@ void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
 }
 
 void QnResourceBrowserWidget::at_thumbnailReady(QnUuid resourceId, const QPixmap &pixmap) {
-    if (m_tooltipWidget && m_tooltipWidget->resourceId() != resourceId)
+    if (!m_tooltipWidget || m_tooltipWidget->resourceId() != resourceId)
         return;
     m_tooltipWidget->setPixmap(pixmap);
 }

@@ -14,9 +14,9 @@
 
 static const int32_t MAX_PTS_DRIFT = 63000;    //700 ms
 static const int32_t DEFAULT_FRAME_DURATION = 3000;    //30 fps
-static const int64_t MSEC_IN_SEC = 1000;
+//static const int64_t MSEC_IN_SEC = 1000;
 static const int64_t USEC_IN_SEC = 1000*1000;
-static const int64_t USEC_IN_MSEC = 1000;
+//static const int64_t USEC_IN_MSEC = 1000;
 
 
 PtsToClockMapper::TimeSynchronizationData::TimeSynchronizationData()

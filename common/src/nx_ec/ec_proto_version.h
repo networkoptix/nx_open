@@ -21,8 +21,6 @@ namespace nx_ec
         THIS VALUE MUST NOT BE CHANGED!
     */
     static const int INITIAL_EC2_PROTO_VERSION = 1000;
-    //!Name of Http header holding ec2 proto version
-    static const QByteArray EC2_PROTO_VERSION_HEADER_NAME = "NX-EC-PROTO-VERSION";
 }
 
 #endif //EC_PROTO_VERSION_H

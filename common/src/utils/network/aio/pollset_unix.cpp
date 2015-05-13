@@ -417,7 +417,7 @@ namespace aio
         return m_impl->monitoredEvents.size();
     }
 
-    static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;
+    //static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;
 
     /*!
         \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.

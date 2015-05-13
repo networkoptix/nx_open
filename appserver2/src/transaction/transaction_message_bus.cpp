@@ -72,6 +72,7 @@ struct SendTransactionToTransportFastFuction {
 
 typedef std::function<bool (Qn::SerializationFormat, const QByteArray&)> FastFunctionType;
 
+//Overload for ubjson transactions
 template<class T, class Function>
 bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonReader<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, 
                              Function function, FastFunctionType fastFunction)
@@ -91,31 +92,49 @@ bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonRe
     return true;
 }
 
-template<class Function>
-bool handleTransaction(const QByteArray &serializedTransaction, const Function &function, FastFunctionType fastFunction)
+//Overload for json transactions
+template<class T, class Function>
+bool handleTransactionParams(const QByteArray &serializedTransaction, const QJsonObject& jsonData, const QnAbstractTransaction &abstractTransaction, 
+                             Function function, FastFunctionType fastFunction)
 {
-    QnAbstractTransaction transaction;
-    QnUbjsonReader<QByteArray> stream(&serializedTransaction);
-    if (!QnUbjson::deserialize(&stream, &transaction)) {
-        qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
-        return false;
+    if (fastFunction(Qn::JsonFormat, serializedTransaction)) {
+        return true; // process transaction directly without deserialize
     }
 
+    QnTransaction<T> transaction(abstractTransaction);
+    if (!QJson::deserialize(jsonData["params"], &transaction.params)) {
+        qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
+        return false;
+    }
+    //if (!abstractTransaction.persistentInfo.isNull())
+    //    QnJsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
+    function(transaction);
+    return true;
+}
+
+template<class SerializationSupport, class Function>
+bool handleTransaction2(
+    const QnAbstractTransaction& transaction,
+    const SerializationSupport& serializationSupport,
+    const QByteArray& serializedTransaction,
+    const Function& function,
+    FastFunctionType fastFunction )
+{
     switch (transaction.command) {
-    case ApiCommand::getFullInfo:           return handleTransactionParams<ApiFullInfoData>         (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::setResourceStatus:     return handleTransactionParams<ApiResourceStatusData>(serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::setResourceParam:      return handleTransactionParams<ApiResourceParamWithRefData>   (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveResource:          return handleTransactionParams<ApiResourceData>         (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveCamera:            return handleTransactionParams<ApiCameraData>           (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveCameras:           return handleTransactionParams<ApiCameraDataList>       (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::getFullInfo:           return handleTransactionParams<ApiFullInfoData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::setResourceStatus:     return handleTransactionParams<ApiResourceStatusData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::setResourceParam:      return handleTransactionParams<ApiResourceParamWithRefData>   (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveResource:          return handleTransactionParams<ApiResourceData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveCamera:            return handleTransactionParams<ApiCameraData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveCameras:           return handleTransactionParams<ApiCameraDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::saveCameraUserAttributes:
-        return handleTransactionParams<ApiCameraAttributesData> (serializedTransaction, &stream, transaction, function, fastFunction);
+        return handleTransactionParams<ApiCameraAttributesData> (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::saveCameraUserAttributesList:
-        return handleTransactionParams<ApiCameraAttributesDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
+        return handleTransactionParams<ApiCameraAttributesDataList> (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::saveServerUserAttributes:
-        return handleTransactionParams<ApiMediaServerUserAttributesData> (serializedTransaction, &stream, transaction, function, fastFunction);
+        return handleTransactionParams<ApiMediaServerUserAttributesData> (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::saveServerUserAttributesList:
-        return handleTransactionParams<ApiMediaServerUserAttributesDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
+        return handleTransactionParams<ApiMediaServerUserAttributesDataList> (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::removeBusinessRule:
     case ApiCommand::removeResource:
     case ApiCommand::removeUser:
@@ -123,60 +142,107 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::removeVideowall:
     case ApiCommand::removeStorage:
     case ApiCommand::removeCamera:          
-    case ApiCommand::removeMediaServer:     return handleTransactionParams<ApiIdData>               (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::removeMediaServer:     return handleTransactionParams<ApiIdData>               (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::removeCameraHistoryItem:
-    case ApiCommand::addCameraHistoryItem:  return handleTransactionParams<ApiCameraServerItemData> (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveMediaServer:       return handleTransactionParams<ApiMediaServerData>      (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveStorage:           return handleTransactionParams<ApiStorageData>          (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveUser:              return handleTransactionParams<ApiUserData>             (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveBusinessRule:      return handleTransactionParams<ApiBusinessRuleData>     (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveLayouts:           return handleTransactionParams<ApiLayoutDataList>       (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveLayout:            return handleTransactionParams<ApiLayoutData>           (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::saveVideowall:         return handleTransactionParams<ApiVideowallData>        (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::videowallControl:      return handleTransactionParams<ApiVideowallControlMessageData>(serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::addCameraHistoryItem:  return handleTransactionParams<ApiCameraServerItemData> (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveMediaServer:       return handleTransactionParams<ApiMediaServerData>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveStorage:           return handleTransactionParams<ApiStorageData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveUser:              return handleTransactionParams<ApiUserData>             (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveBusinessRule:      return handleTransactionParams<ApiBusinessRuleData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveLayouts:           return handleTransactionParams<ApiLayoutDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveLayout:            return handleTransactionParams<ApiLayoutData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::saveVideowall:         return handleTransactionParams<ApiVideowallData>        (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::videowallControl:      return handleTransactionParams<ApiVideowallControlMessageData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::addStoredFile:
-    case ApiCommand::updateStoredFile:      return handleTransactionParams<ApiStoredFileData>       (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::removeStoredFile:      return handleTransactionParams<ApiStoredFilePath>       (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::updateStoredFile:      return handleTransactionParams<ApiStoredFileData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::removeStoredFile:      return handleTransactionParams<ApiStoredFilePath>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::broadcastBusinessAction:
-    case ApiCommand::execBusinessAction:    return handleTransactionParams<ApiBusinessActionData>   (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::execBusinessAction:    return handleTransactionParams<ApiBusinessActionData>   (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::addLicense:            
-    case ApiCommand::removeLicense:         return handleTransactionParams<ApiLicenseData>          (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::installUpdate:         return handleTransactionParams<ApiUpdateInstallData>    (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::removeLicense:         return handleTransactionParams<ApiLicenseData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::installUpdate:         return handleTransactionParams<ApiUpdateInstallData>    (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::addCameraBookmarkTags:
     case ApiCommand::removeCameraBookmarkTags:
-                                            return handleTransactionParams<ApiCameraBookmarkTagDataList>(serializedTransaction, &stream, transaction, function, fastFunction);
+                                            return handleTransactionParams<ApiCameraBookmarkTagDataList>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
-    case ApiCommand::moduleInfo:            return handleTransactionParams<ApiModuleData>           (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::moduleInfoList:        return handleTransactionParams<ApiModuleDataList>       (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::moduleInfo:            return handleTransactionParams<ApiModuleData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::moduleInfoList:        return handleTransactionParams<ApiModuleDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
-    case ApiCommand::discoverPeer:          return handleTransactionParams<ApiDiscoverPeerData>     (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::discoverPeer:          return handleTransactionParams<ApiDiscoverPeerData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::addDiscoveryInformation:
     case ApiCommand::removeDiscoveryInformation:
-                                            return handleTransactionParams<ApiDiscoveryData>        (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::getDiscoveryData:      return handleTransactionParams<ApiDiscoveryDataList>    (serializedTransaction, &stream, transaction, function, fastFunction);
+                                            return handleTransactionParams<ApiDiscoveryData>        (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::getDiscoveryData:      return handleTransactionParams<ApiDiscoveryDataList>    (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
-    case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
     case ApiCommand::lockRequest:
     case ApiCommand::lockResponse:
-    case ApiCommand::unlockRequest:         return handleTransactionParams<ApiLockData>             (serializedTransaction, &stream, transaction, function, fastFunction); 
-    case ApiCommand::peerAliveInfo:         return handleTransactionParams<ApiPeerAliveData>        (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::tranSyncRequest:       return handleTransactionParams<ApiSyncRequestData>      (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::tranSyncResponse:      return handleTransactionParams<QnTranStateResponse>     (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::tranSyncDone:          return handleTransactionParams<ApiTranSyncDoneData>     (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::updatePersistentSequence:          return handleTransactionParams<ApiUpdateSequenceData>         (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::markLicenseOverflow:     return handleTransactionParams<ApiLicenseOverflowData>         (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::unlockRequest:         return handleTransactionParams<ApiLockData>             (serializedTransaction, serializationSupport, transaction, function, fastFunction); 
+    case ApiCommand::peerAliveInfo:         return handleTransactionParams<ApiPeerAliveData>        (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::tranSyncRequest:       return handleTransactionParams<ApiSyncRequestData>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::tranSyncResponse:      return handleTransactionParams<QnTranStateResponse>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::tranSyncDone:          return handleTransactionParams<ApiTranSyncDoneData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::updatePersistentSequence:          return handleTransactionParams<ApiUpdateSequenceData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::markLicenseOverflow:     return handleTransactionParams<ApiLicenseOverflowData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::restoreDatabase: return true;
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
         Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
+        return false;
+    }
+}
+
+
+template<class Function>
+bool handleTransaction(
+    Qn::SerializationFormat tranFormat,
+    const QByteArray &serializedTransaction,
+    const Function &function,
+    FastFunctionType fastFunction)
+{
+    if( tranFormat == Qn::UbjsonFormat )
+    {
+        QnAbstractTransaction transaction;
+        QnUbjsonReader<QByteArray> stream(&serializedTransaction);
+        if (!QnUbjson::deserialize(&stream, &transaction)) {
+            qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
+            return false;
+        }
+
+        return handleTransaction2(
+            transaction,
+            &stream,
+            serializedTransaction,
+            function,
+            fastFunction );
+    }
+    else if( tranFormat == Qn::JsonFormat )
+    {
+        QnAbstractTransaction transaction;
+        QJsonObject tranObject;
+        //TODO #ak take tranObject from cache
+        if( !QJson::deserialize(serializedTransaction, &tranObject) )
+            return false;
+        if( !QJson::deserialize( tranObject["tran"], &transaction ) )
+            return false;
+
+        return handleTransaction2(
+            transaction,
+            tranObject["tran"].toObject(),
+            serializedTransaction,
+            function,
+            fastFunction );
+    }
+    else
+    {
         return false;
     }
 }
@@ -434,7 +500,10 @@ bool QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRunt
     }
 }
 
-void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader)
+void QnTransactionMessageBus::at_gotTransaction(
+    Qn::SerializationFormat tranFormat,
+    const QByteArray &serializedTran,
+    const QnTransactionTransportHeader &transportHeader)
 {
     QnTransactionTransport* sender = checked_cast<QnTransactionTransport*>(this->sender());
 
@@ -460,8 +529,14 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
     Q_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
 
     using namespace std::placeholders;
-    if(!handleTransaction(serializedTran, std::bind(GotTransactionFuction(), this, _1, sender, transportHeader), [](Qn::SerializationFormat, const QByteArray& ) { return false; } ))
+    if( !handleTransaction(
+            tranFormat,
+            serializedTran,
+            std::bind(GotTransactionFuction(), this, _1, sender, transportHeader),
+            [](Qn::SerializationFormat, const QByteArray& ) { return false; } ) )
+    {
         sender->setState(QnTransactionTransport::Error);
+    }
 
     //TODO #ak is it garanteed that sender is alive?
     sender->transactionProcessed();
@@ -715,7 +790,7 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
 
     QnTransactionTransportHeader transportHeader(_transportHeader);
     transportHeader.distance++;
-    if (transportHeader.flags & TT_ProxyToClient) {
+    if (transportHeader.flags & Qn::TT_ProxyToClient) {
         QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
         if (clients.isEmpty())
             return;
@@ -785,7 +860,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     ttUnicast.processedPeers << sender->remotePeer().id << m_localPeer.id;
     ttUnicast.dstPeers << sender->remotePeer().id;
     QnTransactionTransportHeader ttBroadcast(ttUnicast);
-    ttBroadcast.flags |= TT_ProxyToClient;
+    ttBroadcast.flags |= Qn::TT_ProxyToClient;
 
     QList<QByteArray> serializedTransactions;
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params.persistentState, serializedTransactions);
@@ -805,7 +880,8 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
 
         using namespace std::placeholders;
         for(const QByteArray& serializedTran: serializedTransactions)
-            if(!handleTransaction(serializedTran, 
+            if(!handleTransaction(Qn::UbjsonFormat,
+                                  serializedTran, 
                                   std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttBroadcast), 
                                   std::bind(SendTransactionToTransportFastFuction(), this, _1, _2, sender, ttBroadcast)))
                                   sender->setState(QnTransactionTransport::Error);
@@ -1272,9 +1348,12 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 }
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
+    const QnUuid& connectionGuid,
     const QSharedPointer<AbstractStreamSocket>& socket,
-    const ApiPeerData &remotePeer,
-    qint64 remoteSystemIdentityTime )
+    ConnectionType::Type connectionType,
+    const ApiPeerData& remotePeer,
+    qint64 remoteSystemIdentityTime,
+    const QByteArray& contentEncoding )
 {
     if (!dbManager)
     {
@@ -1285,7 +1364,12 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     if (m_restartPending)
         return; // reject incoming connection because of media server is about to restart
 
-    QnTransactionTransport* transport = new QnTransactionTransport( m_localPeer, socket );
+    QnTransactionTransport* transport = new QnTransactionTransport(
+        connectionGuid,
+        m_localPeer,
+        socket,
+        connectionType,
+        contentEncoding );
     transport->setRemotePeer(remotePeer);
     transport->setRemoteIdentityTime(remoteSystemIdentityTime);
     connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
@@ -1299,7 +1383,38 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     Q_ASSERT(!m_connections.contains(remotePeer.id));
 }
 
-QUrl addCurrentPeerInfo(const QUrl& srcUrl)
+void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
+    const QnUuid& connectionGuid,
+    const QSharedPointer<AbstractStreamSocket>& socket,
+    const ApiPeerData &remotePeer,
+    qint64 remoteSystemIdentityTime,
+    const nx_http::Request& request,
+    const QByteArray& requestBuf )
+{
+    if (!dbManager)
+    {
+        qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
+        return;
+    }
+
+    if (m_restartPending)
+        return; // reject incoming connection because of media server is about to restart
+
+    QMutexLocker lock(&m_mutex);
+    for(QnTransactionTransport* transport: m_connections.values())
+    {
+        if( transport->connectionGuid() == connectionGuid )
+        {
+            transport->setIncomingTransactionChannelSocket(
+                socket,
+                request,
+                requestBuf );
+            return;
+        }
+    }
+}
+
+static QUrl addCurrentPeerInfo(const QUrl& srcUrl)
 {
     QUrl url(srcUrl);
     QUrlQuery q(url.query());

@@ -5,7 +5,7 @@
 #include "plugins/resource/onvif/onvif_resource.h"
 #include "utils/common/long_runnable.h"
 
-static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
+//static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
 class QnDlinkPtzRepeatCommand : public QnLongRunnable
 {

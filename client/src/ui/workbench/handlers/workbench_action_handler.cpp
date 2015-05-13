@@ -1201,6 +1201,10 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if(!resource)
         return;
 
+    QnResourceWidget *widget = parameters.widget();
+    if (!widget)
+        return;
+
     bool isSearchLayout = workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
     
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
@@ -1210,10 +1214,6 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         if (!isSearchLayout)
             return;
 
-        QnResourceWidget *widget = parameters.widget();
-        if (!widget)
-            return;
-        
         period = widget->item()->data(Qn::ItemSliderSelectionRole).value<QnTimePeriod>();
         if (period.isEmpty())
             return;
@@ -1329,8 +1329,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Calculate size of the resulting matrix. */
     qreal desiredItemAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-    QnResourceWidget *widget = parameters.widget();
-    if (widget && widget->hasAspectRatio())
+    if (widget->hasAspectRatio())
         desiredItemAspectRatio = widget->visualAspectRatio();
 
     /* Calculate best size for layout cells. */
@@ -1910,7 +1909,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     QnUserResourcePtr user(new QnUserResource());
     user->setPermissions(Qn::GlobalLiveViewerPermissions);
 
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), mainWindow()));
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
@@ -1971,7 +1970,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(!(permissions & Qn::ReadPermission))
         return;
 
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), mainWindow()));
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
     setHelpTopic(dialog.data(), Qn::UserSettings_Help);

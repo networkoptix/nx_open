@@ -32,7 +32,7 @@ qreal calculateMagnitude(const QColor &value);
 qreal calculateMagnitude(const QRectF &value); /* QRectF is treated as a 4D vector here. */
 
 template<class T>
-qreal calculateMagnitude(const T &value, ...) {
+qreal calculateMagnitude(const T&, ...) {
     qnWarning("calculateMagnitude function is not implemented for type '%1'.", typeid(T).name());
     return 0.0;
 }

@@ -486,5 +486,5 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) {
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr& ) {
 }

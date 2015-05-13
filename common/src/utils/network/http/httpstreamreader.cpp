@@ -39,10 +39,18 @@ namespace nx_http
     */
     bool HttpStreamReader::parseBytes( const BufferType& data, size_t count, size_t* bytesProcessed )
     {
+        return parseBytes(
+            QnByteArrayConstRef(data, 0, count),
+            bytesProcessed );
+    }
+
+    bool HttpStreamReader::parseBytes(
+        const QnByteArrayConstRef& data,
+        size_t* bytesProcessed )
+    {
         if( bytesProcessed )
             *bytesProcessed = 0;
-        if( count == nx_http::BufferNpos )
-            count = data.size();
+        const size_t count = data.size();
 
         //reading line-by-line
         //TODO #ak automate bytesProcessed modification based on currentDataPos
@@ -58,7 +66,8 @@ namespace nx_http
                         //different buffers, we MUST read LF before reading message body
                     size_t bytesRead = 0;
                     m_lineSplitter.finishCurrentLineEnding(
-                        ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
+                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
+                        data.mid( currentDataPos, count-currentDataPos ),
                         &bytesRead );
                     currentDataPos += bytesRead;
                     if( bytesProcessed )
@@ -76,7 +85,8 @@ namespace nx_http
                     if( m_contentDecoder )
                     {
                         msgBodyBytesRead = readMessageBody(
-                            QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data ){ m_codedMessageBodyBuffer.append(data.constData(), data.size()); } );
                         //decoding content
                         if( (msgBodyBytesRead != (size_t)-1) && (msgBodyBytesRead > 0) )
@@ -91,7 +101,8 @@ namespace nx_http
                     else
                     {
                         msgBodyBytesRead = readMessageBody(
-                            QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data )
                                 {
                                     std::unique_lock<std::mutex> lk( m_mutex );
@@ -130,7 +141,8 @@ namespace nx_http
                     ConstBufferRefType lineBuffer;
                     size_t bytesRead = 0;
                     const bool lineFound = m_lineSplitter.parseByLines(
-                        ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
+                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
+                        data.mid( currentDataPos, count-currentDataPos ),
                         &lineBuffer,
                         &bytesRead );
                     currentDataPos += bytesRead;

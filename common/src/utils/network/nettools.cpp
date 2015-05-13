@@ -641,9 +641,9 @@ int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 
 #elif defined(__linux__)
 
-int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
 {
-    memset(MAC_str, 0, sizeof(MAC_str)/sizeof(*MAC_str));
+    memset(MAC_str, 0, MAC_ADDR_LEN);
 #define HWADDR_len 6
     struct ifreq ifr;
     int s = socket(AF_INET, SOCK_DGRAM, 0);

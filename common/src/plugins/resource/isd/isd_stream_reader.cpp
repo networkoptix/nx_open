@@ -27,7 +27,7 @@ QnISDStreamReader::~QnISDStreamReader()
     stop();
 }
 
-static const int BYTES_PER_KB = 1024;
+//static const int BYTES_PER_KB = 1024;
 
 #define USE_VBR
 

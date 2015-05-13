@@ -8,7 +8,8 @@
 #include "droid_resource.h"
 #include "utils/network/socket.h"
 #include "utils/network/rtpsession.h"
-#include "utils/network/h264_rtp_parser.h"
+
+class CLH264RtpParser;
 
 class PlDroidStreamReader: public CLServerPushStreamReader
 {

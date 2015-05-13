@@ -30,7 +30,7 @@ namespace {
     const QString defaultPlaceholder(6, L'*');
 }
 
-QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
+QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent): 
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
     m_mode(Mode::Invalid),
@@ -42,17 +42,14 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     m_emailModified(false),
     m_accessRightsModified(false)
 {
-    if(context == NULL) 
-        qnNullWarning(context);
+    ui->setupUi(this);
 
-    foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(Qn::user))
+    for(const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>())
         m_userByLogin[user->getName().toLower()] = user;
 
     std::fill(m_valid.begin(), m_valid.end(), true);
     std::fill(m_flags.begin(), m_flags.end(), Editable | Visible);
     
-    ui->setupUi(this);
-
     setHelpTopic(ui->accessRightsLabel, ui->accessRightsComboBox,   Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->accessRightsGroupbox,                          Qn::UserSettings_UserRoles_Help);
 
@@ -501,7 +498,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
     previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);
-    previous = createAccessRightCheckBox(tr("Can edit Video Walls"), Qn::GlobalEditVideoWallPermission, previous);
+               createAccessRightCheckBox(tr("Can edit Video Walls"), Qn::GlobalEditVideoWallPermission, previous);
 
     updateDependantPermissions();
 }

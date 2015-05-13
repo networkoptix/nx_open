@@ -1047,6 +1047,7 @@ namespace ec2
 
     signals:
         void moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive);
+        void gotInitialModules(const QList<QnModuleInformationWithAddresses> &modules);
         void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
 
     protected:

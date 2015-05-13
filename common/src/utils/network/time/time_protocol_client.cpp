@@ -22,7 +22,7 @@ static const size_t MAX_TIME_STR_LENGTH = sizeof(quint32);
 static const unsigned short TIME_PROTOCOL_DEFAULT_PORT = 37;     //time protocol
 static const int SOCKET_READ_TIMEOUT = 7000;
 static const int MILLIS_PER_SEC = 1000;
-static const int SEC_PER_MIN = 60;
+//static const int SEC_PER_MIN = 60;
 
 TimeProtocolClient::TimeProtocolClient( const QString& timeServer )
 :
