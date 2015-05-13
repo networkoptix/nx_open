@@ -683,8 +683,10 @@ void QnTransactionTransport::sendHttpKeepAlive()
         m_dataToSend.push_back( QByteArray() );
         serializeAndSendNextDataBuffer();
     }
-    if( !m_outgoingDataSocket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
-        setStateNoLock( State::Error );
+    if (m_outgoingDataSocket) {
+        if( !m_outgoingDataSocket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
+            setStateNoLock( State::Error );
+    }
 }
 
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
