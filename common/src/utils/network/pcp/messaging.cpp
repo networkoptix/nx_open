@@ -1,6 +1,7 @@
 #include "messaging.h"
 
 static const int NONCE_SIZE = 12;
+static const quint8 RESPONSE_BIT = (1 << 7);
 
 namespace pcp {
 
@@ -8,7 +9,7 @@ QDataStream& operator<<(QDataStream& stream, const RequestHeader& data)
 {
     quint16 r = 0;
 
-    quint8 opcode = static_cast<quint8>(data.opcode) >> 1;
+    quint8 opcode = static_cast<quint8>(data.opcode);
 
     stream << data.version << opcode << r
            << data.lifeTime << data.clientIp;
@@ -16,7 +17,7 @@ QDataStream& operator<<(QDataStream& stream, const RequestHeader& data)
     return stream;
 }
 
-QDataStream& operator>>(QDataStream& stream, RequestHeader data)
+QDataStream& operator>>(QDataStream& stream, RequestHeader& data)
 {
     quint16 r;
 
@@ -25,7 +26,7 @@ QDataStream& operator>>(QDataStream& stream, RequestHeader data)
     stream >> data.version >> opcode >> r
            >> data.lifeTime >> data.clientIp;
 
-    data.opcode = (opcode && 1) ? Opcode::INVALID : static_cast<Opcode>(opcode << 1);
+    data.opcode = static_cast<Opcode>(opcode);
     return stream;
 }
 
@@ -34,7 +35,7 @@ QDataStream& operator<<(QDataStream& stream, const ResponseHeadeer& data)
     quint8 r8 = 0;
     quint32 r32 = 0;
 
-    quint8 opcode = (static_cast<quint8>(data.opcode) >> 1) & 1;
+    quint8 opcode = static_cast<quint8>(data.opcode) | RESPONSE_BIT;
     quint8 result = static_cast<quint8>(data.resultCode);
 
     stream << data.version << opcode << r8 << result
@@ -43,7 +44,7 @@ QDataStream& operator<<(QDataStream& stream, const ResponseHeadeer& data)
     return stream;
 }
 
-QDataStream& operator>>(QDataStream& stream, ResponseHeadeer data)
+QDataStream& operator>>(QDataStream& stream, ResponseHeadeer& data)
 {
     quint8 r8;
     quint32 r32;
@@ -54,7 +55,7 @@ QDataStream& operator>>(QDataStream& stream, ResponseHeadeer data)
     stream >> data.version >> opcode >> r8 >> result
            >> data.lifeTime >> data.epochTime >> r32 >> r32 >> r32;
 
-    data.opcode = (opcode && 0) ? static_cast<Opcode>(opcode << 1) : Opcode::INVALID;
+    data.opcode = (opcode & RESPONSE_BIT) ? static_cast<Opcode>(opcode ^ RESPONSE_BIT) : Opcode::INVALID;
     data.resultCode = static_cast<ResultCode>(result);
     return stream;
 }
@@ -73,7 +74,7 @@ QDataStream& operator<<(QDataStream& stream, const MapMessage& data)
     return stream;
 }
 
-QDataStream& operator>>(QDataStream& stream, MapMessage data)
+QDataStream& operator>>(QDataStream& stream, MapMessage& data)
 {
     quint8 r8;
     quint16 r16;
@@ -97,12 +98,12 @@ QDataStream& operator<<(QDataStream& stream, const PeerMessage& data)
 
     stream << data.protocol << r8 << r16
            << data.internalPort << data.externalPort << data.externalIp
-           << data.internalPort << r16 << data.externalIp;
+           << data.remotePort << r16 << data.remoteIp;
 
     return stream;
 }
 
-QDataStream& operator>>(QDataStream& stream, PeerMessage data)
+QDataStream& operator>>(QDataStream& stream, PeerMessage& data)
 {
     quint8 r8;
     quint16 r16;
@@ -112,7 +113,7 @@ QDataStream& operator>>(QDataStream& stream, PeerMessage data)
 
     stream >> data.protocol >> r8 >> r16
            >> data.internalPort >> data.externalPort >> data.externalIp
-           >> data.internalPort >> r16 >> data.externalIp;
+           >> data.remotePort >> r16 >> data.remoteIp;
 
     return stream;
 }

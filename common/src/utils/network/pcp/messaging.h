@@ -50,7 +50,7 @@ struct RequestHeader
 };
 
 QDataStream& operator<<(QDataStream& stream, const RequestHeader& data);
-QDataStream& operator>>(QDataStream& stream, RequestHeader data);
+QDataStream& operator>>(QDataStream& stream, RequestHeader& data);
 
 struct ResponseHeadeer
 {
@@ -63,7 +63,7 @@ struct ResponseHeadeer
 };
 
 QDataStream& operator<<(QDataStream& stream, const ResponseHeadeer& data);
-QDataStream& operator>>(QDataStream& stream, ResponseHeadeer data);
+QDataStream& operator>>(QDataStream& stream, ResponseHeadeer& data);
 
 struct MapMessage
 {
@@ -76,26 +76,45 @@ struct MapMessage
 };
 
 QDataStream& operator<<(QDataStream& stream, const MapMessage& data);
-QDataStream& operator>>(QDataStream& stream, MapMessage data);
+QDataStream& operator>>(QDataStream& stream, MapMessage& data);
 
 struct PeerMessage
 {
-    QByteArray nonce;
-    quint8     protocol;
+    QByteArray  nonce;
+    quint8      protocol;
 
     quint16 internalPort;
     quint16 externalPort;
     quint32 externalIp;
 
     quint16 remotePort;
-    quint16 reservedx;
     quint32 remoteIp;
 };
 
 QDataStream& operator<<(QDataStream& stream, const PeerMessage& data);
-QDataStream& operator>>(QDataStream& stream, PeerMessage data);
+QDataStream& operator>>(QDataStream& stream, PeerMessage& data);
 
 QByteArray makeRandomNonce();
+
+template <typename T>
+QByteArray toBytes(const T& data, QDataStream::ByteOrder bo = QDataStream::BigEndian)
+{
+    QByteArray a;
+    QDataStream s(&a, QIODevice::WriteOnly);
+    s.setByteOrder(bo);
+    s << data;
+    return a;
+}
+
+template <typename T>
+T fromBytes(const QByteArray& bytes, QDataStream::ByteOrder bo = QDataStream::BigEndian)
+{
+    T d;
+    QDataStream s(bytes);
+    s.setByteOrder(bo);
+    s >> d;
+    return d;
+}
 
 } // namespace pcp
 
