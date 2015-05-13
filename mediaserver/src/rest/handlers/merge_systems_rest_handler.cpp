@@ -138,6 +138,11 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             return nx_http::StatusCode::ok;
         }
 
+        if (!backupDatabase()) {
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
+            return nx_http::StatusCode::ok;
+        }
+
         if (!applyCurrentSettings(url, user, password, currentPassword, admin, mergeOneServer)) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
@@ -249,6 +254,12 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
                 remoteSysTime = reply.sysIdTime;
                 remoteTranLogTime = reply.tranLogTime;
             }
+        }
+        {
+            CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
+            CLHttpStatus status = client.doGET(lit("/api/backupDatabase"));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
         }
 
         QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());
