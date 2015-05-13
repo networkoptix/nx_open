@@ -232,6 +232,7 @@ namespace nx_http
     namespace Method
     {
         extern const StringType GET;
+        extern const StringType HEAD;
         extern const StringType POST;
         extern const StringType PUT;
     }

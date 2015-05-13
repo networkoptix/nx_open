@@ -13,7 +13,7 @@
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
-static const int AUTHORIZED_TIMEOUT = 60 * 1000;
+//static const int AUTHORIZED_TIMEOUT = 60 * 1000;
 static const int MAX_AUTH_RETRY_COUNT = 3;
 
 
@@ -71,9 +71,13 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         t.restart();
         while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId) && d->socket->isConnected())
         {
-            d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
-            if (nx_http::getHeaderValue( d->response.headers, "x-server-guid" ).isEmpty())
-                d->response.headers.insert(nx_http::HttpHeader("x-server-guid", qnCommon->moduleGUID().toByteArray()));
+            if( d->request.requestLine.method == nx_http::Method::GET ||
+                d->request.requestLine.method == nx_http::Method::HEAD )
+            {
+                d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
+            }
+            if (nx_http::getHeaderValue( d->response.headers, "X-server-guid" ).isEmpty())
+                d->response.headers.insert(nx_http::HttpHeader("X-server-guid", qnCommon->moduleGUID().toByteArray()));
 
             auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
             QByteArray contentEncoding;
@@ -81,11 +85,14 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             {
                 nx_http::header::AcceptEncodingHeader acceptEncodingHeader( acceptEncodingHeaderIter->second );
                 if( acceptEncodingHeader.encodingIsAllowed( "identity" ) )
-                    ;   //preferring identity
+                {
+                    contentEncoding = "identity";
+                }
                 else if( acceptEncodingHeader.encodingIsAllowed( "gzip" ) )
                 {
                     contentEncoding = "gzip";
-                    d->responseBody = GZipCompressor::compressData(d->responseBody);
+                    if( !d->responseBody.isEmpty() )
+                        d->responseBody = GZipCompressor::compressData(d->responseBody);
                 }
                 else
                 {
@@ -94,7 +101,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             }
             sendResponse(
                 isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
-                "text/html",
+                d->responseBody.isEmpty() ? QByteArray() : "text/html",
                 contentEncoding );
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT)

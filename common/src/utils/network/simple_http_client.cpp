@@ -9,7 +9,7 @@
 #include "../common/util.h"
 
 
-static const int MAX_LINE_LENGTH = 1024*16;
+//static const int MAX_LINE_LENGTH = 1024*16;
 
 using namespace std;
 

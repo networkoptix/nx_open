@@ -13,7 +13,6 @@
 #include "../media/nalUnits.h"
 #include "rtpsession.h"
 
-
 class CLH264RtpParser: public QnRtpVideoStreamParser
 {
 public:

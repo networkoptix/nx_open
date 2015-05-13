@@ -30,7 +30,7 @@ public:
     int m_bitsPerSample;
 
 private:
-    int m_frequency;
+    //int m_frequency;
 };
 
 

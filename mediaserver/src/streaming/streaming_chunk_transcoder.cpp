@@ -29,7 +29,7 @@ static const double MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS = 30*1000*1000;
 static const int TRANSCODE_THREAD_COUNT = 1;
 static const int USEC_IN_MSEC = 1000;
 static const int MSEC_IN_SEC = 1000;
-static const int MICROS_IN_SECOND = MSEC_IN_SEC*USEC_IN_MSEC;
+//static const int MICROS_IN_SECOND = MSEC_IN_SEC*USEC_IN_MSEC;
 
 StreamingChunkTranscoder::TranscodeContext::TranscodeContext()
 :

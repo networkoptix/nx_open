@@ -67,7 +67,7 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
 
     QnUuid resourceGuid = QnUuid(urlQuery.queryItemValue(lit("x-camera-guid")));
     if (resourceGuid.isNull())
-        resourceGuid = QnUuid(urlQuery.queryItemValue(lit("x-server-guid")));
+        resourceGuid = QnUuid(urlQuery.queryItemValue(lit("X-server-guid")));
 
     if (resourceGuid.isNull())
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);

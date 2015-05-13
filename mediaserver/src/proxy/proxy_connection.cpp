@@ -21,8 +21,6 @@
 
 #include "proxy_connection_processor_p.h"
 
-#include <QDebug>
-
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
 static const int CONNECT_TIMEOUT = 1000 * 2;
@@ -46,6 +44,7 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     Q_D(QnProxyConnectionProcessor);
     d->owner = owner;
 }
+
 
 QnProxyConnectionProcessor::~QnProxyConnectionProcessor()
 {

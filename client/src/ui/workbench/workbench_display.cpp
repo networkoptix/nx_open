@@ -481,6 +481,7 @@ void QnWorkbenchDisplay::initSceneView() {
 
     /* Run handlers. */
     at_workbench_currentLayoutChanged();
+    at_mapper_spacingChanged();
 }
 
 void QnWorkbenchDisplay::initBoundingInstrument() {
@@ -602,7 +603,7 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
     QSizeF newWidgetSize = occupiedGeometry.size() * focusExpansion;
 
     qreal magicConst = maxExpandedSize;
-    if (qnSettings->isVideoWallMode())
+    if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
         magicConst = 0.8;   //TODO: #Elric magic const
     else
     if (
