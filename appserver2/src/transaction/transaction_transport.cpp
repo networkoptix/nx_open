@@ -37,7 +37,7 @@
 
 
 /*!
-    Real transaction posted to the QnTransactionMessageBus can be greater 
+    Real number of transactions posted to the QnTransactionMessageBus can be greater 
     (all transactions that read with single read from socket)
 */
 static const int MAX_TRANS_TO_POST_AT_A_TIME = 16;
@@ -884,7 +884,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         if( !m_outgoingTranClient )
         {
             m_outgoingTranClient = std::make_shared<nx_http::AsyncHttpClient>();
-            m_outgoingTranClient->setResponseReadTimeoutMs( 10000 );
+            m_outgoingTranClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * 3 );
             m_outgoingTranClient->setUserAgent( QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             m_outgoingTranClient->addAdditionalHeader(
                 nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
@@ -1319,6 +1319,7 @@ void QnTransactionTransport::startListeningNonSafe()
 
 void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::AsyncHttpClientPtr& client )
 {
+#ifndef USE_HTTP_CLIENT_TO_SEND_POST
     QMutexLocker lk( &m_mutex );
 
     assert( client == m_outgoingTranClient );
@@ -1381,6 +1382,9 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
     {
         return setStateNoLock( State::Error );
     }
+#else
+    assert( false );
+#endif
 }
 
 void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClientPtr& client )

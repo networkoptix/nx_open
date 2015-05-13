@@ -129,11 +129,6 @@ namespace nx_http
             If timeout has been met, connection is closed, state set to \a failed and \a AsyncHttpClient::done emitted
         */
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
-        /*!
-            By default \a true.
-            \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
-        */
-        void setDecodeChunkedMessageBody( bool val );
 
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
@@ -191,6 +186,11 @@ namespace nx_http
         HttpHeaders m_additionalHeaders;
         int m_awaitedMessageNumber;
         SocketAddress m_remoteEndpoint;
+        //!Authorization header, successfully used with \a m_url
+        /*!
+            //TODO #ak (2.4) this information should stored globally depending on server endpoint, server path, user credentials 
+        */
+        std::unique_ptr<nx_http::header::Authorization> m_currentUrlAuthorization;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );
