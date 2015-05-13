@@ -475,6 +475,22 @@ bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
     return false;
 }
 
+QnUuid QnMediaServerResource::getOriginalGuid() const {
+    QMutexLocker lock(&m_mutex);
+    return m_originalGuid;
+}
+
+void QnMediaServerResource::setOriginalGuid(const QnUuid &guid) {
+    QMutexLocker lock(&m_mutex);
+    m_originalGuid = guid;
+}
+
+bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return !server->getOriginalGuid().isNull();
+    return false;
+}
+
 void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
     if (getStatus() != newStatus) 

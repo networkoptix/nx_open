@@ -91,6 +91,14 @@ public:
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
+    /** Original GUID is set for incompatible servers when their getGuid() getter returns a fake GUID.
+     * This allows us to hold temporary fake server dublicates in the resource pool.
+     */
+    QnUuid getOriginalGuid() const;
+    /** Set original GUID. No signals emmited after this method because the original GUID should not be changed after resource creation. */
+    void setOriginalGuid(const QnUuid &guid);
+    static bool isFakeServer(const QnResourcePtr &resource);
+
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
     void setStorageDataToUpdate(const QnAbstractStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);
@@ -128,6 +136,8 @@ private:
     QVector<nx_http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
+
+    QnUuid m_originalGuid;
 
     // used for client purpose only. Can be moved to separete class
     QnAbstractStorageResourceList m_storagesToUpdate;

@@ -26,6 +26,7 @@ bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, co
     }
 }
 
+//TODO: #GDM #High change resource parameter to shared pointer
 QnAbstractConnection::QnAbstractConnection(QObject *parent, QnResource* targetRes): 
     base_type(parent),
     m_targetRes(targetRes)

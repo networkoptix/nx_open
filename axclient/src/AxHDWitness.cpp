@@ -82,8 +82,6 @@
 #include "ui/workaround/fglrx_full_screen.h"
 #include <QtCore/private/qthread_p.h>
 
-#include <bespin.h>
-
 #include <QXmlStreamWriter>
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -534,8 +532,7 @@ bool AxHDWitness::doInitialize()
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    QStyle *baseStyle = new Bespin::Style();
-    QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
+    auto *style = QnSkin::newStyle();
     qApp->setStyle(style);
     qApp->processEvents();
 
