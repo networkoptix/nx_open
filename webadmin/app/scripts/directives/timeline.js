@@ -48,7 +48,7 @@ angular.module('webadminApp')
                     chunkHeight:20,
                     exactChunkColor:'rgba(192,192,192,0.65)',
                     hightlightChunkColor:'rgb(192,192,192)',
-                    loadingChunkColor:'rgb(200,200,200)',
+                    loadingChunkColor:'rgb(00,200,00)',
 
                     timeMarkerColor:'blue',
                     dateFormat:'dd.mm.yyyy',
@@ -57,7 +57,7 @@ angular.module('webadminApp')
                 function positionMarker(){
                     var lastCoord = scope.positionCoordinate;
                     if(!scope.positionProvider){
-                        console.log("no position provider");
+                        timeMarker.addClass("hiddenTimemarker");
                         return;
                     }
                     var playedPosition = scope.positionProvider.playedPosition;
@@ -288,6 +288,11 @@ angular.module('webadminApp')
                         }
                     }
 
+                    scope.chunksLevel ++;
+                    if(scope.chunksLevel >= RulerModel.levels.length){
+                        scope.chunksLevel = RulerModel.levels.length - 1;
+                    }
+
                     scope.disableZoomIn  = Math.ceil(scope.actualZoomLevel) >= scope.maxZoomLevel;//scope.actualLevel >= RulerModel.levels.length-1;
                     scope.disableZoomOut = scope.actualZoomLevel <= 0;
 
@@ -336,11 +341,11 @@ angular.module('webadminApp')
                     var screenStartRelativePos = startPosition / (scope.frameWidth-viewportWidth);
                     return screenStartRelativePos;
                 }
-                function drawChunk(context,startCoordinate, endCoordinate, exactChunk){
+                function drawChunk(context, startCoordinate, endCoordinate, exactChunk){
                     context.fillStyle = exactChunk? timelineConfig.exactChunkColor:timelineConfig.loadingChunkColor;
 
                     if(highlightchunk && startCoordinate <= mouseCoordinate && endCoordinate >= mouseCoordinate){
-                        context.fillStyle = timelineConfig.hightlightChunkColor;
+                        //context.fillStyle = timelineConfig.hightlightChunkColor;
                     }
 
                     context.fillRect(startCoordinate, chunksVertStart , Math.max(1,endCoordinate - startCoordinate), timelineConfig.chunkHeight);
@@ -351,7 +356,16 @@ angular.module('webadminApp')
                     //4. Set interval for events
                     //TODO: Set interval for events
 
+
+
                     var context = canvas.getContext('2d');
+
+                    /*if( scope.positionProvider) { // Draw cached video. Disabled, because seeking doesn't work
+                        var startCoordinate = dateToScreenPosition(scope.positionProvider.start);
+                        var endCoordinate = dateToScreenPosition(scope.positionProvider.lastPlayedDate);
+                        drawChunk(context, startCoordinate, endCoordinate, false);
+                    }*/
+
                     var level = RulerModel.levels[scope.actualLevel];
                     var start = level.interval.alignToFuture(screenRelativePositionToDate(0));
                     var end = level.interval.alignToFuture(screenRelativePositionToDate(1));

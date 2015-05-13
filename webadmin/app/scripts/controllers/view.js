@@ -65,7 +65,11 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.updateTime = function(currentTime, duration){
             currentTime = currentTime || 0;
+
             $scope.positionProvider.setPlayingPosition(currentTime*1000);
+            if(!$scope.positionProvider.liveMode) {
+                $location.search('time', Math.round($scope.positionProvider.playedPosition));
+            }
         };
 
         $scope.playerReady = function(API){
@@ -73,9 +77,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             API.play();
         };
 
-        $scope.selectCameraById = function (cameraId) {
+        $scope.selectCameraById = function (cameraId,position) {
 
             $scope.cameraId = cameraId || $scope.cameraId;
+            if(position){
+                position = parseInt(position);
+            }
 
             $scope.activeCamera = _.find($scope.allcameras, function (camera) {
                 return camera.id === $scope.cameraId;
@@ -85,28 +92,29 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId]);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640);
 
-                updateVideoSource(false); //live
+                updateVideoSource(position);
             }
         };
         $scope.selectCamera = function (activeCamera) {
             $location.path('/view/' + activeCamera.id, false);
-            $scope.selectCameraById(activeCamera.id);
+            $scope.selectCameraById(activeCamera.id,false);
         };
 
         $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
-            $scope.selectCameraById(next.params.cameraId);
+            $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
         });
 
         $scope.switchPosition = function( val ){
 
             var playing = $scope.positionProvider.checkPlayingDate(val);
 
-            console.log("switchPosition", new Date(val), playing);
-            if(playing === false) {
+            //console.log("switchPosition", new Date(val), playing);
+            //if(playing === false) {
                 updateVideoSource(val);//We have nothing more to do with it.
-            }else{
+            /*}else{
+                console.log("try to seek time",playing/1000);
                 $scope.playerAPI.seekTime(playing); // Jump to buffered video
-            }
+            }*/
         };
 
         function extractDomain(url) {
@@ -197,7 +205,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
         $scope.$watch('allcameras', function () {
-            $scope.selectCameraById();
+            $scope.selectCameraById($scope.cameraId,$location.search().time || false);
         });
 
         mediaserver.getMediaServers().then(function (data) {
@@ -207,7 +215,8 @@ angular.module('webadminApp').controller('ViewCtrl',
             });
             $scope.mediaServers = data.data;
             getCameras();
-            $scope.selectCameraById($routeParams.cameraId);
+
+            $scope.selectCameraById($routeParams.cameraId,$location.search().time || false);
         }, function () {
             alert('network problem');
         });

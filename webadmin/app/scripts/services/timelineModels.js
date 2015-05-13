@@ -233,7 +233,6 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                     }
                     var addchunk = new Chunk(null, data.data[i][0], endChunk, level);
 
-
                     // console.log("read chunk",addchunk);
                     self.addChunk(addchunk);
                     self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
@@ -243,11 +242,9 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                 //2. Splice cache for existing interval, store it as local cache
                 self.updateSplice();
 
-                console.log("resolved");
                 deferred.resolve(self.chunksTree);
             }, function (error) {
 
-                console.log("rejected");
                 deferred.reject(error);
             });
     }else{
@@ -283,7 +280,7 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
     var noNeedUpdate = this.splice(result,start,end,level);
     if(!noNeedUpdate){ // Request update if we have a tree
         if(this.chunksTree) {
-            this.debug();
+            //this.debug();
             this.requestInterval(start, end, level);
         }
     }
@@ -347,7 +344,16 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
                 if(currentChunk.start <= chunk.start){ // We may have a miss here
                     this.addChunk(chunk, currentChunk);
                 }else{
-                    parent.children.splice(i, 0, new Chunk(parent, chunk.start, chunk.end, parent.level + 1));
+                    //Maybe we don't want to create chunk here. Maybe we want to increase previous chunk
+
+                    if(i>0 && chunk.start - parent.children[i-1].end < RulerModel.levels[chunk.level].detailization){
+                        parent.children[i-1].end = chunk.end; // Increase previous chunk
+                        i--;
+                    }else {
+                        // Otherwise - create new chunk on this level.
+                        parent.children.splice(i, 0, new Chunk(parent, chunk.start, chunk.end, parent.level + 1));
+                    }
+
                     this.addChunk(chunk, parent.children[i]);
                 }
 
@@ -365,9 +371,6 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
 
     }
 
-    if(chunk.level === this.level && chunk.start >= this.start && chunk.end <= this.end){
-        this.updateSplice();
-    }
 };
 
 /**
@@ -411,7 +414,6 @@ CameraRecordsProvider.prototype.splice = function(result, start, end, level, par
         // Try to go deeper
         result.push(parent);
         if(!parent.updating ) { //prevent updating again
-            console.log("we need to update chunk",parent, "to level",level);
             parent.updating = true;
             noNeedForUpdate = false; //We need to update
         }
@@ -494,7 +496,7 @@ ShortCache.prototype.init = function(start){
     this.updating = false;
 
     this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
-    this.lastPlayedDate = start;
+    this.lastPlayedDate = 0;
 
     this.update();
 };
@@ -528,8 +530,8 @@ ShortCache.prototype.update = function(requestPosition,position){
             if(data.data.length == 0){
                 console.log("no chunks for this camera and interval");
             }
-            if(data.data.length>0 && data.data[0][0] < requestPosition){ // Crop first chunk.
-                data.data[0][1] -= requestPosition - data.data[0][0];
+            if(data.data.length > 0 && parseInt(data.data[0][0]) < requestPosition){ // Crop first chunk.
+                data.data[0][1] -= requestPosition - parseInt(data.data[0][0]);
                 data.data[0][0] = requestPosition;
             }
             self.currentDetailization = data.data;
@@ -612,13 +614,13 @@ ShortCache.prototype.setPlayingPosition = function(position){
         }
     }
 
-    var liveMode = false;
+    this.liveMode = false;
     if(i == this.currentDetailization.length){ // We have no good detailization for this moment - pretend to be playing live
         this.playedPosition = (new Date()).getTime();
-        liveMode = true;
+        this.liveMode = true;
     }
 
-    if(!liveMode && this.currentDetailization.length>0
+    if(!this.liveMode && this.currentDetailization.length>0
         && (this.currentDetailization[this.currentDetailization.length - 1][1]
             + this.currentDetailization[this.currentDetailization.length - 1][0]
             < this.playedPosition + this.updateInterval)) { // It's time to update
