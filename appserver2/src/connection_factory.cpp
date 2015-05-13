@@ -111,7 +111,6 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
     {
         universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
-        universalTcpListener->addHandler<QnHttpTransactionReceiver>("HTTP", "ec2/forward_events");
 
         m_sslEnabled = universalTcpListener->isSslEnabled();
     }
@@ -281,6 +280,10 @@ namespace ec2
 
         registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
             std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
+    
+        restProcessorPool->registerHandler(
+            lit("ec2/forward_events"),
+            new QnHttpTransactionReceiver() );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )

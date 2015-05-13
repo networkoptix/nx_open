@@ -5,6 +5,7 @@
 
 #include "http_transaction_receiver.h"
 
+#include <rest/server/rest_connection_processor.h>
 #include <utils/network/tcp_connection_priv.h>
 
 #include "http/custom_headers.h"
@@ -13,71 +14,43 @@
 
 namespace ec2
 {
-    class QnHttpTransactionReceiverPrivate
-    :
-        public QnTCPConnectionProcessorPrivate
+    QnHttpTransactionReceiver::QnHttpTransactionReceiver()
     {
-    public:
-
-        QnHttpTransactionReceiverPrivate()
-        : 
-            QnTCPConnectionProcessorPrivate()
-        {
-        }
-    };
-
-    QnHttpTransactionReceiver::QnHttpTransactionReceiver(
-        QSharedPointer<AbstractStreamSocket> socket,
-        QnTcpListener* _owner )
-    :
-        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket )
-    {
-        Q_UNUSED(_owner)
-
-        setObjectName( "QnHttpTransactionReceiver" );
     }
 
-    QnHttpTransactionReceiver::~QnHttpTransactionReceiver()
+    int QnHttpTransactionReceiver::executeGet(
+        const QString& /*path*/,
+        const QnRequestParamList& /*params*/,
+        QByteArray& /*result*/,
+        QByteArray&, /*contentType*/ 
+        const QnRestConnectionProcessor* )
     {
-        stop();
+        return nx_http::StatusCode::badRequest;
     }
 
-    void QnHttpTransactionReceiver::run()
+    int QnHttpTransactionReceiver::executePost(
+        const QString& path,
+        const QnRequestParamList& /*params*/,
+        const QByteArray& body,
+        const QByteArray& srcBodyContentType,
+        QByteArray& resultBody,
+        QByteArray& contentType,
+        const QnRestConnectionProcessor* connection )
     {
-        Q_D(QnHttpTransactionReceiver);
-        initSystemThreadId();
-
-        if (d->clientRequest.isEmpty()) {
-            if (!readRequest())
-                return;
-        }
-        parseRequest();
-        d->response.headers.emplace( "Connection", "close" );
-
-        if( d->request.requestLine.method != nx_http::Method::POST )
-        {
-            sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-            return;
-        }
-
-        auto connectionGuidIter = d->request.headers.find( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME );
-        if( connectionGuidIter == d->request.headers.end() )
-        {
-            sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-            return;
-        }
+        auto connectionGuidIter = connection->request().headers.find( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME );
+        if( connectionGuidIter == connection->request().headers.end() )
+            return nx_http::StatusCode::forbidden;
         const QnUuid connectionGuid( connectionGuidIter->second );
 
         if( !QnTransactionMessageBus::instance()->gotTransactionFromRemotePeer(
                 connectionGuid,
-                d->request,
-                d->requestBody ) )
+                connection->request(),
+                body ) )
         {
-            sendResponse( nx_http::StatusCode::notFound, nx_http::StringType() );
-            return;
+            return nx_http::StatusCode::notFound;
         }
-    
-        sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
-        return;
+
+        return nx_http::StatusCode::ok;
     }
+
 }

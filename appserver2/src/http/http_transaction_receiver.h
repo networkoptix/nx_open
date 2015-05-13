@@ -6,28 +6,42 @@
 #ifndef HTTP_TRANSACTION_RECEIVER_H
 #define HTTP_TRANSACTION_RECEIVER_H
 
-#include "utils/network/tcp_connection_processor.h"
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "utils/network/tcp_listener.h"
+#include <core/dataconsumer/abstract_data_consumer.h>
+#include <rest/server/request_handler.h>
+#include <utils/network/tcp_connection_processor.h>
+#include <utils/network/tcp_listener.h>
 
 
 namespace ec2
 {
-    class QnHttpTransactionReceiverPrivate;
-
     class QnHttpTransactionReceiver
     :
-        public QnTCPConnectionProcessor
+        public QnRestRequestHandler
     {
     public:
-        QnHttpTransactionReceiver( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner );
-        virtual ~QnHttpTransactionReceiver();
+        QnHttpTransactionReceiver();
 
-    protected:
-        virtual void run() override;
+        //!Implementation of QnRestRequestHandler::executeGet
+        virtual int executeGet(
+            const QString& /*path*/,
+            const QnRequestParamList& /*params*/,
+            QByteArray& /*result*/,
+            QByteArray&, /*contentType*/ 
+            const QnRestConnectionProcessor* ) override;
+
+        //!Implementation of QnRestRequestHandler::executePost
+        virtual int executePost(
+            const QString& path,
+            const QnRequestParamList& /*params*/,
+            const QByteArray& body,
+            const QByteArray& srcBodyContentType,
+            QByteArray& resultBody,
+            QByteArray& contentType,
+            const QnRestConnectionProcessor* ) override;
 
     private:
-        Q_DECLARE_PRIVATE(QnHttpTransactionReceiver);
+        QnHttpTransactionReceiver( const QnHttpTransactionReceiver& );
+        QnHttpTransactionReceiver& operator=( const QnHttpTransactionReceiver& );
     };
 }
 
