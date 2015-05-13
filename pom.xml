@@ -327,7 +327,6 @@
             <modules>                       
                 <module>applauncher</module> 
                 <module>client</module>     
-                <module>axclient</module>     
                 <module>clientexe</module>
             </modules>  
         </profile>         
