@@ -71,8 +71,13 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (isServer) 
     {
-        if (resource->getId() != ownMediaServer->getId())
-            resource->addFlags( Qn::foreigner );
+        if (resource->getId() == ownMediaServer->getId()) {
+            QnMediaServerResourcePtr savedServer;
+            QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(ownMediaServer, &savedServer);
+            return;
+        }
+
+        resource->addFlags(Qn::foreigner);
     }
 
     // We are always online
