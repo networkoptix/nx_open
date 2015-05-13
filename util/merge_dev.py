@@ -7,7 +7,6 @@ import os
 import argparse
 
 def execCommand(command):
-    print command
     code = subprocess.call(command)
     if code != 0:
         sys.exit(code)
@@ -17,7 +16,6 @@ def getChangelog(revision):
     command = 'hg log -T "{desc}\\n\\n" -r '
     changeset = '"(::{0} - ::prod_2.3.1)"'.format(revision)
     command = command + changeset
-    print command
     changelog = subprocess.check_output(command, shell=True)
     changes = sorted(set(changelog.split('\n\n')))
     
