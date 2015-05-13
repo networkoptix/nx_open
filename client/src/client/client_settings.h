@@ -178,8 +178,6 @@ protected:
 private:
     void loadFromWebsite();
 
-    Q_SLOT void at_accessManager_finished(QNetworkReply *reply);
-
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(int,                         maxSceneVideoItems,     setMaxSceneVideoItems,      MAX_SCENE_VIDEO_ITEMS,      24)
@@ -250,7 +248,6 @@ private:
     QN_END_PROPERTY_STORAGE()
 
 private:
-    QNetworkAccessManager *m_accessManager;
     QSettings *m_settings;
     bool m_loading;
 };

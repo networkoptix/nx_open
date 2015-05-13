@@ -59,15 +59,12 @@ namespace {
 
 QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
     base_type(parent),
-    m_accessManager(new QNetworkAccessManager(this)),
     m_loading(true)
 {
     if (localSettings)
         m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName(), this);
     else
         m_settings = new QSettings(this);
-
-    connect(m_accessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(at_accessManager_finished(QNetworkReply *)));
 
     init();
 
@@ -109,8 +106,10 @@ QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
     /* Load from settings. */
     load();
 
-    /* Load from external source. */
-    loadFromWebsite();
+    /* Update showcase url from external source. */
+    Q_ASSERT_X(!isShowcaseEnabled(), Q_FUNC_INFO, "Paxton dll crashes here, make sure showcase fucntionality is disabled");
+    if (isShowcaseEnabled())
+        loadFromWebsite();
 
     setThreadSafe(true);
 
@@ -118,7 +117,6 @@ QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
 }
 
 QnClientSettings::~QnClientSettings() {
-	delete m_accessManager;
 }
 
 QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
@@ -282,21 +280,20 @@ bool QnClientSettings::isWritable() const {
 }
 
 void QnClientSettings::loadFromWebsite() {
- //   m_accessManager->get(QNetworkRequest(settingsUrl()));
-}
-
-void QnClientSettings::at_accessManager_finished(QNetworkReply *reply) {
-    if(reply->error() != QNetworkReply::NoError) {
-        qnWarning("Could not download client settings from '%1': %2.", reply->url().toString(), reply->errorString());
-        return;
-    }
-
-    QJsonObject jsonObject;
-    if(!QJson::deserialize(reply->readAll(), &jsonObject)) {
-        qnWarning("Could not parse client settings downloaded from '%1'.", reply->url().toString());
-    } else {
-        updateFromJson(jsonObject.value(lit("settings")).toObject());
-    }
-
-    reply->deleteLater();
+    QNetworkAccessManager *accessManager = new QNetworkAccessManager(this);
+    connect(accessManager, &QNetworkAccessManager::finished, this, [accessManager, this](QNetworkReply *reply) {
+        if(reply->error() != QNetworkReply::NoError) {
+            qnWarning("Could not download client settings from '%1': %2.", reply->url().toString(), reply->errorString());
+        } else {
+            QJsonObject jsonObject;
+            if(!QJson::deserialize(reply->readAll(), &jsonObject)) {
+                qnWarning("Could not parse client settings downloaded from '%1'.", reply->url().toString());
+            } else {
+                updateFromJson(jsonObject.value(lit("settings")).toObject());
+            }
+        }
+        reply->deleteLater();
+        accessManager->deleteLater();
+    });
+    accessManager->get(QNetworkRequest(settingsUrl()));
 }
