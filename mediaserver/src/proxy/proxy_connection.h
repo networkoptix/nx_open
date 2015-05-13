@@ -2,17 +2,21 @@
 #define __PROXY_CONNECTION_H_
 
 #include <QHostAddress>
-#include "utils/network/tcp_connection_processor.h"
-
+#include "network/universal_request_processor.h"
 
 class QnAbstractStreamDataProvider;
 class QnProxyConnectionProcessorPrivate;
+class QnRoute;
 
 class QnProxyConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnProxyConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
-    QnProxyConnectionProcessor(QnProxyConnectionProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnProxyConnectionProcessor(
+            QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner);
+
+    QnProxyConnectionProcessor(
+            QnProxyConnectionProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
+            QnUniversalTcpListener* owner);
 
     virtual ~QnProxyConnectionProcessor();
 protected:
@@ -21,13 +25,13 @@ protected:
 private:
     static bool doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize);
     static int getDefaultPortByProtocol(const QString& protocol);
-    QString connectToRemoteHost(const QString& guid, const QUrl& url); // return new client request buffer size or -1 if error
+    QString connectToRemoteHost(const QnRoute& route, const QUrl& url); // return new client request buffer size or -1 if error
     bool isProtocol(const QString& protocol) const;
     void doRawProxy();
     void doSmartProxy();
     bool openProxyDstConnection();
     QUrl getDefaultProxyUrl();
-    bool updateClientRequest(QUrl& dstUrl, QString& xServerGUID);
+    bool updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute);
 private:
     Q_DECLARE_PRIVATE(QnProxyConnectionProcessor);
 };

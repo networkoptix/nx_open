@@ -23,6 +23,7 @@
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
+#include "nx_ec/data/api_reverse_connection_data.h"
 #include "managers/time_manager.h"
 
 #include <utils/common/checked_cast.h>
@@ -192,6 +193,7 @@ bool handleTransaction2(
     case ApiCommand::getKnownPeersSystemTime: return handleTransactionParams<ApiPeerSystemTimeDataList> (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::updatePersistentSequence:          return handleTransactionParams<ApiUpdateSequenceData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::markLicenseOverflow:     return handleTransactionParams<ApiLicenseOverflowData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::openReverseConnection:   return handleTransactionParams<ApiReverseConnectionData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
     case ApiCommand::restoreDatabase: return true;
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";

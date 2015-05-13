@@ -146,6 +146,39 @@ namespace nx_http
         }
         void setAuthType( AuthType value );
 
+        static QByteArray calcHa1(
+            const QByteArray& userName,
+            const QByteArray& realm,
+            const QByteArray& userPassword );
+
+        /*! \note HA2 in case of qop=auth-int is not supported */
+        static QByteArray calcHa2(
+            const QByteArray& method,
+            const QByteArray& uri );
+
+        static QByteArray calcResponse(
+            const QByteArray& ha1,
+            const QByteArray& nonce,
+            const QByteArray& ha2 );
+
+        //!Calculate Digest response with message-body validation (auth-int)
+        static QByteArray calcResponseAuthInt(
+            const QByteArray& ha1,
+            const QByteArray& nonce,
+            const QByteArray& nonceCount,
+            const QByteArray& clientNonce,
+            const QByteArray& qop,
+            const QByteArray& ha2 );
+
+        static bool calcDigestResponse(
+            const QByteArray& method,
+            const QString& userName,
+            const boost::optional<QString>& userPassword,
+            const boost::optional<QByteArray>& predefinedHA1,
+            const QUrl& url,
+            const header::WWWAuthenticate& wwwAuthenticateHeader,
+            header::DigestAuthorization* const digestAuthorizationHeader );
+
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read

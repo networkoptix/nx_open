@@ -3,6 +3,7 @@
 
 #include "utils/network/socket.h"
 #include "utils/network/tcp_connection_priv.h"
+#include "network/universal_tcp_listener.h"
 
 class QnProxyConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -16,7 +17,7 @@ public:
     }
 
     QSharedPointer<AbstractStreamSocket> dstSocket;
-    QnTcpListener* owner;
+    QnUniversalTcpListener* owner;
     QUrl lastConnectedUrl;
 };
 

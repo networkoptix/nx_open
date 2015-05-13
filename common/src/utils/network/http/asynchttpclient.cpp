@@ -733,6 +733,126 @@ namespace nx_http
         return false;
     }
 
+    QByteArray AsyncHttpClient::calcHa1(
+        const QByteArray& userName,
+        const QByteArray& realm,
+        const QByteArray& userPassword )
+    {
+        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
+        md5HashCalc.addData( userName );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( realm );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( userPassword );
+        return md5HashCalc.result().toHex();
+    }
+
+    QByteArray AsyncHttpClient::calcHa2(
+        const QByteArray& method,
+        const QByteArray& uri )
+    {
+        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
+        md5HashCalc.addData( method );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( uri );
+        return md5HashCalc.result().toHex();
+    }
+
+    QByteArray AsyncHttpClient::calcResponse(
+        const QByteArray& ha1,
+        const QByteArray& nonce,
+        const QByteArray& ha2 )
+    {
+        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
+        md5HashCalc.addData( ha1 );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( nonce );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( ha2 );
+        return md5HashCalc.result().toHex();
+    }
+
+    QByteArray AsyncHttpClient::calcResponseAuthInt(
+        const QByteArray& ha1,
+        const QByteArray& nonce,
+        const QByteArray& nonceCount,
+        const QByteArray& clientNonce,
+        const QByteArray& qop,
+        const QByteArray& ha2 )
+    {
+        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
+        md5HashCalc.addData( ha1 );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( nonce );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( nonceCount );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( clientNonce );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( qop );
+        md5HashCalc.addData( ":" );
+        md5HashCalc.addData( ha2 );
+        return md5HashCalc.result().toHex();
+    }
+
+    bool AsyncHttpClient::calcDigestResponse(
+        const QByteArray& method,
+        const QString& userName,
+        const boost::optional<QString>& userPassword,
+        const boost::optional<QByteArray>& predefinedHA1,
+        const QUrl& url,
+        const header::WWWAuthenticate& wwwAuthenticateHeader,
+        header::DigestAuthorization* const digestAuthorizationHeader )
+    {
+        if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
+            return false;
+
+        //reading params
+        QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
+        const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
+        QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
+        const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
+        QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
+        const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
+
+        if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
+            return false;   //qop=auth-int is not supported
+
+        const BufferType& ha1 = predefinedHA1
+            ? predefinedHA1.get()
+            : calcHa1(
+                userName.toLatin1(),
+                realm,
+                userPassword ? userPassword.get().toLatin1() : QByteArray() );
+        //HA2, qop=auth-int is not supported
+        const BufferType& ha2 = calcHa2(
+            method,
+            url.path().toLatin1() );
+        //response
+        digestAuthorizationHeader->addParam( "username", userName.toLatin1() );
+        digestAuthorizationHeader->addParam( "realm", realm );
+        digestAuthorizationHeader->addParam( "nonce", nonce );
+        digestAuthorizationHeader->addParam( "uri", url.path().toLatin1() );
+
+        const BufferType nonceCount = "00000001";     //TODO #ak generate it
+        const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
+
+        QByteArray digestResponse;
+        if( qop.isEmpty() )
+        {
+            digestResponse = calcResponse( ha1, nonce, ha2 );
+        }
+        else
+        {
+            digestResponse = calcResponseAuthInt( ha1, nonce, nonceCount, clientNonce, qop, ha2 );
+            digestAuthorizationHeader->addParam( "qop", qop );
+            digestAuthorizationHeader->addParam( "nc", nonceCount );
+            digestAuthorizationHeader->addParam( "cnonce", clientNonce );
+        }
+        digestAuthorizationHeader->addParam( "response", digestResponse );
+        return true;
+    }
+
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
