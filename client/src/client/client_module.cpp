@@ -2,8 +2,11 @@
 
 #include <QtWidgets/QApplication>
 
+#include <api/session_manager.h>
+
 #include <common/common_module.h>
 
+#include "client_settings.h"
 #include "client_meta_types.h"
 
 #include <utils/common/app_info.h>
@@ -28,7 +31,6 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
  
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(argc, argv, this);
-
     
     bool isLocalSettings = false;
     QnCommandLineParser commandLineParser;
@@ -37,6 +39,7 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
 
     QnClientSettings *settings = new QnClientSettings(isLocalSettings);
     common->store<QnClientSettings>(settings);
+    common->store<QnSessionManager>(new QnSessionManager());
 
     common->setModuleGUID(QnUuid::createUuid());
 }

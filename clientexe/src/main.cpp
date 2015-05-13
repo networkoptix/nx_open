@@ -129,7 +129,6 @@ extern "C"
 #include "api/runtime_info_manager.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
-#include <utils/common/timermanager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -412,7 +411,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if (!engineVersion.isEmpty()) {
         QnSoftwareVersion version(engineVersion);
         if (!version.isNull()) {
-            qWarning() << "Starting with overriden version: " << version.toString();
+            qWarning() << "Starting with overridden version: " << version.toString();
             qnCommon->setEngineVersion(version);
         }
     }
@@ -457,7 +456,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
 
-    QScopedPointer<TimerManager> timerManager(new TimerManager());
+    
 
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     QString skinRoot = dynamicCustomizationPath.isEmpty() 
@@ -576,9 +575,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
-
-    // Create and start SessionManager
-    QnSessionManager::instance()->start();
 
     ffmpegInit();
 
@@ -775,8 +771,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 #endif
 
-    QnSessionManager::instance()->stop();
-
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
 
@@ -833,7 +827,6 @@ int main(int argc, char **argv)
 
     QnClientModule client(argc, argv);
 
-    QnSessionManager::instance();
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     QnResourcePool::initStaticInstance( new QnResourcePool() );

@@ -127,8 +127,6 @@ private:
     QScopedPointer<QnCameraUserAttributePool> m_cameraUserAttributePool;
     QScopedPointer<QnMediaServerUserAttributesPool> m_mediaServerUserAttributesPool;
 
-    QScopedPointer<TimerManager> m_timerManager;
-
     QnMainWindow *m_mainWindow;
 };
 
