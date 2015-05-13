@@ -24,7 +24,6 @@
 #include <QtNetwork/QNetworkInterface>
 
 #include <api/app_server_connection.h>
-#include <api/session_manager.h>
 #include <api/global_settings.h>
 
 #include <appserver/processor.h>
@@ -1443,9 +1442,6 @@ void QnMain::run()
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
-    // todo: #rvasilenko this class doesn't used any more on the server side
-    //QnSessionManager::instance()->start();
-
 #ifdef ENABLE_ONVIF
     QnSoapServer soapServer;    //starting soap server to accept event notifications from onvif cameras
     soapServer.bind();
@@ -1521,7 +1517,6 @@ void QnMain::run()
     qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
-    QScopedPointer<TimerManager> timerManager(new TimerManager());
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 
     ec2::ApiRuntimeData runtimeData;

@@ -240,38 +240,6 @@ void QnMediaServerResource::onRequestDone( int reqID, ec2::ErrorCode errorCode )
     emit storageSavingDone(reqID, errorCode);
 }
 
-/*
-void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &storages)
-{
-    m_storages = storages;
-}
-*/
-
-// --------------------------------------------------
-
-/*
-class TestConnectionTask: public QRunnable
-{
-public:
-    TestConnectionTask(QnMediaServerResourcePtr owner, const QUrl& url): m_owner(owner), m_url(url) {}
-
-    void run()
-    {
-        QnHTTPRawResponse response;
-        QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("ping"), QnRequestHeaderList(), QnRequestParamList(), response);
-        QByteArray guid = m_owner->getGuid().toUtf8();
-        if (response.data.contains("Requested method is absent") || response.data.contains(guid))
-        {
-            // server OK
-            m_owner->setPrimaryIF(m_url.host());
-        }
-    }
-private:
-    QnMediaServerResourcePtr m_owner;
-    QUrl m_url;
-};
-*/
-
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
 {
     QString apiScheme = QUrl(getApiUrl()).scheme();
@@ -472,6 +440,22 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
 bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags() & Qn::SF_Edge) && !server->isRedundancy();
+    return false;
+}
+
+QnUuid QnMediaServerResource::getOriginalGuid() const {
+    QMutexLocker lock(&m_mutex);
+    return m_originalGuid;
+}
+
+void QnMediaServerResource::setOriginalGuid(const QnUuid &guid) {
+    QMutexLocker lock(&m_mutex);
+    m_originalGuid = guid;
+}
+
+bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return !server->getOriginalGuid().isNull();
     return false;
 }
 

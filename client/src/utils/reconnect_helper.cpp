@@ -171,7 +171,6 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
         return;
     }
 
-    int port = iter->port;
     for (const SocketAddress &remoteAddress: QnModuleFinder::instance()->moduleAddresses(iter->id)) {
         bool found = false;
         auto sameUrl = [remoteAddress](const QUrl &url) {

@@ -31,7 +31,6 @@ void QnLicenseNotificationDialog::setLicenses(const QList<QnLicensePtr> &license
     m_model->setLicenses(licenses);
 
     // TODO: #Elric this code does not belong here.
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     int invalidCount = 0;
     foreach(const QnLicensePtr &license, licenses)
         if (!qnLicensePool->isLicenseValid(license))

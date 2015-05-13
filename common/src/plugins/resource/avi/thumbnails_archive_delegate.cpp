@@ -78,6 +78,13 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     bool holeDetected = false;
     if (!delegateForMediaStep) 
     {
+        qint64 startTime = m_baseDelegate->startTime();
+        if (startTime != AV_NOPTS_VALUE) {
+            qint64 outerSteps = (startTime - m_currentPos) / m_frameStep;
+            if (outerSteps > 0)
+                m_currentPos += outerSteps * m_frameStep;
+        }
+
         qint64 seekRez = m_baseDelegate->seek(m_currentPos, true);
         while (seekRez == -1 && m_currentPos < m_rangeEnd && m_rangeEnd != AV_NOPTS_VALUE) {
             m_currentPos += m_frameStep;

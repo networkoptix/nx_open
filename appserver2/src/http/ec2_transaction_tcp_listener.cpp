@@ -169,24 +169,19 @@ void QnTransactionTcpProcessor::run()
         }
     }
 
+    QnUuid connectionGuid;
     auto connectionGuidIter = d->request.headers.find( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME );
     if( connectionGuidIter == d->request.headers.end() )
-    {
-        sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-        QnTransactionTransport::connectingCanceled(remoteGuid, false);
-        return;
-    }
-    const QnUuid connectionGuid( connectionGuidIter->second );
+        connectionGuid = QnUuid::createUuid();  //generating random connection guid
+    else
+        connectionGuid = connectionGuidIter->second;
 
+    ConnectionType::Type requestedConnectionType = ConnectionType::none;
     auto connectionDirectionIter = d->request.headers.find( nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME );
     if( connectionDirectionIter == d->request.headers.end() )
-    {
-        sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-        QnTransactionTransport::connectingCanceled(remoteGuid, false);
-        return;
-    }
-    const ConnectionType::Type requestedConnectionType = 
-        ConnectionType::fromString(connectionDirectionIter->second);
+        requestedConnectionType = ConnectionType::incoming;
+    else
+        requestedConnectionType = ConnectionType::fromString(connectionDirectionIter->second);
     
     //checking content encoding requested by remote peer
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );

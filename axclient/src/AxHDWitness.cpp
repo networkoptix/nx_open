@@ -82,8 +82,6 @@
 #include "ui/workaround/fglrx_full_screen.h"
 #include <QtCore/private/qthread_p.h>
 
-#include <bespin.h>
-
 #include <QXmlStreamWriter>
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -447,8 +445,6 @@ bool AxHDWitness::doInitialize()
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
 
-    m_timerManager.reset(new TimerManager());
-
     m_clientModule.reset(new QnClientModule(argc, NULL));
     m_syncTime.reset(new QnSyncTime());
 
@@ -511,8 +507,6 @@ bool AxHDWitness::doInitialize()
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
     
-    QnSessionManager::instance()->start();
-    
     ffmpegInit();
       
     m_moduleFinder.reset(new QnModuleFinder(true));
@@ -534,8 +528,7 @@ bool AxHDWitness::doInitialize()
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    QStyle *baseStyle = new Bespin::Style();
-    QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
+    auto *style = QnSkin::newStyle();
     qApp->setStyle(style);
     qApp->processEvents();
 
@@ -567,8 +560,6 @@ void AxHDWitness::doFinalize()
     m_moduleFinder->pleaseStop();
     m_moduleFinder.reset(NULL);
 
-    QnSessionManager::instance()->stop();
-
     qInstallMessageHandler(defaultMsgHandler);
     customizer.reset(NULL);
 
@@ -592,8 +583,6 @@ void AxHDWitness::doFinalize()
 
     m_syncTime.reset(NULL);
     m_clientModule.reset(NULL);
-
-    m_timerManager.reset(NULL);
 }
 
 void AxHDWitness::createMainWindow() {

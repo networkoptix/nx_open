@@ -10,10 +10,6 @@
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
-
-    QnUuid getGuid(const QnResourcePtr &resource) {
-        return QnUuid::fromStringSafe(resource->getProperty(lit("guid")));
-    }
 }
 
 QnRestUpdatePeerTask::QnRestUpdatePeerTask(QObject *parent) :
@@ -48,14 +44,14 @@ void QnRestUpdatePeerTask::doStart() {
 
     foreach (const QnUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
-        Q_ASSERT_X(server, "An incompatible server resource is expected here.", Q_FUNC_INFO);
+        Q_ASSERT_X(QnMediaServerResource::isFakeServer(server), "An incompatible server resource is expected here.", Q_FUNC_INFO);
 
         NX_LOG(lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
                .arg(m_updateId).arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
 
         int handle = server->apiConnection()->installUpdate(m_updateId, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
         m_serverByRequest[handle] = server;
-        m_serverByRealId.insert(getGuid(server), server);
+        m_serverByRealId.insert(server->getOriginalGuid(), server);
 
         connect(server.data(), &QnMediaServerResource::versionChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
     }
@@ -70,7 +66,7 @@ void QnRestUpdatePeerTask::doStart() {
         if (!server)
             return;
 
-        if (!m_serverByRealId.contains(getGuid(server)))
+        if (!m_serverByRealId.contains(server->getOriginalGuid()))
             return;
 
         connect(server.data(), &QnMediaServerResource::versionChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
@@ -99,7 +95,7 @@ void QnRestUpdatePeerTask::finishPeer(const QnUuid &id) {
            .arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG1);
 
     emit peerFinished(server->getId());
-    emit peerUpdateFinished(server->getId(), getGuid(server));
+    emit peerUpdateFinished(server->getId(), server->getOriginalGuid());
 
     if (m_serverByRealId.isEmpty()) {
         NX_LOG(lit("Update: QnRestUpdatePeerTask: Installation finished."), cl_logDEBUG1);
@@ -134,7 +130,7 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     if (!server)
         return;
 
-    QnUuid id = getGuid(server);
+    QnUuid id = server->getOriginalGuid();
     if (id.isNull())
         id = server->getId();
 

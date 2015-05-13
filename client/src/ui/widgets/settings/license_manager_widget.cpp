@@ -445,7 +445,7 @@ void QnLicenseManagerWidget::at_removeButton_clicked()
         at_licenseRemoved( reqID, errorCode, license );
     };
 
-    int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->removeLicense(license, this,  removeLisencesHandler);
+    QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->removeLicense(license, this,  removeLisencesHandler);
 }
 
 void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license)
