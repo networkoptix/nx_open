@@ -627,6 +627,8 @@ namespace nx_http
 
         m_totalBytesRead += bytesRead;
 
+        //TODO #ak m_httpStreamReader is allowed to process not all bytes in m_responseBuffer. MUST support this!
+
         if( !m_httpStreamReader.parseBytes( m_responseBuffer, bytesRead ) )
         {
             NX_LOG( lit("Error parsing http response from %1. %2").
