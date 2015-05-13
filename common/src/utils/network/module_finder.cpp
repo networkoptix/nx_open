@@ -31,6 +31,14 @@ namespace {
     bool isBetterAddress(const HostAddress &address, const HostAddress &other) {
         return !isLocalAddress(other) && isLocalAddress(address);
     }
+
+    QUrl addressToUrl(const HostAddress &address, int port = -1) {
+        QUrl url;
+        url.setScheme(lit("http"));
+        url.setHost(address.toString());
+        url.setPort(port);
+        return url;
+    }
 }
 
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
@@ -46,6 +54,20 @@ QnModuleFinder::QnModuleFinder(bool clientOnly) :
 
     m_timer->setInterval(checkInterval);
     connect(m_timer, &QTimer::timeout, this, &QnModuleFinder::at_timer_timeout);
+
+
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return;
+        connect(server.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnModuleFinder::at_server_auxUrlsChanged);
+    });
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return;
+        disconnect(server.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnModuleFinder::at_server_auxUrlsChanged);
+    });
 }
 
 QnModuleFinder::~QnModuleFinder() {
@@ -115,6 +137,13 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     QnUuid oldId = m_idByAddress.value(address);
     if (!oldId.isNull() && oldId != moduleInformation.id)
         removeAddress(address, true);
+
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+    if (server && (server->getIgnoredUrls().contains(addressToUrl(address.address, address.port)) ||
+                   server->getIgnoredUrls().contains(addressToUrl(address.address))))
+    {
+        return;
+    }
 
     qint64 currentTime = m_elapsedTimer.elapsed();
 
@@ -213,6 +242,17 @@ void QnModuleFinder::at_timer_timeout() {
 
     for (const SocketAddress &address: addressesToRemove)
         removeAddress(address, false);
+}
+
+void QnModuleFinder::at_server_auxUrlsChanged(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    Q_ASSERT_X(!server.isNull(), Q_FUNC_INFO, "server resource is expected");
+    if (!server)
+        return;
+
+    int port = server->getPort();
+    for (const QUrl &url: server->getIgnoredUrls())
+        removeAddress(SocketAddress(url.host(), url.port(port)), false);
 }
 
 QSet<SocketAddress> QnModuleFinder::moduleAddresses(const QnUuid &id) const {
