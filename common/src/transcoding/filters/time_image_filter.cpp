@@ -16,7 +16,7 @@
 
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 20;
 static const int MIN_TEXT_HEIGHT = 14;
-static const double FPS_EPS = 1e-8;
+//static const double FPS_EPS = 1e-8;
 
 QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs, qint64 timeMsec):
     m_dateTimeXOffs(0),

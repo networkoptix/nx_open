@@ -1,5 +1,7 @@
 #ifdef ENABLE_DROID
 
+#include "utils/network/h264_rtp_parser.h"
+
 #include "droid_stream_reader.h"
 #include "droid_resource.h"
 

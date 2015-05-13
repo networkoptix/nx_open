@@ -351,8 +351,8 @@ namespace ec2
 #if 1
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::connect, loginInfo, func );
+        m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
+            addr, ApiCommand::connect, std::nullptr_t(), func );
 #else
         //TODO: #ak following does not compile due to msvc2012 restriction: no more than 6 arguments to std::bind
         using namespace std::placeholders;
@@ -583,8 +583,8 @@ namespace ec2
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::testConnection, loginInfo, func );
+        m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
+            addr, ApiCommand::testConnection, std::nullptr_t(), func );
         return reqID;
     }
 

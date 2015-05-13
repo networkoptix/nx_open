@@ -33,7 +33,8 @@ namespace ec2
     QnTimeManager<QueryProcessorType>::~QnTimeManager()
     {
         //safely disconnecting from TimeSynchronizationManager
-        TimeSynchronizationManager::instance()->disconnectAndJoin( this );
+        if (TimeSynchronizationManager::instance())
+            TimeSynchronizationManager::instance()->disconnectAndJoin( this );
     }
 
     template<class QueryProcessorType>

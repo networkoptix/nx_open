@@ -215,7 +215,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
     {
         if (itr->first.toLower() == "host" && !host.isEmpty())
             itr->second = host.toUtf8();
-        else if (itr->first == "x-server-guid")
+        else if (itr->first == "X-server-guid")
             xServerGUID = itr->second;
     }
 

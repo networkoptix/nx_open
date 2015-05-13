@@ -315,6 +315,10 @@ webadmin/.idea
 webadmin/.sass-cache
 app/bower_components
 
+plugins/acs/Paxton/packages
+plugins/acs/Paxton/CustomProperties.cs
+plugins/NxControl/NxControl.cs
+
 statserver/.venv
 statserver/build
 statserver/dist

@@ -11,6 +11,7 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QMutexLocker>
 
+#include <utils/common/util.h>
 #include "utils/network/socket_factory.h"
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
@@ -22,7 +23,7 @@
 
 static const int DEFAULT_CONNECT_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
-static const int DEFAULT_HTTP_PORT = 80;
+//static const int DEFAULT_HTTP_PORT = 80;
 
 using std::make_pair;
 
@@ -674,16 +675,24 @@ namespace nx_http
         m_request.requestLine.method = httpMethod;
         m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
         m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
+
+        nx_http::insertOrReplaceHeader(
+            &m_request.headers,
+            HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
+        nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("Connection", "keep-alive") );
         if( !m_userAgent.isEmpty() )
             m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )
         {
-            m_request.headers.insert( std::make_pair("Accept", "*/*") );
-            if( m_contentEncodingUsed )
-                m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip;q=1.0, identity;q=0.5, *;q=0") );
-            else
-                m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
-            m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
+            if( httpMethod == nx_http::Method::GET || httpMethod == nx_http::Method::HEAD )
+            {
+                m_request.headers.insert( std::make_pair("Accept", "*/*") );
+                if( m_contentEncodingUsed )
+                    m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip;q=1.0, identity;q=0.5, *;q=0") );
+                else
+                    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
+            }
+            //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
             //m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }
@@ -696,16 +705,16 @@ namespace nx_http
         if( !m_url.password().isEmpty() )
             m_userPassword = m_url.password();
 
-        //adding NX-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
+        //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
         if( !m_userName.isEmpty() )
-            nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("NX-User-Name", m_userName.toUtf8()) );
+            nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("X-Nx-User-Name", m_userName.toUtf8()) );
 
         //not using Basic authentication by default, since it is not secure
         nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
     }
 
-    void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
+    void AsyncHttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
     {
         m_additionalHeaders.emplace( key, value );
     }

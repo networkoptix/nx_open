@@ -48,7 +48,7 @@ public:
 
     void start();
     void stop();
-    bool isCameraRecoring(const QnResourcePtr& camera);
+    bool isCameraRecoring(const QnResourcePtr& camera) const;
 
     Recorders findRecorders(const QnResourcePtr& res) const;
 
@@ -66,6 +66,7 @@ private slots:
     void at_checkLicenses();
     void at_historyMutexLocked();
     void at_historyMutexTimeout();
+    void at_serverPropertyChanged(const QnResourcePtr &, const QString &key);
 private:
     void updateCamera(const QnSecurityCamResourcePtr& camera);
 

@@ -298,13 +298,13 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     bool isArmBox = checkForARMBox(info.data.box);
     if (isArmBox && !licenseTypeInfo[type()].allowedForARM)
         return gotError(errCode, InvalidType); // strict allowed license type for ARM devices
-#if 0
-    if (isEdgeBox && type() == Qn::LC_Edge) 
+#if 1
+    if (isArmBox && type() == Qn::LC_Edge) 
     {
         for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
             if (license->hardwareId() == hardwareId() && license->type() == type()) 
             {
-                if (mode == VM_CheckInfo && license->key() != key())
+                if (mode == VM_JustCreated && license->key() != key())
                     return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
                 else if (license->key() < key())
                     return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed

@@ -5,6 +5,7 @@
 
 #include "core/datapacket/video_data_packet.h"
 #include "licensing/license.h"
+#include "utils/media/nalUnits.h"
 #include "utils/common/util.h"
 #include "utils/common/scoped_painter_rollback.h"
 #include "utils/math/math.h"

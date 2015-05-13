@@ -31,10 +31,11 @@
 #include "common/common_module.h"
 
 
-static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
-static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
-static const int DB_UPDATE_PER_RECORDS = 128;
+//static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
+//static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
+//static const int DB_UPDATE_PER_RECORDS = 128;
 static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
+static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 
 
 class ScanMediaFilesTask: public QnLongRunnable
@@ -209,6 +210,7 @@ QnStorageManager::QnStorageManager():
 
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
+    m_clearMotionTimer.restart();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -330,8 +332,14 @@ bool QnStorageManager::needToStopMediaScan() const
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
-    QMutexLocker lock(&m_rebuildStateMtx);
-    m_archiveRebuildInfo = data;
+    bool isRebuildFinished = false;
+    {
+        QMutexLocker lock(&m_rebuildStateMtx);
+        isRebuildFinished = (data.state == Qn::RebuildState_None && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
+        m_archiveRebuildInfo = data;
+    }
+    if (isRebuildFinished)
+        emit rebuildFinished();
 }
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff)
@@ -712,8 +720,24 @@ void QnStorageManager::clearSpace()
         }
     }
 
-    clearUnusedMotion();
-    //clearCameraHistory();
+    bool readyToDeleteMotion = (m_archiveRebuildInfo.state == Qn::RebuildState_None); // do not delete motion while rebuilding in progress (just in case, unnecessary)
+    for(const QnStorageResourcePtr& storage: getAllStorages()) {
+        if (storage->getStatus() == Qn::Offline) {
+            readyToDeleteMotion = false; // offline storage may contain archive. do not delete motion so far
+            break;
+        }
+
+    }
+    if (readyToDeleteMotion)
+    {
+        if (m_clearMotionTimer.elapsed() > MOTION_CLEANUP_INTERVAL) {
+            m_clearMotionTimer.restart();
+            clearUnusedMotion();
+        }
+    }
+    else {
+        m_clearMotionTimer.restart();
+    }
 }
 
 QnStorageManager::StorageMap QnStorageManager::getAllStorages() const 
@@ -777,8 +801,8 @@ void QnStorageManager::clearUnusedMotion()
     updateRecordedMonths(m_devFileCatalog[QnServer::HiQualityCatalog], usedMonths);
     updateRecordedMonths(m_devFileCatalog[QnServer::LowQualityCatalog], usedMonths);
 
-    for(const DeviceFileCatalogPtr& catalog: m_devFileCatalog[QnServer::HiQualityCatalog].values())
-        QnMotionHelper::instance()->deleteUnusedFiles(usedMonths[catalog->cameraUniqueId()].toList(), catalog->cameraUniqueId());
+    for( const QString& dir: QDir(QnMotionHelper::getBaseDir()).entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+        QnMotionHelper::instance()->deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
 }
 
 /*

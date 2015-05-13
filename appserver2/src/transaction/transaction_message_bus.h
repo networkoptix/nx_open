@@ -43,7 +43,24 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer, qint64 remoteSystemIdentityTime);
+        void gotConnectionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            const QSharedPointer<AbstractStreamSocket>& socket,
+            ConnectionType::Type connectionType,
+            const ApiPeerData& remotePeer,
+            qint64 remoteSystemIdentityTime,
+            const QByteArray& contentEncoding );
+        //!Report socket to receive transactions from
+        /*!
+            \param requestBuf Contains serialized \a request and (possibly) partial (or full) message body
+        */
+        void gotIncomingTransactionsConnectionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            const QSharedPointer<AbstractStreamSocket>& socket,
+            const ApiPeerData &remotePeer,
+            qint64 remoteSystemIdentityTime,
+            const nx_http::Request& request,
+            const QByteArray& requestBuf );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -222,7 +239,10 @@ namespace ec2
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
-        void at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader);
+        void at_gotTransaction(
+            Qn::SerializationFormat tranFormat,
+            const QByteArray &serializedTran,
+            const QnTransactionTransportHeader &transportHeader);
         void doPeriodicTasks();
         bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
         void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);

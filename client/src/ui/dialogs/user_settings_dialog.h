@@ -41,7 +41,7 @@ public:
     };
     Q_DECLARE_FLAGS(ElementFlags, ElementFlag)
 
-    QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent = NULL);
+    QnUserSettingsDialog(QWidget *parent = NULL);
     virtual ~QnUserSettingsDialog();
 
     QnUserResourcePtr user() const;
@@ -122,7 +122,7 @@ private:
     Mode m_mode;
 
     QString m_currentPassword;
-    QHash<QString, QnResourcePtr> m_userByLogin;
+    QHash<QString, QnUserResourcePtr> m_userByLogin;
     QnUserResourcePtr m_user;
     std::array<bool, ElementCount> m_valid;
     std::array<QString, ElementCount> m_hints;

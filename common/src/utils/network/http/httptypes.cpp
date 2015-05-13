@@ -263,6 +263,7 @@ namespace nx_http
     namespace Method
     {
         const StringType GET( "GET" );
+        const StringType HEAD( "HEAD" );
         const StringType POST( "POST" );
         const StringType PUT( "PUT" );
     }
@@ -524,6 +525,13 @@ namespace nx_http
         serializeHeaders( headers, dstBuffer );
         dstBuffer->append( (const BufferType::value_type*)"\r\n" );
         dstBuffer->append( messageBody );
+    }
+
+    BufferType Request::serialized() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
     }
 
     BufferType Request::getCookieValue(const BufferType& name) const

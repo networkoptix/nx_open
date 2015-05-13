@@ -52,12 +52,19 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
     connect(this, &QnResource::resourceChanged, this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
+    connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
 {
     QMutexLocker lock(&m_mutex);
     m_runningIfRequests.clear();
+}
+
+void QnMediaServerResource::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
+{
+    if (key == QnMediaResource::panicRecordingKey())
+        m_panicModeCache.update();
 }
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
@@ -280,7 +287,7 @@ Qn::PanicMode QnMediaServerResource::getPanicMode() const
 
 Qn::PanicMode QnMediaServerResource::calculatePanicMode() const 
 {
-    QString strVal = getProperty(lit("panic_mode"));
+    QString strVal = getProperty(QnMediaResource::panicRecordingKey());
     Qn::PanicMode result = Qn::PM_None;
     QnLexical::deserialize(strVal, &result);
     return result;
@@ -291,7 +298,8 @@ void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
         return;
     QString strVal;
     QnLexical::serialize(panicMode, &strVal);
-    setProperty(lit("panic_mode"), strVal);
+    setProperty(QnMediaResource::panicRecordingKey(), strVal);
+    m_panicModeCache.update();
 }
 
 Qn::ServerFlags QnMediaServerResource::getServerFlags() const
@@ -436,7 +444,7 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
 
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     QnModuleInformation moduleInformation;
-    moduleInformation.type = nxMediaServerId;
+    moduleInformation.type = QnModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = false;
     moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();

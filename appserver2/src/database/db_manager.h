@@ -138,6 +138,7 @@ namespace ec2
         */
         ApiOjectType getObjectTypeNoLock(const QnUuid& objectId);
         ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
+        ApiObjectInfoList getObjectsNoLock(const ApiOjectType& objectType);
 
         bool saveMiscParam( const QByteArray& name, const QByteArray& value );
         bool readMiscParam( const QByteArray& name, QByteArray* value );
@@ -266,7 +267,10 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This transaction can't be executed directly!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
@@ -533,6 +537,7 @@ namespace ec2
         bool updateCameraHistoryGuids();
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
+        bool fixBusinessRules();
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
@@ -559,6 +564,7 @@ namespace ec2
         bool m_dbJustCreated;
         bool m_isBackupRestore;
         bool m_needResyncLayout;
+        bool m_needResyncbRules;
     };
 };
 

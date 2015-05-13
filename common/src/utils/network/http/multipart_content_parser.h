@@ -12,6 +12,10 @@
 
 namespace nx_http
 {
+    /*!
+        Input: http multipart content stream.
+        Output: separate content frames
+    */
     class MultipartContentParser
     :
         public AbstractByteStreamConverter
@@ -25,15 +29,24 @@ namespace nx_http
         //!Implementation of AbstractByteStreamFilter::flush
         virtual size_t flush() override;
 
+        /*!
+            \return \a false, if \a contentType does not specify multipart content
+            \note After this method has been called, no \a MultipartContentParser::setBoundary call is needed
+        */
         bool setContentType( const StringType& contentType );
         void setBoundary( const StringType& boundary );
+        //!Returns headers of last read frame
+        const nx_http::HttpHeaders& prevFrameHeaders() const;
 
     private:
         enum ParsingState
         {
+            none,
             waitingBoundary,
             readingHeaders,
             readingTextData,
+            //!reading trailing CR of LF before binary data
+            depleteLineFeedBeforeBinaryData,
             //!reading data with Content-Length known
             readingSizedBinaryData,
             //!reading data with Content-Length not known: searching for boundary
@@ -47,6 +60,7 @@ namespace nx_http
         };
 
         ParsingState m_state;
+        ParsingState m_nextState;
         LineSplitter m_lineSplitter;
         nx_http::BufferType m_currentFrame;
         StringType m_boundary;

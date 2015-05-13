@@ -37,6 +37,7 @@ static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
 static const int STORE_QUEUE_SIZE = 50;
 
+#if 0
 static QRectF cwiseMul(const QRectF &l, const QSizeF &r) 
 {
     return QRectF(
@@ -46,6 +47,7 @@ static QRectF cwiseMul(const QRectF &l, const QSizeF &r)
         l.height() * r.height()
         );
 }
+#endif
 
 QString QnStreamRecorder::errorString(int errCode) {
     switch (errCode) {
@@ -144,7 +146,7 @@ void QnStreamRecorder::close()
 
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
         {
-            if (m_formatCtx->streams[i]->codec->codec)
+            if (m_formatCtx->streams[i]->codec)
                 avcodec_close(m_formatCtx->streams[i]->codec);
         }
         

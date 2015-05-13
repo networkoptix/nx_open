@@ -42,8 +42,8 @@ struct FffmpegLog
 CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
-    m_width(0),
-    m_height(0),
+    //m_width(0),
+    //m_height(0),
     m_codecId(codec_id),
     m_showmotion(false),
     m_decodeMode(DecodeMode_Full),
@@ -84,13 +84,7 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 
     if( m_passedContext )
     {
-        if( m_passedContext->codec )
-            avcodec_close(m_passedContext);
-        av_freep(&m_passedContext->rc_override);
-        av_freep(&m_passedContext->intra_matrix);
-        av_freep(&m_passedContext->inter_matrix);
-        av_freep(&m_passedContext->extradata);
-        av_freep(&m_passedContext->rc_eq);
+        avcodec_close(m_passedContext);
         av_freep(&m_passedContext);
     }
 
@@ -121,8 +115,10 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 
 void CLFFmpegVideoDecoder::closeDecoder()
 {
-    if (m_context->codec)
+    if (m_context) {
         avcodec_close(m_context);
+        av_freep(&m_context);
+    }
 #ifdef _USE_DXVA
     m_decoderContext.close();
 #endif
@@ -132,13 +128,6 @@ void CLFFmpegVideoDecoder::closeDecoder()
     if (m_deinterlaceBuffer)
         av_free(m_deinterlaceBuffer);
     av_free(m_deinterlacedFrame);
-    av_freep(&m_context->rc_override);
-    av_freep(&m_context->intra_matrix);
-    av_freep(&m_context->inter_matrix);
-    av_freep(&m_context->extradata);
-    av_freep(&m_context->rc_eq);
-    av_freep(&m_context);
-
     delete m_frameTypeExtractor;
     m_motionMap.clear();
 }
@@ -263,15 +252,10 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     
     
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
-    if (m_context->codec)
+    if (m_context) {
         avcodec_close(m_context);
-
-    av_freep(&m_context->rc_override);
-    av_freep(&m_context->intra_matrix);
-    av_freep(&m_context->inter_matrix);
-    av_freep(&m_context->extradata);
-    av_freep(&m_context->rc_eq);
-    av_freep(&m_context);
+        av_freep(&m_context);
+    }
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
     if (m_passedContext) {

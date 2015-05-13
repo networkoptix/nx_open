@@ -130,6 +130,7 @@ extern "C"
 #include "api/runtime_info_manager.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
+#include <utils/common/timermanager.h>
 
 #include <crash_reporter.h>
 
@@ -459,6 +460,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
 
+    QScopedPointer<TimerManager> timerManager(new TimerManager());
+
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     QString skinRoot = dynamicCustomizationPath.isEmpty() 
         ? lit(":") 
@@ -604,6 +607,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     if(translation.isEmpty()) /* By path. */
         translation = translationManager->loadTranslation(qnSettings->translationPath());
+
+    /* Check if qnSettings value is invalid. */
+    if (translation.isEmpty()) 
+        translation = translationManager->defaultTranslation();
 
     translationManager->installTranslation(translation);
 

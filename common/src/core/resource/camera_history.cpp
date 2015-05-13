@@ -76,7 +76,7 @@ QnMediaServerResourcePtr QnCameraHistory::getMediaServerAndPeriodOnTime(qint64 t
         return QnMediaServerResourcePtr();
     
     currentPeriod.startTimeMs = itr.key();
-    currentPeriod.durationMs = -1;
+    currentPeriod.durationMs = QnTimePeriod::infiniteDuration();
     QnMediaServerResourcePtr result = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(itr.value()));
     ++itr;
     if (itr != timePeriods.constEnd())
@@ -114,7 +114,7 @@ QnMediaServerResourcePtr QnCameraHistory::getNextMediaServerAndPeriodFromTime(co
     if (itr == timePeriods.constEnd())
         return QnMediaServerResourcePtr();
     currentPeriod.startTimeMs = itr.key();
-    currentPeriod.durationMs = -1;
+    currentPeriod.durationMs = QnTimePeriod::infiniteDuration();
     QnMediaServerResourcePtr result = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(itr.value()));
     ++itr;
     if (itr != timePeriods.constEnd())

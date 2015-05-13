@@ -98,9 +98,6 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     bool sameRtpTransport = true;
     QString rtpTransport;
 
-    bool sameMotionStream = true;
-    QString motionStream;
-
     int camCnt = 0;
     foreach(const QnVirtualCameraResourcePtr &camera, cameras) 
     {
@@ -142,11 +139,6 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         if (camRtpTransport != rtpTransport && camCnt > 0)
             sameRtpTransport = false;
         rtpTransport = camRtpTransport;
-
-        QString camMotionStream = camera->getProperty(QnMediaResource::motionStreamKey());
-        if (camMotionStream != motionStream && camCnt > 0)
-            sameMotionStream = false;
-        motionStream = camMotionStream;
 
         camCnt++;
     }

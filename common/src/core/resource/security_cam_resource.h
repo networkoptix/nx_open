@@ -311,7 +311,7 @@ private:
     Qn::MotionType calculateMotionType() const;
 
 private slots:
-    void atResourceChanged();
+    void resetCachedValues();
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

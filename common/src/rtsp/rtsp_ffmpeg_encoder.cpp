@@ -104,12 +104,13 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
         // send data with RTP headers
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.get());
         const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(m_media.get());
+#if 0
         int ffHeaderSize = RTSP_FFMPEG_GENERIC_HEADER_SIZE;
         if (video)
             ffHeaderSize += RTSP_FFMPEG_VIDEO_HEADER_SIZE;
         else if (metadata)
             ffHeaderSize += RTSP_FFMPEG_METADATA_HEADER_SIZE;
-
+#endif
         //m_mutex.unlock();
 
         //buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);

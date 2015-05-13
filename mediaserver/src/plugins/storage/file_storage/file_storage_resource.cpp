@@ -108,8 +108,8 @@ bool QnFileStorageResource::renameFile(const QString& oldName, const QString& ne
 bool QnFileStorageResource::removeDir(const QString& url)
 {
     updatePermissions();
-    qnFileDeletor->deleteDir(removeProtocolPrefix(url));
-    return true;
+    QDir dir;
+    return dir.rmdir(removeProtocolPrefix(url));
 }
 
 bool QnFileStorageResource::isDirExists(const QString& url)

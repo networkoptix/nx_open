@@ -25,7 +25,8 @@ namespace nx_http
         m_prevChar( 0 ),
         m_lineEndingOffset( 0 ),
         m_decodeChunked( true ),
-        m_currentMessageNumber( 0 )
+        m_currentMessageNumber( 0 ),
+        m_breakAfterReadingHeaders( false )
     {
     }
 
@@ -38,10 +39,18 @@ namespace nx_http
     */
     bool HttpStreamReader::parseBytes( const BufferType& data, size_t count, size_t* bytesProcessed )
     {
+        return parseBytes(
+            QnByteArrayConstRef(data, 0, count),
+            bytesProcessed );
+    }
+
+    bool HttpStreamReader::parseBytes(
+        const QnByteArrayConstRef& data,
+        size_t* bytesProcessed )
+    {
         if( bytesProcessed )
             *bytesProcessed = 0;
-        if( count == nx_http::BufferNpos )
-            count = data.size();
+        const size_t count = data.size();
 
         //reading line-by-line
         //TODO #ak automate bytesProcessed modification based on currentDataPos
@@ -52,17 +61,20 @@ namespace nx_http
                 case pullingLineEndingBeforeMessageBody:
                 {
                     //reading line ending of the previous line
-                        //this is needed to handle buggy http/rtsp servers which do not use CRLF, but CR or LF
-                        //So, we allow HTTP headers to be terminated with CR of LF. Thus, if CRLF has been split to
+                        //this is needed to handle rtsp servers which are allowed to use CRLF and CR or LF alone
+                        //So, we allow HTTP headers to be terminated with CR or LF. Thus, if CRLF has been split to
                         //different buffers, we MUST read LF before reading message body
                     size_t bytesRead = 0;
                     m_lineSplitter.finishCurrentLineEnding(
-                        ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
+                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
+                        data.mid( currentDataPos, count-currentDataPos ),
                         &bytesRead );
                     currentDataPos += bytesRead;
                     if( bytesProcessed )
                         *bytesProcessed = currentDataPos;
                     m_state = readingMessageBody;
+                    if( m_breakAfterReadingHeaders )
+                        return true;
                     break;
                 }
 
@@ -73,7 +85,8 @@ namespace nx_http
                     if( m_contentDecoder )
                     {
                         msgBodyBytesRead = readMessageBody(
-                            QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data ){ m_codedMessageBodyBuffer.append(data.constData(), data.size()); } );
                         //decoding content
                         if( (msgBodyBytesRead != (size_t)-1) && (msgBodyBytesRead > 0) )
@@ -88,7 +101,8 @@ namespace nx_http
                     else
                     {
                         msgBodyBytesRead = readMessageBody(
-                            QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data )
                                 {
                                     std::unique_lock<std::mutex> lk( m_mutex );
@@ -127,7 +141,8 @@ namespace nx_http
                     ConstBufferRefType lineBuffer;
                     size_t bytesRead = 0;
                     const bool lineFound = m_lineSplitter.parseByLines(
-                        ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
+                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
+                        data.mid( currentDataPos, count-currentDataPos ),
                         &lineBuffer,
                         &bytesRead );
                     currentDataPos += bytesRead;
@@ -214,6 +229,11 @@ namespace nx_http
         return m_currentMessageNumber;
     }
 
+    void HttpStreamReader::setBreakAfterReadingHeaders( bool val )
+    {
+        m_breakAfterReadingHeaders = val;
+    }
+
     bool HttpStreamReader::parseLine( const ConstBufferRefType& data )
     {
         switch( m_state )
@@ -298,7 +318,8 @@ namespace nx_http
         Q_ASSERT( m_httpMessage.type != MessageType::none );
 
         HttpHeaders::const_iterator contentEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Content-Encoding") );
-        if( contentEncodingIter != m_httpMessage.headers().end() )
+        if( contentEncodingIter != m_httpMessage.headers().end() &&
+            contentEncodingIter->second != "identity" )
         {
             AbstractByteStreamConverter* contentDecoder = createContentDecoder( contentEncodingIter->second );
             if( contentDecoder == nullptr )

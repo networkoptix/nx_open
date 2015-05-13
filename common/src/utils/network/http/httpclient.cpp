@@ -93,7 +93,7 @@ namespace nx_http
 
     void HttpClient::addRequestHeader( const StringType& key, const StringType& value )
     {
-        m_asyncHttpClient->addRequestHeader( key, value );
+        m_asyncHttpClient->addAdditionalHeader( key, value );
     }
 
     const QUrl& HttpClient::url() const
