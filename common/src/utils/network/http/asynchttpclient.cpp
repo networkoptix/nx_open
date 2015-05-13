@@ -695,14 +695,18 @@ namespace nx_http
 
         //TODO #ak if that url has already been authenticated, adding same authentication info to the request
         if( m_currentUrlAuthorization )
+        {
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader(
                     header::Authorization::NAME,
                     m_currentUrlAuthorization->toString() ) );
-
-        //not using Basic authentication by default, since it is not secure
-        nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+        }
+        else
+        {
+            //not using Basic authentication by default, since it is not secure
+            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+        }
     }
 
     void AsyncHttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
