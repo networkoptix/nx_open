@@ -136,6 +136,7 @@ void QnUniversalRequestProcessor::run()
     {
         if (ready) 
         {
+            t.restart();
             parseRequest();
 
             bool isHandlerExist = dynamic_cast<QnUniversalTcpListener*>(d->owner)->findHandler(d->socket, d->request.requestLine.version.protocol, d->request) != 0;
@@ -143,10 +144,12 @@ void QnUniversalRequestProcessor::run()
                 return;
 
             d->response.headers.clear();
-            //isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive" && d->protocol.toLower() == "http";
-            isKeepAlive =
-                nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close" &&
-                d->request.requestLine.version == nx_http::http_1_1;
+
+            if( d->request.requestLine.version == nx_http::http_1_1 )
+                isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close";
+            else if( d->request.requestLine.version == nx_http::http_1_0 )
+                isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
+
             if (isKeepAlive) {
                 d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
                 d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
