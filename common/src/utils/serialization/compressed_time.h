@@ -4,13 +4,9 @@
 #include "compressed_time_fwd.h"
 #include "compressed_time_reader.h"
 #include "compressed_time_writer.h"
-#include "compressed_time_functions.h"
 #include "serialization.h"
 
 namespace QnCompressedTime {
-
-    static const char SIGNED_FORMAT[3] = {'B', '2', 'S'};
-    static const char UNSIGNED_FORMAT[3] = {'B', '2', 'U'};
 
     template<class T, class Output>
     void serialize(const T &value, QnCompressedTimeWriter<Output> *stream) {
