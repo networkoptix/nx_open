@@ -11,6 +11,7 @@
 #include <common/common_module.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
 #include <client/client_message_processor.h>
 
@@ -51,15 +52,14 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
  
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
-
-    QnClientSettings *settings = new QnClientSettings(forceLocalSettings);
-    common->store<QnClientSettings>(settings);
-    common->store<QnSessionManager>(new QnSessionManager());
-
     common->setModuleGUID(QnUuid::createUuid());
 
-    m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
-    m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
+    common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
+    common->store<QnClientSettings>(new QnClientSettings(forceLocalSettings));
+    common->store<QnSessionManager>(new QnSessionManager());
+
+    common->store<QnCameraUserAttributePool>(new QnCameraUserAttributePool());
+    common->store<QnMediaServerUserAttributesPool>(new QnMediaServerUserAttributesPool());
     common->store<QnResourcePool>(new QnResourcePool());
     common->store<QnSyncTime>(new QnSyncTime());
 

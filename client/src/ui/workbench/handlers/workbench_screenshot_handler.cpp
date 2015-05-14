@@ -13,6 +13,7 @@
 #include <camera/single_thumbnail_loader.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/file_processor.h>
 #include <core/resource/media_server_resource.h>
@@ -334,7 +335,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
-    if (qnSettings->isDevMode() && filename == lit("_DEBUG_SCREENSHOT_KEY_")) {
+    if (qnRuntime->isDevMode() && filename == lit("_DEBUG_SCREENSHOT_KEY_")) {
         takeDebugScreenshotsSet(widget);
         return;
     }

@@ -20,6 +20,7 @@
 #include <ui/workbench/workbench_display.h> // TODO: this one does not belong here.
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include "action_manager.h"
 #include "action_target_provider.h"
@@ -141,18 +142,18 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
     if(!(this->scope() & scope) && this->scope() != scope)
         return Qn::InvisibleAction;
 
-    if((m_flags & Qn::DevMode) && !qnSettings->isDevMode())
+    if((m_flags & Qn::DevMode) && !qnRuntime->isDevMode())
         return Qn::InvisibleAction;
 
     auto hasMode = [this](QnActionTypes::ClientMode mode) {
         return (m_mode & mode) == mode;
     };
 
-    if (qnSettings->isVideoWallMode() && 
+    if (qnRuntime->isVideoWallMode() && 
         !hasMode(QnActionTypes::VideoWallMode) )
         return Qn::InvisibleAction;
 
-    if (qnSettings->isActiveXMode() && 
+    if (qnRuntime->isActiveXMode() && 
         !hasMode(QnActionTypes::ActiveXMode) )
         return Qn::InvisibleAction;
 

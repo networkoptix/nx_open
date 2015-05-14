@@ -20,6 +20,7 @@
 #include <utils/common/variant_timer.h>
 #include <utils/aspect_ratio.h>
 
+#include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
 #include <common/common_meta_types.h>
 
@@ -603,7 +604,7 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
     QSizeF newWidgetSize = occupiedGeometry.size() * focusExpansion;
 
     qreal magicConst = maxExpandedSize;
-    if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         magicConst = 0.8;   //TODO: #Elric magic const
     else
     if (
@@ -1270,7 +1271,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
             : layoutBoundingRect.united(backgroundBoundingRect);
 
     /* Do not add additional spacing in following cases: */
-    bool noAdjust = qnSettings->isVideoWallMode()                           /*< Videowall client. */
+    bool noAdjust = qnRuntime->isVideoWallMode()                           /*< Videowall client. */
         || !backgroundBoundingRect.isNull();                                /*< There is a layout background. */
 
     if (noAdjust)

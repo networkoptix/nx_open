@@ -37,7 +37,7 @@ QnGlobals::QnGlobals(QObject *parent):
      * This is needed because globals instance may be constructed before the
      * corresponding resource initializer is called. */
     Q_INIT_RESOURCE(client);
-
+    //TODO: #GDM make rid of global static
     init();
 
     /* This is somewhat hacky. We still want the values to be writable for

@@ -140,15 +140,16 @@ QList<QnUuid> idListFromResList( const QList<ResourcePtrType>& resList )
 
 class QnCameraUserAttributePool
 :
-    public QnGeneralAttributePool<QnUuid, QnCameraUserAttributesPtr>
+    public QObject,
+    public QnGeneralAttributePool<QnUuid, QnCameraUserAttributesPtr>,
+    public Singleton<QnCameraUserAttributePool>
 {
+    Q_OBJECT
 public:
     QnCameraUserAttributePool();
     virtual ~QnCameraUserAttributePool();
 
     QnCameraUserAttributesList getAttributesList( const QList<QnUuid>& idList );
-
-    static QnCameraUserAttributePool* instance();
 };
 
 #endif  //CAMERA_USER_ATTRIBUTE_POOL_H

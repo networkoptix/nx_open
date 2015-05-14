@@ -20,8 +20,10 @@
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
+#include <client/client_runtime_settings.h>
 
 #include <common/common_module.h>
 
@@ -450,7 +452,7 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QLatin1String("--screen") << QString::number(screen);
     }
 
-    if (qnSettings->isDevMode())
+    if (qnRuntime->isDevMode())
         arguments << lit("--dev-mode-key=razrazraz");
 
     qDebug() << "Starting new instance with args" << arguments;
@@ -560,7 +562,7 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-	if (!qnSettings->isActiveXMode()) {
+	if (!qnRuntime->isActiveXMode()) {
 		if (!user) {
 	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 			return;
@@ -573,7 +575,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
 	}
 
     // we should not change state when using "Open in New Window"
-    if (m_delayedDrops.isEmpty() && !qnSettings->isVideoWallMode() && !qnSettings->isActiveXMode()) {
+    if (m_delayedDrops.isEmpty() && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode()) {
         QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
         workbench()->update(state);
 
@@ -587,7 +589,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     * Otherwise the user will see uncreated layouts in layout selection menu.
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
-    if (user && !qnSettings->isActiveXMode()) {
+    if (user && !qnRuntime->isActiveXMode()) {
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
             if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
                 resourcePool()->removeResource(layout);
@@ -632,7 +634,7 @@ void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode())
         return;
 
     m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);

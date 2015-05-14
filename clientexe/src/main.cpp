@@ -296,33 +296,41 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool forceLocalSettings = false;
 
     QnCommandLineParser commandLineParser;
+
+    /* Options used to open new client window. */
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
     commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
     commandLineParser.addParameter(&screen,                 "--screen",                     NULL,   QString());
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
     commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
-    commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
-    commandLineParser.addParameter(&ec2TranLogLevel,        "--ec2-tran-log-level",
-        "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", lit("none"));
+
+    /* Development options */
 #ifdef ENABLE_DYNAMIC_TRANSLATION
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
 #endif
-    commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
-    commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
-    commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
-    commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     QString dynamicCustomizationPath;
     commandLineParser.addParameter(&dynamicCustomizationPath,"--customization",              NULL,   QString());
 #endif
-    commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
-    commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
-    commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
-    commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
-    commandLineParser.addParameter(&engineVersion,          "--override-version",           NULL,   QString());
-    commandLineParser.addParameter(&noClientUpdate,         "--no-client-update",           NULL,   QString());
+    commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
     commandLineParser.addParameter(&softwareYuv,            "--soft-yuv",                   NULL,   QString());
     commandLineParser.addParameter(&forceLocalSettings,     "--local-settings",             NULL,   QString());
+    commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
+    commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
+    commandLineParser.addParameter(&engineVersion,          "--override-version",           NULL,   QString());
+
+    /* Persistent settings override. */
+    commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
+    commandLineParser.addParameter(&ec2TranLogLevel,        "--ec2-tran-log-level",
+        "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", lit("none"));
+    commandLineParser.addParameter(&noClientUpdate,         "--no-client-update",           NULL,   QString());
+    commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());    
+
+    /* Runtime settings */
+    commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
+    commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
+    commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
+    commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
@@ -337,11 +345,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
-        qnSettings->setDevMode(true);
+        qnRuntime->setDevMode(true);
     }
 
     if (softwareYuv)
-        qnSettings->setSoftwareYuv(true);
+        qnRuntime->setSoftwareYuv(true);
 
     if (!engineVersion.isEmpty()) {
         QnSoftwareVersion version(engineVersion);
@@ -356,11 +364,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QString logFileNameSuffix;
     if (!videowallGuid.isNull()) {
-        qnSettings->setVideoWallMode(true);
+        qnRuntime->setVideoWallMode(true);
         noSingleApplication = true;
         noFullScreen = true;
         noVersionMismatchCheck = true;
-        qnSettings->setLightModeOverride(Qn::LightModeVideoWall);
+        qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
 
         logFileNameSuffix = videowallInstanceGuid.isNull() 
             ? videowallGuid.toString() 
@@ -371,15 +379,17 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     initLog(logLevel, logFileNameSuffix, ec2TranLogLevel);
 
 	// TODO: #Elric why QString???
-    if (!lightMode.isEmpty()) {
+    if (!lightMode.isEmpty() && videowallGuid.isNull()) {
         bool ok;
         Qn::LightModeFlags lightModeOverride(lightMode.toInt(&ok));
         if (ok)
-            qnSettings->setLightModeOverride(lightModeOverride);
+            qnRuntime->setLightModeOverride(lightModeOverride);
         else
-            qnSettings->setLightModeOverride(Qn::LightModeFull);
+            qnRuntime->setLightModeOverride(Qn::LightModeFull);
     }
 
+    //TODO: #GDM fix it
+    /* Here the value from LightModeOverride will be copied to LightMode */
     QnPerformanceTest::detectLightMode();
 
 #ifdef Q_OS_MACX
@@ -504,7 +514,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     ffmpegInit();
 
     QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true));
-    moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    moduleFinder->setCompatibilityMode(qnRuntime->isDevMode());
     moduleFinder->start();
 
     QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
@@ -550,7 +560,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     /* Create main window. */
-    Qt::WindowFlags flags = qnSettings->isVideoWallMode()
+    Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
             ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
             : static_cast<Qt::WindowFlags>(0);
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data(), NULL, flags));
@@ -602,7 +612,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     // show beta version warning message for the main instance only
     if (!noSingleApplication &&
-        !qnSettings->isDevMode() &&
+        !qnRuntime->isDevMode() &&
         QnAppInfo::beta())
         context->action(Qn::BetaVersionMessageAction)->trigger();
 

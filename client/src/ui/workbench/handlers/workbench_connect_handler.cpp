@@ -14,6 +14,7 @@
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -171,7 +172,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     // ask user if he wants to save changes
-    bool force = qnSettings->isActiveXMode() || qnSettings->isVideoWallMode();
+    bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
     if (connected() && !disconnectFromServer(force))
         return; 
 
@@ -180,14 +181,14 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
 
     if (url.isValid()) {
         /* ActiveX plugin */
-        if (qnSettings->isActiveXMode()) {
+        if (qnRuntime->isActiveXMode()) {
             if (connectToServer(url, true) != ec2::ErrorCode::ok) {
                 QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
                 menu()->trigger(Qn::ExitAction);
             }
         } else
         /* Videowall item */
-        if (qnSettings->isVideoWallMode()) {
+        if (qnRuntime->isVideoWallMode()) {
             //TODO: #GDM #High videowall should try indefinitely
             if (connectToServer(url, true) != ec2::ErrorCode::ok) {
                 QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);

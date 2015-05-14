@@ -33,9 +33,11 @@ Q_DECLARE_METATYPE(QnMediaServerUserAttributesList)
 
 class QnMediaServerUserAttributesPool
 :
+    public QObject,
     public QnGeneralAttributePool<QnUuid, QnMediaServerUserAttributesPtr>,
     public Singleton<QnMediaServerUserAttributesPool>
 {
+    Q_OBJECT
 public:
     QnMediaServerUserAttributesPool();
 };

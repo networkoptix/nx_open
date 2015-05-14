@@ -1,6 +1,7 @@
 #include "workbench_debug_handler.h"
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 
@@ -57,8 +58,8 @@ void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered() {
 }
 
 void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
-    qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
-    qDebug() << qnSettings->debugCounter();
+    qnRuntime->setDebugCounter(qnRuntime->debugCounter() + 1);
+    qDebug() << qnRuntime->debugCounter();
 
     auto showPalette = [this] {
         QnPaletteWidget *w = new QnPaletteWidget();
@@ -71,7 +72,7 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
         timer->setInterval(100);
         timer->setSingleShot(false);
         connect(timer, &QTimer::timeout, this, [this, timer] {
-            if (qnSettings->debugCounter() != 1) {
+            if (qnRuntime->debugCounter() != 1) {
                 timer->stop();
                 timer->deleteLater();
                 return;
@@ -88,8 +89,8 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
 }
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
-    qnSettings->setDebugCounter(qnSettings->debugCounter() - 1);
-    qDebug() << qnSettings->debugCounter();
+    qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
+    qDebug() << qnRuntime->debugCounter();
 }
 
 void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered() {

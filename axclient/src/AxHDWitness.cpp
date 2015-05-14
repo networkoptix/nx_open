@@ -21,6 +21,7 @@
 #include "common/common_module.h"
 
 #include <client/client_message_processor.h>
+#include <client/client_runtime_settings.h>
 
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_context.h"
@@ -418,8 +419,6 @@ bool AxHDWitness::doInitialize()
     
     AllowSetForegroundWindow(ASFW_ANY);
 
-    int argc = 0;
-
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
@@ -427,7 +426,7 @@ bool AxHDWitness::doInitialize()
     m_clientModule.reset(new QnClientModule());
 
     qnSettings->setLightMode(Qn::LightModeActiveX);
-    qnSettings->setActiveXMode(true);
+    qnRuntime->setActiveXMode(true);
 
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
@@ -465,7 +464,7 @@ bool AxHDWitness::doInitialize()
     ffmpegInit();
       
     m_moduleFinder.reset(new QnModuleFinder(true));
-    m_moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    m_moduleFinder->setCompatibilityMode(qnRuntime->isDevMode());
     m_moduleFinder->start();
 
     m_router.reset(new QnRouter(m_moduleFinder.data()));
