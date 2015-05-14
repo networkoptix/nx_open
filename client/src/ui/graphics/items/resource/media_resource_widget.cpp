@@ -803,7 +803,10 @@ float QnMediaResourceWidget::visualAspectRatio() const {
     if (qFuzzyIsNull(customAspectRatio))
         return base_type::visualAspectRatio();
 
-    qreal aspectRatio = customAspectRatio * QnGeometry::aspectRatio(channelLayout()->size());
+    qreal aspectRatio = customAspectRatio;
+    if (zoomRect().isNull())
+        aspectRatio *= QnGeometry::aspectRatio(channelLayout()->size());
+
     return QnAspectRatio::isRotated90(rotation()) ? 1 / aspectRatio : aspectRatio;
 }
 

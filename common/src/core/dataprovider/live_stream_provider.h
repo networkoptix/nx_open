@@ -73,7 +73,6 @@ public:
     void startIfNotRunning();
 
     bool isCameraControlDisabled() const;
-    virtual bool isCameraControlRequired() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
     void updateSoftwareMotionStreamNum();
 
