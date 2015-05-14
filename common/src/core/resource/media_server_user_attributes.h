@@ -6,13 +6,10 @@
 #ifndef MEDIA_SERVER_USER_ATTRIBUTES_H
 #define MEDIA_SERVER_USER_ATTRIBUTES_H
 
-#include <QtCore/QSet>
-#include <QtCore/QByteArray>
-
 #include <utils/common/singleton.h>
 
-#include "camera_user_attribute_pool.h"
-
+#include <core/resource/general_attribute_pool.h>
+#include <core/resource/resource_fwd.h>
 
 class QnMediaServerUserAttributes
 {
