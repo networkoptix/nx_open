@@ -52,6 +52,7 @@ signals:
 private:
     void at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void at_timer_timeout();
+    void at_server_auxUrlsChanged(const QnResourcePtr &resource);
 
     void removeAddress(const SocketAddress &address, bool holdItem);
     void handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address);

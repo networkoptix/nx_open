@@ -1,15 +1,26 @@
 #include "AxHDWitness.h"
 
-#include "client/client_message_processor.h"
+//#include <objsafe.h>
+//#include <fstream>
+
+//#include <QAxAggregated>
+#include <QAxFactory>
+
+#include <QtCore/QFileInfo>
+#include <QtCore/QDir>
+#include <QtWidgets/QDesktopWidget>
+
 #include "api/session_manager.h"
 #include "core/resource_management/resource_discovery_manager.h"
-#include "core/ptz/client_ptz_controller_pool.h"
-#include <api/global_settings.h>
+
+
 #include "api/runtime_info_manager.h"
 #include "api/app_server_connection.h"
 #include <nx_ec/ec2_lib.h>
 
 #include "common/common_module.h"
+
+#include <client/client_message_processor.h>
 
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_context.h"
@@ -17,26 +28,17 @@
 #include "ui/workbench/workbench_layout.h"
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
-#include <QAxAggregated>
-#include <QAxFactory>
-#include <objsafe.h>
-
-#include "core/resource_management/resource_pool.h"
+#include "core/resource/camera_history.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/media_resource.h"
 #include "core/resource/network_resource.h"
+#include "core/resource/storage_resource.h"
 #include <core/resource/user_resource.h>
-#include <core/resource/camera_user_attribute_pool.h>
-#include <core/resource/media_server_user_attributes.h>
-
-#include <fstream>
+#include <core/resource_management/resource_pool.h>
+#include "core/resource/resource_directory_browser.h"
 
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
-
-#include <QtCore/QFileInfo>
-#include <QtCore/QDir>
-#include <QtWidgets/QDesktopWidget>
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -44,7 +46,6 @@
 #include "utils/network/router.h"
 #include <utils/common/command_line_parser.h>
 #include <utils/common/app_info.h>
-#include <utils/common/synctime.h>
 #include <utils/common/timermanager.h>
 
 #include "utils/server_interface_watcher.h"
@@ -55,22 +56,12 @@
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
 
-#include "platform/platform_abstraction.h"
-
-#include "core/resource/storage_resource.h"
-
-#include "core/resource/resource_directory_browser.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
-
 #include "tests/auto_tester.h"
 #include "utils/network/socket.h"
 #include <openssl/evp.h>
 
 #include <plugins/resource/server_camera/server_camera_factory.h>
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
-#include "core/resource/camera_history.h"
 #include <utils/common/log.h>
 
 
@@ -81,8 +72,6 @@
 
 #include "ui/workaround/fglrx_full_screen.h"
 #include <QtCore/private/qthread_p.h>
-
-#include <bespin.h>
 
 #include <QXmlStreamWriter>
 
@@ -128,16 +117,6 @@ void ffmpegInit()
     // client uses ordinary QT file to access file system, server uses buffering access implemented inside QnFileStorageResource
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
-    // QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
-    //QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("memory"), QnLayoutFileStorageResource::instance);
-
-    /*
-    extern URLProtocol ufile_protocol;
-    av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
-
-    extern URLProtocol qtufile_protocol;
-    av_register_protocol2(&qtufile_protocol, sizeof(qtufile_protocol));
-    */
 }
 
 static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
@@ -150,7 +129,6 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
 extern HHOOK qax_hhook;
 
-#if 1
 extern LRESULT QT_WIN_CALLBACK axs_FilterProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 LRESULT QT_WIN_CALLBACK qn_FilterProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -162,7 +140,6 @@ LRESULT QT_WIN_CALLBACK qn_FilterProc(int nCode, WPARAM wParam, LPARAM lParam)
         return CallNextHookEx(qax_hhook, nCode, wParam, lParam);
     }
 }
-#endif
 
 AxHDWitness::AxHDWitness(QWidget* parent, const char* name)
     : m_mainWindow(0), m_isInitialized(false)
@@ -447,27 +424,7 @@ bool AxHDWitness::doInitialize()
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
 
-    m_timerManager.reset(new TimerManager());
-
-    m_clientModule.reset(new QnClientModule(argc, NULL));
-    m_syncTime.reset(new QnSyncTime());
-
-    m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
-    m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
-
-    QnResourcePool::initStaticInstance( new QnResourcePool() );
-
-    m_dictionary.reset(new QnResourcePropertyDictionary());
-    m_statusDictionary.reset(new QnResourceStatusDictionary());
-	m_serverAdditionalAddressesDictionary.reset(new QnServerAdditionalAddressesDictionary());
-
-    m_platform.reset(new QnPlatformAbstraction());
-    m_runnablePool.reset(new QnLongRunnablePool());
-    m_clientPtzPool.reset(new QnClientPtzControllerPool());
-    m_globalSettings.reset(new QnGlobalSettings());
-    m_clientMessageProcessor.reset(new QnClientMessageProcessor());
-    m_runtimeInfoManager.reset(new QnRuntimeInfoManager());
-    m_serverCameraFactory.reset(new QnServerCameraFactory());
+    m_clientModule.reset(new QnClientModule());
 
     qnSettings->setLightMode(Qn::LightModeActiveX);
     qnSettings->setActiveXMode(true);
@@ -483,18 +440,12 @@ bool AxHDWitness::doInitialize()
     customizer.reset(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
-    QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
-    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
-
     m_ec2ConnectionFactory.reset(getConnectionFactory(Qn::PT_DesktopClient));
 
     ec2::ResourceContext resCtx(QnServerCameraFactory::instance(), qnResPool, qnResTypePool);
     m_ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( m_ec2ConnectionFactory.data() );
-    
-    /* Initialize application instance. */
-    QApplication::setStartDragDistance(20);
-    
+       
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
         return false;
@@ -510,8 +461,6 @@ bool AxHDWitness::doInitialize()
     cl_log.log("Software version: ", QnAppInfo::applicationVersion(), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
-    
-    QnSessionManager::instance()->start();
     
     ffmpegInit();
       
@@ -534,10 +483,9 @@ bool AxHDWitness::doInitialize()
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    QStyle *baseStyle = new Bespin::Style();
-    QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
-    qApp->setStyle(style);
-    qApp->processEvents();
+    auto *style = QnSkin::newStyle();
+    QApplication::setStyle(style);
+    QApplication::processEvents();
 
     connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
         emit connectionProcessed(0, QString());
@@ -548,7 +496,7 @@ bool AxHDWitness::doInitialize()
 
 void AxHDWitness::doFinalize()
 {
-    qApp->processEvents();
+    QApplication::processEvents();
 
     if (m_context)
         disconnect(m_context->navigator(), NULL, this, NULL);
@@ -563,37 +511,14 @@ void AxHDWitness::doFinalize()
 
     m_serverInterfaceWatcher.reset(NULL);
     m_router.reset(NULL);
- 
-    m_moduleFinder->pleaseStop();
     m_moduleFinder.reset(NULL);
-
-    QnSessionManager::instance()->stop();
 
     qInstallMessageHandler(defaultMsgHandler);
     customizer.reset(NULL);
 
     skin.reset(NULL);
-    m_serverCameraFactory.reset(NULL);
-    m_runtimeInfoManager.reset(NULL);
-    m_clientMessageProcessor.reset(NULL);
-    m_globalSettings.reset(NULL);
-    m_clientPtzPool.reset(NULL);
-    m_runnablePool.reset(NULL);
-    m_platform.reset(NULL);
 
-	m_serverAdditionalAddressesDictionary.reset(NULL);
-    m_statusDictionary.reset(NULL);
-    m_dictionary.reset(NULL);
-
-    QnResourcePool::initStaticInstance(NULL);
-
-    m_mediaServerUserAttributesPool.reset(NULL);
-    m_cameraUserAttributePool.reset(NULL);
-
-    m_syncTime.reset(NULL);
     m_clientModule.reset(NULL);
-
-    m_timerManager.reset(NULL);
 }
 
 void AxHDWitness::createMainWindow() {
@@ -602,6 +527,7 @@ void AxHDWitness::createMainWindow() {
     m_context.reset(new QnWorkbenchContext(qnResPool));
     m_context->instance<QnFglrxFullScreen>();
 
+    //TODO: #GDM is it really needed here?
     Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
     m_context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
 

@@ -26,6 +26,7 @@ bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, co
     }
 }
 
+//TODO: #GDM #High change resource parameter to shared pointer
 QnAbstractConnection::QnAbstractConnection(QObject *parent, QnResource* targetRes): 
     base_type(parent),
     m_targetRes(targetRes)
@@ -77,6 +78,10 @@ QString QnAbstractConnection::objectName(int object) const {
 
 int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
     if (!isReady())
+        return -1;
+
+    Q_ASSERT_X(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
+    if (!QnSessionManager::instance())
         return -1;
 
     QnAbstractReplyProcessor *processor = nullptr;
@@ -131,6 +136,10 @@ int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestParamL
 }
 
 int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
+    Q_ASSERT_X(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
+    if (!QnSessionManager::instance())
+        return -1;
+
     QnRequestHeaderList actualHeaders = headers;
     if(!m_extraHeaders.isEmpty())
         actualHeaders.append(m_extraHeaders);

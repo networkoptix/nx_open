@@ -82,13 +82,13 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
     }
 
     for (const QUrl &url: server->getAdditionalUrls()) {
-        QUrl turl = makeUrl(url.host(), port);
+        QUrl turl = makeUrl(url.host(), url.port(port));
         additionalUrls.insert(turl);
         addUrl(turl, m_urls);
     }
 
     for (const QUrl &url: server->getIgnoredUrls()) {
-        QUrl turl = makeUrl(url.host(), port);
+        QUrl turl = makeUrl(url.host(), url.port(port));
         ignoredUrls.insert(turl);
         addUrl(turl, m_ignoredUrls);
     }

@@ -36,6 +36,7 @@ namespace ec2
             /* Connection */
             testConnection              = 100,  /*< ApiLoginData */
             connect                     = 101,  /*< ApiLoginData */
+            openReverseConnection       = 102,  /*< ApiReverseConnectionData */
 
             /* Common resource */
             saveResource                = 200,  /*< ApiResourceData */
@@ -166,8 +167,11 @@ namespace ec2
         QString toString( Value val );
         Value fromString(const QString& val);
 
-        /** Check if transaction can be sent independently of current connection state. MUST have sequence field filled. */
+        /** Check if transaction can be sent independently of current syncronisation state.
+         *  These transactions are rather commands then data transfers. */
         bool isSystem( Value val );
+
+        /** Check if transaction should be written to data base. */
         bool isPersistent( Value val );
     }
 

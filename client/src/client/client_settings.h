@@ -36,7 +36,6 @@ public:
         AUDIO_VOLUME,
         MEDIA_FOLDER,
         EXTRA_MEDIA_FOLDERS,
-        OPEN_LAYOUTS_ON_LOGIN,
         SOFTWARE_YUV,
         USER_WORKBENCH_STATES,
         LICENSE_WARNING_STATES,
@@ -155,7 +154,7 @@ public:
         VARIABLE_COUNT
     };
 
-    QnClientSettings(bool localSettings, QObject *parent = NULL);
+    QnClientSettings(bool forceLocalSettings, QObject *parent = NULL);
     virtual ~QnClientSettings();
 
     void load();
@@ -178,8 +177,6 @@ protected:
 private:
     void loadFromWebsite();
 
-    Q_SLOT void at_accessManager_finished(QNetworkReply *reply);
-
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(int,                         maxSceneVideoItems,     setMaxSceneVideoItems,      MAX_SCENE_VIDEO_ITEMS,      24)
@@ -192,7 +189,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastScreenshotDir,      setLastScreenshotDir,       LAST_SCREENSHOT_DIR,        QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastRecordingDir,       setLastRecordingDir,        LAST_RECORDING_DIR,         QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
-        QN_DECLARE_RW_PROPERTY(bool,                        isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false)
         QN_DECLARE_RW_PROPERTY(bool,                        isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false)
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateHash,        userWorkbenchStates,    setUserWorkbenchStates,     USER_WORKBENCH_STATES,      QnWorkbenchStateHash())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
@@ -250,7 +246,6 @@ private:
     QN_END_PROPERTY_STORAGE()
 
 private:
-    QNetworkAccessManager *m_accessManager;
     QSettings *m_settings;
     bool m_loading;
 };

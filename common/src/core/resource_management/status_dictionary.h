@@ -3,8 +3,9 @@
 
 #include "utils/common/singleton.h"
 
-class QnResourceStatusDictionary: public Singleton<QnResourceStatusDictionary>
+class QnResourceStatusDictionary: public QObject, public Singleton<QnResourceStatusDictionary>
 {
+    Q_OBJECT
 public:
     Qn::ResourceStatus value(const QnUuid& resourceId) const;
     void setValue(const QnUuid& resourceId, Qn::ResourceStatus status);

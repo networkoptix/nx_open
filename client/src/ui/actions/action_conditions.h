@@ -668,4 +668,17 @@ private:
     int m_count;
 };
 
+class QnFakeServerActionCondition: public QnActionCondition {
+public:
+    QnFakeServerActionCondition(bool allResources = false, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_all(allResources)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+private:
+    bool m_all;
+};
+
 #endif // QN_ACTION_CONDITIONS_H

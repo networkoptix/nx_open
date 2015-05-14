@@ -24,9 +24,9 @@ namespace {
     }
 
 #ifdef Q_OS_MAC
-    const QString relativeHelpRootPath = lit("/../Resources/help");
+    const QString relativeHelpRootPath = lit("/../Resources/help/");
 #else
-    const QString relativeHelpRootPath = lit("/../help");
+    const QString relativeHelpRootPath = lit("/help/");
 #endif
 
     /** If the help could not be loaded, try again in 30 seconds. */
@@ -43,7 +43,8 @@ QnHelpHandler::QnHelpHandler(QObject *parent):
     m_topic(Qn::Empty_Help),
     m_helpRetryPeriodMSec(defaultHelpRetryPeriodMSec)
 {
-    m_helpRoot = qApp->applicationDirPath() + relativeHelpRootPath;
+    m_helpSearchPaths.append(qApp->applicationDirPath() + relativeHelpRootPath);
+    m_helpSearchPaths.append(qApp->applicationDirPath() + lit("/..") + relativeHelpRootPath);
 
     QnOnlineHelpDetector *helpDetector = new QnOnlineHelpDetector(this);
     connect(helpDetector,   &QnOnlineHelpDetector::urlFetched,  this,   [this, helpDetector](const QString &helpUrl) {
@@ -79,11 +80,16 @@ void QnHelpHandler::setHelpTopic(int topic) {
 }
 
 QUrl QnHelpHandler::urlForTopic(int topic) const {
-    QString filePath = m_helpRoot + QLatin1String("/") + QLatin1String(relativeUrlForTopic(topic));
-    if (QFile::exists(filePath))
-        return QUrl::fromLocalFile(filePath);
-    else if (!m_onlineHelpRoot.isEmpty())
-        return QUrl(m_onlineHelpRoot + lit("/") + QLatin1String(relativeUrlForTopic(topic)));
+    QString topicPath = QLatin1String(relativeUrlForTopic(topic));
+
+    for (const QString &helpRoot: m_helpSearchPaths) {
+        QString filePath = helpRoot + topicPath;
+        if (QFile::exists(filePath))
+            return QUrl::fromLocalFile(filePath);
+    }
+
+    if (!m_onlineHelpRoot.isEmpty())
+        return QUrl(m_onlineHelpRoot + lit("/") + topicPath);
     else
         QMessageBox::warning(0, tr("Error"), tr("Error")); // TODO: #dklychkov place something more detailed in the future
 

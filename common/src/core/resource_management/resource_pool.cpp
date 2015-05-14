@@ -39,21 +39,6 @@ QnResourcePool::~QnResourcePool()
     m_resources.clear();
 }
 
-//Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
-
-static QnResourcePool* resourcePool_instance = NULL;
-
-void QnResourcePool::initStaticInstance( QnResourcePool* inst )
-{
-    resourcePool_instance = inst;
-}
-
-QnResourcePool* QnResourcePool::instance()
-{
-    //return globalResourcePool();
-    return resourcePool_instance;
-}
-
 void QnResourcePool::beginTran()
 {
     m_tranInProgress = true;

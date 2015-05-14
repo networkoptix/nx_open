@@ -19,7 +19,6 @@
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
 
-
 namespace ec2
 {
     ECConnectionNotificationManager::ECConnectionNotificationManager(const ResourceContext& resCtx,
@@ -137,6 +136,12 @@ namespace ec2
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDatabaseDumpData> & /*tran*/)
     {
         databaseReplaceRequired();
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiReverseConnectionData>& tran )
+    {
+        Q_ASSERT(tran.command == ApiCommand::openReverseConnection);
+        emit m_ecConnection->reverseConnectionRequested(tran.params);
     }
 
     void ECConnectionNotificationManager::databaseReplaceRequired()

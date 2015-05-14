@@ -10,16 +10,23 @@
 #   include <unistd.h>
 #endif
 
+#ifdef Q_WS_X11
+#include <X11/Xlib.h>
+#endif
+
+#include <iostream>
+
 #include <utils/common/app_info.h>
 #include "ui/widgets/main_window.h"
-#include "client/client_settings.h"
 #include <api/global_settings.h>
 
+
+#include <QtCore/QStandardPaths>
+#include <QtCore/QString>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QTranslator>
-#include <QtCore/QStandardPaths>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
@@ -32,6 +39,18 @@ extern "C"
     #include <libavformat/avformat.h>
     #include <libavformat/avio.h>
 }
+
+#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+#include <client/client_module.h>
+#include <client/client_connection_data.h>
+#include <client/client_resource_processor.h>
+#include <client/client_translation_manager.h>
+
+#include "core/resource/media_server_resource.h"
+#include "core/resource/storage_resource.h"
+#include "core/resource/resource_directory_browser.h"
+#include <core/resource_management/resource_pool.h>
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -47,24 +66,15 @@ extern "C"
 #include "utils/common/util.h"
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
+
 #include "plugins/resource/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
-#include <plugins/resource/server_camera/server_camera.h>
+//#include <plugins/resource/server_camera/server_camera.h>
 #include <plugins/resource/server_camera/server_camera_factory.h>
 
 
-#define TEST_RTSP_SERVER
-
-#include <core/resource/camera_user_attribute_pool.h>
-#include "core/resource/media_server_resource.h"
-#include <core/resource/media_server_user_attributes.h>
-#include "core/resource/storage_resource.h"
-
 #include "plugins/resource/axis/axis_resource_searcher.h"
 #include "plugins/plugin_manager.h"
-#include "core/resource/resource_directory_browser.h"
 
 #ifdef _DEBUG
 #include "tests/auto_tester.h"
@@ -77,15 +87,12 @@ extern "C"
 #include "plugins/resource/iqinvision/iqinvision_resource_searcher.h"
 #include "plugins/resource/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 #include "plugins/resource/isd/isd_resource_searcher.h"
-//#include "plugins/resource/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
 
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
-#include "client/client_message_processor.h"
-#include "client/client_translation_manager.h"
 
 #ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
@@ -103,18 +110,13 @@ extern "C"
 #endif
 
 #include "ui/help/help_handler.h"
-#include <client/client_module.h>
-#include <client/client_connection_data.h>
-#include <client/client_resource_processor.h>
-#include "platform/platform_abstraction.h"
+
 #include "utils/common/long_runnable.h"
-#include <utils/common/synctime.h>
 
 #include "text_to_wav.h"
 #include "common/common_module.h"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
-#include "core/ptz/client_ptz_controller_pool.h"
 #include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
@@ -127,9 +129,6 @@ extern "C"
 #include "ui/workaround/mac_utils.h"
 #endif
 #include "api/runtime_info_manager.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include <utils/common/timermanager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -200,72 +199,6 @@ void ffmpegInit()
     */
 }
 
-#ifdef TEST_RTSP_SERVER
-
-void addTestFile(const QString& fileName, const QString& resId)
-{
-    Q_UNUSED(resId)
-    QnAviResourcePtr resource(new QnAviResource(fileName));
-    qnResPool->addResource(QnResourcePtr(resource));
-}
-
-void addTestData()
-{
-    /*
-    QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
-    resource->removeFlag(Qn::local); // to initialize access to resource throught RTSP server
-    resource->addFlag(Qn::remote); // to initialize access to resource throught RTSP server
-    resource->setParentId(server->getId());
-    qnResPool->addResource(QnResourcePtr(resource));
-    */
-
-    /*
-    QnFakeCameraPtr testCamera(new QnFakeCamera());
-    testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));
-    testCamera->setUrl("00000");
-    testCamera->setName("testCamera");
-    qnResPool->addResource(QnResourcePtr(testCamera));
-    */
-
-    /*
-    addTestFile("e:/Users/roman76r/blake/3PM PRIVATE SESSION, HOLLYWOOD Jayme.flv", "q1");
-    addTestFile("e:/Users/roman76r/blake/8 FEATURE PREMIERE_Paid Companions_Bottled-Up_h.wmv", "q2");
-    addTestFile("e:/Users/roman76r/blake/9  FEATURE PREMIERE_Paid Compan_Afternoon Whores.wmv", "q3");
-    addTestFile("e:/Users/roman76r/blake/A CUT ABOVE Aria & Justine.flv", "q4");
-    addTestFile("e:/Users/roman76r/blake/A DOLL'S LIFE Jacqueline, Nika & Jade.flv", "q5");
-    */
-
-    /*
-    QnAviResourcePtr resource2(new QnAviResource("C:/Users/physic/Videos/HighDef_-_Audio_-_Japan.avi"));
-    resource2->removeFlag(Qn::local); // to initialize access to resource throught RTSP server
-    resource2->addFlag(Qn::remote); // to initialize access to resource throught RTSP server
-    resource2->setParentId(server->getId());
-    qnResPool->addResource(QnResourcePtr(resource2));
-    */
-
-    /*
-    QnNetworkResourceList testList;
-    testList << testCamera;
-    QnTimePeriodList periods = server->apiConnection()->recordedTimePeriods(testList);
-    for (int i = 0; i < periods.size(); ++i)
-    {
-        qDebug() << periods[i].startTime << ' ' << periods[i].duration;
-    }
-    */
-
-}
-#endif
-
-void initAppServerConnection(const QnUuid &videowallGuid, const QnUuid &videowallInstanceGuid) {
-    QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
-    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
-    if (!videowallGuid.isNull()) {
-        QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
-        QnAppServerConnectionFactory::setInstanceGuid(videowallInstanceGuid);
-    }
-}
-
 /** Initialize log. */
 void initLog(
     QString logLevel,
@@ -325,14 +258,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
-#ifdef Q_WS_X11
-#include <X11/Xlib.h>
-#endif
-
-#include <iostream>
-
 #ifndef API_TEST_MAIN
-#define ENABLE_DYNAMIC_CUSTOMIZATION
+//#define ENABLE_DYNAMIC_CUSTOMIZATION
 
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // these functions should be called in every thread that wants to use rand() and qrand()
@@ -343,14 +270,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
-    /* Parse command line. */
-#ifdef _DEBUG
-    QnAutoTester autoTester(argc, argv);
-#endif
 
-    QnSyncTime syncTime;
-
-    qnSettings->updateFromCommandLine(argc, argv, stderr);
 
     QString devModeKey;
     bool noSingleApplication = false;
@@ -372,6 +292,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QString sVideoWallItemGuid;
     QString engineVersion;
     bool noClientUpdate = false;
+    bool softwareYuv = false;
+    bool forceLocalSettings = false;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -399,8 +321,17 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
     commandLineParser.addParameter(&engineVersion,          "--override-version",           NULL,   QString());
     commandLineParser.addParameter(&noClientUpdate,         "--no-client-update",           NULL,   QString());
+    commandLineParser.addParameter(&softwareYuv,            "--soft-yuv",                   NULL,   QString());
+    commandLineParser.addParameter(&forceLocalSettings,     "--local-settings",             NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
+
+    QnClientModule client(forceLocalSettings);
+
+    /* Parse command line. */
+#ifdef _DEBUG
+    QnAutoTester autoTester(argc, argv);
+#endif
 
     ec2::DummyHandler dummyEc2RequestHandler;
 
@@ -409,10 +340,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
+    if (softwareYuv)
+        qnSettings->setSoftwareYuv(true);
+
     if (!engineVersion.isEmpty()) {
         QnSoftwareVersion version(engineVersion);
         if (!version.isNull()) {
-            qWarning() << "Starting with overriden version: " << version.toString();
+            qWarning() << "Starting with overridden version: " << version.toString();
             qnCommon->setEngineVersion(version);
         }
     }
@@ -457,7 +391,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
 
-    QScopedPointer<TimerManager> timerManager(new TimerManager());
+    
 
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     QString skinRoot = dynamicCustomizationPath.isEmpty() 
@@ -485,23 +419,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     customizer->customize(qnGlobals);
 
     /* Initialize application instance. */
-    application->setQuitOnLastWindowClosed(true);
-    application->setWindowIcon(qnSkin->icon("window_icon.png"));
-    application->setStartDragDistance(20);
-    application->setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+    QApplication::setQuitOnLastWindowClosed(true);
+    QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
+    
+    QApplication::setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
-
-    QnResourcePropertyDictionary dictionary;
-    QnResourceStatusDictionary statusDictionary;
-    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
-    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-    QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
-    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
-    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
-    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
@@ -529,13 +453,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         }
     }
 
-    QScopedPointer<QnServerCameraFactory> serverCameraFactory(new QnServerCameraFactory());
 
-    //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
-    QNetworkProxyFactory::setApplicationProxyFactory( new QnNetworkProxyFactory() );
 
     /* Initialize connections. */
-    initAppServerConnection(videowallGuid, videowallInstanceGuid);
+    if (!videowallGuid.isNull()) {
+        QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
+        QnAppServerConnectionFactory::setInstanceGuid(videowallInstanceGuid);
+    }
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory( videowallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
@@ -576,9 +500,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
-
-    // Create and start SessionManager
-    QnSessionManager::instance()->start();
 
     ffmpegInit();
 
@@ -654,9 +575,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
-    //initializing plugin manager. TODO supply plugin dir (from settings)
-    //PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
-
     /* Process input files. */
     bool haveInputFiles = false;
     {
@@ -671,10 +589,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     if(!noSingleApplication)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
-
-#ifdef TEST_RTSP_SERVER
-    addTestData();
-#endif
 
 #ifdef _DEBUG
     if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
@@ -775,15 +689,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 #endif
 
-    QnSessionManager::instance()->stop();
-
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
 
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setUrl(QUrl());
-
-    QNetworkProxyFactory::setApplicationProxyFactory(0);
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
@@ -792,15 +702,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     //restoring default message handler
     qInstallMessageHandler( defaultMsgHandler );
 
+#ifdef Q_OS_WIN
+    QnDesktopResourceSearcher::initStaticInstance( NULL );
+#endif
+
     return result;
 }
-
-#include <QtCore/QStandardPaths>
-#include <QtCore/QString>
-
-#include <QtCore/QStandardPaths>
-#include <QtCore/QString>
-
 
 int main(int argc, char **argv)
 {
@@ -831,12 +738,7 @@ int main(int argc, char **argv)
     QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, lit("/etc/xdg"));
 #endif
 
-    QnClientModule client(argc, argv);
 
-    QnSessionManager::instance();
-    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
-    std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    QnResourcePool::initStaticInstance( new QnResourcePool() );
 
 #ifdef Q_OS_MAC
     mac_restoreFileAccess();
@@ -844,18 +746,11 @@ int main(int argc, char **argv)
 
     int result = runApplication(application.data(), argc, argv);
 
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
-
-#ifdef Q_OS_WIN
-    QnDesktopResourceSearcher::initStaticInstance( NULL );
-#endif
 
 #ifdef Q_OS_MAC
     mac_stopFileAccess();
 #endif
 
-//    qApp->processEvents(); //TODO: #Elric crashes
     return result;
 }
 

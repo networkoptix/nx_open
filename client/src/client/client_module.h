@@ -1,18 +1,22 @@
 #ifndef QN_CLIENT_MODULE_H
 #define QN_CLIENT_MODULE_H
 
+#include <memory>
+
 #include <QtCore/QObject>
 
-#include "client_settings.h"
+class QnCameraUserAttributePool;
+class QnMediaServerUserAttributesPool;
 
 class QnClientModule: public QObject {
     Q_OBJECT
 public:
-    QnClientModule(int &argc, char **argv, QObject *parent = NULL);
+    QnClientModule(bool forceLocalSettings = false, QObject *parent = NULL);
     virtual ~QnClientModule();
 
 private:
-	QScopedPointer<QnClientSettings> m_clientSettings;
+    std::unique_ptr<QnCameraUserAttributePool> m_cameraUserAttributePool;
+    std::unique_ptr<QnMediaServerUserAttributesPool> m_mediaServerUserAttributesPool;
 };
 
 

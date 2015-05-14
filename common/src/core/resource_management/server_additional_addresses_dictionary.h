@@ -4,8 +4,9 @@
 #include <utils/common/singleton.h>
 
 
-class QnServerAdditionalAddressesDictionary : public Singleton<QnServerAdditionalAddressesDictionary>
+class QnServerAdditionalAddressesDictionary: public QObject, public Singleton<QnServerAdditionalAddressesDictionary>
 {
+    Q_OBJECT
 public:
     QList<QUrl> additionalUrls(const QnUuid &serverId) const;
     QList<QUrl> ignoredUrls(const QnUuid &serverId) const;
