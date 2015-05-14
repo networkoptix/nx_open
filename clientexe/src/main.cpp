@@ -117,7 +117,6 @@ extern "C"
 
 #include "platform/platform_abstraction.h"
 #include "utils/common/long_runnable.h"
-#include <utils/common/synctime.h>
 
 #include "text_to_wav.h"
 #include "common/common_module.h"
@@ -292,8 +291,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #ifdef _DEBUG
     QnAutoTester autoTester(argc, argv);
 #endif
-
-    QnSyncTime syncTime;
 
     qnSettings->updateFromCommandLine(argc, argv, stderr);
 

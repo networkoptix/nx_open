@@ -107,7 +107,6 @@ private:
     QScopedPointer<QnSkin> skin;
     QScopedPointer<QnCustomizer> customizer;
     QScopedPointer<QnClientModule> m_clientModule;
-    QScopedPointer<QnSyncTime> m_syncTime;
 
     QScopedPointer<QnPlatformAbstraction> m_platform;
     QScopedPointer<QnLongRunnablePool> m_runnablePool;

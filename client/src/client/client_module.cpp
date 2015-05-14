@@ -15,6 +15,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/common/synctime.h>
 
 #include "version.h"
 
@@ -50,6 +51,7 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
     m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
     common->store<QnResourcePool>(new QnResourcePool());
+    common->store<QnSyncTime>(new QnSyncTime());
 }
 
 QnClientModule::~QnClientModule() {

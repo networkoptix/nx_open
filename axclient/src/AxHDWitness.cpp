@@ -48,7 +48,6 @@
 #include "utils/network/router.h"
 #include <utils/common/command_line_parser.h>
 #include <utils/common/app_info.h>
-#include <utils/common/synctime.h>
 #include <utils/common/timermanager.h>
 
 #include "utils/server_interface_watcher.h"
@@ -442,7 +441,6 @@ bool AxHDWitness::doInitialize()
     QCoreApplication::setLibraryPaths( pluginDirs );
 
     m_clientModule.reset(new QnClientModule(argc, NULL));
-    m_syncTime.reset(new QnSyncTime());
 
     m_dictionary.reset(new QnResourcePropertyDictionary());
     m_statusDictionary.reset(new QnResourceStatusDictionary());
@@ -567,7 +565,6 @@ void AxHDWitness::doFinalize()
     m_statusDictionary.reset(NULL);
     m_dictionary.reset(NULL);
 
-    m_syncTime.reset(NULL);
     m_clientModule.reset(NULL);
 }
 
