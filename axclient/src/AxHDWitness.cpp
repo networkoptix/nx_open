@@ -37,13 +37,8 @@
 #include <core/resource_management/resource_pool.h>
 #include "core/resource/resource_directory_browser.h"
 
-
-
-
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
-
-
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -122,16 +117,6 @@ void ffmpegInit()
     // client uses ordinary QT file to access file system, server uses buffering access implemented inside QnFileStorageResource
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
-    // QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
-    //QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("memory"), QnLayoutFileStorageResource::instance);
-
-    /*
-    extern URLProtocol ufile_protocol;
-    av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
-
-    extern URLProtocol qtufile_protocol;
-    av_register_protocol2(&qtufile_protocol, sizeof(qtufile_protocol));
-    */
 }
 
 static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
@@ -144,7 +129,6 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
 extern HHOOK qax_hhook;
 
-#if 1
 extern LRESULT QT_WIN_CALLBACK axs_FilterProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 LRESULT QT_WIN_CALLBACK qn_FilterProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -156,7 +140,6 @@ LRESULT QT_WIN_CALLBACK qn_FilterProc(int nCode, WPARAM wParam, LPARAM lParam)
         return CallNextHookEx(qax_hhook, nCode, wParam, lParam);
     }
 }
-#endif
 
 AxHDWitness::AxHDWitness(QWidget* parent, const char* name)
     : m_mainWindow(0), m_isInitialized(false)
@@ -457,18 +440,12 @@ bool AxHDWitness::doInitialize()
     customizer.reset(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
-    QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
-    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
-
     m_ec2ConnectionFactory.reset(getConnectionFactory(Qn::PT_DesktopClient));
 
     ec2::ResourceContext resCtx(QnServerCameraFactory::instance(), qnResPool, qnResTypePool);
     m_ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( m_ec2ConnectionFactory.data() );
-    
-    /* Initialize application instance. */
-    QApplication::setStartDragDistance(20);
-    
+       
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
         return false;
@@ -507,8 +484,8 @@ bool AxHDWitness::doInitialize()
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     auto *style = QnSkin::newStyle();
-    qApp->setStyle(style);
-    qApp->processEvents();
+    QApplication::setStyle(style);
+    QApplication::processEvents();
 
     connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
         emit connectionProcessed(0, QString());
@@ -519,7 +496,7 @@ bool AxHDWitness::doInitialize()
 
 void AxHDWitness::doFinalize()
 {
-    qApp->processEvents();
+    QApplication::processEvents();
 
     if (m_context)
         disconnect(m_context->navigator(), NULL, this, NULL);
@@ -534,8 +511,6 @@ void AxHDWitness::doFinalize()
 
     m_serverInterfaceWatcher.reset(NULL);
     m_router.reset(NULL);
- 
-    m_moduleFinder->pleaseStop();
     m_moduleFinder.reset(NULL);
 
     qInstallMessageHandler(defaultMsgHandler);

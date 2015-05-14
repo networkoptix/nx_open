@@ -7,7 +7,6 @@
 
 #include <ActiveQt/QAxBindable>
 
-#include "client/client_resource_processor.h"
 #include "ui/widgets/main_window.h"
 #include "ui/style/skin.h"
 #include <client/client_module.h>
@@ -84,7 +83,6 @@ private:
     bool m_isInitialized;
 
     QScopedPointer<ec2::AbstractECConnectionFactory> m_ec2ConnectionFactory;
-    QnClientResourceProcessor m_clientResourceProcessor;
 
     QScopedPointer<QnWorkbenchContext> m_context;
     QScopedPointer<QnSkin> skin;

@@ -199,15 +199,6 @@ void ffmpegInit()
     */
 }
 
-void initAppServerConnection(const QnUuid &videowallGuid, const QnUuid &videowallInstanceGuid) {
-    QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
-    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
-    if (!videowallGuid.isNull()) {
-        QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
-        QnAppServerConnectionFactory::setInstanceGuid(videowallInstanceGuid);
-    }
-}
-
 /** Initialize log. */
 void initLog(
     QString logLevel,
@@ -421,10 +412,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     customizer->customize(qnGlobals);
 
     /* Initialize application instance. */
-    application->setQuitOnLastWindowClosed(true);
-    application->setWindowIcon(qnSkin->icon("window_icon.png"));
-    application->setStartDragDistance(20);
-    application->setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+    QApplication::setQuitOnLastWindowClosed(true);
+    QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
+    
+    QApplication::setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
@@ -455,11 +446,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         }
     }
 
-    //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
-    QNetworkProxyFactory::setApplicationProxyFactory( new QnNetworkProxyFactory() );
+
 
     /* Initialize connections. */
-    initAppServerConnection(videowallGuid, videowallInstanceGuid);
+    if (!videowallGuid.isNull()) {
+        QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
+        QnAppServerConnectionFactory::setInstanceGuid(videowallInstanceGuid);
+    }
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory( videowallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
@@ -694,8 +687,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setUrl(QUrl());
-
-    QNetworkProxyFactory::setApplicationProxyFactory(0);
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());

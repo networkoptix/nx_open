@@ -2,7 +2,9 @@
 
 #include <QtWidgets/QApplication>
 
+#include <api/app_server_connection.h>
 #include <api/global_settings.h>
+#include <api/network_proxy_factory.h>
 #include <api/runtime_info_manager.h>
 #include <api/session_manager.h>
 
@@ -41,6 +43,7 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));    
     if (QApplication::applicationVersion().isEmpty())
         QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
+    QApplication::setStartDragDistance(20);
  
     /* We don't want changes in desktop color settings to mess up our custom style. */
     QApplication::setDesktopSettingsAware(false);
@@ -75,9 +78,17 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     common->store<QnClientMessageProcessor>(new QnClientMessageProcessor());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnServerCameraFactory>(new QnServerCameraFactory());
+
+    //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
+    QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
+
+    QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
+    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
 }
 
 QnClientModule::~QnClientModule() {
+    QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
+
     QApplication::setOrganizationName(QString());
     QApplication::setApplicationName(QString());
     QApplication::setApplicationDisplayName(QString());
