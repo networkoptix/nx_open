@@ -685,8 +685,7 @@ void QnWorkbenchUi::tick(int deltaMSecs) {
 }
 
 void QnWorkbenchUi::at_freespaceAction_triggered() {
-	// ax 23
-	return;
+    Q_ASSERT_X(!qnSettings->isActiveXMode(), Q_FUNC_INFO, "This function must not be called in ActiveX mode.");
 
     QAction *fullScreenAction = action(Qn::EffectiveMaximizeAction);
 

@@ -527,6 +527,7 @@ void AxHDWitness::createMainWindow() {
     m_context.reset(new QnWorkbenchContext(qnResPool));
     m_context->instance<QnFglrxFullScreen>();
 
+    //TODO: #GDM is it really needed here?
     Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
     m_context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
