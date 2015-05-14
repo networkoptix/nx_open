@@ -78,7 +78,6 @@ namespace ConnectionType
 
 static const int DEFAULT_READ_BUFFER_SIZE = 4 * 1024;
 static const int SOCKET_TIMEOUT = 1000 * 1000;
-static const int TCP_KEEPALIVE_TIMEOUT = 1000 * 5;
 const char* QnTransactionTransport::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
 const char* QnTransactionTransport::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
@@ -796,7 +795,7 @@ bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 {
     QMutexLocker lock(&m_mutex);
     return m_lastReceiveTimer.isValid() &&  //if not valid we still have not begun receiving transactions
-        (m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * 3);
+        (m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE);
 }
 
 void QnTransactionTransport::serializeAndSendNextDataBuffer()
@@ -831,32 +830,27 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         }
         else    //m_peerRole == prOriginating
         {
-#ifndef USE_HTTP_CLIENT_TO_SEND_POST
-            //sending transactions as a POST request
-            nx_http::Request request;
-            request.requestLine.method = nx_http::Method::POST;
-            request.requestLine.url = lit("/ec2/forward_events");
-            request.requestLine.version = nx_http::http_1_1;
-            //request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
-            request.headers.emplace(
-                "Content-Type",
-                m_base64EncodeOutgoingTransactions
-                    ? "application/text"
-                    : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
-            request.headers.emplace( "Host", m_remoteAddr.host().toLatin1() );
-            //request.headers.emplace( "Pragma", "no-cache" );
-            //request.headers.emplace( "Cache-Control", "no-cache" );
-            //request.headers.emplace( "Connection", "keep-alive" );
-            request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
-            addHttpChunkExtensions( &request.headers );
-            request.headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
-            if( m_base64EncodeOutgoingTransactions )    //informing server that transaction is encoded
-                request.headers.emplace( nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME, "true" );
-            request.messageBody = dataCtx.sourceData;
-            dataCtx.encodedSourceData = request.serialized();
-#else
-            dataCtx.encodedSourceData = dataCtx.sourceData;
-#endif
+            if( m_outgoingDataSocket )
+            {
+                //sending transactions as a POST request
+                nx_http::Request request;
+                request.requestLine.method = nx_http::Method::POST;
+                request.requestLine.url = lit("/ec2/forward_events");
+                request.requestLine.version = nx_http::http_1_1;
+
+                for( const auto& header: m_outgoingClientHeaders )
+                    request.headers.emplace( header );
+
+                request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
+                addHttpChunkExtensions( &request.headers );
+                request.headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
+                request.messageBody = dataCtx.sourceData;
+                dataCtx.encodedSourceData = request.serialized();
+            }
+            else
+            {
+                dataCtx.encodedSourceData = dataCtx.sourceData;
+            }
         }
     }
     using namespace std::placeholders;
@@ -884,7 +878,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         if( !m_outgoingTranClient )
         {
             m_outgoingTranClient = std::make_shared<nx_http::AsyncHttpClient>();
-            m_outgoingTranClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * 3 );
+            m_outgoingTranClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
             m_outgoingTranClient->setUserAgent( QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             m_outgoingTranClient->addAdditionalHeader(
                 nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
@@ -1436,6 +1430,49 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
         m_outgoingTranClient.reset();
         return;
     }
+
+    //----------------------------------------------------------------------------------------
+    //TODO #ak since http client does not support http interleaving we have to send 
+        //POST requests directly from this class.
+        //This block does it
+    m_outgoingClientHeaders.clear();
+    m_outgoingClientHeaders.emplace_back(
+        "User-Agent",
+        QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
+    m_outgoingClientHeaders.emplace_back(
+        "Content-Type",
+        m_base64EncodeOutgoingTransactions
+            ? "application/text"
+            : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
+    m_outgoingClientHeaders.emplace_back( "Host", m_remoteAddr.host().toLatin1() );
+    m_outgoingClientHeaders.emplace_back(
+        nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
+        m_connectionGuid.toByteArray() );
+    m_outgoingClientHeaders.emplace_back(
+        nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
+        ConnectionType::toString(ConnectionType::outgoing) );
+    if( m_base64EncodeOutgoingTransactions )    //informing server that transaction is encoded
+        m_outgoingClientHeaders.emplace_back(
+            nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME,
+            "true" );
+    auto authorizationHeaderIter = client->request().headers.find( nx_http::header::Authorization::NAME );
+    if( authorizationHeaderIter != client->request().headers.end() )
+        m_outgoingClientHeaders.emplace_back( *authorizationHeaderIter );
+    auto nxUsernameHeaderIter = client->request().headers.find( "X-Nx-User-Name" );
+    if( nxUsernameHeaderIter != client->request().headers.end() )
+        m_outgoingClientHeaders.emplace_back( *nxUsernameHeaderIter );
+
+    assert( !m_outgoingDataSocket );
+    m_outgoingDataSocket = client->takeSocket();
+    m_outgoingTranClient.reset();
+
+    using namespace std::placeholders;
+    //monitoring m_outgoingDataSocket for connection close
+    m_dummyReadBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
+    m_outgoingDataSocket->readSomeAsync(
+        &m_dummyReadBuffer,
+        std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
+    //----------------------------------------------------------------------------------------
 
     m_dataToSend.pop_front();
     if( m_dataToSend.empty() )

@@ -55,6 +55,8 @@ class QnTransactionTransport
 public:
     static const char* TUNNEL_MULTIPART_BOUNDARY;
     static const char* TUNNEL_CONTENT_TYPE;
+    static const int TCP_KEEPALIVE_TIMEOUT = 5*1000;
+    static const int KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE = 3;
 
     //not using Qt signal/slot because it is undefined in what thread this object lives and in what thread TimerSynchronizationManager lives
     typedef std::function<void(QnTransactionTransport*, const nx_http::HttpHeaders&)> HttpChunkExtensonHandler;
@@ -264,6 +266,7 @@ private:
     quint64 m_sendKeepAliveTask;
     nx::Buffer m_dummyReadBuffer;
     bool m_base64EncodeOutgoingTransactions;
+    std::vector<nx_http::HttpHeader> m_outgoingClientHeaders;
 
 private:
     void default_initializer();

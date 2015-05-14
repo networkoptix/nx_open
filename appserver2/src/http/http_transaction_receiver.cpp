@@ -10,15 +10,20 @@
 
 #include "http/custom_headers.h"
 #include "transaction/transaction_message_bus.h"
+#include "transaction/transaction_transport.h"
 
 
 namespace ec2
 {
-    QnHttpTransactionReceiver::QnHttpTransactionReceiver()
+    ////////////////////////////////////////////////////////////
+    //// class QnRestTransactionReceiver
+    ////////////////////////////////////////////////////////////
+
+    QnRestTransactionReceiver::QnRestTransactionReceiver()
     {
     }
 
-    int QnHttpTransactionReceiver::executeGet(
+    int QnRestTransactionReceiver::executeGet(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,
         QByteArray& /*result*/,
@@ -28,7 +33,7 @@ namespace ec2
         return nx_http::StatusCode::badRequest;
     }
 
-    int QnHttpTransactionReceiver::executePost(
+    int QnRestTransactionReceiver::executePost(
         const QString& path,
         const QnRequestParamList& /*params*/,
         const QByteArray& body,
@@ -53,4 +58,100 @@ namespace ec2
         return nx_http::StatusCode::ok;
     }
 
+
+
+    ////////////////////////////////////////////////////////////
+    //// class QnHttpTransactionReceiver
+    ////////////////////////////////////////////////////////////
+
+    class QnHttpTransactionReceiverPrivate
+    :
+        public QnTCPConnectionProcessorPrivate
+    {
+    public:
+
+        QnHttpTransactionReceiverPrivate()
+        : 
+            QnTCPConnectionProcessorPrivate()
+        {
+        }
+    };
+
+    QnHttpTransactionReceiver::QnHttpTransactionReceiver(
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnTcpListener* _owner )
+    :
+        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket )
+    {
+        Q_UNUSED(_owner)
+
+        setObjectName( "QnHttpTransactionReceiver" );
+    }
+
+    QnHttpTransactionReceiver::~QnHttpTransactionReceiver()
+    {
+        stop();
+    }
+
+    void QnHttpTransactionReceiver::run()
+    {
+        Q_D(QnHttpTransactionReceiver);
+        initSystemThreadId();
+
+        if( !d->socket->setRecvTimeout(
+                QnTransactionTransport::TCP_KEEPALIVE_TIMEOUT *
+                QnTransactionTransport::KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE ) )
+        {
+            return;
+        }
+
+        for( ;; )
+        {
+            if( !readSingleRequest() )
+                return;
+            
+            if( d->request.requestLine.method != nx_http::Method::POST )
+            {
+                sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+                return;
+            }
+
+            auto connectionGuidIter = d->request.headers.find( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME );
+            if( connectionGuidIter == d->request.headers.end() )
+            {
+                sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+                return;
+            }
+            const QnUuid connectionGuid( connectionGuidIter->second );
+
+            if( !QnTransactionMessageBus::instance()->gotTransactionFromRemotePeer(
+                    connectionGuid,
+                    d->request,
+                    d->requestBody ) )
+            {
+                sendResponse( nx_http::StatusCode::notFound, nx_http::StringType() );
+                return;
+            }
+
+            //checking whether connection persistent or not...
+            bool closeConnection = true;
+            if( d->request.requestLine.version == nx_http::http_1_1 )
+            {
+                closeConnection = false;
+                auto connectionHeaderIter = d->request.headers.find( "Connection" );
+                if( connectionHeaderIter != d->request.headers.end() &&
+                    connectionHeaderIter->second == "close" )
+                {
+                    //client requested connection closure
+                    closeConnection = true;
+                    d->response.headers.insert( *connectionHeaderIter );
+                }
+            }
+
+            sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
+
+            if( closeConnection )
+                return;
+        }
+    }
 }

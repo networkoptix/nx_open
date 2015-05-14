@@ -122,6 +122,11 @@ namespace nx_http
         return initiateHttpMessageDelivery( url );
     }
 
+    const nx_http::Request& AsyncHttpClient::request() const
+    {
+        return m_request;
+    }
+
     /*!
         Response is valid only after signal \a responseReceived() has been emitted
     */
