@@ -572,12 +572,6 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
 			context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 	}
 
-    /* Open all user's layouts. */
-    //if(qnSettings->isLayoutsOpenedOnLogin()) {
-        //QnLayoutResourceList layouts = context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>();
-        //menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
-    //}
-
     // we should not change state when using "Open in New Window"
     if (m_delayedDrops.isEmpty() && !qnSettings->isVideoWallMode() && !qnSettings->isActiveXMode()) {
         QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());

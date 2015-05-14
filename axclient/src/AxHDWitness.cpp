@@ -450,8 +450,7 @@ bool AxHDWitness::doInitialize()
 
     m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
     m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
-
-    QnResourcePool::initStaticInstance( new QnResourcePool() );
+    m_resourcePool.reset(new QnResourcePool());
 
     m_dictionary.reset(new QnResourcePropertyDictionary());
     m_statusDictionary.reset(new QnResourceStatusDictionary());
@@ -576,8 +575,7 @@ void AxHDWitness::doFinalize()
     m_statusDictionary.reset(NULL);
     m_dictionary.reset(NULL);
 
-    QnResourcePool::initStaticInstance(NULL);
-
+    m_resourcePool.reset(NULL);
     m_mediaServerUserAttributesPool.reset(NULL);
     m_cameraUserAttributePool.reset(NULL);
 

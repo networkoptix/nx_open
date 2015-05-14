@@ -83,13 +83,11 @@ QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
     setName(MEDIA_FOLDER,           lit("mediaRoot"));
     setName(EXTRA_MEDIA_FOLDERS,    lit("auxMediaRoot"));
     setName(DOWNMIX_AUDIO,          lit("downmixAudio"));
-    setName(OPEN_LAYOUTS_ON_LOGIN,  lit("openLayoutsOnLogin"));
     setName(LAST_RECORDING_DIR,     lit("videoRecording/previousDir"));
     setName(LAST_EXPORT_DIR,        lit("export/previousDir"));
 
     /* Set command line switch names. */
     addArgumentName(SOFTWARE_YUV,           "--soft-yuv");
-    addArgumentName(OPEN_LAYOUTS_ON_LOGIN,  "--open-layouts-on-login");
     addArgumentName(MAX_SCENE_VIDEO_ITEMS,  "--max-video-items");
 
     /* Load from internal resource. */

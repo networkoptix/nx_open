@@ -1450,7 +1450,7 @@ void QnMain::run()
 
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    QnResourcePool::initStaticInstance( new QnResourcePool() );
+    std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
@@ -1640,8 +1640,6 @@ void QnMain::run()
         qnCommon->setTranscodeDisabled(true);
 
     QnResource::startCommandProc();
-
-    QnResourcePool::instance(); // to initialize net state;
 
     std::unique_ptr<QnRestProcessorPool> restProcessorPool( new QnRestProcessorPool() );
 
@@ -2088,9 +2086,6 @@ void QnMain::run()
 
     fileDeletor.reset();
     storageManager.reset();
-
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
 
     m_mediaServer.clear();
 }

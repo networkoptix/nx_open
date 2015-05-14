@@ -10,16 +10,23 @@
 #   include <unistd.h>
 #endif
 
+#ifdef Q_WS_X11
+#include <X11/Xlib.h>
+#endif
+
+#include <iostream>
+
 #include <utils/common/app_info.h>
 #include "ui/widgets/main_window.h"
-#include "client/client_settings.h"
 #include <api/global_settings.h>
 
+
+#include <QtCore/QStandardPaths>
+#include <QtCore/QString>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QTranslator>
-#include <QtCore/QStandardPaths>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
@@ -32,6 +39,14 @@ extern "C"
     #include <libavformat/avformat.h>
     #include <libavformat/avio.h>
 }
+
+#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+#include <client/client_module.h>
+#include <client/client_connection_data.h>
+#include <client/client_resource_processor.h>
+#include <client/client_message_processor.h>
+#include <client/client_translation_manager.h>
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -54,9 +69,6 @@ extern "C"
 #include <plugins/resource/server_camera/server_camera.h>
 #include <plugins/resource/server_camera/server_camera_factory.h>
 
-
-#define TEST_RTSP_SERVER
-
 #include <core/resource/camera_user_attribute_pool.h>
 #include "core/resource/media_server_resource.h"
 #include <core/resource/media_server_user_attributes.h>
@@ -77,15 +89,12 @@ extern "C"
 #include "plugins/resource/iqinvision/iqinvision_resource_searcher.h"
 #include "plugins/resource/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 #include "plugins/resource/isd/isd_resource_searcher.h"
-//#include "plugins/resource/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
 
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
-#include "client/client_message_processor.h"
-#include "client/client_translation_manager.h"
 
 #ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
@@ -103,9 +112,7 @@ extern "C"
 #endif
 
 #include "ui/help/help_handler.h"
-#include <client/client_module.h>
-#include <client/client_connection_data.h>
-#include <client/client_resource_processor.h>
+
 #include "platform/platform_abstraction.h"
 #include "utils/common/long_runnable.h"
 #include <utils/common/synctime.h>
@@ -199,63 +206,6 @@ void ffmpegInit()
     */
 }
 
-#ifdef TEST_RTSP_SERVER
-
-void addTestFile(const QString& fileName, const QString& resId)
-{
-    Q_UNUSED(resId)
-    QnAviResourcePtr resource(new QnAviResource(fileName));
-    qnResPool->addResource(QnResourcePtr(resource));
-}
-
-void addTestData()
-{
-    /*
-    QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
-    resource->removeFlag(Qn::local); // to initialize access to resource throught RTSP server
-    resource->addFlag(Qn::remote); // to initialize access to resource throught RTSP server
-    resource->setParentId(server->getId());
-    qnResPool->addResource(QnResourcePtr(resource));
-    */
-
-    /*
-    QnFakeCameraPtr testCamera(new QnFakeCamera());
-    testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));
-    testCamera->setUrl("00000");
-    testCamera->setName("testCamera");
-    qnResPool->addResource(QnResourcePtr(testCamera));
-    */
-
-    /*
-    addTestFile("e:/Users/roman76r/blake/3PM PRIVATE SESSION, HOLLYWOOD Jayme.flv", "q1");
-    addTestFile("e:/Users/roman76r/blake/8 FEATURE PREMIERE_Paid Companions_Bottled-Up_h.wmv", "q2");
-    addTestFile("e:/Users/roman76r/blake/9  FEATURE PREMIERE_Paid Compan_Afternoon Whores.wmv", "q3");
-    addTestFile("e:/Users/roman76r/blake/A CUT ABOVE Aria & Justine.flv", "q4");
-    addTestFile("e:/Users/roman76r/blake/A DOLL'S LIFE Jacqueline, Nika & Jade.flv", "q5");
-    */
-
-    /*
-    QnAviResourcePtr resource2(new QnAviResource("C:/Users/physic/Videos/HighDef_-_Audio_-_Japan.avi"));
-    resource2->removeFlag(Qn::local); // to initialize access to resource throught RTSP server
-    resource2->addFlag(Qn::remote); // to initialize access to resource throught RTSP server
-    resource2->setParentId(server->getId());
-    qnResPool->addResource(QnResourcePtr(resource2));
-    */
-
-    /*
-    QnNetworkResourceList testList;
-    testList << testCamera;
-    QnTimePeriodList periods = server->apiConnection()->recordedTimePeriods(testList);
-    for (int i = 0; i < periods.size(); ++i)
-    {
-        qDebug() << periods[i].startTime << ' ' << periods[i].duration;
-    }
-    */
-
-}
-#endif
-
 void initAppServerConnection(const QnUuid &videowallGuid, const QnUuid &videowallInstanceGuid) {
     QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
@@ -324,12 +274,6 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
-#ifdef Q_WS_X11
-#include <X11/Xlib.h>
-#endif
-
-#include <iostream>
-
 #ifndef API_TEST_MAIN
 #define ENABLE_DYNAMIC_CUSTOMIZATION
 
@@ -341,6 +285,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     int result = 0;
 
     QThread::currentThread()->setPriority(QThread::HighestPriority);
+
+    QnClientModule client(argc, argv);
+
+    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
+    std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
+    std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     /* Parse command line. */
 #ifdef _DEBUG
@@ -650,9 +600,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
-    //initializing plugin manager. TODO supply plugin dir (from settings)
-    //PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
-
     /* Process input files. */
     bool haveInputFiles = false;
     {
@@ -667,10 +614,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     if(!noSingleApplication)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
-
-#ifdef TEST_RTSP_SERVER
-    addTestData();
-#endif
 
 #ifdef _DEBUG
     if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
@@ -786,15 +729,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     //restoring default message handler
     qInstallMessageHandler( defaultMsgHandler );
 
+#ifdef Q_OS_WIN
+    QnDesktopResourceSearcher::initStaticInstance( NULL );
+#endif
+
     return result;
 }
-
-#include <QtCore/QStandardPaths>
-#include <QtCore/QString>
-
-#include <QtCore/QStandardPaths>
-#include <QtCore/QString>
-
 
 int main(int argc, char **argv)
 {
@@ -825,11 +765,7 @@ int main(int argc, char **argv)
     QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, lit("/etc/xdg"));
 #endif
 
-    QnClientModule client(argc, argv);
 
-    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
-    std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    QnResourcePool::initStaticInstance( new QnResourcePool() );
 
 #ifdef Q_OS_MAC
     mac_restoreFileAccess();
@@ -837,18 +773,11 @@ int main(int argc, char **argv)
 
     int result = runApplication(application.data(), argc, argv);
 
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
-
-#ifdef Q_OS_WIN
-    QnDesktopResourceSearcher::initStaticInstance( NULL );
-#endif
 
 #ifdef Q_OS_MAC
     mac_stopFileAccess();
 #endif
 
-//    qApp->processEvents(); //TODO: #Elric crashes
     return result;
 }
 
