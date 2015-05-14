@@ -18,6 +18,7 @@ def getChangelog(revision):
     command = command + changeset
     changelog = subprocess.check_output(command, shell=True)
     changes = sorted(set(changelog.split('\n\n')))
+    changes.insert(0, 'Merge Changelog:')
     
     return '\n'.join(changes).strip('\n')
       
