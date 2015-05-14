@@ -9,6 +9,10 @@
 #include "client_settings.h"
 #include "client_meta_types.h"
 
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/media_server_user_attributes.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 
@@ -42,6 +46,10 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     common->store<QnSessionManager>(new QnSessionManager());
 
     common->setModuleGUID(QnUuid::createUuid());
+
+    m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
+    m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
+    common->store<QnResourcePool>(new QnResourcePool());
 }
 
 QnClientModule::~QnClientModule() {

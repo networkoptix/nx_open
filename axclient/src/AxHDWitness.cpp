@@ -21,13 +21,17 @@
 #include <QAxFactory>
 #include <objsafe.h>
 
-#include "core/resource_management/resource_pool.h"
+#include "core/resource/camera_history.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/media_resource.h"
 #include "core/resource/network_resource.h"
+#include "core/resource/storage_resource.h"
 #include <core/resource/user_resource.h>
-#include <core/resource/camera_user_attribute_pool.h>
-#include <core/resource/media_server_user_attributes.h>
+#include <core/resource_management/resource_pool.h>
+#include "core/resource/resource_directory_browser.h"
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
 
 #include <fstream>
 
@@ -57,20 +61,12 @@
 
 #include "platform/platform_abstraction.h"
 
-#include "core/resource/storage_resource.h"
-
-#include "core/resource/resource_directory_browser.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
-
 #include "tests/auto_tester.h"
 #include "utils/network/socket.h"
 #include <openssl/evp.h>
 
 #include <plugins/resource/server_camera/server_camera_factory.h>
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
-#include "core/resource/camera_history.h"
 #include <utils/common/log.h>
 
 
@@ -448,10 +444,6 @@ bool AxHDWitness::doInitialize()
     m_clientModule.reset(new QnClientModule(argc, NULL));
     m_syncTime.reset(new QnSyncTime());
 
-    m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
-    m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
-    m_resourcePool.reset(new QnResourcePool());
-
     m_dictionary.reset(new QnResourcePropertyDictionary());
     m_statusDictionary.reset(new QnResourceStatusDictionary());
 	m_serverAdditionalAddressesDictionary.reset(new QnServerAdditionalAddressesDictionary());
@@ -574,10 +566,6 @@ void AxHDWitness::doFinalize()
 	m_serverAdditionalAddressesDictionary.reset(NULL);
     m_statusDictionary.reset(NULL);
     m_dictionary.reset(NULL);
-
-    m_resourcePool.reset(NULL);
-    m_mediaServerUserAttributesPool.reset(NULL);
-    m_cameraUserAttributePool.reset(NULL);
 
     m_syncTime.reset(NULL);
     m_clientModule.reset(NULL);

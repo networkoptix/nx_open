@@ -124,10 +124,6 @@ private:
     QScopedPointer<QnResourceStatusDictionary> m_statusDictionary;
 	QScopedPointer<QnServerAdditionalAddressesDictionary> m_serverAdditionalAddressesDictionary;
 
-    QScopedPointer<QnCameraUserAttributePool> m_cameraUserAttributePool;
-    QScopedPointer<QnMediaServerUserAttributesPool> m_mediaServerUserAttributesPool;
-    QScopedPointer<QnResourcePool> m_resourcePool;
-
     QnMainWindow *m_mainWindow;
 };
 

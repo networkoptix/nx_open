@@ -48,6 +48,14 @@ extern "C"
 #include <client/client_message_processor.h>
 #include <client/client_translation_manager.h>
 
+#include "core/resource/media_server_resource.h"
+#include "core/resource/storage_resource.h"
+#include "core/resource/resource_directory_browser.h"
+#include <core/resource_management/resource_pool.h>
+#include "core/resource_management/server_additional_addresses_dictionary.h"
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
+
 #include "decoders/video/ipp_h264_decoder.h"
 
 #include <utils/common/log.h>
@@ -62,21 +70,15 @@ extern "C"
 #include "utils/common/util.h"
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
+
 #include "plugins/resource/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include <plugins/resource/server_camera/server_camera.h>
 #include <plugins/resource/server_camera/server_camera_factory.h>
 
-#include <core/resource/camera_user_attribute_pool.h>
-#include "core/resource/media_server_resource.h"
-#include <core/resource/media_server_user_attributes.h>
-#include "core/resource/storage_resource.h"
 
 #include "plugins/resource/axis/axis_resource_searcher.h"
 #include "plugins/plugin_manager.h"
-#include "core/resource/resource_directory_browser.h"
 
 #ifdef _DEBUG
 #include "tests/auto_tester.h"
@@ -134,8 +136,6 @@ extern "C"
 #include "ui/workaround/mac_utils.h"
 #endif
 #include "api/runtime_info_manager.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -287,10 +287,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     QnClientModule client(argc, argv);
-
-    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
-    std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     /* Parse command line. */
 #ifdef _DEBUG
