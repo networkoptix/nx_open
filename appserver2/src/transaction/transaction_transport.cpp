@@ -351,7 +351,7 @@ void QnTransactionTransport::close()
 void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey )
 {
     if (!QnAppServerConnectionFactory::videowallGuid().isNull()) {
-        httpClient->addAdditionalHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+        httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
         return;
     }
 
@@ -398,7 +398,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     fillAuthInfo( m_httpClient, m_authByKey );
     if( m_localPeer.isServer() )
         m_httpClient->addAdditionalHeader(
-            nx_ec::EC2_SYSTEM_NAME_HEADER_NAME,
+            Qn::EC2_SYSTEM_NAME_HEADER_NAME,
             QnCommonModule::instance()->localSystemName().toUtf8() );
 
     m_remoteAddr = remotePeerUrl;
@@ -413,10 +413,10 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
 #endif
     m_httpClient->addAdditionalHeader(
-        nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
+        Qn::EC2_CONNECTION_GUID_HEADER_NAME,
         m_connectionGuid.toByteArray() );
     m_httpClient->addAdditionalHeader(
-        nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
+        Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
         ConnectionType::toString(m_connectionType) );   //incoming means this peer wants to receive data via this connection
 
     // Client reconnects to the server
@@ -428,9 +428,9 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     }
 
     m_remoteAddr.setQuery(q);
-    m_httpClient->removeAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME );
+    m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
     m_httpClient->addAdditionalHeader(
-        nx_ec::EC2_CONNECTION_STATE_HEADER_NAME,
+        Qn::EC2_CONNECTION_STATE_HEADER_NAME,
         toString(getState()).toLatin1() );
     if (!m_httpClient->doGet(m_remoteAddr)) {
         qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
@@ -497,8 +497,8 @@ void QnTransactionTransport::connectDone(const QnUuid& id)
 
 void QnTransactionTransport::repeatDoGet()
 {
-    m_httpClient->removeAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME );
-    m_httpClient->addAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
+    m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
+    m_httpClient->addAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
     if (!m_httpClient->doGet(m_remoteAddr))
         cancelConnecting();
 }
@@ -784,10 +784,10 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             m_postTranUrl = m_remoteAddr;
         }
         m_outgoingTranClient->addAdditionalHeader(
-            nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
+            Qn::EC2_CONNECTION_GUID_HEADER_NAME,
             m_connectionGuid.toByteArray() );
         m_outgoingTranClient->addAdditionalHeader(
-            nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
+            Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
             ConnectionType::toString(ConnectionType::outgoing) );
         if( !m_outgoingTranClient->doPost(
                 m_postTranUrl,
@@ -836,7 +836,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             QTimer::singleShot(0, this, SLOT(repeatDoGet()));
         }
         else {
-            QnUuid guid(nx_http::getHeaderValue( client->response()->headers, nx_ec::EC2_SERVER_GUID_HEADER_NAME ));
+            QnUuid guid(nx_http::getHeaderValue( client->response()->headers, Qn::SERVER_GUID_HEADER_NAME ));
             if (!guid.isNull()) {
                 emit peerIdDiscovered(m_remoteAddr, guid);
                 emit remotePeerUnauthorized(guid);
@@ -846,9 +846,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
-    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(nx_ec::EC2_GUID_HEADER_NAME);
-    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(nx_ec::EC2_RUNTIME_GUID_HEADER_NAME);
-    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(nx_ec::EC2_SYSTEM_IDENTITY_HEADER_NAME);
+    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(Qn::GUID_HEADER_NAME);
+    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME);
     if (itrSystemIdentityTime != client->response()->headers.end())
         setRemoteIdentityTime(itrSystemIdentityTime->second.toLongLong());
 
@@ -860,7 +860,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     //checking remote server protocol version
     nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter = 
-        client->response()->headers.find(nx_ec::EC2_PROTO_VERSION_HEADER_NAME);
+        client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
     const int remotePeerEcProtoVersion = ec2ProtoVersionIter == client->response()->headers.end()
         ? nx_ec::INITIAL_EC2_PROTO_VERSION
         : ec2ProtoVersionIter->second.toInt();

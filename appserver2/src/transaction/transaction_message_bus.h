@@ -236,6 +236,7 @@ namespace ec2
         void removePeersWithTimeout(const QSet<QnUuid>& lostPeers);
         QSet<QnUuid> checkAlivePeerRouteTimeout();
         void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
+        int distanceToPeer(const QnUuid& dstPeer) const;
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

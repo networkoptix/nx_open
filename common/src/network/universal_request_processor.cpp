@@ -10,6 +10,7 @@
 #include "authenticate_helper.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
+#include "http/custom_headers.h"
 
 
 static const int AUTH_TIMEOUT = 60 * 1000;
@@ -73,8 +74,8 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             {
                 d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
             }
-            if (nx_http::getHeaderValue( d->response.headers, "X-server-guid" ).isEmpty())
-                d->response.headers.insert(nx_http::HttpHeader("X-server-guid", qnCommon->moduleGUID().toByteArray()));
+            if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
+                d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
 
             auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
             QByteArray contentEncoding;

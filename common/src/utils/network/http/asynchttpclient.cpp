@@ -15,6 +15,7 @@
 #include "utils/network/socket_factory.h"
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
+#include "http/custom_headers.h"
 
 
 //TODO: #ak persistent connection support
@@ -692,7 +693,7 @@ namespace nx_http
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
         if( !m_userName.isEmpty() )
-            nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("X-Nx-User-Name", m_userName.toUtf8()) );
+            nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()) );
 
         //not using Basic authentication by default, since it is not secure
         nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);

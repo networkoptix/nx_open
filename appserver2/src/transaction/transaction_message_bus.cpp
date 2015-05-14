@@ -1053,7 +1053,7 @@ void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
     if (m_alivePeers.contains(peer.id)) 
         return;
     addAlivePeerInfo(peer, peer.id, 0);
-    handlePeerAliveChanged(peer, true, true);
+    handlePeerAliveChanged(peer, true, false);
 }
 
 void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bool isAlive, bool sendTran) 
@@ -1062,6 +1062,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
 
     if (sendTran)
     {
+        Q_ASSERT(!isAlive || peer.id == qnCommon->moduleGUID()); // each peer can send isAlive=true for himself only
         QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
         tran.params = aliveData;
         Q_ASSERT(!tran.params.peer.instanceId.isNull());
@@ -1343,8 +1344,11 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 {
     QList<QnTransaction<ApiRuntimeData>> result;
     m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
-    for(const QnTransaction<ApiRuntimeData> &tran: result)
-        transport->sendTransaction(tran, transportHeader);
+    for(const QnTransaction<ApiRuntimeData> &tran: result) {
+        QnTransactionTransportHeader ttHeader = transportHeader;
+        ttHeader.distance = distanceToPeer(tran.params.peer.id);
+        transport->sendTransaction(tran, ttHeader);
+    }
 }
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
@@ -1562,6 +1566,18 @@ QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
         }
     }
     return result;
+}
+
+int QnTransactionMessageBus::distanceToPeer(const QnUuid& dstPeer) const
+{
+    if (dstPeer == qnCommon->moduleGUID())
+        return 0;
+
+    int minDistance = INT_MAX;
+    for (const RoutingRecord& rec: m_alivePeers.value(dstPeer).routingInfo)
+        minDistance = qMin(minDistance, rec.distance);
+    Q_ASSERT(minDistance != INT_MAX);
+    return minDistance;
 }
 
 }
