@@ -6,7 +6,7 @@
 
 class QnAbstractStreamDataProvider;
 class QnProxyConnectionProcessorPrivate;
-class QnRoute;
+struct QnRoute;
 
 class QnProxyConnectionProcessor: public QnTCPConnectionProcessor
 {
