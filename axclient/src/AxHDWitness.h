@@ -16,25 +16,10 @@
 #include "nx_ec/ec_api.h"
 #include "api/abstract_connection.h"
 
-class QnLongRunnablePool;
-class QnSyncTime;
-class QnPlatformAbstraction;
-class QnClientPtzControllerPool;
-class QnClientPtzControllerPool;
-class QnGlobalSettings;
-class QnRuntimeInfoManager;
-class QnClientMessageProcessor;
 class QnModuleFinder;
 class QnRouter;
 class QnGlobalModuleFinder;
 class QnServerInterfaceWatcher;
-class QnResourcePropertyDictionary;
-class QnResourceStatusDictionary;
-class QnCameraUserAttributePool;
-class QnMediaServerUserAttributesPool;
-class TimerManager;
-class QnServerCameraFactory;
-class QnServerAdditionalAddressesDictionary;
 
 class AxHDWitness : public QWidget
 {
@@ -101,27 +86,15 @@ private:
     QScopedPointer<ec2::AbstractECConnectionFactory> m_ec2ConnectionFactory;
     QnClientResourceProcessor m_clientResourceProcessor;
 
-    QScopedPointer<QnServerCameraFactory> m_serverCameraFactory;
-
     QScopedPointer<QnWorkbenchContext> m_context;
     QScopedPointer<QnSkin> skin;
     QScopedPointer<QnCustomizer> customizer;
     QScopedPointer<QnClientModule> m_clientModule;
 
-    QScopedPointer<QnPlatformAbstraction> m_platform;
-    QScopedPointer<QnLongRunnablePool> m_runnablePool;
-    QScopedPointer<QnClientPtzControllerPool> m_clientPtzPool;
-    QScopedPointer<QnGlobalSettings> m_globalSettings;
-    QScopedPointer<QnClientMessageProcessor> m_clientMessageProcessor;
-    QScopedPointer<QnRuntimeInfoManager> m_runtimeInfoManager;
-
     QScopedPointer<QnModuleFinder> m_moduleFinder;
     QScopedPointer<QnRouter> m_router;
     QScopedPointer<QnServerInterfaceWatcher> m_serverInterfaceWatcher;
 
-    QScopedPointer<QnResourcePropertyDictionary> m_dictionary;
-    QScopedPointer<QnResourceStatusDictionary> m_statusDictionary;
-	QScopedPointer<QnServerAdditionalAddressesDictionary> m_serverAdditionalAddressesDictionary;
 
     QnMainWindow *m_mainWindow;
 };

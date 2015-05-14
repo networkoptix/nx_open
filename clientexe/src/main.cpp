@@ -45,16 +45,12 @@ extern "C"
 #include <client/client_module.h>
 #include <client/client_connection_data.h>
 #include <client/client_resource_processor.h>
-#include <client/client_message_processor.h>
 #include <client/client_translation_manager.h>
 
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/resource/resource_directory_browser.h"
 #include <core/resource_management/resource_pool.h>
-#include "core/resource_management/server_additional_addresses_dictionary.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -73,7 +69,7 @@ extern "C"
 
 #include "plugins/resource/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
-#include <plugins/resource/server_camera/server_camera.h>
+//#include <plugins/resource/server_camera/server_camera.h>
 #include <plugins/resource/server_camera/server_camera_factory.h>
 
 
@@ -115,14 +111,12 @@ extern "C"
 
 #include "ui/help/help_handler.h"
 
-#include "platform/platform_abstraction.h"
 #include "utils/common/long_runnable.h"
 
 #include "text_to_wav.h"
 #include "common/common_module.h"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
-#include "core/ptz/client_ptz_controller_pool.h"
 #include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
@@ -435,16 +429,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-    QnResourcePropertyDictionary dictionary;
-    QnResourceStatusDictionary statusDictionary;
-    QnServerAdditionalAddressesDictionary serverAdditionalAddressesDictionary;
-    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-    QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
-    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
-    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
-    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
-
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
 
@@ -470,8 +454,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
             }
         }
     }
-
-    QScopedPointer<QnServerCameraFactory> serverCameraFactory(new QnServerCameraFactory());
 
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory( new QnNetworkProxyFactory() );

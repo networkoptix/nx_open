@@ -2,16 +2,27 @@
 
 #include <QtWidgets/QApplication>
 
+#include <api/global_settings.h>
+#include <api/runtime_info_manager.h>
 #include <api/session_manager.h>
 
 #include <common/common_module.h>
 
-#include "client_settings.h"
-#include "client_meta_types.h"
+#include <client/client_settings.h>
+#include <client/client_meta_types.h>
+#include <client/client_message_processor.h>
 
-#include <core/resource_management/resource_pool.h>
+#include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
+
+#include <platform/platform_abstraction.h>
+
+#include <plugins/resource/server_camera/server_camera_factory.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
@@ -52,6 +63,18 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
     common->store<QnResourcePool>(new QnResourcePool());
     common->store<QnSyncTime>(new QnSyncTime());
+
+    common->store<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary());
+    common->store<QnResourceStatusDictionary>(new QnResourceStatusDictionary());
+    common->store<QnServerAdditionalAddressesDictionary>(new QnServerAdditionalAddressesDictionary());
+
+    common->store<QnPlatformAbstraction>(new QnPlatformAbstraction());
+    common->store<QnLongRunnablePool>(new QnLongRunnablePool());
+    common->store<QnClientPtzControllerPool>(new QnClientPtzControllerPool());
+    common->store<QnGlobalSettings>(new QnGlobalSettings());
+    common->store<QnClientMessageProcessor>(new QnClientMessageProcessor());
+    common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
+    common->store<QnServerCameraFactory>(new QnServerCameraFactory());
 }
 
 QnClientModule::~QnClientModule() {

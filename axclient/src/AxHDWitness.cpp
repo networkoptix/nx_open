@@ -1,25 +1,32 @@
 #include "AxHDWitness.h"
 
-#include "client/client_message_processor.h"
+//#include <objsafe.h>
+//#include <fstream>
+
+//#include <QAxAggregated>
+#include <QAxFactory>
+
+#include <QtCore/QFileInfo>
+#include <QtCore/QDir>
+#include <QtWidgets/QDesktopWidget>
+
 #include "api/session_manager.h"
 #include "core/resource_management/resource_discovery_manager.h"
-#include "core/ptz/client_ptz_controller_pool.h"
-#include <api/global_settings.h>
+
+
 #include "api/runtime_info_manager.h"
 #include "api/app_server_connection.h"
 #include <nx_ec/ec2_lib.h>
 
 #include "common/common_module.h"
 
+#include <client/client_message_processor.h>
+
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_layout.h"
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-
-#include <QAxAggregated>
-#include <QAxFactory>
-#include <objsafe.h>
 
 #include "core/resource/camera_history.h"
 #include "core/resource/layout_resource.h"
@@ -29,18 +36,14 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include "core/resource/resource_directory_browser.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
 
-#include <fstream>
+
+
 
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QDir>
-#include <QtWidgets/QDesktopWidget>
+
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -57,8 +60,6 @@
 #include "decoders/video/abstractdecoder.h"
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
-
-#include "platform/platform_abstraction.h"
 
 #include "tests/auto_tester.h"
 #include "utils/network/socket.h"
@@ -442,18 +443,6 @@ bool AxHDWitness::doInitialize()
 
     m_clientModule.reset(new QnClientModule(argc, NULL));
 
-    m_dictionary.reset(new QnResourcePropertyDictionary());
-    m_statusDictionary.reset(new QnResourceStatusDictionary());
-	m_serverAdditionalAddressesDictionary.reset(new QnServerAdditionalAddressesDictionary());
-
-    m_platform.reset(new QnPlatformAbstraction());
-    m_runnablePool.reset(new QnLongRunnablePool());
-    m_clientPtzPool.reset(new QnClientPtzControllerPool());
-    m_globalSettings.reset(new QnGlobalSettings());
-    m_clientMessageProcessor.reset(new QnClientMessageProcessor());
-    m_runtimeInfoManager.reset(new QnRuntimeInfoManager());
-    m_serverCameraFactory.reset(new QnServerCameraFactory());
-
     qnSettings->setLightMode(Qn::LightModeActiveX);
     qnSettings->setActiveXMode(true);
 
@@ -553,17 +542,6 @@ void AxHDWitness::doFinalize()
     customizer.reset(NULL);
 
     skin.reset(NULL);
-    m_serverCameraFactory.reset(NULL);
-    m_runtimeInfoManager.reset(NULL);
-    m_clientMessageProcessor.reset(NULL);
-    m_globalSettings.reset(NULL);
-    m_clientPtzPool.reset(NULL);
-    m_runnablePool.reset(NULL);
-    m_platform.reset(NULL);
-
-	m_serverAdditionalAddressesDictionary.reset(NULL);
-    m_statusDictionary.reset(NULL);
-    m_dictionary.reset(NULL);
 
     m_clientModule.reset(NULL);
 }
