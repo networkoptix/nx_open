@@ -23,7 +23,7 @@ protected:
 
 private:
     int m_topic;
-    QString m_helpRoot;
+    QStringList m_helpSearchPaths;
     QString m_onlineHelpRoot;
 
     /** If the online help could not be loaded, try again in some time. */
