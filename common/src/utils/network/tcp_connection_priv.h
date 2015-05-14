@@ -51,14 +51,16 @@ static const int CODE_INTERNAL_ERROR = 500;
 
 class QnTCPConnectionProcessorPrivate
 {
+    friend class QnTCPConnectionProcessor;
+
 public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTCPConnectionProcessorPrivate():
         socket(0),
-        tcpReadBufferSize(0),
-        tcpReadBufferPos(0),
-        clientRequestOffset(0)
+        clientRequestOffset(0),
+        interleavedMessageDataPos(0),
+        currentRequestSize(0)
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
         socketTimeout = 5 * 1000;
@@ -82,13 +84,16 @@ public:
     QByteArray receiveBuffer;
     QMutex sockMutex;
     quint8* tcpReadBuffer;
-    size_t tcpReadBufferSize;
-    size_t tcpReadBufferPos;
     int socketTimeout;
     bool chunkedMode;
     int clientRequestOffset;
     QDateTime lastModified;
     QnUuid authUserId;
+
+private:
+    QByteArray interleavedMessageData;
+    size_t interleavedMessageDataPos;
+    size_t currentRequestSize;
 };
 
 #endif // __TCP_CONNECTION_PRIV_H__

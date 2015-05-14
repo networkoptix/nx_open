@@ -46,6 +46,9 @@ public:
     bool readRequest();
     /*!
         Reads single HTTP request. To be used when HTTP interleaving is required
+        \note After return of this method there is already-parsed request in d->request. 
+            No need to call QnTCPConnectionProcessor::parseRequest
+        \note \a d->clientRequest is not filled by this method!
     */
     bool readSingleRequest();
     virtual void parseRequest();
