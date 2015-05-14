@@ -57,11 +57,11 @@ namespace {
 
 } // anonymous namespace
 
-QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
+QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     base_type(parent),
     m_loading(true)
 {
-    if (localSettings)
+    if (forceLocalSettings)
         m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName(), this);
     else
         m_settings = new QSettings(this);
@@ -85,10 +85,6 @@ QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
     setName(DOWNMIX_AUDIO,          lit("downmixAudio"));
     setName(LAST_RECORDING_DIR,     lit("videoRecording/previousDir"));
     setName(LAST_EXPORT_DIR,        lit("export/previousDir"));
-
-    /* Set command line switch names. */
-    addArgumentName(SOFTWARE_YUV,           "--soft-yuv");
-    addArgumentName(MAX_SCENE_VIDEO_ITEMS,  "--max-video-items");
 
     /* Load from internal resource. */
     QFile file(QLatin1String(":/globals.json"));

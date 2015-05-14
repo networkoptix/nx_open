@@ -22,7 +22,7 @@ class QnResourceDataPool;
 class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
     Q_OBJECT
 public:
-    QnCommonModule(int &argc, char **argv, QObject *parent = NULL);
+    QnCommonModule(QObject *parent = NULL);
     virtual ~QnCommonModule();
 
     using Singleton<QnCommonModule>::instance;

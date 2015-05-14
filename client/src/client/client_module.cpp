@@ -32,8 +32,9 @@
 
 #include "version.h"
 
-QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject(parent) {
+QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(client);
+    Q_INIT_RESOURCE(appserver2);
 
     QnClientMetaTypes::initialize();
 
@@ -49,14 +50,9 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     QApplication::setDesktopSettingsAware(false);
  
     /* Init singletons. */
-    QnCommonModule *common = new QnCommonModule(argc, argv, this);
-    
-    bool isLocalSettings = false;
-    QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&isLocalSettings, "--local-settings",  NULL, QString());
-    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
+    QnCommonModule *common = new QnCommonModule(this);
 
-    QnClientSettings *settings = new QnClientSettings(isLocalSettings);
+    QnClientSettings *settings = new QnClientSettings(forceLocalSettings);
     common->store<QnClientSettings>(settings);
     common->store<QnSessionManager>(new QnSessionManager());
 

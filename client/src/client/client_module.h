@@ -11,7 +11,7 @@ class QnMediaServerUserAttributesPool;
 class QnClientModule: public QObject {
     Q_OBJECT
 public:
-    QnClientModule(int &argc, char **argv, QObject *parent = NULL);
+    QnClientModule(bool forceLocalSettings = false, QObject *parent = NULL);
     virtual ~QnClientModule();
 
 private:

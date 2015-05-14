@@ -16,7 +16,7 @@
 #include <utils/common/timermanager.h>
 
 
-QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
+QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());

@@ -154,7 +154,7 @@ public:
         VARIABLE_COUNT
     };
 
-    QnClientSettings(bool localSettings, QObject *parent = NULL);
+    QnClientSettings(bool forceLocalSettings, QObject *parent = NULL);
     virtual ~QnClientSettings();
 
     void load();

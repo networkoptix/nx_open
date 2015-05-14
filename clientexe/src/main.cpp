@@ -270,14 +270,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
-    QnClientModule client(argc, argv);
 
-    /* Parse command line. */
-#ifdef _DEBUG
-    QnAutoTester autoTester(argc, argv);
-#endif
-
-    qnSettings->updateFromCommandLine(argc, argv, stderr);
 
     QString devModeKey;
     bool noSingleApplication = false;
@@ -299,6 +292,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QString sVideoWallItemGuid;
     QString engineVersion;
     bool noClientUpdate = false;
+    bool softwareYuv = false;
+    bool forceLocalSettings = false;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -326,8 +321,17 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
     commandLineParser.addParameter(&engineVersion,          "--override-version",           NULL,   QString());
     commandLineParser.addParameter(&noClientUpdate,         "--no-client-update",           NULL,   QString());
+    commandLineParser.addParameter(&softwareYuv,            "--soft-yuv",                   NULL,   QString());
+    commandLineParser.addParameter(&forceLocalSettings,     "--local-settings",             NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
+
+    QnClientModule client(forceLocalSettings);
+
+    /* Parse command line. */
+#ifdef _DEBUG
+    QnAutoTester autoTester(argc, argv);
+#endif
 
     ec2::DummyHandler dummyEc2RequestHandler;
 
@@ -335,6 +339,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnSettings->setDevMode(true);
     }
+
+    if (softwareYuv)
+        qnSettings->setSoftwareYuv(true);
 
     if (!engineVersion.isEmpty()) {
         QnSoftwareVersion version(engineVersion);

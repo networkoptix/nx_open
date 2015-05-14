@@ -424,7 +424,7 @@ bool AxHDWitness::doInitialize()
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
 
-    m_clientModule.reset(new QnClientModule(argc, NULL));
+    m_clientModule.reset(new QnClientModule());
 
     qnSettings->setLightMode(Qn::LightModeActiveX);
     qnSettings->setActiveXMode(true);
