@@ -346,6 +346,67 @@ bool QnTCPConnectionProcessor::readRequest()
     return false;
 }
 
+bool QnTCPConnectionProcessor::readSingleRequest()
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    d->request = nx_http::Request();
+    d->response = nx_http::Response();
+    d->clientRequest.clear();
+    d->requestBody.clear();
+    d->responseBody.clear();
+
+    while (!needToStop() && d->socket->isConnected())
+    {
+        if( d->tcpReadBufferSize == 0 )
+        {
+            //buffer depleted, draining more data
+            d->tcpReadBufferPos = 0;
+            const int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+            if (readed <= 0) 
+                return false;
+            d->tcpReadBufferSize = readed;
+        }
+
+        size_t bytesParsed = 0;
+        if( !d->httpStreamReader.parseBytes(
+                QByteArray::fromRawData((const char*)d->tcpReadBuffer + d->tcpReadBufferPos, d->tcpReadBufferSize),
+                &bytesParsed ) ||
+            (d->httpStreamReader.state() == nx_http::HttpStreamReader::parseError) )
+        {
+            //parse error
+            return false;
+        }
+        d->clientRequest.append(
+            (const char*) d->tcpReadBuffer + d->tcpReadBufferPos,
+            bytesParsed);
+        d->tcpReadBufferPos += bytesParsed;
+        d->tcpReadBufferSize -= bytesParsed;
+
+        if (d->clientRequest.size() > MAX_REQUEST_SIZE)
+        {
+            qWarning() << "Too large HTTP client request ("<<d->clientRequest.size()<<" bytes"
+                ", "<<MAX_REQUEST_SIZE<<" allowed). Ignoring...";
+            return false;
+        }
+
+        if( d->httpStreamReader.state() == nx_http::HttpStreamReader::messageDone )
+        {
+            NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
+                arg(d->socket->getForeignAddress().toString()).
+                arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
+            return true;
+        }
+        
+        if( d->httpStreamReader.state() > nx_http::HttpStreamReader::readingMessageHeaders )
+        {
+            if( d->httpStreamReader.contentLength() )
+                d->clientRequest.reserve( d->httpStreamReader.contentLength().get() );
+        }
+    }
+    return false;
+}
+
 void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& other)
 {
     Q_D(const QnTCPConnectionProcessor);

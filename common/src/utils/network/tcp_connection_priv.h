@@ -4,14 +4,14 @@
 #include <QDateTime>
 #include <QtCore/QByteArray>
 
-
-static const int TCP_READ_BUFFER_SIZE = 65536;
-
 #include "tcp_connection_processor.h"
 
 #include "utils/common/byte_array.h"
 #include "utils/network/http/httptypes.h"
+#include "utils/network/http/httpstreamreader.h"
 
+
+static const int TCP_READ_BUFFER_SIZE = 65536;
 
 static const QByteArray STATIC_UNAUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
@@ -56,6 +56,8 @@ public:
 
     QnTCPConnectionProcessorPrivate():
         socket(0),
+        tcpReadBufferSize(0),
+        tcpReadBufferPos(0),
         clientRequestOffset(0)
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
@@ -71,6 +73,7 @@ public:
     QSharedPointer<AbstractStreamSocket> socket;
     nx_http::Request request;
     nx_http::Response response;
+    nx_http::HttpStreamReader httpStreamReader;
 
     QByteArray protocol;
     QByteArray requestBody;
@@ -79,6 +82,8 @@ public:
     QByteArray receiveBuffer;
     QMutex sockMutex;
     quint8* tcpReadBuffer;
+    size_t tcpReadBufferSize;
+    size_t tcpReadBufferPos;
     int socketTimeout;
     bool chunkedMode;
     int clientRequestOffset;

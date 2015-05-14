@@ -323,7 +323,6 @@ namespace nx_http
 
     namespace MessageType
     {
-        // TODO: #Elric #enum
         enum Value
         {
             none,

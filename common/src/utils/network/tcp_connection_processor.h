@@ -40,7 +40,14 @@ public:
     bool sendBuffer(const QnByteArray& sendBuffer);
     bool sendBuffer(const QByteArray& sendBuffer);
 
+    /*!
+        \bug In case of interleaved requests, this method reads everything after first HTTP request as message body
+    */
     bool readRequest();
+    /*!
+        Reads single HTTP request. To be used when HTTP interleaving is required
+    */
+    bool readSingleRequest();
     virtual void parseRequest();
 
     virtual bool isTakeSockOwnership() const { return false; }
