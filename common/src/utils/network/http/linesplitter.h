@@ -40,6 +40,7 @@ namespace nx_http
         void finishCurrentLineEnding(
             const ConstBufferRefType& data,
             size_t* const bytesRead );
+        bool currentLineEndingClosed() const;
         //!Resets parser state
         void reset();
 

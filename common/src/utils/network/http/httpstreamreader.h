@@ -79,6 +79,7 @@ namespace nx_http
         void setDecodeChunkedMessageBody( bool val );
         //!Returns sequential HTTP message number
         int currentMessageNumber() const;
+        boost::optional<quint64> contentLength() const;
 
         //!If \a true, then \a parseBytes always returns after reading http headers and trailing CRLF have been read
         void setBreakAfterReadingHeaders( bool val );
@@ -98,6 +99,7 @@ namespace nx_http
         };
 
         ReadState m_state;
+        ReadState m_nextState;
         Message m_httpMessage;
         boost::optional<quint64> m_contentLength;
         bool m_isChunkedTransfer;
@@ -106,7 +108,7 @@ namespace nx_http
 
         //!HTTP/1.1 chunk stream parsing
         ChunkStreamParseState m_chunkStreamParseState;
-        ChunkStreamParseState m_nextState;
+        ChunkStreamParseState m_nextChunkStreamParseState;
         size_t m_currentChunkSize;
         size_t m_currentChunkBytesRead;
         BufferType::value_type m_prevChar;

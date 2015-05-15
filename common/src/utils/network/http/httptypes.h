@@ -253,6 +253,10 @@ namespace nx_http
             return protocol == right.protocol
                 && version == right.version;
         }
+        bool operator!=( const MimeProtoVersion& right ) const
+        {
+            return !(*this == right);
+        }
     };
 
     static const MimeProtoVersion http_1_0 = { "HTTP", "1.0" };
@@ -319,7 +323,6 @@ namespace nx_http
 
     namespace MessageType
     {
-        // TODO: #Elric #enum
         enum Value
         {
             none,
@@ -419,11 +422,15 @@ namespace nx_http
 
             Authorization();
             Authorization( const AuthScheme::Value& authSchemeVal );
+            Authorization( Authorization&& right );
             ~Authorization();
+
+            Authorization& operator=( Authorization&& right );
 
             bool parse( const BufferType& str );
             void serialize( BufferType* const dstBuffer ) const;
             StringType toString() const;
+            void clear();
 
         private:
             Authorization( const Authorization& );

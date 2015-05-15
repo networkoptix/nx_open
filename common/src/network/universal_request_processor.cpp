@@ -10,6 +10,7 @@
 #include "authenticate_helper.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
+#include "http/custom_headers.h"
 
 
 static const int AUTH_TIMEOUT = 60 * 1000;
@@ -73,8 +74,8 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             {
                 d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
             }
-            if (nx_http::getHeaderValue( d->response.headers, "X-server-guid" ).isEmpty())
-                d->response.headers.insert(nx_http::HttpHeader("X-server-guid", qnCommon->moduleGUID().toByteArray()));
+            if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
+                d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
 
             auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
             QByteArray contentEncoding;
@@ -136,6 +137,7 @@ void QnUniversalRequestProcessor::run()
     {
         if (ready) 
         {
+            t.restart();
             parseRequest();
 
             bool isHandlerExist = dynamic_cast<QnUniversalTcpListener*>(d->owner)->findHandler(d->socket, d->request.requestLine.version.protocol, d->request) != 0;
@@ -143,7 +145,14 @@ void QnUniversalRequestProcessor::run()
                 return;
 
             d->response.headers.clear();
-            isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive" && d->protocol.toLower() == "http";
+
+            if( d->request.requestLine.version == nx_http::http_1_1 )
+                isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close";
+            else if( d->request.requestLine.version == nx_http::http_1_0 )
+                isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
+            else    //e.g., RTSP
+                isKeepAlive = false;
+
             if (isKeepAlive) {
                 d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
                 d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
