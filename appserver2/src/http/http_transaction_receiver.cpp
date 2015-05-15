@@ -102,6 +102,9 @@ namespace ec2
                 QnTransactionTransport::TCP_KEEPALIVE_TIMEOUT *
                 QnTransactionTransport::KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE ) )
         {
+            const int osErrorCode = SystemError::getLastOSErrorCode();
+            NX_LOG( lit("Failed to set timeout for HTTP connection from %1. %2").
+                arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString(osErrorCode)), cl_logWARNING );
             return;
         }
 
@@ -129,6 +132,8 @@ namespace ec2
                     d->request,
                     d->requestBody ) )
             {
+                NX_LOG( lit("QnHttpTransactionReceiver. Received transaction from %1 for unknown connection %2").
+                    arg(d->socket->getForeignAddress().toString()).arg(connectionGuid.toString()), cl_logWARNING );
                 sendResponse( nx_http::StatusCode::notFound, nx_http::StringType() );
                 return;
             }
