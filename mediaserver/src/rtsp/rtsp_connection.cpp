@@ -40,6 +40,7 @@
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>
+#include "http/custom_headers.h"
 
 
 class QnTcpListener;
@@ -1070,7 +1071,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         if (nx_http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
-        d->clientGuid = nx_http::getHeaderValue(d->request.headers, "x-guid");
+        d->clientGuid = nx_http::getHeaderValue(d->request.headers, Qn::GUID_HEADER_NAME);
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
         //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);

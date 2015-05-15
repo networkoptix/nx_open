@@ -23,6 +23,7 @@
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
+#include "http/custom_headers.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
@@ -193,7 +194,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 
 bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
 {
-    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( "X-server-guid" );
+    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
     if( xServerGuidIter != request.headers.end() )
     {
         const nx_http::BufferType& desiredServerGuid = xServerGuidIter->second;
@@ -202,13 +203,13 @@ bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
     }
 
     nx_http::BufferType desiredCameraGuid;
-    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( "x-camera-guid" );
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     if( xCameraGuidIter != request.headers.end() )
     {
         desiredCameraGuid = xCameraGuidIter->second;
     }
     else {
-        desiredCameraGuid = request.getCookieValue("x-camera-guid");
+        desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
     }
     if (!desiredCameraGuid.isEmpty()) {
         QnResourcePtr camera = qnResPool->getResourceById(desiredCameraGuid);

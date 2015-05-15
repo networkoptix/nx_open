@@ -45,10 +45,11 @@ namespace ec2
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(
             const QnUuid& connectionGuid,
-            const QSharedPointer<AbstractStreamSocket>& socket,
+            QSharedPointer<AbstractStreamSocket> socket,
             ConnectionType::Type connectionType,
             const ApiPeerData& remotePeer,
             qint64 remoteSystemIdentityTime,
+            const nx_http::Request& request,
             const QByteArray& contentEncoding );
         //!Report socket to receive transactions from
         /*!
@@ -61,6 +62,11 @@ namespace ec2
             qint64 remoteSystemIdentityTime,
             const nx_http::Request& request,
             const QByteArray& requestBuf );
+        //!Process transaction received via standard HTTP server interface
+        bool gotTransactionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            const nx_http::Request& request,
+            const QByteArray& requestMsgBody );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -236,6 +242,7 @@ namespace ec2
         void removePeersWithTimeout(const QSet<QnUuid>& lostPeers);
         QSet<QnUuid> checkAlivePeerRouteTimeout();
         void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
+        int distanceToPeer(const QnUuid& dstPeer) const;
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

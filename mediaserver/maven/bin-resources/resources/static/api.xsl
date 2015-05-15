@@ -25,7 +25,7 @@
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <link rel="stylesheet" href="styles/29403685.vendor.css"/>
 
-                <link rel="stylesheet" href="styles/84c3fe2d.main.css"/>
+                <link rel="stylesheet" href="styles/72b89b19.main.css"/>
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
@@ -33,14 +33,14 @@
                 <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
                     <div class="container">
                         <div class="navbar-header">
-                            <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" >
+                            <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" href="index.html">
                                 <img src="customization/webadmin_logo.png" height="48"/>
-                                API Reference
                             </a>
+                            <h1>API reference</h1>
                         </div>
                         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
                             <ul class="nav navbar-nav navbar-right">
-                                <li ><a href="index.html">Web. administration</a></li>
+                                <li ><a href="index.html">Web administration</a></li>
                             </ul>
                         </nav>
                     </div>
@@ -106,6 +106,21 @@
                                                   <xsl:value-of select="$urlPrefix"/>/<xsl:value-of
                                                   select="name"/>
                                                 </span>
+
+                                                <xsl:if test="method='GET'">
+                                                    <span class="label label-success">
+                                                        <a target="_blank">
+                                                            <xsl:attribute name="href">
+                                                                <xsl:value-of select="$urlPrefix"/>
+                                                                /
+                                                                <xsl:value-of select="name"/>
+                                                            </xsl:attribute>
+                                                            try method
+                                                        </a>
+                                                    </span>
+                                                </xsl:if>
+
+
                                             </h4> <div class="well">
                                                 <xsl:value-of select="description"/>
                                             </div> <dl>

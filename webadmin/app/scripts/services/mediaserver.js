@@ -119,7 +119,7 @@ angular.module('webadminApp')
             restart: function() { return wrapRequest($http.post(proxy + '/api/restart')); },
             getStorages: function(){ return wrapRequest($http.get(proxy + '/api/storageSpace')); },
             saveStorages:function(info){return wrapRequest($http.post(proxy + '/ec2/saveStorages',info)); },
-            discoveredPeers:function(){return wrapRequest($http.get(proxy + '/api/discoveredPeers')); },
+            discoveredPeers:function(){return wrapRequest($http.get(proxy + '/api/discoveredPeers?showAddresses=true')); },
             getMediaServer: function(id){return wrapRequest($http.get(proxy + '/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}',''))); },
             getMediaServers: function(){return wrapRequest($http.get(proxy + '/ec2/getMediaServersEx')); },
             getCameras:function(id){
