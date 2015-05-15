@@ -21,6 +21,7 @@ namespace nx_ec
     static const QByteArray EC2_SYSTEM_IDENTITY_HEADER_NAME = "X-system-identity-time";
     //!Name of Http header holding ec2 proto version
     static const QByteArray EC2_PROTO_VERSION_HEADER_NAME = "X-Nx-EC-PROTO-VERSION";
+    static const QByteArray BASE64_ENCODING_REQUIRED_HEADER_NAME = "X-Nx-base64-encoding-required";
 }
 
 #endif  //CUSTOM_HEADERS_H

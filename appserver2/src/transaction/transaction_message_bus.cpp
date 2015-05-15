@@ -1214,10 +1214,11 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     const QnUuid& connectionGuid,
-    const QSharedPointer<AbstractStreamSocket>& socket,
+    QSharedPointer<AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
     const ApiPeerData& remotePeer,
     qint64 remoteSystemIdentityTime,
+    const nx_http::Request& request,
     const QByteArray& contentEncoding )
 {
     if (!dbManager)
@@ -1232,10 +1233,11 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     QnTransactionTransport* transport = new QnTransactionTransport(
         connectionGuid,
         m_localPeer,
-        socket,
+        remotePeer,
+        std::move(socket),
         connectionType,
+        request,
         contentEncoding );
-    transport->setRemotePeer(remotePeer);
     transport->setRemoteIdentityTime(remoteSystemIdentityTime);
     connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
@@ -1277,6 +1279,36 @@ void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
             return;
         }
     }
+}
+
+bool QnTransactionMessageBus::gotTransactionFromRemotePeer(
+    const QnUuid& connectionGuid,
+    const nx_http::Request& request,
+    const QByteArray& requestMsgBody )
+{
+    if (!dbManager)
+    {
+        qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
+        return false;
+    }
+
+    if (m_restartPending)
+        return false; // reject incoming connection because of media server is about to restart
+
+    QMutexLocker lock(&m_mutex);
+
+    for( QnTransactionTransport* transport: m_connections.values() )
+    {
+        if( transport->connectionGuid() == connectionGuid )
+        {
+            transport->receivedTransaction(
+                request.headers,
+                requestMsgBody );
+            return true;
+        }
+    }
+
+    return false;
 }
 
 static QUrl addCurrentPeerInfo(const QUrl& srcUrl)

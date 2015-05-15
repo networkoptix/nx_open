@@ -217,13 +217,18 @@ void QnTransactionTcpProcessor::run()
     }
     else
     {
+        auto base64EncodingRequiredHeaderIter = d->request.headers.find( nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME );
+        if( base64EncodingRequiredHeaderIter != d->request.headers.end() )
+            d->response.headers.insert( *base64EncodingRequiredHeaderIter );
+
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
-            d->socket,
+            std::move(d->socket),
             requestedConnectionType,
             remotePeer,
             remoteSystemIdentityTime,
+            d->request,
             contentEncoding );
         d->socket.clear();
     }

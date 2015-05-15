@@ -27,6 +27,7 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
+#include "http/http_transaction_receiver.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
@@ -279,6 +280,10 @@ namespace ec2
 
         registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
             std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
+    
+        restProcessorPool->registerHandler(
+            lit("ec2/forward_events"),
+            new QnHttpTransactionReceiver() );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )

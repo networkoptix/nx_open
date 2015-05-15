@@ -51,6 +51,7 @@ class QnTransactionTransport
     public QObject
 {
     Q_OBJECT
+
 public:
     static const char* TUNNEL_MULTIPART_BOUNDARY;
     static const char* TUNNEL_CONTENT_TYPE;
@@ -74,12 +75,14 @@ public:
     //!Initializer for incoming connection
     QnTransactionTransport(
         const QnUuid& connectionGuid,
-        const ApiPeerData &localPeer,
-        const QSharedPointer<AbstractStreamSocket>& socket,
+        const ApiPeerData& localPeer,
+        const ApiPeerData& remotePeer,
+        QSharedPointer<AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
+        const nx_http::Request& request,
         const QByteArray& contentEncoding );
     //!Initializer for outgoing connection
-    QnTransactionTransport( const ApiPeerData &localPeer );
+    QnTransactionTransport( const ApiPeerData& localPeer );
     ~QnTransactionTransport();
 
 signals:
@@ -176,9 +179,12 @@ public:
 
     void processExtraData();
     void startListening();
-    void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
+
+    void receivedTransaction(
+        const nx_http::HttpHeaders& headers,
+        const QnByteArrayConstRef& tranData );
 
     void transactionProcessed();
 
@@ -222,7 +228,7 @@ private:
     QSharedPointer<AbstractStreamSocket> m_outgoingDataSocket;
     nx_http::AsyncHttpClientPtr m_httpClient;
     State m_state;
-    /*std::vector<quint8>*/ nx::Buffer m_readBuffer;
+    nx::Buffer m_readBuffer;
     //!Holds raw data. It is serialized to http chunk just before sending to socket
     std::deque<DataToSend> m_dataToSend;
     QUrl m_remoteAddr;
@@ -243,23 +249,25 @@ private:
     int m_postedTranCount;
     bool m_asyncReadScheduled;
     qint64 m_remoteIdentityTime;
-    bool m_incomingTunnelOpened;
     nx_http::HttpStreamReader m_httpStreamReader;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
-    nx_http::HttpMessageStreamParser m_incomingTransactionsRequestsParser;
+    std::shared_ptr<nx_http::HttpMessageStreamParser> m_incomingTransactionsRequestsParser;
     ConnectionType::Type m_connectionType;
     PeerRole m_peerRole;
     QByteArray m_contentEncoding;
-    std::shared_ptr<AbstractByteStreamConverter> m_transactionReceivedAsResponseParser;
+    std::shared_ptr<AbstractByteStreamConverter> m_incomingTransactionStreamParser;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
     QUrl m_postTranUrl;
+    quint64 m_sendKeepAliveTask;
+    nx::Buffer m_dummyReadBuffer;
+    bool m_base64EncodeOutgoingTransactions;
 
 private:
     void default_initializer();
-    void sendHttpKeepAlive();
+    void sendHttpKeepAlive( quint64 taskID );
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray&& data);
@@ -286,15 +294,21 @@ private:
     */
     void scheduleAsyncRead();
     bool readCreateIncomingTunnelMessage();
-    void receivedTransaction( const QnByteArrayConstRef& tranData );
+    void receivedTransactionViaInternalTunnel( const QnByteArrayConstRef& tranDataWithHeader );
+    void receivedTransactionNonSafe(
+        const nx_http::HttpHeaders& headers,
+        const QnByteArrayConstRef& tranData );
     void startListeningNonSafe();
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
+    void startSendKeepAliveTimerNonSafe();
+    void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
     void repeatDoGet();
     void openPostTransactionConnectionDone( const nx_http::AsyncHttpClientPtr& );
+    void postTransactionDone( const nx_http::AsyncHttpClientPtr& );
 };
 
 }

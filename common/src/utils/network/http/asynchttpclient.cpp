@@ -199,11 +199,6 @@ namespace nx_http
         m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
     }
 
-    void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )
-    {
-        m_httpStreamReader.setDecodeChunkedMessageBody( val );
-    }
-
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
@@ -388,12 +383,15 @@ namespace nx_http
                     arg( QLatin1String( m_httpStreamReader.message().response->statusLine.reasonPhrase ) ), cl_logDEBUG2 );
 
                 const Response* response = m_httpStreamReader.message().response;
-                if( response->statusLine.statusCode == StatusCode::unauthorized
-                    && !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
+                if( response->statusLine.statusCode == StatusCode::unauthorized )
                 {
-                    //trying authorization
-                    if( resendRequestWithAuthorization( *response ) )
-                        return;
+                    m_currentUrlAuthorization.reset();
+                    if( !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
+                    {
+                        //trying authorization
+                        if( resendRequestWithAuthorization( *response ) )
+                            return;
+                    }
                 }
 
                 const bool messageHasMessageBody =
@@ -629,6 +627,8 @@ namespace nx_http
 
         m_totalBytesRead += bytesRead;
 
+        //TODO #ak m_httpStreamReader is allowed to process not all bytes in m_responseBuffer. MUST support this!
+
         if( !m_httpStreamReader.parseBytes( m_responseBuffer, bytesRead ) )
         {
             NX_LOG( lit("Error parsing http response from %1. %2").
@@ -663,7 +663,6 @@ namespace nx_http
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
             HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
-        nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("Connection", "keep-alive") );
         if( !m_userAgent.isEmpty() )
             m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )
@@ -694,8 +693,20 @@ namespace nx_http
         if( !m_userName.isEmpty() )
             nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("X-Nx-User-Name", m_userName.toUtf8()) );
 
-        //not using Basic authentication by default, since it is not secure
-        nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+        //TODO #ak if that url has already been authenticated, adding same authentication info to the request
+        if( m_currentUrlAuthorization )
+        {
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                nx_http::HttpHeader(
+                    header::Authorization::NAME,
+                    m_currentUrlAuthorization->toString() ) );
+        }
+        else
+        {
+            //not using Basic authentication by default, since it is not secure
+            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+        }
     }
 
     void AsyncHttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
@@ -746,11 +757,13 @@ namespace nx_http
         wwwAuthenticateHeader.parse( wwwAuthenticateIter->second );
         if( wwwAuthenticateHeader.authScheme == header::AuthScheme::basic )
         {
+            header::BasicAuthorization basicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() );
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader(
                     header::Authorization::NAME,
-                    header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+                    basicAuthorization.toString() ) );
+            m_currentUrlAuthorization.reset( new header::Authorization( std::move(basicAuthorization) ) );
         }
         else if( wwwAuthenticateHeader.authScheme == header::AuthScheme::digest )
         {
@@ -821,6 +834,7 @@ namespace nx_http
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
+            m_currentUrlAuthorization.reset( new header::Authorization( std::move(digestAuthorizationHeader) ) );
         }
         else
         {
