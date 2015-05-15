@@ -135,12 +135,6 @@ namespace {
     /** Maximal expanded size of a raised widget, relative to viewport size. */
     const qreal maxExpandedSize = 0.5;
 
-    /** Viewport lower size boundary, in scene coordinates. */
-    const QSizeF viewportLowerSizeBound = QSizeF(qnGlobals->workbenchUnitSize() * 0.05, qnGlobals->workbenchUnitSize() * 0.05);
-
-    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings
-    const qreal selectedFrameWidth = defaultFrameWidth * 2; // TODO: #Elric same here
-
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;
 
@@ -915,7 +909,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
     widget->setFrameOpacity(m_frameOpacity);
-    widget->setFrameWidth(defaultFrameWidth);
+    widget->setFrameWidth(qnGlobals->defaultFrameWidth());
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -1448,7 +1442,7 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
     }
 
     m_boundingInstrument->setPositionBounds(m_view, moveRect);
-    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
+    m_boundingInstrument->setSizeBounds(m_view, qnGlobals->viewportLowerSizeBound(), Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
@@ -1577,7 +1571,9 @@ void QnWorkbenchDisplay::updateFrameWidths() {
         return;
 
     foreach(QnResourceWidget *widget, this->widgets())
-        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() ? selectedFrameWidth : defaultFrameWidth);
+        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() 
+            ? qnGlobals->selectedFrameWidth() 
+            : qnGlobals->defaultFrameWidth());
 }
 
 void QnWorkbenchDisplay::updateCurtainedCursor() {

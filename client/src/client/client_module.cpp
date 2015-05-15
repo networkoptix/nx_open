@@ -27,6 +27,8 @@
 
 #include <plugins/resource/server_camera/server_camera_factory.h>
 
+#include <ui/style/globals.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
@@ -56,6 +58,7 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
 
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
     common->store<QnClientSettings>(new QnClientSettings(forceLocalSettings));
+    common->store<QnGlobals>(new QnGlobals());
     common->store<QnSessionManager>(new QnSessionManager());
 
     common->store<QnCameraUserAttributePool>(new QnCameraUserAttributePool());
