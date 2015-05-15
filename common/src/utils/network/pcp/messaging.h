@@ -3,6 +3,12 @@
 
 #include <QtCore/QDataStream>
 
+#ifdef _WIN32
+#   include <winsock2.h>
+#else
+#   include <netinet/in.h>
+#endif
+
 namespace pcp {
 
 /** Port Control Protocol (PCP)
@@ -42,11 +48,11 @@ enum class ResultCode : quint8
 
 struct RequestHeader
 {
-    quint8 version;
-    Opcode opcode;
+    quint8      version;
+    Opcode      opcode;
 
-    quint32 lifeTime;
-    quint32 clientIp;
+    quint32     lifeTime;
+    QByteArray  clientIp;
 };
 
 QDataStream& operator<<(QDataStream& stream, const RequestHeader& data);
@@ -58,8 +64,8 @@ struct ResponseHeadeer
     Opcode      opcode;
     ResultCode  resultCode;
 
-    quint32 lifeTime;
-    quint32 epochTime;
+    quint32     lifeTime;
+    quint32     epochTime;
 };
 
 QDataStream& operator<<(QDataStream& stream, const ResponseHeadeer& data);
@@ -70,9 +76,9 @@ struct MapMessage
     QByteArray  nonce;
     quint8      protocol;
 
-    quint16 internalPort;
-    quint16 externalPort;
-    quint32 externalIp;
+    quint16     internalPort;
+    quint16     externalPort;
+    QByteArray  externalIp;
 };
 
 QDataStream& operator<<(QDataStream& stream, const MapMessage& data);
@@ -83,38 +89,18 @@ struct PeerMessage
     QByteArray  nonce;
     quint8      protocol;
 
-    quint16 internalPort;
-    quint16 externalPort;
-    quint32 externalIp;
+    quint16     internalPort;
+    quint16     externalPort;
+    QByteArray  externalIp;
 
-    quint16 remotePort;
-    quint32 remoteIp;
+    quint16     remotePort;
+    QByteArray  remoteIp;
 };
 
 QDataStream& operator<<(QDataStream& stream, const PeerMessage& data);
 QDataStream& operator>>(QDataStream& stream, PeerMessage& data);
 
 QByteArray makeRandomNonce();
-
-template <typename T>
-QByteArray toBytes(const T& data, QDataStream::ByteOrder bo = QDataStream::BigEndian)
-{
-    QByteArray a;
-    QDataStream s(&a, QIODevice::WriteOnly);
-    s.setByteOrder(bo);
-    s << data;
-    return a;
-}
-
-template <typename T>
-T fromBytes(const QByteArray& bytes, QDataStream::ByteOrder bo = QDataStream::BigEndian)
-{
-    T d;
-    QDataStream s(bytes);
-    s.setByteOrder(bo);
-    s >> d;
-    return d;
-}
 
 } // namespace pcp
 

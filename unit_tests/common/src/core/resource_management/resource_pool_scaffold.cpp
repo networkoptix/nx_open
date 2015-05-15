@@ -21,13 +21,11 @@ QnResourcePoolScaffold::QnResourcePoolScaffold() {
     m_cameraAttributesPool = new QnCameraUserAttributePool();
     m_serverAttributesPool = new QnMediaServerUserAttributesPool();
     m_resPool = new QnResourcePool();
-    QnResourcePool::initStaticInstance(m_resPool);
     QnResourcePool::instance(); // to initialize net state;
 }
 
 QnResourcePoolScaffold::~QnResourcePoolScaffold() {
     delete m_resPool;
-    QnResourcePool::initStaticInstance( NULL );
     delete m_serverAttributesPool;
     delete m_cameraAttributesPool;
     delete m_statusDictionary;

@@ -1,33 +1,37 @@
 #include <gtest/gtest.h>
 #include <utils/network/pcp/messaging.h>
-
-#include <QDebug>
+#include <utils/memory/data_stream_helpers.h>
 
 using namespace pcp;
 
+static const auto ipHex = QByteArray(16, 'a') + QByteArray(16, 'b');
+static const auto ipBin = dsh::reversed(QByteArray::fromHex(ipHex));
+
+static const auto nonceBin = makeRandomNonce();
+static const auto nonceHex = dsh::reversed(nonceBin).toHex();
+
 TEST(PcpMessaging, RequestHeader)
 {
-    const RequestHeader h = { VERSION, Opcode::MAP, 0x12345678, 0xAABBCCDD };
+    const RequestHeader h = { VERSION, Opcode::MAP, 0x12345678, ipBin };
 
-    const auto a = toBytes(h);
-    EXPECT_EQ(QByteArray("0201000012345678AABBCCDD"), a.toHex().toUpper());
+    const auto a = dsh::toBytes(h);
+    EXPECT_EQ(QByteArray("0201000078563412") + ipHex, a.toHex());
 
-    const auto h2 = fromBytes<RequestHeader>(a);
+    const auto h2 = dsh::fromBytes<RequestHeader>(a);
     EXPECT_EQ(VERSION,       h2.version);
     EXPECT_EQ(Opcode::MAP,   h2.opcode);
     EXPECT_EQ(0x12345678,    h2.lifeTime);
-    EXPECT_EQ(0xAABBCCDD,    h2.clientIp);
+    EXPECT_EQ(ipBin,         h2.clientIp);
 }
 
 TEST(PcpMessaging, ResponseHeadeer)
 {
-    const ResponseHeadeer h = { VERSION, Opcode::PEER, ResultCode::SUCCESS, 0x12345678, 0xAABBCCDD };
+    const ResponseHeadeer h = { VERSION, Opcode::PEER, ResultCode::SUCCESS, 0x12345678, 0xaabbccdd };
 
-    const auto a = toBytes(h);
-    const QByteArray msg("0282000012345678AABBCCDD000000000000000000000000");
-    EXPECT_EQ(msg, a.toHex().toUpper());
+    const auto a = dsh::toBytes(h);
+    EXPECT_EQ(QByteArray("0282000078563412ddccbbaa000000000000000000000000"), a.toHex());
 
-    const auto h2 = fromBytes<ResponseHeadeer>(a);
+    const auto h2 = dsh::fromBytes<ResponseHeadeer>(a);
     EXPECT_EQ(VERSION,              h2.version);
     EXPECT_EQ(Opcode::PEER,         h2.opcode);
     EXPECT_EQ(ResultCode::SUCCESS,  h2.resultCode);
@@ -37,38 +41,33 @@ TEST(PcpMessaging, ResponseHeadeer)
 
 TEST(PcpMessaging, MapMessage)
 {
-    const auto nonce = makeRandomNonce();
-    const MapMessage h = { nonce, 0x77, 0x1111, 0x2222, 0xAABBCCDD };
+    const MapMessage h = { nonceBin, 0x77, 0x1122, 0x3344, ipBin };
 
-    const auto a = toBytes(h);
-    QByteArray msg("7700000011112222AABBCCDD");
-    msg.push_front(nonce.toHex().toUpper());
-    EXPECT_EQ(msg, a.toHex().toUpper());
+    const auto a = dsh::toBytes(h);
+    EXPECT_EQ(nonceHex + QByteArray("7700000022114433") + ipHex, a.toHex());
 
-    const auto h2 = fromBytes<MapMessage>(a);
-    EXPECT_EQ(nonce,            h2.nonce);
-    EXPECT_EQ(0x77,             h2.protocol);
-    EXPECT_EQ(0x1111,           h2.internalPort);
-    EXPECT_EQ(0x2222,           h2.externalPort);
-    EXPECT_EQ(0xAABBCCDD,       h2.externalIp);
+    const auto h2 = dsh::fromBytes<MapMessage>(a);
+    EXPECT_EQ(nonceBin, h2.nonce);
+    EXPECT_EQ(0x77,     h2.protocol);
+    EXPECT_EQ(0x1122,   h2.internalPort);
+    EXPECT_EQ(0x3344,   h2.externalPort);
+    EXPECT_EQ(ipBin,    h2.externalIp);
 }
 
 TEST(PcpMessaging, PeerMessage)
 {
-    const auto nonce = makeRandomNonce();
-    const PeerMessage h = { nonce, 0x77, 0x1111, 0x2222, 0xAABBCCDD, 0x3333, 0xDDCCBBAA };
+    const PeerMessage h = { nonceBin, 0x77, 0x1122, 0x3344, ipBin, 0x5566, ipBin };
 
-    const auto a = toBytes<PeerMessage>(h);
-    QByteArray msg("7700000011112222AABBCCDD33330000DDCCBBAA");
-    msg.push_front(nonce.toHex().toUpper());
-    EXPECT_EQ(msg, a.toHex().toUpper());
+    const auto a = dsh::toBytes<PeerMessage>(h);
+    EXPECT_EQ(nonceHex + QByteArray("7700000022114433") + ipHex + QByteArray("66550000") + ipHex,
+              a.toHex());
 
-    const auto h2 = fromBytes<PeerMessage>(a);
-    EXPECT_EQ(nonce,            h2.nonce);
-    EXPECT_EQ(0x77,             h2.protocol);
-    EXPECT_EQ(0x1111,           h2.internalPort);
-    EXPECT_EQ(0x2222,           h2.externalPort);
-    EXPECT_EQ(0xAABBCCDD,       h2.externalIp);
-    EXPECT_EQ(0x3333,           h2.remotePort);
-    EXPECT_EQ(0xDDCCBBAA,       h2.remoteIp);
+    const auto h2 = dsh::fromBytes<PeerMessage>(a);
+    EXPECT_EQ(nonceBin, h2.nonce);
+    EXPECT_EQ(0x77,     h2.protocol);
+    EXPECT_EQ(0x1122,   h2.internalPort);
+    EXPECT_EQ(0x3344,   h2.externalPort);
+    EXPECT_EQ(ipBin,    h2.externalIp);
+    EXPECT_EQ(0x5566,   h2.remotePort);
+    EXPECT_EQ(ipBin,    h2.remoteIp);
 }
