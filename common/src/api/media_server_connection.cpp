@@ -770,7 +770,7 @@ int QnMediaServerConnection::deleteBookmarkAsync(const QnNetworkResourcePtr &cam
 
 int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot) {
     QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "application/json");
+    //headers << QnRequestParam("content-type",   "application/json");
 
     QnRequestParamList params;
     params << QnRequestParam("id",               QnLexical::serialized(camera->getPhysicalId()));
@@ -794,7 +794,10 @@ int QnMediaServerConnection::uploadUpdateChunk(const QString &updateId, const QB
     params << QnRequestParam("updateId", updateId);
     params << QnRequestParam("offset", offset);
 
-    return sendAsyncPostRequest(InstallUpdateObject, params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "text/xml");
+
+    return sendAsyncPostRequest(InstallUpdateObject, headers, params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
 
 int QnMediaServerConnection::restart(QObject *target, const char *slot) {

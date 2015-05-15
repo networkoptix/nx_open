@@ -351,18 +351,18 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
 
     //qDebug() << "api url" << request.url();
 
-    bool skipContentType = false;
+    //bool skipContentType = false;
     for (const QnRequestHeader& header: headers) {
-        if (header.first == QLatin1String("Content-Type"))
-            skipContentType = true;
+        //if (header.first == QLatin1String("Content-Type"))
+        //    skipContentType = true;
         request.setRawHeader(header.first.toLatin1(), header.second.toUtf8());
     }
 
     QString userInfo = url.userInfo();
     if (!userInfo.isEmpty())
         request.setRawHeader("Authorization", "Basic " + userInfo.toLatin1().toBase64());
-    if (!skipContentType)
-        request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
+    //if (!skipContentType)
+    //    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
     QNetworkReply* reply = NULL;
     switch(operation) {
