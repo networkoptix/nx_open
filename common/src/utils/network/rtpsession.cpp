@@ -1126,7 +1126,7 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
     if( m_numOfPredefinedChannels )
     {
         request.headers.insert( nx_http::HttpHeader( "x-play-now", "true" ) );
-        request.headers.insert( nx_http::HttpHeader( "x-guid", getGuid() ) );
+        request.headers.insert( nx_http::HttpHeader( "X-guid", getGuid() ) );
     }
     return request;
 }

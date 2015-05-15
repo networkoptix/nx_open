@@ -208,7 +208,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
                 if (QnResourcePtr camera = qnResPool->getResourceById(cameraGuid))
                     xServerGUID = camera->getParentId().toString();
             }
-        } else if (itr->first == "x-server-guid"){
+        } else if (itr->first == "X-server-guid"){
             xServerGUID = itr->second;
         }
     }
