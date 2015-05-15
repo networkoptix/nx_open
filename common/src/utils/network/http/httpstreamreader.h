@@ -84,9 +84,6 @@ namespace nx_http
         //!If \a true, then \a parseBytes always returns after reading http headers and trailing CRLF have been read
         void setBreakAfterReadingHeaders( bool val );
 
-        //!If \a true, then \a parseBytes always returns after reading http headers and trailing CRLF have been read
-        void setBreakAfterReadingHeaders( bool val );
-
     private:
         // TODO: #Elric #enum
         enum ChunkStreamParseState

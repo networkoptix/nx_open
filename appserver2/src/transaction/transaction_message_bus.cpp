@@ -1376,11 +1376,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     QnTransactionTransport* transport = new QnTransactionTransport(
         connectionGuid,
         m_localPeer,
-        socket,
         remotePeer,
         std::move(socket),
         connectionType,
-        contentEncoding );
         request,
         contentEncoding );
     transport->setRemoteIdentityTime(remoteSystemIdentityTime);

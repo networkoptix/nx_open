@@ -127,7 +127,7 @@ QnTransactionTransport::QnTransactionTransport(
 
     //TODO #ak use binary filter stream for serializing transactions
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
-        request.headers, nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
+        request.headers, Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
 
     if( m_connectionType == ConnectionType::bidirectional )
         m_incomingDataSocket = m_outgoingDataSocket;
@@ -425,11 +425,11 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     fillAuthInfo( m_httpClient, m_authByKey );
     if( m_localPeer.isServer() )
         m_httpClient->addAdditionalHeader(
-            nx_ec::EC2_SYSTEM_NAME_HEADER_NAME,
+            Qn::EC2_SYSTEM_NAME_HEADER_NAME,
             QnCommonModule::instance()->localSystemName().toUtf8() );
     if( m_base64EncodeOutgoingTransactions )    //requesting server to encode transactions
         m_httpClient->addAdditionalHeader(
-            nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME,
+            Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
 
     m_remoteAddr = remotePeerUrl;
@@ -444,10 +444,10 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     q.addQueryItem( "format", QnLexical::serialized(Qn::JsonFormat) );
 #endif
     m_httpClient->addAdditionalHeader(
-        nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
+        Qn::EC2_CONNECTION_GUID_HEADER_NAME,
         m_connectionGuid.toByteArray() );
     m_httpClient->addAdditionalHeader(
-        nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
+        Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
         ConnectionType::toString(m_connectionType) );   //incoming means this peer wants to receive data via this connection
 
     // Client reconnects to the server
@@ -459,9 +459,9 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     }
 
     m_remoteAddr.setQuery(q);
-    m_httpClient->removeAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME );
+    m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
     m_httpClient->addAdditionalHeader(
-        nx_ec::EC2_CONNECTION_STATE_HEADER_NAME,
+        Qn::EC2_CONNECTION_STATE_HEADER_NAME,
         toString(getState()).toLatin1() );
     if (!m_httpClient->doGet(m_remoteAddr)) {
         qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
@@ -528,8 +528,8 @@ void QnTransactionTransport::connectDone(const QnUuid& id)
 
 void QnTransactionTransport::repeatDoGet()
 {
-    m_httpClient->removeAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME );
-    m_httpClient->addAdditionalHeader( nx_ec::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
+    m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
+    m_httpClient->addAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
     if (!m_httpClient->doGet(m_remoteAddr))
         cancelConnecting();
 }
@@ -606,7 +606,6 @@ void QnTransactionTransport::receivedTransactionNonSafe(
 
     switch( m_remotePeer.dataFormat )
     {
-#ifdef USE_JSON
         case Qn::JsonFormat:
             if( !QnJsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.constData()),
@@ -619,7 +618,6 @@ void QnTransactionTransport::receivedTransactionNonSafe(
                 return;
             }
             break;
-#endif
 
         case Qn::UbjsonFormat:
             if( !QnUbjsonTransactionSerializer::deserializeTran(
@@ -642,11 +640,7 @@ void QnTransactionTransport::receivedTransactionNonSafe(
     Q_ASSERT( !transportHeader.processedPeers.empty() );
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
         arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
-#ifdef USE_JSON
-#   error "TransactionMessageBus accepts only transactions in ubjson format"
-#else
-    emit gotTransaction(serializedTran, transportHeader);
-#endif
+    emit gotTransaction( m_remotePeer.dataFormat, serializedTran, transportHeader);
     ++m_postedTranCount;
 }
 
@@ -664,7 +658,7 @@ void QnTransactionTransport::receivedTransaction(
 
     if( nx_http::getHeaderValue(
             headers,
-            nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
+            Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
     {
         receivedTransactionNonSafe(
             headers,
@@ -881,14 +875,14 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             m_outgoingTranClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
             m_outgoingTranClient->setUserAgent( QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             m_outgoingTranClient->addAdditionalHeader(
-                nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
+                Qn::EC2_CONNECTION_GUID_HEADER_NAME,
                 m_connectionGuid.toByteArray() );
             m_outgoingTranClient->addAdditionalHeader(
-                nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
+                Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
                 ConnectionType::toString(ConnectionType::outgoing) );
             if( m_base64EncodeOutgoingTransactions )    //informing server that transaction is encoded
                 m_outgoingTranClient->addAdditionalHeader(
-                    nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME,
+                    Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
                     "true" );
             connect(
                 m_outgoingTranClient.get(), &nx_http::AsyncHttpClient::done,
@@ -960,7 +954,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
             QTimer::singleShot(0, this, SLOT(repeatDoGet()));
         }
         else {
-            QnUuid guid(nx_http::getHeaderValue( client->response()->headers, nx_ec::EC2_SERVER_GUID_HEADER_NAME ));
+            QnUuid guid(nx_http::getHeaderValue( client->response()->headers, Qn::EC2_SERVER_GUID_HEADER_NAME ));
             if (!guid.isNull()) {
                 emit peerIdDiscovered(m_remoteAddr, guid);
                 emit remotePeerUnauthorized(guid);
@@ -970,9 +964,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         return;
     }
 
-    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(nx_ec::EC2_GUID_HEADER_NAME);
-    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(nx_ec::EC2_RUNTIME_GUID_HEADER_NAME);
-    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(nx_ec::EC2_SYSTEM_IDENTITY_HEADER_NAME);
+    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(Qn::EC2_GUID_HEADER_NAME);
+    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME);
     if (itrSystemIdentityTime != client->response()->headers.end())
         setRemoteIdentityTime(itrSystemIdentityTime->second.toLongLong());
 
@@ -984,7 +978,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     //checking remote server protocol version
     nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter = 
-        client->response()->headers.find(nx_ec::EC2_PROTO_VERSION_HEADER_NAME);
+        client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
     const int remotePeerEcProtoVersion = ec2ProtoVersionIter == client->response()->headers.end()
         ? nx_ec::INITIAL_EC2_PROTO_VERSION
         : ec2ProtoVersionIter->second.toInt();
@@ -1072,7 +1066,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     else {
         if( nx_http::getHeaderValue(
                 m_httpClient->response()->headers,
-                nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
+                Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
             //inserting base64 decoder after m_multipartContentParser
             std::shared_ptr<AbstractByteStreamFilter> lastFilterBak = m_multipartContentParser->nextFilter();
@@ -1446,14 +1440,14 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
             : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ) );
     m_outgoingClientHeaders.emplace_back( "Host", m_remoteAddr.host().toLatin1() );
     m_outgoingClientHeaders.emplace_back(
-        nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
+        Qn::EC2_CONNECTION_GUID_HEADER_NAME,
         m_connectionGuid.toByteArray() );
     m_outgoingClientHeaders.emplace_back(
-        nx_ec::EC2_CONNECTION_DIRECTION_HEADER_NAME,
+        Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME,
         ConnectionType::toString(ConnectionType::outgoing) );
     if( m_base64EncodeOutgoingTransactions )    //informing server that transaction is encoded
         m_outgoingClientHeaders.emplace_back(
-            nx_ec::BASE64_ENCODING_REQUIRED_HEADER_NAME,
+            Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
     auto authorizationHeaderIter = client->request().headers.find( nx_http::header::Authorization::NAME );
     if( authorizationHeaderIter != client->request().headers.end() )

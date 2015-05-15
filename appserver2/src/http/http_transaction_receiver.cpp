@@ -42,7 +42,7 @@ namespace ec2
         QByteArray& contentType,
         const QnRestConnectionProcessor* connection )
     {
-        auto connectionGuidIter = connection->request().headers.find( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME );
+        auto connectionGuidIter = connection->request().headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == connection->request().headers.end() )
             return nx_http::StatusCode::forbidden;
         const QnUuid connectionGuid( connectionGuidIter->second );
@@ -119,7 +119,7 @@ namespace ec2
                 return;
             }
 
-            auto connectionGuidIter = d->request.headers.find( nx_ec::EC2_CONNECTION_GUID_HEADER_NAME );
+            auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
             if( connectionGuidIter == d->request.headers.end() )
             {
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
