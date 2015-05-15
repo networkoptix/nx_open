@@ -822,7 +822,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
         QNetworkProxy proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);
         if (proxy.type() != QNetworkProxy::NoProxy)
             session->setProxyAddr(proxy.hostName(), proxy.port());
-        session->setAdditionAttribute("x-server-guid", server->getId().toByteArray());
+        session->setAdditionAttribute("X-server-guid", server->getId().toByteArray());
     }
 
     session->setTransport(QLatin1String("TCP"));

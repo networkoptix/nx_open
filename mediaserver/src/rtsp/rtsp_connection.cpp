@@ -1069,7 +1069,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         if (nx_http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
-        d->clientGuid = nx_http::getHeaderValue(d->request.headers, "x-guid");
+        d->clientGuid = nx_http::getHeaderValue(d->request.headers, "X-guid");
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
         //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
