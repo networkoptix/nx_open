@@ -116,11 +116,7 @@
                                                 <xsl:if test="method='GET'">
                                                     <span class="label label-success">
                                                         <a target="_blank">
-                                                            <xsl:attribute name="href">
-                                                                <xsl:value-of select="$urlPrefix"/>
-                                                                /
-                                                                <xsl:value-of select="name"/>
-                                                            </xsl:attribute>
+                                                            <xsl:attribute name="href"><xsl:value-of select="$urlPrefix"/>/<xsl:value-of select="name"/></xsl:attribute>
                                                             try method
                                                         </a>
                                                     </span>
