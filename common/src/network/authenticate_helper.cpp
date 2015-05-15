@@ -292,7 +292,7 @@ QByteArray QnAuthHelper::createHttpQueryAuthParam( const QString& userName, cons
     "three, four"
     \endcode
 */
-static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
+QList<QByteArray> QnAuthHelper::smartSplit(const QByteArray& data, const char delimiter)
 {
     bool quoted = false;
     QList<QByteArray> rez;
