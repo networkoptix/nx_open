@@ -36,6 +36,7 @@
 #include "model/camera_list_reply.h"
 #include "model/configure_reply.h"
 #include "model/upload_update_reply.h"
+#include "http/custom_headers.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -307,18 +308,18 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     setUrl(mserver->getApiUrl());
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
 
-    QString guid = mserver->getProperty(lit("guid")); // todo: wtf?
+    QnUuid guid = mserver->getOriginalGuid();
 
     QnRequestHeaderList queryParameters;
-	queryParameters.insert(lit("X-server-guid"), mserver->getId().toString());
+	queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), mserver->getId().toString());
 
     setExtraQueryParameters(queryParameters);
 
     QnRequestHeaderList extraHeaders;
-	extraHeaders.insert(lit("X-server-guid"), guid.isEmpty() ? mserver->getId().toString() : guid);
+	extraHeaders.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), guid.isNull() ? mserver->getId().toString() : guid.toString());
 
     if (!videowallGuid.isNull())
-        extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());
+        extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
     setExtraHeaders(extraHeaders);
 }
 

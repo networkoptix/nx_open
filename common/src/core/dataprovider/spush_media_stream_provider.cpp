@@ -18,7 +18,7 @@ CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     m_openStreamResult(CameraDiagnostics::ErrorCode::unknown),
     m_openStreamCounter(0),
     m_FrameCnt(0),
-    m_cameraControlRequired(false)
+    m_openedWithStreamCtrl(false)
 {
 }
 
@@ -43,14 +43,60 @@ bool CLServerPushStreamReader::canChangeStatus() const
     return liveProvider && liveProvider->canChangeStatus();
 }
 
-CameraDiagnostics::Result CLServerPushStreamReader::openStreamInternal()
+CameraDiagnostics::Result CLServerPushStreamReader::openStream()
 {
-    return openStream();
+    return openStreamWithErrChecking(isCameraControlRequired());
 }
 
 bool CLServerPushStreamReader::isCameraControlRequired() const
 {
-    return m_cameraControlRequired;
+    return !isCameraControlDisabled() && needConfigureProvider();
+}
+
+CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bool isControlRequired)
+{
+    m_FrameCnt = 0;
+    bool isInitialized = m_resource->isInitialized();
+    if (!isInitialized) {
+        if (m_openStreamResult == CameraDiagnostics::NoErrorResult())
+            m_openStreamResult = CameraDiagnostics::InitializationInProgress();
+    }
+    else {
+        m_openStreamResult = openStreamInternal(isControlRequired);
+        m_needControlTimer.restart();
+        m_openedWithStreamCtrl = isControlRequired;
+    }
+
+    {
+        QMutexLocker lk( &m_openStreamMutex );
+        ++m_openStreamCounter;
+        m_cond.wakeAll();
+    }
+
+    if (!isStreamOpened())
+    {
+        QnSleep::msleep(100); // to avoid large CPU usage
+
+        closeStream(); // to release resources 
+
+        setNeedKeyData();
+        if (isInitialized) 
+		{
+            mFramesLost++;
+            m_stat[0].onData(0);
+            m_stat[0].onEvent(CL_STAT_FRAME_LOST);
+
+            if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
+            {
+                if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
+                    getResource()->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? Qn::Unauthorized : Qn::Offline);
+                m_stat[0].onLostConnection();
+                mFramesLost = 0;
+            }
+        }
+    }
+
+    return m_openStreamResult;
 }
 
 void CLServerPushStreamReader::run()
@@ -58,8 +104,6 @@ void CLServerPushStreamReader::run()
     initSystemThreadId();
     setPriority(QThread::HighPriority);
     NX_LOG("stream reader started", cl_logDEBUG2);
-
-    m_cameraControlRequired = QnLiveStreamProvider::isCameraControlRequired();
 
     beforeRun();
 
@@ -71,58 +115,16 @@ void CLServerPushStreamReader::run()
 
         if (!isStreamOpened())
         {
-            m_FrameCnt = 0;
-            CameraDiagnostics::Result openStreamResult;
-            if (!m_resource->isInitialized()) {
-                openStreamResult = CameraDiagnostics::InitializationInProgress();
-                if (m_openStreamResult == CameraDiagnostics::NoErrorResult())
-                    m_openStreamResult = openStreamResult;
-            }
-            else {
-                m_openStreamResult = openStreamResult = openStreamInternal();
-                m_needControlTimer.restart();
-            }
-
-            {
-                QMutexLocker lk( &m_openStreamMutex );
-                ++m_openStreamCounter;
-                m_cond.wakeAll();
-            }
-            if (!isStreamOpened())
-            {
-                QnSleep::msleep(100); // to avoid large CPU usage
-
-                closeStream(); // to release resources 
-
-                setNeedKeyData();
-
-                if (openStreamResult.errorCode != CameraDiagnostics::ErrorCode::cameraInitializationInProgress)
-                {
-                    mFramesLost++;
-                    m_stat[0].onData(0);
-                    m_stat[0].onEvent(CL_STAT_FRAME_LOST);
-
-                    if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
-                    {
-                        if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
-                            getResource()->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? Qn::Unauthorized : Qn::Offline);
-                        m_stat[0].onLostConnection();
-                        mFramesLost = 0;
-                    }
-                }
-
-                continue;
-            }
+            openStream();
+            continue;
         }
-        else {
-            if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME) 
-            {
-                if (!m_cameraControlRequired && QnLiveStreamProvider::isCameraControlRequired())
-                {
-                    m_cameraControlRequired = true;
-                    pleaseReOpen();
-                }
-                m_needControlTimer.restart();
+        else if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME) 
+        {
+            m_needControlTimer.restart();
+            if (!m_openedWithStreamCtrl && isCameraControlRequired()) {
+                closeStream();
+                openStreamWithErrChecking(true);
+                continue;
             }
         }
 
@@ -134,8 +136,6 @@ void CLServerPushStreamReader::run()
         }
 
         const QnAbstractMediaDataPtr& data = getNextData();
-
-
         if (data==0)
         {
             setNeedKeyData();
@@ -221,8 +221,6 @@ void CLServerPushStreamReader::run()
             putData(std::move(data));
         else
             setNeedKeyData();
-
-
     }
 
     if (isStreamOpened())

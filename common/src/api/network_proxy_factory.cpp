@@ -9,6 +9,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <network/authenticate_helper.h>
 #include <utils/network/router.h>
+#include "http/custom_headers.h"
 
 
 // -------------------------------------------------------------------------- //
@@ -65,9 +66,9 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
 
     QUrlQuery urlQuery(query.url());
 
-    QnUuid resourceGuid = QnUuid(urlQuery.queryItemValue(lit("x-camera-guid")));
+    QnUuid resourceGuid = QnUuid(urlQuery.queryItemValue(QString::fromLatin1(Qn::CAMERA_GUID_HEADER_NAME)));
     if (resourceGuid.isNull())
-        resourceGuid = QnUuid(urlQuery.queryItemValue(lit("X-server-guid")));
+        resourceGuid = QnUuid(urlQuery.queryItemValue(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME)));
 
     if (resourceGuid.isNull())
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
@@ -93,7 +94,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resour
     }
 
     if (server) {
-        QnUuid id = QnUuid::fromStringSafe(server->getProperty(lit("guid"))); // todo: wtf?
+        QnUuid id = server->getOriginalGuid();
 		if (id.isNull())
 			id = server->getId();
         QnRoute route = QnRouter::instance()->routeTo(id);

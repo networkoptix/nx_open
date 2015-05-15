@@ -948,7 +948,7 @@ void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader, qreal aspectR
     updateThumbnailsStepSize(true); // TODO: #Elric
 
     if(m_thumbnailsLoader)
-        foreach(const QnThumbnail &thumbnail, loader->thumbnails())
+        foreach(const QnThumbnail &thumbnail, m_thumbnailsLoader->thumbnails())
             addThumbnail(thumbnail);
 }
 
