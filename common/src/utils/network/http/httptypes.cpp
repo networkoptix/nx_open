@@ -708,70 +708,70 @@ namespace nx_http
     }
 
 
-	namespace header
-	{
-		namespace AuthScheme
-		{
-			const char* toString( Value val )
-			{
-				switch( val )
-				{
-					case basic:
-						return "Basic";
-					case digest:
-						return "Digest";
-					default:
-						return "None";
-				}
-			}
-
-			Value fromString( const char* str )
-			{
-				if( ::strcasecmp( str, "Basic" ) == 0 )
-					return basic;
-				if( ::strcasecmp( str, "Digest" ) == 0 )
-					return digest;
-				return none;
-			}
-
-			Value fromString( const ConstBufferRefType& str )
+    namespace header
+    {
+        namespace AuthScheme
+        {
+            const char* toString( Value val )
             {
-				if( str == "Basic" )
-					return basic;
-				if( str == "Digest" )
-					return digest;
-				return none;
+                switch( val )
+                {
+                    case basic:
+                        return "Basic";
+                    case digest:
+                        return "Digest";
+                    default:
+                        return "None";
+                }
+            }
+
+            Value fromString( const char* str )
+            {
+                if( ::strcasecmp( str, "Basic" ) == 0 )
+                    return basic;
+                if( ::strcasecmp( str, "Digest" ) == 0 )
+                    return digest;
+                return none;
+            }
+
+            Value fromString( const ConstBufferRefType& str )
+            {
+                if( str == "Basic" )
+                    return basic;
+                if( str == "Digest" )
+                    return digest;
+                return none;
             }
         }
 
-		///////////////////////////////////////////////////////////////////
-		//  Authorization
-		///////////////////////////////////////////////////////////////////
-		bool BasicCredentials::parse( const BufferType& /*str*/ )
-		{
+        ///////////////////////////////////////////////////////////////////
+        //  Authorization
+        ///////////////////////////////////////////////////////////////////
+        bool BasicCredentials::parse( const BufferType& /*str*/ )
+        {
             //TODO/IMPL
             Q_ASSERT( false );
             return false;
-		}
+        }
 
-		void BasicCredentials::serialize( BufferType* const dstBuffer ) const
-		{
+        void BasicCredentials::serialize( BufferType* const dstBuffer ) const
+        {
             BufferType serializedCredentials;
             serializedCredentials.append(userid);
             serializedCredentials.append(':');
             serializedCredentials.append(password);
             *dstBuffer += serializedCredentials.toBase64();
-		}
+        }
 
-		bool DigestCredentials::parse( const BufferType& /*str*/ )
-		{
-			//TODO/IMPL implementation
+        bool DigestCredentials::parse( const BufferType& /*str*/ )
+        {
+            //TODO/IMPL implementation
             Q_ASSERT( false );
             return false;
-		}
+        }
 
-		void DigestCredentials::serialize( BufferType* const dstBuffer ) const
-		{
+        void DigestCredentials::serialize( BufferType* const dstBuffer ) const
+        {
             for( QMap<BufferType, BufferType>::const_iterator
                 it = params.begin();
                 it != params.end();
@@ -784,7 +784,7 @@ namespace nx_http
                 dstBuffer->append( it.value() );
                 dstBuffer->append( "\"" );
             }
-		}
+        }
 
 
         //////////////////////////////////////////////
@@ -793,74 +793,102 @@ namespace nx_http
 
         const StringType Authorization::NAME("Authorization");
 
-		Authorization::Authorization()
-		:
-			authScheme( AuthScheme::none )
-		{
-			basic = NULL;
-		}
+        Authorization::Authorization()
+        :
+            authScheme( AuthScheme::none )
+        {
+            basic = NULL;
+        }
 
-		Authorization::Authorization( const AuthScheme::Value& authSchemeVal )
-		:
-			authScheme( authSchemeVal )
-		{
-			switch( authScheme )
-			{
-				case AuthScheme::basic:
-					basic = new BasicCredentials();
-					break;
-				
-				case AuthScheme::digest:
-					digest = new DigestCredentials();
-					break;
+        Authorization::Authorization( const AuthScheme::Value& authSchemeVal )
+        :
+            authScheme( authSchemeVal )
+        {
+            switch( authScheme )
+            {
+                case AuthScheme::basic:
+                    basic = new BasicCredentials();
+                    break;
+                
+                case AuthScheme::digest:
+                    digest = new DigestCredentials();
+                    break;
 
-				default:
-					basic = NULL;
-					break;
-			}
-		}
-
-		Authorization::~Authorization()
-		{
-			switch( authScheme )
-			{
-				case AuthScheme::basic:
-					delete basic;
+                default:
                     basic = NULL;
-					break;
-				
-				case AuthScheme::digest:
-					delete digest;
-                    digest = NULL;
-					break;
+                    break;
+            }
+        }
 
-				default:
-					break;
-			}
-		}
+        Authorization::Authorization( Authorization&& right )
+        :
+            authScheme( right.authScheme ),
+            basic( right.basic )
+        {
+            right.authScheme = AuthScheme::none;
+            right.basic = nullptr;
+        }
 
-		bool Authorization::parse( const BufferType& /*str*/ )
-		{
-			//TODO/IMPL implementation
+        Authorization::~Authorization()
+        {
+            clear();
+        }
+
+        Authorization& Authorization::operator=( Authorization&& right )
+        {
+            clear();
+
+            authScheme = right.authScheme;
+            basic = right.basic;
+
+            right.authScheme = AuthScheme::none;
+            right.basic = nullptr;
+
+            return *this;
+        }
+
+        bool Authorization::parse( const BufferType& /*str*/ )
+        {
+            //TODO/IMPL implementation
             Q_ASSERT( false );
-			return false;
-		}
+            return false;
+        }
 
-		void Authorization::serialize( BufferType* const dstBuffer ) const
-		{
+        void Authorization::serialize( BufferType* const dstBuffer ) const
+        {
             dstBuffer->append( AuthScheme::toString( authScheme ) );
             dstBuffer->append( " " );
-			if( authScheme == AuthScheme::basic )
-				basic->serialize( dstBuffer );
-			else if( authScheme == AuthScheme::digest )
-				digest->serialize( dstBuffer );
-		}
+            if( authScheme == AuthScheme::basic )
+                basic->serialize( dstBuffer );
+            else if( authScheme == AuthScheme::digest )
+                digest->serialize( dstBuffer );
+        }
 
         StringType Authorization::toString() const
         {
             BufferType dest;
             serialize( &dest );
             return dest;
+        }
+
+        void Authorization::clear()
+        {
+            switch( authScheme )
+            {
+                case AuthScheme::basic:
+                    delete basic;
+                    basic = nullptr;
+                    break;
+                
+                case AuthScheme::digest:
+                    delete digest;
+                    digest = nullptr;
+                    break;
+
+                default:
+                    break;
+            }
+            authScheme = AuthScheme::none;
         }
 
         BasicAuthorization::BasicAuthorization( const StringType& userName, const StringType& userPassword )

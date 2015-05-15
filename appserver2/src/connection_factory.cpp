@@ -27,9 +27,12 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
+#include "http/http_transaction_receiver.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
+
+static const char INCOMING_TRANSACTIONS_PATH[] = "ec2/forward_events";
 
 namespace ec2
 {
@@ -110,6 +113,7 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
     {
         universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
+        universalTcpListener->addHandler<QnHttpTransactionReceiver>("HTTP", INCOMING_TRANSACTIONS_PATH);
 
         m_sslEnabled = universalTcpListener->isSslEnabled();
     }
@@ -279,6 +283,11 @@ namespace ec2
 
         registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
             std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
+
+        //using HTTP processor since HTTP REST does not support HTTP interleaving
+        //restProcessorPool->registerHandler(
+        //    QLatin1String(INCOMING_TRANSACTIONS_PATH),
+        //    new QnRestTransactionReceiver() );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
