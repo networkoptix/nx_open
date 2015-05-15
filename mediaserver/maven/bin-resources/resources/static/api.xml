@@ -1413,7 +1413,7 @@
                         <caption>JSON with a list of the discovered peers</caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>restart</name>
                     <description>Restart the server.</description>
                     <method>GET</method>
@@ -1495,7 +1495,7 @@
                         </caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>mergeSystems</name>
                     <description>Merge two systems.</description>
                     <method>GET</method>
@@ -1662,6 +1662,11 @@
                         <param>
                             <name>rotation</name>
                             <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>sfd</name>
+                            <description>Stand Frame Duration. If param is present, video speed is limited by real time.</description>
                             <optional>true</optional>
                         </param>
                     </params>
