@@ -19,8 +19,7 @@ function Chunk(boundaries,start,end,level,title,extension){
 }
 
 
-
-//Вспопомогательная мини-библиотека для декларации и использования настроек линейки
+// Additional mini-library for declaring and using settings for ruler levels
 function Interval (seconds,minutes,hours,days,months,years){
     this.seconds = seconds;
     this.minutes = minutes;
@@ -30,7 +29,6 @@ function Interval (seconds,minutes,hours,days,months,years){
     this.years = years;
 }
 
-// Прибавить интервал к дате
 Interval.prototype.addToDate = function(date, count){
     if(Number.isInteger(date)) {
         date = new Date(date);
@@ -54,14 +52,23 @@ Interval.prototype.addToDate = function(date, count){
 Interval.secondsBetweenDates = function(date1,date2){
     return (date2.getTime() - date1.getTime())/1000;
 };
-// Сколько секунд в интервале. Может выдавать не очень точный показатель, если интервал больше года из-за высокосности - на таком масштабе эта погрешность не играет роли
+
+/**
+ * How many seconds are there in the interval.
+ * Fucntion may return not exact value, it doesn't count leap years (difference doesn't matter in that case)
+ * @returns {*}
+ */
 Interval.prototype.getSeconds = function(){
-    var date1 = new Date(1971,11,1,0,0,0,0);//Первое декабря перед высокосным годом. Это нужно, чтобы интервал оценивался по максимуму (если месяц, то 31 день, если год - то 366 дней)
+    var date1 = new Date(1971,11,1,0,0,0,0);//The first of december before the leap year. We need to count maximum interval (month -> 31 day, year -> 366 days)
     var date2 = this.addToDate(date1);
     return Interval.secondsBetweenDates(date1,date2);
 };
-//Выравнивание даты по интервалу в прошлое
-//Работает исходя из предположения, что не бывает интервала, состоящего из 1 месяца и 3х дней, например - значащий показатель в интервале только один
+
+/**
+ * Align to past. Can't work with intervals like "1 month and 3 days"
+ * @param dateToAlign
+ * @returns {Date}
+ */
 Interval.prototype.alignToPast = function(dateToAlign){
     var date = new Date(dateToAlign);
 
@@ -111,14 +118,16 @@ Interval.prototype.checkDate = function(date){
 
     return this.alignToPast(date).getTime() === date.getTime();
 };
-//Выравнивание даты по интервалу в будущее
-//Работает просто: добавляет интервал и выравнивает в прошлое
+
 Interval.prototype.alignToFuture = function(date){
     return this.alignToPast(this.addToDate(date));
 };
 
 
-//Модель для линейки - дерево с возможностью детализации вглубь
+/**
+ * Special model for ruler levels. Stores all possible detailization level for the ruler
+ * @type {{levels: *[], getLevelIndex: getLevelIndex}}
+ */
 var RulerModel = {
 
     /**
@@ -161,12 +170,6 @@ var RulerModel = {
 
 
 
-
-
-
-
-
-
 //Provider for records from mediaserver
 function CameraRecordsProvider(cameras,mediaserver,$q,width) {
 
@@ -174,18 +177,18 @@ function CameraRecordsProvider(cameras,mediaserver,$q,width) {
     this.mediaserver = mediaserver;
     this.$q = $q;
     this.chunksTree = null;
+    this.requestedCache = [];
     this.width = width;
     var self = this;
     //1. request first detailization to get initial bounds
 
-    this.requestInterval(0, self.now(), 0).then(function () {
+    this.requestInterval(0, self.now() + 10000, 0).then(function () {
         if(!self.chunksTree){
             return; //No chunks for this camera
         }
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
         var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,self.width);
-        console.log("record boundaries", self.chunksTree.title);
-        self.requestInterval(self.chunksTree.start, self.now(), nextLevel);
+        self.requestInterval(self.chunksTree.start, self.now(), nextLevel + 1);
     });
 
     //2. getCameraHistory
@@ -195,16 +198,46 @@ CameraRecordsProvider.prototype.now = function(){
     return (new Date()).getTime();
 };
 
-/**
- * Update active splice
- */
-CameraRecordsProvider.prototype.updateSplice = function(){
-    var ret = [];
-    this.splice(ret,this.start, this.end, this.level);
-    //console.log("send message to timeline for updating, or timeline should just get updated splice himself every redrawing")
+CameraRecordsProvider.prototype.cacheRequestedInterval = function (start,end,level){
+    for(var i=0;i<level+1;i++){
+        if(i>=this.requestedCache.length){
+            this.requestedCache.push([{start:start,end:end}]); //Add new cache level
+            continue;
+        }
+
+        //Find good position to cache new requested interval
+        for(var j=0;j<this.requestedCache[i].length;j++){
+            if(this.requestedCache[i][j].end < start){
+                continue;
+            }
+
+            if(this.requestedCache[i][j].start > end){ // no intersection - just add
+                this.requestedCache[i].splice(j,0,{start:start,end:end});
+                return;
+            }
+
+            this.requestedCache[i][j].start = Math.min(start,this.requestedCache[i][j].start);
+            this.requestedCache[i][j].end = Math.max(end,this.requestedCache[i][j].end);
+            return;
+        }
+    }
+};
+CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,end,level) {
+    var levelCache = this.requestedCache[level];
+    for(var i=0;i < levelCache.length;i++) {
+        if(start < levelCache[i].start){
+            return false;
+        }
+
+        start = Math.max(start,levelCache[i].end);
+
+        if(end < levelCache[i].end){
+            return true;
+        }
+    }
+    return end <= start;
 };
 
-var requestCounter = 0;
 CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     var deferred = this.$q.defer();
     this.start = start;
@@ -217,34 +250,27 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     // And do we need to request it?
 
     if(!self.lockRequests) {
-        self.lockRequests = !this.chunksTree; // We may lock requests here
+        self.lockRequests = true; // We may lock requests here if we have no tree yet
         this.mediaserver.getRecords('/', this.cameras[0], start, end, detailization)
             .then(function (data) {
+                self.cacheRequestedInterval(start,end,level);
+                self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
 
                 if(data.data.length == 0){
                     console.log("no chunks for this camera");
-
-                    //Todo: find next chunk with a request.
                 }
+
                 for (var i = 0; i < data.data.length; i++) {
                     var endChunk = data.data[i][0] + data.data[i][1];
                     if (data.data[i][1] < 0) {
                         endChunk = (new Date()).getTime() + 100000;// some date in future
                     }
                     var addchunk = new Chunk(null, data.data[i][0], endChunk, level);
-
-                    // console.log("read chunk",addchunk);
                     self.addChunk(addchunk);
-                    self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
-
                 }
-
-                //2. Splice cache for existing interval, store it as local cache
-                self.updateSplice();
 
                 deferred.resolve(self.chunksTree);
             }, function (error) {
-
                 deferred.reject(error);
             });
     }else{
@@ -262,7 +288,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
  * @param level
  * @return Promise
  */
-CameraRecordsProvider.prototype.setInterval = function (start,end,level){
+CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level){
 
     if(start instanceof Date)
     {
@@ -274,20 +300,15 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
     }
 
     // Splice existing intervals and check, if we need an update from server
-    //console.log("--------------------------------------------------");
-    //console.log("setInterval",new Date(start),new Date(end),level);
     var result = [];
-    var noNeedUpdate = this.splice(result,start,end,level);
-    if(!noNeedUpdate){ // Request update if we have a tree
-        if(this.chunksTree) {
-            //this.debug();
-            this.requestInterval(start, end, level);
-        }
+    this.splice(result,start,end,level);
+    var noNeedUpdate = this.checkRequestedIntervalCache(start,end,level);
+    if(!noNeedUpdate){ // Request update
+        this.requestInterval(start, end, level);
     }
-    // Return splice
+    // Return splice - as is
     return result;
 };
-
 
 CameraRecordsProvider.prototype.debug = function(currentNode,level){
     if(!currentNode){
@@ -316,8 +337,6 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
 
     parent = parent || this.chunksTree;
     // Go through tree, find good place for chunk
-    parent.updating = false;
-
     if(parent.children.length === 0 ){ // no children yet
         if(parent.level === chunk.level - 1){ //
             parent.children.push(chunk);
@@ -325,51 +344,67 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
         }
         parent.children.push(new Chunk(parent,chunk.start,chunk.end,parent.level+1));
         this.addChunk(chunk,parent.children[0]);
-    } else {
+        return;
+    }
+
+    if(parent.level === chunk.level - 1){ //We are on good level here - find position and add
         for (var i = 0; i < parent.children.length; i++) {
-            var currentChunk = parent.children[i];
-            if (currentChunk.end < chunk.start) {
-                continue;
+            if(parent.children[i].start == chunk.start && parent.children[i].end == chunk.end){//dublicate
+                return;
             }
-            if(currentChunk.level == chunk.level && currentChunk.end == chunk.end && currentChunk.start == chunk.start){
-                return; //Skip the dublicate
-            }
-
-            if (currentChunk.level == chunk.level) {
-                //we are on right position - place chunk before current
-                parent.children.splice(i, 0, chunk);
-            } else {
-                //Here we should go deeper
-
-                if(currentChunk.start <= chunk.start){ // We may have a miss here
-                    this.addChunk(chunk, currentChunk);
-                }else{
-                    //Maybe we don't want to create chunk here. Maybe we want to increase previous chunk
-
-                    if(i>0 && chunk.start - parent.children[i-1].end < RulerModel.levels[chunk.level].detailization){
-                        parent.children[i-1].end = chunk.end; // Increase previous chunk
-                        i--;
-                    }else {
-                        // Otherwise - create new chunk on this level.
-                        parent.children.splice(i, 0, new Chunk(parent, chunk.start, chunk.end, parent.level + 1));
-                    }
-
-                    this.addChunk(chunk, parent.children[i]);
+            if(parent.children[i].start >= chunk.start){
+                if(parent.children[i].start < chunk.end ){
+                    //Join two chunks
+                    console.error("impossible situation - intersection in chunks",chunk,parent.children[i],i,parent);
                 }
-
+                break;
             }
+        }
+        parent.children.splice(i, 0, chunk);//Just add chunk here and return
+        return;
+    }
+
+    for (var i = 0; i < parent.children.length; i++) {
+        var currentChunk = parent.children[i];
+        if (currentChunk.end < chunk.start) { //no intersection - no way we need this chunk now
+            continue;
+        }
+
+        if(currentChunk.start <= chunk.start && currentChunk.end >= chunk.end){ // Really good new parent
+            this.addChunk(chunk, currentChunk);
             return;
         }
 
-        if(parent.level === chunk.level - 1){ //
-            parent.children.splice(i, 0, chunk);
-        }else {
-            parent.children.push(new Chunk(parent, chunk.start, chunk.end, parent.level + 1));
-            this.addChunk(chunk, parent.children[i]);
+        //Here we have either intersection or missing parent at all
+        if(currentChunk.start - chunk.end < RulerModel.levels[currentChunk.level].detailization){ //intersection (negative value) or close enough chunk
+            currentChunk.start = chunk.start;//increase left boundaries
+            this.addChunk(chunk, currentChunk);
+            return;
         }
 
+        if(i>0){//We can try encreasing prev. chunk
+            if(chunk.start - parent.children[i-1].end < RulerModel.levels[chunk.level].detailization){
+                parent.children[i-1].end = chunk.end; // Increase previous chunk
+                this.addChunk(chunk, parent.children[i-1]);
+                return;
+            }
+        }
 
+        parent.children.splice(i, 0, new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new children and go deeper
+        this.addChunk(chunk, parent.children[i]);
+        return;
     }
+
+    //Try to encrease last chunk from parent
+    if(chunk.start - parent.children[i-1].end < RulerModel.levels[chunk.level].detailization){
+        parent.children[i-1].end = chunk.end; // Increase previous chunk
+        this.addChunk(chunk, parent.children[i-1]);
+        return;
+    }
+
+    //Add new last chunk and go deeper
+    parent.children.push(new Chunk(parent, chunk.start, chunk.end, parent.level + 1)); //Create new chunk
+    this.addChunk(chunk, parent.children[i]);
 
 };
 
@@ -390,10 +425,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
  * @param result - heap for recursive call
  */
 CameraRecordsProvider.prototype.splice = function(result, start, end, level, parent){
-
     parent = parent || this.chunksTree;
-
-    var noNeedForUpdate = true;
 
     if(!parent){
         return false;
@@ -402,66 +434,30 @@ CameraRecordsProvider.prototype.splice = function(result, start, end, level, par
     if (parent.children.length > 0) {
         for (var i = 0; i < parent.children.length; i++) {
             var currentChunk = parent.children[i];
-            if (currentChunk.end <= start || currentChunk.start >= end || currentChunk.level === level) {
-                currentChunk.expand = false;
+            if(currentChunk.end < start){ //skip this branch
+                continue;
+            }
+            if(currentChunk.start > end){ //do not go further
+                break;
+            }
+
+            if (currentChunk.level === level) { //Exactly required level
                 result.push(currentChunk);
-            } else {
-                currentChunk.expand = true;
-                noNeedForUpdate = noNeedForUpdate && this.splice(result, start, end, level, currentChunk);
+                //currentChunk.expand = false;
+            } else { //Need to go deeper
+                this.splice(result, start, end, level, currentChunk);
+                //currentChunk.expand = true;
             }
         }
     } else {
-        // Try to go deeper
         result.push(parent);
-        if(!parent.updating ) { //prevent updating again
-            parent.updating = true;
-            noNeedForUpdate = false; //We need to update
-        }
     }
-
-    return noNeedForUpdate;
 };
 
-CameraRecordsProvider.prototype.findNearestPosition = function (position,parent) {
-    parent = parent || this.chunksTree;
-    if (!parent) {
-        return null;
-    }
-
-    if (parent.children.length > 0) {
-        for (var i = 0; i < parent.children.length; i++) {
-            var currentChunk = parent.children[i];
-            if(currentChunk.start >= position ){
-                console.log("start 1" , currentChunk);
-                return currentChunk.start;
-            }
-
-            if(currentChunk.end > position ){
-                //We may be in the actual chunk
-                //We may have to go deeper
-                return this.findNearestPosition(position,currentChunk);
-            }
-        }
-    }
-
-    if(parent.start >= position ){
-        console.log("start 2" , parent);
-        return parent.start;
-    }
-
-    if(parent.end < position){ //After the last chunk
-        return null; //Go to live!
-    }
-
-    //Here we may want to request better detailization
-    //console.warn("request deeper detailization", parent);
-
-    return position; // Position is inside the chunk
-};
 
 
 /**
- * ShortCache - special collection for short cunks with best detailization for calculating position
+ * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
  * @param start
  * @constructor
  */

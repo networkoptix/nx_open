@@ -356,8 +356,6 @@ angular.module('webadminApp')
                     //4. Set interval for events
                     //TODO: Set interval for events
 
-
-
                     var context = canvas.getContext('2d');
 
                     /*if( scope.positionProvider) { // Draw cached video. Disabled, because seeking doesn't work
@@ -372,7 +370,7 @@ angular.module('webadminApp')
 
                     if(scope.records && scope.records.chunksTree) {
                         // 1. Splice events
-                        var events = scope.records.setInterval(start, end, scope.chunksLevel);
+                        var events = scope.records.getIntervalRecords(start, end, scope.chunksLevel);
 
                         // 2. Draw em!
                         for(var i=0;i<events.length;i++){
