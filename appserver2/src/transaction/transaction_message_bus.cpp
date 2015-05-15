@@ -391,12 +391,15 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     if (!aliveData.isAlive && !gotFromPeer.isNull()) 
     {
         bool isPeerActuallyAlive = aliveData.peer.id == qnCommon->moduleGUID();
+        QnTransactionTransportHeader ttHeader;
         auto itr = m_connections.find(aliveData.peer.id);
         if (itr != m_connections.end()) 
         {
             QnTransactionTransport* transport = itr.value();
-            if (transport->getState() == QnTransactionTransport::ReadyForStreaming)
+            if (transport->getState() == QnTransactionTransport::ReadyForStreaming) {
                 isPeerActuallyAlive = true;
+                ttHeader.distance = 1;
+            }
         }
         if (isPeerActuallyAlive) {
             // ignore incoming offline peer info because we can see that peer online
@@ -404,7 +407,9 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
             tran.params = aliveData;
             tran.params.isAlive = true;
             Q_ASSERT(!aliveData.peer.instanceId.isNull());
-            sendTransaction(tran); // resend broadcast alive info for that peer
+            ttHeader.processedPeers = connectedServerPeers(tran.command) << m_localPeer.id;
+            ttHeader.fillSequence();
+            sendTransactionInternal(tran, ttHeader); // resend broadcast alive info for that peer
             return false; // ignore peer offline transaction
         }
     }
