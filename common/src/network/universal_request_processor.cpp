@@ -149,6 +149,8 @@ void QnUniversalRequestProcessor::run()
                 isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close";
             else if( d->request.requestLine.version == nx_http::http_1_0 )
                 isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
+            else    //e.g., RTSP
+                isKeepAlive = false;
 
             if (isKeepAlive) {
                 d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
