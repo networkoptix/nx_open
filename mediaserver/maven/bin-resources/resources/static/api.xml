@@ -729,7 +729,7 @@
             <urlPrefix>/api</urlPrefix>
             <groupDescription>This group contains functions related to a single server</groupDescription>
             <functions>
-                <function>
+                <function proprietary="true">
                     <name>execAction</name>
                     <description>Execute business action. Action data should be in a internal
                         binary format. This method is going to be refactored at next
@@ -825,7 +825,7 @@
                 <function>
                     <name>setCameraParam</name>
                     <description>Sets values of several camera parameters. This parameters are used
-                        on a advanced Tab in camera settings. For instance: brightness, contrast
+                        on the Advanced tab in camera settings. For instance: brightness, contrast
                         e.t.c.</description>
                     <method>POST</method>
                     <params>
@@ -1213,7 +1213,7 @@
                 </function>
                 <function>
                     <name>rebuildArchive</name>
-                    <description>Start or stop erver archive rebuilding.</description>
+                    <description>Start or stop server archive rebuilding.</description>
                     <method>POST</method>
                     <params>
                         <param>
@@ -1367,7 +1367,7 @@
                         <caption>JSON data.</caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>installUpdate</name>
                     <description>Updates server by the package contained in POST body</description>
                     <method>POST</method>
@@ -1382,7 +1382,14 @@
                         INSTALLATION_ERROR if the server couldn't execute installation script.</caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
+                    <name>installUpdate</name>
+                    <description>Install update from zip package which should be in the request body.</description>
+                    <method>POST</method>
+                    <params/>
+                    <result/>
+                </function>
+                <function proprietary="true">
                     <name>onEvent</name>
                     <description>Process business event from external system. Reserved for future
                         use.</description>
@@ -1413,13 +1420,7 @@
                     <params/>
                     <result/>
                 </function>
-                <function>
-                    <name>installUpdate</name>
-                    <description>Install update from zip package which should be in the request body.</description>
-                    <method>POST</method>
-                    <params/>
-                    <result/>
-                </function>
+
                 <function>
                     <name>moduleInformation</name>
                     <description>Get information about the server.</description>
