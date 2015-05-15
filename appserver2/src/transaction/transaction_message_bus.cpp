@@ -1067,7 +1067,6 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
 
     if (sendTran)
     {
-        Q_ASSERT(!isAlive || peer.id == qnCommon->moduleGUID()); // each peer can send isAlive=true for himself only
         QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
         tran.params = aliveData;
         Q_ASSERT(!tran.params.peer.instanceId.isNull());
