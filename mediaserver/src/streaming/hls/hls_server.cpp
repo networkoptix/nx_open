@@ -221,7 +221,7 @@ namespace nx_hls
         response.headers.insert( std::make_pair(
             "Date",
             QLocale(QLocale::English).toString(QDateTime::currentDateTime(), lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1() ) );
-        response.headers.insert( std::make_pair( "Server", (qApp->applicationName() + lit(" ") + QCoreApplication::applicationVersion()).toLatin1().data()) );
+        response.headers.emplace( "Server", nx_http::serverString() );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
 
         if( request.requestLine.version == nx_http::http_1_1 )
@@ -230,7 +230,7 @@ namespace nx_hls
                 response.headers.insert( std::make_pair( 
                     "Transfer-Encoding",
                     response.headers.find("Content-Length") != response.headers.end() ? "identity" : "chunked") );
-            response.headers.insert( std::make_pair( "Connection", "close" ) ); //no persistent connections support
+            response.headers.emplace( "Connection", "close" ); //no persistent connections support
         }
 
         sendResponse( response );
