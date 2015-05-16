@@ -27,7 +27,7 @@ void QnMediaCycleBuffer::update(size_type pos, const value_type* data, size_type
     Q_ASSERT(pos + size <= m_maxSize);
     size_type updPos = (m_offset + pos) % m_maxSize;
     int copySize = qMin(m_maxSize - updPos, size);
-    memcpy(m_buffer + updPos, data, size);
+    memcpy(m_buffer + updPos, data, copySize);
     if (size > copySize)
         memcpy(m_buffer, data + copySize, size - copySize);
     if (pos + size > m_size)
