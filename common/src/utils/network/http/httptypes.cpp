@@ -965,18 +965,11 @@ namespace nx_http
             const std::vector<ConstBufferRefType>& paramsList = splitQuotedString( authenticateParamsStr, ',' );
             for( const ConstBufferRefType& token: paramsList )
             {
-                auto nameAndValue = splitQuotedString( token.trimmed(), '=' );
+                const auto& nameAndValue = splitQuotedString( token.trimmed(), '=' );
                 if( nameAndValue.empty() )
                     continue;
-                BufferType value = nameAndValue.size() > 1 ? nameAndValue[1] : BufferType();
-                if( value.size() >= 2 )
-                {
-                    if( value[0] == '\"' )
-                        value.remove( 0, 1 );
-                    if( value[value.size()-1] == '\"' )
-                        value.remove( value.size()-1, 1 );
-                }
-                params.insert( nameAndValue[0].trimmed(), value );
+                ConstBufferRefType value = nameAndValue.size() > 1 ? nameAndValue[1] : ConstBufferRefType();
+                params.insert( nameAndValue[0].trimmed(), value.trimmed("\"") );
             }
 
             return true;
