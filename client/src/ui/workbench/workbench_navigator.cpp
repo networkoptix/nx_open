@@ -105,8 +105,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
+    m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0)
-    , m_cameraDataManager(NULL)
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
