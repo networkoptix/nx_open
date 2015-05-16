@@ -19,8 +19,8 @@ public:
     QnMediaCycleBuffer(size_type bufferSize, int align);
     ~QnMediaCycleBuffer();
 
-    //!Update data in middle of the buffer. Extend buffer size if required
-    void update(size_type pos, const value_type* data, size_type size);
+    //!Insert data to the middle of buffer. Extend buffer size if required
+    void insert(size_type pos, const value_type* data, size_type size);
 
     //!Add data to the end of the buffer
     void push_back(const value_type* data, size_type size);

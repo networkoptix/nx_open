@@ -346,7 +346,7 @@ qint64 QBufferedFile::writeData ( const char * data, qint64 len )
         }
 
         int toWrite = qMin((int) len, m_cycleBuffer.maxSize() - m_bufferPos);
-        m_cycleBuffer.update(m_bufferPos, data, toWrite);
+        m_cycleBuffer.insert(m_bufferPos, data, toWrite);
         m_bufferPos += toWrite;
         m_actualFileSize = qMax(m_actualFileSize, m_filePos + m_cycleBuffer.size());
         if (m_cycleBuffer.size() == m_cycleBuffer.maxSize()) 

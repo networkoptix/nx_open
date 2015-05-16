@@ -19,10 +19,10 @@ QnMediaCycleBuffer::~QnMediaCycleBuffer()
 
 void QnMediaCycleBuffer::push_back(const value_type* data, size_type size)
 {
-    update(m_size, data, size);
+    insert(m_size, data, size);
 }
 
-void QnMediaCycleBuffer::update(size_type pos, const value_type* data, size_type size)
+void QnMediaCycleBuffer::insert(size_type pos, const value_type* data, size_type size)
 {
     Q_ASSERT(pos + size <= m_maxSize);
     size_type updPos = (m_offset + pos) % m_maxSize;
