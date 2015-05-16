@@ -8,6 +8,7 @@
 #include "utils/common/threadqueue.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/byte_array.h"
+#include "utils/memory/cycle_buffer.h"
 
 class QBufferedFile;
 
@@ -99,17 +100,15 @@ private:
     bool prepareBuffer(int bufOffset);
     bool updatePos();
     void mergeBufferWithExistingData();
+    int writeBuffer(int toWrite);
 private:
     QnFile m_fileEngine;
-    const int m_bufferSize;
     int m_minBufferSize;
-    quint8* m_buffer;
-    quint8* m_sectorBuffer;
+    QnMediaCycleBuffer m_cycleBuffer;
     QueueFileWriter* m_queueWriter;
     unsigned int m_systemDependentFlags;
 private:
     bool m_isDirectIO;
-    int m_bufferLen;
     int m_bufferPos;
     qint64 m_actualFileSize;
     qint64 m_filePos;
@@ -117,6 +116,7 @@ private:
 
     friend class QueueFileWriter;
     QnByteArray m_cachedBuffer; // cached file begin
+    QnByteArray m_tmpBuffer;
     qint64 m_lastSeekPos;
 };
 
