@@ -413,7 +413,6 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     setState(ConnectingStage1);
 
     m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-    m_httpClient->setUserAgent( QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
     connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
         this, &QnTransactionTransport::at_responseReceived,
@@ -837,7 +836,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             request.requestLine.method = nx_http::Method::POST;
             request.requestLine.url = lit("/ec2/forward_events");
             request.requestLine.version = nx_http::http_1_1;
-            //request.headers.emplace( "User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
+            //request.headers.emplace( "User-Agent", nx_http::userAgentString() );
             request.headers.emplace(
                 "Content-Type",
                 m_base64EncodeOutgoingTransactions
@@ -885,7 +884,6 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         {
             m_outgoingTranClient = std::make_shared<nx_http::AsyncHttpClient>();
             m_outgoingTranClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * 3 );
-            m_outgoingTranClient->setUserAgent( QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             m_outgoingTranClient->addAdditionalHeader(
                 nx_ec::EC2_CONNECTION_GUID_HEADER_NAME,
                 m_connectionGuid.toByteArray() );

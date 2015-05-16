@@ -596,6 +596,11 @@ namespace nx_http
         */
         int serialize( BufferType* const dstBuffer ) const;
     };
+
+    //!Returns common value for User-Agent header
+    StringType userAgentString();
+    //!Returns common value for Server header
+    StringType serverString();
 }
 
 #endif  //HTTPTYPES_H

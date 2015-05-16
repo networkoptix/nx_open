@@ -9,6 +9,8 @@
 #include <cstring>
 #include <memory>
 
+#include "version.h"
+
 #ifdef _WIN32
 static int strcasecmp(const char * str1, const char * str2) { return strcmpi(str1, str2); }
 static int strncasecmp(const char * str1, const char * str2, size_t n) { return strnicmp(str1, str2, n); }
@@ -1429,4 +1431,41 @@ namespace nx_http
         return 0;
     }
     */
+
+
+#if defined(_WIN32)
+#   define COMMON_SERVER "Apache/2.4.10 (MSWin)"
+#   if defined(_WIN64)
+#       define COMMON_USER_AGENT "Mozilla/5.0 (Windows NT 6.1; WOW64)"
+#   else
+#       define COMMON_USER_AGENT "Mozilla/5.0 (Windows NT 6.1; Win32)"
+#   endif
+#elif defined(__linux__)
+#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   ifdef __LP64__
+#       define COMMON_USER_AGENT "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)"
+#   else
+#       define COMMON_USER_AGENT "Mozilla/5.0 (X11; Ubuntu; Linux x86; rv:36.0)"
+#   endif
+#elif defined(__APPLE__)
+#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_USER_AGENT "Mozilla/5.0 (Macosx x86_64)"
+#else   //some other unix (e.g., FreeBSD)
+#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_USER_AGENT "Mozilla/5.0"
+#endif
+
+    static const StringType defaultUserAgentString = QN_PRODUCT_NAME "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_USER_AGENT;
+
+    StringType userAgentString()
+    {
+        return defaultUserAgentString;
+    }
+
+    static const StringType defaultServerString = QN_PRODUCT_NAME "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_SERVER;
+
+    StringType serverString()
+    {
+        return defaultServerString;
+    }
 }

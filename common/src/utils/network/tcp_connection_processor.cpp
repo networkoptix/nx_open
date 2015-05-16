@@ -199,9 +199,15 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     d->response.statusLine.statusCode = httpStatusCode;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
 
+    if( isConnectionCanBePersistent() )
+    {
+        d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
+        d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1, max=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
+    }
+
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION) );
+        nx_http::HttpHeader("Server", nx_http::serverString() ) );
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
         nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
@@ -383,8 +389,20 @@ void QnTCPConnectionProcessor::releaseSocket()
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
 {
     Q_D(QnTCPConnectionProcessor);
-    contentType = "text/html";
+    contentType = "text/html; charset=iso-8859-1";
     d->responseBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
     d->response.headers.insert(nx_http::HttpHeader("Location", page));
     return CODE_MOVED_PERMANENTLY;
+}
+
+bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+
+    if( d->request.requestLine.version == nx_http::http_1_1 )
+        return nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close";
+    else if( d->request.requestLine.version == nx_http::http_1_0 )
+        return nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
+    else    //e.g., RTSP
+        return false;
 }

@@ -15,6 +15,7 @@
 #include "utils/network/socket_factory.h"
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
+#include "version.h"
 
 
 //TODO: #ak persistent connection support
@@ -663,20 +664,21 @@ namespace nx_http
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
             HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
-        if( !m_userAgent.isEmpty() )
-            m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
+        m_request.headers.emplace(
+            "User-Agent",
+            m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1() );
         if( useHttp11 )
         {
             if( httpMethod == nx_http::Method::GET || httpMethod == nx_http::Method::HEAD )
             {
-                m_request.headers.insert( std::make_pair("Accept", "*/*") );
+                //m_request.headers.insert( std::make_pair("Accept", "*/*") );
                 if( m_contentEncodingUsed )
-                    m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip;q=1.0, identity;q=0.5, *;q=0") );
-                else
-                    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
+                    m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip") );
+                //else
+                //    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
             }
             //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
-            //m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
+            m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }
 
