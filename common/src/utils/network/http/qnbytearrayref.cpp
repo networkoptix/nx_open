@@ -113,12 +113,12 @@ QList<QnByteArrayConstRef> QnByteArrayConstRef::split( char sep ) const
     return tokenList;
 }
 
-QnByteArrayConstRef QnByteArrayConstRef::trimmed() const
+QnByteArrayConstRef QnByteArrayConstRef::trimmed( const value_type* charsToTrim ) const
 {
     QnByteArrayConstRef result( *this );
     while( result.m_count > 0 )
     {
-        if( result.front() == ' ' || result.front() == '\t' )
+        if( strchr( charsToTrim, result.front() ) != NULL )
         {
             ++result.m_offset;
             --result.m_count;
@@ -131,7 +131,7 @@ QnByteArrayConstRef QnByteArrayConstRef::trimmed() const
 
     while( result.m_count > 0 )
     {
-        if( result.back() == ' ' || result.back() == '\t' )
+        if( strchr( charsToTrim, result.back() ) != NULL )
             --result.m_count;
         else
             break;

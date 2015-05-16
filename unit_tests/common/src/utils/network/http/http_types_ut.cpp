@@ -386,6 +386,14 @@ TEST( HttpHeaderTest, AcceptEncoding_parse )
         ASSERT_FALSE( acceptEncoding.encodingIsAllowed("identity") );
         ASSERT_FALSE( acceptEncoding.encodingIsAllowed("qweasd123") );
     }
+
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncoding( "gzip;q=1.0, identity;q=0.5, *;q=0" );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("gzip") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("deflate") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("identity") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("qweasd123") );
+    }
 }
 
 
