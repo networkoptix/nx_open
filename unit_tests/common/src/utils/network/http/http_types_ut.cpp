@@ -386,6 +386,14 @@ TEST( HttpHeaderTest, AcceptEncoding_parse )
         ASSERT_FALSE( acceptEncoding.encodingIsAllowed("identity") );
         ASSERT_FALSE( acceptEncoding.encodingIsAllowed("qweasd123") );
     }
+
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncoding( "gzip;q=1.0, identity;q=0.5, *;q=0" );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("gzip") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("deflate") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("identity") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("qweasd123") );
+    }
 }
 
 
@@ -413,4 +421,46 @@ TEST( HttpHeaderTest, Request_parse )
     nx_http::Request request;
     ASSERT_TRUE( request.parse( HTTP_REQUEST ) );
     ASSERT_EQ( nx_http::getHeaderValue( request.headers, "x-media-step" ).toLongLong(), 9693025000LL );
+}
+
+
+//////////////////////////////////////////////
+//   Via header tests
+//////////////////////////////////////////////
+
+TEST( HttpHeaderTest, WWWAuthenticate_parse )
+{
+    {
+        static const char testData[] = "Digest realm=\"AXIS_ACCC8E338EDF\", nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", algorithm=MD5, qop=\"auth\"";
+
+        nx_http::header::WWWAuthenticate auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData(testData, sizeof(testData)-1) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::digest );
+        ASSERT_EQ( auth.params.size(), 4 );
+        ASSERT_EQ( auth.params["realm"], "AXIS_ACCC8E338EDF" );
+        ASSERT_EQ( auth.params["algorithm"], "MD5" );
+        ASSERT_EQ( auth.params["qop"], "auth" );
+        ASSERT_EQ( auth.params["nonce"], "p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad" );
+    }
+
+    {
+        static const char testData[] = "Digest realm=AXIS_ACCC8E338EDF, nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", algorithm=MD5, qop=auth";
+
+        nx_http::header::WWWAuthenticate auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData(testData, sizeof(testData)-1) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::digest );
+        ASSERT_EQ( auth.params.size(), 4 );
+        ASSERT_EQ( auth.params["realm"], "AXIS_ACCC8E338EDF" );
+        ASSERT_EQ( auth.params["algorithm"], "MD5" );
+        ASSERT_EQ( auth.params["qop"], "auth" );
+        ASSERT_EQ( auth.params["nonce"], "p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad" );
+    }
+
+    //TODO #ak uncomment and fix!
+    //{
+    //    static const char testData[] = "Digest realm=AXIS_ACCC8E338EDF, nonce=p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad, algorithm=MD5, qop=auth";
+
+    //    nx_http::header::WWWAuthenticate auth;
+    //    ASSERT_FALSE( auth.parse( QByteArray::fromRawData(testData, sizeof(testData)-1) ) );
+    //}
 }

@@ -925,6 +925,32 @@ namespace nx_http
         {
         }
 
+        static std::vector<QnByteArrayConstRef> splitQuotedString( const QnByteArrayConstRef& src, char sep )
+        {
+            std::vector<QnByteArrayConstRef> result;
+            QnByteArrayConstRef::size_type curTokenStart = 0;
+            bool quoted = false;
+            for( QnByteArrayConstRef::size_type
+                pos = 0;
+                pos < src.size();
+                ++pos )
+            {
+                const char ch = src[pos];
+                if( !quoted && (ch == sep) )
+                {
+                    result.push_back( src.mid(curTokenStart, pos-curTokenStart) );
+                    curTokenStart = pos+1;
+                }
+                else if( ch == '"' )
+                {
+                    quoted = !quoted;
+                }
+            }
+            result.push_back( src.mid(curTokenStart) );
+
+            return result;
+        }
+
         bool WWWAuthenticate::parse( const BufferType& str )
         {
             int authSchemeEndPos = str.indexOf( " " );
@@ -933,14 +959,11 @@ namespace nx_http
 
             authScheme = AuthScheme::fromString( ConstBufferRefType(str, 0, authSchemeEndPos) );
 
-            const BufferType& authenticateParamsStr = ConstBufferRefType(str, authSchemeEndPos+1).toByteArrayWithRawData();
-            const QList<BufferType>& paramsList = authenticateParamsStr.split(',');
-            for( QList<BufferType>::const_iterator
-                it = paramsList.begin();
-                it != paramsList.end();
-                ++it )
+            const ConstBufferRefType authenticateParamsStr( str, authSchemeEndPos+1 );
+            const std::vector<ConstBufferRefType>& paramsList = splitQuotedString( authenticateParamsStr, ',' );
+            for( const ConstBufferRefType& token: paramsList )
             {
-                QList<BufferType> nameAndValue = it->trimmed().split('=');
+                auto nameAndValue = splitQuotedString( token.trimmed(), '=' );
                 if( nameAndValue.empty() )
                     continue;
                 BufferType value = nameAndValue.size() > 1 ? nameAndValue[1] : BufferType();
