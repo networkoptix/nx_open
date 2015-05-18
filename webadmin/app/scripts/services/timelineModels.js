@@ -173,9 +173,6 @@ var RulerModel = {
 
 
 
-
-
-
 //Provider for records from mediaserver
 function CameraRecordsProvider(cameras,mediaserver,$q,width) {
 
@@ -206,7 +203,7 @@ CameraRecordsProvider.prototype.now = function(){
 
 CameraRecordsProvider.prototype.cacheRequestedInterval = function (start,end,level){
     for(var i=0;i<level+1;i++){
-        if(i>=this.requestedCache.length){
+        if(i >= this.requestedCache.length){
             this.requestedCache.push([{start:start,end:end}]); //Add new cache level
             continue;
         }
@@ -219,12 +216,12 @@ CameraRecordsProvider.prototype.cacheRequestedInterval = function (start,end,lev
 
             if(this.requestedCache[i][j].start > end){ // no intersection - just add
                 this.requestedCache[i].splice(j,0,{start:start,end:end});
-                return;
+                break;
             }
 
             this.requestedCache[i][j].start = Math.min(start,this.requestedCache[i][j].start);
             this.requestedCache[i][j].end = Math.max(end,this.requestedCache[i][j].end);
-            return;
+            break;
         }
     }
 };
@@ -239,7 +236,7 @@ CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,en
             return false;
         }
 
-        start = Math.max(start,levelCache[i].end);
+        start = Math.max(start,levelCache[i].end);//Move start
 
         if(end < levelCache[i].end){
             return true;
@@ -253,7 +250,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     this.start = start;
     this.end = end;
     this.level = level;
-    var detailization = RulerModel.levels[level].interval.getSeconds()*1000;
+    var detailization = RulerModel.levels[level].interval.detailization();
 
     var self = this;
     //1. Request records for interval
@@ -264,6 +261,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
         this.mediaserver.getRecords('/', this.cameras[0], start, end, detailization)
             .then(function (data) {
                 self.cacheRequestedInterval(start,end,level);
+
                 self.lockRequests = false;//Unlock requests - we definitely have chunkstree here
 
                 if(data.data.length == 0){
@@ -374,11 +372,27 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
             if(parent.children[i].start == chunk.start && parent.children[i].end == chunk.end){//dublicate
                 return;
             }
+
+            if(parent.children[i].end >= chunk.start && parent.children[i].start <= chunk.start){ // Intersection here
+
+                if(parent.children[i].end >= chunk.end){// One contains another
+                    console.warn("skipped contained chunk 1",chunk,parent.children[i],i,parent);
+                    return; //Skip it
+                }
+                console.error("impossible situation 1 - intersection in chunks",chunk,parent.children[i],i,parent);
+                return;
+            }
+
             if(parent.children[i].start >= chunk.start){
                 if(parent.children[i].start < chunk.end ){
-                    //Join two chunks
-                    console.error("impossible situation - intersection in chunks",chunk,parent.children[i],i,parent);
-                    //this.debug();
+                    //Mb Join two chunks?
+
+                    if(parent.children[i].end < chunk.start ){// One contains another
+                        console.warn("skipped contained chunk 2",chunk,parent.children[i],i,parent);
+                        return; //Skip it
+                    }
+                    console.error("impossible situation 2 - intersection in chunks",chunk,parent.children[i],i,parent);
+                    return;
                 }
                 break;
             }
@@ -452,6 +466,7 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
 CameraRecordsProvider.prototype.selectRecords = function(result, start, end, level, parent){
     parent = parent || this.chunksTree;
 
+    var addedRecords = 0;
     if(!parent){
         return false;
     }
@@ -467,16 +482,21 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
             }
 
             if (currentChunk.level === level) { //Exactly required level
+                addedRecords++ ;
                 result.push(currentChunk);
                 //currentChunk.expand = false;
             } else { //Need to go deeper
-                this.selectRecords(result, start, end, level, currentChunk);
+
+                addedRecords += this.selectRecords(result, start, end, level, currentChunk);
                 //currentChunk.expand = true;
             }
         }
-    } else {
+    }
+    if(addedRecords === 0){
+        addedRecords ++;
         result.push(parent);
     }
+    return addedRecords;
 };
 
 
@@ -659,5 +679,4 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
     return this.playedPosition;
 };
-
 
