@@ -1364,7 +1364,7 @@
                 </function>
                 <function proprietary="true">
                     <name>installUpdate</name>
-                    <description>Updates server by the package contained in POST body</description>
+                    <description>Install update from zip package which should be in the POST body</description>
                     <method>POST</method>
                     <params/>
                     <result>
@@ -1376,18 +1376,10 @@
                         EXTRACTION_ERROR if some extraction problems were found (e.g. not enough space);
                         INSTALLATION_ERROR if the server couldn't execute installation script.</caption>
                     </result>
-                </function>
-                <function proprietary="true">
-                    <name>installUpdate</name>
-                    <description>Install update from zip package which should be in the request body.</description>
-                    <method>POST</method>
-                    <params/>
-                    <result/>
-                </function>
-                <function proprietary="true">
+                 </function>
+                 <function proprietary="true">
                     <name>onEvent</name>
-                    <description>Process business event from external system. Reserved for future
-                        use.</description>
+                    <description>Process business event from external system. Reserved for future use.</description>
                     <method>POST</method>
                     <params/>
                     <result/>
