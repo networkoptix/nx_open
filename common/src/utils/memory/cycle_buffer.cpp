@@ -44,18 +44,7 @@ void QnMediaCyclicBuffer::pop_front(size_type size)
         m_offset -= m_maxSize;
 }
 
-QnMediaCyclicBuffer::size_type QnMediaCyclicBuffer::seriesDataSize(size_type pos) const
-{
-    if (m_offset + pos < m_maxSize)
-        return qMin(m_size - pos, m_maxSize - (m_offset + pos));
-    else {
-        size_type reqPos = (m_offset + pos) % m_maxSize;
-        size_type lastPos = (m_offset + m_size) % m_maxSize;
-        return lastPos - reqPos;
-    }
-}
-
-const QnMediaCyclicBuffer::value_type* QnMediaCyclicBuffer::data(size_type pos, size_type size)
+const QnMediaCyclicBuffer::value_type* QnMediaCyclicBuffer::unfragmentedData(size_type pos, size_type size)
 {
     if (size == -1)
         size = m_size;
@@ -66,6 +55,23 @@ const QnMediaCyclicBuffer::value_type* QnMediaCyclicBuffer::data(size_type pos, 
         reqPos = pos;
     }
     return m_buffer + reqPos;
+}
+
+std::vector<QnMediaCyclicBuffer::Range> QnMediaCyclicBuffer::fragmentedData(size_type pos, size_type size) const
+{
+    if (size == -1)
+        size = m_size;
+    Q_ASSERT(pos + size <= m_size);
+
+    std::vector<QnMediaCyclicBuffer::Range> result;
+    if (m_size == 0 || size == 0)
+        return result;
+    size_type reqPos = (m_offset + pos) % m_maxSize;
+    size_type frontDataSize = qMin(size, m_maxSize - reqPos);
+    result.push_back(Range(m_buffer + reqPos, frontDataSize));
+    if (size > frontDataSize)
+        result.push_back(Range(m_buffer, size - frontDataSize));
+    return result;
 }
 
 void QnMediaCyclicBuffer::reallocateBuffer()

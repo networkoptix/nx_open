@@ -206,27 +206,16 @@ void QBufferedFile::mergeBufferWithExistingData()
 
 int QBufferedFile::writeBuffer(int toWrite)
 {
-    int writedTotal = 0;
-    int toWriteSeq = qMin(toWrite, m_cycleBuffer.seriesDataSize());
+    qint64 totalWrited = 0;
+    for (const auto& range: m_cycleBuffer.fragmentedData(0, toWrite))
     {
-        qint64 writed1 = m_queueWriter->write(this, m_cycleBuffer.data(0, toWriteSeq), toWriteSeq);
-        if (writed1 > 0) {
-            m_cycleBuffer.pop_front(writed1);
-            writedTotal += writed1;
-        }
-        if (writed1 != toWriteSeq)
-            return writed1; // IO error
+        qint64 writed = m_queueWriter->write(this, range.data, range.size);
+        if (writed != range.size)
+            return totalWrited; // IO error
+        totalWrited += writed;
+        m_cycleBuffer.pop_front(range.size);
     }
-    int toWriteRest = toWrite - toWriteSeq;
-    if (toWriteRest > 0)
-    {
-        qint64 writed2 = m_queueWriter->write(this, m_cycleBuffer.data(0, toWriteRest), toWriteRest);
-        if (writed2 > 0) {
-            m_cycleBuffer.pop_front(writed2);
-            writedTotal += writed2;
-        }
-    }
-    return writedTotal;
+    return totalWrited;
 }
 
 void QBufferedFile::flushBuffer()
@@ -284,7 +273,7 @@ void QBufferedFile::close()
 
         if (m_cycleBuffer.size() > 0) {
             m_fileEngine.seek(m_filePos);
-            m_fileEngine.write(m_cycleBuffer.data(), m_cycleBuffer.size());
+            m_fileEngine.write(m_cycleBuffer.unfragmentedData(), m_cycleBuffer.size());
         }
         
         if (m_isDirectIO)

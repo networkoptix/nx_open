@@ -10,7 +10,15 @@ class QnMediaCyclicBuffer
 public:
     typedef int size_type;
     typedef char value_type;
-    
+
+    struct Range
+    {
+        Range(const value_type* data, size_type size): data(data), size(size) {}
+        
+        const value_type* data;
+        size_type size;
+    };
+
     /*!
         Constructor
         \param bufferSize bufferSize
@@ -30,12 +38,14 @@ public:
 
     /*!
         Return pointer to data buffer. It may cause memory copy operation to defragment internal buffer.
-        This pointer is guarantee that requested buffer is accessible as a single serial data block
+        This pointer is guarantee that requested buffer is accessible as a single serial data block at least for size bytes
+        \param pos data offset.
+        \param size data size. -1 means all data.
     */
-    const value_type* data(size_type pos = 0, size_type size = -1);
+    const value_type* unfragmentedData(size_type pos = 0, size_type size = -1);
 
-    //!Return maximum data size, that can be captured via 'data' call without memory copying.
-    size_type seriesDataSize(size_type pos = 0) const;
+    //!Return buffer list covered requested range of the data
+    std::vector<Range> fragmentedData(size_type pos = 0, size_type size = -1) const;
 
     //!Return buffer size
     size_type size() const { return m_size; }

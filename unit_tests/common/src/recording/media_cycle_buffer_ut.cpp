@@ -15,18 +15,19 @@ bool isDataEq(const QByteArray& data, char ch)
     return true;
 }
 
-void checkTestPattern(QnMediaCycleBuffer& buffer)
+void checkTestPattern(QnMediaCyclicBuffer& buffer)
 {
     QByteArray testString("TEST_DATA");
     for (int i = 1; i < buffer.size() - testString.size() - 1; ++i)
     {
-        buffer.update(0, "B", 1);
-        buffer.update(buffer.size()-1, "E", 1);
-        buffer.update(i, testString.data(), testString.size());
-        QByteArray resultData = buffer.data(i, testString.size());
+        buffer.insert(0, "B", 1);
+        buffer.insert(buffer.size()-1, "E", 1);
+        buffer.insert(i, testString.data(), testString.size());
+        const char* dstData = buffer.unfragmentedData(i, testString.size());
+        QByteArray resultData = QByteArray::fromRawData(dstData, testString.size());
         ASSERT_EQ(testString, resultData);
-        ASSERT_EQ(buffer.data(0, 1), QByteArray("B", 1));
-        ASSERT_EQ(buffer.data(buffer.size()-1, 1), QByteArray("E", 1));
+        ASSERT_EQ(*buffer.unfragmentedData(0, 1), 'B');
+        ASSERT_EQ(*buffer.unfragmentedData(buffer.size()-1, 1), 'E');
     }
 }
 
@@ -35,7 +36,7 @@ TEST( QnMediaCycleBuffer, main )
     static const int DATA_BLOCK_SIZE = 32;
     static const int DATA_BLOCKS = 5;
 
-    QnMediaCycleBuffer buffer(DATA_BLOCK_SIZE * DATA_BLOCKS * 16, 64);
+    QnMediaCyclicBuffer buffer(DATA_BLOCK_SIZE * DATA_BLOCKS * 16, 64);
 
     char testData[DATA_BLOCKS][DATA_BLOCK_SIZE];
     for (int i = 0; i < 5; ++i)
@@ -56,7 +57,7 @@ TEST( QnMediaCycleBuffer, main )
     int chIdx = 1;
     while (buffer.size() > 0)
     {
-        QByteArray data = buffer.data(0, 16);
+        QByteArray data = QByteArray::fromRawData(buffer.unfragmentedData(0, 16), 16);
         ASSERT_EQ(data.size(), 16);
         ASSERT_TRUE(isDataEq(data, testData[chIdx][0]));
         processedBytes += 16;
