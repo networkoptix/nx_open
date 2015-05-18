@@ -14,7 +14,6 @@
 
 
 static const int AUTH_TIMEOUT = 60 * 1000;
-static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;
 static const int MAX_AUTH_RETRY_COUNT = 3;
 
@@ -99,7 +98,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             }
             sendResponse(
                 isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
-                d->responseBody.isEmpty() ? QByteArray() : "text/html",
+                d->responseBody.isEmpty() ? QByteArray() : "text/html; charset=iso-8859-1",
                 contentEncoding );
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT)
@@ -146,17 +145,8 @@ void QnUniversalRequestProcessor::run()
 
             d->response.headers.clear();
 
-            if( d->request.requestLine.version == nx_http::http_1_1 )
-                isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close";
-            else if( d->request.requestLine.version == nx_http::http_1_0 )
-                isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
-            else    //e.g., RTSP
-                isKeepAlive = false;
+            isKeepAlive = isConnectionCanBePersistent();
 
-            if (isKeepAlive) {
-                d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
-                d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
-            }
             if( !processRequest() )
             {
                 QByteArray contentType;

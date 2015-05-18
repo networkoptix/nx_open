@@ -91,6 +91,8 @@ void QnTransactionTransport::default_initializer()
     m_readSync = false;
     m_writeSync = false;
     m_syncDone = false;
+    m_syncInProgress = false;
+    m_needResync = false;
     m_state = NotDefined; 
     m_connected = false;
     m_prevGivenHandlerID = 0;
@@ -412,7 +414,6 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     setState(ConnectingStage1);
 
     m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-    m_httpClient->setUserAgent( QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
     connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
         this, &QnTransactionTransport::at_responseReceived,
@@ -873,7 +874,6 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         {
             m_outgoingTranClient = std::make_shared<nx_http::AsyncHttpClient>();
             m_outgoingTranClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
-            m_outgoingTranClient->setUserAgent( QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
             m_outgoingTranClient->addAdditionalHeader(
                 Qn::EC2_CONNECTION_GUID_HEADER_NAME,
                 m_connectionGuid.toByteArray() );
@@ -1432,7 +1432,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
     m_outgoingClientHeaders.clear();
     m_outgoingClientHeaders.emplace_back(
         "User-Agent",
-        QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION );
+        nx_http::userAgentString() );
     m_outgoingClientHeaders.emplace_back(
         "Content-Type",
         m_base64EncodeOutgoingTransactions

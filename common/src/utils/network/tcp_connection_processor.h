@@ -15,6 +15,9 @@ class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:
+    static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
+
+
     QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket);
     virtual ~QnTCPConnectionProcessor();
 
@@ -87,6 +90,8 @@ protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 
     QnTCPConnectionProcessorPrivate *d_ptr;
+
+    bool isConnectionCanBePersistent() const;
 };
 
 #endif // __TCP_CONNECTION_PROCESSOR_H__

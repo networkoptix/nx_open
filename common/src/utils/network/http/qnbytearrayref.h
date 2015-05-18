@@ -40,7 +40,11 @@ public:
     bool startsWith( const_pointer str, size_type len = npos ) const;
     uint toUInt() const;
     float toFloat() const;
+    const value_type& front() const;
+    const value_type& back() const;
     QList<QnByteArrayConstRef> split( char sep ) const;
+    //!Removes from front and back of the string any character of null-terminated string \a charsToTrim
+    QnByteArrayConstRef trimmed( const value_type* charsToTrim = " \t" ) const;
 
     bool isEqualCaseInsensitive( const char* str, size_t strLength = (size_t)-1 ) const;
 
