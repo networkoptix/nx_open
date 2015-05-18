@@ -112,7 +112,7 @@ void QnTransactionTcpProcessor::run()
     }
 
 
-    d->response.headers.insert(nx_http::HttpHeader(Qn::GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
     d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray()));
     d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME, QByteArray::number(qnCommon->systemIdentityTime())));
     d->response.headers.insert(nx_http::HttpHeader(
@@ -149,7 +149,7 @@ void QnTransactionTcpProcessor::run()
         }
         parseRequest();
 
-        d->response.headers.insert(nx_http::HttpHeader(Qn::GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
         d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray()));
         d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME, QByteArray::number(qnCommon->systemIdentityTime())));
         d->response.headers.insert(nx_http::HttpHeader(
@@ -212,13 +212,18 @@ void QnTransactionTcpProcessor::run()
     }
     else
     {
+        auto base64EncodingRequiredHeaderIter = d->request.headers.find( Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME );
+        if( base64EncodingRequiredHeaderIter != d->request.headers.end() )
+            d->response.headers.insert( *base64EncodingRequiredHeaderIter );
+
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
-            d->socket,
+            std::move(d->socket),
             requestedConnectionType,
             remotePeer,
             remoteSystemIdentityTime,
+            d->request,
             contentEncoding );
         d->socket.clear();
     }

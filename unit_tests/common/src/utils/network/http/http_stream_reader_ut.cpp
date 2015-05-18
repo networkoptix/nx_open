@@ -29,6 +29,50 @@ public:
     }
 };
 
+TEST( HttpStreamReader, parsingRequest )
+{
+    const char requestStr[] =
+        "GET /hhh HTTP/1.1\r\n"
+        "Content-Type: text/html\r\n"
+        "x-server-guid: {47bf37a0-72a6-2890-b967-5da9c390d28a}\r\n"
+        "WWW-Authenticate: Digest realm=\"NetworkOptix\",nonce=\"50df1b6e2a378\"\r\n"
+        "Access-Control-Allow-Origin: *\r\n"
+        //"Content-Length: 0\r\n"
+        "\r\n";
+
+    QByteArray sourceDataStream( requestStr, sizeof(requestStr)-1 );
+
+    for( int dataStep = 1; dataStep < 16*1024; dataStep <<= 1 )
+    {
+        nx_http::HttpStreamReader streamReader;
+        for( int pos = 0; pos < sourceDataStream.size(); )
+        {
+            size_t bytesProcessed = 0;
+            ASSERT_TRUE( streamReader.parseBytes( 
+                sourceDataStream.mid( pos ),
+                std::min<int>( dataStep, sourceDataStream.size() - pos ),
+                &bytesProcessed ) );
+            //ASSERT_TRUE( bytesProcessed > 0 );
+            pos += bytesProcessed;
+            ASSERT_TRUE( bytesProcessed != 0 );
+        }
+
+        //TODO #ak validate parsed request
+        ASSERT_EQ( streamReader.state(), nx_http::HttpStreamReader::messageDone );
+        ASSERT_EQ( streamReader.message().type, nx_http::MessageType::request );
+        ASSERT_TRUE( streamReader.message().request->messageBody.isEmpty() );
+    }
+
+    //nx_http::HttpStreamReader streamReader;
+    //size_t bytesProcessed = 0;
+    //ASSERT_TRUE( streamReader.parseBytes(
+    //    QByteArray::fromRawData(requestStr, sizeof(requestStr)-1),
+    //    &bytesProcessed ) );
+
+    //ASSERT_EQ( bytesProcessed, sizeof(requestStr)-1 );
+    //ASSERT_EQ( streamReader.state(), nx_http::HttpStreamReader::messageDone );
+}
+
 TEST( HttpStreamReader, MultipleMessages )
 {
     //vector<pair<message, message body>>
