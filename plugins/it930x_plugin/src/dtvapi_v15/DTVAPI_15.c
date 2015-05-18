@@ -660,4 +660,21 @@ Dword DTV_GetBoardInputValue(
 	return result;
 }
 
+Dword DTV_RX_Reset(
+	IN int handle,
+	IN Byte *value)
+{
+	Dword result = ERR_NO_ERROR;
+	int p_value = *value;
+	
+	if(handle > 0){
+		if(ioctl(handle, IOCTL_ITE_ENDEAVOUR_RXRESET, (void *)&p_value))
+			result = ERR_CANT_FIND_USB_DEV;
+	} else {
+		result = ERR_USB_INVALID_HANDLE;
+	}
+	
+	return result;
+}
+
 #endif

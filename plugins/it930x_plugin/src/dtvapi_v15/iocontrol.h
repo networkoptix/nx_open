@@ -412,6 +412,13 @@ typedef struct {
  */	
 #define IOCTL_ITE_ENDEAVOUR_SENTUARTDATA \
 	_IOR(AFA_IOC_MAGIC, IOCTRL_ITE_GROUP_ENDEAVOUR + 0x04, SentUartData)
+	
+/**
+ * Endeavour Reset RX.
+ * Paramters:	CmdRequest
+ */	
+#define IOCTL_ITE_ENDEAVOUR_RXRESET \
+	_IOR(AFA_IOC_MAGIC, IOCTRL_ITE_GROUP_ENDEAVOUR + 0x05, int)
 
 
 Dword DemodIOCTLFun(

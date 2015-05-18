@@ -201,7 +201,7 @@ typedef enum {
 //						ENDEAVOUR 	: it930x
 //						SAMBA		: it9175
 //		handle_number
-// 
+//
 //	RETURNS:
 //		handle if no error, negative value otherwise.
 //-----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ DTVEXPORT int DTV_DeviceOpen(
 //
 //	PARAMETERS:
 //		handle
-// 
+//
 //	RETURNS:
 //		0 if no error, non-zero value otherwise.
 //-----------------------------------------------------------------------------
@@ -320,7 +320,7 @@ DTVEXPORT Dword DTV_EnablePIDTable(
 //
 //	PARAMETERS:
 //		handle
-// 
+//
 //	RETURNS:
 //		0 if no error, non-zero value otherwise.
 //-----------------------------------------------------------------------------
@@ -382,7 +382,7 @@ DTVEXPORT Dword DTV_ResetPIDTable(
 //
 //	PARAMETERS:
 //		handle
-// 
+//
 //	RETURNS:
 //		0 if no error, non-zero value otherwise.
 //-----------------------------------------------------------------------------
@@ -395,7 +395,7 @@ Dword DTV_StartCapture(
 //
 //	PARAMETERS:
 //		handle
-// 
+//
 //	RETURNS:
 //		0 if no error, non-zero value otherwise.
 //-----------------------------------------------------------------------------
@@ -411,7 +411,7 @@ DTVEXPORT Dword DTV_StopCapture(
 //		byCtrl 		- 1: Power Up, 0: Power Down.
 //						Power Up :  Resume  device to normal state.
 //						Power Down : Suspend device to hibernation state.
-// 
+//
 //	RETURNS:
 //		0 if no error, non-zero value otherwise.
 //-----------------------------------------------------------------------------
@@ -426,7 +426,7 @@ DTVEXPORT Dword DTV_ControlPowerSaving(
 //	PARAMETERS:
 //		handle
 //		pDriverInfo	- Return driver information with DTVDriverInfo structure.
-// 
+//
 //	RETURNS:
 //		0 if no error, non-zero value otherwise.
 //-----------------------------------------------------------------------------
@@ -445,7 +445,7 @@ Dword DTV_SendRC(IN int handle, IN const Byte * data, IN unsigned length);
 //		handle
 //		buffer			- Data buffer point.
 //		read_length	- read data length.
-// 
+//
 //	RETURNS:
 //		Buffer filled length actually.
 //-----------------------------------------------------------------------------
@@ -462,7 +462,7 @@ DTVEXPORT int DTV_GetData(
 //		handle
 //		wRegAddr		- Register address.
 //		pbyData		- Register value.
-// 
+//
 //	RETURNS:
 //		0 if no error, non-zero value otherwise.
 // -----------------------------------------------------------------------------
@@ -546,7 +546,7 @@ DTVEXPORT Dword DTV_EndeavourRegisterControl(
 DTVEXPORT Dword DTV_NULLPacket_Pilter(
 	IN int handle,
 	IN PPIDFilter PIDfilter);
-	
+
 //-----------------------------------------------------------------------------
 //	PURPOSE:
 //		Write EEPROM data.
@@ -554,7 +554,7 @@ DTVEXPORT Dword DTV_NULLPacket_Pilter(
 //	PARAMETERS:
 //		handle
 //		pbyData		- Register value.
-// 
+//
 //	RETURNS:
 //		0 if no error, non-zero value otherwise.
 // -----------------------------------------------------------------------------
@@ -577,11 +577,26 @@ DTVEXPORT Dword DTV_EndeavourSetPIDFilter(
 //	PARAMETERS:
 //		handle
 //		value		- power value.
-// 
+//
 //	RETURNS:
 //		0 if no error, non-zero value otherwise.
 // -----------------------------------------------------------------------------
 DTVEXPORT Dword DTV_GetBoardInputValue(
 	IN int handle,
 	OUT Byte *value);
-#endif 
+
+//-----------------------------------------------------------------------------
+//	PURPOSE:
+//		RX Reset.
+//
+//	PARAMETERS:
+//		handle
+//		value		- open/close value.
+//
+//	RETURNS:
+//		0 if no error, non-zero value otherwise.
+// -----------------------------------------------------------------------------
+DTVEXPORT Dword DTV_RX_Reset(
+	IN int handle,
+	IN Byte *value);
+#endif
