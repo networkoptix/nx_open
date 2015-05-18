@@ -11,8 +11,8 @@
                 <function>
                     <name>getResourceTypes</name>
                     <description>Read all resource types. Resource type contain object type such as
-                        'Server', 'Camera' e.t.c. Also, resource types contain addition information
-                        for cameras such as maximum fps, resolution e.t.c</description>
+                        'Server', 'Camera' e.t.c. Also, resource types contain additional information
+                        for cameras such as maximum fps, resolution, e.t.c</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -34,7 +34,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -46,9 +46,8 @@
                 </function>
                 <function>
                     <name>getResourceParams</name>
-                    <description>Read resource (camera, user or server) addition parameters (camera
-                        firmware version e.t.c). List of parameters depends of resource
-                        type.</description>
+                    <description>Read resource (camera, user or server) additional parameters (camera firmware version, e.t.c).
+                                 List of parameters depends of resource type.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -70,7 +69,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -110,7 +109,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -144,7 +143,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -161,7 +160,7 @@
                         <attributes>
                             <attribute>
                                 <name>addParams</name>
-                                <description>List of addition parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c</description>
+                                <description>List of additional parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c</description>
                             </attribute>
                             <attribute>
                                 <name>audioEnabled</name>
@@ -213,7 +212,7 @@
                             </attribute> 
                             <attribute>
                                 <name>motionMask</name>
-                                <description>Camera's motion mask. This string defines several rects via ':' delimiter. Each rect is described by 5 digits: sensitivity, x,y(for left top corner), width, height</description>
+                                <description>Camera's motion mask. This string defines several rectangles via ':' delimiter. Each rectangle is described by 5 digits: sensitivity, x,y(for left top corner), width, height</description>
                             </attribute> 
                             <attribute>
                                 <name>motionType</name>
@@ -262,7 +261,7 @@
                             </attribute> 
                             <attribute>
                                 <name>url</name>
-                                <description>Camera plain ip address or full http url if camera was added manually. Also, for multichannel encoders full url is used</description>
+                                <description>Camera plain IP address or full http url if camera was added manually. Also, for multichannel encoders full url is used</description>
                             </attribute> 
                             <attribute>
                                 <name>vendor</name>
@@ -297,7 +296,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -331,7 +330,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -365,7 +364,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -400,7 +399,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -434,7 +433,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -468,7 +467,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -504,7 +503,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -544,7 +543,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -585,7 +584,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -625,7 +624,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -666,7 +665,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -706,7 +705,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical structure only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -845,7 +844,7 @@
                     </params>
                     <result>
                         <caption>Returns OK if all parameters have been set, otherwise returns error 500
-                        (Internal server error) and result of setting for every param.</caption>
+                        (Internal server error) and result of setting for every parameter.</caption>
                     </result>
                 </function>
                 <function>
@@ -870,7 +869,7 @@
                     </params>
                     <result>
                         <caption>Returns required parameter values in form of paramName=paramValue, each
-                        param on new line</caption>
+                        parameter on new line</caption>
                     </result>
                 </function>
                 <function>
@@ -888,7 +887,7 @@
                             <name>time</name>
                             <description>required image time. Microseconds since 1970 UTC or string
                                 in format 'YYYY-MM-DDThh24:mi:ss.zzz'. Date format is auto detected.
-                                Also, addition special values are allowed.</description>
+                                Also, additional special values are allowed.</description>
                             <optional>false</optional>
                             <values>
                                 <value>
@@ -1002,19 +1001,19 @@
                     <params>
                         <param>
                             <name>start_ip</name>
-                            <description>First ip address in range to scan.</description>
+                            <description>First IP address in range to scan.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
                         <param>
                             <name>end_ip</name>
-                            <description>Last ip address in range to scan.</description>
+                            <description>Last IP address in range to scan.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
                         <param>
                             <name>port</name>
-                            <description>Camera(s) port to check. Port is autodetected if parameter
+                            <description>Camera(s) port to check. Port is auto-detected if parameter
                                 is absent.</description>
                             <optional>true</optional>
                             <values/>
@@ -1038,7 +1037,7 @@
                 </function>
                 <function>
                     <name>manualCamera/status</name>
-                    <description>Get manual addition progress.</description>
+                    <description>Get manual adding progress.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1054,7 +1053,7 @@
                 </function>
                 <function>
                     <name>manualCamera/stop</name>
-                    <description>Stop manual addition progress.</description>
+                    <description>Stop manual adding progress.</description>
                     <method>POST</method>
                     <params>
                         <param>
@@ -1125,7 +1124,7 @@
                         </param>
                         <param>
                             <name>password</name>
-                            <description>System admin password.</description>
+                            <description>System administrator password.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
@@ -1142,7 +1141,7 @@
                 </function>
                 <function>
                     <name>ptz</name>
-                    <description>Perform reading or writting PTZ operation</description>
+                    <description>Perform reading or writing PTZ operation</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1166,11 +1165,11 @@
                                 </value>
                                 <value>
                                     <name>AbsoluteDeviceMovePtzCommand</name>
-                                    <description>Move camera to absolute pozition. Parameters xPos, yPos and zPos are used in range defined by camera. Parameter speed is used in range [0..1.0].</description>
+                                    <description>Move camera to absolute position. Parameters xPos, yPos and zPos are used in range defined by camera. Parameter speed is used in range [0..1.0].</description>
                                 </value>
                                 <value>
                                     <name>AbsoluteLogicalMovePtzCommand</name>
-                                    <description>Move camera to absolute pozition. Parameters xPos, yPos range are: [-180..+180]. Parameter zPos range is: [0..180] (field of view in degree). Parameters speed range is: [0..1.0].</description>
+                                    <description>Move camera to absolute position. Parameters xPos, yPos range are: [-180..+180]. Parameter zPos range is: [0..180] (field of view in degree). Parameters speed range is: [0..1.0].</description>
                                 </value>
                                 <value>
                                     <name>GetDevicePositionPtzCommand</name>
@@ -1224,7 +1223,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Rebuild progress if no input param specified or XML with OK message or
+                        <caption>Rebuild progress if no input parameter specified or XML with OK message or
                         error code.</caption>
                     </result>
                 </function>
@@ -1258,9 +1257,9 @@
                         </param>
                         <param>
                             <name>filter</name>
-                            <description>This paremeter is used for motion search (periodsType must be 1). Match motion on a video by specified rect. 
+                            <description>This parameter is used for motion search (periodsType must be 1). Match motion on a video by specified rectangle. 
                                 Filter format is: &lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;
-                                rect format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
+                                rectangle format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
                                 'x' and 'width' in range [0..43], 'y' and 'height' in range [0..31].
                             </description>
                             <optional>true</optional>
@@ -1295,11 +1294,7 @@
                                     <name>1</name>
                                     <description>Only chunk with motion (parameter motionRegions required)</description>
                                 </value>
-                                <value>
-                                    <name>2</name>
-                                    <description>Bookmarks (reserverd for future use)</description>
-                                </value>
-                            </values>
+                             </values>
                         </param>
                     </params>
                     <result>
@@ -1413,7 +1408,7 @@
                         <caption>JSON with a list of the discovered peers</caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>restart</name>
                     <description>Restart the server.</description>
                     <method>GET</method>
@@ -1477,13 +1472,13 @@
                         </param>
                         <param>
                             <name>password</name>
-                            <description>New admin password.</description>
+                            <description>New administrator password.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
                         <param>
                             <name>oldPassword</name>
-                            <description>Old admin password.</description>
+                            <description>Old administrator password.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
@@ -1495,7 +1490,7 @@
                         </caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>mergeSystems</name>
                     <description>Merge two systems.</description>
                     <method>GET</method>
@@ -1508,13 +1503,13 @@
                         </param>
                         <param>
                             <name>password</name>
-                            <description>Admin password of the target system.</description>
+                            <description>Administrator password of the target system.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
                         <param>
                             <name>currentPassword</name>
-                            <description>Admin password of the current system.</description>
+                            <description>Administrator password of the current system.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
@@ -1525,11 +1520,11 @@
                             <values>
                                 <value>
                                     <name>true</name>
-                                    <description>The current system will get system name and admin password of the target system.</description>
+                                    <description>The current system will get system name and administrator password of the target system.</description>
                                 </value>
                                 <value>
                                     <name>false</name>
-                                    <description>The target system will get system name and admin password of the current system.</description>
+                                    <description>The target system will get system name and administrator password of the current system.</description>
                                 </value>
                             </values>
                         </param>
@@ -1609,8 +1604,8 @@
                                     <description/>
                                 </value>
                                 <value>
-                                    <name>mpjeg</name>
-                                    <description/>
+                                    <name>mjpeg</name>
+                                    <description>Motion JPEG</description>
                                 </value>
                                 <value>
                                     <name>mpeg4</name>
@@ -1625,7 +1620,7 @@
                         <param>
                             <name>stream</name>
                             <description>Open high quality stream if parameter is 0 or low quality stream if parameter is 1. 
-                                         By default server auto detect preffered stream index based on destination resolution.</description>
+                                         By default server auto detect preferred stream index based on destination resolution.</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1644,7 +1639,7 @@
                     <description>
                         Url format for opening camera stream using HTTP protocol. Codec and stream format can be specified in url parameters.
                         Live stream and archive can be downloaded. If required and possible, media stream transcoding is performed on-the-fly.
-                        Stream format can be one of following: webm, mpegts, mp4, 3gp, mpjpeg (motion jpeg)                        
+                        Stream format can be one of following: webm, mpegts, mp4, 3gp, mjpeg (motion jpeg)                        
                         Example: http://&lt;server_ip&gt;:&lt;port&gt;/media/12AB42FD5912.webm
                     </description>
                     <method>GET</method>
@@ -1662,6 +1657,11 @@
                         <param>
                             <name>rotation</name>
                             <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>sfd</name>
+                            <description>Stand Frame Duration. If parameter is present, video speed is limited by real time.</description>
                             <optional>true</optional>
                         </param>
                     </params>
@@ -1716,7 +1716,7 @@
                     <params>
                         <param>
                             <name>startDatetime</name>
-                            <description>Fragment start time in ISO format, server timezone. Example: 2015-02-05T19:00 (2015, 2 Feb 19:00)</description>
+                            <description>Fragment start time in ISO format, server time zone. Example: 2015-02-05T19:00 (2015, 2 Feb 19:00)</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1731,7 +1731,7 @@
                         </param>
                         <param>
                             <name>hi</name>
-                            <description>Return hiqh quality stream</description>
+                            <description>Return high quality stream</description>
                             <optional>true</optional>
                         </param>
                         <param>
