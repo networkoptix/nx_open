@@ -42,7 +42,7 @@
                             <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" href="index.html">
                                 <img src="customization/webadmin_logo.png" height="48"/>
                             </a>
-                            <h1>API reference</h1>
+                            <h3>API reference</h3>
                         </div>
                         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
                             <ul class="nav navbar-nav navbar-right">

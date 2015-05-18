@@ -16,6 +16,7 @@
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
 #include "settings.h"
+#include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_connection_data.h"
 #include "api/app_server_connection.h"
 #include "utils/network/router.h"
@@ -72,18 +73,30 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (isServer) 
     {
-        if (resource->getId() != ownMediaServer->getId())
-            resource->addFlags( Qn::foreigner );
-    }
+        if (resource->getId() == ownMediaServer->getId()) {
+            ec2::ApiMediaServerData ownData;
 
-    // We are always online
-    if (isServer && resource->getId() == serverGuid()) 
-    {
-        if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined) {
-            qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
-            resource->setStatus(Qn::Online);
+            ec2::ApiMediaServerData newData;
+
+            ec2::fromResourceToApi(ownMediaServer, ownData);
+            ec2::fromResourceToApi(resource.staticCast<QnMediaServerResource>(), newData);
+
+            if (ownData != newData) {
+                QnMediaServerResourcePtr savedServer;
+                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(ownMediaServer, &savedServer);
+                return;
+            }
+
+            // We are always online
+            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined) {
+                qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
+                resource->setStatus(Qn::Online);
+            }
+        } else {
+            resource->addFlags(Qn::foreigner);
         }
     }
+
     QnUuid resId = resource->getId();
     if (QnResourcePtr ownResource = qnResPool->getResourceById(resId))
         ownResource->update(resource);
