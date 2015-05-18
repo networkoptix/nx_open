@@ -39,6 +39,7 @@ namespace ite
         m_signalPresent(false)
     {
         open();
+        resetFrozen();
     }
 
     bool RxDevice::open()
@@ -58,6 +59,24 @@ namespace ite
         }
 
         return false;
+    }
+
+    void RxDevice::resetFrozen()
+    {
+        try
+        {
+            if (m_it930x)
+            {
+                debug_printf("[it930x] Reset Rx device %d\n", m_rxID);
+                m_it930x->rxReset();
+            }
+        }
+        catch (DtvException& ex)
+        {
+            debug_printf("[it930x] %s %d\n", ex.what(), ex.code());
+
+            m_it930x.reset();
+        }
     }
 
     bool RxDevice::wantedByCamera() const
@@ -188,7 +207,7 @@ namespace ite
         return false;
     }
 
-    void RxDevice::unlockC()
+    void RxDevice::unlockC(bool resetRx)
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
@@ -196,6 +215,8 @@ namespace ite
 
         if (m_it930x)
             m_it930x->unlockFrequency();
+        if (resetRx)
+            resetFrozen();
 
         if (m_txDev)
             m_txDev->close();

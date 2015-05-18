@@ -176,7 +176,7 @@ namespace ite
 
         bool captureAnyRxDevice();
         RxDevicePtr captureFreeRxDevice();
-        void freeDevice();
+        void freeRx(bool reset = false);
 
         void initEncoders();
         void stopEncoders();

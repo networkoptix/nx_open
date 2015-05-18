@@ -175,6 +175,7 @@ namespace ite
 
         bool responseCode(uint16_t cmd, uint8_t& outCode);
         void clearResponse(uint16_t cmd);
+        unsigned responsesCount() const;
 
         void parse(RcPacket& pkt);              // recv: DevReader -> Demux -> (some thread) -> RcPacket -> RcCommand -> TxDevice
         RcCommand * mkRcCmd(uint16_t command);  // send: RxDevice -> TxDevice -> RcCommand -> RxDevice -> It930x

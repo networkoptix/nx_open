@@ -125,6 +125,13 @@ namespace ite
         m_responses.erase(outCmd);
     }
 
+    unsigned TxDevice::responsesCount() const
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        return m_responses.size();
+    }
+
     bool TxDevice::hasResponses(const uint16_t * cmdInputIDs, unsigned size) const
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK

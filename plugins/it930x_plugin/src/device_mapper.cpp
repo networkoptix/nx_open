@@ -297,7 +297,7 @@ namespace ite
             debug_printf("[search] rescan finished\n");
     }
 
-    void DeviceMapper::restoreCamera(const nxcip::CameraInfo& info)
+    void DeviceMapper::restoreCamera(const nxcip::CameraInfo& )
     {
 #if 0
         DevLink link;

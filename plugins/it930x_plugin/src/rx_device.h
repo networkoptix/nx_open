@@ -94,7 +94,7 @@ namespace ite
         bool lockCamera(TxDevicePtr txDev);
         bool tryLockC(unsigned freq, bool prio = true, const char ** reason = nullptr);
         bool isLocked() const;
-        void unlockC();
+        void unlockC(bool resetRx = false);
 
         bool startSearchTx(unsigned channel, unsigned timeoutMS);
         void stopSearchTx(DevLink& outDevLink);
@@ -283,6 +283,7 @@ namespace ite
 
         bool isLocked_u() const { return m_it930x.get() && m_it930x->hasStream(); }
         bool wantedByCamera() const;
+        void resetFrozen();
 
         bool open();
         void stats();

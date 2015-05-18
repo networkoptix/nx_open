@@ -203,6 +203,18 @@ namespace ite
             strncpy(info.supportHWInfo, (const char *)driverInfo.SupportHWInfo, 32);
         }
 
+        void rxReset()
+        {
+#if DTVAPI_V15
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
+            Byte value = 1; // some magic value from sample
+            int ret = DTV_RX_Reset(m_handle, &value);
+            if (ret)
+                throw DtvException("DTV_RX_Reset", ret);
+#endif
+        }
+
         void sendRcPacket(const RcPacket& cmd)
         {
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK

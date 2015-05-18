@@ -750,8 +750,10 @@ namespace ite
             Timer::sleep(10);
         }
 
-        // TODO: passive mode
-
+#if 1   // experimental
+        if (m_txDevice->responsesCount() == 0)
+            freeRx(true);
+#endif
         return m_txDevice->ready();
     }
 
@@ -762,7 +764,7 @@ namespace ite
         {
             initEncoders();
             if (! m_rxDevice->isReading())
-                freeDevice();
+                freeRx();
         }
     }
 
@@ -792,7 +794,7 @@ namespace ite
                 return true;
             }
             //else
-            freeDevice();
+            freeRx();
         }
 
         RxDevicePtr dev = captureFreeRxDevice();
@@ -841,11 +843,11 @@ namespace ite
         return best;
     }
 
-    void CameraManager::freeDevice()
+    void CameraManager::freeRx(bool resetRx)
     {
         if (m_rxDevice)
         {
-            m_rxDevice->unlockC();
+            m_rxDevice->unlockC(resetRx);
             m_rxDevice.reset();
         }
         m_stopTimer.stop();
@@ -937,7 +939,7 @@ namespace ite
             return false;
 
         stopEncoders();
-        freeDevice();
+        freeRx();
         return true;
     }
 }
