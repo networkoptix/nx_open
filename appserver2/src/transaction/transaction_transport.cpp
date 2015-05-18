@@ -91,6 +91,8 @@ void QnTransactionTransport::default_initializer()
     m_readSync = false;
     m_writeSync = false;
     m_syncDone = false;
+    m_syncInProgress = false;
+    m_needResync = false;
     m_state = NotDefined; 
     m_connected = false;
     m_prevGivenHandlerID = 0;
