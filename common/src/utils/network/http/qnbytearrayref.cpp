@@ -85,6 +85,16 @@ float QnByteArrayConstRef::toFloat() const
     return toByteArrayWithRawData().toFloat();
 }
 
+const QnByteArrayConstRef::value_type& QnByteArrayConstRef::front() const
+{
+    return m_src->at(m_offset);
+}
+
+const QnByteArrayConstRef::value_type& QnByteArrayConstRef::back() const
+{
+    return m_src->at(m_offset+m_count-1);
+}
+
 QList<QnByteArrayConstRef> QnByteArrayConstRef::split( char sep ) const
 {
     QList<QnByteArrayConstRef> tokenList;
@@ -101,6 +111,33 @@ QList<QnByteArrayConstRef> QnByteArrayConstRef::split( char sep ) const
     if( curTokenStart <= dataEnd )
         tokenList.append( QnByteArrayConstRef( *m_src, m_offset + curTokenStart-constData(), dataEnd-curTokenStart ) );
     return tokenList;
+}
+
+QnByteArrayConstRef QnByteArrayConstRef::trimmed( const value_type* charsToTrim ) const
+{
+    QnByteArrayConstRef result( *this );
+    while( result.m_count > 0 )
+    {
+        if( strchr( charsToTrim, result.front() ) != NULL )
+        {
+            ++result.m_offset;
+            --result.m_count;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    while( result.m_count > 0 )
+    {
+        if( strchr( charsToTrim, result.back() ) != NULL )
+            --result.m_count;
+        else
+            break;
+    }
+
+    return result;
 }
 
 bool QnByteArrayConstRef::isEqualCaseInsensitive( const char* str, size_t strLength ) const

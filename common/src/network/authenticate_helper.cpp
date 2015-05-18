@@ -292,7 +292,7 @@ QByteArray QnAuthHelper::createHttpQueryAuthParam( const QString& userName, cons
     "three, four"
     \endcode
 */
-static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
+QList<QByteArray> QnAuthHelper::smartSplit(const QByteArray& data, const char delimiter)
 {
     bool quoted = false;
     QList<QByteArray> rez;
@@ -505,7 +505,8 @@ bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteAr
 
 void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
 {
-    QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
+    QString auth(lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5"));
+    //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\",algorithm=MD5,qop=\"auth\""));
 	QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
     nx_http::insertOrReplaceHeader(
         &response.headers,
@@ -521,7 +522,7 @@ bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
 
 QByteArray QnAuthHelper::getNonce()
 {
-    return QByteArray::number(qnSyncTime->currentUSecsSinceEpoch() , 16);
+    return QByteArray::number(qnSyncTime->currentUSecsSinceEpoch(), 16);
 }
 
 void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)
