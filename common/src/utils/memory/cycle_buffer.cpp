@@ -1,6 +1,6 @@
 #include "cycle_buffer.h"
 
-QnMediaCycleBuffer::QnMediaCycleBuffer(size_type bufferSize, int align):
+QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
     m_buffer(0),
     m_maxSize(bufferSize),
     m_size(0),
@@ -12,17 +12,17 @@ QnMediaCycleBuffer::QnMediaCycleBuffer(size_type bufferSize, int align):
     }
 }
 
-QnMediaCycleBuffer::~QnMediaCycleBuffer()
+QnMediaCyclicBuffer::~QnMediaCyclicBuffer()
 {
     qFreeAligned(m_buffer);
 }
 
-void QnMediaCycleBuffer::push_back(const value_type* data, size_type size)
+void QnMediaCyclicBuffer::push_back(const value_type* data, size_type size)
 {
     insert(m_size, data, size);
 }
 
-void QnMediaCycleBuffer::insert(size_type pos, const value_type* data, size_type size)
+void QnMediaCyclicBuffer::insert(size_type pos, const value_type* data, size_type size)
 {
     Q_ASSERT(pos + size <= m_maxSize);
     size_type updPos = (m_offset + pos) % m_maxSize;
@@ -34,7 +34,7 @@ void QnMediaCycleBuffer::insert(size_type pos, const value_type* data, size_type
         m_size = pos + size;
 }
 
-void QnMediaCycleBuffer::pop_front(size_type size)
+void QnMediaCyclicBuffer::pop_front(size_type size)
 {
     Q_ASSERT(m_size >= size);
     
@@ -44,7 +44,7 @@ void QnMediaCycleBuffer::pop_front(size_type size)
         m_offset -= m_maxSize;
 }
 
-QnMediaCycleBuffer::size_type QnMediaCycleBuffer::seriesDataSize(size_type pos) const
+QnMediaCyclicBuffer::size_type QnMediaCyclicBuffer::seriesDataSize(size_type pos) const
 {
     if (m_offset + pos < m_maxSize)
         return qMin(m_size - pos, m_maxSize - (m_offset + pos));
@@ -55,7 +55,7 @@ QnMediaCycleBuffer::size_type QnMediaCycleBuffer::seriesDataSize(size_type pos) 
     }
 }
 
-const QByteArray QnMediaCycleBuffer::data(size_type pos, size_type size)
+const QnMediaCyclicBuffer::value_type* QnMediaCyclicBuffer::data(size_type pos, size_type size)
 {
     if (size == -1)
         size = m_size;
@@ -65,10 +65,10 @@ const QByteArray QnMediaCycleBuffer::data(size_type pos, size_type size)
         reallocateBuffer();
         reqPos = pos;
     }
-    return QByteArray::fromRawData(m_buffer + reqPos, size);
+    return m_buffer + reqPos;
 }
 
-void QnMediaCycleBuffer::reallocateBuffer()
+void QnMediaCyclicBuffer::reallocateBuffer()
 {
     if (m_offset + m_size <= m_maxSize) {
         memmove(m_buffer, m_buffer + m_offset, m_size);

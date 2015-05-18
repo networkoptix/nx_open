@@ -5,7 +5,7 @@
     Fixed size cyclic buffer implementation.
 */
 
-class QnMediaCycleBuffer
+class QnMediaCyclicBuffer
 {
 public:
     typedef int size_type;
@@ -16,8 +16,8 @@ public:
         \param bufferSize bufferSize
         \param align memory align factor for internal buffer
     */
-    QnMediaCycleBuffer(size_type bufferSize, int align);
-    ~QnMediaCycleBuffer();
+    QnMediaCyclicBuffer(size_type bufferSize, int align);
+    ~QnMediaCyclicBuffer();
 
     //!Insert data to the middle of buffer. Extend buffer size if required
     void insert(size_type pos, const value_type* data, size_type size);
@@ -29,10 +29,10 @@ public:
     void pop_front(size_type size);
 
     /*!
-        Return external data buffer. It may cause memory copy operation to defragment internal buffer.
-        In most cases it doesn't require any memory copy operations. QByteArray is construct as reference to the internal buffer.
+        Return pointer to data buffer. It may cause memory copy operation to defragment internal buffer.
+        This pointer is guarantee that requested buffer is accessible as a single serial data block
     */
-    const QByteArray data(size_type pos = 0, size_type size = -1);
+    const value_type* data(size_type pos = 0, size_type size = -1);
 
     //!Return maximum data size, that can be captured via 'data' call without memory copying.
     size_type seriesDataSize(size_type pos = 0) const;

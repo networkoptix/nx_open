@@ -104,7 +104,7 @@ private:
 private:
     QnFile m_fileEngine;
     int m_minBufferSize;
-    QnMediaCycleBuffer m_cycleBuffer;
+    QnMediaCyclicBuffer m_cycleBuffer;
     QueueFileWriter* m_queueWriter;
     unsigned int m_systemDependentFlags;
 private:
