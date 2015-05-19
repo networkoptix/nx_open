@@ -48,7 +48,7 @@ angular.module('webadminApp')
                     chunkHeight:20,
                     exactChunkColor:'rgba(192,192,192,0.65)',
                     hightlightChunkColor:'rgb(192,192,192)',
-                    loadingChunkColor:'rgb(00,200,00)',
+                    loadingChunkColor:'rgba(192,192,192,0.4)',
 
                     timeMarkerColor:'blue',
                     dateFormat:'dd.mm.yyyy',
@@ -377,7 +377,7 @@ angular.module('webadminApp')
                             var chunk = events[i];
                             var startCoordinate = dateToScreenPosition(chunk.start);
                             var endCoordinate = dateToScreenPosition(chunk.end);
-                            drawChunk(context,startCoordinate, endCoordinate,chunk.level);
+                            drawChunk(context,startCoordinate, endCoordinate,chunk.level === scope.chunksLevel);
                         }
                     }
                 }
