@@ -7,7 +7,7 @@ import os
 import argparse
 
 targetBranch = 'prod_2.3.1';
-ignoredCommits = ['Merge']
+ignoredCommits = ['Merge', '']
 
 def execCommand(command):
     code = subprocess.call(command)
@@ -17,12 +17,12 @@ def execCommand(command):
         
 def getChangelog(revision):
     command = 'hg log -T "{desc}\\n\\n" -r '
-    changeset = '"(::{0} - ::prod_2.3.1)"'.format(revision)
+    changeset = '"(::{0} - ::{1})"'.format(revision, targetBranch)
     command = command + changeset
     changelog = subprocess.check_output(command, shell=True)
     changes = sorted(set(changelog.split('\n\n')))
     
-    changes = [x for x in changes if not x in ignoredCommits]
+    changes = [x.strip('\n') for x in changes if not x in ignoredCommits]
     
     changes.insert(0, 'Merge Changelog:')
     
