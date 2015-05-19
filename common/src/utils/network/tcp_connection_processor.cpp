@@ -417,7 +417,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             //TODO #ak we have parsed message in d->httpStreamReader: should use it, not copy!
             d->request = *d->httpStreamReader.message().request;
             d->protocol = d->request.requestLine.version.protocol;
-            d->requestBody = d->request.messageBody;
+            d->requestBody = d->httpStreamReader.fetchMessageBody();
 
             //TODO #ak logging
             //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
