@@ -67,15 +67,17 @@ namespace nx_http
                         //different buffers, we MUST read LF before reading message body
                     size_t bytesRead = 0;
                     m_lineSplitter.finishCurrentLineEnding(
-                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
                         data.mid( currentDataPos, count-currentDataPos ),
                         &bytesRead );
                     currentDataPos += bytesRead;
                     if( bytesProcessed )
                         *bytesProcessed = currentDataPos;
                     m_state = m_nextState;
-                    if( m_breakAfterReadingHeaders )
+                    if( m_breakAfterReadingHeaders ||
+                        m_state == messageDone )    //MUST break parsing on message boudary so that calling entity has chance to handle message
+                    {
                         return true;
+                    }
                     break;
                 }
 
@@ -86,7 +88,6 @@ namespace nx_http
                     if( m_contentDecoder )
                     {
                         msgBodyBytesRead = readMessageBody(
-                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
                             data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data ){ m_codedMessageBodyBuffer.append(data.constData(), data.size()); } );
                         //decoding content
@@ -102,7 +103,6 @@ namespace nx_http
                     else
                     {
                         msgBodyBytesRead = readMessageBody(
-                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
                             data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data )
                                 {
@@ -142,7 +142,6 @@ namespace nx_http
                     ConstBufferRefType lineBuffer;
                     size_t bytesRead = 0;
                     const bool lineFound = m_lineSplitter.parseByLines(
-                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
                         data.mid( currentDataPos, count-currentDataPos ),
                         &lineBuffer,
                         &bytesRead );
