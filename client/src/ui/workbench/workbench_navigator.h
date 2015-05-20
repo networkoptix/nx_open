@@ -254,9 +254,6 @@ private:
     qreal m_lastMinimalSpeed;
     qreal m_lastMaximalSpeed;
 
-    qint64 m_lastUpdateSlider;
-    qint64 m_lastCameraTime;
-
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
     QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;   

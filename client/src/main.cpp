@@ -830,6 +830,10 @@ int main(int argc, char **argv)
 
     QnClientModule client(argc, argv);
 
+#ifdef Q_OS_WIN
+    win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
+#endif
+        
     QnSessionManager::instance();
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );

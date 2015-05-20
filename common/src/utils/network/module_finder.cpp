@@ -137,6 +137,21 @@ QList<QnModuleInformation> QnModuleFinder::foundModules() const {
     return result;
 }
 
+QList<QnModuleInformationWithAddresses> QnModuleFinder::foundModulesWithAddresses() const {
+    QList<QnModuleInformationWithAddresses> result;
+    for (const ModuleItem &moduleItem: m_moduleItemById) {
+        QnModuleInformationWithAddresses moduleInformation(moduleItem.moduleInformation);
+        for (const SocketAddress &address: moduleItem.addresses) {
+            if (address.port == moduleInformation.port)
+                moduleInformation.remoteAddresses.insert(address.address.toString());
+            else
+                moduleInformation.remoteAddresses.insert(address.toString());
+        }
+        result.append(moduleInformation);
+    }
+    return result;
+}
+
 QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const {
     return m_moduleItemById.value(moduleId).moduleInformation;
 }

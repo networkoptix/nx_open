@@ -26,6 +26,7 @@ public:
     bool isCompatibilityMode() const;
 
     QList<QnModuleInformation> foundModules() const;
+    QList<QnModuleInformationWithAddresses> foundModulesWithAddresses() const;
 
     QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
     QSet<SocketAddress> moduleAddresses(const QnUuid &id) const;
