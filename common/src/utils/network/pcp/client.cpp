@@ -1,30 +1,35 @@
 #include "client.h"
 
-#include <QtCore/QMutex>
-#include <QtCore/QDateTime>
+#include "utils/common/log.h"
+#include "utils/network/nettools.h"
+#include "utils/common/timermanager.h"
 
-#include <queue>
-
-#include "messaging.h"
+#include <QDateTime>
 
 static const int AFORT_COUNT = 3;
 static const quint32 LIFETIME = 1 * 60 * 60; // 1 hour
 
-namespace pcp {
-
-Client::Client()
+static QList<QnInterfaceAndAddr> getInterfaces(const SocketAddress& address)
 {
-    // TODO: listen to incomming messages and notify m_subscription
+    QList<QnInterfaceAndAddr> allIfs = getAllIPv4Interfaces();
+    if (address.address == HostAddress::anyHost)
+        return allIfs;
+
+    QHostAddress qAddress(address.address.toString());
+    QList<QnInterfaceAndAddr> targetIfs;
+    for (const auto& ifc : allIfs)
+        if (qAddress == ifc.address)
+            targetIfs.push_back(ifc);
+
+    return targetIfs;
 }
 
-Guard Client::mapPort(SocketAddress address)
-{
-    // TODO: send mapping request and setup timer to renew it
-    static_cast<void>(address);
+namespace pcp {
 
-    return Guard([]()
+Guard Client::mapPort(const SocketAddress& address)
+{
+    return Guard([address]()
     {
-        // TODO: remove renew timer
     });
 }
 

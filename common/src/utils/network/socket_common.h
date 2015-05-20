@@ -21,7 +21,6 @@
 
 #include <QString>
 
-
 //!Represents ipv4 address. Supports conversion to QString and to uint32
 /*!
     \note Not using QHostAddress because QHostAddress can trigger dns name lookup which depends on Qt sockets which we do not want to use
@@ -121,6 +120,10 @@ public:
 
     bool isNull() const { return address == HostAddress() && port == 0; }
 };
+
+inline bool operator!=( const SocketAddress& lhs, const SocketAddress& rhs ) {
+    return !( lhs == rhs );
+}
 
 inline uint qHash(const SocketAddress &address) {
     return qHash(address.address.toString(), address.port);

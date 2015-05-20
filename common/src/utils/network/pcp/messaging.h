@@ -15,6 +15,7 @@ namespace pcp {
  *  for details: https://tools.ietf.org/html/rfc6887
  */
 static const quint8 VERSION = 2;
+static const int MAX_MESSAGE_SIZE = 1100;
 
 static const quint16 CLIENT_PORT = 5350;
 static const quint16 SERVER_PORT = 5351;

@@ -507,7 +507,7 @@ namespace nx_hls
         nx_http::HttpHeaders::const_iterator hostIter = request.headers.find( "Host" );
         if( hostIter != request.headers.end() )
         {
-            SocketAddress sockAddress( hostIter->second );
+            SocketAddress sockAddress( QString( hostIter->second ) );
             baseUrl.setHost( sockAddress.address.toString() );
             if( sockAddress.port > 0 )
                 baseUrl.setPort( sockAddress.port );
@@ -644,7 +644,7 @@ namespace nx_hls
         nx_http::HttpHeaders::const_iterator hostIter = request.headers.find( "Host" );
         if( hostIter != request.headers.end() )
         {
-            SocketAddress sockAddress( hostIter->second );
+            SocketAddress sockAddress( QString( hostIter->second ) );
             baseChunkUrl.setHost( sockAddress.address.toString() );
             if( sockAddress.port > 0 )
                 baseChunkUrl.setPort( sockAddress.port );

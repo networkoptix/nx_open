@@ -1,4 +1,5 @@
 
+#include <sstream>
 #include <memory>
 
 #include <QtCore/QCoreApplication>
@@ -552,6 +553,12 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     return QString();
 }
+
+QHostAddress getGatewayOfIf(const QString& ip);
+{
+    return QHostAddress();
+}
+
 #else // Linux
 void removeARPrecord(const QHostAddress& ip) {Q_UNUSED(ip)}
 
@@ -560,6 +567,32 @@ QString getMacByIP(const QHostAddress& ip, bool net)
     Q_UNUSED(ip)
     Q_UNUSED(net)
     return QString();
+}
+
+QHostAddress getGatewayOfIf(const QString& netIf)
+{
+    std::ostringstream cmd;
+    cmd << "route -n | grep " << netIf.toStdString();
+    FILE* fp = popen(cmd.str().c_str(), "r");
+
+    char* line = NULL;
+    size_t len = 0;
+    while (getline(&line, &len, fp) != -1)
+    {
+        const auto info = QString(QLatin1String(line)).split(lit(" "), QString::SkipEmptyParts);
+        QHostAddress addr(info[1]);
+        if (info.size() > 1 && info[1] != QLatin1String("0.0.0.0"))
+        {
+            free(line);
+            pclose(fp);
+            return QHostAddress(info[1]);
+        }
+
+        free(line);
+    }
+
+    pclose(fp);
+    return QHostAddress();
 }
 
 #endif

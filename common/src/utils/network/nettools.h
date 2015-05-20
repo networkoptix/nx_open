@@ -50,6 +50,8 @@ QN_EXPORT void removeARPrecord(const QHostAddress& ip);
 QN_EXPORT QString getMacByIP(const QString& host, bool net = true);
 QN_EXPORT QString getMacByIP(const QHostAddress& ip, bool net = true);
 
+QN_EXPORT QHostAddress getGatewayOfIf(const QString& netIf);
+
 // returns all pingable hosts in the range
 QN_EXPORT QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads);
 

@@ -1,10 +1,10 @@
 #ifndef PCP_CLIENT_H
 #define PCP_CLIENT_H
 
-#include <utils/network/socket_factory.h>
-#include <utils/common/subscription.h>
+#include "utils/network/socket_factory.h"
+#include "utils/common/subscription.h"
 
-#include <map>
+#include <QtCore/QMutex>
 
 namespace pcp {
 
@@ -13,18 +13,20 @@ struct Mapping
 {
     SocketAddress internal;
     SocketAddress external;
+
+    Mapping(const SocketAddress& _internal = SocketAddress(),
+            const SocketAddress& _external = SocketAddress())
+        : internal(_internal), external(_external) {}
 };
 
 /** PCP Client to work with multiplie network interfaces */
 class Client
 {
-    Client();
-
 public:
     static Client& instance();
 
     /** Mapps @param port on @param address to the same port on NAT async */
-    Guard mapPort(SocketAddress address);
+    Guard mapPort(const SocketAddress& address);
 
     /** Subscribes for port mapping events */
     Guard subscribe(const std::function<void(Mapping)>& callback);
