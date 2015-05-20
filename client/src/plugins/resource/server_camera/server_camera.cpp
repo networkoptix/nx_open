@@ -34,9 +34,7 @@ void QnServerCamera::setIframeDistance(int frames, int timems)
 
 QnConstResourceVideoLayoutPtr QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
-    Q_UNUSED(dataProvider)
-    // todo: layout must be loaded in resourceParams
-    return QnVirtualCameraResource::getVideoLayout();
+    return QnVirtualCameraResource::getVideoLayout(dataProvider);
 }
 
 QnConstResourceAudioLayoutPtr QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const

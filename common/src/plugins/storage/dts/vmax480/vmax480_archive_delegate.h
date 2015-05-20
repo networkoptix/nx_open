@@ -20,8 +20,8 @@ public:
     virtual qint64 endTime()override;
     virtual QnAbstractMediaDataPtr getNextData()override;
     virtual qint64 seek (qint64 time, bool findIFrame)override;
-    virtual QnResourceVideoLayoutPtr getVideoLayout()override;
-    virtual QnResourceAudioLayoutPtr getAudioLayout()override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout()override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout()override;
 
     virtual void beforeClose() override;
 

@@ -42,8 +42,6 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
 
-    void setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout);
-
     virtual const QnResource* toResource() const = 0;
     virtual QnResource* toResource() = 0;
     virtual const QnResourcePtr toResourcePtr() const = 0;
@@ -67,6 +65,8 @@ public:
     static QString panicRecordingKey();
     static QString dynamicVideoLayoutKey();
     static QString motionStreamKey();
+
+    static QnConstResourceVideoLayoutPtr getDefaultVideoLayout();
 protected:
     void initMediaResource();
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
