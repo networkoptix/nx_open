@@ -304,10 +304,11 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
         for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
             if (license->hardwareId() == hardwareId() && license->type() == type()) 
             {
-                if (mode == VM_JustCreated && license->key() != key())
-                    return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
+				// Only single EDGE license per ARM device is allowed
+                if (mode != VM_Regular && license->key() != key())
+                    return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid for any of special (non regular) mode
                 else if (license->key() < key())
-                    return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
+                    return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
             }
         }
     }
