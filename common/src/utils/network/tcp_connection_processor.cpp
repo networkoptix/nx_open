@@ -199,9 +199,15 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     d->response.statusLine.statusCode = httpStatusCode;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
 
+    if( isConnectionCanBePersistent() )
+    {
+        d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
+        d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1, max=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
+    }
+
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("User-Agent", QN_ORGANIZATION_NAME " " QN_PRODUCT_NAME " " QN_APPLICATION_VERSION) );
+        nx_http::HttpHeader("Server", nx_http::serverString() ) );
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
         nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
@@ -347,6 +353,83 @@ bool QnTCPConnectionProcessor::readRequest()
     return false;
 }
 
+bool QnTCPConnectionProcessor::readSingleRequest()
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    d->request = nx_http::Request();
+    d->response = nx_http::Response();
+    d->requestBody.clear();
+    d->responseBody.clear();
+    d->currentRequestSize = 0;
+
+    if( !d->clientRequest.isEmpty() )   //TODO #ak it is more reliable to check for the first call of this method
+    {
+        //due to bug in QnTCPConnectionProcessor::readRequest() d->clientRequest 
+        //    can contain multiple interleaved requests.
+        //    Have to parse them!
+        assert( d->interleavedMessageData.isEmpty() );
+        d->interleavedMessageData = d->clientRequest;    //no copying here!
+        d->clientRequest.clear();
+        d->interleavedMessageDataPos = 0;
+    }
+
+    while (!needToStop() && d->socket->isConnected())
+    {
+        if( d->interleavedMessageDataPos == d->interleavedMessageData.size() )
+        {
+            //buffer depleted, draining more data
+            const int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+            if (readed <= 0)
+            {
+                const int lastOSErrorCode = SystemError::getLastOSErrorCode();
+                NX_LOG( lit("Error reading request from %1: %2").
+                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString(lastOSErrorCode)),
+                    cl_logDEBUG1 );
+                return false;
+            }
+            d->interleavedMessageData = QByteArray::fromRawData( (const char*)d->tcpReadBuffer, readed );
+            d->interleavedMessageDataPos = 0;
+        }
+
+        size_t bytesParsed = 0;
+        if( !d->httpStreamReader.parseBytes(
+                QnByteArrayConstRef( d->interleavedMessageData, d->interleavedMessageDataPos ),
+                &bytesParsed ) ||
+            (d->httpStreamReader.state() == nx_http::HttpStreamReader::parseError) )
+        {
+            //parse error
+            return false;
+        }
+        d->currentRequestSize += bytesParsed;
+        d->interleavedMessageDataPos += bytesParsed;
+
+        if( d->currentRequestSize > MAX_REQUEST_SIZE )
+        {
+            qWarning() << "Too large HTTP client request ("<<d->currentRequestSize<<" bytes"
+                ", "<<MAX_REQUEST_SIZE<<" allowed). Ignoring...";
+            return false;
+        }
+
+        if( d->httpStreamReader.state() == nx_http::HttpStreamReader::messageDone )
+        {
+            if( d->httpStreamReader.message().type != nx_http::MessageType::request )
+                return false;
+            //TODO #ak we have parsed message in d->httpStreamReader: should use it, not copy!
+            d->request = *d->httpStreamReader.message().request;
+            d->protocol = d->request.requestLine.version.protocol;
+            d->requestBody = d->httpStreamReader.fetchMessageBody();
+
+            //TODO #ak logging
+            //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
+            //    arg(d->socket->getForeignAddress().toString()).
+            //    arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
+            return true;
+        }
+    }
+    return false;
+}
+
 void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& other)
 {
     Q_D(const QnTCPConnectionProcessor);
@@ -384,8 +467,20 @@ void QnTCPConnectionProcessor::releaseSocket()
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
 {
     Q_D(QnTCPConnectionProcessor);
-    contentType = "text/html";
+    contentType = "text/html; charset=iso-8859-1";
     d->responseBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
     d->response.headers.insert(nx_http::HttpHeader("Location", page));
     return CODE_MOVED_PERMANENTLY;
+}
+
+bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+
+    if( d->request.requestLine.version == nx_http::http_1_1 )
+        return nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close";
+    else if( d->request.requestLine.version == nx_http::http_1_0 )
+        return nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
+    else    //e.g., RTSP
+        return false;
 }

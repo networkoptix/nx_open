@@ -20,6 +20,7 @@
 #include "media_server/server_message_processor.h"
 
 #include "proxy_connection_processor_p.h"
+#include "http/custom_headers.h"
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
@@ -213,12 +214,12 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     }
     d->request.requestLine.url = urlPath;
 
-    nx_http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( "x-camera-guid" );
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     QnUuid cameraGuid;
     if( xCameraGuidIter != d->request.headers.end() )
         cameraGuid = xCameraGuidIter->second;
     else
-        cameraGuid = d->request.getCookieValue("x-camera-guid");
+        cameraGuid = d->request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
     if (!cameraGuid.isNull()) {
         if (QnResourcePtr camera = qnResPool->getResourceById(cameraGuid))
             dstRoute.id = camera->getParentId().toString();
@@ -228,7 +229,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     {
         if (itr->first.toLower() == "host" && !host.isEmpty())
             itr->second = host.toUtf8();
-        else if (itr->first == "x-server-guid")
+        else if (itr->first == Qn::SERVER_GUID_HEADER_NAME)
             dstRoute.id = itr->second;
     }
 
@@ -241,7 +242,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     {
         if (!dstRoute.gatewayId.isNull())
         {
-            nx_http::StringType ttlString = nx_http::getHeaderValue(d->request.headers, "x-proxy-ttl");
+            nx_http::StringType ttlString = nx_http::getHeaderValue(d->request.headers, Qn::PROXY_TTL_HEADER_NAME);
             bool ok;
             int ttl = ttlString.toInt(&ok);
             if (!ok)
@@ -251,7 +252,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             if (ttl <= 0)
                 return false;
 
-            nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader("x-proxy-ttl", QByteArray::number(ttl)));
+            nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::PROXY_TTL_HEADER_NAME, QByteArray::number(ttl)));
 
             QString path = urlPath;
             if (!path.startsWith(QLatin1Char('/')))

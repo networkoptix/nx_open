@@ -78,7 +78,10 @@ namespace nx_http
 
         //TODO #ak skip \n in case when it comes with next buffer
         if( *lineEnd == '\r' && (lineEnd+1) < data.data()+data.size() && *(lineEnd+1) == '\n' )
+        {
+            m_prevLineEnding = '\n';
             ++lineEnd;
+        }
 
         //currentDataPos = lineEnd + 1;
         if( bytesRead )
@@ -104,6 +107,11 @@ namespace nx_http
                 *bytesRead += 1;
             return;
         }
+    }
+
+    bool LineSplitter::currentLineEndingClosed() const
+    {
+        return m_prevLineEnding == '\n';
     }
 
     void LineSplitter::reset()

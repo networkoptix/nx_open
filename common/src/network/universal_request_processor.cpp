@@ -9,10 +9,10 @@
 #include "authenticate_helper.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
+#include "http/custom_headers.h"
 
 
 static const int AUTH_TIMEOUT = 60 * 1000;
-static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;
 static const int MAX_AUTH_RETRY_COUNT = 3;
 
@@ -76,8 +76,8 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             {
                 d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
             }
-            if (nx_http::getHeaderValue( d->response.headers, "X-server-guid" ).isEmpty())
-                d->response.headers.insert(nx_http::HttpHeader("X-server-guid", qnCommon->moduleGUID().toByteArray()));
+            if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
+                d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
 
             auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
             QByteArray contentEncoding;
@@ -101,7 +101,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             }
             sendResponse(
                 isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
-                d->responseBody.isEmpty() ? QByteArray() : "text/html",
+                d->responseBody.isEmpty() ? QByteArray() : "text/html; charset=iso-8859-1",
                 contentEncoding );
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT)
@@ -139,6 +139,7 @@ void QnUniversalRequestProcessor::run()
     {
         if (ready) 
         {
+            t.restart();
             parseRequest();
 
             auto handler = d->owner->findHandler(d->protocol, d->request);
@@ -146,11 +147,9 @@ void QnUniversalRequestProcessor::run()
                 return;
 
             d->response.headers.clear();
-            isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive" && d->protocol.toLower() == "http";
-            if (isKeepAlive) {
-                d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
-                d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
-            }
+
+            isKeepAlive = isConnectionCanBePersistent();
+
 
             // getting a new handler inside is necessary due to possibility of
             // changing request during authentication

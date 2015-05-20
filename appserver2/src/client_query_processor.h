@@ -25,6 +25,7 @@
 #include "transaction/json_transaction_serializer.h"
 #include "transaction/transaction.h"
 #include "utils/serialization/ubjson.h"
+#include "http/custom_headers.h"
 
 
 namespace ec2
@@ -117,7 +118,7 @@ namespace ec2
 
             //TODO #ak videowall looks strange here
             if (!QnAppServerConnectionFactory::videowallGuid().isNull())
-                httpClient->addAdditionalHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;

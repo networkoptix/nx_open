@@ -749,6 +749,10 @@ int main(int argc, char **argv)
 #endif
 
 
+#ifdef Q_OS_WIN
+    win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
+#endif
+        
 
 #ifdef Q_OS_MAC
     mac_restoreFileAccess();
