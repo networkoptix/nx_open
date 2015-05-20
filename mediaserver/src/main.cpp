@@ -24,7 +24,6 @@
 #include <QtNetwork/QNetworkInterface>
 
 #include <api/app_server_connection.h>
-#include <api/session_manager.h>
 #include <api/global_settings.h>
 
 #include <appserver/processor.h>
@@ -1375,6 +1374,7 @@ bool QnMain::initTcpListener()
 
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
+    m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();
@@ -1452,13 +1452,9 @@ void QnMain::run()
         QnSSLSocket::initSSLEngine( certData );
     }
 
-    QnSyncTime syncTime;
-
+    QScopedPointer<QnSyncTime> syncTime(new QnSyncTime());
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
-
-    // todo: #rvasilenko this class doesn't used any more on the server side
-    //QnSessionManager::instance()->start();
 
 #ifdef ENABLE_ONVIF
     QnSoapServer soapServer;    //starting soap server to accept event notifications from onvif cameras
@@ -1468,7 +1464,7 @@ void QnMain::run()
 
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    QnResourcePool::initStaticInstance( new QnResourcePool() );
+    std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
@@ -1535,7 +1531,6 @@ void QnMain::run()
     qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
-    QScopedPointer<TimerManager> timerManager(new TimerManager());
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 
     ec2::ApiRuntimeData runtimeData;
@@ -1661,8 +1656,6 @@ void QnMain::run()
 
     QnResource::startCommandProc();
 
-    QnResourcePool::instance(); // to initialize net state;
-
     std::unique_ptr<QnRestProcessorPool> restProcessorPool( new QnRestProcessorPool() );
 
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
@@ -1679,14 +1672,9 @@ void QnMain::run()
 
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
+    messageProcessor->registerProxySender(m_universalTcpListener);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
-
-    QUrl proxyServerUrl = ec2Connection->connectionInfo().ecUrl;
-    //proxyServerUrl.setPort(connectInfo->proxyPort);
-    m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid().toString());
-    //m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
-
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
@@ -2162,9 +2150,6 @@ void QnMain::run()
     fileDeletor.reset();
     storageManager.reset();
 
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
-
     m_mediaServer.clear();
 }
 
@@ -2242,7 +2227,7 @@ protected:
     virtual int executeApplication() override {
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
 
         if (!m_overrideVersion.isNull())
             qnCommon->setEngineVersion(m_overrideVersion);

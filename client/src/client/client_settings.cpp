@@ -18,6 +18,7 @@
 #include <ui/style/globals.h>
 
 #include <client/client_meta_types.h>
+#include <client/client_runtime_settings.h>
 
 #include <utils/common/app_info.h>
 
@@ -57,17 +58,14 @@ namespace {
 
 } // anonymous namespace
 
-QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
+QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     base_type(parent),
-    m_accessManager(new QNetworkAccessManager(this)),
     m_loading(true)
 {
-    if (localSettings)
+    if (forceLocalSettings)
         m_settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, qApp->organizationName(), qApp->applicationName(), this);
     else
         m_settings = new QSettings(this);
-
-    connect(m_accessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(at_accessManager_finished(QNetworkReply *)));
 
     init();
 
@@ -86,14 +84,8 @@ QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
     setName(MEDIA_FOLDER,           lit("mediaRoot"));
     setName(EXTRA_MEDIA_FOLDERS,    lit("auxMediaRoot"));
     setName(DOWNMIX_AUDIO,          lit("downmixAudio"));
-    setName(OPEN_LAYOUTS_ON_LOGIN,  lit("openLayoutsOnLogin"));
     setName(LAST_RECORDING_DIR,     lit("videoRecording/previousDir"));
     setName(LAST_EXPORT_DIR,        lit("export/previousDir"));
-
-    /* Set command line switch names. */
-    addArgumentName(SOFTWARE_YUV,           "--soft-yuv");
-    addArgumentName(OPEN_LAYOUTS_ON_LOGIN,  "--open-layouts-on-login");
-    addArgumentName(MAX_SCENE_VIDEO_ITEMS,  "--max-video-items");
 
     /* Load from internal resource. */
     QFile file(QLatin1String(":/globals.json"));
@@ -109,8 +101,10 @@ QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
     /* Load from settings. */
     load();
 
-    /* Load from external source. */
-    loadFromWebsite();
+    /* Update showcase url from external source. */
+    Q_ASSERT_X(!isShowcaseEnabled(), Q_FUNC_INFO, "Paxton dll crashes here, make sure showcase fucntionality is disabled");
+    if (isShowcaseEnabled())
+        loadFromWebsite();
 
     setThreadSafe(true);
 
@@ -118,7 +112,6 @@ QnClientSettings::QnClientSettings(bool localSettings, QObject *parent):
 }
 
 QnClientSettings::~QnClientSettings() {
-	delete m_accessManager;
 }
 
 QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
@@ -182,11 +175,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
             return baseValue;
         }
-    case DEBUG_COUNTER:
-    case DEV_MODE:
-    case VIDEO_WALL_MODE:
-    case ACTIVE_X_MODE:
-        return defaultValue; /* Not to be read from settings. */
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
         break;
@@ -194,7 +182,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
 }
 
 void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
-    if (isVideoWallMode() || isActiveXMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
 
     switch(id) {
@@ -231,19 +219,13 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         settings->endGroup();
         break;
     }
-    case DEBUG_COUNTER:
     case UPDATE_FEED_URL:
     //case SHOWCASE_URL:
     //case SHOWCASE_ENABLED:
     case SETTINGS_URL:
-    case DEV_MODE:
     case GL_VSYNC:
     case LIGHT_MODE:
-    case LIGHT_MODE_OVERRIDE:
     case PTZ_PRESET_IN_USE_WARNING_DISABLED:
-    case VIDEO_WALL_MODE:
-    case ACTIVE_X_MODE:
-    case SOFTWARE_YUV:
     case NO_CLIENT_UPDATE:
         break; /* Not to be saved to settings. */
     default:
@@ -286,21 +268,20 @@ QSettings* QnClientSettings::rawSettings() {
 }
 
 void QnClientSettings::loadFromWebsite() {
- //   m_accessManager->get(QNetworkRequest(settingsUrl()));
-}
-
-void QnClientSettings::at_accessManager_finished(QNetworkReply *reply) {
-    if(reply->error() != QNetworkReply::NoError) {
-        qnWarning("Could not download client settings from '%1': %2.", reply->url().toString(), reply->errorString());
-        return;
-    }
-
-    QJsonObject jsonObject;
-    if(!QJson::deserialize(reply->readAll(), &jsonObject)) {
-        qnWarning("Could not parse client settings downloaded from '%1'.", reply->url().toString());
-    } else {
-        updateFromJson(jsonObject.value(lit("settings")).toObject());
-    }
-
-    reply->deleteLater();
+    QNetworkAccessManager *accessManager = new QNetworkAccessManager(this);
+    connect(accessManager, &QNetworkAccessManager::finished, this, [accessManager, this](QNetworkReply *reply) {
+        if(reply->error() != QNetworkReply::NoError) {
+            qnWarning("Could not download client settings from '%1': %2.", reply->url().toString(), reply->errorString());
+        } else {
+            QJsonObject jsonObject;
+            if(!QJson::deserialize(reply->readAll(), &jsonObject)) {
+                qnWarning("Could not parse client settings downloaded from '%1'.", reply->url().toString());
+            } else {
+                updateFromJson(jsonObject.value(lit("settings")).toObject());
+            }
+        }
+        reply->deleteLater();
+        accessManager->deleteLater();
+    });
+    accessManager->get(QNetworkRequest(settingsUrl()));
 }

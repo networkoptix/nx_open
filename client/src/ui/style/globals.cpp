@@ -26,18 +26,11 @@ namespace {
         }
     }
 
-    Q_GLOBAL_STATIC(QnGlobals, qn_globals_instance);
-
 } // anonymous namespace
 
 QnGlobals::QnGlobals(QObject *parent):
     base_type(parent)
 {
-    /* Ensure that default skin resource is loaded. 
-     * This is needed because globals instance may be constructed before the
-     * corresponding resource initializer is called. */
-    Q_INIT_RESOURCE(client);
-
     init();
 
     /* This is somewhat hacky. We still want the values to be writable for
@@ -48,10 +41,6 @@ QnGlobals::QnGlobals(QObject *parent):
 
 QnGlobals::~QnGlobals() {
     return;
-}
-
-QnGlobals *QnGlobals::instance() {
-    return qn_globals_instance();
 }
 
 QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {

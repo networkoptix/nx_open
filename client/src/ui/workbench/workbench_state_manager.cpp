@@ -3,6 +3,7 @@
 #include <common/common_module.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/user_resource.h>
 
@@ -20,8 +21,8 @@ bool QnWorkbenchStateManager::tryClose(bool force) {
 
     bool canSaveState = 
            !qnCommon->remoteGUID().isNull()
-        && !qnSettings->isVideoWallMode()
-        && !qnSettings->isActiveXMode()
+        && !qnRuntime->isVideoWallMode()
+        && !qnRuntime->isActiveXMode()
         &&  context()->user();
 
     QnWorkbenchState state;

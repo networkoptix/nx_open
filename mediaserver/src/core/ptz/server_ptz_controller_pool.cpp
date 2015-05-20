@@ -23,6 +23,11 @@ QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
     connect(this, &QnServerPtzControllerPool::controllerChanged, this, &QnServerPtzControllerPool::at_controllerChanged);
 }
 
+QnServerPtzControllerPool::~QnServerPtzControllerPool()
+{
+    disconnect( this, nullptr, this, nullptr );
+}
+
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
     // TODO: #Elric we're creating controller from main thread. 
     // Controller ctor may take some time (several seconds).

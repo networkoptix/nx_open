@@ -34,6 +34,7 @@ namespace ec2
 
             REGISTER_COMMAND(testConnection),
             REGISTER_COMMAND(connect),
+            REGISTER_COMMAND(openReverseConnection),
 
             REGISTER_COMMAND(getResourceTypes),
             REGISTER_COMMAND(setResourceStatus),
@@ -187,7 +188,8 @@ namespace ec2
                     val == tranSyncDone ||
                     val == uploadUpdate ||
                     val == uploadUpdateResponce ||
-                    val == installUpdate;
+                    val == installUpdate ||
+                    val == openReverseConnection;
 
         }
 

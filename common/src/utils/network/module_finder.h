@@ -26,6 +26,7 @@ public:
     bool isCompatibilityMode() const;
 
     QList<QnModuleInformation> foundModules() const;
+    QList<QnModuleInformationWithAddresses> foundModulesWithAddresses() const;
 
     QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
     QSet<SocketAddress> moduleAddresses(const QnUuid &id) const;
@@ -52,6 +53,7 @@ signals:
 private:
     void at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void at_timer_timeout();
+    void at_server_auxUrlsChanged(const QnResourcePtr &resource);
 
     void removeAddress(const SocketAddress &address, bool holdItem);
     void handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address);

@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
@@ -43,7 +44,7 @@ QnWorkbenchAccessController::~QnWorkbenchAccessController() {
 
 Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &resource) const {
     if (resource == m_user)
-        if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
+        if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
             return Qn::GlobalViewerPermissions;
 
     if (!m_dataByResource.contains(resource)) {
@@ -65,7 +66,7 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {
 }
 
 Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResourcePtr &user) const {
-    if (qnSettings->isVideoWallMode() || qnSettings->isActiveXMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return Qn::GlobalViewerPermissions;
 
     Qn::Permissions result(0);
