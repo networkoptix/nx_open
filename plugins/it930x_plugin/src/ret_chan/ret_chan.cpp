@@ -6,26 +6,32 @@
 
 //
 
+unsigned RCString::readLength(const Byte * buf)
+{
+    unsigned x = buf[0];
+    x <<= 8; x |= buf[1];
+    x <<= 8; x |= buf[2];
+    x <<= 8; x |= buf[3];
+    return x;
+}
+
 unsigned RCString::copy(const RCString * srcStr)
 {
-    clear();
-
-    stringLength = srcStr->stringLength;
-    stringData = new Byte[stringLength];
-
-    memcpy(stringData, srcStr->stringData, stringLength);
-
-    return ReturnChannelError::NO_ERROR;
+    return set(srcStr->stringData, srcStr->stringLength);
 }
 
 unsigned RCString::set(const Byte * buf, unsigned bufferLength)
 {
     clear();
 
-    stringLength = bufferLength;
-    stringData = new Byte[stringLength];
-
-    memcpy(stringData, buf, bufferLength);
+    if (buf && bufferLength)
+    {
+        stringLength = bufferLength;
+        stringData = new Byte[stringLength];
+        memcpy(stringData, buf, bufferLength);
+    }
+    else
+        stringLength = 0;
 
     return ReturnChannelError::NO_ERROR;
 }
@@ -1698,7 +1704,7 @@ unsigned Cmd_StringRead(const Byte * buf, unsigned bufferLength, unsigned * inde
     }
     else
 	{
-        unsigned strLength = (buf[tempIndex]<<24) | (buf[tempIndex+1]<<16) | (buf[tempIndex+2]<<8) | buf[tempIndex+3] ;
+        unsigned strLength = RCString::readLength( &buf[tempIndex] );
 		tempIndex = tempIndex + 4;
 
         if (bufferLength < tempIndex + strLength)
@@ -1710,7 +1716,7 @@ unsigned Cmd_StringRead(const Byte * buf, unsigned bufferLength, unsigned * inde
 		{
             str->set(buf + tempIndex, strLength);
 
-			tempIndex = tempIndex + str->stringLength;
+            tempIndex = tempIndex + str->length();
 			(* index) = tempIndex;
 		}
 	}
@@ -1757,7 +1763,7 @@ void Cmd_QwordAssign(Byte* buf, unsigned long long var,unsigned* length)
 void Cmd_StringAssign(Byte* buf,const RCString* str,unsigned* length)
 {
 	unsigned tempLength = (* length);
-	unsigned strLength = str->stringLength;
+    unsigned strLength = str->length();
 	buf[tempLength + 0] = (Byte)(strLength>>24);
 	buf[tempLength + 1]  = (Byte)(strLength>>16);
 	buf[tempLength + 2] = (Byte)(strLength>>8);
@@ -1765,7 +1771,7 @@ void Cmd_StringAssign(Byte* buf,const RCString* str,unsigned* length)
 
 	tempLength = tempLength + 4;
 
-    memcpy( buf + tempLength, str->stringData, strLength);
+    memcpy( buf + tempLength, str->data(), strLength);
 
 	tempLength = tempLength + strLength;
 	(*length) = tempLength;

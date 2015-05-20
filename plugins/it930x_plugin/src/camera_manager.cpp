@@ -30,8 +30,8 @@ namespace
         const char * m_name;
     };
 
-    AdvParam PARAM_ALL_OPEN = "<all>";
-    AdvParam PARAM_ALL_CLOSE = "</all>";
+    AdvParam PARAM_ALL_OPEN = "{";
+    AdvParam PARAM_ALL_CLOSE = "}";
 
     AdvParam PARAM_SIGNAL_CHANNEL =         "channel";
     AdvParam PARAM_SIGNAL_PRESENT =         "present";
@@ -750,7 +750,7 @@ namespace ite
             Timer::sleep(10);
         }
 
-#if 1   // experimental
+#if 0   // experimental
         if (m_txDevice->responsesCount() == 0)
             freeRx(true);
 #endif

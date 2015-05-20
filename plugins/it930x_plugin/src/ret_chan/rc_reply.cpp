@@ -428,10 +428,10 @@ void User_getSdtServiceReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    enable				= %u\n",in_ServiceConfig->enable);
 	printf("    LCN					= 0x%x\n",in_ServiceConfig->LCN);
 
-	printf("    serviceName stringLength		= %u\n",in_ServiceConfig->serviceName.stringLength);
-	printf("    serviceName stringData		= %s\n",in_ServiceConfig->serviceName.stringData);
-	printf("    provider stringLength		= %u\n",in_ServiceConfig->provider.stringLength);
-	printf("    provider stringData			= %s\n",in_ServiceConfig->provider.stringData);
+    printf("    serviceName stringLength		= %u\n",in_ServiceConfig->serviceName.length());
+    printf("    serviceName stringData		= %s\n",in_ServiceConfig->serviceName.data());
+    printf("    provider stringLength		= %u\n",in_ServiceConfig->provider.length());
+    printf("    provider stringData			= %s\n",in_ServiceConfig->provider.data());
 	printf("    extensionFlag			= %u\n",in_ServiceConfig->extensionFlag);
 	if(in_ServiceConfig->extensionFlag == 1)
 	{
@@ -464,10 +464,10 @@ void User_getEITInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    startDate			= 0x%08x\n",in_EITInfo->eitInfoParam[i].startDate);
 		printf("    startTime			= 0x%08x\n",in_EITInfo->eitInfoParam[i].startTime);
 		printf("    duration			= 0x%08x\n",in_EITInfo->eitInfoParam[i].duration);
-		printf("    eventName stringLength	= %u\n",in_EITInfo->eitInfoParam[i].eventName.stringLength);
-		printf("    eventName stringData	= %s\n",in_EITInfo->eitInfoParam[i].eventName.stringData);
-		printf("    eventText stringLength	= %u\n",in_EITInfo->eitInfoParam[i].eventText.stringLength);
-		printf("    eventText stringData	= %s\n",in_EITInfo->eitInfoParam[i].eventText.stringData);
+        printf("    eventName stringLength	= %u\n",in_EITInfo->eitInfoParam[i].eventName.length());
+        printf("    eventName stringData	= %s\n",in_EITInfo->eitInfoParam[i].eventName.data());
+        printf("    eventText stringLength	= %u\n",in_EITInfo->eitInfoParam[i].eventText.length());
+        printf("    eventText stringData	= %s\n",in_EITInfo->eitInfoParam[i].eventText.data());
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
 	}
 	printf("=== Cmd=0x%04x: User_getEITInfoReply ===\n\n", CMD_GetEITInformationOutput);
@@ -524,20 +524,20 @@ void User_getDeviceInformationReply(RCHostInfo* deviceInfo, Word /*command*/)
 	ManufactureInfo* in_ManufactureInfo = &deviceInfo->manufactureInfo;
 
 	printf("=== Cmd=0x%04x: User_getDeviceInformationReply ===\n\n", CMD_GetDeviceInformationOutput);
-	printf("    manufactureName.stringLength	= %u\n",in_ManufactureInfo->manufactureName.stringLength);
-	printf("    manufactureName.stringData		= %s\n",in_ManufactureInfo->manufactureName.stringData);
+    printf("    manufactureName.stringLength	= %u\n",in_ManufactureInfo->manufactureName.length());
+    printf("    manufactureName.stringData		= %s\n",in_ManufactureInfo->manufactureName.data());
 
-	printf("    modelName.stringLength		= %u\n",in_ManufactureInfo->modelName.stringLength);
-	printf("    modelName.stringData		= %s\n",in_ManufactureInfo->modelName.stringData);
+    printf("    modelName.stringLength		= %u\n",in_ManufactureInfo->modelName.length());
+    printf("    modelName.stringData		= %s\n",in_ManufactureInfo->modelName.data());
 
-	printf("    firmwareVersion.stringLength	= %u\n",in_ManufactureInfo->firmwareVersion.stringLength);
-	printf("    firmwareVersion.stringData		= %s\n",in_ManufactureInfo->firmwareVersion.stringData);
+    printf("    firmwareVersion.stringLength	= %u\n",in_ManufactureInfo->firmwareVersion.length());
+    printf("    firmwareVersion.stringData		= %s\n",in_ManufactureInfo->firmwareVersion.data());
 
-	printf("    serialNumber.stringLength		= %u\n",in_ManufactureInfo->serialNumber.stringLength);
-	printf("    serialNumber.stringData		= %s\n",in_ManufactureInfo->serialNumber.stringData);
+    printf("    serialNumber.stringLength		= %u\n",in_ManufactureInfo->serialNumber.length());
+    printf("    serialNumber.stringData		= %s\n",in_ManufactureInfo->serialNumber.data());
 
-	printf("    hardwareId.stringLength		= %u\n",in_ManufactureInfo->hardwareId.stringLength);
-	printf("    hardwareId.stringData		= %s\n",in_ManufactureInfo->hardwareId.stringData);
+    printf("    hardwareId.stringLength		= %u\n",in_ManufactureInfo->hardwareId.length());
+    printf("    hardwareId.stringData		= %s\n",in_ManufactureInfo->hardwareId.data());
 	printf("=== Cmd=0x%04x: User_getDeviceInformationReply ===\n\n", CMD_GetDeviceInformationOutput);
 }
 
@@ -546,8 +546,8 @@ void User_getHostnameReply(RCHostInfo* deviceInfo, Word /*command*/)
 	HostInfo* in_HostInfo = &deviceInfo->hostInfo;
 
 	printf("=== Cmd=0x%04x: User_getHostnameReply ===\n\n", CMD_GetHostnameOutput);
-	printf("    hostName.stringLength	= %u\n",in_HostInfo->hostName.stringLength);
-	printf("    hostName.stringData		= %s\n",in_HostInfo->hostName.stringData);
+    printf("    hostName.stringLength	= %u\n",in_HostInfo->hostName.length());
+    printf("    hostName.stringData		= %s\n",in_HostInfo->hostName.data());
 	printf("=== Cmd=0x%04x: User_getHostnameReply ===\n\n", CMD_GetHostnameOutput);
 }
 
@@ -586,8 +586,8 @@ void User_getSystemLogReply(RCHostInfo* deviceInfo, Word /*command*/)
 	SystemLog* in_SystemLog = &deviceInfo->systemLog;
 
 	printf("=== Cmd=0x%04x: User_getSystemLogReply ===\n\n", CMD_GetSystemLogOutput);
-	printf("    systemLog stringLength	= %u\n",in_SystemLog->logData.stringLength);
-	printf("    systemLog stringData	= %s\n",in_SystemLog->logData.stringData);
+    printf("    systemLog stringLength	= %u\n",in_SystemLog->logData.length());
+    printf("    systemLog stringData	= %s\n",in_SystemLog->logData.data());
 	printf("=== Cmd=0x%04x: User_getSystemLogReply ===\n\n", CMD_GetSystemLogOutput);
 }
 
@@ -611,8 +611,8 @@ void User_getOSDInfoReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    textEnable		= %u\n",in_OSDInfo->textEnable);
 	printf("    textPosition	= %u\n",in_OSDInfo->textPosition);
 
-	printf("    text stringLength	= %u\n",in_OSDInfo->text.stringLength);
-	printf("    text stringData	= %s\n",in_OSDInfo->text.stringData);
+    printf("    text stringLength	= %u\n",in_OSDInfo->text.length());
+    printf("    text stringData	= %s\n",in_OSDInfo->text.data());
 	printf("=== Cmd=0x%04x: User_getOSDInfoReply ===\n\n", CMD_GetOSDInformationOutput);
 }
 
@@ -621,8 +621,8 @@ void User_systemRebootReply(RCHostInfo* deviceInfo, Word /*command*/)
 	SystemReboot* in_SystemReboot = &deviceInfo->systemReboot;
 
 	printf("=== Cmd=0x%04x: User_systemReboot ===\n\n", CMD_SystemRebootOutput);
-	printf("    rebootMessage stringLength	= %u\n",in_SystemReboot->responseMessage.stringLength);
-	printf("    rebootMessage stringData	= %s\n",in_SystemReboot->responseMessage.stringData);
+    printf("    rebootMessage stringLength	= %u\n",in_SystemReboot->responseMessage.length());
+    printf("    rebootMessage stringData	= %s\n",in_SystemReboot->responseMessage.data());
 	printf("=== Cmd=0x%04x: User_systemReboot ===\n\n", CMD_SystemRebootOutput);
 }
 
@@ -631,8 +631,8 @@ void User_upgradeSystemFirmwareReply(RCHostInfo* deviceInfo, Word command)
 	SystemFirmware* in_SystemFirmware = &deviceInfo->systemFirmware;
 
 	printf("=== Cmd=0x%04x: User_upgradeSystemFirmwareReply ===\n\n", command);
-	printf("    message stringLength	= %u\n",in_SystemFirmware->message.stringLength);
-	printf("    message stringData		= %s\n",in_SystemFirmware->message.stringData);
+    printf("    message stringLength	= %u\n",in_SystemFirmware->message.length());
+    printf("    message stringData		= %s\n",in_SystemFirmware->message.data());
 	printf("=== Cmd=0x%04x: User_upgradeSystemFirmwareReply ===\n\n", command);
 }
 
@@ -650,8 +650,8 @@ void User_getDigitalInputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_DigitalInputsInfo->listSize; i ++)
 	{
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
-		printf("    upgradeMessage stringLength	= %u\n",in_DigitalInputsInfo->tokenList[i].stringLength);
-		printf("    upgradeMessage stringData	= %s\n",in_DigitalInputsInfo->tokenList[i].stringData);
+        printf("    upgradeMessage stringLength	= %u\n",in_DigitalInputsInfo->tokenList[i].length());
+        printf("    upgradeMessage stringData	= %s\n",in_DigitalInputsInfo->tokenList[i].data());
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
 	}
 	printf("=== Cmd=0x%04x: User_getDigitalInputsReply ===\n\n", CMD_GetDigitalInputsOutput);
@@ -668,8 +668,8 @@ void User_getRelayOutputsReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_RelayOutputs->listSize; i ++)
 	{
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
-		printf("    token stringLength	= %u\n", in_RelayOutputs->relayOutputsParam[i].token.stringLength);
-		printf("    token stringData	= %s\n", in_RelayOutputs->relayOutputsParam[i].token.stringData);
+        printf("    token stringLength	= %u\n", in_RelayOutputs->relayOutputsParam[i].token.length());
+        printf("    token stringData	= %s\n", in_RelayOutputs->relayOutputsParam[i].token.data());
 
 		printf("    mode		= %u\n", in_RelayOutputs->relayOutputsParam[i].mode);
 		printf("    delayTime		= %u\n", in_RelayOutputs->relayOutputsParam[i].delayTime);
@@ -744,8 +744,8 @@ void User_getStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("=== Cmd=0x%04x: User_getStatusReply ===\n\n", CMD_IMG_GetStatusOutput);
 	printf("    position		= %u\n",in_FocusStatusInfo->position);
 	printf("    moveStatus		= %u\n",in_FocusStatusInfo->moveStatus);
-	printf("    error stringLength	= %u\n",in_FocusStatusInfo->error.stringLength);
-	printf("    error stringData	= %s\n",in_FocusStatusInfo->error.stringData);
+    printf("    error stringLength	= %u\n",in_FocusStatusInfo->error.length());
+    printf("    error stringData	= %s\n",in_FocusStatusInfo->error.data());
 	printf("=== Cmd=0x%04x: User_getStatusReply ===\n\n", CMD_IMG_GetStatusOutput);
 }
 
@@ -820,8 +820,8 @@ void User_getUserDefinedSettingsReply(RCHostInfo* deviceInfo, Word /*command*/)
 	UserDefinedSettings* in_UserDefinedSettings = &deviceInfo->userDefinedSettings;
 
 	printf("=== Cmd=0x%04x: User_getUserDefinedSettingsReply ===\n\n", CMD_GetUserDefinedSettingsInput);
-	printf("    uerDefinedData 	stringLength	= %u\n",in_UserDefinedSettings->uerDefinedData.stringLength);
-	printf("    uerDefinedData 	stringData	= %s\n",in_UserDefinedSettings->uerDefinedData.stringData);
+    printf("    uerDefinedData 	stringLength	= %u\n",in_UserDefinedSettings->uerDefinedData.length());
+    printf("    uerDefinedData 	stringData	= %s\n",in_UserDefinedSettings->uerDefinedData.data());
 	printf("=== Cmd=0x%04x: User_getUserDefinedSettingsReply ===\n\n", CMD_GetUserDefinedSettingsInput);
 }
 //-----------------------Imaging Service-------------------------
@@ -864,8 +864,8 @@ void User_getVideoOSDConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    detailInfoOption		= %u\n",in_VideoOSDConfig->detailInfoOption);
 	printf("    textEnable			= %u\n",in_VideoOSDConfig->textEnable);
 	printf("    textPosition		= %u\n",in_VideoOSDConfig->textPosition);
-	printf("    text stringLength		= %u\n",in_VideoOSDConfig->text.stringLength);
-	printf("    text stringData		= %s\n",in_VideoOSDConfig->text.stringData);
+    printf("    text stringLength		= %u\n",in_VideoOSDConfig->text.length());
+    printf("    text stringData		= %s\n",in_VideoOSDConfig->text.data());
 	printf("=== Cmd=0x%04x: User_getVideoOSDConfigReply ===\n\n", CMD_GetVideoOSDConfigurationOutput);
 }
 
@@ -900,8 +900,8 @@ void User_getAudioSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/
 	printf("    audioSrcTokensAvailableListSize			= %u\n",in_AudioSrcConfigOptions->audioSrcTokensAvailableListSize);
 	for( i = 0; i < in_AudioSrcConfigOptions->audioSrcTokensAvailableListSize; i ++)
 	{
-		printf("    audioSrcTokensAvailableList[%u] stringLength		= %u\n", i, in_AudioSrcConfigOptions->audioSrcTokensAvailableList[i].stringLength);
-		printf("    audioSrcTokensAvailableList[%u] stringData		= %s\n", i, in_AudioSrcConfigOptions->audioSrcTokensAvailableList[i].stringData);
+        printf("    audioSrcTokensAvailableList[%u] stringLength		= %u\n", i, in_AudioSrcConfigOptions->audioSrcTokensAvailableList[i].length());
+        printf("    audioSrcTokensAvailableList[%u] stringData		= %s\n", i, in_AudioSrcConfigOptions->audioSrcTokensAvailableList[i].data());
 	}
 	printf("=== Cmd=0x%04x: User_getAudioSrcConfigOptionsReply ===\n\n", CMD_GetAudioSourceConfigurationOptionsOutput);
 }
@@ -960,8 +960,8 @@ void User_getVideoSrcConfigOptionsReply(RCHostInfo* deviceInfo, Word /*command*/
 	printf("    videoSrcTokensAvailableListSize			= %u\n",in_VideoSrcConfigOptions->videoSrcTokensAvailableListSize);
 	for( i = 0; i < in_VideoSrcConfigOptions->videoSrcTokensAvailableListSize; i ++)
 	{
-		printf("    videoSrcTokensAvailableList[%u] stringLength		= %u\n", i, in_VideoSrcConfigOptions->videoSrcTokensAvailableList[i].stringLength);
-		printf("    videoSrcTokensAvailableList[%u] stringData		= %s\n", i, in_VideoSrcConfigOptions->videoSrcTokensAvailableList[i].stringData);
+        printf("    videoSrcTokensAvailableList[%u] stringLength		= %u\n", i, in_VideoSrcConfigOptions->videoSrcTokensAvailableList[i].length());
+        printf("    videoSrcTokensAvailableList[%u] stringData		= %s\n", i, in_VideoSrcConfigOptions->videoSrcTokensAvailableList[i].data());
 	}
 	printf("    rotateModeOptions					= 0x%x\n",in_VideoSrcConfigOptions->rotateModeOptions);
 	printf("    rotateDegreeMinOption				= %u\n",in_VideoSrcConfigOptions->rotateDegreeMinOption);
@@ -982,10 +982,10 @@ void User_getAudioEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_AudioEncConfig->configListSize; i ++)
 	{
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
-		printf("    token stringLength	= %u\n",in_AudioEncConfig->configList[i].token.stringLength);
-		printf("    token stringData	= %s\n",in_AudioEncConfig->configList[i].token.stringData);
-		printf("    name stringLength	= %u\n",in_AudioEncConfig->configList[i].name.stringLength);
-		printf("    name stringData	= %s\n",in_AudioEncConfig->configList[i].name.stringData);
+        printf("    token stringLength	= %u\n",in_AudioEncConfig->configList[i].token.length());
+        printf("    token stringData	= %s\n",in_AudioEncConfig->configList[i].token.data());
+        printf("    name stringLength	= %u\n",in_AudioEncConfig->configList[i].name.length());
+        printf("    name stringData	= %s\n",in_AudioEncConfig->configList[i].name.data());
 		printf("    useCount		= %u\n",in_AudioEncConfig->configList[i].useCount);
 		printf("    encoding		= %u\n",in_AudioEncConfig->configList[i].encoding);
 		printf("    bitrate		= %u\n",in_AudioEncConfig->configList[i].bitrate);
@@ -1005,12 +1005,12 @@ void User_getAudioSourceConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_AudioSrcConfig->configListSize; i ++)
 	{
 		printf("----------------------------- Index %u ----------------------------------\n",i);
-		printf("    name stringLength		= %u\n", in_AudioSrcConfig->audioSrcConfigList[i].name.stringLength);
-		printf("    name stringData		= %s\n",in_AudioSrcConfig->audioSrcConfigList[i].name.stringData);
-		printf("    token stringLength		= %u\n",in_AudioSrcConfig->audioSrcConfigList[i].token.stringLength);
-		printf("    token stringData		= %s\n",in_AudioSrcConfig->audioSrcConfigList[i].token.stringData);
-		printf("    sourceToken stringLength	= %u\n",  in_AudioSrcConfig->audioSrcConfigList[i].sourceToken.stringLength);
-		printf("    sourceToken stringData	= %s\n",in_AudioSrcConfig->audioSrcConfigList[i].sourceToken.stringData);
+        printf("    name stringLength		= %u\n", in_AudioSrcConfig->audioSrcConfigList[i].name.length());
+        printf("    name stringData		= %s\n",in_AudioSrcConfig->audioSrcConfigList[i].name.data());
+        printf("    token stringLength		= %u\n",in_AudioSrcConfig->audioSrcConfigList[i].token.length());
+        printf("    token stringData		= %s\n",in_AudioSrcConfig->audioSrcConfigList[i].token.data());
+        printf("    sourceToken stringLength	= %u\n",  in_AudioSrcConfig->audioSrcConfigList[i].sourceToken.length());
+        printf("    sourceToken stringData	= %s\n",in_AudioSrcConfig->audioSrcConfigList[i].sourceToken.data());
 		printf("    useCount			= %u\n",in_AudioSrcConfig->audioSrcConfigList[i].useCount);
 		printf("----------------------------- Index %u ----------------------------------\n",i);
 	}
@@ -1027,8 +1027,8 @@ void User_getAudioSourcesReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_AudioSources->audioSourcesListSize; i ++)
 	{
 		printf("----------------------------- Index %u ----------------------------------\n",i);
-		printf("    audioSourcesToken stringLength	= %u\n", in_AudioSources->audioSourcesList[i].audioSourcesToken.stringLength);
-		printf("    audioSourcesToken stringData	= %s\n",  in_AudioSources->audioSourcesList[i].audioSourcesToken.stringData);
+        printf("    audioSourcesToken stringLength	= %u\n", in_AudioSources->audioSourcesList[i].audioSourcesToken.length());
+        printf("    audioSourcesToken stringData	= %s\n",  in_AudioSources->audioSourcesList[i].audioSourcesToken.data());
 
 		printf("    channels				= %u\n",  in_AudioSources->audioSourcesList[i].channels);
 		printf("----------------------------- Index %u ----------------------------------\n",i);
@@ -1061,16 +1061,16 @@ void User_getProfilesReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_MediaProfiles->profilesListSize; i ++)
 	{
 		printf("----------------------------- Index %u ----------------------------------\n",i);
-		printf("    name stringLength					= %u\n", in_MediaProfiles->mediaProfilesParam[i].name.stringLength);
-		printf("    name stringData					= %s\n", in_MediaProfiles->mediaProfilesParam[i].name.stringData);
-		printf("    token stringLength					= %u\n", in_MediaProfiles->mediaProfilesParam[i].token.stringLength);
-		printf("    token stringData					= %s\n", in_MediaProfiles->mediaProfilesParam[i].token.stringData);
-		printf("    videoSrcName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcName.stringLength);
-		printf("    videoSrcName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcName.stringData);
-		printf("    videoSrcToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcToken.stringLength);
-		printf("    videoSrcToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcToken.stringData);
-		printf("    videoSrcSourceToken stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcSourceToken.stringLength);
-		printf("    videoSrcSourceToken stringData			= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcSourceToken.stringData);
+        printf("    name stringLength					= %u\n", in_MediaProfiles->mediaProfilesParam[i].name.length());
+        printf("    name stringData					= %s\n", in_MediaProfiles->mediaProfilesParam[i].name.data());
+        printf("    token stringLength					= %u\n", in_MediaProfiles->mediaProfilesParam[i].token.length());
+        printf("    token stringData					= %s\n", in_MediaProfiles->mediaProfilesParam[i].token.data());
+        printf("    videoSrcName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcName.length());
+        printf("    videoSrcName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcName.data());
+        printf("    videoSrcToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcToken.length());
+        printf("    videoSrcToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcToken.data());
+        printf("    videoSrcSourceToken stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcSourceToken.length());
+        printf("    videoSrcSourceToken stringData			= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcSourceToken.data());
 		printf("    videoSrcUseCount					= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcUseCount);
 		printf("    videoSrcBounds_x					= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcBounds_x);
 		printf("    videoSrcBounds_y					= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcBounds_y);
@@ -1080,18 +1080,18 @@ void User_getProfilesReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    videoSrcRotateDegree				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcRotateDegree);
 		printf("    videoSrcMirrorMode					= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoSrcMirrorMode);
 
-		printf("    audioSrcName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcName.stringLength);
-		printf("    audioSrcName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcName.stringData);
-		printf("    audioSrcToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcToken.stringLength);
-		printf("    audioSrcToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcToken.stringData);
-		printf("    audioSrcSourceToken stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcSourceToken.stringLength);
-		printf("    audioSrcSourceToken stringData			= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcSourceToken.stringData);
+        printf("    audioSrcName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcName.length());
+        printf("    audioSrcName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcName.data());
+        printf("    audioSrcToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcToken.length());
+        printf("    audioSrcToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcToken.data());
+        printf("    audioSrcSourceToken stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcSourceToken.length());
+        printf("    audioSrcSourceToken stringData			= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcSourceToken.data());
 		printf("    audioSrcUseCount					= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioSrcUseCount);
 
-		printf("    videoEncName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncName.stringLength);
-		printf("    videoEncName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoEncName.stringData);
-		printf("    videoEncToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncToken.stringLength);
-		printf("    videoEncToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoEncToken.stringData);
+        printf("    videoEncName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncName.length());
+        printf("    videoEncName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoEncName.data());
+        printf("    videoEncToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncToken.length());
+        printf("    videoEncToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].videoEncToken.data());
 		printf("    videoEncUseCount					= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncUseCount);
 		printf("    videoEncEncodingMode				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncEncodingMode);
 		printf("    videoEncResolutionWidth				= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncResolutionWidth);
@@ -1104,29 +1104,29 @@ void User_getProfilesReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    videoEncGovLength					= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncGovLength);
 		printf("    videoEncProfile					= %u\n", in_MediaProfiles->mediaProfilesParam[i].videoEncProfile);
 
-		printf("    audioEncName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioEncName.stringLength);
-		printf("    audioEncName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioEncName.stringData);
-		printf("    audioEncToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioEncToken.stringLength);
-		printf("    audioEncToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioEncToken.stringData);
+        printf("    audioEncName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioEncName.length());
+        printf("    audioEncName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioEncName.data());
+        printf("    audioEncToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioEncToken.length());
+        printf("    audioEncToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioEncToken.data());
 		printf("    audioEncUseCount					= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioEncUseCount);
 		printf("    audioEncEncoding					= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioEncEncoding);
 		printf("    audioEncBitrate					= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioEncBitrate);
 		printf("    audioEncSampleRate					= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioEncSampleRate);
 
-		printf("    audioOutputName stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputName.stringLength);
-		printf("    audioOutputName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputName.stringData);
-		printf("    audioOutputToken stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputToken.stringLength);
-		printf("    audioOutputToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputToken.stringData);
-		printf("    audioOutputOutputToken stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputOutputToken.stringLength);
-		printf("    audioOutputOutputToken stringData			= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputOutputToken.stringData);
+        printf("    audioOutputName stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputName.length());
+        printf("    audioOutputName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputName.data());
+        printf("    audioOutputToken stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputToken.length());
+        printf("    audioOutputToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputToken.data());
+        printf("    audioOutputOutputToken stringLength			= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputOutputToken.length());
+        printf("    audioOutputOutputToken stringData			= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputOutputToken.data());
 		printf("    audioOutputUseCount					= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputUseCount);
 		printf("    audioOutputSendPrimacy				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputSendPrimacy);
 		printf("    audioOutputOutputLevel				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioOutputOutputLevel);
 
-		printf("    audioDecName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioDecName.stringLength);
-		printf("    audioDecName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioDecName.stringData);
-		printf("    audioDecToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioDecToken.stringLength);
-		printf("    audioDecToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioDecToken.stringData);
+        printf("    audioDecName stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioDecName.length());
+        printf("    audioDecName stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioDecName.data());
+        printf("    audioDecToken stringLength				= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioDecToken.length());
+        printf("    audioDecToken stringData				= %s\n", in_MediaProfiles->mediaProfilesParam[i].audioDecToken.data());
 		printf("    audioDecUseCount					= %u\n", in_MediaProfiles->mediaProfilesParam[i].audioDecUseCount);
 		if(in_MediaProfiles->extensionFlag == 1)
 		{
@@ -1152,10 +1152,10 @@ void User_getVideoEncConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_VideoEncConfig->configListSize; i ++)
 	{
 		printf("---------------------------------- Index %u -------------------------------------\n",i);
-		printf("    name stringLength		= %u\n", in_VideoEncConfig->configList[i].name.stringLength);
-		printf("    name stringData		= %s\n", in_VideoEncConfig->configList[i].name.stringData);
-		printf("    token stringLength		= %u\n", in_VideoEncConfig->configList[i].token.stringLength);
-		printf("    token stringData		= %s\n", in_VideoEncConfig->configList[i].token.stringData);
+        printf("    name stringLength		= %u\n", in_VideoEncConfig->configList[i].name.length());
+        printf("    name stringData		= %s\n", in_VideoEncConfig->configList[i].name.data());
+        printf("    token stringLength		= %u\n", in_VideoEncConfig->configList[i].token.length());
+        printf("    token stringData		= %s\n", in_VideoEncConfig->configList[i].token.data());
 		printf("    useCount			= %u\n", in_VideoEncConfig->configList[i].useCount);
 		printf("    encoding			= %u\n", in_VideoEncConfig->configList[i].encoding);
 		printf("    width			= %u\n", in_VideoEncConfig->configList[i].width);
@@ -1192,12 +1192,12 @@ void User_getVideoSrcConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_VideoSrcConfig->configListSize; i ++)
 	{
 		printf("---------------------------------- Index %u -------------------------------------\n", i);
-		printf("    name stringLength		= %u\n",in_VideoSrcConfig->configList[i].name.stringLength);
-		printf("    name stringData		= %s\n",in_VideoSrcConfig->configList[i].name.stringData);
-		printf("    token stringLength		= %u\n",in_VideoSrcConfig->configList[i].token.stringLength);
-		printf("    token stringData		= %s\n",in_VideoSrcConfig->configList[i].token.stringData);
-		printf("    srcToken stringLength	= %u\n",in_VideoSrcConfig->configList[i].srcToken.stringLength);
-		printf("    srcToken stringData		= %s\n",in_VideoSrcConfig->configList[i].srcToken.stringData);
+        printf("    name stringLength		= %u\n",in_VideoSrcConfig->configList[i].name.length());
+        printf("    name stringData		= %s\n",in_VideoSrcConfig->configList[i].name.data());
+        printf("    token stringLength		= %u\n",in_VideoSrcConfig->configList[i].token.length());
+        printf("    token stringData		= %s\n",in_VideoSrcConfig->configList[i].token.data());
+        printf("    srcToken stringLength	= %u\n",in_VideoSrcConfig->configList[i].srcToken.length());
+        printf("    srcToken stringData		= %s\n",in_VideoSrcConfig->configList[i].srcToken.data());
 		printf("    useCount			= %u\n",in_VideoSrcConfig->configList[i].useCount);
 		printf("    bounds_x			= %u\n",in_VideoSrcConfig->configList[i].bounds_x);
 		printf("    bounds_y			= %u\n",in_VideoSrcConfig->configList[i].bounds_y);
@@ -1228,8 +1228,8 @@ void User_getVideoSrcReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_VideoSrc->videoSrcListSize; i ++)
 	{
 		printf("---------------------------------- Index %u -------------------------------------\n", i);
-		printf("    token stringLength	= %u\n",in_VideoSrc->srcList[i].token.stringLength);
-		printf("    token stringData	= %s\n",in_VideoSrc->srcList[i].token.stringData);
+        printf("    token stringLength	= %u\n",in_VideoSrc->srcList[i].token.length());
+        printf("    token stringData	= %s\n",in_VideoSrc->srcList[i].token.data());
 		printf("    frameRate		= %u\n",in_VideoSrc->srcList[i].frameRate);
 		printf("    resolutionWidth	= %u\n",in_VideoSrc->srcList[i].resolutionWidth);
 		printf("    resolutionHeight	= %u\n",in_VideoSrc->srcList[i].resolutionHeight);
@@ -1270,16 +1270,16 @@ void User_getRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_RuleList->ruleListSize; i ++)
 	{
 		printf("--------------------rule %u--------------------\n", i );
-		printf("    ruleName stringLength	= %u\n",in_RuleList->totalRuleList[i].ruleName.stringLength);
-		printf("    ruleName stringData		= %s\n",in_RuleList->totalRuleList[i].ruleName.stringData);
-		printf("    ruleToken stringLength	= %u\n",in_RuleList->totalRuleList[i].ruleToken.stringLength);
-		printf("    ruleToken stringData	= %s\n",in_RuleList->totalRuleList[i].ruleToken.stringData);
+        printf("    ruleName stringLength	= %u\n",in_RuleList->totalRuleList[i].ruleName.length());
+        printf("    ruleName stringData		= %s\n",in_RuleList->totalRuleList[i].ruleName.data());
+        printf("    ruleToken stringLength	= %u\n",in_RuleList->totalRuleList[i].ruleToken.length());
+        printf("    ruleToken stringData	= %s\n",in_RuleList->totalRuleList[i].ruleToken.data());
 		printf("    type			= 0x%02x\n",in_RuleList->totalRuleList[i].type);
 
 		if(deviceInfo->ruleList.extensionFlag == 1)
 		{
-			printf("    videoSrcToken stringLength	= %u\n",in_RuleList->totalRuleList[i].videoSrcToken.stringLength);
-			printf("    videoSrcToken stringData	= %s\n",in_RuleList->totalRuleList[i].videoSrcToken.stringData);
+            printf("    videoSrcToken stringLength	= %u\n",in_RuleList->totalRuleList[i].videoSrcToken.length());
+            printf("    videoSrcToken stringData	= %s\n",in_RuleList->totalRuleList[i].videoSrcToken.data());
 			printf("    threshold			= %u\n",in_RuleList->totalRuleList[i].threshold);
 			printf("    motionSensitivity		= %u\n",in_RuleList->totalRuleList[i].motionSensitivity);
 		}else
@@ -1352,10 +1352,10 @@ void User_getRulesReply(RCHostInfo* deviceInfo, Word /*command*/)
 			printf("    alarmOnDelay		= %u\n",ptrRule_CellMotion->alarmOnDelay);
 			printf("    alarmOffDelay		= %u\n",ptrRule_CellMotion->alarmOffDelay);
 			printf("    activeCellsSize		= %u\n",ptrRule_CellMotion->activeCellsSize);
-			printf("    activeCells stringLength	= %u\n",ptrRule_CellMotion->activeCells.stringLength);
+            printf("    activeCells stringLength	= %u\n",ptrRule_CellMotion->activeCells.length());
 			printf("    activeCells stringData	= \n");
-			for( j = 0; j < ptrRule_CellMotion->activeCells.stringLength; j ++)
-				printf("    [%u] : 0x%02x\n", j , ptrRule_CellMotion->activeCells.stringData[j]);
+            for (j = 0; j < ptrRule_CellMotion->activeCells.length(); j++)
+                printf("    [%u] : 0x%02x\n", j , ptrRule_CellMotion->activeCells.data()[j]);
 			printf("    sensitivity			= %u\n",ptrRule_CellMotion->sensitivity);
 			printf("    layoutBounds_x		= %u\n",ptrRule_CellMotion->layoutBounds_x);
 			printf("    layoutBounds_y		= %u\n",ptrRule_CellMotion->layoutBounds_y);
@@ -1387,11 +1387,11 @@ void User_getPTZConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0; i < in_PTZConfig->PTZConfigListSize; i ++)
 	{
 		printf("------------------------------------ Index %u --------------------------------------\n", i);
-		printf("    name stringLength		= %u\n",in_PTZConfig->PTZConfigList[i].name.stringLength);
-		printf("    name stringData		= %s\n",in_PTZConfig->PTZConfigList[i].name.stringData);
+        printf("    name stringLength		= %u\n",in_PTZConfig->PTZConfigList[i].name.length());
+        printf("    name stringData		= %s\n",in_PTZConfig->PTZConfigList[i].name.data());
 		printf("    useCount			= %u\n",in_PTZConfig->PTZConfigList[i].useCount);
-		printf("    token stringLength		= %u\n",in_PTZConfig->PTZConfigList[i].token.stringLength);
-		printf("    token stringData		= %s\n",in_PTZConfig->PTZConfigList[i].token.stringData);
+        printf("    token stringLength		= %u\n",in_PTZConfig->PTZConfigList[i].token.length());
+        printf("    token stringData		= %s\n",in_PTZConfig->PTZConfigList[i].token.data());
 		printf("    defaultPanSpeed		= %hd\n",in_PTZConfig->PTZConfigList[i].defaultPanSpeed);
 		printf("    defaultTiltSpeed		= %hd\n",in_PTZConfig->PTZConfigList[i].defaultTiltSpeed);
 		printf("    defaultZoomSpeed		= %hd\n",in_PTZConfig->PTZConfigList[i].defaultZoomSpeed);
@@ -1406,8 +1406,8 @@ void User_getPTZConfigReply(RCHostInfo* deviceInfo, Word /*command*/)
 		printf("    reverseMode			= %u\n",in_PTZConfig->PTZConfigList[i].reverseMode);
 		if(in_PTZConfig->extensionFlag == 1)
 		{
-			printf("    videoSrcToken stringLength	= %u\n",in_PTZConfig->PTZConfigList[i].videoSrcToken.stringLength);
-			printf("    videoSrcToken stringData	= %s\n",in_PTZConfig->PTZConfigList[i].videoSrcToken.stringData);
+            printf("    videoSrcToken stringLength	= %u\n",in_PTZConfig->PTZConfigList[i].videoSrcToken.length());
+            printf("    videoSrcToken stringData	= %s\n",in_PTZConfig->PTZConfigList[i].videoSrcToken.data());
 		}else
 		{
 			printf("    No Extension Parameter!\n");
@@ -1427,8 +1427,8 @@ void User_getPTZStatusReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("    zoomPosition	= %hd\n",in_PTZStatus->zoomPosition);
 	printf("    panTiltMoveStatus	= %u\n",in_PTZStatus->panTiltMoveStatus);
 	printf("    zoomMoveStatus	= %u\n",in_PTZStatus->zoomMoveStatus);
-	printf("    error stringLength	= %u\n",in_PTZStatus->error.stringLength);
-	printf("    error stringData	= %s\n",in_PTZStatus->error.stringData);
+    printf("    error stringLength	= %u\n",in_PTZStatus->error.length());
+    printf("    error stringData	= %s\n",in_PTZStatus->error.data());
 	printf("    UTCHour		= %u\n",in_PTZStatus->UTCHour);
 	printf("    UTCMinute		= %u\n",in_PTZStatus->UTCMinute);
 	printf("    UTCSecond		= %u\n",in_PTZStatus->UTCSecond);
@@ -1448,10 +1448,10 @@ void User_getPresetsReply(RCHostInfo* deviceInfo, Word /*command*/)
 	for( i = 0 ; i < in_PTZPresets->configListSize; i ++)
 	{
 		printf("------------------------------------ Index %u --------------------------------------\n", i);
-		printf("    presetName stringLength	= %u\n",in_PTZPresets->configList[i].presetName.stringLength);
-		printf("    presetName stringData	= %s\n",in_PTZPresets->configList[i].presetName.stringData);
-		printf("    presetToken stringLength	= %u\n",in_PTZPresets->configList[i].presetToken.stringLength);
-		printf("    presetToken stringData	= %s\n",in_PTZPresets->configList[i].presetToken.stringData);
+        printf("    presetName stringLength	= %u\n",in_PTZPresets->configList[i].presetName.length());
+        printf("    presetName stringData	= %s\n",in_PTZPresets->configList[i].presetName.data());
+        printf("    presetToken stringLength	= %u\n",in_PTZPresets->configList[i].presetToken.length());
+        printf("    presetToken stringData	= %s\n",in_PTZPresets->configList[i].presetToken.data());
 
 		printf("    panPosition			= %hd\n",in_PTZPresets->configList[i].panPosition);
 		printf("    tiltPosition		= %hd\n",in_PTZPresets->configList[i].tiltPosition);
@@ -1466,8 +1466,8 @@ void User_setPresetReply(RCHostInfo* deviceInfo, Word /*command*/)
 	PTZPresetsSet* in_PTZPresetsSet = &deviceInfo->ptzPresetsSet;
 
 	printf("=== Cmd=0x%04x: User_setPresetReply ===\n\n", CMD_SetPresetOutput);
-	printf("    presetToken stringLength	= %u\n",in_PTZPresetsSet->presetToken_set.stringLength);
-	printf("    presetToken stringData	= %s\n",in_PTZPresetsSet->presetToken_set.stringData);
+    printf("    presetToken stringLength	= %u\n",in_PTZPresetsSet->presetToken_set.length());
+    printf("    presetToken stringData	= %s\n",in_PTZPresetsSet->presetToken_set.data());
 	printf("=== Cmd=0x%04x: User_setPresetReply ===\n\n", CMD_SetPresetOutput);
 }
 //--------------------------PTZ Service--------------------------
@@ -1489,8 +1489,8 @@ void User_metadataStreamLineEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("\n=== Cmd=0x%04x: User_metadataStreamLineEventReply ===\r\n", CMD_MetadataStreamOutput);
 	printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
 	printf("     version			= 0x%04x\r\n",in_MetadataStreamInfo->version);
-	printf("     ruleToken stringLength	= %u\r\n",in_Metadata_Line_Event->ruleToken.stringLength);
-	printf("     ruleToken stringData	= %s\r\n",in_Metadata_Line_Event->ruleToken.stringData);
+    printf("     ruleToken stringLength	= %u\r\n",in_Metadata_Line_Event->ruleToken.length());
+    printf("     ruleToken stringData	= %s\r\n",in_Metadata_Line_Event->ruleToken.data());
 	printf("     objectID			= %u\r\n",in_Metadata_Line_Event->objectID);
 	printf("     UTCHour			= %u\r\n",in_Metadata_Line_Event->UTCHour);
 	printf("     UTCMinute			= %u\r\n",in_Metadata_Line_Event->UTCMinute);
@@ -1501,8 +1501,8 @@ void User_metadataStreamLineEventReply(RCHostInfo* deviceInfo, Word /*command*/)
 	printf("     extensionFlag		= %u\r\n",in_Metadata_Line_Event->extensionFlag);
 	if(in_Metadata_Line_Event->extensionFlag == 1)
 	{
-		printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Line_Event->videoSrcToken.stringLength);
-		printf("     videoSrcToken stringData	= %s\n",in_Metadata_Line_Event->videoSrcToken.stringData);
+        printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Line_Event->videoSrcToken.length());
+        printf("     videoSrcToken stringData	= %s\n",in_Metadata_Line_Event->videoSrcToken.data());
 	}else
 	{
 		printf("    No Extension Parameter!\n");
@@ -1518,8 +1518,8 @@ void User_metadataStreamFieldEventReply(RCHostInfo* deviceInfo, Word /*command*/
 	printf("\n=== Cmd=0x%04x: User_metadataStreamFieldEventReply ===\r\n", CMD_MetadataStreamOutput);
 	printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
 	printf("     version			= 0x%04x\r\n",in_MetadataStreamInfo->version);
-	printf("     ruleToken stringLength	= %u\r\n",in_Metadata_Field_Event->ruleToken.stringLength);
-	printf("     ruleToken stringData	= %s\r\n",in_Metadata_Field_Event->ruleToken.stringData);
+    printf("     ruleToken stringLength	= %u\r\n",in_Metadata_Field_Event->ruleToken.length());
+    printf("     ruleToken stringData	= %s\r\n",in_Metadata_Field_Event->ruleToken.data());
 	printf("     objectID			= %u\r\n",in_Metadata_Field_Event->objectID);
 	printf("     IsInside			= %u\r\n",in_Metadata_Field_Event->IsInside);
 	printf("     UTCHour			= %u\r\n",in_Metadata_Field_Event->UTCHour);
@@ -1531,8 +1531,8 @@ void User_metadataStreamFieldEventReply(RCHostInfo* deviceInfo, Word /*command*/
 	printf("     extensionFlag		= %u\r\n",in_Metadata_Field_Event->extensionFlag);
 	if(in_Metadata_Field_Event->extensionFlag == 1)
 	{
-		printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Field_Event->videoSrcToken.stringLength);
-		printf("     videoSrcToken stringData	= %s\n",in_Metadata_Field_Event->videoSrcToken.stringData);
+        printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Field_Event->videoSrcToken.length());
+        printf("     videoSrcToken stringData	= %s\n",in_Metadata_Field_Event->videoSrcToken.data());
 	}else
 	{
 		printf("    No Extension Parameter!\n");
@@ -1548,8 +1548,8 @@ void User_metadataStreamMotionEventReply(RCHostInfo* deviceInfo, Word /*command*
 	printf("\n=== Cmd=0x%04x: User_metadataStreamMotionEventReply ===\r\n", CMD_MetadataStreamOutput);
 	printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
 	printf("     version			= 0x%04x\r\n",in_MetadataStreamInfo->version);
-	printf("     ruleToken stringLength	= %u\r\n",in_Metadata_Motion_Event->ruleToken.stringLength);
-	printf("     ruleToken stringData	= %s\r\n",in_Metadata_Motion_Event->ruleToken.stringData);
+    printf("     ruleToken stringLength	= %u\r\n",in_Metadata_Motion_Event->ruleToken.length());
+    printf("     ruleToken stringData	= %s\r\n",in_Metadata_Motion_Event->ruleToken.data());
 	printf("     objectID			= %u\r\n",in_Metadata_Motion_Event->objectID);
 	printf("     UTCHour			= %u\r\n",in_Metadata_Motion_Event->UTCHour);
 	printf("     UTCMinute			= %u\r\n",in_Metadata_Motion_Event->UTCMinute);
@@ -1560,8 +1560,8 @@ void User_metadataStreamMotionEventReply(RCHostInfo* deviceInfo, Word /*command*
 	printf("     extensionFlag		= %u\r\n",in_Metadata_Motion_Event->extensionFlag);
 	if(in_Metadata_Motion_Event->extensionFlag == 1)
 	{
-		printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Motion_Event->videoSrcToken.stringLength);
-		printf("     videoSrcToken stringData	= %s\n",in_Metadata_Motion_Event->videoSrcToken.stringData);
+        printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Motion_Event->videoSrcToken.length());
+        printf("     videoSrcToken stringData	= %s\n",in_Metadata_Motion_Event->videoSrcToken.data());
 	}else
 	{
 		printf("    No Extension Parameter!\n");
@@ -1577,8 +1577,8 @@ void User_metadataStreamCountingEventReply(RCHostInfo* deviceInfo, Word /*comman
 	printf("\n=== Cmd=0x%04x: User_metadataStreamCountingEventReply ===\r\n", CMD_MetadataStreamOutput);
 	printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
 	printf("     version			= 0x%04x\r\n",in_MetadataStreamInfo->version);
-	printf("     ruleToken stringLength	= %u\r\n",in_Metadata_Counting_Event->ruleToken.stringLength);
-	printf("     ruleToken stringData	= %s\r\n",in_Metadata_Counting_Event->ruleToken.stringData);
+    printf("     ruleToken stringLength	= %u\r\n",in_Metadata_Counting_Event->ruleToken.length());
+    printf("     ruleToken stringData	= %s\r\n",in_Metadata_Counting_Event->ruleToken.data());
 	printf("     objectID			= %u\r\n",in_Metadata_Counting_Event->objectID);
 	printf("     count			= %u\r\n",in_Metadata_Counting_Event->count);
 	printf("     UTCHour			= %u\r\n",in_Metadata_Counting_Event->UTCHour);
@@ -1590,8 +1590,8 @@ void User_metadataStreamCountingEventReply(RCHostInfo* deviceInfo, Word /*comman
 	printf("     extensionFlag		= %u\r\n",in_Metadata_Counting_Event->extensionFlag);
 	if(in_Metadata_Counting_Event->extensionFlag == 1)
 	{
-		printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Counting_Event->videoSrcToken.stringLength);
-		printf("     videoSrcToken stringData	= %s\n",in_Metadata_Counting_Event->videoSrcToken.stringData);
+        printf("     videoSrcToken stringLength	= %u\n",in_Metadata_Counting_Event->videoSrcToken.length());
+        printf("     videoSrcToken stringData	= %s\n",in_Metadata_Counting_Event->videoSrcToken.data());
 	}else
 	{
 		printf("    No Extension Parameter!\n");
@@ -1607,8 +1607,8 @@ void User_metadataStreamCellMotionEventReply(RCHostInfo* deviceInfo, Word /*comm
 	printf("\n=== Cmd=0x%04x: User_metadataStreamCellMotionEventReply ===\r\n", CMD_MetadataStreamOutput);
 	printf("     type			= 0x%04x\r\n",in_MetadataStreamInfo->type);
 	printf("     version			= 0x%04x\r\n",in_MetadataStreamInfo->version);
-	printf("     ruleToken stringLength	= %u\r\n",in_Metadata_CellMotion_Event->ruleToken.stringLength);
-	printf("     ruleToken stringData	= %s\r\n",in_Metadata_CellMotion_Event->ruleToken.stringData);
+    printf("     ruleToken stringLength	= %u\r\n",in_Metadata_CellMotion_Event->ruleToken.length());
+    printf("     ruleToken stringData	= %s\r\n",in_Metadata_CellMotion_Event->ruleToken.data());
 	printf("     IsMotion			= %u\r\n",in_Metadata_CellMotion_Event->IsMotion);
 	printf("     UTCHour			= %u\r\n",in_Metadata_CellMotion_Event->UTCHour);
 	printf("     UTCMinute			= %u\r\n",in_Metadata_CellMotion_Event->UTCMinute);
@@ -1619,8 +1619,8 @@ void User_metadataStreamCellMotionEventReply(RCHostInfo* deviceInfo, Word /*comm
 	printf("     extensionFlag		= %u\r\n",in_Metadata_CellMotion_Event->extensionFlag);
 	if(in_Metadata_CellMotion_Event->extensionFlag == 1)
 	{
-		printf("     videoSrcToken stringLength	= %u\n",in_Metadata_CellMotion_Event->videoSrcToken.stringLength);
-		printf("     videoSrcToken stringData	= %s\n",in_Metadata_CellMotion_Event->videoSrcToken.stringData);
+        printf("     videoSrcToken stringLength	= %u\n",in_Metadata_CellMotion_Event->videoSrcToken.length());
+        printf("     videoSrcToken stringData	= %s\n",in_Metadata_CellMotion_Event->videoSrcToken.data());
 	}else
 	{
 		printf("    No Extension Parameter!\n");

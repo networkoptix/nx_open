@@ -1290,8 +1290,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 									}
 									for( i = tmpByte; i < deviceInfo->ptzConfig.PTZConfigListSize; i ++)
 									{
-										deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken.stringLength = 0;
-										deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken.stringData = NULL;
+                                        deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken.set(NULL, 0);
 									}
 								}else
 								{
@@ -1311,8 +1310,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 						{
 							for( i = 0; i < deviceInfo->ptzConfig.PTZConfigListSize; i ++)
 							{
-								deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken.stringLength = 0;
-								deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken.stringData = NULL;
+                                deviceInfo->ptzConfig.PTZConfigList[i].videoSrcToken.set(NULL, 0);
 							}
 						}
 
@@ -1573,8 +1571,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 									}
 									for( i = tmpByte; i < deviceInfo->ruleList.ruleListSize; i ++)
 									{
-										deviceInfo->ruleList.totalRuleList[i].videoSrcToken.stringLength = 0;
-										deviceInfo->ruleList.totalRuleList[i].videoSrcToken.stringData = NULL;
+                                        deviceInfo->ruleList.totalRuleList[i].videoSrcToken.set(NULL, 0);
 										deviceInfo->ruleList.totalRuleList[i].threshold = 0xFF;
 										deviceInfo->ruleList.totalRuleList[i].motionSensitivity = 0xFF;
 									}
@@ -1600,8 +1597,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 						{
 							for( i = 0; i < deviceInfo->ruleList.ruleListSize; i ++)
 							{
-								deviceInfo->ruleList.totalRuleList[i].videoSrcToken.stringLength = 0;
-								deviceInfo->ruleList.totalRuleList[i].videoSrcToken.stringData = NULL;
+                                deviceInfo->ruleList.totalRuleList[i].videoSrcToken.set(NULL, 0);
 								deviceInfo->ruleList.totalRuleList[i].threshold = 0xFF;
 								deviceInfo->ruleList.totalRuleList[i].motionSensitivity = 0xFF;
 							}
@@ -1676,8 +1672,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 										}
 										for( i = tmpByte; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; i ++)
 										{
-											deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken.stringLength = 0;
-											deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken.stringData = NULL;
+                                            deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken.set(NULL, 0);
 										}
 									}else
 									{
@@ -1697,8 +1692,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 							{
 								for( i = 0; i < deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoListSize; i ++)
 								{
-									deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken.stringLength = 0;
-									deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken.stringData = NULL;
+                                    deviceInfo->metadataStreamInfo.metadata_Stream.streamInfoList[i].videoSrcToken.set(NULL, 0);
 								}
 							}
 
@@ -1722,8 +1716,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 								check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken);
 							}else
 							{
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringLength = 0;
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringData = NULL;
+                                deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.set(NULL, 0);
 							}
 
 							User_metadataStreamLineEventReply(deviceInfo, command );
@@ -1746,8 +1739,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 								check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken);
 							}else
 							{
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringLength = 0;
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringData = NULL;
+                                deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.set(NULL, 0);
 							}
 
 							User_metadataStreamFieldEventReply(deviceInfo, command );
@@ -1769,8 +1761,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 								check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken);
 							}else
 							{
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringLength = 0;
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringData = NULL;
+                                deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.set(NULL, 0);
 							}
 
 							User_metadataStreamMotionEventReply(deviceInfo, command );
@@ -1793,8 +1784,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 								check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken);
 							}else
 							{
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringLength = 0;
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringData = NULL;
+                                deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.set(NULL, 0);
 							}
 
 							User_metadataStreamCountingEventReply(deviceInfo, command );
@@ -1816,8 +1806,7 @@ unsigned parseRC(IN TxDevice * deviceInfo, Word command, const Byte * Buffer, un
 								check = Cmd_StringRead(Buffer , checkByte, &index, &deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken);
 							}else
 							{
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringLength = 0;
-								deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.stringData = NULL;
+                                deviceInfo->metadataStreamInfo.metadata_Event.videoSrcToken.set(NULL, 0);
 							}
 
 							User_metadataStreamCellMotionEventReply(deviceInfo, command );
@@ -1862,7 +1851,7 @@ static unsigned Cmd_generalGet(IN TxDevice * deviceInfo, IN Word command)
 
     const Security * security = &deviceInfo->security;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -1887,7 +1876,7 @@ static unsigned Cmd_getWithByte(IN TxDevice * deviceInfo, IN Byte byteData, IN W
 
 	const Security* security = &deviceInfo->security;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -1914,8 +1903,8 @@ static unsigned Cmd_getWithString(IN TxDevice * deviceInfo, IN const RCString * 
 
 	const Security* security = &deviceInfo->security;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + string->stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + string->length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -1942,9 +1931,9 @@ static unsigned Cmd_getWithStrings(IN TxDevice * deviceInfo, IN const RCString *
 
 	const Security* security = &deviceInfo->security;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
     for (unsigned i = 0; i < stringSize; ++i)
-        cmd_buffer_size += (4 + stringArray[i].stringLength);
+        cmd_buffer_size += (4 + stringArray[i].length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -1976,7 +1965,7 @@ static unsigned Cmd_getHwRegisterValues(IN TxDevice * deviceInfo, IN Word comman
 	const Security* security = &deviceInfo->security;
 	const HwRegisterInfo* hwRegisterInfo = &deviceInfo->hwRegisterInfo;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2007,7 +1996,7 @@ static unsigned Cmd_setTxDeviceAddressID(IN TxDevice * deviceInfo, IN Word comma
 	const Security* security = &deviceInfo->security;
 	const NewTxDevice* newTxDevice = &deviceInfo->newTxDevice;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2037,8 +2026,8 @@ static unsigned Cmd_setCalibrationTable(IN TxDevice * deviceInfo, IN Word comman
 	const Security* security = &deviceInfo->security;
 	const CalibrationTable* calibrationTable = &deviceInfo->calibrationTable;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + calibrationTable->tableData.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + calibrationTable->tableData.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2069,7 +2058,7 @@ static unsigned Cmd_setTransmissionParameters(IN TxDevice * deviceInfo, IN Word 
 	const Security* security = &deviceInfo->security;
 	const TransmissionParameter* transmissionParameter = &deviceInfo->transmissionParameter;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2114,7 +2103,7 @@ static unsigned Cmd_setHwRegisterValues(IN TxDevice * deviceInfo, IN Word comman
 	const Security* security = &deviceInfo->security;
 	const HwRegisterInfo* hwRegisterInfo = &deviceInfo->hwRegisterInfo;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
     cmd_buffer_size += hwRegisterInfo->valueListSize;
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
@@ -2148,7 +2137,7 @@ static unsigned Cmd_setAdvanceOptions(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const AdvanceOptions* advanceOptions = &deviceInfo->advanceOptions;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2189,7 +2178,7 @@ static unsigned Cmd_setTPSInfo(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const TPSInfo* tpsInfo = &deviceInfo->tpsInfo;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2223,7 +2212,7 @@ static unsigned Cmd_setPSITable(IN TxDevice * deviceInfo, IN Word command)
     const Security* security = &deviceInfo->security;
 	const PSITable* psiTable = &deviceInfo->psiTable;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2263,7 +2252,7 @@ static unsigned Cmd_setNitLocation(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const NITLoacation* nitLoacation = &deviceInfo->nitLoacation;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2295,8 +2284,8 @@ static unsigned Cmd_setSdtServiceConfiguration(IN TxDevice * deviceInfo, IN Word
 	const Security* security = &deviceInfo->security;
 	const ServiceConfig* serviceConfig = &deviceInfo->serviceConfig;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + serviceConfig->serviceName.stringLength) + (4 + serviceConfig->provider.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + serviceConfig->serviceName.length()) + (4 + serviceConfig->provider.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2337,11 +2326,11 @@ static unsigned Cmd_setEITInformation(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const EITInfo* eitInfo = &deviceInfo->eitInfo;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + eitInfo->videoEncConfigToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + eitInfo->videoEncConfigToken.length());
     for (Byte i = 0; i < eitInfo->listSize; i ++)
 	{
-        cmd_buffer_size += 13 + (4 + eitInfo->eitInfoParam[i].eventName.stringLength) + (4 + eitInfo->eitInfoParam[i].eventText.stringLength);
+        cmd_buffer_size += 13 + (4 + eitInfo->eitInfoParam[i].eventName.length()) + (4 + eitInfo->eitInfoParam[i].eventText.length());
 	}
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
@@ -2383,7 +2372,7 @@ static unsigned Cmd_setSystemDateAndTime(IN TxDevice * deviceInfo, IN Word comma
 	const Security* security = &deviceInfo->security;
 	const SystemTime* systemTime = &deviceInfo->systemTime;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2428,8 +2417,8 @@ static unsigned Cmd_setOSDInformation(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const OSDInfo* osdInfo = &deviceInfo->osdInfo;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + osdInfo->text.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + osdInfo->text.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2472,8 +2461,8 @@ static unsigned Cmd_upgradeSystemFirmware(IN TxDevice * deviceInfo, IN Word comm
 	const Security* security = &deviceInfo->security;
 	const SystemFirmware* systemFirmware = &deviceInfo->systemFirmware;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + systemFirmware->data.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + systemFirmware->data.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2506,8 +2495,8 @@ static unsigned Cmd_setRelayOutputSettings(IN TxDevice * deviceInfo, IN Word com
 	const Security* security = &deviceInfo->security;
 	const RelayOutputsParam* relayOutputsParam = &deviceInfo->relayOutputsSetParam;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + relayOutputsParam->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + relayOutputsParam->token.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2539,8 +2528,8 @@ static unsigned Cmd_setRelayOutputState(IN TxDevice * deviceInfo, IN Word comman
 	const Security* security = &deviceInfo->security;
 	const RelayOutputState* relayOutputState = &deviceInfo->relayOutputState;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + relayOutputState->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + relayOutputState->token.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2574,8 +2563,8 @@ static unsigned Cmd_move(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const FocusMoveInfo* focusMoveInfo = &deviceInfo->focusMoveInfo;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + focusMoveInfo->videoSourceToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + focusMoveInfo->videoSourceToken.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2609,8 +2598,8 @@ static unsigned Cmd_setImagingSettings(IN TxDevice * deviceInfo, IN Word command
 	const Security* security = &deviceInfo->security;
 	const ImageConfig* imageConfig = &deviceInfo->imageConfig;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + imageConfig->videoSourceToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + imageConfig->videoSourceToken.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2694,8 +2683,8 @@ static unsigned Cmd_setVideoSrcControl(IN TxDevice * deviceInfo, IN Word command
 	const Security* security = &deviceInfo->security;
 	const VideoSrcControl* videoSrcControl = &deviceInfo->videoSrcControl;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + videoSrcControl->videoSrcToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + videoSrcControl->videoSrcToken.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2725,8 +2714,8 @@ static unsigned Cmd_setVideoPrivateArea(IN TxDevice * deviceInfo, IN Word comman
 	const Security* security = &deviceInfo->security;
 	const VideoPrivateArea* videoPrivateArea = &deviceInfo->videoPrivateArea;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + videoPrivateArea->videoSrcToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + videoPrivateArea->videoSrcToken.length());
     cmd_buffer_size += 4 * videoPrivateArea->polygonListSize;
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
@@ -2763,8 +2752,8 @@ static unsigned Cmd_setVideoOSDConfig(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const VideoOSDConfig* videoOSDConfig = &deviceInfo->videoOSDConfig;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + videoOSDConfig->videoSrcToken.stringLength) + (4 + videoOSDConfig->text.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + videoOSDConfig->videoSrcToken.length()) + (4 + videoOSDConfig->text.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2808,8 +2797,8 @@ static unsigned Cmd_setAudioEncConfig(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const AudioEncConfigParam* audioEncConfigParam = &deviceInfo->audioEncConfigSetParam;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + audioEncConfigParam->name.stringLength) + (4 + audioEncConfigParam->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + audioEncConfigParam->name.length()) + (4 + audioEncConfigParam->token.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2844,8 +2833,8 @@ static unsigned Cmd_setAudioSrcConfig(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const AudioSrcConfigParam* audioSrcConfig = &deviceInfo->audioSrcConfigSetParam;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + audioSrcConfig->name.stringLength) + (4 + audioSrcConfig->token.stringLength) + (4 + audioSrcConfig->sourceToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + audioSrcConfig->name.length()) + (4 + audioSrcConfig->token.length()) + (4 + audioSrcConfig->sourceToken.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2878,8 +2867,8 @@ static unsigned Cmd_setVideoEncConfig(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const VideoEncConfigParam* videoEncConfigParam = &deviceInfo->videoEncConfigSetParam;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + videoEncConfigParam->name.stringLength) + (4 + videoEncConfigParam->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + videoEncConfigParam->name.length()) + (4 + videoEncConfigParam->token.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -2924,8 +2913,8 @@ static unsigned Cmd_setVideoSrcConfig(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const VideoSrcConfigParam* videoSrcConfigParam = &deviceInfo->videoSrcConfigSetParam;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + videoSrcConfigParam->name.stringLength) + (4 + videoSrcConfigParam->token.stringLength) + (4 + videoSrcConfigParam->srcToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + videoSrcConfigParam->name.length()) + (4 + videoSrcConfigParam->token.length()) + (4 + videoSrcConfigParam->srcToken.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -3033,8 +3022,8 @@ static unsigned Cmd_gotoPreset(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const PTZGotoParam* ptzGotoParam = &deviceInfo->ptzGotoParam;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + ptzGotoParam->token.stringLength) + (4 + ptzGotoParam->presetToken.stringLength) ;
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + ptzGotoParam->token.length()) + (4 + ptzGotoParam->presetToken.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -3067,8 +3056,8 @@ static unsigned Cmd_removePreset(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const PTZRemoveParam* ptzRemoveParam = &deviceInfo->ptzRemoveParam;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + ptzRemoveParam->token.stringLength) + (4 + ptzRemoveParam->presetToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + ptzRemoveParam->token.length()) + (4 + ptzRemoveParam->presetToken.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -3098,8 +3087,8 @@ static unsigned Cmd_setPreset(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const PTZPresetsSet* ptzPresetsSet = &deviceInfo->ptzPresetsSet;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + ptzPresetsSet->token.stringLength) + (4 + ptzPresetsSet->presetName.stringLength) + (4 + ptzPresetsSet->presetToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + ptzPresetsSet->token.length()) + (4 + ptzPresetsSet->presetName.length()) + (4 + ptzPresetsSet->presetToken.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -3130,8 +3119,8 @@ static unsigned Cmd_absoluteMove(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const PTZAbsoluteMove* ptzAbsoluteMove = &deviceInfo->ptzAbsoluteMove;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + ptzAbsoluteMove->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + ptzAbsoluteMove->token.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -3166,8 +3155,8 @@ static unsigned Cmd_relativeMove(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const PTZRelativeMove* ptzRelativeMove = &deviceInfo->ptzRelativeMove;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + ptzRelativeMove->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + ptzRelativeMove->token.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -3202,8 +3191,8 @@ static unsigned Cmd_continuousMove(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const PTZContinuousMove* ptzContinuousMove = &deviceInfo->ptzContinuousMove;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + ptzContinuousMove->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + ptzContinuousMove->token.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -3236,8 +3225,8 @@ static unsigned Cmd_gotoHomePosition(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const PTZHomePosition* ptzHomePosition = &deviceInfo->ptzHomePosition;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + ptzHomePosition->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + ptzHomePosition->token.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -3269,8 +3258,8 @@ static unsigned Cmd_PTZStop(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const PTZStop* ptzStop = &deviceInfo->ptzStop;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + ptzStop->token.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + ptzStop->token.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 
@@ -3302,8 +3291,8 @@ static unsigned Cmd_createRule(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const TotalRule* totalRule = &deviceInfo->totalRule;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + totalRule->ruleName.stringLength) + (4 + totalRule->ruleToken.stringLength) + (4 + totalRule->videoSrcToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + totalRule->ruleName.length()) + (4 + totalRule->ruleToken.length()) + (4 + totalRule->videoSrcToken.length());
 
     switch (totalRule->type)
     {
@@ -3338,7 +3327,7 @@ static unsigned Cmd_createRule(IN TxDevice * deviceInfo, IN Word command)
         case 0x14:
         {
             Rule_CellMotion * ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
-            cmd_buffer_size += 24 + ( 4 + ptrRule_CellMotion->activeCells.stringLength ) ;
+            cmd_buffer_size += 24 + ( 4 + ptrRule_CellMotion->activeCells.length() ) ;
             break;
         }
 
@@ -3464,8 +3453,8 @@ static unsigned Cmd_modifyRule(IN TxDevice * deviceInfo, IN Word command)
 	const Security* security = &deviceInfo->security;
 	const TotalRule* totalRule = &deviceInfo->totalRule;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
-    cmd_buffer_size += (4 + totalRule->ruleName.stringLength) + (4 + totalRule->ruleToken.stringLength) + (4 + totalRule->videoSrcToken.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
+    cmd_buffer_size += (4 + totalRule->ruleName.length()) + (4 + totalRule->ruleToken.length()) + (4 + totalRule->videoSrcToken.length());
 
     switch (totalRule->type)
     {
@@ -3500,7 +3489,7 @@ static unsigned Cmd_modifyRule(IN TxDevice * deviceInfo, IN Word command)
         case 0x14:
         {
             Rule_CellMotion * ptrRule_CellMotion = (Rule_CellMotion*) totalRule->rule;
-            cmd_buffer_size += 24 + ( 4 + ptrRule_CellMotion->activeCells.stringLength ) ;
+            cmd_buffer_size += 24 + ( 4 + ptrRule_CellMotion->activeCells.length() ) ;
             break;
         }
 
@@ -3629,7 +3618,7 @@ static unsigned Cmd_setMetadataSettings(IN TxDevice * deviceInfo, IN Word comman
 	const Security* security = &deviceInfo->security;
 	const MetadataSettings* metadataSettings = &deviceInfo->metadataSettings;
 
-    cmd_buffer_size += (4 + security->userName.stringLength) + (4 + security->password.stringLength);
+    cmd_buffer_size += (4 + security->userName.length()) + (4 + security->password.length());
 
     Byte * cmd_buffer = deviceInfo->rc_getBuffer(cmd_buffer_size);
 

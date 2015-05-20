@@ -153,14 +153,14 @@ public:
 
         QnCameraAdvancedParamValueList result;
         if (success) {
-            m_resource->setParamPhysical(QString(), QLatin1String("<all>"));
+            m_resource->setParamsBegin();
             for(const QnCameraAdvancedParamValue &value: m_values) {
                 if (m_resource->setParamPhysical(value.id, value.value))
                     result << value;
                 else
                     success = false;
             }
-            m_resource->setParamPhysical(QString(), QLatin1String("</all>"));
+            m_resource->setParamsEnd();
         }
         emit m_resource->asyncParamsSetDone(m_resource, result);
         return success;
@@ -467,6 +467,15 @@ bool QnResource::setParamPhysical(const QString &id, const QString &value) {
     Q_UNUSED(value)
     return false;
 }
+
+bool QnResource::setParamsBegin() {
+    return false;
+}
+
+bool QnResource::setParamsEnd() {
+    return false;
+}
+
 
 #ifdef ENABLE_DATA_PROVIDERS
 

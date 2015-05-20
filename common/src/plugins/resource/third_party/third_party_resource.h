@@ -40,6 +40,8 @@ public:
     virtual bool getParamPhysical(const QString &id, QString &value) override;
     //!Implementation of QnResource::setParamPhysical
     virtual bool setParamPhysical(const QString &id, const QString &value) override;
+    virtual bool setParamsBegin() override;
+    virtual bool setParamsEnd() override;
 
     //!Implementation of QnNetworkResource::ping
     /*!
@@ -130,6 +132,7 @@ private:
     //!Returns resolution with pixel count equal or less than \a desiredResolution
     nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
     nxcip::Resolution getSecondStreamResolution() const;
+    bool setParam(const char * id, const char * value);
 };
 
 #endif // ENABLE_THIRD_PARTY

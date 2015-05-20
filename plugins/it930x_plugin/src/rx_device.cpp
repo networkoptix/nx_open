@@ -383,7 +383,7 @@ namespace ite
         bool ok = cmd && cmd->isValid() && txDev && m_it930x;
         if (!ok)
         {
-            debug_printf("[RC send] bad command or device. RxID: %d TxID: %d\n", rxID(), txDev->txID());
+            debug_printf("[RC send] bad command or device. RxID: %d TxID: %d\n", rxID(), (txDev ? txDev->txID() : 0));
             Timer::sleep(RC_DELAY_MS());
             return false;
         }

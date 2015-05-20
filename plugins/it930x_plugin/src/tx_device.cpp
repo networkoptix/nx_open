@@ -30,10 +30,8 @@ namespace ite
 
         setFrequency(freq);
 
-        m_recvSecurity.userName.stringData = nullptr;
-        m_recvSecurity.userName.stringLength = 0;
-        m_recvSecurity.password.stringData = nullptr;
-        m_recvSecurity.password.stringLength = 0;
+        m_recvSecurity.userName.set(nullptr, 0);
+        m_recvSecurity.password.set(nullptr, 0);
     }
 
     void TxDevice::parse(RcPacket& pkt)

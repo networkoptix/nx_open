@@ -8,9 +8,6 @@
 
 struct RCString
 {
-	unsigned stringLength;
-    Byte * stringData;
-
     RCString()
     :   stringLength(0),
         stringData(nullptr)
@@ -26,6 +23,20 @@ struct RCString
     unsigned set(const Byte * buf, unsigned length);
     unsigned clear();
     unsigned copy(const RCString * srcStr);
+
+    unsigned length() const { return stringLength; }
+    Byte * data() const
+    {
+        if (stringData)
+            return stringData;
+        return (Byte *)"";
+    }
+
+    static unsigned readLength(const Byte *);
+
+private:
+    unsigned stringLength;
+    Byte * stringData;
 
 #if 0
     ~RCString()

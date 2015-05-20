@@ -193,7 +193,7 @@ namespace ite
 
         static std::string rcStr2str(const RCString& s)
         {
-            return std::string((const char *)s.stringData, s.stringLength);
+            return std::string((const char *)s.data(), s.length());
         }
 
         static void str2rcStr(const std::string& str, RCString& rcStr)
