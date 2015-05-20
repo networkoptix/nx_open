@@ -363,7 +363,7 @@ const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
 }
 
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
-QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized)
         return defaultVideoLayout;
@@ -429,7 +429,7 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
     return m_videoLayout;
 }
 
-QnResourceAudioLayoutPtr QnAviArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnAviArchiveDelegate::getAudioLayout()
 {
     return m_audioLayout;
 }
