@@ -348,18 +348,18 @@ void QnTransactionTransport::removeEventHandler( int eventHandlerID )
     m_beforeSendingChunkHandlers.erase( eventHandlerID );
 }
 
-AbstractStreamSocket* QnTransactionTransport::getSocket() const
+QSharedPointer<AbstractStreamSocket> QnTransactionTransport::getSocket() const
 {
     if( m_connectionType == ConnectionType::bidirectional )
     {
-        return m_incomingDataSocket.data();
+        return m_incomingDataSocket;
     }
     else
     {
         if( m_peerRole == prOriginating )
-            return m_incomingDataSocket.data();
+            return m_incomingDataSocket;
         else
-            return m_outgoingDataSocket.data();
+            return m_outgoingDataSocket;
     }
 }
 
