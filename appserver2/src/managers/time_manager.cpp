@@ -582,7 +582,9 @@ namespace ec2
     void TimeSynchronizationManager::onNewConnectionEstablished(QnTransactionTransport* transport )
     {
         using namespace std::placeholders;
-        transport->getSocket()->toggleStatisticsCollection( true );
+        auto transportSocket = transport->getSocket();
+        if( transportSocket )
+            transportSocket->toggleStatisticsCollection( true );
         transport->setBeforeSendingChunkHandler( std::bind( &TimeSynchronizationManager::onBeforeSendingTransaction, this, _1, _2 ) );
         transport->setHttpChunkExtensonHandler( std::bind( &TimeSynchronizationManager::onTransactionReceived, this, _1, _2 ) );
     }
@@ -613,7 +615,8 @@ namespace ec2
                 //taking into account tcp connection round trip time
                 unsigned int rttMillis = 0;
                 StreamSocketInfo sockInfo;
-                if( transport->getSocket()->getConnectionStatistics( &sockInfo ) )
+                auto transportSocket = transport->getSocket();
+                if( transportSocket && transportSocket->getConnectionStatistics( &sockInfo ) )
                     rttMillis = sockInfo.rttVar;
 
                 TimeSyncInfo remotePeerTimeSyncInfo;
