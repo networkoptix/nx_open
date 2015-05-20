@@ -20,6 +20,7 @@ extern "C"
 #include <core/resource/media_server_resource.h>
 
 #include <plugins/resource/server_camera/server_camera.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
 
 #include <redass/redass_controller.h>
 
@@ -69,8 +70,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
 
     if (reader)
         connect(this, SIGNAL(dataDropped(QnArchiveStreamReader*)), qnRedAssController, SLOT(onSlowStream(QnArchiveStreamReader*)));
-
-    m_defaultVideoLayout.reset( new QnDefaultResourceVideoLayout() );
 
     m_auth.username = QnAppServerConnectionFactory::url().userName();
     m_auth.password = QnAppServerConnectionFactory::url().password();
@@ -281,9 +280,11 @@ bool QnRtspClientArchiveDelegate::openInternal() {
 
         QString vLayout = m_rtspSession.getVideoLayout();
         if (!vLayout.isEmpty()) {
-            m_customVideoLayout = QnCustomResourceVideoLayout::fromString(vLayout);
-            // TODO: #Elric we need to create another layout instance, but there is no need to reparse it!
-            m_camera->setCustomVideoLayout(QnCustomResourceVideoLayout::fromString(vLayout));
+            auto newValue = QnCustomResourceVideoLayout::fromString(vLayout);
+            bool isChanged =  getVideoLayout()->toString() != newValue->toString();
+            m_customVideoLayout = newValue;
+            if(isChanged)
+                emit m_reader->videoLayoutChanged();
         }
     }
     return m_opened;
@@ -641,15 +642,17 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
     */
 }
 
-QnResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
 {
     if (m_customVideoLayout)
         return m_customVideoLayout;
+    else if (m_camera)
+        return m_camera->getVideoLayout();
     else
-        return m_defaultVideoLayout;
+        return QnMediaResource::getDefaultVideoLayout();
 }
 
-QnResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
 {
     if (!m_audioLayout) {
         m_audioLayout.reset( new QnResourceCustomAudioLayout() );
