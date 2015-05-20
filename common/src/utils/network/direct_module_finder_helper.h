@@ -21,7 +21,7 @@ class QnDirectModuleFinderHelper : public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
 public:
-    explicit QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder);
+    explicit QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder, bool clientMode = false);
 
     void setForcedUrls(const QSet<QUrl> &forcedUrls);
 
@@ -37,6 +37,9 @@ private:
     void updateModuleFinder();
 
 private:
+    /** When the helper works in client mode it does not use ignoredUrls from database. */
+    bool m_clientMode;
+
     QnModuleFinder *m_moduleFinder;
     QElapsedTimer m_elapsedTimer;
 
