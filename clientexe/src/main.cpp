@@ -747,12 +747,7 @@ int main(int argc, char **argv)
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, lit("/etc/xdg"));
     QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, lit("/etc/xdg"));
 #endif
-
-
-#ifdef Q_OS_WIN
-    win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
-#endif
-        
+     
 
 #ifdef Q_OS_MAC
     mac_restoreFileAccess();

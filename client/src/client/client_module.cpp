@@ -9,6 +9,9 @@
 #include <api/session_manager.h>
 
 #include <common/common_module.h>
+#ifdef Q_OS_WIN
+    #include "common/systemexcept_win32.h"
+#endif
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -77,6 +80,10 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
     common->store<QnClientMessageProcessor>(new QnClientMessageProcessor());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnServerCameraFactory>(new QnServerCameraFactory());
+
+#ifdef Q_OS_WIN
+    win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
+#endif
 
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
