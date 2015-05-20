@@ -11,7 +11,7 @@ class QnCommonModule;
 class QnMediaServerModule: public QObject, public QnInstanceStorage, public Singleton<QnMediaServerModule> {
     Q_OBJECT;
 public:
-    QnMediaServerModule(int &argc, char **argv, QObject *parent = NULL);
+    QnMediaServerModule(QObject *parent = NULL);
     virtual ~QnMediaServerModule();
 
     using Singleton<QnMediaServerModule>::instance;

@@ -1,5 +1,4 @@
-TEMPLATE = app
-QT += xmlpatterns
+TEMPLATE = lib
 
 INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \

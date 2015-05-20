@@ -137,6 +137,7 @@ protected:
 
     QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoader(QnResourceWidget *widget);
+    void clearLoaderCache();
 protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
@@ -257,9 +258,6 @@ private:
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;
     qreal m_lastMaximalSpeed;
-
-    qint64 m_lastUpdateSlider;
-    qint64 m_lastCameraTime;
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
    

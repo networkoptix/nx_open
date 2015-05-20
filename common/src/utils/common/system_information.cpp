@@ -15,7 +15,7 @@ QnSystemInformation::QnSystemInformation(const QString &platform, const QString 
 {}
 
 QnSystemInformation::QnSystemInformation(const QString &infoString) {
-    QRegExp infoRegExp(lit("(\\S+)\\s+(\\S+)\\s*(\\S*)"));
+    QRegExp infoRegExp(QLatin1String("(\\S+)\\s+(\\S+)\\s*(\\S*)"));
     if (infoRegExp.exactMatch(infoString)) {
         platform = infoRegExp.cap(1);
         arch = infoRegExp.cap(2);

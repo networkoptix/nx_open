@@ -6,7 +6,7 @@
 #include <soap/soapserver.h>
 #endif
 
-QnMediaServerModule::QnMediaServerModule(int &argc, char **argv, QObject *parent):
+QnMediaServerModule::QnMediaServerModule(QObject *parent):
     QObject(parent) 
 {
     Q_INIT_RESOURCE(mediaserver);
@@ -20,7 +20,7 @@ QnMediaServerModule::QnMediaServerModule(int &argc, char **argv, QObject *parent
     soapServer->start();     //starting soap server to accept event notifications from onvif cameras
 #endif //ENABLE_ONVIF
 
-    m_common = new QnCommonModule(argc, argv, this);
+    m_common = new QnCommonModule(this);
 }
 
 QnMediaServerModule::~QnMediaServerModule() {

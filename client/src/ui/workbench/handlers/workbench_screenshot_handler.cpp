@@ -13,6 +13,7 @@
 #include <camera/single_thumbnail_loader.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/file_processor.h>
 #include <core/resource/media_server_resource.h>
@@ -342,7 +343,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
-    if (qnSettings->isDevMode() && filename == lit("_DEBUG_SCREENSHOT_KEY_")) {
+    if (qnRuntime->isDevMode() && filename == lit("_DEBUG_SCREENSHOT_KEY_")) {
         takeDebugScreenshotsSet(widget);
         return;
     }
@@ -359,7 +360,6 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
     parameters.rotationAngle = widget->rotation();
-
     takeScreenshot(widget, parameters);
 }
 
@@ -407,6 +407,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     setHelpTopic(dialog.data(), Qn::MainWindow_MediaItem_Screenshot_Help);
 
     QString fileName;
+
 
     forever {
         if (!dialog->exec())

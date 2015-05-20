@@ -99,6 +99,9 @@ public:
         lastPartitionsUpdateTime(0)
     {
         memset(&lastDiskUsageUpdateTime, 0, sizeof(lastDiskUsageUpdateTime));
+
+        m_hddStatCalcTimer.start();
+        m_networkStatCalcTimer.start();
     }
 
     virtual ~QnLinuxMonitorPrivate()

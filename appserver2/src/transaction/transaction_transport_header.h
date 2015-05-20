@@ -23,7 +23,9 @@ namespace ec2 {
         QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet()):
             processedPeers(processedPeers), 
             dstPeers(dstPeers), 
-            sequence(0) {}
+            sequence(0),
+            flags(Qn::TT_None), 
+            distance(0) {}
 
         void fillSequence();
 

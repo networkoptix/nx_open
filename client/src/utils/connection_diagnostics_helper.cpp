@@ -3,7 +3,9 @@
 #include <api/model/connection_info.h>
 
 #include <common/common_module.h>
+
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec_proto_version.h>
@@ -27,7 +29,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
     //checking brand compatibility
     if (success)
-        success = qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
+        success = qnRuntime->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
 
     if(!success)
         return Result::Failure;
@@ -60,7 +62,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
     //checking brand compatibility
     if (success)
-        success = qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
+        success = qnRuntime->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
 
     QString detail;
 
@@ -297,7 +299,7 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
         tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n' 
       + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
 
-    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
+    bool compatibleProduct = qnRuntime->isDevMode() || connectionInfo.brand.isEmpty()
         || connectionInfo.brand == QnAppInfo::productNameShort();
 
     if (errorCode == ec2::ErrorCode::unauthorized) {

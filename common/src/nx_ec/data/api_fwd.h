@@ -51,6 +51,7 @@ namespace ec2 {
     struct ApiTranSyncDoneData;
     struct ApiPeerAliveData;
     struct ApiResourceStatusData;
+    struct ApiReverseConnectionData;
     struct ApiStorageData;
     struct ApiStoredFileData;
     struct ApiStoredFilePath;
@@ -144,6 +145,7 @@ namespace ec2 {
     (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
+    (ApiReverseConnectionData)\
     (ApiResourceData)\
     (ApiResourceParamData)\
     (ApiResourceParamWithRefData)\

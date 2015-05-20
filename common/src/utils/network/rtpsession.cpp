@@ -19,12 +19,13 @@
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
 #include "utils/network/http/httptypes.h"
-#include "../common/sleep.h"
+#include "utils/common/sleep.h"
 #include "tcp_connection_processor.h"
 #include "simple_http_client.h"
 #include "utils/media/bitStream.h"
-#include "../common/synctime.h"
+#include "utils/common/synctime.h"
 #include "tcp_connection_priv.h"
+#include "http/custom_headers.h"
 
 
 #define DEFAULT_RTP_PORT 554
@@ -1165,7 +1166,7 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
     if( m_numOfPredefinedChannels )
     {
         request.headers.insert( nx_http::HttpHeader( "x-play-now", "true" ) );
-        request.headers.insert( nx_http::HttpHeader( "x-guid", getGuid() ) );
+        request.headers.insert( nx_http::HttpHeader( Qn::GUID_HEADER_NAME, getGuid() ) );
     }
     return request;
 }

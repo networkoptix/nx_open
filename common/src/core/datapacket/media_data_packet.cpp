@@ -66,10 +66,8 @@ QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
 
 QnMediaContext::~QnMediaContext()
 {
-    if (m_ctx) {
-        avcodec_close(m_ctx);
-        av_freep(&m_ctx);
-    }
+    QnFfmpegHelper::deleteCodecContext(m_ctx);
+    m_ctx = 0;
 }
 
 

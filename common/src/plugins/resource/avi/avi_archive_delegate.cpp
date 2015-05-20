@@ -163,7 +163,9 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
         m_contexts << QnMediaContextPtr(0);
 
     if (m_contexts[stream->index] == 0 || m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
-        m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
+    {
+	    m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
+    }
 
     return m_contexts[stream->index];
 }

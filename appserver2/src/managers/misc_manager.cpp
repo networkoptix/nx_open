@@ -11,8 +11,10 @@ void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModul
 }
 
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleDataList> &transaction) {
+    QList<QnModuleInformationWithAddresses> modules;
     for (const ApiModuleData &data: transaction.params)
-        emit moduleChanged(data.moduleInformation, data.isAlive);
+        modules.append(data.moduleInformation);
+    emit gotInitialModules(modules);
 }
 
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &transaction) {

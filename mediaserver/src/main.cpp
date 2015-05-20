@@ -24,7 +24,6 @@
 #include <QtNetwork/QNetworkInterface>
 
 #include <api/app_server_connection.h>
-#include <api/session_manager.h>
 #include <api/global_settings.h>
 
 #include <appserver/processor.h>
@@ -1366,6 +1365,7 @@ bool QnMain::initTcpListener()
 
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
+    m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();
@@ -1437,13 +1437,10 @@ void QnMain::run()
         QnSSLSocket::initSSLEngine( certData );
     }
 
-    QnSyncTime syncTime;
-
+    QScopedPointer<QnSyncTime> syncTime(new QnSyncTime());
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
-    // todo: #rvasilenko this class doesn't used any more on the server side
-    //QnSessionManager::instance()->start();
 
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
@@ -1653,14 +1650,9 @@ void QnMain::run()
 
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
+    messageProcessor->registerProxySender(m_universalTcpListener);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
-
-    QUrl proxyServerUrl = ec2Connection->connectionInfo().ecUrl;
-    //proxyServerUrl.setPort(connectInfo->proxyPort);
-    m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid().toString());
-    //m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
-
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
@@ -2163,7 +2155,7 @@ protected:
     virtual int executeApplication() override {
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
 
         if (!m_overrideVersion.isNull())
             qnCommon->setEngineVersion(m_overrideVersion);

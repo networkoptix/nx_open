@@ -6,7 +6,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QCryptographicHash>
 
-#include <api/session_manager.h>
 #include <common/common_meta_types.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -14,9 +13,10 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include <utils/common/product_features.h>
+#include <utils/common/timermanager.h>
 
 
-QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
+QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
@@ -25,6 +25,7 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     
     /* Init statics. */
     qnProductFeatures();
+    store<TimerManager>(new TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
@@ -34,7 +35,6 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     instance<QnCameraHistoryPool>();
 
     /* Init members. */
-    m_sessionManager = new QnSessionManager(); //instance<QnSessionManager>();
     m_runUuid = QnUuid::createUuid();
     m_transcodingDisabled = false;
     m_systemIdentityTime = 0;
@@ -42,7 +42,6 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
 }
 
 QnCommonModule::~QnCommonModule() {
-    delete m_sessionManager;
 }
 
 void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &server) {
@@ -53,6 +52,7 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
 
 void QnCommonModule::bindModuleinformation(const QnUserResourcePtr &adminUser) {
     connect(adminUser.data(),   &QnUserResource::resourceChanged,   this,   &QnCommonModule::updateModuleInformation);
+    connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
     connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
 }
 

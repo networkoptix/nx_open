@@ -29,7 +29,6 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     result.addr = m_moduleFinder->primaryAddress(id);
     if (!result.addr.isNull())
         return result; // direct access to peer
-
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return result; // no connection to the server, can't route

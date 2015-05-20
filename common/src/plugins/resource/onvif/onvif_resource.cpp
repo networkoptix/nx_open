@@ -261,8 +261,7 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_renewSubscriptionTimerID(0),
     m_maxChannels(1),
     m_streamConfCounter(0),
-    m_prevPullMessageResponseClock(0),
-    m_physicalParamsMutex(QMutex::Recursive)
+    m_prevPullMessageResponseClock(0)
 {
     m_monotonicClock.start();
 }

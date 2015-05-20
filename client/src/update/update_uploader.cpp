@@ -98,7 +98,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
         if (!server)
             return false;
 
-        if (server->hasProperty(lit("guid"))) {
+        if (QnMediaServerResource::isFakeServer(server)) {
             m_restPeers.insert(peerId);
             m_restTargets.append(server);
         } else {

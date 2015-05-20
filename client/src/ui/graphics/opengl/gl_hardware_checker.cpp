@@ -7,8 +7,6 @@
 #include <utils/common/software_version.h>
 
 bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
-    const QGLContext *context = QGLContext::currentContext();
-
     QByteArray extensionsString = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
     QByteArray versionString = reinterpret_cast<const char *>(glGetString(GL_VERSION));
     QByteArray rendererString = reinterpret_cast<const char *>(glGetString(GL_RENDERER));

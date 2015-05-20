@@ -30,6 +30,7 @@ extern "C"
 #include <utils/network/rtp_stream_parser.h>
 #include <utils/network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
+#include "http/custom_headers.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -847,13 +848,13 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
     session->setAuth(auth, RTPSession::authDigest);
 
     if (!m_auth.videowall.isNull())
-        session->setAdditionAttribute("X-NetworkOptix-VideoWall", m_auth.videowall.toString().toUtf8());
+        session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());
 
     if (server) {
         QNetworkProxy proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);
         if (proxy.type() != QNetworkProxy::NoProxy)
             session->setProxyAddr(proxy.hostName(), proxy.port());
-        session->setAdditionAttribute("x-server-guid", server->getId().toByteArray());
+        session->setAdditionAttribute(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     }
 
     session->setTransport(QLatin1String("TCP"));

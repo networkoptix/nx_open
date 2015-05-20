@@ -14,6 +14,9 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 
+#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+
 #include <core/dataprovider/abstract_streamdataprovider.h>
 
 #include <core/resource/security_cam_resource.h>
@@ -77,7 +80,6 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/counter.h>
-#include <client/client_settings.h>
 
 #include "watchers/workbench_render_watcher.h"
 #include "workbench.h"
@@ -286,6 +288,30 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderZoomingOut(false),
     m_lastThumbnailsHeight(48.0),
 
+    m_treeWidget(NULL),
+    m_treeResizerWidget(NULL),
+    m_treeItem(NULL),
+    m_treeBackgroundItem(NULL),
+    m_treeShowButton(NULL),
+    m_treePinButton(NULL),
+    m_treeHidingProcessor(NULL),
+    m_treeShowingProcessor(NULL),
+    m_treeOpacityProcessor(NULL),
+    m_treeOpacityAnimatorGroup(NULL),
+    m_treeXAnimator(NULL),    
+
+    m_titleItem(NULL),
+    m_titleShowButton(NULL),
+    m_mainMenuButton(NULL),
+    m_tabBarWidget(NULL),
+    m_tabBarItem(NULL),
+    m_titleOpacityAnimatorGroup(NULL),
+    m_titleBackgroundItem(NULL),
+    m_titleYAnimator(NULL),
+    m_titleOpacityProcessor(NULL),
+    m_titleRightButtonsLayout(NULL),
+    m_windowButtonsWidget(NULL),
+
     m_notificationsBackgroundItem(NULL),
     m_notificationsItem(NULL),
     m_notificationsPinButton(NULL),
@@ -338,11 +364,15 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Fps counter. */
     createFpsWidget();
 
-    /* Tree panel. */
-    createTreeWidget();
+	if (!qnRuntime->isActiveXMode()) {
+		/* Tree panel. */
+		createTreeWidget();
+	}
 
-    /* Title bar. */
-    createTitleWidget();
+	if (!qnRuntime->isActiveXMode()) {
+		/* Title bar. */
+		createTitleWidget();
+	}
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoNotifications))
         createNotificationsWidget();
@@ -357,7 +387,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     createSearchWidget();
 
     /* Debug overlay */
-    //createDebugWidget();
+//    createDebugWidget();
 
     initGraphicsMessageBox();
 
@@ -387,7 +417,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     //TODO: #GDM #Common think about a refactoring
     bool treeOpened = qnSettings->isTreeOpened(); //quite a hack because m_treePinButton sets tree opened if it is pinned
     bool notificationsOpened = qnSettings->isNotificationsOpened(); //same shit
-    m_treePinButton->setChecked(qnSettings->isTreePinned());
+	if (m_treePinButton)
+		m_treePinButton->setChecked(qnSettings->isTreePinned());
     if (m_notificationsPinButton)
         m_notificationsPinButton->setChecked(qnSettings->isNotificationsPinned());
     setTreeOpened(treeOpened, false);
@@ -396,11 +427,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setNotificationsOpened(notificationsOpened, false);
 
     m_calendarPinButton->setChecked(qnSettings->isCalendarPinned());
+	if (m_titleBackgroundItem) {
 
-    /* Set up title D&D. */
-    DropInstrument *dropInstrument = new DropInstrument(true, context(), this);
-    display()->instrumentManager()->installInstrument(dropInstrument);
-    dropInstrument->setSurface(m_titleBackgroundItem);
+		/* Set up title D&D. */
+		DropInstrument *dropInstrument = new DropInstrument(true, context(), this);
+		display()->instrumentManager()->installInstrument(dropInstrument);
+		dropInstrument->setSurface(m_titleBackgroundItem);
+	}
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -431,9 +464,13 @@ QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const
     /* Get items. */
     switch(scope) {
     case Qn::TitleBarScope:
-        return m_tabBarWidget->currentParameters(scope);
+        if (m_tabBarWidget)
+            return m_tabBarWidget->currentParameters(scope);
+        return QnActionParameters();
     case Qn::TreeScope:
-        return m_treeWidget->currentParameters(scope);
+        if (m_treeWidget)
+            return m_treeWidget->currentParameters(scope);
+        return QnActionParameters();
     default:
         return QnActionParameters(currentTarget(scope));
     }
@@ -452,7 +489,8 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
 }
 
 void QnWorkbenchUi::setProxyUpdatesEnabled(bool updatesEnabled) {
-    m_treeItem->setUpdatesEnabled(updatesEnabled);
+	if (m_treeItem)
+		m_treeItem->setUpdatesEnabled(updatesEnabled);
 }
 
 void QnWorkbenchUi::setWindowButtonsUsed(bool windowButtonsUsed) {
@@ -460,6 +498,9 @@ void QnWorkbenchUi::setWindowButtonsUsed(bool windowButtonsUsed) {
         return;
 
     m_windowButtonsUsed = windowButtonsUsed;
+
+	if (!m_titleItem)
+		return;
 
     if(m_windowButtonsUsed) {
         m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
@@ -473,7 +514,7 @@ void QnWorkbenchUi::setWindowButtonsUsed(bool windowButtonsUsed) {
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     ensureAnimationAllowed(animate);
 
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         bool sliderVisible =
             navigator()->currentWidget() != NULL &&
             !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server));
@@ -541,10 +582,10 @@ void QnWorkbenchUi::updateViewportMargins() {
         display()->setViewportMargins(QMargins(0, 0, 0, 0));
     } else {
         display()->setViewportMargins(calculateViewportMargins(
-            m_treeXAnimator->isRunning() ? m_treeXAnimator->targetValue().toReal() : m_treeItem->pos().x(),
-            m_treeItem->size().width(),
-            m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y(),
-            m_titleItem->size().height(),
+            m_treeXAnimator ? (m_treeXAnimator->isRunning() ? m_treeXAnimator->targetValue().toReal() : m_treeItem->pos().x()) : 0.0,
+            m_treeItem ? m_treeItem->size().width() : 0.0,
+            m_titleYAnimator ? (m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y()) : 0.0,
+            m_titleItem ? m_titleItem->size().height() : 0.0,
             m_sliderYAnimator->isRunning() ? m_sliderYAnimator->targetValue().toReal() : m_sliderItem->pos().y(),
             m_notificationsItem ? m_notificationsXAnimator->isRunning() ? m_notificationsXAnimator->targetValue().toReal() : m_notificationsItem->pos().x() : 0.0
         ));
@@ -650,6 +691,8 @@ void QnWorkbenchUi::tick(int deltaMSecs) {
 }
 
 void QnWorkbenchUi::at_freespaceAction_triggered() {
+    Q_ASSERT_X(!qnRuntime->isActiveXMode(), Q_FUNC_INFO, "This function must not be called in ActiveX mode.");
+
     QAction *fullScreenAction = action(Qn::EffectiveMaximizeAction);
 
     bool isFullscreen = fullScreenAction->isChecked();
@@ -731,7 +774,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
         }
     }
 
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         switch (role) {
         case Qn::ZoomedRole:
         case Qn::RaisedRole:
@@ -770,12 +813,14 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
         m_sliderItem->size().height()
     ));
 
-    m_titleItem->setGeometry(QRectF(
-        0.0,
-        m_titleItem->pos().y(),
-        rect.width(),
-        m_titleItem->size().height()
-    ));
+	if (m_titleItem) {
+		m_titleItem->setGeometry(QRectF(
+			0.0,
+			m_titleItem->pos().y(),
+			rect.width(),
+			m_titleItem->size().height()
+		));
+	}
 
     if (m_notificationsItem) {
         if (m_notificationsXAnimator->isRunning())
@@ -818,6 +863,9 @@ void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {
 
 void QnWorkbenchUi::setTreeVisible(bool visible, bool animate) {
     ensureAnimationAllowed(animate);
+
+	if (!m_treeItem)
+		return;
 
     bool changed = m_treeVisible != visible;
 
@@ -883,6 +931,9 @@ bool QnWorkbenchUi::isTreeOpened() const {
 void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
     ensureAnimationAllowed(animate);
 
+	if (!m_treeItem)
+		return;
+
     m_inFreespace = false;
 
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
@@ -917,6 +968,9 @@ QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRec
 }
 
 void QnWorkbenchUi::updateTreeGeometry() {
+	if (!m_treeItem)
+		return;
+
     /* Update painting rect the "fair" way. */
     QRectF geometry = updatedTreeGeometry(m_treeItem->geometry(), m_titleItem->geometry(), m_sliderItem->geometry());
     m_treeItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
@@ -1187,6 +1241,9 @@ void QnWorkbenchUi::createTreeWidget() {
 #pragma region TitleWidget
 
 void QnWorkbenchUi::setTitleUsed(bool used) {
+	if (!m_titleItem)
+		return;
+
     m_titleItem->setVisible(used);
     m_titleBackgroundItem->setVisible(used);
     m_titleShowButton->setVisible(used);
@@ -1261,6 +1318,9 @@ bool QnWorkbenchUi::isTitleOpened() const {
 void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
     ensureAnimationAllowed(animate);
 
+	if (!m_titleItem)
+		return;
+
     if(animate) {
         m_titleOpacityAnimatorGroup->pause();
         opacityAnimator(m_titleItem)->setTargetValue(foregroundOpacity);
@@ -1276,6 +1336,9 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
 }
 
 void QnWorkbenchUi::updateTitleOpacity(bool animate) {
+    if (!m_titleItem)
+        return;
+
     if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
         qreal opacity = m_titleVisible ? opaque : hidden;
         setTitleOpacity(opacity, opacity, false);
@@ -2058,7 +2121,7 @@ bool QnWorkbenchUi::isSliderOpened() const {
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         opened = true;
         save = false;
     }
@@ -2092,7 +2155,7 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
     bool changed = m_sliderVisible != visible;
 
     m_sliderVisible = visible;
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         if (visible)
             m_sliderAutoHideTimer->start(sliderAutoHideTimeoutMSec);
         else
@@ -2214,7 +2277,7 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(
-        (geometry.left() + geometry.right() - m_titleShowButton->size().height()) / 2,
+        (geometry.left() + geometry.right() - (m_titleShowButton ? m_titleShowButton->size().height() : 0)) / 2,
         qMin(m_controlsWidgetRect.bottom(), geometry.top())
         ));
 }
@@ -2281,7 +2344,7 @@ void QnWorkbenchUi::createSliderWidget()
     }
     m_sliderShowButton->setFocusProxy(m_sliderItem);
 
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         m_sliderShowButton->setVisible(false);
 
         m_sliderAutoHideTimer = new QTimer(this);
@@ -2353,7 +2416,7 @@ void QnWorkbenchUi::createSliderWidget()
     connect(m_sliderItem,               &QGraphicsWidget::geometryChanged,          this,           &QnWorkbenchUi::at_sliderItem_geometryChanged);
     connect(m_sliderResizerWidget,      &QGraphicsWidget::geometryChanged,          this,           &QnWorkbenchUi::at_sliderResizerWidget_geometryChanged);
     connect(navigator(),                &QnWorkbenchNavigator::currentWidgetChanged,this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         connect(navigator(),           &QnWorkbenchNavigator::positionChanged,      this,           &QnWorkbenchUi::updateCalendarVisibilityAnimated);
         connect(navigator(),           &QnWorkbenchNavigator::speedChanged,         this,           &QnWorkbenchUi::updateCalendarVisibilityAnimated);
     }
@@ -2578,7 +2641,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
 void QnWorkbenchUi::updateFpsGeometry() {
     QPointF pos = QPointF(
         m_controlsWidgetRect.right() - m_fpsItem->size().width(),
-        m_titleItem->geometry().bottom()
+        m_titleItem ? m_titleItem->geometry().bottom() : 0.0
         );
 
     if(qFuzzyEquals(pos, m_fpsItem->pos()))

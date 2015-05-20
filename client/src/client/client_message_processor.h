@@ -37,6 +37,7 @@ protected:
 
 private slots:
     void at_systemNameChangeRequested(const QString &systemName);
+    void at_gotInitialModules(const QList<QnModuleInformationWithAddresses> &modules);
 
 private:
     QnIncompatibleServerWatcher *m_incompatibleServerWatcher;

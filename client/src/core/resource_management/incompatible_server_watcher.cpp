@@ -5,7 +5,6 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/log.h>
 #include <common/common_module.h>
-#include <client/client_message_processor.h>
 
 namespace {
 
@@ -35,7 +34,7 @@ QnMediaServerResourcePtr makeResource(const QnModuleInformationWithAddresses &mo
 
     server->setId(QnUuid::createUuid());
     server->setStatus(initialStatus, true);
-    server->setProperty(lit("guid"), moduleInformation.id.toString());
+    server->setOriginalGuid(moduleInformation.id);
 
     updateServer(server, moduleInformation);
 
@@ -51,8 +50,6 @@ bool isSuitable(const QnModuleInformation &moduleInformation) {
 QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(QObject *parent) :
     QObject(parent)
 {
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened, this, &QnIncompatibleServerWatcher::start);
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed, this, &QnIncompatibleServerWatcher::stop);
 }
 
 QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher() {
@@ -104,6 +101,11 @@ void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep) {
     lock.unlock();
 
     removeResource(getFakeId(id));
+}
+
+void QnIncompatibleServerWatcher::createModules(const QList<QnModuleInformationWithAddresses> &modules) {
+    for (const QnModuleInformationWithAddresses &moduleInformation: modules)
+        at_moduleChanged(moduleInformation, true);
 }
 
 void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
@@ -194,7 +196,7 @@ void QnIncompatibleServerWatcher::addResource(const QnModuleInformationWithAddre
     } else {
         // update the resource
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO); //TODO: #GDM Fix assert
+        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
         updateServer(server, moduleInformation);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")

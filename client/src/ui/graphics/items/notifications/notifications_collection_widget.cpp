@@ -18,6 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/actions/actions.h>
@@ -177,7 +178,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     controlsLayout->addStretch();
 
 #ifdef _DEBUG
-    if(qnSettings->isDevMode()) {
+    if(qnRuntime->isDevMode()) {
         QnImageButtonWidget *debugButton = new QnImageButtonWidget(m_headerWidget);
         debugButton->setIcon(qnSkin->icon("item/search.png"));
         debugButton->setToolTip(tr("DEBUG"));

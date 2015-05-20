@@ -68,6 +68,7 @@
 #include <nx_ec/data/api_lock_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_resource_data.h>
+#include <nx_ec/data/api_reverse_connection_data.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -207,6 +208,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QnModuleInformationWithAddresses>();
     qRegisterMetaType<QList<QnModuleInformation>>();
+    qRegisterMetaType<QList<QnModuleInformationWithAddresses>>();
 
     qRegisterMetaType<Qn::CameraDataType>();
 
@@ -221,6 +223,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" ); 
     qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); 
     qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" ); 
+    qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
     qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
     qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 

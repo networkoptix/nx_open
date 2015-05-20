@@ -28,6 +28,7 @@
 #include <nx_ec/data/api_license_overflow_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_camera_history_data.h>
+#include <nx_ec/data/api_reverse_connection_data.h>
 
 #include "ec_api_fwd.h"
 
@@ -1039,6 +1040,7 @@ namespace ec2
 
     signals:
         void moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive);
+        void gotInitialModules(const QList<QnModuleInformationWithAddresses> &modules);
         void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
 
     protected:
@@ -1138,6 +1140,8 @@ namespace ec2
         */
         void initNotification(QnFullResourceData fullData);
         void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
+
+        void reverseConnectionRequested(const ec2::ApiReverseConnectionData& reverseConnetionData);
 
         void remotePeerFound(ApiPeerAliveData data);
         void remotePeerLost(ApiPeerAliveData data);

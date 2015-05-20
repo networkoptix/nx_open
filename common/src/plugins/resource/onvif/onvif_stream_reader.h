@@ -39,7 +39,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStream() override;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual void setCameraControlDisabled(bool value) override;
@@ -58,14 +58,14 @@ private:
 
     bool isGotFrame(QnCompressedVideoDataPtr videoData);
 
-    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( QString* const streamUrl );
-    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl ) const;
+    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( QString* const streamUrl, bool isCameraControlRequired);
+    CameraDiagnostics::Result updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl, bool isCameraControlRequired ) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
-    CameraDiagnostics::Result fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
-    CameraDiagnostics::Result fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    CameraDiagnostics::Result fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
+    CameraDiagnostics::Result fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
     
-    CameraDiagnostics::Result fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    CameraDiagnostics::Result fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const;
     Profile* fetchExistingProfile(const ProfilesResp& response, bool isPrimary, CameraInfoParams& info) const;
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile* profile) const;
     CameraDiagnostics::Result createNewProfile(const QString& name, const QString& token) const;
