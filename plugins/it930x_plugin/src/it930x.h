@@ -205,7 +205,7 @@ namespace ite
 
         void rxReset()
         {
-#if DTVAPI_V15
+#if 0
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
 
             Byte value = 1; // some magic value from sample
