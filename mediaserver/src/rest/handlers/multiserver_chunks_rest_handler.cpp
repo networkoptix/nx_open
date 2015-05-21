@@ -133,7 +133,8 @@ int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequ
 
     if (request.format == Qn::CompressedPeriodsFormat)
     {
-        result = QnCompressedTime::serialized(outputData, false);
+        bool signedSerialization = request.periodsType == Qn::BookmarksContent;
+        result = QnCompressedTime::serialized(outputData, signedSerialization);
         contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
     }
     else {

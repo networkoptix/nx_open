@@ -71,11 +71,13 @@ void QnCachingCameraDataLoader::initLoaders() {
             else
                 loader = new QnFlatCameraDataLoader(camera, dataType);
         }
-        else if (aviFile)
+        else if (aviFile) {
             loader = QnLayoutFileCameraDataLoader::newInstance(aviFile, dataType);
+        }
 
-        if (loader) {
-            m_loaders[i].reset(loader);
+        m_loaders[i].reset(loader);
+
+        if (loader) {           
             connect(loader, &QnAbstractCameraDataLoader::ready,         this,  [this, dataType](const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle){ 
                 Q_UNUSED(handle);
                 Q_ASSERT_X(updatedPeriod.isInfinite(), Q_FUNC_INFO, "We are always loading till very end.");
@@ -212,6 +214,7 @@ void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
     Qn::CameraDataType type = timePeriodToDataType(periodType);
 
     QnAbstractCameraDataLoaderPtr loader = m_loaders[type];
+    Q_ASSERT_X(loader, Q_FUNC_INFO, "Loader must always exists");
     if(!loader) {
         qnWarning("No valid loader in scope.");
         emit loadingFailed();
@@ -220,6 +223,7 @@ void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
 
     switch (type) {
     case Qn::RecordedTimePeriod:
+    case Qn::BookmarkTimePeriod:
         loader->load();
         break;
     case Qn::MotionTimePeriod:
@@ -231,7 +235,7 @@ void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
             emit periodsChanged(Qn::MotionContent);
         }
         break;
-    case Qn::BookmarkTimePeriod:
+    
     case Qn::BookmarkData:
             //TODO: #GDM #Bookmarks IMPLEMENT ME
         //loader->load(targetPeriod, m_bookmarksTextFilter, resolutionMs);  //TODO: #GDM #Bookmarks process tags list on the server side

@@ -1616,7 +1616,6 @@ namespace ec2
         int minDistance = INT_MAX;
         for (const RoutingRecord& rec: m_alivePeers.value(dstPeer).routingInfo)
             minDistance = qMin(minDistance, rec.distance);
-        Q_ASSERT(minDistance != INT_MAX);
         return minDistance;
     }
 

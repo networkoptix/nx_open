@@ -100,7 +100,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     if (!server || server->getStatus() != Qn::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
-            tr("Bookmark can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
+            tr("Bookmark can only be added to an online server.")); //TODO: #tr
         return;
     }
 
