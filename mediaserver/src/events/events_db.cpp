@@ -301,12 +301,18 @@ bool QnEventsDB::migrateBusinessParams() {
         QByteArray runtimeParams;
     };
 
-    auto convertAction = [](const QByteArray &packed) {
+    auto convertAction = [](const QByteArray &packed) -> QByteArray {
+        /* Check if data is in Ubjson already. */
+        if (!packed.isEmpty() && packed[0] == L'[')
+            return packed;
         QnBusinessActionParameters ap = convertOldActionParameters(packed);
         return QnUbjson::serialized(ap);
     };
 
-    auto convertRuntime = [](const QByteArray &packed) {
+    auto convertRuntime = [](const QByteArray &packed)-> QByteArray {
+        /* Check if data is in Ubjson already. */
+        if (!packed.isEmpty() && packed[0] == L'[')
+            return packed;
         QnBusinessEventParameters rp = convertOldEventParameters(packed);
         return QnUbjson::serialized(rp);
     };
