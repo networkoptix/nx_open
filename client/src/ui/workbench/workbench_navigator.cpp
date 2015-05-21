@@ -813,6 +813,7 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
 // Updaters
 // -------------------------------------------------------------------------- //
 void QnWorkbenchNavigator::updateCentralWidget() {
+    //TODO: #GDM get rid of central widget - it is used ONLY as a previous/current value in the layout change process
     QnResourceWidget *centralWidget = display()->widget(Qn::CentralRole);
     if(m_centralWidget == centralWidget)
         return;
