@@ -182,7 +182,7 @@ public:
     //!Remove event handler, installed by \a QnTransactionTransport::setHttpChunkExtensonHandler or \a QnTransactionTransport::setBeforeSendingChunkHandler
     void removeEventHandler( int eventHandlerID );
 
-    AbstractStreamSocket* getSocket() const;
+    QSharedPointer<AbstractStreamSocket> getSocket() const;
 
     static bool tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator);
     static bool tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator);

@@ -18,7 +18,7 @@ class QTimer;
 class QnModuleFinder : public QObject, public Singleton<QnModuleFinder> {
     Q_OBJECT
 public:
-    QnModuleFinder(bool clientOnly);
+    QnModuleFinder(bool clientMode);
 
     virtual ~QnModuleFinder();
 
@@ -55,7 +55,7 @@ private:
     void at_timer_timeout();
     void at_server_auxUrlsChanged(const QnResourcePtr &resource);
 
-    void removeAddress(const SocketAddress &address, bool holdItem);
+    void removeAddress(const SocketAddress &address, bool holdItem, const QSet<QUrl> &ignoredUrls = QSet<QUrl>());
     void handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void sendModuleInformation(const QnModuleInformation &moduleInformation, const SocketAddress &address, bool isAlive);
 
@@ -63,7 +63,7 @@ private:
     QElapsedTimer m_elapsedTimer;
     QTimer *m_timer;
 
-    bool m_clientOnly;
+    bool m_clientMode;
 
     QScopedPointer<QnMulticastModuleFinder> m_multicastModuleFinder;
     QnDirectModuleFinder *m_directModuleFinder;
