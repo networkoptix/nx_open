@@ -8,10 +8,12 @@
         <translation>Панель задач</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>В данной системе нет панели задач.
-Приложение будет завершено.</translation>
+        <source>There is no system tray on this system.</source>
+        <translation>В данной системе нет панели задач.</translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation>Приложение будет закрыто.</translation>
     </message>
 </context>
 <context>
@@ -96,11 +98,6 @@ Application will now quit.</source>
         <translation>Невозможно получить доступ к установленным сервисам</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>Произошла ошибка при доступе к сирвису %1</translation>
-    </message>
-    <message>
         <source>Show &amp;Media Server Log</source>
         <translation>&amp;Показать журнал Медиа Сервера</translation>
     </message>
@@ -111,6 +108,10 @@ Application will now quit.</source>
     <message>
         <source>Stop Media Server</source>
         <translation>Остановить Медиа Сервер</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation>Ошибка при попытке доступа к следующим сервисам:</translation>
     </message>
 </context>
 </TS>

@@ -42,8 +42,8 @@ struct FffmpegLog
 CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
-    m_width(0),
-    m_height(0),
+    //m_width(0),
+    //m_height(0),
     m_codecId(codec_id),
     m_showmotion(false),
     m_decodeMode(DecodeMode_Full),
@@ -82,17 +82,8 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
     closeDecoder();
 
-    if( m_passedContext )
-    {
-        if( m_passedContext->codec )
-            avcodec_close(m_passedContext);
-        av_freep(&m_passedContext->rc_override);
-        av_freep(&m_passedContext->intra_matrix);
-        av_freep(&m_passedContext->inter_matrix);
-        av_freep(&m_passedContext->extradata);
-        av_freep(&m_passedContext->rc_eq);
-        av_freep(&m_passedContext);
-    }
+    QnFfmpegHelper::deleteCodecContext(m_passedContext);
+    m_passedContext = 0;
 
     if( m_swDecoderCount )
         m_swDecoderCount->deref();
@@ -121,8 +112,8 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 
 void CLFFmpegVideoDecoder::closeDecoder()
 {
-    if (m_context->codec)
-        avcodec_close(m_context);
+    QnFfmpegHelper::deleteCodecContext(m_context);
+    m_context = 0;
 #ifdef _USE_DXVA
     m_decoderContext.close();
 #endif
@@ -132,13 +123,6 @@ void CLFFmpegVideoDecoder::closeDecoder()
     if (m_deinterlaceBuffer)
         av_free(m_deinterlaceBuffer);
     av_free(m_deinterlacedFrame);
-    av_freep(&m_context->rc_override);
-    av_freep(&m_context->intra_matrix);
-    av_freep(&m_context->inter_matrix);
-    av_freep(&m_context->extradata);
-    av_freep(&m_context->rc_eq);
-    av_freep(&m_context);
-
     delete m_frameTypeExtractor;
     m_motionMap.clear();
 }
@@ -263,15 +247,8 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     
     
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
-    if (m_context->codec)
-        avcodec_close(m_context);
-
-    av_freep(&m_context->rc_override);
-    av_freep(&m_context->intra_matrix);
-    av_freep(&m_context->inter_matrix);
-    av_freep(&m_context->extradata);
-    av_freep(&m_context->rc_eq);
-    av_freep(&m_context);
+    QnFfmpegHelper::deleteCodecContext(m_context);
+    m_context = 0;
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
     if (m_passedContext) {
@@ -402,7 +379,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             {
                 if (m_decodeMode == DecodeMode_Fastest)
                     return false;
-                else if (m_frameTypeExtractor->getFrameType((quint8*) data->data(), data->dataSize()) == FrameTypeExtractor::B_Frame)
+                else if (m_frameTypeExtractor->getFrameType((quint8*) data->data(), static_cast<int>(data->dataSize())) == FrameTypeExtractor::B_Frame)
                     return false;
             }
         }
@@ -426,7 +403,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         AVPacket avpkt;
         av_init_packet(&avpkt);
         avpkt.data = (unsigned char*)data->data();
-        avpkt.size = data->dataSize();
+        avpkt.size = static_cast<int>(data->dataSize());
         avpkt.dts = avpkt.pts = data->timestamp;
         // HACK for CorePNG to decode as normal PNG by default
         avpkt.flags = AV_PKT_FLAG_KEY;
@@ -540,13 +517,14 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             m_motionMap.remove(motionIndex);
         }
         else
-            outFrame->metadata.clear();
+            outFrame->metadata.reset();
 
+        PixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height || 
-            outFrame->format != m_context->pix_fmt || outFrame->linesize[0] != m_frame->linesize[0]))
+            outFrame->format != correctedPixelFormat || outFrame->linesize[0] != m_frame->linesize[0]))
         {
-            outFrame->reallocate(m_context->width, m_context->height, m_context->pix_fmt, m_frame->linesize[0]);
+            outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, m_frame->linesize[0]);
         }
 
         if (m_frame->interlaced_frame && m_context->thread_count > 1)
@@ -615,7 +593,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             outFrame->linesize[2] = copyFromFrame->linesize[2];
             outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
-        outFrame->format = GetPixelFormat();
+        outFrame->format = correctedPixelFormat;
         outFrame->sample_aspect_ratio = getSampleAspectRatio();
         return m_context->pix_fmt != PIX_FMT_NONE;
     }
@@ -686,7 +664,6 @@ void CLFFmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode va
 {
     if (m_decodeMode == val)
         return;
-    //NX_LOG("set cpu mode:", val, cl_logALWAYS);
     if (val >= m_decodeMode || m_decodeMode < DecodeMode_Fastest)
     {
         m_decodeMode = val;

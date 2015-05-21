@@ -171,7 +171,7 @@ namespace {
                     result.eventType = (QnBusiness::EventType) toInt(field);
                     break;
                 case EventTimestampParam:
-                    result.eventTimestamp = toInt64(field);
+                    result.eventTimestampUsec = toInt64(field);
                     break;
                 case EventResourceParam:
                     result.eventResourceId = QnUuid(field);
@@ -301,12 +301,18 @@ bool QnEventsDB::migrateBusinessParams() {
         QByteArray runtimeParams;
     };
 
-    auto convertAction = [](const QByteArray &packed) {
+    auto convertAction = [](const QByteArray &packed) -> QByteArray {
+        /* Check if data is in Ubjson already. */
+        if (!packed.isEmpty() && packed[0] == L'[')
+            return packed;
         QnBusinessActionParameters ap = convertOldActionParameters(packed);
         return QnUbjson::serialized(ap);
     };
 
-    auto convertRuntime = [](const QByteArray &packed) {
+    auto convertRuntime = [](const QByteArray &packed)-> QByteArray {
+        /* Check if data is in Ubjson already. */
+        if (!packed.isEmpty() && packed[0] == L'[')
+            return packed;
         QnBusinessEventParameters rp = convertOldEventParameters(packed);
         return QnUbjson::serialized(rp);
     };
@@ -380,7 +386,7 @@ bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
         "event_resource_guid, action_resource_guid) "
         "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_guid, :toggle_state, :aggregation_count, :event_type, :event_resource_guid, :action_resource_guid);");
 
-    qint64 timestampUsec = action->getRuntimeParams().eventTimestamp;
+    qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
     
     QnBusinessEventParameters actionRuntime = action->getRuntimeParams();
@@ -419,7 +425,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
 
 {
     QString request(lit("SELECT * FROM runtime_actions where"));
-    if (period.durationMs != -1) {
+    if (!period.isInfinite()) {
         request += QString(lit(" timestamp between '%1' and '%2'")).arg(period.startTimeMs/1000).arg(period.endTimeMs()/1000);
     }
     else {

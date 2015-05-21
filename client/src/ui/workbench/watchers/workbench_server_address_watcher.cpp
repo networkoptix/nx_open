@@ -1,49 +1,36 @@
 #include "workbench_server_address_watcher.h"
 
-#include "utils/network/direct_module_finder.h"
+#include "utils/network/module_finder.h"
 #include "utils/network/direct_module_finder_helper.h"
+#include "utils/network/module_information.h"
 #include "client/client_settings.h"
 
 QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_directModuleFinder(0),
-    m_directModuleFinderHelper(0)
+    QnWorkbenchContextAware(parent)
 {
-    m_urls = QSet<QUrl>::fromList(qnSettings->knownServerUrls());
-}
-
-void QnWorkbenchServerAddressWatcher::setDirectModuleFinder(QnDirectModuleFinder *directModuleFinder) {
-    if (m_directModuleFinder == directModuleFinder)
+    QnModuleFinder *moduleFinder = QnModuleFinder::instance();
+    if (!moduleFinder)
         return;
 
-    if (m_directModuleFinder)
-        m_directModuleFinder->disconnect(this);
+    m_urls = QSet<QUrl>::fromList(qnSettings->knownServerUrls());
 
-    m_directModuleFinder = directModuleFinder;
-
-    if (m_directModuleFinder)
-        connect(m_directModuleFinder, &QnDirectModuleFinder::moduleUrlFound, this, &QnWorkbenchServerAddressWatcher::at_directModuleFinder_moduleUrlFound);
+    connect(moduleFinder, &QnModuleFinder::moduleAddressFound, this, &QnWorkbenchServerAddressWatcher::at_moduleFinder_moduleUrlFound);
+    moduleFinder->directModuleFinderHelper()->setForcedUrls(m_urls);
 }
 
-void QnWorkbenchServerAddressWatcher::setDirectModuleFinderHelper(QnModuleFinderHelper *directModuleFinderHelper) {
-    if (m_directModuleFinderHelper)
-        m_directModuleFinderHelper->setUrlsForPeriodicalCheck(QnUrlSet());
-
-    m_directModuleFinderHelper = directModuleFinderHelper;
-
-    if (m_directModuleFinderHelper)
-        m_directModuleFinderHelper->setUrlsForPeriodicalCheck(m_urls, true);
-}
-
-void QnWorkbenchServerAddressWatcher::at_directModuleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
+void QnWorkbenchServerAddressWatcher::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
     Q_UNUSED(moduleInformation)
+
+    QUrl url;
+    url.setScheme(lit("http"));
+    url.setHost(address.address.toString());
+    url.setPort(address.port);
 
     if (m_urls.contains(url))
         return;
 
     m_urls.insert(url);
     qnSettings->setKnownServerUrls(m_urls.toList());
-    if (m_directModuleFinderHelper)
-        m_directModuleFinderHelper->setUrlsForPeriodicalCheck(m_urls);
+    QnModuleFinder::instance()->directModuleFinderHelper()->setForcedUrls(m_urls);
 }

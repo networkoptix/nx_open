@@ -56,6 +56,7 @@ public:
 #endif
         imageStatus(ImageStatus::None)
     {}
+
     virtual ~QnGridBackgroundItemPrivate() {}
 
     bool imageIsVisible() const {
@@ -99,8 +100,12 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent, QnWorkbenchCon
 {
     setAcceptedMouseButtons(0);
 
-    connect(this->context()->instance<QnLocalFileCache>(), SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
-    connect(this->context()->instance<QnAppServerImageCache>(), SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    auto imageLoaded = [this](const QString &filename, QnAppServerFileCache::OperationResult status) {
+        at_imageLoaded(filename, status == QnAppServerFileCache::OperationResult::ok);
+    };
+
+    connect(this->context()->instance<QnLocalFileCache>(),      &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
+    connect(this->context()->instance<QnAppServerImageCache>(), &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
     connect(this->context(), SIGNAL(userChanged(QnUserResourcePtr)), this, SLOT(at_context_userChanged()));
 
     connect(qnSettings->notifier(QnClientSettings::BACKGROUND), &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);

@@ -7,7 +7,6 @@
 #include <QtCore/QMap>
 
 #include "rtp_stream_parser.h"
-#include "../media/nalUnits.h"
 #include "decoders/audio/aac.h"
 
 
@@ -19,7 +18,7 @@ public:
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
-    virtual QnResourceAudioLayoutPtr getAudioLayout() override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 private:
     int m_sizeLength; // 0 if constant size. see RFC3640
     int m_constantSize;

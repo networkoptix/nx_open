@@ -26,13 +26,13 @@ public:
      * @brief append                                Append other set of bookmarks.
      * @param other                                 Other data struct, must be instance of QnBookmarkCameraData.
      */
-    virtual void append(const QnAbstractCameraDataPtr &other) override;
+    virtual void update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) override;
 
     /**
      * @brief append                                Append several sets of bookmarks at once.
      * @param other                                 List of data structs to append, each of them must be instance of QnBookmarkCameraData.
      */
-    virtual void append(const QList<QnAbstractCameraDataPtr> &other) override;
+    virtual void mergeInto(const QList<QnAbstractCameraDataPtr> &other) override;
 
     /**
      * @brief clear                                 Remove all bookmarks from the struct.
@@ -65,6 +65,19 @@ public:
      * @return                                      Longest bookmark found at that time; empty bookmark if nothing is found.
      */
     QnCameraBookmark find(const qint64 position) const;
+
+    /**
+     * @brief find                                  Searches all bookmarks covering the certain moment of time.
+     * @param position                              Time in milliseconds since epoch.
+     * @return                                      List of acceptable bookmarks
+     */
+    QnCameraBookmarkList findAll(const qint64 position) const;
+
+    /**
+     * @brief data                                  Get raw data list using specified time period
+     * @return                                      List of filtered by specified period bookmarks sorted by their start time.
+     */
+    QnCameraBookmarkList data(const QnTimePeriod &period) const;
 
     /**
      * @brief data                                  Get raw data list.

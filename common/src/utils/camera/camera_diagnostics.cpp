@@ -19,90 +19,101 @@ public:
         using namespace CameraDiagnostics::ErrorCode;
 
         int requiredParamCount = 0;
-        QString errorMessage;
+        QStringList errorMessageParts;
         switch( val )
         {
             case noError:
                 requiredParamCount = 0;
-                errorMessage = tr("OK");
+                errorMessageParts << tr("OK");
                 break;
             case mediaServerUnavailable:
                 requiredParamCount = 1;
-                errorMessage = tr("Server %1 is not available.\n Check that Server is up and running.");
+                errorMessageParts   << tr("Server %1 is not available.")
+                                    << tr("Check that Server is up and running.");
                 break;
             case mediaServerBadResponse:
                 requiredParamCount = 2;
-                errorMessage = tr("Received bad response from Server %1: \"%2\".\n Check if Server is up and has the proper version.");
+                errorMessageParts   << tr("Received bad response from Server %1: \"%2\".") 
+                                    << tr("Check if Server is up and has the proper version.");
                 break;
             case cannotEstablishConnection:
                 requiredParamCount = 1;
-                errorMessage = tr("Cannot connect to http port %1.\n Make sure the camera is plugged into the network.");
+                errorMessageParts   << tr("Cannot connect to http port %1.") 
+                                    << tr("Make sure the camera is plugged into the network.");
                 break;
             case cannotOpenCameraMediaPort:
                 requiredParamCount = 2;
-                errorMessage = tr("Cannot open media url %1. Failed to connect to media port %2.\n "
-                    "Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.");
+                errorMessageParts   << tr("Cannot open media url %1. Failed to connect to media port %2.")
+                                    << tr("Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.");
                 break;
             case connectionClosedUnexpectedly:
                 requiredParamCount = 2;
-                errorMessage = tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly.\n "
-                                  "Make sure the camera is plugged into the network. Try to reboot the camera.");
+                errorMessageParts   << tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly.")
+                                    << tr("Make sure the camera is plugged into the network. Try to reboot the camera.");
                 break;
             case responseParseError:
                 requiredParamCount = 2;
-                errorMessage = tr("Could not parse camera response. Url %1, request name %2.\n Please try to reboot the camera, "
-                    "then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.");
+                errorMessageParts   << tr("Could not parse camera response. Url %1, request name %2.")
+                                    << tr("Please try to reboot the camera, then restore factory defaults on the web-page.")
+                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case noMediaTrack:
                 requiredParamCount = 1;
-                errorMessage = tr("No supported media tracks at url %1.\n Please try to reboot the camera, then restore factory defaults on the web-page. "
-                    "Finally, try to update firmware. If the problem persists, please contact support.");
+                errorMessageParts   << tr("No supported media tracks at url %1.")
+                                    << tr("Please try to reboot the camera, then restore factory defaults on the web-page.")
+                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case notAuthorised:
                 requiredParamCount = 1;
-                errorMessage = tr("Not authorized. Url %1.");
+                errorMessageParts   << tr("Not authorized. Url %1.");
                 break;
             case unsupportedProtocol:
                 requiredParamCount = 2;
-                errorMessage = tr("Cannot open media url %1. Unsupported media protocol %2.\n Please try to restore factory defaults on the web-page. "
-                    "Finally, try to update firmware. If the problem persists, please contact support.");
+                errorMessageParts   << tr("Cannot open media url %1. Unsupported media protocol %2.")
+                                    << tr("Please try to reboot the camera, then restore factory defaults on the web-page.")
+                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case cannotConfigureMediaStream:
                 requiredParamCount = 1;
-                errorMessage = tr("Failed to configure parameter %1.\n First, try to turn on recording (if it's off) and decrease fps in camera settings. "
-                    "If it doesn't help, restore factory defaults on the camera web-page. If the problem persists, please contact support.");
+                errorMessageParts   << tr("Failed to configure parameter %1.")
+                                    << tr("First, try to turn on recording (if it's off) and decrease fps in camera settings.")
+                                    << tr("If it doesn't help, restore factory defaults on the camera web-page. If the problem persists, please contact support.");
                 break;
             case requestFailed:
                 requiredParamCount = 2;
-                errorMessage = tr("Camera request \"%1\" failed with error \"%2\".\n Please try to reboot the camera, then restore factory defaults on the web-page. "
-                    "Finally, try to update firmware. If the problem persists, please contact support.");
+                errorMessageParts   << tr("Camera request \"%1\" failed with error \"%2\".")
+                                    << tr("Please try to reboot the camera, then restore factory defaults on the web-page.")
+                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case notImplemented:
                 requiredParamCount = 0;
-                errorMessage = tr("Unknown Camera Issue.\n Please contact support.");
+                errorMessageParts   << tr("Unknown Camera Issue.")
+                                    << tr("Please contact support.");
                 break;
             case ioError:
                 requiredParamCount = 1;
-                errorMessage = tr("An input/output error has occurred. OS message: \"%1\".\n Make sure the camera is plugged into the network. Try to reboot the camera.");
+                errorMessageParts   << tr("An input/output error has occurred. OS message: \"%1\".")
+                                    << tr("Make sure the camera is plugged into the network. Try to reboot the camera.");
                 break;
             case serverTerminated:
-                errorMessage = tr("Server has been stopped.");
+                errorMessageParts   << tr("Server has been stopped.");
                 break;
             case cameraInvalidParams:
                 requiredParamCount = 1;
-                errorMessage = tr("Invalid data was received from the camera: %1.");
+                errorMessageParts   << tr("Invalid data was received from the camera: %1.");
                 break;
             case badMediaStream:
-                errorMessage = tr("Too many media errors. Please open camera issues dialog for more details.");
+                errorMessageParts   << tr("Too many media errors. Please open camera issues dialog for more details.");
                 break;
             case noMediaStream:
-                errorMessage = tr("Media stream is opened but no media data was received.");
+                errorMessageParts   << tr("Media stream is opened but no media data was received.");
                 break;
             case cameraInitializationInProgress:
-                errorMessage = tr("Camera initialization process in progress");
+                errorMessageParts   << tr("Camera initialization process in progress");
                 break;
             case cameraPluginError:
-                errorMessage = tr("Camera plugin error. %1");
+                requiredParamCount = 1;
+                errorMessageParts   << tr("Camera plugin error. %1");
                 break;
             default:
             {
@@ -115,19 +126,23 @@ public:
                         break;
                 }
 
-                errorMessage = tr("Unknown error. Please contact support.");
-                if( nonEmptyParamCount )
-                    errorMessage += tr("\n\nParameters: ");
-                for( int i = 0; i < nonEmptyParamCount; ++i )
-                {
-                    if( i > 0 )
-                        errorMessage += QLatin1String(", ");
-                    errorMessage += errorParams[i];
+                errorMessageParts << tr("Unknown error. Please contact support.");
+                if( nonEmptyParamCount ) {
+                    QString params = tr("Parameters:");
+                    
+                    for( int i = 0; i < nonEmptyParamCount; ++i )
+                    {
+                        if( i > 0 )
+                            params += QLatin1String(", ");
+                        params += errorParams[i];
+                    }
+                    errorMessageParts << QString() << QString() << params;
                 }
                 break;
             }
         }
 
+        QString errorMessage = errorMessageParts.join(L'\n');
         requiredParamCount = std::min<int>(requiredParamCount, errorParams.size());
         for( int i = 0; i < requiredParamCount; ++i )
             errorMessage = errorMessage.arg(!errorParams[i].isEmpty() ? errorParams[i] : tr("(unknown)"));

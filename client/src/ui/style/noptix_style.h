@@ -7,10 +7,8 @@
 #include <ui/graphics/items/standard/graphics_style.h>
 #include <common/config.h>
 
-
 class QnNoptixStyleAnimator;
 class QnSkin;
-class QnGlobals;
 class QnCustomizer;
 
 class QnStyleOptionProgressBar: public QStyleOptionProgressBarV2 {
@@ -77,7 +75,6 @@ private:
 private:
     QnNoptixStyleAnimator *m_hoverAnimator, *m_rotationAnimator;
     QnSkin *m_skin;
-    QnGlobals *m_globals;
     QnCustomizer *m_customizer;
     QIcon m_branchClosed, m_branchOpen, m_closeTab;
     QPixmap m_grooveBorder, m_grooveBody, m_sliderHandleHovered, m_sliderHandle;

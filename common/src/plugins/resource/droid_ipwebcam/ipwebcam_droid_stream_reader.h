@@ -15,7 +15,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
-    virtual CameraDiagnostics::Result openStream();
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
     virtual void closeStream() ;
     virtual bool isStreamOpened() const;
 

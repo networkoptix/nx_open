@@ -12,7 +12,7 @@ QnRtspH264Encoder::QnRtspH264Encoder():
 
 }
 
-QByteArray QnRtspH264Encoder::getAdditionSDP()
+QByteArray QnRtspH264Encoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
 {
     if (!m_sdpMediaPacket) 
         return QByteArray();
@@ -69,7 +69,7 @@ void QnRtspH264Encoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 {
     if (media->dataType != QnAbstractMediaData::VIDEO)
     {
-        m_media.clear();
+        m_media.reset();
         return;
     }
 

@@ -28,7 +28,8 @@
         {
             "keys": [
                 "VISTA|VK2-ENCODER",
-                "*|DW-CP04"
+                "*|DW-CP04",
+                "Avigilon|ENC-*"
             ],
             "analogEncoder": true
         },
@@ -720,6 +721,33 @@
         },
         {
             "keys": [
+                "Samsung Techwin|SNP-6321"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO" : "Actual tilt range is [0,-180]",
+                        "device":  [0, 1],
+                        "logical": [-90, 20]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.10, 0.20 , 0.30 , 0.40 , 0.50 , 0.60 , 0.70, 0.80, 0.90, 1],
+                        "logical": [1, 1.31, 1.60 , 1.91 , 2.64 , 3.32 , 4.36 , 5.82, 8.55, 13.5 , 20],
+                        "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },        
+        {
+            "keys": [
                 "VIVOTEK|SD8363E", "VIVOTEK|SD8363E|SD8363-VVTK-0200f", "SD8363|SD8363"
             ],
             "ptzMapper": {
@@ -743,7 +771,8 @@
                         "space": "35MmEquiv"
                     }
                 }
-            }
+            },
+            "tourGetPosWorkaround": true
         },
         {
             "keys": [

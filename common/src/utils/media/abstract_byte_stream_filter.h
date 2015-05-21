@@ -52,6 +52,11 @@ public:
         m_nextFilter = nextFilter;
     }
 
+    virtual const std::shared_ptr<AbstractByteStreamFilter>& nextFilter() const
+    {
+        return m_nextFilter;
+    }
+
 protected:
     std::shared_ptr<AbstractByteStreamFilter> m_nextFilter;
 };

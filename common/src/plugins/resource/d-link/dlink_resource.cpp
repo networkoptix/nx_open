@@ -348,7 +348,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
     float apectRatio = apectRatio_0;
 
-    if (abs(apectRatio_0 - apectRatio_1) > 0.01)
+    if (std::abs(apectRatio_0 - apectRatio_1) > 0.01)
         apectRatio = apectRatio_1; // 
             
    
@@ -368,6 +368,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
     }
 
     //detecting and saving selected resolutions
+    /*
     const CodecID supportedCodec = !m_camInfo.hasH264.isEmpty()
         ? CODEC_ID_H264
         : (m_camInfo.hasMPEG4 ? CODEC_ID_MPEG4 : CODEC_ID_MJPEG);
@@ -375,8 +376,8 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
     mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_camInfo.primaryStreamResolution(), supportedCodec) );
     if( m_camInfo.secondaryStreamResolution().width() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_camInfo.secondaryStreamResolution(), supportedCodec ) );
-    saveResolutionList( mediaStreams );
-
+    saveMediaStreamInfoIfNeeded( mediaStreams );
+    */
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();

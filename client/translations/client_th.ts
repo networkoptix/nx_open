@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Information</source>
-        <translation>สารสนเทศ</translation>
+        <translation>ข้อมูล</translation>
     </message>
     <message>
         <source>Credits</source>
@@ -17,11 +17,11 @@
     </message>
     <message>
         <source>GPU Information</source>
-        <translation>สารสนเทศ GPU </translation>
+        <translation>ข้อมูล GPU</translation>
     </message>
     <message>
         <source>Connected servers</source>
-        <translation>เชื่อมต่อเซิร์ฟเวอร์</translation>
+        <translation>เชื่อมต่อกับเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Support</source>
@@ -81,10 +81,6 @@
         <translation>เหตุการณ์</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>เริ่ม</translation>
-    </message>
-    <message>
         <source>at</source>
         <translation>ที่</translation>
     </message>
@@ -101,16 +97,20 @@
         <translation>การกระทำ</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>&lt;Select at least one camera&gt;</source>
         <translation>เลือกกล้องอย่างน้อยหนึ่งตัว</translation>
     </message>
     <message>
         <source>Comments:</source>
         <translation>หมายเหตุ:</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <translation>เมื่อ</translation>
+    </message>
+    <message>
+        <source>Do</source>
+        <translation>ทำ</translation>
     </message>
 </context>
 <context>
@@ -129,7 +129,7 @@
     </message>
     <message>
         <source>Event log</source>
-        <translation>เหตุการณ์</translation>
+        <translation>log เหตุการณ์</translation>
     </message>
     <message>
         <source>Advanced...</source>
@@ -161,10 +161,6 @@
     <message>
         <source>Ca&amp;mera Address:</source>
         <translation>&amp;ที่อยู่กล้อง:</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ตัวอย่าง:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>IP, hostname, RTSP link...</source>
@@ -203,10 +199,6 @@
         <translation>&amp;พอร์ตเชื่อมต่อ:</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
-        <translation>ค้นพบกล้อง</translation>
-    </message>
-    <message>
         <source>Manuf.</source>
         <translation>รายการ.</translation>
     </message>
@@ -237,6 +229,10 @@
     <message>
         <source>New scan...</source>
         <translation>เริ่มตรวจสอบใหม่...</translation>
+    </message>
+    <message>
+        <source>Discovered Cameras:</source>
+        <translation>กล้องที่ตรวจพบ:</translation>
     </message>
 </context>
 <context>
@@ -273,11 +269,11 @@
     <name>CameraDiagnosticsDialog</name>
     <message>
         <source>Camera Diagnostics</source>
-        <translation>การวินิจฉัยของกล้อง</translation>
+        <translation>การตรวจสอบกล้อง</translation>
     </message>
     <message>
         <source>Diagnostics for camera</source>
-        <translation>การวินิจฉัยสำหรับกล้อง</translation>
+        <translation>การตรวจสอบสำหรับกล้อง</translation>
     </message>
 </context>
 <context>
@@ -291,7 +287,7 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
         <source>I have read the manual and understand the risks</source>
-        <translation>ฉันได้อ่านคู่มือและเข้าใจความเสี่ยง</translation>
+        <translation>ฉันได้อ่านคู่มือและเข้าใจความเสี่ยงเรียบร้อยแล้ว</translation>
     </message>
     <message>
         <source>Camera Settings Control</source>
@@ -299,23 +295,23 @@
     </message>
     <message>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>เก็บโปรไฟล์การตั้งค่า</translation>
+        <translation>เก็บสัญญาณภาพและโปรไฟล์การตั้งค่าของกล้อง</translation>
     </message>
     <message>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>คำเตือน! FPS และการตั้งค่าที่มีคุณภาพในตารางเวลาการบันทึกจะไม่ทำงาน!</translation>
+        <translation>คำเตือน! FPS และคุณภาพใน การตั้งค่าการบันทึก จะไม่ทำงาน!</translation>
     </message>
     <message>
         <source>Secondary Stream Control</source>
-        <translation>การควบคุมสำรอง</translation>
+        <translation>การควบคุมสัญญาณภาพสำรอง</translation>
     </message>
     <message>
         <source>Override secondary stream quality</source>
-        <translation>ตั้งค่าการควบคุม</translation>
+        <translation>การเขียนทับคุณภาพของสัญญาณภาพสำรอง</translation>
     </message>
     <message>
         <source>Don&apos;t use</source>
-        <translation>ไม่ใช้</translation>
+        <translation>ไม่ได้ใช้</translation>
     </message>
     <message>
         <source>Low quality</source>
@@ -328,10 +324,6 @@
     <message>
         <source>High quality</source>
         <translation>คุณภาพสูง</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>คำเตือน! ที่มีคุณภาพต่ำอาจส่งผลให้ภาพความละเอียดต่ำ</translation>
     </message>
     <message utf8="true">
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
@@ -376,6 +368,14 @@
     <message>
         <source>Restore Defaults</source>
         <translation>คืนค่าเริ่มต้น</translation>
+    </message>
+    <message>
+        <source>Warning! Low quality may result in low resolution image.</source>
+        <translation>คำเตือน คุณภาพที่ตำ อาจจะทำให้ความละเอียดของภาพต่ำไปด้วย.</translation>
+    </message>
+    <message>
+        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation>&quot;อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่ากล้อง&quot; ถูกปิดใช้งานในระบบการบริหาร.</translation>
     </message>
 </context>
 <context>
@@ -574,10 +574,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>ConnectionTestingDialog</name>
     <message>
         <source>Connection Test</source>
-        <translatorcomment>123</translatorcomment>
-        <translation>   &lt;String Id=&quot;DiskCostDlg_Title&quot;                                  Overridable=&quot;yes&quot;&gt;${company.name} ${product.name} Setup v.${release.version}&lt;/String&gt;
-    &lt;String Id=&quot;ErrorDlg_Title&quot;                                     Overridable=&quot;yes&quot;&gt;${company.name} ${product.name} Setup v.${release.version}&lt;/String&gt;
-    &lt;String Id=&quot;ExitDialog_Title&quot;                                   Overridable=&quot;yes&quot;&gt;${company.name} ${product.name} Setup v.${release.version}&lt;/String&gt;</translation>
+        <translation>ตรวจสอบการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Testing connection...</source>
@@ -653,7 +650,7 @@ Short for &quot;seconds&quot;</extracomment>
     <name>GeneralPreferencesWidget</name>
     <message>
         <source>Main Media Folder</source>
-        <translation>หน้าหลัก Media โฟลเดอร์</translation>
+        <translation>หน้าหลัก มีเดีย โฟลเดอร์</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
@@ -661,7 +658,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Extra Media Folders</source>
-        <translation>ค้นหาเพิ่มเติม</translation>
+        <translation>ค้นหา มีเดีย เพิ่มเติม</translation>
     </message>
     <message>
         <source>&amp;Add...</source>
@@ -680,10 +677,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>มิกซ์เสียง จาก 5.1 ถึง 2.1:</translation>
     </message>
     <message>
-        <source>Restart required.</source>
-        <translation>เริ่มต้นใหม่ที่ต้องการ.</translation>
-    </message>
-    <message>
         <source>Auto pause video:</source>
         <translation>หยุดวิดีโออัตโนมัติ:</translation>
     </message>
@@ -693,7 +686,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>minutes of inactivity</source>
-        <translation>นาที</translation>
+        <translation>นาที ไม่มีการใช้งาน</translation>
     </message>
     <message>
         <source>Run application when PC boots up:</source>
@@ -704,16 +697,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>เพิ่มบัฟเฟอร์:</translation>
     </message>
     <message>
-        <source>Disable only if the client takes too much CPU.</source>
-        <translation>ปิดการใช้งานในกรณีที่ใช้ CPU มากเกินไป.</translation>
-    </message>
-    <message>
         <source>Browse logs</source>
-        <translation>สิบค้นการทำงาน</translation>
+        <translation>ค้นหา logs</translation>
     </message>
     <message>
         <source>Clear local cache</source>
         <translation>ล้างข้อมูลแคช</translation>
+    </message>
+    <message>
+        <source>Restart required</source>
+        <translation>มีความต้องการที่จะเริ่มต้นใหม่</translation>
     </message>
 </context>
 <context>
@@ -740,24 +733,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>เปิดเหตุการณ์  Ctrl+E</translation>
-    </message>
-    <message>
         <source>&amp;Camera List</source>
         <translation>&amp;รายการกล้อง</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>เปิดการบันทึก Ctrl +L</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>เปิดดูรายชื่อกล้อง</translation>
     </message>
     <message>
         <source>&amp;Health Monitoring</source>
@@ -840,7 +821,11 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Loading image... Please wait.</source>
-        <translation>กำลังโหลดภาพ..</translation>
+        <translation>กำลังโหลดภาพ..กรุณารอสักครู่.</translation>
+    </message>
+    <message>
+        <source>&lt;No image&gt;</source>
+        <translation>ไม่มีภาพ</translation>
     </message>
 </context>
 <context>
@@ -1093,11 +1078,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>วินาที</translation>
     </message>
     <message>
-        <source>This option will not affect Recording Schedule.
-Recording Schedule is always based on Server Time.</source>
-        <translation>การเปลี่ยนแปลงนี้จะไม่มีผลต่อการบันทึก การบันทึกจะขึ้นอยู่กับเวลาของเซิร์ฟเวอร์.</translation>
-    </message>
-    <message>
         <source>Background Animation</source>
         <translation>พื้นหลังภาพเคลื่อนไหว</translation>
     </message>
@@ -1250,7 +1230,7 @@ Recording Schedule is always based on Server Time.</source>
     <name>PreferencesDialog</name>
     <message>
         <source>Local Settings</source>
-        <translation>การตั้งค่าภายใน</translation>
+        <translation>การตั้งค่าภายในระบบ</translation>
     </message>
 </context>
 <context>
@@ -1265,11 +1245,11 @@ Recording Schedule is always based on Server Time.</source>
     </message>
     <message>
         <source>Create Tour</source>
-        <translation>สร้างทัวร์</translation>
+        <translation>สร้างตำแหน่งทัวร์</translation>
     </message>
     <message>
         <source>Start Tour</source>
-        <translation>เริ่มทัวร์</translation>
+        <translation>เริ่มทัวร์ตามตำแหน่ง</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1281,7 +1261,7 @@ Recording Schedule is always based on Server Time.</source>
     </message>
     <message>
         <source>No tour selected</source>
-        <translation>ไม่ได้เลือกทัวร์</translation>
+        <translation>ไม่ได้เลือกตำแหน่งทัวร์</translation>
     </message>
     <message>
         <source>Preview</source>
@@ -1293,26 +1273,26 @@ Recording Schedule is always based on Server Time.</source>
     </message>
     <message>
         <source>Get Preview</source>
-        <translation>ได้รับแสดงตัวอย่าง</translation>
+        <translation>ได้รับตัวอย่างที่แสดง</translation>
     </message>
 </context>
 <context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
-        <translation>ขยายเข้า</translation>
+        <translation>ซูมเข้า</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation>ขยายออก</translation>
+        <translation>ซูมออก</translation>
     </message>
     <message>
         <source>Focus Far</source>
-        <translation>ปรับโฟกัลไกล</translation>
+        <translation>ปรับโฟกัลระยะไกล</translation>
     </message>
     <message>
         <source>Focus Near</source>
-        <translation>ปรับโฟกัสใกล้</translation>
+        <translation>ปรับโฟกัสระยะใกล้</translation>
     </message>
     <message>
         <source>Auto Focus</source>
@@ -1343,18 +1323,6 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <source>Parameter 1 is null.</source>
         <translation>พารามิเตอร์ 1 ห้ามว่าง.</translation>
-    </message>
-    <message>
-        <source>b/s</source>
-        <translation>b/s</translation>
-    </message>
-    <message>
-        <source>Kb/s</source>
-        <translation>Kb/s</translation>
-    </message>
-    <message>
-        <source>Mb/s</source>
-        <translation>Mb/s</translation>
     </message>
     <message>
         <source>None</source>
@@ -1431,50 +1399,48 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnAboutDialog</name>
     <message>
-        <source>Server at %2: v%1&lt;br/&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Copy to Clipboard</source>
-        <translation>คัดลอกคลิปบอร์ด</translation>
+        <translation>คัดลอกไปคลิปบอร์ด</translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
-Built for %5-%6 with %7.&lt;br/&gt;
-</source>
-        <translation></translation>
+        <source>Server at %2: v%1</source>
+        <translation>เซิร์ฟเวอร์ %2:v%1</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</source>
-        <translation></translation>
+        <source>%1 version %2 (%3).</source>
+        <translation>%1 เวอร์ชั่น %2 (%3).</translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br/&gt;
-&lt;br /&gt;
-&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
-&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
-&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
-&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
-&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
-&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
-</source>
-        <translation></translation>
+        <source>Built for %1-%2 with %3.</source>
+        <translation>สร้าง สำหรับ %1-%2 กับ %3.</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</source>
-        <translation></translation>
+        <source>Client is not connected to any server</source>
+        <translation>ผู้ใช้งานไม่สามารถติดต่อได้กับเซอร์ฟเวอร์</translation>
     </message>
     <message>
-        <source>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br/&gt;
-&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;
-&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br/&gt;
-&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br/&gt;
-</source>
-        <translation></translation>
+        <source>%1 uses the following external libraries:</source>
+        <translation>%1 ใช้ปฏิบัติตามสิ่งต่อไปนี้:</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Support&lt;/b&gt;: %1</source>
-        <translation></translation>
+        <source>OpenGL version</source>
+        <translation>รุ่น OpenGL</translation>
+    </message>
+    <message>
+        <source>OpenGL renderer</source>
+        <translation>OpenGL renderer</translation>
+    </message>
+    <message>
+        <source>OpenGL vendor</source>
+        <translation>OpenGL vendor</translation>
+    </message>
+    <message>
+        <source>OpenGL max texture size</source>
+        <translation>เปิด OpenGL หน้าจอใหญ่</translation>
+    </message>
+    <message>
+        <source>Support</source>
+        <translation>ทีมช่วยเหลือ</translation>
     </message>
 </context>
 <context>
@@ -1486,17 +1452,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <source>Saving...</source>
         <translation>กำลังบันทึก...</translation>
-    </message>
-</context>
-<context>
-    <name>QnAction</name>
-    <message>
-        <source>%n</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -1679,19 +1634,19 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Layout...</source>
-        <translation>เค้าโครง ...</translation>
+        <translation>หน้าต่าง ...</translation>
     </message>
     <message>
         <source>New Layout...</source>
-        <translation>เคร้าโครงใหม่...</translation>
+        <translation>หน้าต่างใหม่...</translation>
     </message>
     <message>
         <source>Tab</source>
-        <translation>Tab</translation>
+        <translation>แท็บ</translation>
     </message>
     <message>
         <source>New Tab</source>
-        <translation>Tab ใหม่</translation>
+        <translation>แท็บใหม่</translation>
     </message>
     <message>
         <source>Ctrl+T</source>
@@ -2194,10 +2149,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>การตั้งค่ากล้อง...</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>การตั้งค่ารูปภาพ...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>การตั้งค่าเค้าโครง...</translation>
     </message>
@@ -2235,7 +2186,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
-        <translation type="unfinished"></translation>
+        <translation>ผสานการเชื่อมต่อกับระบบปัจจุบัน ...</translation>
     </message>
     <message>
         <source>Change Cell Aspect Ratio...</source>
@@ -2553,6 +2504,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Hide Search Panel</source>
         <translation>ซ่อนแผงค้นหา</translation>
     </message>
+    <message>
+        <source>File Settings...</source>
+        <translation>ตั้งค่าแฟ้มข้อมูล...</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2592,31 +2547,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Preview</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnAutoTester</name>
-    <message>
-        <source>Time to wait before finishing the test, in milliseconds. Default is %1.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Substring that must be present in one of the resources.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show this help screen.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All tests completed successfully.
-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Test for resource substring &apos;%1&apos; failed.
-</source>
         <translation></translation>
     </message>
 </context>
@@ -2827,12 +2757,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>ยืนยันการตั้งค่า</translation>
     </message>
     <message>
-        <source>Are you sure you want to reset rules to the defaults?
-This action CANNOT be undone!</source>
-        <translation>คุณแน่ใจว่าคุณต้องการที่จะตั้งค่าเริ่มต้น?
-การดำเนินการนี้ไม่สามารถยกเลิกได้!</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>ผิดพลาด</translation>
     </message>
@@ -2884,6 +2808,14 @@ This action CANNOT be undone!</source>
         <source>Unsaved changes will be lost. Save?</source>
         <translation>การเปลี่ยนแปลงที่ไม่ได้บันทึกไว้จะหายไป บันทึก?</translation>
     </message>
+    <message>
+        <source>Are you sure you want to reset rules to the defaults?</source>
+        <translation>คุณแน่ใจว่าคุณต้องการที่จะตั้งค่ากฎไปยังเริ่มต้น?</translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation>การดำเนินการนี้ไม่สามารถยกเลิกได้!</translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
@@ -2931,12 +2863,6 @@ This action CANNOT be undone!</source>
         <translation>ความผิดพลาด</translation>
     </message>
     <message>
-        <source>Server is offline.
-Camera addition is possible for online servers only.</source>
-        <translation>เซอร์ฟเวอร์ออฟไลน์
-การเพิ่มจำนวนกล้อง เซอร์ฟเวอร์จะต้องออนไลน์เท่านั้น.</translation>
-    </message>
-    <message>
         <source>First address in range is greater than the last one.</source>
         <translation>ที่อยู่ลำดับแรกในช่วงทมีค่ามากกว่าอยู่ท้ายสุด.</translation>
     </message>
@@ -2963,20 +2889,6 @@ Camera addition is possible for online servers only.</source>
     <message>
         <source>Success</source>
         <translation>สำเร็จ</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n camera(s) added successfully.
-It might take a few moments to populate them in the tree.</source>
-        <translation>
-            <numerusform>%n เพิ่มกล้องสำเร็จ
-มันอาจจะใช้เวลาสักครู่เพื่อเติมกล้องเข้าในระบบ.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Error while adding camera(s).</source>
-        <translation>
-            <numerusform>เกิดข้อผิดพลาดในขณะที่การเพิ่มกล้อง(s).</numerusform>
-        </translation>
     </message>
     <message>
         <source>Server went offline, search aborted.</source>
@@ -3005,7 +2917,7 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <source>Scanning hosts... (%1)</source>
         <translation>
-            <numerusform>กำลังสแกนโฮสต์ ...(%1)</numerusform>
+            <numerusform>กำลังสแกนโฮสต์ ... (%1)%n</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -3038,15 +2950,37 @@ It might take a few moments to populate them in the tree.</source>
         <source>Select target server...</source>
         <translation>เลือกเซิร์ฟเวอร์เป้าหมาย...</translation>
     </message>
+    <message>
+        <source>Examples:</source>
+        <translation>ตัวอย่าง:</translation>
+    </message>
+    <message>
+        <source>Server is offline.</source>
+        <translation>เซิร์ฟเวอร์ ออฟไลน์.</translation>
+    </message>
+    <message>
+        <source>Camera addition is possible for online servers only.</source>
+        <translation>การเพิ่งเติมกล้องเป็นไปได้สำหรับเซิร์ฟเวอร์ออนไลน์เท่านั้น.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras added successfully.</source>
+        <translation>
+            <numerusform>%n เพิ่มกล้องเรียบร้อยแล้ว.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>It might take a few moments to populate them in the tree.</source>
+        <translation>อาจจะใช้เวลาสักครู่ในการเพื่อเติมพวกเขาในระบบ.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding %n cameras.</source>
+        <translation>
+            <numerusform>เกิดข้อผิดพลาดในขณะที่มีการเพิ่ม %n กล้อง.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
-    <message>
-        <source>Please wait while settings are being loaded.
-This can take a lot of time.</source>
-        <translation>โปรดรอสักครู่ในขณะที่โหลดการตั้งค่า
-การโหลดนี้อาจจะใช้เวลานาน.</translation>
-    </message>
     <message>
         <source>Applying settings...</source>
         <translation>การตั้งค่าการใช้งาน...</translation>
@@ -3068,6 +3002,14 @@ This can take a lot of time.</source>
 %2</source>
         <translation>ไม่สามารถบันทึกพารามิเตอร์ต่อไปนี้ (%1):
 %2</translation>
+    </message>
+    <message>
+        <source>Please wait while settings are being loaded.</source>
+        <translation>โปรดรอสักครู่ในขณะที่โหลดการตั้งค่า.</translation>
+    </message>
+    <message>
+        <source>This can take a lot of time.</source>
+        <translation>การทำงานนี้อาจจะใช้เวลานาน.</translation>
     </message>
 </context>
 <context>
@@ -3168,7 +3110,7 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>%1 have no input ports</source>
         <translation>
-            <numerusform>%1 ไม่มีพอร์ตเชื่อมต่อ</numerusform>
+            <numerusform>%1 ไม่มีพอร์ตเชื่อมต่อ %n</numerusform>
         </translation>
     </message>
 </context>
@@ -3262,7 +3204,7 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform>การตรวจสอบการบันทึกหรือการเคลื่อนไหวที่ถูกปิดใช้งานสำหรับ %1</numerusform>
+            <numerusform>การตรวจสอบการบันทึกหรือการเคลื่อนไหวที่ถูกปิดใช้งานสำหรับ %1 %n</numerusform>
         </translation>
     </message>
 </context>
@@ -3278,7 +3220,7 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>%1 have no output relays</source>
         <translation>
-            <numerusform>%1 ไม่มีการแสดงผล</numerusform>
+            <numerusform>%1 ไม่มีการแสดงผล %n</numerusform>
         </translation>
     </message>
 </context>
@@ -3287,7 +3229,7 @@ This can take a lot of time.</source>
     <message numerus="yes">
         <source>Recording is disabled for %1</source>
         <translation>
-            <numerusform>การบันทึกถูกปิดไว้ สำหรับ %1</numerusform>
+            <numerusform>การบันทึกถูกปิดไว้ สำหรับ %1 %n</numerusform>
         </translation>
     </message>
 </context>
@@ -3447,16 +3389,6 @@ This can take a lot of time.</source>
         <translation>ข้าสู่ระบบหรือรหัสผ่านที่คุณป้อนไม่ถูกต้องโปรดลองอีกครั้ง.</translation>
     </message>
     <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation>การเชื่อมต่อไปยังเซิร์ฟเวอร์ไม่สามารถสร้าง
-รายละเอียดการเชื่อมต่อที่คุณได้ป้อนไม่ถูกต้องโปรดลองอีกครั้ง
-
-ถ้าข้อผิดพลาดนี้ยังคงอยู่โปรดติดต่อผู้ดูแลระบบ VMS ของคุณ.</translation>
-    </message>
-    <message>
         <source>You are trying to connect to incompatible Server.</source>
         <translation>.คุณพยายามที่จะเชื่อมต่อไปยังเซิร์ฟเวอร์เข้ากันไม่ได้.</translation>
     </message>
@@ -3473,93 +3405,96 @@ If this error persists, please contact your VMS administrator.</source>
         <translation>ไคลเอนต์</translation>
     </message>
     <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
-        <translation>คุณกำลังจะเชื่อมต่อไปยังเซิร์ฟเวอร์ซึ่งมีรุ่นที่แตกต่างกัน
-  - รุ่นลูกค้า: %1
-  - รุ่นของเซิร์ฟเวอร์:%2
-รุ่นนี้เข้ากันไม่ได้ โปรดอัปเดตของคุณ %3</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation>คุณกำลังจะเชื่อมต่อไปยังเซิร์ฟเวอร์ซึ่งมีรุ่นที่แตกต่างกัน:
-  - รุ่นลูกค้า: %1
-  - รุ่นของเซิร์ฟเวอร์:%2
-โหมดความเข้ากันได้สำหรับรุ่นต่ำกว่า %3ไม่ได้รับการสนับสนุน.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation>เซิร์ฟเวอร์ที่เลือกไว้มีรุ่นที่แตกต่างกัน:
-  - รุ่นลูกค้า: %1
-  - รุ่นของเซิร์ฟเวอร์:%2
-รุ่นอื่น ๆ ของลูกค้าเป็นสิ่งจำเป็นในการที่จะสร้างการเชื่อมต่อไปยังเซิร์ฟเวอร์นี้.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-An error has occurred while trying to restart in compatibility mode.</source>
-        <translation>เซิร์ฟเวอร์ที่เลือกไว้มีรุ่นที่แตกต่างกัน:
-  - รุ่นลูกค้า: %1
-  - รุ่นของเซิร์ฟเวอร์:%2
-เกิดข้อผิดพลาดในขณะที่พยายามที่จะเริ่มต้นใหม่ในโหมดความเข้ากันได้.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - EC version: %2.
-You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Client version %3 is required to connect to this Server.
-Download version %3?</source>
-        <translation>คุณกำลังจะเชื่อมต่อไปยังเซิร์ฟเวอร์ซึ่งมีรุ่นที่แตกต่างกัน:
- - รุ่นลูกค้า: %1
- - รุ่นของเซิร์ฟเวอร์:%2
-ไคลเอ็นต์รุ่น %3 จะต้องเชื่อมต่อกับเซิร์ฟเวอร์นี้
-ดาวโหลดเวอร์ชั่น %3 ไหม?</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Would you like to restart the Client in compatibility mode?</source>
-        <translation>คุณกำลังจะเชื่อมต่อไปยังเซิร์ฟเวอร์ซึ่งมีรุ่นที่แตกต่างกัน:
-  - รุ่นลูกค้า: %1
-  - รุ่นของเซิร์ฟเวอร์:%2
-คุณต้องการที่จะเริ่มต้นใหม่ไคลเอนต์ในโหมดที่เข้ากันได้หรือไม่?</translation>
-    </message>
-    <message>
         <source>Launcher process is not found</source>
         <translation>กระบวนการเปิดไม่พบ</translation>
-    </message>
-    <message>
-        <source>Cannot restart the Client in compatibility mode.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>ไม่สามารถเริ่มไคลเอนต์ในโหมดความเข้ากันได้
-กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
     </message>
     <message>
         <source>Failure</source>
         <translation>ความล้มเหลว</translation>
     </message>
     <message>
-        <source>Failed to launch compatibility version %1
-Try to restore version %1?</source>
-        <translation>ล้มเหลวในการทำงานร่วมกันที่จะเปิดตัวรุ่นที่ %1
-ต้องการที่จะเรียกคืนรุ่น %1?</translation>
+        <source>Connection to the Server could not be established.</source>
+        <translation>การเชื่อมต่อไปยังเซิร์ฟเวอร์ไม่สามารถสร้างได้.</translation>
+    </message>
+    <message>
+        <source>Connection details that you have entered are incorrect, please try again.</source>
+        <translation>รายละเอียดการเชื่อมต่อที่คุณได้ป้อนไม่ถูกต้องโปรดลองอีกครั้ง.</translation>
+    </message>
+    <message>
+        <source>If this error persists, please contact your VMS administrator.</source>
+        <translation>ถ้าข้อผิดพลาดนี้ยังคงอยู่โปรดติดต่อผู้ดูแลระบบ VMS ของคุณ.</translation>
+    </message>
+    <message>
+        <source> - Client version: %1.</source>
+        <translation> - รุ่นผู้ใช้: %1.</translation>
+    </message>
+    <message>
+        <source> - Server version: %1.</source>
+        <translation> - รุ่นของเซิร์ฟเวอร์: %1.</translation>
+    </message>
+    <message>
+        <source>You are about to connect to Server which has a different version:</source>
+        <translation>คุณกำลังจะเชื่อมต่อไปยังเซิร์ฟเวอร์ซึ่งมีรุ่นที่แตกต่างกัน:</translation>
+    </message>
+    <message>
+        <source>These versions are not compatible. Please update your %1.</source>
+        <translation>รุ่นนี้เข้ากันไม่ได้ โปรดอัปเดตรุ่นของคุณ %1.</translation>
+    </message>
+    <message>
+        <source>Compatibility mode for versions lower than %1 is not supported.</source>
+        <translation>โหมดความเข้ากันไม่ได้สำหรับรุ่นที่ต่ำกว่า %1 ไม่ได้รับการสนับสนุน.</translation>
+    </message>
+    <message>
+        <source>Selected Server has a different version:</source>
+        <translation>เซิร์ฟเวอร์ที่เลือกไว้มีรุ่นที่แตกต่างกัน:</translation>
+    </message>
+    <message>
+        <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
+        <translation>รุ่นอื่น ๆ ของผู้ใช้เป็นสิ่งจำเป็นในการที่จะสร้างการเชื่อมต่อไปยังเซิร์ฟเวอร์นี้.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to restart in compatibility mode.</source>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะเริ่มต้นใหม่ในโหมดความเข้ากันได้.</translation>
+    </message>
+    <message>
+        <source>Client version %1 is required to connect to this Server.</source>
+        <translation>ไคลเอ็นต์รุ่น %1 จะต้องเชื่อมต่อกับเซิร์ฟเวอร์นี้.</translation>
+    </message>
+    <message>
+        <source>Download version %1?</source>
+        <translation>ดาวน์โหลดเวอร์ชั่น %1?</translation>
+    </message>
+    <message>
+        <source>Would you like to restart the Client in compatibility mode?</source>
+        <translation>คุณต้องการที่จะเริ่มต้นไคลเอนต์ใหม่ในโหมดที่เข้ากันได้หรือไม่?</translation>
+    </message>
+    <message>
+        <source>Cannot restart the Client in compatibility mode.</source>
+        <translation>ไม่สามารถเริ่มไคลเอนต์ในโหมดความเข้ากันได้.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
+    </message>
+    <message>
+        <source>Failed to launch compatibility version %1</source>
+        <translation>เกิดข้อผิดพลาดในรุ่นการทำงานร่วมกัน %1</translation>
+    </message>
+    <message>
+        <source>Try to restore version %1?</source>
+        <translation>ลองที่จะเรียกคืนรุ่นก่อนหน้านี้ %1?</translation>
+    </message>
+    <message>
+        <source>Server has a different version:</source>
+        <translation>เซิร์ฟเวอร์ มีรุ่นที่แตกต่างกัน:</translation>
+    </message>
+    <message>
+        <source>You will be asked to restart the client in compatibility mode.</source>
+        <translation>คุณจะต้องรีสตาร์ทเครื่องไคลเอนต์ในโหมดความเข้ากันได้.</translation>
+    </message>
+    <message>
+        <source>You will be asked to update your %1</source>
+        <translation>คุณจะถูกขอให้มีการอัปเดต %1</translation>
     </message>
 </context>
 <context>
@@ -3567,62 +3502,6 @@ Try to restore version %1?</source>
     <message>
         <source>Request timed out.</source>
         <translation>การร้องขอหมดเวลา.</translation>
-    </message>
-    <message>
-        <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation>เข้าสู่ระบบหรือรหัสผ่านที่คุณป้อนไม่ถูกต้องโปรดลองอีกครั้ง.</translation>
-    </message>
-    <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation>การเชื่อมต่อไปยังเซิร์ฟเวอร์ไม่สามารถสร้าง
-รายละเอียดการเชื่อมต่อที่คุณได้ป้อนไม่ถูกต้องโปรดลองอีกครั้ง
-
-ถ้าข้อผิดพลาดนี้ยังคงอยู่โปรดติดต่อผู้ดูแลระบบ VMS ของคุณ.</translation>
-    </message>
-    <message>
-        <source>You are trying to connect to incompatible Server.</source>
-        <translation>คุณพยายามที่จะเชื่อมต่อไปยังเซิร์ฟเวอร์เข้ากันไม่ได้.</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation>Server มีรุ่นที่แตกต่างกัน:
-  - รุ่นลูกค้า: %1
-  - รุ่นของเซิร์ฟเวอร์:%2.
-โหมดความเข้ากันได้สำหรับรุ่นต่ำกว่า %3 ไม่ได้รับการสนับสนุน.</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-You will be asked to restart the client in compatibility mode.</source>
-        <translation>Server มีรุ่นที่แตกต่างกัน:
-  - รุ่นลูกค้า: %1
-  - รุ่นของเซิร์ฟเวอร์:%2
-คุณจะต้องรีสตาร์ทเครื่องไคลเอนต์ในโหมดความเข้ากันได้.</translation>
-    </message>
-    <message>
-        <source>Server</source>
-        <translation>Server</translation>
-    </message>
-    <message>
-        <source>Client</source>
-        <translation>Client</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
-        <translation>Server มีรุ่นที่แตกต่างกัน:
-  - รุ่นลูกค้า: %1
-  - รุ่นของเซิร์ฟเวอร์:%2
-รุ่นนี้เข้ากันไม่ได้ โปรดอัปเดตของคุณ %3</translation>
     </message>
     <message>
         <source>Success</source>
@@ -3877,16 +3756,6 @@ These versions are not compatible. Please update your %3</source>
         <translation>วีดีโอการเคลื่อนไหว</translation>
     </message>
     <message>
-        <source>
-</source>
-        <translation>
-</translation>
-    </message>
-    <message>
-        <source> (%1 times)</source>
-        <translation> (%1 เวลา)</translation>
-    </message>
-    <message>
         <source>Date/Time</source>
         <translation>วัน/เวลา</translation>
     </message>
@@ -3909,6 +3778,10 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <source>Description</source>
         <translation>รายละเอียด</translation>
+    </message>
+    <message>
+        <source>%1 times</source>
+        <translation>%1 เวลา</translation>
     </message>
 </context>
 <context>
@@ -3971,6 +3844,25 @@ These versions are not compatible. Please update your %3</source>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation>ไม่มีโฟลเดอร์%1&apos; นี้อยู่.</translation>
     </message>
+    <message>
+        <source>Disable only if the client takes too much CPU</source>
+        <translation>ปิดการใช้งานเฉพาะในกรณีที่รุ่นผู้ใช้ มีการใช้งาน CPU มากเกินไป</translation>
+    </message>
+</context>
+<context>
+    <name>QnGeneralSystemAdministrationWidget</name>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation>เปิด การเตือน / การจัดการเหตุการณ์</translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation>เปิดบันทึกเหตุการณ์</translation>
+    </message>
+    <message>
+        <source>Open Camera List</source>
+        <translation>เปิดรายการ กล้อง</translation>
+    </message>
 </context>
 <context>
     <name>QnGenericTabbedDialog</name>
@@ -3983,20 +3875,19 @@ These versions are not compatible. Please update your %3</source>
         <translation>ยืนยันการออก</translation>
     </message>
     <message>
-        <source>Unsaved changes will be lost. Save the following pages?
-</source>
-        <translation>การแก้ไขเปลี่ยนแปลงจะหายไปถ้าไม่ได้ทำการบันทึก  การบันทึกหน้าต่อไปนี้?</translation>
+        <source>Unsaved changes will be lost. Save the following pages?</source>
+        <translation>การเปลี่ยนแปลงที่ไม่ได้บันทึกจะหายไป บันทึกหน้าต่อไปนี้หรือไม่?</translation>
     </message>
 </context>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>เราตรวจพบว่าการ์ดจอของคุณจะไม่ได้รับการสนับสนุน คุณสามารถดำเนินการภายใต้ความเสี่ยงของคุณเอง.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers may resolve the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>การติดตั้งและ / หรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณอาจแก้ไขปัญหา.</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
@@ -4004,11 +3895,11 @@ These versions are not compatible. Please update your %3</source>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.</source>
-        <translation type="unfinished"></translation>
+        <translation>เราตรวจพบว่าไดรเวอร์การ์ดจอของคุณอาจจะไม่ได้ติดตั้งหรือหมดอายุ.</translation>
     </message>
     <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
-        <translation type="unfinished"></translation>
+        <translation>การติดตั้งและ / หรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณสามารถเพิ่มประสิทธิภาพระบบของคุณเมื่อคุณจะดูและทำงานร่วมกับวิดีโอ.</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
@@ -4063,28 +3954,16 @@ These versions are not compatible. Please update your %3</source>
         <translation>ไม่สามารถแสดงข้อมูลได้ %1</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%2&quot;...</source>
-        <translation>กำลังนำข้อมูลออก&quot;%2&quot;...</translation>
-    </message>
-    <message>
         <source>Could not export camera %1</source>
         <translation>ไม่สามารถนำข้อมูลกล้องออกได้ %1</translation>
+    </message>
+    <message>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation>กำลังส่งออก &quot;%1&quot;...</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
-    <message>
-        <source>&lt;No image&gt;</source>
-        <translation>ไม่มีภาพ</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be loaded&gt;</source>
-        <translation>ไม่สามารถโหลดภาพได้</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be uploaded&gt;</source>
-        <translation>ไม่สามารถอัพโหลดภาพได้</translation>
-    </message>
     <message>
         <source>Select file...</source>
         <translation>เลือกไฟล์...</translation>
@@ -4092,6 +3971,38 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <source>Pictures %1</source>
         <translation>รูปภาพ %1</translation>
+    </message>
+    <message>
+        <source>&lt;No picture&gt;</source>
+        <translation>&lt;ไม่ มีรูป&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Error while loading picture&gt;</source>
+        <translation>&lt;ข้อผิดพลาด ในขณะที่โหลดภาพ&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Error while uploading picture&gt;</source>
+        <translation>&lt;ข้อผิดพลาด ในขณะที่การอัปโหลดภาพ&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be read&gt;</source>
+        <translation>&lt;ภาพ ไม่สามารถอ่าน&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
+        <translation>&lt;รูปภาพ มีขนาดใหญ่เกินไป ขนาดสูงสุดคือ %1 Mb&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be loaded&gt;</source>
+        <translation>&lt;ภาพ ไม่สามารถโหลด&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutTabBar</name>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>หน้าจอ %1 s</translation>
     </message>
 </context>
 <context>
@@ -4197,42 +4108,8 @@ These versions are not compatible. Please update your %3</source>
         <translation>ซอฟต์แวร์ที่ได้รับอนุญาตให้:</translation>
     </message>
     <message>
-        <source>
-%1 %2</source>
-        <translation>
-%1 %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>
-At least %n %2 are required</source>
-        <translation>
-            <numerusform>
-อย่างน้อย %n %2 ความต้องการ</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>
-%n %2 are currently in use</source>
-        <translation>
-            <numerusform>
-%n %2 ถูกใช้งานอยู่</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Obtaining licenses from Server...</source>
         <translation>การได้รับอนุญาตจากเซอร์ฟเวอร์...</translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial or trial license.</source>
-        <translation>คุณไม่ได้รับการอนุญาตในการติดตั้ง
-กรุณายืนยันสิทธิ์เปิดใช้งาน หรือ ทดลองใช้งาน.</translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial license.</source>
-        <translation>คุณไม่ได้รับการอนุญาตในการติดตั้ง
-กรุณายืนยันสิทธิ์เปิดใช้งาน.</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
@@ -4241,12 +4118,6 @@ Please activate your commercial license.</source>
     <message>
         <source>License Activation</source>
         <translation>เปิดใช้งานเต็มประสิทธิภาพ</translation>
-    </message>
-    <message>
-        <source>Network error has occurred during automatic license activation.
-Try to activate your license manually.</source>
-        <translation>เครือข่ายล้มเหลวในการเปิดใช้งาน
-กรุณาเปิดใช้งานโดยตรงจากคอมพิวเตอร์.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
@@ -4296,6 +4167,42 @@ Try to activate your license manually.</source>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.</source>
         <translation>คีย์ใบอนุญาตนี้ได้รับการเปิดใช้งานก่อนหน้านี้แล้ว %1 กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
     </message>
+    <message>
+        <source>%1 %2</source>
+        <translation>%1 %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %2 are required</source>
+        <translation>
+            <numerusform>อย่างน้อย %n %2 ที่ต้องการ</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %2 are currently in use</source>
+        <translation>
+            <numerusform>%n %2 มีใช้อยู่ในปัจจุบัน</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed.</source>
+        <translation>คุณไม่ได้รับใบอนุญาตถูกต้องติดตั้ง.</translation>
+    </message>
+    <message>
+        <source>Please activate your commercial or trial license.</source>
+        <translation>กรุณาเปิดใช้งานใบอนุญาตการค้า หรือเปิดทดลองใช้งาน.</translation>
+    </message>
+    <message>
+        <source>Please activate your commercial license.</source>
+        <translation>กรุณาเปิดใช้งานใบอนุญาตการค้าของคุณ.</translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation.</source>
+        <translation>มีข้อผิดพลาดของเครือข่ายที่เกิดขึ้นระหว่างการเปิดใช้ใบอนุญาตอัตโนมัติ.</translation>
+    </message>
+    <message>
+        <source>Try to activate your license manually.</source>
+        <translation>ลองที่จะเปิดใช้งานใบอนุญาตของคุณด้วยตนเอง.</translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseNotificationDialog</name>
@@ -4320,7 +4227,7 @@ Try to activate your license manually.</source>
     </message>
     <message>
         <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณาส่งอีเมลที่มีซีรี่คีย์และหมายเลขของฮาร์ดแวร์ให้กับ %1 ที่จะได้รับแฟ้มคีย์การเปิดใช้งาน.</translation>
     </message>
     <message>
         <source>Success</source>
@@ -4422,10 +4329,8 @@ Try to activate your license manually.</source>
         <translation>ลบการเชื่อมต่อ</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete the connection
-%1?</source>
-        <translation>คุณแน่ใจหรือว่าต้องการที่จะลบการเชื่อมต่อ
-%1?</translation>
+        <source>Are you sure you want to delete this connection: %1?</source>
+        <translation>คุณแน่ใจว่าคุณต้องการที่จะลบการเชื่อมต่อ:%1?</translation>
     </message>
 </context>
 <context>
@@ -4486,6 +4391,25 @@ Try to activate your license manually.</source>
         <source>Crop</source>
         <translation>ตัด</translation>
     </message>
+    <message>
+        <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
+        <translation>ตัวเลือกนี้จะไม่ส่งผลกระทบต่อตารางเวลาการบันทึก ตารางเวลาการบันทึกจะขึ้นอยู่กับเวลาของเซิร์ฟเวอร์.</translation>
+    </message>
+</context>
+<context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation>ตั้งค่าแฟ้มข้อมูล</translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation>ภาพไม่ได้โหลด</translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation>แฟ้มข้อมูลเลนส์ฟิชอาย</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
@@ -4530,10 +4454,6 @@ Try to activate your license manually.</source>
         <translation>ภาพสด</translation>
     </message>
     <message>
-        <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7</translation>
-    </message>
-    <message>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
         <translation>%1 (Tour &quot;%2&quot; is active)</translation>
     </message>
@@ -4559,16 +4479,6 @@ Try to activate your license manually.</source>
     <message>
         <source>The new system will have password and name from the system:</source>
         <translation>ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบ:</translation>
-    </message>
-    <message>
-        <source>Success!
-
-The system was configured successfully.
-The servers from the remote system should appear in your system soon.</source>
-        <translation>สำเร็จ!
-
-ระบบได้รับการกำหนดค่าเรียบร้อยแล้ว
-เซิร์ฟเวอร์จากระบบระยะไกลควรจะปรากฏขึ้นในระบบของคุณเร็ว ๆ นี้.</translation>
     </message>
     <message>
         <source>http(s)://host:port</source>
@@ -4637,6 +4547,18 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <source>Cannot merge systems.</source>
         <translation>ผสานระบบไม่ได้.</translation>
+    </message>
+    <message>
+        <source>Success!</source>
+        <translation>สำเร็จ!</translation>
+    </message>
+    <message>
+        <source>The system was configured successfully.</source>
+        <translation>ระบบที่ได้รับการกำหนดค่าเรียบร้อยแล้ว.</translation>
+    </message>
+    <message>
+        <source>The servers from the remote system should appear in your system soon.</source>
+        <translation>เซิร์ฟเวอร์จากระบบระยะไกลควรจะปรากฏขึ้นในระบบของคุณเร็ว ๆ นี้.</translation>
     </message>
 </context>
 <context>
@@ -4724,6 +4646,21 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
 </context>
 <context>
+    <name>QnNetworkSpeedStrings</name>
+    <message>
+        <source>b/s</source>
+        <translation>b/s</translation>
+    </message>
+    <message>
+        <source>Kb/s</source>
+        <translation>Kb/s</translation>
+    </message>
+    <message>
+        <source>Mb/s</source>
+        <translation>Mb/s</translation>
+    </message>
+</context>
+<context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
         <source>%n more item(s)</source>
@@ -4767,10 +4704,6 @@ The servers from the remote system should appear in your system soon.</source>
         <translation>คลิปเสียงได้ถึง %1 วินาที</translation>
     </message>
     <message>
-        <source>Custom Title:</source>
-        <translation>ชื่อเรื่องที่กำหนดเอง:</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>ข้อผิดพลาด</translation>
     </message>
@@ -4796,7 +4729,11 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
     <message>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation></translation>
+        <translation>คุณแน่ใจที่ต้องการจะลบ &apos;%1&apos;?</translation>
+    </message>
+    <message>
+        <source>Custom title:</source>
+        <translation>ชื่อที่กำหนดเอง:</translation>
     </message>
 </context>
 <context>
@@ -4821,8 +4758,12 @@ The servers from the remote system should appear in your system soon.</source>
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
-        <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
-        <translation>ปิด (&lt;b&gt;คลิกขวา&lt;/b&gt;)</translation>
+        <source>Close</source>
+        <translation>ปิด</translation>
+    </message>
+    <message>
+        <source>Right Click</source>
+        <translation>คลิก ขวา</translation>
     </message>
 </context>
 <context>
@@ -4877,29 +4818,18 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
 </context>
 <context>
-    <name>QnPerformance</name>
+    <name>QnPerformanceTest</name>
+    <message>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <translation>ประสิทธิภาพการทำงานของคอมพิวเตอร์เครื่องนี้จะทำงาน %1 ในโหมดการตั้งค่าเท่านั้น.</translation>
+    </message>
+    <message>
+        <source>For full-featured mode please use another computer.</source>
+        <translation>สำหรับโหมดเต็มรูปแบบกรุณาใช้คอมพิวเตอร์เครื่องอื่น.</translation>
+    </message>
     <message>
         <source>Warning</source>
-        <translation>คำเตือน</translation>
-    </message>
-    <message>
-        <source>Performance of this computer allows running %1 in configuration mode only. For full-featured mode please use another computer.</source>
-        <translation>ประสิทธิภาพการทำงานของคอมพิวเตอร์เครื่องนี้ช่วยให้การทำงาน %1 ในโหมดการตั้งค่าเท่านั้น สำหรับโหมดเต็มรูปแบบกรุณาใช้คอมพิวเตอร์เครื่องอื่น.</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>การตั้งค่ารูปภาพ</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>ภาพไม่ได้โหลด</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>นี่คือภาพเลนส์ฟิชอาย</translation>
+        <translation>การเตือน</translation>
     </message>
 </context>
 <context>
@@ -4921,24 +4851,24 @@ The servers from the remote system should appear in your system soon.</source>
         <translation>การแจ้งเตือน</translation>
     </message>
     <message>
-        <source>Settings file is read-only. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation>แฟ้มการตั้งค่าแบบอ่านอย่างเดียว กรุณาติดต่อผู้ดูแลระบบของคุณ
-การเปลี่ยนแปลงทั้งหมดจะหายไปหลังจากออกจากโปรแกรม.</translation>
-    </message>
-    <message>
-        <source>Settings cannot be saved. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation>การตั้งค่าไม่สามารถบันทึกได้ กรุณาติดต่อผู้ดูแลระบบของคุณ
-การเปลี่ยนแปลงทั้งหมดจะหายไปหลังจากออกจากโปรแกรม.</translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation>ข้อมูล</translation>
     </message>
     <message>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
         <translation>การเปลี่ยนแปลงบางอย่างจะมีผลบังคับใช้หลังจากที่เริ่มเปิดระบบใหม่ คุณต้องการที่จะเริ่มใช้ในขณะนี้หรือไม่?</translation>
+    </message>
+    <message>
+        <source>Settings file is read-only. Please contact your system administrator.</source>
+        <translation>การตั้งค่าแฟ้มแบบอ่านอย่างเดียว กรุณาติดต่อผู้ดูแลระบบของคุณ.</translation>
+    </message>
+    <message>
+        <source>All changes will be lost after program exit.</source>
+        <translation>การเปลี่ยนแปลงทั้งหมดจะหายไปหลังจากออกจากโปรแกรม.</translation>
+    </message>
+    <message>
+        <source>Settings cannot be saved. Please contact your system administrator.</source>
+        <translation>การตั้งค่าไม่สามารถบันทึกได้ กรุณาติดต่อผู้ดูแลระบบของคุณ.</translation>
     </message>
 </context>
 <context>
@@ -4955,34 +4885,12 @@ All changes will be lost after program exit.</source>
         <translation>ไม่สามารถได้รับตำแหน่งจากกล้อง</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะได้รับตำแหน่งปัจจุบันจากกล้อง %1
-
-โปรดรอกล้องออนไลน์สักครู่.</translation>
-    </message>
-    <message>
         <source>Could not set position for camera</source>
         <translation>ไม่สามารถกำหนดตำแหน่งกล้อง</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งกล้องปัจจุบัน %1
-
-โปรดรอกล้องออนไลน์สักครู่.</translation>
-    </message>
-    <message>
         <source>Remove preset</source>
         <translation>ลบที่ตั้งไว้ล่วงหน้า</translation>
-    </message>
-    <message>
-        <source>This preset is used in some tours.
-These tours will become invalid if you remove it.</source>
-        <translation>ที่ตั้งไว้นี้จะใช้ในบางทัวร์
-ทัวร์เหล่านี้จะกลายเป็นที่ไม่ถูกต้องถ้าคุณเอามันออกไป.</translation>
     </message>
     <message>
         <source>Do not show again.</source>
@@ -4999,6 +4907,26 @@ These tours will become invalid if you remove it.</source>
     <message>
         <source>Changes are not saved. Do you want to save them?</source>
         <translation>การเปลี่ยนแปลงยังไม่ถูกบันทึก คุณต้องการที่จะบันทึกหรือไ่ม่?</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation>เกิดข้อผิดพลาดในขณะที่จะได้รับตำแหน่งปัจจุบันจากกล้อง %1.</translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation>โปรดรอสักครู่ สำหรับการออนไลน์ของกล้อง.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบันสำหรับ กล้อง %1.</translation>
+    </message>
+    <message>
+        <source>This preset is used in some tours.</source>
+        <translation>ตำแหน่งตั้งไว้นี้จะใช้ในบางทัวร์.</translation>
+    </message>
+    <message>
+        <source>These tours will become invalid if you remove it.</source>
+        <translation>ทัวร์เหล่านี้จะกลายเป็นที่ไม่ถูกต้องถ้าคุณเอามันออกไป.</translation>
     </message>
 </context>
 <context>
@@ -5439,18 +5367,6 @@ These tours will become invalid if you remove it.</source>
         <translation>คำเตือน</translation>
     </message>
     <message>
-        <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation>คุณกำลังจะเปิดตามปกติอีกครั้งเก็บข้อมูลให้ตรงกัน สนใจ! การใช้งานบนฮาร์ดดิสก์ของคุณจะเพิ่มขึ้นในระหว่างขั้นตอนการประสานอีกครั้ง! ทั้งนี้ขึ้นอยู่กับขนาดของข้อมูลที่เก็บจะสามารถใช้เวลาหลายชั่วโมง ขั้นตอนนี้เป็นเพียงสิ่งที่จำเป็นถ้าโฟลเดอร์ที่เก็บถาวรของคุณได้ถูกย้ายเปลี่ยนชื่อหรือเปลี่ยน คุณสามารถยกเลิกการสร้างการดำเนินงานในช่วงเวลาใดโดยไม่สูญเสียข้อมูล ต่อหรือไม่?</translation>
-    </message>
-    <message>
-        <source>Rebuild archive index</source>
-        <translation>สร้างดัชนีเก็บ</translation>
-    </message>
-    <message>
-        <source>Fast initial scan in progress</source>
-        <translation>เริ่มต้นสแกนอย่างรวดเร็วในความคืบหน้า</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>เสร็จสิ้น</translation>
     </message>
@@ -5476,7 +5392,31 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Add external Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>เพื่อหน่วยความจำภายนอก...</translation>
+    </message>
+    <message>
+        <source>You are about to launch the archive re-synchronization routine.</source>
+        <translation>คุณกำลังจะเปิดอีกครั้งกับการเก็บข้อมูลให้ตรงกัน.</translation>
+    </message>
+    <message>
+        <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
+        <translation>สนใจ! การใช้งานบนฮาร์ดดิสก์ของคุณจะเพิ่มขึ้นในระหว่างขั้นตอนการประสานอีกครั้ง! ทั้งนี้ขึ้นอยู่กับขนาดของข้อมูลที่เก็บอาจจะใช้เวลาหลายชั่วโมง.</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
+        <translation>ขั้นตอนนี้เป็นเพียงสิ่งที่จำเป็นถ้าโฟลเดอร์ที่เก็บถาวรของคุณได้ถูกย้ายเปลี่ยนชื่อหรือเปลี่ยน คุณสามารถยกเลิกการสร้างการดำเนินงานในช่วงเวลาใดโดยไม่สูญเสียข้อมูล.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to continue?</source>
+        <translation>คุณแน่ใจว่าต้องการที่จะทำต่อไปหรือไม่?</translation>
+    </message>
+    <message>
+        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
+        <translation>สร้างดัชนีเก็บสำหรับการจัดเก็บ &apos;%1&apos; ในความคืบหน้า</translation>
+    </message>
+    <message>
+        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
+        <translation>สแกนได้อย่างรวดเร็วสำหรับการจัดเก็บข้อมูล &apos;%1&apos; ในความคืบหน้า</translation>
     </message>
 </context>
 <context>
@@ -5550,15 +5490,15 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Release notes</source>
-        <translation type="unfinished"></translation>
+        <translation>หมายเหตุการเผยแพร่</translation>
     </message>
     <message>
         <source>Get a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>รับเฉพาะการสร้าง</translation>
     </message>
     <message>
         <source>Get the latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>ได้รับรุ่นล่าสุด</translation>
     </message>
     <message>
         <source>Update from Internet...</source>
@@ -5605,12 +5545,6 @@ These tours will become invalid if you remove it.</source>
         <translation>ข้อผิดพลาด</translation>
     </message>
     <message>
-        <source>Cannot cancel update at this state.
-Please wait until update is finished</source>
-        <translation>ไม่สามารถยกเลิกการปรับปรุงได้
-โปรดรอจนกว่าการปรับปรุงเสร็จสิ้น</translation>
-    </message>
-    <message>
         <source>Update finished... 100%</source>
         <translation>ปรับปรุงเสร็จสิ้น... 100%</translation>
     </message>
@@ -5637,12 +5571,6 @@ Please wait until update is finished</source>
     <message>
         <source>Launcher process is not found</source>
         <translation>กระบวนการเปิดไม่พบ</translation>
-    </message>
-    <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>ไม่สามารถเริ่มการทำงานของไคลแอนต์ได้
-กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
     </message>
     <message>
         <source>Update cancelled</source>
@@ -5772,6 +5700,26 @@ Please close the application and start it again using the shortcut in the start 
         <source>Installing updates... %1%</source>
         <translation>กำลังติดตั้งการอัพเดท... %1%</translation>
     </message>
+    <message>
+        <source>Cannot cancel update at this state.</source>
+        <translation>ไม่สามารถยกเลิกการปรับปรุงนี้ได้.</translation>
+    </message>
+    <message>
+        <source>Please wait until update is finished</source>
+        <translation>โปรดรอจนกว่าการปรับปรุงเสร็จสิ้น</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation>ไม่สามารถเริ่มการทำงานของ ผู้ใช้.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
+    </message>
+    <message>
+        <source>Check for updates automatically</source>
+        <translation>ตรวจหาการปรับปรุงโดยอัตโนมัติ</translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -5843,10 +5791,12 @@ Please close the application and start it again using the shortcut in the start 
         <translation>ยืนยันตั้งค่าการเคลื่อนไหว</translation>
     </message>
     <message>
-        <source>Are you sure you want to reset motion regions to the defaults?
-This action CANNOT be undone!</source>
-        <translation>คุณแน่ใจว่าคุณต้องการรีเซ็ตการเคลื่อนไหวเพื่อเริ่มต้น
-การดำเนินการนี้ไม่สามารถยกเลิกได้!</translation>
+        <source>Are you sure you want to reset motion regions to the defaults?</source>
+        <translation>คุณแน่ใจว่าคุณต้องการรีเซ็ตการเคลื่อนไหวกลับไปค่าเริ่มต้น?</translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation>การดำเนินการนี้ไม่สามารถยกเลิกได้!</translation>
     </message>
 </context>
 <context>
@@ -5983,6 +5933,22 @@ This action CANNOT be undone!</source>
         <source>Provided storage path does not define a valid external storage.</source>
         <translation>เส้นทางการจัดเก็บที่มีให้ไม่ได้กำหนดจัดเก็บข้อมูลภายนอกที่ถูกต้อง.</translation>
     </message>
+    <message>
+        <source>Windows Network Shared Resource</source>
+        <translation>เครือข่ายของ Windows ใช้งานทรัพทยากรร่วมกัน</translation>
+    </message>
+    <message>
+        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
+        <translation>\\&lt;คอมพิวเตอร์ ชื่อ&gt;\&lt;โฟลเดอร์&gt;</translation>
+    </message>
+    <message>
+        <source>Coldstore Network Storage</source>
+        <translation>Coldstore เครือข่ายเก็บข้อมูล</translation>
+    </message>
+    <message>
+        <source>coldstore://&lt;Address&gt;</source>
+        <translation>coldstore://&lt;ที่อยู่&gt;</translation>
+    </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
@@ -6064,100 +6030,116 @@ This action CANNOT be undone!</source>
 <context>
     <name>QnTimeSlider</name>
     <message>
+        <source>NO THUMBNAILS AVAILABLE</source>
+        <translation>ไม่มีรูปขนาดย่อที่มีอยู่</translation>
+    </message>
+    <message>
         <source>auto</source>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>อัตโนมัต</translation>
+        <comment>AM/PM usage based on user&apos;s system locale.</comment>
+        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>อัตโนมัติ</translation>
     </message>
     <message>
         <source>ms</source>
-        <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying milliseconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>ms</translation>
     </message>
     <message>
         <source>s</source>
-        <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying seconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>s</translation>
     </message>
     <message>
         <source>m</source>
-        <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying minutes on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>m</translation>
     </message>
     <message>
         <source>h</source>
-        <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying hours on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>h</translation>
     </message>
     <message>
         <source>d</source>
-        <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>d</translation>
     </message>
     <message>
         <source>M</source>
-        <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>M</translation>
     </message>
     <message>
         <source>y</source>
-        <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Suffix for displaying years on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>y</translation>
     </message>
     <message>
         <source>dd MMMM</source>
-        <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
-        <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translatorcomment>MMMM</translatorcomment>
+        <comment>Format for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
-----------
-Format for displaying year caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying years on timeline</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>MINUTES</comment>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>HOURS</comment>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>MMMM yyyy</translation>
     </message>
     <message>
-        <source>NO THUMBNAILS
-AVAILABLE</source>
-        <translation>ไม่มีรูปขนาดย่อ
-ที่มีอยู่</translation>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>yyyy</translation>
     </message>
 </context>
 <context>
@@ -6213,16 +6195,16 @@ AVAILABLE</source>
     <name>QnUserEmailPolicy</name>
     <message>
         <source>Select at least one user</source>
-        <translation>เลือกอย่างน้อยหนึ่งของผู้ใช้</translation>
+        <translation>เลือกผู้ใช้งานอย่างน้อยหนึ่งคน</translation>
     </message>
     <message>
         <source>User %1 has invalid email address</source>
-        <translation>ผู้ใช้ %1 มีที่อยู่อีเมลไม่ถูกต้อง</translation>
+        <translation>ผู้ใช้งาน %1 มีที่อยู่อีเมลไม่ถูกต้อง</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid email address</source>
         <translation>
-            <numerusform>%n ของ %1 ผู้ใช้ที่อยู่อีเมลที่ไม่ถูกต้อง</numerusform>
+            <numerusform>%n ของ %1 ผู้ใช้งาน ที่อยู่อีเมลที่ไม่ถูกต้อง</numerusform>
         </translation>
     </message>
     <message>
@@ -6264,7 +6246,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Login cannot be empty.</source>
-        <translation>ช่องผู้ใช้งานต้องไม่ปล่อยว่าง.</translation>
+        <translation>ช่องผู้ใช้งาน ต้องไม่ปล่อยว่าง.</translation>
     </message>
     <message>
         <source>User with specified login already exists.</source>
@@ -6316,7 +6298,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Live Viewer</source>
-        <translation>ดูสด</translation>
+        <translation>ดูภาพปัจจุบัน</translation>
     </message>
     <message>
         <source>Custom...</source>
@@ -6386,7 +6368,7 @@ AVAILABLE</source>
     <message numerus="yes">
         <source>Pc %1 - Screens %2</source>
         <translation>
-            <numerusform>Pc %1 - จอภาพ %2</numerusform>
+            <numerusform>Pc %1 - จอภาพ %2 %n</numerusform>
         </translation>
     </message>
 </context>
@@ -6420,23 +6402,23 @@ AVAILABLE</source>
     <name>QnWorkbenchActionHandler</name>
     <message>
         <source>New layout</source>
-        <translation>เปิดหน้าใหม่</translation>
+        <translation>เปิดหน้าต่างใหม่</translation>
     </message>
     <message>
         <source>New layout %1</source>
-        <translation>เปิดหน้าใหม่ %1</translation>
+        <translation>เปิดหน้าต่างใหม่ %1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>ผิดพลาด</translation>
+        <translation>เกิดข้อผิดพลาด</translation>
     </message>
     <message>
         <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
-        <translation>ไม่สามารถย้ายกล้อง (s) ไปยังเซิร์ฟเวอร์อื่น ๆ เซิร์ฟเวอร์%1 ไม่ตอบการร้องขอ.</translation>
+        <translation>ไม่สามารถย้ายกล้อง (s) ไปยังเซิร์ฟเวอร์อื่นได้ เซิร์ฟเวอร์%1 ไม่ตอบสนองการรร้องขอ.</translation>
     </message>
     <message>
         <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
-        <translation>%1  ของเซิร์ฟเวอร์ไม่สามารถค้นพบกล้องเหล่านี้เพื่อให้ห่างไกล คุณแน่ใจว่าคุณต้องการที่จะย้ายพวกเขา?</translation>
+        <translation>%1  ของเซิร์ฟเวอร์ไม่สามารถค้นพบกล้อง  คุณแน่ใจว่าคุณต้องการที่จะย้ายพวกเขา?</translation>
     </message>
     <message>
         <source>Layout is locked and cannot be changed.</source>
@@ -6444,15 +6426,15 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Cannot add item</source>
-        <translation>ไม่สามารถเพิ่มรายการ</translation>
+        <translation>ไม่สามารถเพิ่มรายการได้</translation>
     </message>
     <message>
         <source>Cannot add a local file to Multi-Video</source>
-        <translation>ไม่สามารถเพิ่มไฟล์ในท้องถิ่นไปยังหลายวิดีโอ</translation>
+        <translation>ไม่สามารถเพิ่มไฟล์ในเครื่องไปหลายวิดีโอได้</translation>
     </message>
     <message>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation>ทั้งหมดได้รับการสนับสนุน (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+        <translation>สกุลไฟล์ที่รองรับทั้งหมด (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
@@ -6500,7 +6482,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>กล้องมีอยู่แล้วในความคืบหน้า คุณแน่ใจว่าคุณต้องการที่จะยกเลิกการดำเนินการในปัจจุบัน?</translation>
+        <translation>กล้องอยู่ใน การดำเนินการ คุณแน่ใจว่าคุณต้องการที่จะยกเลิกการดำเนินการในปัจจุบัน?</translation>
     </message>
     <message>
         <source>Delete Files</source>
@@ -6528,15 +6510,15 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Video Wall already exists</source>
-        <translation>วีดีโอที่มีอยู่แล้ว</translation>
+        <translation>จอแสดงผลวีดีโอ มีอยู่แล้ว</translation>
     </message>
     <message>
         <source>User with the same name already exists</source>
-        <translation>ผู้ใช้ที่มีชื่อเดียวกันมีอยู่แล้ว</translation>
+        <translation>มีชื่อผู้ใช้งานเดียวกัน ใช้งานอยู่แล้ว</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists</source>
-        <translation>วีดีโอที่มีชื่อเดียวกันมีอยู่แล้ว</translation>
+        <translation>จอแสดงผลวีดีโอ มีชื่อผู้ใช้งานเดียวกัน ใช้งานอยู่แล้ว</translation>
     </message>
     <message>
         <source>Rename</source>
@@ -6545,26 +6527,6 @@ AVAILABLE</source>
     <message>
         <source>Enter new name for the selected item:</source>
         <translation>ใส่ชื่อใหม่สำหรับรายการที่เลือก:</translation>
-    </message>
-    <message numerus="yes">
-        <source>These %n cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>กล้อง n%n เหล่านี้ถูกค้นพบโดยอัตโนมัติ
-พวกเขาอาจจะอัตโนมัติค้นพบอีกครั้งหลังจากที่ถอด
-คุณแน่ใจว่าคุณต้องการที่จะลบพวกเขา?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these %1 cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>%n ของเหล่านี้ %1 กล้องอัตโนมัติค้นพบ
-พวกเขาอาจจะอัตโนมัติค้นพบอีกครั้งหลังจากที่ถอด
-คุณแน่ใจหรือว่าต้องการลบพวกเขา?</numerusform>
-        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n item(s)?</source>
@@ -6578,19 +6540,15 @@ Are you sure you want to delete them?</source>
     </message>
     <message>
         <source>User Settings</source>
-        <translation>ตั้งค่าผู้ใช้</translation>
+        <translation>ตั้งค่าผู้ใช้งาน</translation>
     </message>
     <message>
         <source>Updating background</source>
-        <translation>การอัปเดตพื้นหลัง</translation>
+        <translation>การอัพเดทพื้นหลัง</translation>
     </message>
     <message>
         <source>Image processing can take a lot of time. Please be patient.</source>
-        <translation>การประมวลผลภาพสามารถใช้เวลามาก กรุณารอสักครู่.</translation>
-    </message>
-    <message>
-        <source>Image cannot be uploaded</source>
-        <translation>ภาพไม่สามารถอัปโหลด</translation>
+        <translation>การประมวลผลภาพใช้เวลามาก กรุณารอสักครู่.</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items.</source>
@@ -6602,18 +6560,10 @@ Are you sure you want to delete them?</source>
         <source>Could not delete resource</source>
         <translation>ไม่สามารถลบทรัพยากร</translation>
     </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. 
-
-Error description: &apos;%2&apos;</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะลบทรัพยากรจากเซิร์ฟเวอร์
-
-คำอธิบายข้อผิดพลาด: &apos;%2&apos;</translation>
-    </message>
     <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
-            <numerusform>ไม่สามารถบันทึกการเปลี่ยนแปลงที่เกิดขึ้นกับทรัพยากรต่อไปนี้ n%n (s).</numerusform>
+            <numerusform>ไม่สามารถบันทึกการเปลี่ยนแปลงที่เกิดขึ้นกับทรัพยากรต่อไปนี้ %n (s).</numerusform>
         </translation>
     </message>
     <message>
@@ -6630,7 +6580,7 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>บางส่วนของระบบจะไม่ปรับปรุง: &lt;br/&gt; %1 &lt;br/&gt; โปรดอัปเดตทุกองค์ประกอบที่จะ รุ่นล่าสุด %2.</translation>
+        <translation>บางส่วนของระบบจะไม่อัพเดท: &lt;br/&gt; %1 &lt;br/&gt; โปรดทำการอัพเดตทุกองค์ประกอบจาก รุ่นล่าสุด %2.</translation>
     </message>
     <message>
         <source>Version Mismatch</source>
@@ -6638,36 +6588,74 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Update...</source>
-        <translation>อัปเดต ...</translation>
+        <translation>อัพเดต ...</translation>
     </message>
     <message>
         <source>Beta version %1</source>
-        <translation>รุ่น Beta %1</translation>
+        <translation>รุ่น ทดสอบ %1</translation>
     </message>
     <message>
         <source>You are running beta version of %1.</source>
-        <translation>คุณกำลังเรียกใช้รุ่นเบต้าของ %1.</translation>
+        <translation>คุณกำลังเรียกใช้ รุ่นทดสอบ ของ %1.</translation>
     </message>
     <message>
         <source>Launcher process is not found</source>
         <translation>กระบวนการเปิดไม่พบ</translation>
     </message>
+    <message numerus="yes">
+        <source>These %n cameras are auto-discovered.</source>
+        <translation>
+            <numerusform>กล้อง %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ.</numerusform>
+        </translation>
+    </message>
     <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>ไม่สามารถเริ่มการทำงานของลูกค้า
-กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
+        <source>They may be auto-discovered again after removing.</source>
+        <translation>พวกเขาอาจจะค้นพบอีกครั้งหลังจากที่ถอนการติดตั้ง.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete them?</source>
+        <translation>คุณแน่ใจว่าคุณต้องการที่จะลบพวกเขา?</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these %1 cameras are auto-discovered.</source>
+        <translation>
+            <numerusform>%n ของเหล่านี้ %1 กล้องถูกค้นพบอัตโนมัติ.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to delete a resource from Server. </source>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามจะลบทรัพยากรจากเซิร์ฟเวอร์.</translation>
+    </message>
+    <message>
+        <source>Error description: &apos;%1&apos;</source>
+        <translation>คำอธิบายข้อผิดพลาด: &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation>ไม่สามารถเริ่มการทำงานของผู้ใช้ได้.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation>รูปภาพมีขนาดใหญ่เกินไป ขนาดสูงสุดคือ%1 Mb</translation>
+    </message>
+    <message>
+        <source>Error while uploading picture.</source>
+        <translation>ข้อผิดพลาดในขณะที่การอัปโหลดภาพ.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
         <source>Error</source>
-        <translation>ผิดพลาด</translation>
+        <translation>เกิดข้อผิดพลาด</translation>
     </message>
     <message>
         <source>Bookmark can only be added to an online server.</source>
-        <translation>บุ๊คมาร์ค เท่านั้นที่สามารถเพิ่มไปยังเซิร์ฟเวอร์ออนไลน์.</translation>
+        <translation>บุ๊คมาร์ค สามารถเพิ่มไปยังเซิร์ฟเวอร์ออนไลน์.</translation>
     </message>
     <message>
         <source>Bookmark</source>
@@ -6789,14 +6777,6 @@ Please close the application and start it again using the shortcut in the start 
         <translation>คำเตือน</translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation>คุณกำลังจะส่งออกลำดับวิดีโอที่มีความยาวกว่า 30 นาที
-มันอาจต้องพื้นที่ฮาร์ดดิสก์มากกว่า gibabyte และขึ้นอยู่กับความเร็วในการเชื่อมต่อของคุณยังอาจต้องใช้เวลาหลายนาที
-คุณต้องการที่จะดำเนินการต่อหรือไม่?</translation>
-    </message>
-    <message>
         <source>AVI (*.avi)</source>
         <translation>AVI (*.avi)</translation>
     </message>
@@ -6831,10 +6811,6 @@ Do you want to continue?</source>
     <message>
         <source>Timestamps:</source>
         <translation>Timestamps:</translation>
-    </message>
-    <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>แปลงวิดีโอเพื่อรับประกัน WYSIWYG</translation>
     </message>
     <message>
         <source>AVI format is not recommended</source>
@@ -6905,20 +6881,32 @@ Do you want to continue?</source>
         <translation>ทำให้ไฟล์อ่านอย่างเดียว</translation>
     </message>
     <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation>คุณกำลังจะส่งออกวิดีโอหลายที่มีความยาวรวมเกิน 30 นาที
-มันอาจต้องของพื้นที่ของฮาร์ดดิสก์มากกว่า gigabyte และขึ้นอยู่กับความเร็วในการเชื่อมต่อของคุณยังอาจต้องใช้เวลาหลายนาที
-คุณต้องการที่จะดำเนินการต่อไปหรือไม่?</translation>
-    </message>
-    <message>
         <source>Export successfully finished.</source>
         <translation>การส่งออกเสร็จสิ้น ประสบความสำเร็จ.</translation>
     </message>
     <message>
         <source>Could not export video</source>
         <translation>ไม่สามารถส่งออกวิดีโอ</translation>
+    </message>
+    <message>
+        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
+        <translation>คุณกำลังจะส่งออกลำดับวิดีโอที่มีความยาวกว่า 30 นาที.</translation>
+    </message>
+    <message>
+        <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
+        <translation>มันอาจต้องการมากกว่ากิกะไบต์ของพื้นที่ฮาร์ดดิสก์และขึ้นอยู่กับความเร็วในการเชื่อมต่อของคุณ อาจต้องใช้เวลาหลายนาที.</translation>
+    </message>
+    <message>
+        <source>Do you want to continue?</source>
+        <translation>คุณต้องการที่จะดำเนินการต่อหรือไม่?</translation>
+    </message>
+    <message>
+        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
+        <translation>คุณกำลังจะส่งออกลำดับวิดีโอหลายที่มีความยาวรวมเกิน 30 นาที.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation>การกรอง: หมุน หหการเพิ่มประสิทธิภาพของภาพที่กำหนดเองอัตราส่วน (ต้องแปลง)</translation>
     </message>
 </context>
 <context>
@@ -6956,20 +6944,24 @@ Do you want to continue?</source>
         <translation>เซิร์ฟเวอร์ที่เลือกได้รับการเชื่อมต่อสำเร็จกับระบบของคุณ!</translation>
     </message>
     <message>
-        <source>Authentification failed.
-Please, check the password you have entered.</source>
-        <translation>การตรวจสอบ ล้มเหลว
-กรุณาตรวจสอบรหัสผ่านที่คุณได้ป้อน.</translation>
-    </message>
-    <message>
         <source>Could not configure the selected servers.</source>
         <translation>ไม่สามารถกำหนดค่าเซิร์ฟเวอร์ที่เลือก.</translation>
     </message>
     <message>
-        <source>Could not update the selected servers.
-You can try to update the servers again in the System Administration.</source>
-        <translation>ไม่สามารถปรับปรุงเซิร์ฟเวอร์ที่เลือก
-คุณสามารถพยายามที่จะปรับปรุงเซิร์ฟเวอร์อีกครั้งโดยผู้จัดการระบบ.</translation>
+        <source>Authentication failed.</source>
+        <translation>การตรวจสอบล้มเหลว.</translation>
+    </message>
+    <message>
+        <source>Please, check the password you have entered.</source>
+        <translation>กรุณาตรวจสอบรหัสผ่าน.</translation>
+    </message>
+    <message>
+        <source>Could not update the selected servers.</source>
+        <translation>ไม่สามารถปรับปรุงเซิร์ฟเวอร์ที่เลือก.</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration.</source>
+        <translation>คุณสามารถที่จะปรับปรุงเซิร์ฟเวอร์อีกครั้งในระบบการบริหาร.</translation>
     </message>
 </context>
 <context>
@@ -7058,26 +7050,24 @@ You can try to update the servers again in the System Administration.</source>
         <translation>กล้องทั้งหมด</translation>
     </message>
     <message>
-        <source>&apos;Live&apos;</source>
-        <extracomment>Time slider&apos;s tooltip for position on live. Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for. That&apos;s where these single quotes come from.</extracomment>
-        <translation>ภาพสด</translation>
-    </message>
-    <message>
-        <source>yyyy MMM dd
-hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>yyyy MMM dd
-hh:mm:ss</translation>
-    </message>
-    <message>
         <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>hh:mm:ss</translation>
     </message>
     <message>
         <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for short local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>mm:ss</translation>
+    </message>
+    <message>
+        <source>yyyy MMM dd</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation>yyyy MMM dd</translation>
+    </message>
+    <message>
+        <source>Live</source>
+        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
+        <translation>ช่วงเวลา</translation>
     </message>
 </context>
 <context>
@@ -7087,24 +7077,8 @@ hh:mm:ss</translation>
         <translation>ไม่สามารถได้รับตำแหน่งจากกล้อง</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะได้รับตำแหน่งปัจจุบันจากกล้อง %1
-
-โปรดรอกล้องออนไลน์สักครู่.</translation>
-    </message>
-    <message>
         <source>Could not set position for camera</source>
         <translation>ไม่สามารถกำหนดตำแหน่งกล้อง</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบัน %1 กล้อง
-
-โปรดรอกล้องออนไลน์สักครู่.</translation>
     </message>
     <message>
         <source>Could not set position to camera</source>
@@ -7113,6 +7087,18 @@ Please wait for the camera to go online.</source>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation>เกิดข้อผิดพลาดในขณะที่จะได้รับตำแหน่งปัจจุบันจากอกล้อง %1.</translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation>โปรดรอสักครู่สำหรับกล้องที่จะไออนไลน์.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
+        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบันสำหรับกล้อง %1.</translation>
     </message>
 </context>
 <context>
@@ -7193,10 +7179,6 @@ Please wait for the camera to go online.</source>
         <translation>รุ่นใหม่สามารถใช้ได้</translation>
     </message>
     <message>
-        <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
-        <translation>เวอร์ชั่นใหม่ &lt;b&gt;%1&lt;/b&gt; สามารถใช้ได้.</translation>
-    </message>
-    <message>
         <source>Would you like to update?</source>
         <translation>คุณต้องการที่จะปรับปรุงไหม?</translation>
     </message>
@@ -7220,6 +7202,14 @@ Please wait for the camera to go online.</source>
         <source>Release Notes</source>
         <translation>หมายเหตุ</translation>
     </message>
+    <message>
+        <source>New version %1 is available.</source>
+        <translation>เวอร์ชั่นใหม่ %1 สามารถใช้ได้.</translation>
+    </message>
+    <message>
+        <source>Please update %1 Client.</source>
+        <translation>โปรดอัปเดต %1 ไคลเอนต์.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
@@ -7228,18 +7218,12 @@ Please wait for the camera to go online.</source>
         <translation>การควบคุมเซสชั่นกำลังทำงาน</translation>
     </message>
     <message>
-        <source>Could not start control session.
-Another user is already controlling this screen.</source>
-        <translation>ไม่สามารถเริ่มเซสชันการควบคุม
-มีผู้ใช้อื่นในการควบคุมหน้าจอนี้.</translation>
-    </message>
-    <message>
         <source>Error</source>
-        <translation>ความผิดพลาด</translation>
+        <translation>เกิดข้อผิดพลาด</translation>
     </message>
     <message>
         <source>Unexpected error has occurred. Changes cannot be saved.</source>
-        <translation>ข้อผิดพลาดที่ไม่คาดคิดได้เกิดขึ้น การเปลี่ยนแปลงไม่สามารถบันทึกได้.</translation>
+        <translation>เกิดข้อผิดพลาดที่ไม่คาดคิดขึ้น การเปลี่ยนแปลงไม่สามารถบันทึกได้.</translation>
     </message>
     <message>
         <source>There are no offline videowall items attached to this pc.</source>
@@ -7255,7 +7239,7 @@ Another user is already controlling this screen.</source>
     </message>
     <message>
         <source>More licenses required</source>
-        <translation>ต้องการใบอนุญาติเพิ่มเติม</translation>
+        <translation>ต้องการสิทธ์เพิ่มเติม</translation>
     </message>
     <message>
         <source>To enable the feature please activate at least one Video Wall license.</source>
@@ -7279,31 +7263,31 @@ Another user is already controlling this screen.</source>
     </message>
     <message>
         <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation>เมื่อต้องการเปิดใช้งานคุณลักษณะกรุณาเปิดใช้งานอย่างน้อยหนึ่งใบอนุญาตของ Video Wall</translation>
+        <translation>เมื่อต้องการเปิดใช้งานเพิ่มกรุณาเปิดใช้งานใบอนุญาตของจอแสดงผล</translation>
     </message>
     <message>
         <source>Video Wall</source>
-        <translation>วีดีโอ Wall</translation>
+        <translation>จอแสดงผล</translation>
     </message>
     <message>
         <source>Video Wall %1</source>
-        <translation>วีดีโอ Wall %1</translation>
+        <translation>จอแสดงผลl %1</translation>
     </message>
     <message>
         <source>New Video Wall...</source>
-        <translation>สร้าง Video Wall...</translation>
+        <translation>สร้างจอแสดงผลใหม่...</translation>
     </message>
     <message>
         <source>Enter the name of the Video Wall to create:</source>
-        <translation>ใส่ชื่อของ Video Wall ของการสร้าง:</translation>
+        <translation>ใส่ชื่อของจอแสดงผล ของการสร้าง:</translation>
     </message>
     <message>
         <source>Video Wall already exists</source>
-        <translation>Video Wall มีอยู่แล้ว</translation>
+        <translation>จอแสดงผลl มีอยู่แล้ว</translation>
     </message>
     <message>
         <source>Video Wall with the same name already exists</source>
-        <translation>Video Wall มีชื่อเดียวกันกับที่มีอยู่แล้ว</translation>
+        <translation>จอแสดงผล มีชื่อเดียวกันกับที่มีอยู่แล้ว</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7323,17 +7307,11 @@ Another user is already controlling this screen.</source>
     </message>
     <message>
         <source>Could not start Video Wall.</source>
-        <translation>ไม่สามารถเริ่ม Video Wall.</translation>
+        <translation>ไม่สามารถเริ่ม จอแสดงผล.</translation>
     </message>
     <message>
         <source>Confirm Video Wall stop</source>
-        <translation>ยืนยันการหยุดของ Video Wall</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to stop the Video Wall?
-You&apos;ll have to start it manually.</source>
-        <translation>คุณแน่ใจว่าคุณต้องการที่จะหยุดของ Video Wall
-คุณจะต้องเริ่มต้นด้วยตนเอง.</translation>
+        <translation>ยืนยันการหยุดของ จอแสดงผล</translation>
     </message>
     <message>
         <source>New Matrix %1</source>
@@ -7357,6 +7335,22 @@ You&apos;ll have to start it manually.</source>
             <numerusform>คุณแน่ใจหรือว่าต้องการที่จะลบเมทริกซ์ %n เหล่านี้?</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Could not start control session.</source>
+        <translation>ไม่สามารถเริ่มเซสชันการควบคุม.</translation>
+    </message>
+    <message>
+        <source>Another user is already controlling this screen.</source>
+        <translation>มีผู้ใช้อื่นทำการควบคุมหน้าจอนี้.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop the Video Wall?</source>
+        <translation>คุณแน่ใจว่าคุณต้องการที่จะหยุด วีดีโอวอลล์ ?</translation>
+    </message>
+    <message>
+        <source>You&apos;ll have to start it manually.</source>
+        <translation>คุณจะต้องเริ่มต้นด้วยตนเอง.</translation>
+    </message>
 </context>
 <context>
     <name>ReconnectInfoDialog</name>
@@ -7366,7 +7360,7 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>Please wait while connection is being restored...</source>
-        <translation>โปรดรอสักครู่ในขณะที่การเชื่อมต่อจะถูกคืนค่า ...</translation>
+        <translation>โปรดรอสักครู่ในขณะที่การเชื่อมต่อจะถูกเรียกคืน...</translation>
     </message>
 </context>
 <context>
@@ -7575,7 +7569,7 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>Ping</source>
-        <translation>ทดสอบ</translation>
+        <translation>Ping ทดสอบ</translation>
     </message>
     <message>
         <source>Port:</source>
@@ -7661,7 +7655,7 @@ You&apos;ll have to start it manually.</source>
     <name>SingleCameraSettingsWidget</name>
     <message>
         <source>Camera settings</source>
-        <translation>การตั้งค่ากล้อง</translation>
+        <translation>การตั้งค่าของกล้อง</translation>
     </message>
     <message>
         <source>General</source>
@@ -7689,11 +7683,11 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>Ping</source>
-        <translation>ทดสอบ</translation>
+        <translation>Ping ทดสอบ</translation>
     </message>
     <message>
         <source>Web Page:</source>
-        <translation>หน้าเว็บ:</translation>
+        <translation>เว็บเพจ:</translation>
     </message>
     <message>
         <source>IP Address:</source>
@@ -7729,15 +7723,15 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>Licensing</source>
-        <translation>การออกใบอนุญาต</translation>
+        <translation>การออกไลเซ็นส์</translation>
     </message>
     <message>
         <source>Use an analog license to view this camera</source>
-        <translation>ใช้ใบอนุญาตเพื่อดูกล้องนี้</translation>
+        <translation>ใช้ใบไลเซ็นส์อนาล๊อกเ พื่อดูกล้องนี้</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation>ได้รับอนุญาตเพิ่มเติม ...</translation>
+        <translation>ต้องการไลเซ็นส์เพิ่ม ...</translation>
     </message>
     <message>
         <source>Enable audio</source>
@@ -7816,7 +7810,7 @@ You&apos;ll have to start it manually.</source>
     <name>SmtpSettingsWidget</name>
     <message>
         <source>Outgoing Email Settings</source>
-        <translation>การตั้งค่าอีเมลขาออก</translation>
+        <translation>การตั้งค่าอีเมล์ขาออก</translation>
     </message>
     <message>
         <source>Advanced settings...</source>
@@ -7828,7 +7822,7 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>&amp;Email:</source>
-        <translation>&amp;Email:</translation>
+        <translation>&amp;อีเมล์l:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
@@ -7836,15 +7830,15 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>&amp;System Signature:</source>
-        <translation>&amp;ระบบลายเซ็น:</translation>
+        <translation>&amp;ลายเซ็นระบบ:</translation>
     </message>
     <message>
         <source>Enter short system description here...</source>
-        <translation>ป้อนคำอธิบายสั้น ๆ ระบบที่นี่ ...</translation>
+        <translation>ป้อนรายละเอียดของระบบสั้น ๆ ที่นี่ ...</translation>
     </message>
     <message>
         <source>Support Signature:</source>
-        <translation>ลายเซ็นสนับสนุน:</translation>
+        <translation>ลายเซ็นทีมช่วยเหลือ:</translation>
     </message>
     <message>
         <source>SMTP &amp;Server:</source>
@@ -7852,11 +7846,11 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>&amp;User:</source>
-        <translation>&amp;ชื่อ:</translation>
+        <translation>&amp;ผู้ใช้งาน:</translation>
     </message>
     <message>
         <source>Email:</source>
-        <translation>อีเมลล์:</translation>
+        <translation>อีเมล์:</translation>
     </message>
     <message>
         <source>P&amp;ort:</source>
@@ -7865,10 +7859,6 @@ You&apos;ll have to start it manually.</source>
     <message>
         <source>Unsecure connection</source>
         <translation>การเชื่อมต่อไม่มีการป้องกัน</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(แนะนำ)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Secure connection using TLS</source>
@@ -7900,7 +7890,7 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>Result:</source>
-        <translation>ผล:</translation>
+        <translation>เหตุผล:</translation>
     </message>
     <message>
         <source>OK</source>
@@ -7909,6 +7899,10 @@ You&apos;ll have to start it manually.</source>
     <message>
         <source>Cancel</source>
         <translation>ยกเลิก</translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
+        <translation>(แนะนำ)</translation>
     </message>
 </context>
 <context>
@@ -7938,7 +7932,7 @@ You&apos;ll have to start it manually.</source>
     </message>
     <message>
         <source>Login:</source>
-        <translation>ลงชื่อผู้ใช้:</translation>
+        <translation>ชื่อผู้ใช้:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -7964,7 +7958,7 @@ You&apos;ll have to start it manually.</source>
     <name>UserSettingsDialog</name>
     <message>
         <source>Create New User</source>
-        <translation>สร้างผู้ใช้ใหม่</translation>
+        <translation>สร้างผู้ใช้งานใหม่</translation>
     </message>
     <message>
         <source>User Properties</source>

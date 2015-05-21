@@ -64,8 +64,6 @@ public:
     //bool bindToInterface( const QnInterfaceAndAddr& iface );
     //!Implementation of AbstractSocket::getLocalAddress
     SocketAddress getLocalAddress() const;
-    //!Implementation of AbstractSocket::getPeerAddress
-    SocketAddress getPeerAddress() const;
     //!Implementation of AbstractSocket::close
     virtual void close();
     //!Implementation of AbstractSocket::isClosed
@@ -98,20 +96,6 @@ public:
     bool postImpl( std::function<void()>&& handler );
     //!Implementation of AbstractSocket::dispatchImpl
     bool dispatchImpl( std::function<void()>&& handler );
-
-
-    /**
-     *   Get the local address
-     *   @return local address of socket
-     */
-    QString getLocalHostAddress() const;
-
-    /**
-     *   Get the peer address
-     *   @return remove address of socket
-     */
-    QString getPeerHostAddress() const;
-    quint32 getPeerAddressUint() const;
 
     /**
      *   Get the local port
@@ -213,19 +197,6 @@ public:
     void shutdown();
     virtual void close() override;
 
-
-    /**
-     *   Get the foreign address.  Call connect() before calling recv()
-     *   @return foreign address
-     */
-    QString getForeignHostAddress() const;
-
-    /**
-     *   Get the foreign port.  Call connect() before calling recv()
-     *   @return foreign port
-     */
-    unsigned short getForeignPort() const;
-
 private:
     AsyncSocketImplHelper<Pollable>* m_aioHelper;
     bool m_connected;
@@ -276,8 +247,6 @@ public:
     virtual bool bind( const SocketAddress& localAddress ) override { return m_implDelegate.bind( localAddress ); }
     //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override { return m_implDelegate.getLocalAddress(); }
-    //!Implementation of AbstractSocket::getPeerAddress
-    virtual SocketAddress getPeerAddress() const override { return m_implDelegate.getPeerAddress(); }
     //!Implementation of AbstractSocket::close
     virtual void close() override { return m_implDelegate.close(); }
     //!Implementation of AbstractSocket::isClosed
@@ -534,12 +503,12 @@ public:
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
     //!Implementation of AbstractDatagramSocket::setDestAddr
-    virtual bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort ) override;
+    virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) override;
     //!Implementation of AbstractDatagramSocket::sendTo
     virtual bool sendTo(
         const void* buffer,
         unsigned int bufferLen,
-        const SocketAddress& foreignAddress ) override;
+        const SocketAddress& foreignEndpoint ) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     /*!
         Actually calls \a UDPSocket::recvFrom and saves datagram source address/port
@@ -549,8 +518,7 @@ public:
     virtual int recvFrom(
         void* buffer,
         unsigned int bufferLen,
-        QString& sourceAddress,
-        unsigned short& sourcePort ) override;
+        SocketAddress* const sourceAddress ) override;
     //!Implementation of AbstractDatagramSocket::lastDatagramSourceAddress
     virtual SocketAddress lastDatagramSourceAddress() const override;
     //!Implementation of AbstractDatagramSocket::hasData

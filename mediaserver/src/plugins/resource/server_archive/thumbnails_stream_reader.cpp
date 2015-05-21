@@ -12,10 +12,10 @@
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
 // forward instead seek backward
-static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
+//static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
 
-static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
-static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
+//static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
+//static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
 QnThumbnailsStreamReader::QnThumbnailsStreamReader(const QnResourcePtr& dev )
 :
@@ -106,7 +106,7 @@ void QnThumbnailsStreamReader::run()
 
         checkTime(data);
 
-        QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 
         if (videoData && videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
         {

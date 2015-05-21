@@ -18,6 +18,8 @@
 #   define __forceinline inline
 #endif
 
+/* Do not warn about uninitialized variables in this module due to low-level optimization. */
+#pragma warning( disable : 4700 )
 
 //#define DEBUG_CPU_MODE
 static const unsigned char BitReverseTable256[] = 
@@ -72,7 +74,7 @@ static const int MIN_SQUARE_BY_SENS[10] =
 static quint16 sadTransformMatrix[256*256];
 static const int SAD_SCALED_BITS = 2;
 //static const double SCALED_MAX_VALUE = 4000;
-static const int ZERR_THRESHOLD = 8;
+//static const int ZERR_THRESHOLD = 8;
 //static double sad_yPow = log(SCALED_MAX_VALUE-1)/log(255.0);
 class SadTransformInit
 {

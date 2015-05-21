@@ -35,11 +35,8 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
 void QnFfmpegVideoTranscoder::close()
 {
-    if (m_encoderCtx) {
-        avcodec_close(m_encoderCtx);
-        av_free(m_encoderCtx);
-        m_encoderCtx = 0;
-    }
+    QnFfmpegHelper::deleteCodecContext(m_encoderCtx);
+    m_encoderCtx = 0;
 
     for (int i = 0; i < m_videoDecoders.size(); ++i) {
         delete m_videoDecoders[i];
@@ -114,7 +111,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
-        result->clear();
+        result->reset();
     if (!media)
         return 0;
 
@@ -122,7 +119,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         return -3;
 
 
-    QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(media);
+    QnConstCompressedVideoDataPtr video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
     CLFFmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
         decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);

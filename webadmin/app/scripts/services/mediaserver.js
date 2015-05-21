@@ -13,26 +13,20 @@ angular.module('webadminApp')
                 var pair = params[i].split("=");
                 if(pair[0] === 'proxy'){
                     proxy = '/proxy/' + pair[1];
-                    console.log(proxy);
                     break;
                 }
             }
         }
 
-
-
-
         ipCookie('Authorization','Digest', { path: '/' });
 
         function getSettings(){
-            return $http.get(proxy + '/api/moduleInformation?salt=' + (new Date()).getTime());
+            return $http.get(proxy + '/api/moduleInformation?showAddresses=true');
         }
 
         var offlineDialog = null;
         var loginDialog = null;
         function offlineHandler(error){
-
-            //console.log(error);
 
             // Check 401 against offline
 
@@ -105,7 +99,8 @@ angular.module('webadminApp')
                     // on error - clear object to reload next time
                     return cacheModuleInfo;
                 }
-                return $http.get(url + '/api/moduleInformation',{
+                //Some another server
+                return $http.get(url + '/api/moduleInformation?showAddresses=true',{
                     timeout: 3*1000
                 });
             },
@@ -124,7 +119,7 @@ angular.module('webadminApp')
             restart: function() { return wrapRequest($http.post(proxy + '/api/restart')); },
             getStorages: function(){ return wrapRequest($http.get(proxy + '/api/storageSpace')); },
             saveStorages:function(info){return wrapRequest($http.post(proxy + '/ec2/saveStorages',info)); },
-            discoveredPeers:function(){return wrapRequest($http.get(proxy + '/api/discoveredPeers')); },
+            discoveredPeers:function(){return wrapRequest($http.get(proxy + '/api/discoveredPeers?showAddresses=true')); },
             getMediaServer: function(id){return wrapRequest($http.get(proxy + '/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}',''))); },
             getMediaServers: function(){return wrapRequest($http.get(proxy + '/ec2/getMediaServersEx')); },
             getCameras:function(id){

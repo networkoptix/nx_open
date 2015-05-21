@@ -4,6 +4,7 @@
 
 #include "core/datapacket/audio_data_packet.h"
 #include "utils/media/audio_processor.h"
+#include "utils/media/ffmpeg_helper.h"
 
 
 static const int MAX_AUDIO_JITTER = 1000 * 200;
@@ -34,16 +35,8 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
     if (m_resampleCtx)
         audio_resample_close(m_resampleCtx);
 
-    if (m_encoderCtx) {
-        avcodec_close(m_encoderCtx);
-        av_free(m_encoderCtx);
-    }
-
-    if (m_decoderContext) {
-        avcodec_close(m_decoderContext);
-        av_free(m_decoderContext);
-    }
-
+    QnFfmpegHelper::deleteCodecContext(m_encoderCtx);
+    QnFfmpegHelper::deleteCodecContext(m_decoderContext);
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
@@ -142,7 +135,7 @@ bool QnFfmpegAudioTranscoder::existMoreData() const
 int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
-        result->clear();
+        result->reset();
 
     if (!m_lastErrMessage.isEmpty())
         return -3;
@@ -155,11 +148,11 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         }
 
         m_lastTimestamp = media->timestamp;
-        QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(media);
+        QnConstCompressedAudioDataPtr audio = std::dynamic_pointer_cast<const QnCompressedAudioData>(media);
         AVPacket avpkt;
         av_init_packet(&avpkt);
         avpkt.data = const_cast<quint8*>((const quint8*)media->data());
-        avpkt.size = media->dataSize();
+        avpkt.size = static_cast<int>(media->dataSize());
 
         int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
         // TODO: #vasilenko avoid using deprecated methods

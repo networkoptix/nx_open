@@ -6,7 +6,7 @@
 
 #include <utils/common/app_info.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (json)(datastream)(eq)(hash), QnSystemInformation_Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (ubjson)(xml)(json)(datastream)(eq)(hash), QnSystemInformation_Fields, (optional, true))
 
 QnSystemInformation::QnSystemInformation(const QString &platform, const QString &arch, const QString &modification) :
     arch(arch),
@@ -15,7 +15,7 @@ QnSystemInformation::QnSystemInformation(const QString &platform, const QString 
 {}
 
 QnSystemInformation::QnSystemInformation(const QString &infoString) {
-    QRegExp infoRegExp(lit("(\\S+)\\s+(\\S+)\\s*(\\S*)"));
+    QRegExp infoRegExp(QLatin1String("(\\S+)\\s+(\\S+)\\s*(\\S*)"));
     if (infoRegExp.exactMatch(infoString)) {
         platform = infoRegExp.cap(1);
         arch = infoRegExp.cap(2);

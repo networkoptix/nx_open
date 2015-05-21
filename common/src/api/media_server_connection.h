@@ -41,7 +41,7 @@ public:
     virtual ~QnMediaServerConnection();
 
     int getTimePeriodsAsync(
-        const QnNetworkResourceList &list,
+        const QnVirtualCameraResourcePtr &camera,
         qint64 startTimeMs, 
         qint64 endTimeMs, 
         qint64 detail, 
@@ -183,6 +183,7 @@ public:
     //!Requests name of system, mediaserver is currently connected to
     /*!
         \param slot Slot MUST have signature (int, QString, int)
+        \returns Request handle. -1 In case of failure to start async request
     */
     int getSystemNameAsync( QObject* target, const char* slot );
     //!Request server to run camera \a cameraID diagnostics step following \a previousStep
@@ -195,15 +196,15 @@ public:
         QObject* target, const char* slot );
 
     /**
-        \param slot Slot MUST have signature (int, QnRebuildArchiveReply, int)
-        \returns Request handle
+        \param slot Slot MUST have signature (int, QnStorageScanData, int)
+        \returns Request handle. -1 In case of failure to start async request
      */
     int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 
-    int addBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int updateBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
+    int addBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int updateBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int deleteBookmarkAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int getBookmarksAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
 
     int installUpdate(const QString &updateId, QObject *target, const char *slot);
     int uploadUpdateChunk(const QString &updateId, const QByteArray &data, qint64 offset, QObject *target, const char *slot);
@@ -218,6 +219,10 @@ public:
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
 
     int modulesInformation(QObject *target, const char *slot);
+
+    int cameraHistory(const QnChunksRequestData &request, QObject *target, const char *slot);
+
+    int recordedTimePeriods(const QnChunksRequestData &request, QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
     virtual bool isReady() const override;

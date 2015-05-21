@@ -18,6 +18,7 @@ namespace {
     const QString dynamicVideoLayoutKey         = lit("dynamicVideoLayout");
     const QString motionStreamKey               = lit("motionStream");
     const QString rotationKey                   = lit("rotation");
+    const QString panicRecordingKey             = lit("panic_mode");
 
     /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
     const qreal noCustomAspectRatio = 0.0;
@@ -98,6 +99,12 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
 }
 
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+
+QnConstResourceVideoLayoutPtr QnMediaResource::getDefaultVideoLayout()
+{
+    return defaultVideoLayout;
+}
+
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     QMutexLocker lock(&m_layoutMutex);
@@ -120,13 +127,6 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
         }
         return m_customVideoLayout;
     }
-}
-
-void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout)
-{
-    QMutexLocker lock(&m_layoutMutex);
-    m_customVideoLayout = newLayout;
-    toResource()->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newLayout->toString());
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
@@ -207,6 +207,10 @@ QString QnMediaResource::dontRecordSecondaryStreamKey() {
 
 QString QnMediaResource::rtpTransportKey() {
     return ::rtpTransportKey;
+}
+
+QString QnMediaResource::panicRecordingKey() {
+    return ::panicRecordingKey;
 }
 
 QString QnMediaResource::dynamicVideoLayoutKey() {

@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <map>
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
@@ -71,7 +73,6 @@ public:
     void startIfNotRunning();
 
     bool isCameraControlDisabled() const;
-    virtual bool isCameraControlRequired() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
     void updateSoftwareMotionStreamNum();
 
@@ -120,8 +121,16 @@ private:
     int m_framesSincePrevMediaStreamCheck;
 
     void updateStreamResolution( int channelNumber, const QSize& newResolution );
-    void extractCodedPictureResolution( const QnCompressedVideoDataPtr& videoData, QSize* const newResolution );
+    void extractMediaStreamParams(
+        const QnCompressedVideoDataPtr& videoData,
+        QSize* const newResolution,
+        std::map<QString, QString>* const customStreamParams = nullptr );
     void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
+    void extractSpsPps(
+        const QnCompressedVideoDataPtr& videoData,
+        QSize* const newResolution,
+        std::map<QString, QString>* const customStreamParams );
+
 private:
     QnAbstractVideoCamera* m_owner;
 };

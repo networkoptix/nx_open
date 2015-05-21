@@ -25,7 +25,7 @@
 
 
 static const int BYTES_PER_MB = 1024*1024;
-static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
+//static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
 static const int MS_PER_SEC = 1000;
 //!used, if interface speed cannot be read (noticed on vmware)
 static const int DEFAULT_INTERFACE_SPEED_MBPS = 1000;
@@ -99,6 +99,9 @@ public:
         lastPartitionsUpdateTime(0)
     {
         memset(&lastDiskUsageUpdateTime, 0, sizeof(lastDiskUsageUpdateTime));
+
+        m_hddStatCalcTimer.start();
+        m_networkStatCalcTimer.start();
     }
 
     virtual ~QnLinuxMonitorPrivate()
@@ -586,9 +589,9 @@ SystemError::ErrorCode readPartitionsAndSizes( QList<QnPlatformMonitor::Partitio
 
     for( auto deviceAndPath: deviceToPath )
     {
-        struct statvfs vfsInfo;
+        struct statvfs64 vfsInfo;
         memset( &vfsInfo, 0, sizeof(vfsInfo) );
-        if( statvfs( deviceAndPath.second.first.toUtf8().constData(), &vfsInfo ) == -1 )
+        if( statvfs64( deviceAndPath.second.first.toUtf8().constData(), &vfsInfo ) == -1 )
             continue;
 
         QnPlatformMonitor::PartitionSpace partitionInfo;

@@ -8,10 +8,12 @@
         <translation>システムトレー</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>本システムにシステムトレーが有りません
-アプリケーションは終了します。</translation>
+        <source>There is no system tray on this system.</source>
+        <translation>システムトレーがありません.</translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation>アプリケーション終了.</translation>
     </message>
 </context>
 <context>
@@ -42,11 +44,6 @@ Application will now quit.</source>
     <message>
         <source>Could not access installed services</source>
         <translation>インストールしたサービスにアクセスできません</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>インストールしたサービス%1へのアクセス中にエラーが発生しました</translation>
     </message>
     <message>
         <source>No %1 services installed</source>
@@ -111,6 +108,10 @@ Application will now quit.</source>
     <message>
         <source>Stop Media Server</source>
         <translation>メディアサーバー停止</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation>インストールされたサービスへのアクセスエラー:</translation>
     </message>
 </context>
 </TS>

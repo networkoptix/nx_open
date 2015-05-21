@@ -154,7 +154,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
     getTimer.restart();
     while (m_isOpened) {
         QnAbstractDataPacketPtr tmp = m_maxStream->getNextData(this);
-        result = tmp.dynamicCast<QnAbstractMediaData>();
+        result = std::dynamic_pointer_cast<QnAbstractMediaData>(tmp);
 
         if (result)
             break;
@@ -209,13 +209,13 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 }
 
 static QSharedPointer<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
-QnResourceVideoLayoutPtr QnVMax480ArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnVMax480ArchiveDelegate::getVideoLayout()
 {
     return videoLayout;
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
-QnResourceAudioLayoutPtr QnVMax480ArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnVMax480ArchiveDelegate::getAudioLayout()
 {
     return audioLayout;
 }

@@ -28,8 +28,6 @@
 #include "selection_item.h"
 
 namespace {
-    const qreal zoomFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings;
-
     const qreal zoomWindowMinSize = 0.1;
     const qreal zoomWindowMaxSize = 0.9;
 
@@ -48,7 +46,8 @@ public:
         base_type(parent, windowFlags),
         m_interactive(true)
     {
-        setWindowFrameMargins(zoomFrameWidth, zoomFrameWidth, zoomFrameWidth, zoomFrameWidth);
+        auto margin = qnGlobals->zoomFrameWidth();
+        setWindowFrameMargins(margin, margin, margin, margin);
 
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
@@ -410,7 +409,7 @@ void ZoomWindowInstrument::ensureSelectionItem() {
 
     m_selectionItem = new FixedArSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setPen(QPen(Qt::white, zoomFrameWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+    selectionItem()->setPen(QPen(Qt::white, qnGlobals->zoomFrameWidth(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     selectionItem()->setBrush(Qt::NoBrush);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
     selectionItem()->setOptions(FixedArSelectionItem::DrawSideElements);

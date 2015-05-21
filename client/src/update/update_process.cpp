@@ -20,6 +20,7 @@
 #include <utils/common/sleep.h>
 #include <utils/update/update_utils.h>
 #include <utils/common/app_info.h>
+#include <utils/common/log.h>
 
 #include <api/runtime_info_manager.h>
 
@@ -316,10 +317,13 @@ void QnUpdateProcess::at_clientUpdateInstalled() {
         return;
 
     if (futureWatcher->result() != applauncher::api::ResultType::ok) {
+        NX_LOG(lit("Update: QnUpdateProcess: Client update failed."), cl_logDEBUG1);
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::ClientInstallationFailed);
         return;
     }
+
+    NX_LOG(lit("Update: QnUpdateProcess: Client update installed."), cl_logDEBUG1);
 
     prepareToUpload();
 }
@@ -343,6 +347,9 @@ void QnUpdateProcess::installIncompatiblePeers() {
     restUpdatePeerTask->setUpdateId(m_id);
     restUpdatePeerTask->setVersion(m_target.version);
     connect(restUpdatePeerTask, &QnNetworkPeerTask::finished,                   this,   &QnUpdateProcess::at_restUpdateTask_finished);
+    connect(restUpdatePeerTask, &QnNetworkPeerTask::peerFinished,               this,   [this](const QnUuid &peerId) {
+        setPeerStage(peerId, QnPeerUpdateStage::Init);
+    });
     connect(restUpdatePeerTask, &QnRestUpdatePeerTask::peerUpdateFinished,      this,   &QnUpdateProcess::at_restUpdateTask_peerUpdateFinished);
     connect(restUpdatePeerTask, &QnNetworkPeerTask::finished,                   restUpdatePeerTask,   &QObject::deleteLater);
     m_currentTask = restUpdatePeerTask;

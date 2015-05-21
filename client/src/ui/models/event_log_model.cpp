@@ -382,7 +382,7 @@ QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value) {
 QString QnEventLogModel::textData(const Column& column,const QnBusinessActionData& action) {
     switch(column) {
     case DateTimeColumn: {
-        qint64 timestampUsec = action.getRuntimeParams().eventTimestamp;
+        qint64 timestampUsec = action.getRuntimeParams().eventTimestampUsec;
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timestampUsec/1000);
         return dt.toString(Qt::SystemLocaleShortDate);
     }
@@ -410,13 +410,15 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
                 result = tr("Motion video");
         }
         else {
-            result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, tr("\n"));
+            result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, lit("\n"));
         }
 
         if (!QnBusiness::hasToggleState(eventType)) {
             int count = action.getAggregationCount();
-            if (count > 1)
-                result += tr(" (%1 times)").arg(count); // TODO: #Elric #TR this will probably look bad 
+            if (count > 1) {
+                QString countString = tr("%1 times").arg(count);
+                result += lit(" (%1)").arg(countString);
+            }
         }
         return result;
     }
@@ -506,6 +508,10 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
     const QnBusinessActionData &action = m_index->at(index.row());
 
     switch(role) {
+    case Qt::ToolTipRole:
+        if (index.column() != DescriptionColumn)
+            return QVariant();
+        // else go to Qt::DisplayRole
     case Qt::DisplayRole:
         return QVariant(textData(column, action));
     case Qt::DecorationRole:

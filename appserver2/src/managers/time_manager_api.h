@@ -18,6 +18,7 @@ namespace ec2
     {
     public:
         QnTimeManager( QueryProcessorType* queryProcessor );
+        virtual ~QnTimeManager();
 
         //!Implementation of AbstractTimeManager::getPeerTimeInfoList
         virtual QnPeerTimeInfoList getPeerTimeInfoList() const override;

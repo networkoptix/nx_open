@@ -42,11 +42,13 @@ QnPlVmax480ResourceSearcher* QnPlVmax480ResourceSearcher::instance()
 
 
 void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
-                                                const QString& host, 
+                                                const HostAddress& host, 
                                                 const UpnpDeviceInfo& devInfo,
                                                 const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
+    Q_UNUSED(discoveryAddr)
+
     QnMacAddress mac(devInfo.serialNumber);
     const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
     if( channelCountEndIndex == -1 )
@@ -75,7 +77,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     QMap<int, QByteArray> camNames;
     bool camNamesReaded = false;
 
-    QString groupName = QString(QLatin1String("VMAX %1")).arg(host);
+    QString groupName = QString(QLatin1String("VMAX %1")).arg(host.toString());
 
     for (int i = 0; i < channles; ++i)
     {
@@ -100,7 +102,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         if (needHttpData)
         {
             if (!camNamesReaded) {
-                CLSimpleHTTPClient client(host, httpPort, TCP_TIMEOUT, QAuthenticator());
+                CLSimpleHTTPClient client(host.toString(), httpPort, TCP_TIMEOUT, QAuthenticator());
                 if (vmaxAuthenticate(client, auth)) {
                     QByteArray descrPage = readDescriptionPage(client);
                     if (!descrPage.isEmpty()) {
@@ -119,11 +121,11 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
         resource->setMAC(mac);
 
-        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(host).arg(apiPort).arg(i+1).arg(httpPort));
+        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(host.toString()).arg(apiPort).arg(i+1).arg(httpPort));
         resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(resource->getMAC().toString()).arg(i+1));
         resource->setDefaultAuth(auth);
         resource->setGroupName(groupName);
-        QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(host).arg(apiPort);
+        QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(host.toString()).arg(apiPort);
         resource->setGroupId(groupId);
 
         result << resource;
@@ -132,6 +134,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
 
 QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
+    Q_UNUSED(params)
     QnNetworkResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);

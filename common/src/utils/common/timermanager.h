@@ -10,6 +10,7 @@
 
 #include <QtCore/QThread>
 
+#include <utils/common/singleton.h>
 
 //!Interface of receiver of timer events
 class TimerEventHandler
@@ -36,6 +37,7 @@ class TimerManagerImpl;
 class TimerManager
 :
     public QThread
+    , public Singleton<TimerManager>
 {
 public:
     /*!
@@ -66,15 +68,14 @@ public:
     /*!
         This method garantees that timer \a timerID handler is not being executed after return of this method.
 
-        It is recommended to use previous method, if appropriate, since this method is some more havier.
+        It is recommended to use previous method, if appropriate, since this method is a bit more heavier.
 
         \param timerID ID of timer, created by \a addTimer call. If no such timer, nothing is done
         \note If this method is called from \a TimerEventHandler::onTimer to delete timer being executed, nothing is done
     */
     void joinAndDeleteTimer( const quint64& timerID );
 
-    static TimerManager* instance();
-
+    void stop();
 protected:
     virtual void run();
 

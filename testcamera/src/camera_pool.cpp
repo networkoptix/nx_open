@@ -33,11 +33,10 @@ protected:
             discoverySock->bind( SocketAddress( m_localInterfacesToListen[0], TestCamConst::DISCOVERY_PORT ) );
         discoverySock->setRecvTimeout(100);
         quint8 buffer[1024*8];
-        QString peerAddress;
-        unsigned short peerPort;
+        SocketAddress peerEndpoint;
         while(!m_needStop)
         {
-            int readed = discoverySock->recvFrom(buffer, sizeof(buffer), peerAddress, peerPort);
+            int readed = discoverySock->recvFrom(buffer, sizeof(buffer), &peerEndpoint);
             if (readed > 0)
             {
                 if (QByteArray((const char*)buffer, readed).startsWith(TestCamConst::TEST_CAMERA_FIND_MSG))
@@ -47,7 +46,7 @@ protected:
                     QByteArray rez(TestCamConst::TEST_CAMERA_ID_MSG);
                     rez.append(';');
                     rez.append(camResponse);
-                    discoverySock->setDestAddr(peerAddress, peerPort);
+                    discoverySock->setDestAddr( peerEndpoint );
                     discoverySock->send(rez.data(), rez.size());
                 }
             }
@@ -105,10 +104,10 @@ void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringLis
     }
 }
 
-QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket, owner);
+    return new QnTestCameraProcessor(clientSocket, this);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()

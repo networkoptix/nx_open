@@ -65,6 +65,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(m_resetDefaultsButton, &QPushButton::clicked, this, &QnBusinessRulesDialog::at_resetDefaultsButton_clicked);
 
     setHelpTopic(this, Qn::EventsActions_Help);
+    setHelpTopic(ui->eventLogButton, Qn::EventLog_Help);
 
     m_currentDetailsWidget = ui->detailsWidget;
 
@@ -118,7 +119,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(m_rulesViewModel,                               &QnBusinessRulesActualModel::beforeModelChanged, this, &QnBusinessRulesDialog::at_beforeModelChanged);
     connect(m_rulesViewModel,                               &QnBusinessRulesActualModel::afterModelChanged, this, &QnBusinessRulesDialog::at_afterModelChanged);
 
-    connect(ui->eventLogButton,                             &QPushButton::clicked,  context()->action(Qn::BusinessEventsLogAction), &QAction::trigger);
+    connect(ui->eventLogButton,                             &QPushButton::clicked,  context()->action(Qn::OpenBusinessLogAction), &QAction::trigger);
 
     connect(ui->filterLineEdit,                             &QLineEdit::textChanged, this, &QnBusinessRulesDialog::updateFilter);
     connect(ui->clearFilterButton,                          &QToolButton::clicked, this, &QnBusinessRulesDialog::at_clearFilterButton_clicked);
@@ -209,8 +210,8 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
 
     if (QMessageBox::warning(this,
                              tr("Confirm rules reset"),
-                             tr("Are you sure you want to reset rules to the defaults?\n"\
-                                "This action CANNOT be undone!"),
+                             tr("Are you sure you want to reset rules to the defaults?") + L'\n' +
+                                tr("This action CANNOT be undone!"),
                              QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;

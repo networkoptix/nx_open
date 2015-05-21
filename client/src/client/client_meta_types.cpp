@@ -2,9 +2,9 @@
 
 #include <common/common_meta_types.h>
 
-#include <utils/color_space/image_correction.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/ping_utility.h>
+#include <client/client_globals.h>
+#include <client/client_model_types.h>
+#include <client/client_color_types.h>
 
 #include <camera/thumbnail.h>
 #include <camera/data/abstract_camera_data.h>
@@ -18,9 +18,10 @@
 
 #include <update/updates_common.h>
 
-#include "client_globals.h"
-#include "client_model_types.h"
-#include "client_color_types.h"
+#include <utils/color_space/image_correction.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/ping_utility.h>
+#include <utils/app_server_file_cache.h>
 
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
@@ -79,6 +80,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();
     qRegisterMetaType<QnPingUtility::PingResponce>();
+    qRegisterMetaType<QnAppServerFileCache::OperationResult>();
 
     qRegisterMetaType<QnTimeSliderColors>();
     qRegisterMetaType<QnTimeScrollBarColors>();

@@ -10,13 +10,28 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "utils/update/update_utils.h"
+#include "utils/common/log.h"
 
 namespace {
     const int chunkSize = 1024 * 1024;
     const int chunkTimeout = 5 * 60 * 1000;
+    /* When a server receives the last chunk it extracts the uploaded zip file.
+       This process can take long time on slow devices like ISD.
+       So we have to specify a longer timeout for the last chunk. */
+    const int lastChunkTimeout = 20 * 60 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
+    }
+
+    QString getPeersString(const QSet<QnUuid> &peers) {
+        QString result;
+        for (const QnUuid &id: peers) {
+            if (!result.isEmpty())
+                result += lit(", ");
+            result += id.toString();
+        }
+        return result;
     }
 } // anonymous namespace
 
@@ -25,7 +40,6 @@ QnUpdateUploader::QnUpdateUploader(QObject *parent) :
     m_chunkSize(chunkSize),
     m_chunkTimer(new QTimer(this))
 {
-    m_chunkTimer->setInterval(chunkTimeout);
     m_chunkTimer->setSingleShot(true);
     connect(m_chunkTimer, &QTimer::timeout, this, &QnUpdateUploader::at_chunkTimer_timeout);
 }
@@ -48,10 +62,13 @@ void QnUpdateUploader::sendPreambule() {
 
     m_pendingPeers = m_peers + m_restPeers;
 
-    if (!m_peers.isEmpty())
+    if (!m_peers.isEmpty()) {
+        NX_LOG(lit("Update: QnUpdateUploader: Send preambule transaction [%1].").arg(getPeersString(m_peers)), cl_logDEBUG2);
         connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, md5.toLatin1(), -1, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    }
 
     for (const QnMediaServerResourcePtr &server: m_restTargets) {
+        NX_LOG(lit("Update: QnUpdateUploader: Send preambule request [%1 : %2].").arg(server->getName()).arg(server->getApiUrl()), cl_logDEBUG2);
         int handle = server->apiConnection()->uploadUpdateChunk(m_updateId, md5.toLatin1(), -1, this, SLOT(at_restReply_finished(int,QnUploadUpdateReply,int)));
         m_restRequsts[handle] = server;
     }
@@ -61,9 +78,12 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
     if (m_updateFile)
         return false;
 
+    NX_LOG(lit("Update: QnUpdateUploader: Starting upload [%1, %2].").arg(updateId).arg(fileName), cl_logDEBUG1);
+
     m_updateFile.reset(new QFile(fileName));
     if (!m_updateFile->open(QFile::ReadOnly)) {
         m_updateFile.reset();
+        NX_LOG(lit("Update: QnUpdateUploader: Could not open file %1.").arg(fileName), cl_logERROR);
         return false;
     }
 
@@ -78,7 +98,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
         if (!server)
             return false;
 
-        if (server->hasProperty(lit("guid"))) {
+        if (QnMediaServerResource::isFakeServer(server)) {
             m_restPeers.insert(peerId);
             m_restTargets.append(server);
         } else {
@@ -115,13 +135,17 @@ void QnUpdateUploader::sendNextChunk() {
     }
 
     if (!m_peers.isEmpty()) {
+        NX_LOG(lit("Update: QnUpdateUploader: Send chunk transaction [%1, %2, %3, %4].")
+               .arg(m_updateId).arg(offset).arg(data.size()).arg(getPeersString(m_pendingPeers)), cl_logDEBUG2);
         connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, data, offset, m_pendingPeers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-        m_chunkTimer->start();
+        m_chunkTimer->start(data.isEmpty() ? lastChunkTimeout : chunkTimeout);
     }
 
     for (const QnMediaServerResourcePtr &server: m_restTargets) {
         if (!m_pendingPeers.contains(server->getId()))
             continue;
+        NX_LOG(lit("Update: QnUpdateUploader: Send chunk request [%1, %2, %3, %4, %5].")
+               .arg(m_updateId).arg(offset).arg(data.size()).arg(server->getId().toString()).arg(server->getApiUrl()), cl_logDEBUG2);
         int handle = server->apiConnection()->uploadUpdateChunk(m_updateId, data, offset, this, SLOT(at_restReply_finished(int,QnUploadUpdateReply,int)));
         m_restRequsts[handle] = server;
     }
@@ -134,6 +158,8 @@ void QnUpdateUploader::handleUploadProgress(const QnUuid &peerId, qint64 chunks)
     auto it = m_progressById.find(peerId);
     if (it == m_progressById.end()) // it means we have already done upload for this peer
         return;
+
+    NX_LOG(lit("Update: QnUpdateUploader: Got chunk response [%1, %2].").arg(peerId.toString()).arg(chunks), cl_logDEBUG2);
 
     int progress = 0;
 
@@ -164,6 +190,7 @@ void QnUpdateUploader::handleUploadProgress(const QnUuid &peerId, qint64 chunks)
 
     if (m_progressById.isEmpty()) {
         cleanUp();
+        NX_LOG(lit("Update: QnUpdateUploader: Upload finished."), cl_logDEBUG1);
         emit finished(NoError, QSet<QnUuid>());
     }
 

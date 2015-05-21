@@ -43,7 +43,7 @@ QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
     return new QnDesktopCameraStreamReader(toSharedPointer());
 }
 
-QnConstResourceAudioLayoutPtr QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     const QnDesktopCameraStreamReader* deskopReader = dynamic_cast<const QnDesktopCameraStreamReader*>(dataProvider);
     if (deskopReader && deskopReader->getDPAudioLayout())

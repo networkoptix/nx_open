@@ -14,9 +14,9 @@
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
 // forward instead seek backward
-static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
+//static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
 
-static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
+//static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
 QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
@@ -252,8 +252,13 @@ bool QnArchiveStreamReader::init()
     }
 
     if (!m_delegate->open(m_resource)) {
-        if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
-            emit jumpOccured(requiredJumpTime); 
+        if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) {
+            emit jumpOccured(requiredJumpTime);
+            m_jumpMtx.lock();
+            if (m_requiredJumpTime == requiredJumpTime)
+                m_requiredJumpTime = AV_NOPTS_VALUE;
+            m_jumpMtx.unlock();
+        }
         return false;
     }
     m_delegate->setAudioChannel(m_selectedAudioChannel);
@@ -319,7 +324,7 @@ bool QnArchiveStreamReader::getNextVideoPacket()
         if (m_nextData->dataType == QnAbstractMediaData::META_V1)
             m_skippedMetadata << m_nextData;
 
-        QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(m_nextData);
+        QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(m_nextData);
         if (video)
             return true;
     }
@@ -338,10 +343,11 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMo
     return rez;
 }
 
-void QnArchiveStreamReader::startPaused()
+void QnArchiveStreamReader::startPaused(qint64 startTime)
 {
     m_pausedStart = true;
     m_singleQuantProcessed = true;
+    m_requiredJumpTime = m_tmpSkipFramesToTime = startTime;
     start();
 }
 
@@ -524,8 +530,8 @@ begin_label:
 
     if (m_afterMotionData)
     {
-        QnAbstractMediaDataPtr result = m_afterMotionData;
-        m_afterMotionData.clear();
+        QnAbstractMediaDataPtr result;
+        result.swap( m_afterMotionData );
         return result;
     }
 
@@ -549,7 +555,7 @@ begin_label:
     // If there is no nextPacket - read it from file, otherwise use saved packet
     if (m_nextData) {
         m_currentData = m_nextData;
-        m_nextData.clear();
+        m_nextData.reset();
     }
     else {
         m_currentData = getNextPacket();
@@ -561,7 +567,7 @@ begin_label:
     if (m_currentData->flags & QnAbstractMediaData::MediaFlags_Skip)
         goto begin_label;
 
-    videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
+    videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(m_currentData);
 
     if (m_currentData->timestamp != qint64(AV_NOPTS_VALUE)) {
         setCurrentTime(m_currentData->timestamp);
@@ -587,7 +593,7 @@ begin_label:
                     m_frameTypeExtractor = new FrameTypeExtractor((AVCodecContext*) videoData->context->ctx());
                 }
 
-                frameType = m_frameTypeExtractor->getFrameType((const quint8*) videoData->data(), videoData->dataSize());
+                frameType = m_frameTypeExtractor->getFrameType((const quint8*) videoData->data(), static_cast<int>(videoData->dataSize()));
             }
             bool isKeyFrame;
 
@@ -651,10 +657,14 @@ begin_label:
                     {
                         if (m_cycleMode)
                         {
-                            if (m_delegate->endTime() != DATETIME_NOW)
-                                seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
-                            else
-                                seekTime = qnSyncTime->currentMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
+                            if (m_delegate->endTime() != DATETIME_NOW) {
+                                m_topIFrameTime = m_delegate->endTime();
+                                seekTime = m_topIFrameTime - BACKWARD_SEEK_STEP;
+                            }
+                            else {
+                                m_topIFrameTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+                                seekTime = m_topIFrameTime - LIVE_SEEK_OFFSET;
+                            }
                         }
                         else {
                             m_eof = true;
@@ -674,7 +684,7 @@ begin_label:
                     }
 
                     if (m_currentTime != seekTime) {
-                        m_currentData.clear();
+                        m_currentData.reset();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
                         internalJumpTo(seekTime);
                         m_bofReached = (seekTime == m_delegate->startTime()) || m_topIFrameTime > seekTime;
@@ -707,8 +717,8 @@ begin_label:
                 {
                     // Some error or end of file. Stop reading frames.
                     setSkipFramesToTime(0, true);
-                    QnAbstractMediaDataPtr tmp = m_nextData;
-                    m_nextData.clear();
+                    QnAbstractMediaDataPtr tmp;
+                    tmp.swap( m_nextData );
                     if (tmp && tmp->dataType == QnAbstractMediaData::EMPTY_DATA)
                     {
                         return tmp; //createEmptyPacket(reverseMode); // EOF/BOF reached
@@ -842,8 +852,8 @@ begin_label:
 void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
 {
     m_skippedMetadata.clear();
-    m_nextData.clear();
-    m_afterMotionData.clear();
+    m_nextData.reset();
+    m_afterMotionData.reset();
     qint64 seekRez = 0;
     if (mksec > 0) {
         seekRez = m_delegate->seek(mksec, !m_exactJumpToSpecifiedFrame);
@@ -1201,7 +1211,11 @@ QnMediaContextPtr QnArchiveStreamReader::getCodecContext() const
 qint64 QnArchiveStreamReader::startTime() const
 {
     Q_ASSERT(m_delegate);
-    const QnTimePeriod p = m_playbackMaskHelper.getPlaybackRange();
+    QnTimePeriod p;
+    {
+        QMutexLocker lock(&m_playbackMaskSync);
+        p = m_playbackMaskHelper.getPlaybackRange();
+    }
     if (p.isEmpty())
         return m_delegate->startTime();
     else
@@ -1211,7 +1225,11 @@ qint64 QnArchiveStreamReader::startTime() const
 qint64 QnArchiveStreamReader::endTime() const
 {
     Q_ASSERT(m_delegate);
-    const QnTimePeriod p = m_playbackMaskHelper.getPlaybackRange();
+    QnTimePeriod p;
+    {
+        QMutexLocker lock(&m_playbackMaskSync);
+        p = m_playbackMaskHelper.getPlaybackRange();
+    }
     if (p.isEmpty())
         return m_delegate->endTime();
     else
@@ -1228,6 +1246,17 @@ void QnArchiveStreamReader::setGroupId(const QByteArray& guid)
 {
     if (m_delegate)
         m_delegate->setGroupId(guid);
+}
+
+bool QnArchiveStreamReader::isPaused() const
+{
+    if (getResource()->hasParam(lit("groupplay"))) {
+        QMutexLocker lock(&m_stopMutex);
+        return m_stopCond;
+    }
+    else {
+        return QnAbstractArchiveReader::isPaused();
+    }
 }
 
 void QnArchiveStreamReader::pause() 

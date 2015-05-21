@@ -28,6 +28,8 @@ namespace nx
         const QStringList& arguments,
         const QString& workingDirectory = QString(),
         qint64* pid = nullptr );
+
+    bool checkProcessExists(qint64 pid);
 }
 
 #endif  //NX_PROCESS_H

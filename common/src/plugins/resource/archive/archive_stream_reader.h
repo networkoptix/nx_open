@@ -81,7 +81,7 @@ public:
 
     virtual QnMediaContextPtr getCodecContext() const override;
 
-    virtual void startPaused() override;
+    virtual void startPaused(qint64 startTime) override;
 
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
@@ -94,6 +94,7 @@ public:
 
     virtual void pause() override;
     virtual void resume() override;
+    virtual bool isPaused() const override;
 
     virtual bool isRealTimeSource() const override;
 protected:
@@ -169,7 +170,7 @@ private:
     QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
     QnMediaContextPtr m_codecContext;
 
-    QMutex m_playbackMaskSync;
+    mutable QMutex m_playbackMaskSync;
     QnPlaybackMaskHelper m_playbackMaskHelper;
     MediaQuality m_quality;
     bool m_qualityFastSwitch;
@@ -186,7 +187,7 @@ private:
     qint64 m_latPacketTime;
     
     bool m_stopCond;
-    QMutex m_stopMutex;
+    mutable QMutex m_stopMutex;
     QWaitCondition m_stopWaitCond;
 
     qint64 determineDisplayTime(bool reverseMode);

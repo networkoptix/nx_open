@@ -8,7 +8,7 @@
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_camera_attributes_data.h"
 #include "transaction/transaction.h"
-#include "nx_ec/data/api_camera_server_item_data.h"
+#include "nx_ec/data/api_camera_history_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 
 
@@ -71,8 +71,11 @@ namespace ec2
             emit cameraRemoved( QnUuid(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran )
+        void triggerNotification( const QnTransaction<ApiServerFootageData>& tran )
         {
+            if (tran.command == ApiCommand::addCameraHistoryItem)
+                emit cameraHistoryChanged( tran.params);
+            /*
             QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
                 tran.params.cameraUniqueId,
                 tran.params.timestamp,
@@ -81,6 +84,7 @@ namespace ec2
                 emit cameraHistoryChanged( std::move(cameraHistoryItem ));
             else
                 emit cameraHistoryRemoved( std::move(cameraHistoryItem ));
+            */
         }
 
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran )
@@ -120,14 +124,12 @@ namespace ec2
 
         //!Implementation of AbstractCameraManager::addCamera
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) override;
-        //!Implementation of AbstractCameraManager::addCameraHistoryItem
-        virtual int addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) override;
-        //!Implementation of AbstractCameraManager::removeCameraHistoryItem
-        virtual int removeCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::ApiServerFootageData
+        virtual int setCamerasWithArchive(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::getCameras
         virtual int getCameras( const QnUuid& mediaServerId, impl::GetCamerasHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::getCameraHistoryList
-        virtual int getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) override;
+        virtual int getCamerasWithArchiveList( impl::GetCamerasHistoryHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::save
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::saveUserAttributes
@@ -150,7 +152,6 @@ namespace ec2
         QnTransaction<ApiCameraData> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
         QnTransaction<ApiCameraDataList> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourceList& cameras );
         QnTransaction<ApiCameraAttributesDataList> prepareTransaction( ApiCommand::Value cmd, const QnCameraUserAttributesList& cameraAttributesList );
-        QnTransaction<ApiCameraServerItemData> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& id );
         QnTransaction<ApiCameraBookmarkTagDataList> prepareTransaction( ApiCommand::Value command, const QnCameraBookmarkTags& tags );
     };

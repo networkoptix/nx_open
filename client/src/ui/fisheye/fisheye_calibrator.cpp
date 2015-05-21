@@ -101,6 +101,7 @@ quint8 opt_med9(quint8 * p)
     PIX_SORT(p[4], p[2]) ; return(p[4]) ;
 }
 
+/*
 void QnFisheyeCalibrator::drawCircle(const QImage& frame, const QPoint& center, int radius)
 {
     int w = frame.width();
@@ -117,35 +118,8 @@ void QnFisheyeCalibrator::drawCircle(const QImage& frame, const QPoint& center, 
                 *data = 0;
         }
     }
-
-    /*
-    float radius2 = (float) radius * (float) radius;
-    quint32 result = 0;
-    int yMin = qMax(0, center.y() - radius);
-    int yMax = qMin(m_height-1, center.y() + radius);
-    /*
-    for (int y = yMin; y <= yMax; ++y)
-    {
-        float yOffs = center.y() - y;
-        float xOffs = sqrt(radius2 - yOffs*yOffs);
-        int xLeft = qMax(0, center.x() - int(xOffs + 0.5));
-        int xRight = qMin(m_width-1, center.x() + int(xOffs + 0.5));
-
-        quint32* data = (quint32*) frame.bits() + y * frame.bytesPerLine()/4 + xRight;
-        *data = -1;
-
-        data = (quint32*) frame.bits() + y * frame.bytesPerLine()/4 + xLeft;
-        *data = -1;
-        
-        for (int x = xLeft; x <= xRight; ++x)
-        {
-            *data++ = -1;
-        }
-        
-    }
-    return result;
-    */
 }
+*/
 
 int QnFisheyeCalibrator::findPixel(int y, int x, int xDelta)
 {
@@ -169,14 +143,17 @@ qreal QnFisheyeCalibrator::findElipse(qreal& newRadius)
     {
         QVector<Distance> distances;
         qreal offset = (i==0) ? height*0.33 : height*0.66;
-        int x1 = findPixel(center.y() + offset, m_width-1, -1);
-        int x2 = findPixel(center.y() + offset, 0, 1);
-        int x3 = findPixel(center.y() - offset, m_width-1, -1);
-        int x4 = findPixel(center.y() - offset, 0, 1);
-        distances << Distance(qAbs(center.x() - x1), QPointF(x1, center.y() + offset), RightBottom);
-        distances << Distance(qAbs(center.x() - x2), QPointF(x2, center.y() + offset), LeftBottom);
-        distances << Distance(qAbs(center.x() - x3), QPointF(x3, center.y() - offset), RightTop);
-        distances << Distance(qAbs(center.x() - x4), QPointF(x4, center.y() - offset), LeftTop);
+        int yMax = qMin(center.y() + offset, m_height - 1);
+        int yMin = qMax(center.y() - offset, 0);
+
+        int x1 = findPixel(yMax, m_width-1, -1);
+        int x2 = findPixel(yMax, 0, 1);
+        int x3 = findPixel(yMin, m_width-1, -1);
+        int x4 = findPixel(yMin, 0, 1);
+        distances << Distance(qAbs(center.x() - x1), QPointF(x1, yMax), RightBottom);
+        distances << Distance(qAbs(center.x() - x2), QPointF(x2, yMax), LeftBottom);
+        distances << Distance(qAbs(center.x() - x3), QPointF(x3, yMin), RightTop);
+        distances << Distance(qAbs(center.x() - x4), QPointF(x4, yMin), LeftTop);
         qSort(distances);
         if (i == 0)
             p1 = QPointF(distances[3].pos);
@@ -309,76 +286,11 @@ void QnFisheyeCalibrator::findCircleParams()
     emit finished(NoError);
 }
 
-/*
 int QnFisheyeCalibrator::findYThreshold(QImage frame)
 {
-    // Use adaptive binarisation to find optimal YThreshold value
-    
-    // 1. build hystogram
-    
-    int hystogram[256];
-    memset(hystogram, 0, sizeof(hystogram));
-    for (int y = 0; y < m_width; ++y)
-    {
-        quint32* curPtr = (quint32*) (frame.bits() + y * frame.bytesPerLine());
-        for (int x = 0; x < frame.width()/4; ++x)
-        {
-            quint32 value = *curPtr++;
+    //int w = frame.width();
+    //int h = frame.height();
 
-            hystogram[(quint8) value]++;
-            value >>= 8;
-
-            hystogram[(quint8) value]++;
-            value >>= 8;
-
-            hystogram[(quint8) value]++;
-            value >>= 8;
-
-            hystogram[(quint8) value]++;
-        }
-    }
-
-    // 2. split data to two buckets
-
-    // 2.1 calculate initial range
-    int left = 0;
-    int right = 255;
-    while (hystogram[left] == 0 && left < 256)
-        left++;
-    while (hystogram[right] == 0 && right > 0)
-        right--;
-
-    if (left > right)
-        return 0; // not data in the source frame
-    
-    while (left < right)
-    {
-        // 2.2 calculate center for left and right bucket
-        int mid = (left+right+1)/2;
-
-        quint32 leftSum = 0;
-        for (int i = left; i < mid; ++i)
-            leftSum += hystogram[i];
-        quint32 halfSum = 0;
-
-        for (; left < mid && halfSum < leftSum/2; ++left)
-            halfSum += hystogram[left];
-
-        quint32 rightSum = 0;
-        for (int i = mid; i <= right; ++i)
-            rightSum += hystogram[i];
-        halfSum = 0;
-        for (; right >= mid && halfSum < rightSum/2; --right)
-            halfSum += hystogram[right];
-    }
-    return left;
-}
-*/
-
-int QnFisheyeCalibrator::findYThreshold(QImage frame)
-{
-    int w = frame.width();
-    int h = frame.height();
     static const int MAX_Y_THRESHOLD = 64;
     static const int MIN_Y_THRESHOLD = 32;
     static const int DETECT_BORDER_DELTA = 32;

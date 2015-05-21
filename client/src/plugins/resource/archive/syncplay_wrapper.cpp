@@ -144,8 +144,6 @@ void QnArchiveSyncPlayWrapper::pauseMedia()
     d->paused = true;
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (!info.reader->isEnabled())
-            continue;
         info.reader->setNavDelegate(0);
         info.reader->pauseMedia();
         info.reader->setNavDelegate(this);
@@ -186,10 +184,10 @@ void QnArchiveSyncPlayWrapper::setSkipFramesToTime(qint64 skipTime)
     {
         if (!info.reader->isEnabled())
             continue;
-            info.reader->setNavDelegate(0);
-            info.reader->setSkipFramesToTime(skipTime);
-            info.reader->setNavDelegate(this);
-        }
+        info.reader->setNavDelegate(0);
+        info.reader->setSkipFramesToTime(skipTime);
+        info.reader->setNavDelegate(this);
+    }
 }
 
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
@@ -202,10 +200,10 @@ bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
     {
         if (!info.reader->isEnabled())
             continue;
-            info.reader->setNavDelegate(0);
-            rez |= info.reader->jumpTo(mksec, skipTime);
-            info.reader->setNavDelegate(this);
-        }
+        info.reader->setNavDelegate(0);
+        rez |= info.reader->jumpTo(mksec, skipTime);
+        info.reader->setNavDelegate(this);
+    }
     return rez;
 }
 
@@ -218,23 +216,23 @@ void QnArchiveSyncPlayWrapper::nextFrame()
     {
         if (!info.reader->isEnabled())
             continue;
-            qint64 curTime = info.cam->getCurrentTime();
-            if (mintTime == qint64(AV_NOPTS_VALUE))
-                mintTime = curTime;
-            else if (curTime != qint64(AV_NOPTS_VALUE))
-                mintTime = qMin(mintTime, curTime);
-        }
+        qint64 curTime = info.cam->getCurrentTime();
+        if (mintTime == qint64(AV_NOPTS_VALUE))
+            mintTime = curTime;
+        else if (curTime != qint64(AV_NOPTS_VALUE))
+            mintTime = qMin(mintTime, curTime);
+    }
     foreach(const ReaderInfo& info, d->readers)
     {
         if (!info.reader->isEnabled())
             continue;
-            if (mintTime == qint64(AV_NOPTS_VALUE) || info.cam->getCurrentTime() <= mintTime+SYNC_FOR_FRAME_EPS)
-            {
-                info.reader->setNavDelegate(0);
-                info.reader->nextFrame();
-                info.reader->setNavDelegate(this);
-            }
+        if (mintTime == qint64(AV_NOPTS_VALUE) || info.cam->getCurrentTime() <= mintTime+SYNC_FOR_FRAME_EPS)
+        {
+            info.reader->setNavDelegate(0);
+            info.reader->nextFrame();
+            info.reader->setNavDelegate(this);
         }
+    }
 }
 
 void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
@@ -245,10 +243,10 @@ void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
     {
         if (!info.reader->isEnabled())
             continue;
-            info.reader->setNavDelegate(0);
-            info.reader->previousFrame(mksec);
-            info.reader->setNavDelegate(this);
-        }
+        info.reader->setNavDelegate(0);
+        info.reader->previousFrame(mksec);
+        info.reader->setNavDelegate(this);
+    }
 }
 
 

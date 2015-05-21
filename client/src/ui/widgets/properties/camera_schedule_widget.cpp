@@ -160,21 +160,12 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHighest), Qn::QualityHighest);
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
 
+    setHelpTopic(ui->archiveGroupBox, Qn::CameraSettings_Recording_ArchiveLength_Help);
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     // init buttons
-    ui->recordAlwaysButton->setColor(qnGlobals->recordAlwaysColor());
-    ui->recordAlwaysButton->setCheckedColor(qnGlobals->recordAlwaysColor().lighter());
-
-    ui->recordMotionButton->setColor(qnGlobals->recordMotionColor());
-    ui->recordMotionButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
-
-    ui->recordMotionPlusLQButton->setColor(qnGlobals->recordMotionColor());
-    ui->recordMotionPlusLQButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
-    ui->recordMotionPlusLQButton->setInsideColor(qnGlobals->recordAlwaysColor());
-
-    ui->noRecordButton->setColor(qnGlobals->noRecordColor());
-    ui->noRecordButton->setCheckedColor(qnGlobals->noRecordColor().lighter());
+    connect(ui->gridWidget, &QnScheduleGridWidget::colorsChanged, this, &QnCameraScheduleWidget::updateColors);
+    updateColors();
 
     QnCamLicenseUsageHelper helper;
     ui->licensesUsageWidget->init(&helper);
@@ -333,6 +324,9 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     if(m_cameras == cameras)
         return;
 
+    foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
+        disconnect(camera.data(), &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons);
+
     m_cameras = cameras;
 
     int enabledCount = 0, disabledCount = 0;
@@ -343,6 +337,8 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
 
     foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
     {
+        connect(camera.data(), &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons, Qt::QueuedConnection);
+
         (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
 
         if (firstCamera) {
@@ -594,6 +590,17 @@ void QnCameraScheduleWidget::setFps(int value)
     ui->fpsSpinBox->setValue(value);
 }
 
+void QnCameraScheduleWidget::showMaxFpsWarning(int setValue, int maxValue) {
+    QMessageBox::warning(this, tr("FPS value is too high"),
+        tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.").arg(setValue).arg(maxValue));
+}
+
+void QnCameraScheduleWidget::showMaxDualStreamingWarning(int setValue, int maxValue) {
+    QMessageBox::warning(this, tr("FPS value is too high"),
+        tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.")
+        .arg(setValue).arg(maxValue));
+}
+
 void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     /* Silently ignoring invalid input is OK here. */
     if(value < ui->fpsSpinBox->minimum())
@@ -601,27 +608,22 @@ void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     if(dualStreamValue < ui->fpsSpinBox->minimum())
         dualStreamValue = ui->fpsSpinBox->minimum();
 
-    m_maxFps = value;
-    m_maxDualStreamingFps = dualStreamValue;
-
-    int currentMaxFps = getGridMaxFps();
-    int currentMaxDualStreamingFps = getGridMaxFps(true);
-    if (currentMaxFps > value)
-    {
-        QMessageBox::warning(this, tr("FPS value is too high"),
-            tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.").arg(currentMaxFps).arg(value));
-        emit scheduleTasksChanged();
+    if (m_maxFps != value) {
+        m_maxFps = value;
+        int currentMaxFps = getGridMaxFps();
+        if (currentMaxFps > m_maxFps)
+            emit scheduleTasksChanged();
     }
-    if (currentMaxDualStreamingFps > dualStreamValue)
-    {
-        QMessageBox::warning(this, tr("FPS value is too high"),
-            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.")
-                             .arg(currentMaxDualStreamingFps).arg(dualStreamValue));
-        emit scheduleTasksChanged();
+
+    if (m_maxDualStreamingFps != dualStreamValue) {
+        m_maxDualStreamingFps = dualStreamValue;       
+        int currentMaxDualStreamingFps = getGridMaxFps(true);       
+        if (currentMaxDualStreamingFps > m_maxDualStreamingFps)           
+            emit scheduleTasksChanged();
     }
 
     updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());
-    ui->gridWidget->setMaxFps(value, dualStreamValue);
+    ui->gridWidget->setMaxFps(m_maxFps, m_maxDualStreamingFps);
 }
 
 int QnCameraScheduleWidget::getGridMaxFps(bool motionPlusLqOnly)
@@ -767,6 +769,14 @@ void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled) {
         ui->fpsSpinBox->setMaximum(m_maxFps);
 }
 
+void QnCameraScheduleWidget::updateColors() {
+    ui->recordAlwaysButton->setColor(ui->gridWidget->colors().recordAlways);
+    ui->recordMotionButton->setColor(ui->gridWidget->colors().recordMotion);
+    ui->recordMotionPlusLQButton->setColor(ui->gridWidget->colors().recordMotion);
+    ui->recordMotionPlusLQButton->setInsideColor(ui->gridWidget->colors().recordAlways);
+    ui->noRecordButton->setColor(ui->gridWidget->colors().recordNever);
+}
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -880,7 +890,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
 
     const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();
     QnVirtualCameraResourceList cameras = dialog->selectedResources().filtered<QnVirtualCameraResource>();
-    foreach(QnVirtualCameraResourcePtr camera, cameras) 
+    for(const QnVirtualCameraResourcePtr &camera: cameras) 
     {
         if (copyArchiveLength) {
             int maxDays = maxRecordedDays();

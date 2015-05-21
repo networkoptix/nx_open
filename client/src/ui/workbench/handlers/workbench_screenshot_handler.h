@@ -21,9 +21,9 @@ struct QnScreenshotParameters
 {
     QnScreenshotParameters();
 
-    qint64 time;    //in microseconds since epoch
+    qint64 timestampMsec;    //in microseconds since epoch
     bool isUtc;
-    qint64 adjustedTime;
+    qint64 adjustedTimeMsec;
     QString filename;
     Qn::Corner timestampPosition;
     QnItemDewarpingParams itemDewarpingParams;
@@ -85,7 +85,7 @@ private:
     bool updateParametersFromDialog(QnScreenshotParameters &parameters);
     void takeDebugScreenshotsSet(QnMediaResourceWidget *widget);
 
-    qint64 screenshotTime(QnMediaResourceWidget *widget, bool adjust = false);
+    qint64 screenshotTimeMSec(QnMediaResourceWidget *widget, bool adjust = false);
     void takeScreenshot(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters);
 
 private:

@@ -28,7 +28,7 @@ public:
 
     virtual void pause();
     virtual void resume();
-    bool isPaused() const;
+    virtual bool isPaused() const;
     void pauseDelay();
 
     void smartSleep(int ms);

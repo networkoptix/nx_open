@@ -14,6 +14,9 @@
 #include <ui/style/warning_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include <utils/license_usage_helper.h>
 
 QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
@@ -22,6 +25,7 @@ QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
     m_valid(true)
 {
     ui->setupUi(this);
+    setHelpTopic(this, Qn::Videowall_Attach_Help);
     connect(ui->manageWidget, &QnVideowallManageWidget::itemsChanged, this, [this]{
         if (!m_videowall)
             return;

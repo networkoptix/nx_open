@@ -118,6 +118,17 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
+    QString examples = 
+        lit(
+        "<html><head/><body><p>%1</p>\
+        <p><b>192.168.1.15</b></p>\
+        <p><b>www.example.com:8080</b></p>\
+        <p><b>rtsp://example.com:554/video</b></p>\
+        </body></html>")
+        .arg(tr("Examples:"));
+
+    ui->singleCameraLineEdit->setToolTip(examples);
+
     setHelpTopic(this, Qn::ManualCameraAddition_Help);
 
     m_header = new QnCheckBoxedHeaderView(this);
@@ -389,8 +400,8 @@ bool QnCameraAdditionDialog::ensureServerOnline() {
 
     QMessageBox::critical(this,
                           tr("Error"),
-                          tr("Server is offline.\n"\
-                             "Camera addition is possible for online servers only."));
+                          tr("Server is offline.") + L'\n'
+                        + tr("Camera addition is possible for online servers only."));
     return false;
 }
 
@@ -632,7 +643,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
             QMessageBox::information(
                 this,
                 tr("Success"),
-                tr("%n camera(s) added successfully.\nIt might take a few moments to populate them in the tree.", "", urls.size()),
+                tr("%n cameras added successfully.", "", urls.size()) + L'\n' + tr("It might take a few moments to populate them in the tree."),
                 QMessageBox::Ok
             );
         } else {
@@ -640,7 +651,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
                 setState(CamerasOffline);
                 return;
             }
-            QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s).", "", urls.size()));
+            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n cameras.", "", urls.size()));
         }
     }
     setState(CamerasFound);

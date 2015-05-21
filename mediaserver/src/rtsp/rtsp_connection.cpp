@@ -39,20 +39,22 @@
 #include "utils/network/tcp_listener.h"
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
+#include <utils/common/model_functions.h>
+#include "http/custom_headers.h"
 
 
 class QnTcpListener;
 
 static const QByteArray ENDL("\r\n");
 
-static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
+//static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
 
 // ------------- ServerTrackInfo --------------------
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
 
 enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
-static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
+//static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
 static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
@@ -111,11 +113,9 @@ public:
         lastPlayCSeq(0),
         quality(MEDIA_Quality_High),
         qualityFastSwitch(true),
-        prevStartTime(AV_NOPTS_VALUE),
-        prevEndTime(AV_NOPTS_VALUE),
         metadataChannelNum(7),
         audioEnabled(false),
-		wasDualStreaming(false),
+        wasDualStreaming(false),
         wasCameraControlDisabled(false),
         tcpMode(true),
         transcodedVideoSize(640, 480)
@@ -190,11 +190,9 @@ public:
     int lastPlayCSeq;
     MediaQuality quality;
     bool qualityFastSwitch;
-    qint64 prevStartTime;
-    qint64 prevEndTime;
     int metadataChannelNum;
     bool audioEnabled;
-	bool wasDualStreaming;
+    bool wasDualStreaming;
     bool wasCameraControlDisabled;
     bool tcpMode;
     QSize transcodedVideoSize;
@@ -209,7 +207,7 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStre
 {
     Q_D(QnRtspConnectionProcessor);
     Q_UNUSED(_owner)
-	d->codecId = CODEC_ID_NONE;
+    d->codecId = CODEC_ID_NONE;
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -290,11 +288,32 @@ void QnRtspConnectionProcessor::parseRequest()
 
     QString q = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
     if (q == QString("low"))
+    {
         d->quality = MEDIA_Quality_Low;
+    }
     else if (q == QString("force-high"))
+    {
         d->quality = MEDIA_Quality_ForceHigh;
+    }
+    else if( q.isEmpty() )
+    {
+        d->quality = MEDIA_Quality_High; 
+
+        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
+        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
+        if( !streamIndexStr.isEmpty() )
+        {
+            const int streamIndex = streamIndexStr.toInt();
+            if( streamIndex == 0 )
+                d->quality = MEDIA_Quality_High;
+            else if( streamIndex == 1 )
+                d->quality = MEDIA_Quality_Low;
+        }
+    }
     else
+    {
         d->quality = MEDIA_Quality_High;
+    }
     d->qualityFastSwitch = true;
     d->clientRequest.clear();
 }
@@ -315,7 +334,7 @@ bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
 QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return QHostAddress(d->socket->getPeerAddress().address.ipv4());
+    return QHostAddress(d->socket->getForeignAddress().address.ipv4());
 }
 
 void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
@@ -347,30 +366,6 @@ void QnRtspConnectionProcessor::generateSessionId()
     d->sessionId += QString::number(rand());
 }
 
-QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
-{
-    Q_D(QnRtspConnectionProcessor);
-    if (!d->mediaRes)
-        return QString(); // prevent deadlock
-
-    QMutexLocker lock(&d->mutex);
-
-    if (!d->archiveDP)
-        return QString();
-
-    qint64 endTime = d->archiveDP->endTime();
-    //bool endTimeInFuture = endTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
-    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes->toResourcePtr()))
-        endTime = DATETIME_NOW;
-
-    if (d->archiveDP->startTime() != d->prevStartTime || endTime != d->prevEndTime)
-    {
-        return getRangeStr();
-    }
-    else {
-        return QString();
-    }
-};
 
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
@@ -393,14 +388,14 @@ int QnRtspConnectionProcessor::getAVTcpChannel(int trackNum) const
         return -1;
 }
 
-RtspServerTrackInfoPtr QnRtspConnectionProcessor::getTrackInfo(int trackNum) const
+RtspServerTrackInfo* QnRtspConnectionProcessor::getTrackInfo(int trackNum) const
 {
     Q_D(const QnRtspConnectionProcessor);
     ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
     if (itr != d->trackInfo.end())
-        return itr.value();
+        return itr.value().data();
     else
-        return RtspServerTrackInfoPtr();
+        return nullptr;
 }
 
 int QnRtspConnectionProcessor::getTracksCount() const
@@ -445,22 +440,14 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     return layout ? layout->channelCount() : -1;
 }
 
-QString QnRtspConnectionProcessor::getRangeStr()
+QByteArray QnRtspConnectionProcessor::getRangeStr()
 {
     Q_D(QnRtspConnectionProcessor);
-    QString range;
+    QByteArray range;
     if (d->archiveDP) 
     {
-        if (!d->archiveDP->offlineRangeSupported())
-            d->archiveDP->open();
-        d->prevStartTime = d->archiveDP->startTime();
         qint64 archiveEndTime = d->archiveDP->endTime();
-        //bool endTimeInFuture = archiveEndTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
-        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->mediaRes->toResourcePtr()); // && !endTimeInFuture;
-        if (endTimeIsNow)
-            d->prevEndTime = DATETIME_NOW;
-        else
-            d->prevEndTime = archiveEndTime;
+        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
@@ -468,27 +455,27 @@ QString QnRtspConnectionProcessor::getRangeStr()
             if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += "now";
             else
-                range += QString::number(d->archiveDP->startTime());
+                range += QByteArray::number(d->archiveDP->startTime());
 
             range += "-";
             if (endTimeIsNow)
                 range += "now";
             else 
-                range += QString::number(archiveEndTime);
+                range += QByteArray::number(archiveEndTime);
         }
         else 
         {
             // use 'clock' attrubute. see RFC 2326
             range = "clock=";
             if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
-                range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
+                range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             else
-                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT);
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             range += "-";
-            if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes->toResourcePtr()))
+            if (QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()))
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
             else
-                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT);
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
         }
     }
     return range;
@@ -497,12 +484,16 @@ QString QnRtspConnectionProcessor::getRangeStr()
 void QnRtspConnectionProcessor::addResponseRangeHeader()
 {
     Q_D(QnRtspConnectionProcessor);
-    QString range = getRangeStr();
+    
+    if (d->archiveDP && !d->archiveDP->offlineRangeSupported())
+        d->archiveDP->open();
+
+    QByteArray range = getRangeStr();
     if (!range.isEmpty())
     {
         nx_http::insertOrReplaceHeader(
             &d->response.headers,
-            nx_http::HttpHeader( "Range", range.toLatin1() ) );
+            nx_http::HttpHeader( "Range", range ) );
     }
 };
 
@@ -706,10 +697,28 @@ int QnRtspConnectionProcessor::composeDescribe()
         d->trackInfo.insert(i, trackInfo);
         //d->encoders.insert(i, encoder);
 
+        const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(
+            d->mediaRes->toResource()->getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME ).toLatin1() );
+
+        const QUrlQuery urlQuery( d->request.requestLine.url.query() );
+        const QString& streamIndexStr = urlQuery.queryItemValue( "stream" );
+        const int mediaStreamIndex = streamIndexStr.isEmpty() ? 0 : streamIndexStr.toInt();
+
+        auto mediaStreamIter = std::find_if(
+            supportedMediaStreams.streams.cbegin(),
+            supportedMediaStreams.streams.cend(),
+            [mediaStreamIndex]( const CameraMediaStreamInfo& streamInfo ) {
+                return streamInfo.encoderIndex == mediaStreamIndex;
+            } );
+        const std::map<QString, QString>& streamParams =
+            mediaStreamIter != supportedMediaStreams.streams.cend()
+            ? mediaStreamIter->customStreamParams
+            : std::map<QString, QString>();
+
         //sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << 0 << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "a=control:trackID=" << i << ENDL;
-        QByteArray additionSDP = encoder->getAdditionSDP();
+        QByteArray additionSDP = encoder->getAdditionSDP( streamParams );
         if (!additionSDP.contains("a=rtpmap:"))
             sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;
         sdp << additionSDP;
@@ -800,7 +809,7 @@ int QnRtspConnectionProcessor::composeSetup()
                     trackInfo->clientPort = ports[0].toInt();
                     trackInfo->clientRtcpPort = ports[1].toInt();
                     if (!d->tcpMode) {
-                        if (trackInfo->openServerSocket(d->socket->getPeerAddress().address.toString())) {
+                        if (trackInfo->openServerSocket(d->socket->getForeignAddress().address.toString())) {
                             transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket->getLocalAddress().port));
                             transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalAddress().port));
                         }
@@ -895,12 +904,12 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
         if (cameraResource->isAudioEnabled() != d->audioEnabled ||
-		    cameraResource->hasDualStreaming2() != d->wasDualStreaming ||
+            cameraResource->hasDualStreaming2() != d->wasDualStreaming ||
             (!cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled)) 
         {
-			m_needStop = true;
-			d->socket->close();
-		}
+            m_needStop = true;
+            d->socket->close();
+        }
     }
 }
 
@@ -909,7 +918,7 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged()
     Q_D(QnRtspConnectionProcessor);
 
     QMutexLocker lock(&d->mutex);
-    if (d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
+    if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
         m_needStop = true;
         d->socket->close();
     }
@@ -919,12 +928,29 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
 
+    const QUrlQuery urlQuery( d->request.requestLine.url.query() );
+    QString speedStr = urlQuery.queryItemValue( "speed" );
+    if( speedStr.isEmpty() )
+        speedStr = nx_http::getHeaderValue( d->request.headers, "Speed" );
+
     if (!d->dataProcessor) {
         d->dataProcessor = new QnRtspDataConsumer(this);
-	    d->dataProcessor->pauseNetwork();
-	    d->dataProcessor->setUseRealTimeStreamingMode(!d->useProprietaryFormat);
-	    d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
-	}
+        d->dataProcessor->pauseNetwork();
+        int speed = 1;  //real time
+        if( d->useProprietaryFormat )
+        {
+            speed = QnRtspDataConsumer::MAX_STREAMING_SPEED;
+        }
+        else if( !speedStr.isEmpty() )
+        {
+            bool ok = false;
+            const int tmpSpeed = speedStr.toInt(&ok);
+            if( ok && (tmpSpeed > 0) )
+                speed = tmpSpeed;
+        }
+        d->dataProcessor->setStreamingSpeed(speed);
+        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
+    }
     else 
         d->dataProcessor->clearUnprocessedData();
 
@@ -942,11 +968,13 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
-
-                d->liveDpHi->addDataProcessor(d->dataProcessor);
-                d->liveDpHi->startIfNotRunning();
             }
         }
+        if (d->liveDpHi) {
+            d->liveDpHi->addDataProcessor(d->dataProcessor);
+            d->liveDpHi->startIfNotRunning();
+        }
+
         if (!d->liveDpLow && d->liveDpHi)
         {
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
@@ -955,13 +983,11 @@ void QnRtspConnectionProcessor::createDataProvider()
             bool canRunSecondStream = cameraRes && liveHiProvider && (cameraRes->streamFpsSharingMethod() != Qn::BasicFpsSharing || cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS);
 
             if (canRunSecondStream)
-            {
                 d->liveDpLow = camera->getLiveReader(QnServer::LowQualityCatalog);
-                if (d->liveDpLow) {
-                    d->liveDpLow->addDataProcessor(d->dataProcessor);
-                    d->liveDpLow->startIfNotRunning();
-                }
-            }
+        }
+        if (d->liveDpLow) {
+            d->liveDpLow->addDataProcessor(d->dataProcessor);
+            d->liveDpLow->startIfNotRunning();
         }
     }
     if (!d->archiveDP) {
@@ -990,9 +1016,9 @@ void QnRtspConnectionProcessor::checkQuality()
             qWarning() << "Primary stream has big fps for camera" << d->mediaRes->toResource()->getUniqueId() << ". Secondary stream is disabled.";
         }
     }
-	QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
-	if (cameraRes) {
-		d->wasDualStreaming = cameraRes->hasDualStreaming2();
+    QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
+    if (cameraRes) {
+        d->wasDualStreaming = cameraRes->hasDualStreaming2();
         d->wasCameraControlDisabled = cameraRes->isCameraControlDisabled();
     }
 }
@@ -1045,7 +1071,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         if (nx_http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
-        d->clientGuid = nx_http::getHeaderValue(d->request.headers, "x-guid");
+        d->clientGuid = nx_http::getHeaderValue(d->request.headers, Qn::GUID_HEADER_NAME);
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
         //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
@@ -1208,9 +1234,9 @@ int QnRtspConnectionProcessor::composePlay()
 int QnRtspConnectionProcessor::composeTeardown()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->mediaRes = QnMediaResourcePtr(0);
 
     d->deleteDP();
+    d->mediaRes = QnMediaResourcePtr(0);
 
     d->rtspScale = 1.0;
     d->startTime = d->endTime = 0;
@@ -1477,4 +1503,10 @@ bool QnRtspConnectionProcessor::isTcpMode() const
 {
     Q_D(const QnRtspConnectionProcessor);
     return d->tcpMode;
+}
+
+QSharedPointer<QnArchiveStreamReader> QnRtspConnectionProcessor::getArchiveDP()
+{
+    Q_D(QnRtspConnectionProcessor);
+    return d->archiveDP;
 }

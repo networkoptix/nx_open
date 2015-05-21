@@ -34,7 +34,7 @@ namespace {
         "-----END PUBLIC KEY-----";
 
     /* One analog encoder requires one license to maintain this number of cameras. */
-    const int camerasPerAnalogEncoderCount = 8;
+    const int camerasPerAnalogEncoderCount = 1;
 
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {
@@ -70,13 +70,13 @@ namespace {
 
 struct LicenseTypeInfo
 {
-    LicenseTypeInfo(): licenseType(Qn::LC_Count), allowedForEdge(0) {}
-    LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& className, bool allowedForEdge):
-        licenseType(licenseType), className(className), allowedForEdge(allowedForEdge) {}
+    LicenseTypeInfo(): licenseType(Qn::LC_Count), allowedForARM(0) {}
+    LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& className, bool allowedForARM):
+        licenseType(licenseType), className(className), allowedForARM(allowedForARM) {}
 
     Qn::LicenseType licenseType;
     QnLatin1Array className;
-    bool allowedForEdge;
+    bool allowedForARM;
 };
 
 static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
@@ -270,20 +270,9 @@ bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
     return errorCode == NoError;
 }
 
-bool checkForEdgeBox(const QString& value)
+bool checkForARMBox(const QString& value)
 {
-    const char* EDGE_BOXES[] = {
-        "isd",
-        "isd_s2",
-        "rpi"
-    };
-    QByteArray box = value.toUtf8().toLower().trimmed();
-    for (size_t i = 0; i < sizeof(EDGE_BOXES) / sizeof(char*); ++i)
-    {
-        if (box == EDGE_BOXES[i])
-            return true;
-    }
-    return false;
+    return !value.isEmpty();
 }
 
 /* 
@@ -306,19 +295,20 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
         return gotError(errCode, Expired);
     
-    bool isEdgeBox = checkForEdgeBox(info.data.box);
-    if (isEdgeBox && !licenseTypeInfo[type()].allowedForEdge)
-        return gotError(errCode, InvalidType); // strict allowed license type for EDGE devices
-#if 0
-    if (isEdgeBox && type() == Qn::LC_Edge) 
+    bool isArmBox = checkForARMBox(info.data.box);
+    if (isArmBox && !licenseTypeInfo[type()].allowedForARM)
+        return gotError(errCode, InvalidType); // strict allowed license type for ARM devices
+#if 1
+    if (isArmBox && type() == Qn::LC_Edge) 
     {
         for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
             if (license->hardwareId() == hardwareId() && license->type() == type()) 
             {
-                if (mode == VM_CheckInfo && license->key() != key())
-                    return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
+				// Only single EDGE license per ARM device is allowed
+                if (mode != VM_Regular && license->key() != key())
+                    return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid for any of special (non regular) mode
                 else if (license->key() < key())
-                    return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
+                    return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
             }
         }
     }
@@ -622,16 +612,16 @@ bool QnLicensePool::isEmpty() const
 }
 
 
-QList<QByteArray> QnLicensePool::mainHardwareIds() const {
+QVector<QByteArray> QnLicensePool::mainHardwareIds() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::compatibleHardwareIds() const {
+QVector<QByteArray> QnLicensePool::compatibleHardwareIds() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
 }
 
 QByteArray QnLicensePool::currentHardwareId() const {
-    QList<QByteArray> hwIds = mainHardwareIds();
+    QVector<QByteArray> hwIds = mainHardwareIds();
     return hwIds.isEmpty() 
         ? QByteArray() 
         : hwIds.last();

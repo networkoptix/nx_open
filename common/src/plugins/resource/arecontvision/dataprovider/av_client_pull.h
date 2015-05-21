@@ -9,6 +9,11 @@
 struct AVLastPacketSize
 {
     int x0, y0, width, height;
+
+    AVLastPacketSize()
+    :   x0(0), y0(0), width(0), height(0)
+    {
+    }
 };
 
 class QnPlAVClinetPullStreamReader : public QnClientPullMediaStreamProvider

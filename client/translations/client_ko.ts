@@ -81,10 +81,6 @@
         <translation>이벤트</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;시점&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>at</source>
         <translation>항목</translation>
     </message>
@@ -101,16 +97,20 @@
         <translation>동작</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;동작&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>&lt;Select at least one camera&gt;</source>
         <translation>&lt;최소 하나의 카메라 선택&gt;</translation>
     </message>
     <message>
         <source>Comments:</source>
         <translation>비고:</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <translation>시점</translation>
+    </message>
+    <message>
+        <source>Do</source>
+        <translation>실행</translation>
     </message>
 </context>
 <context>
@@ -146,10 +146,6 @@
 </context>
 <context>
     <name>CameraAdditionDialog</name>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;예제:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
     <message>
         <source>IP, hostname, RTSP link...</source>
         <translation></translation>
@@ -199,10 +195,6 @@
         <translation>찾는중...</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;검색된 카메라:&lt;/b&gt;</translation>
-    </message>
-    <message>
         <source>Manuf.</source>
         <translation>제조사.</translation>
     </message>
@@ -237,6 +229,10 @@
     <message>
         <source>New scan...</source>
         <translation>새로 찾기...</translation>
+    </message>
+    <message>
+        <source>Discovered Cameras:</source>
+        <translation>찾은 카메라:</translation>
     </message>
 </context>
 <context>
@@ -329,10 +325,6 @@
         <source>High quality</source>
         <translation>고화질</translation>
     </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;주의! 저 화질 설정은 낮은 해상도 이미지의 원인이 될 수 있습니다. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
     <message utf8="true">
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation>주의! 고 화질 설정은 서버의 CPU 과부하, 네트워크 연결 오류 및 기타 문제의 원인이 될 수 있습니다.</translation>
@@ -376,6 +368,14 @@
     <message>
         <source>Restore Defaults</source>
         <translation>초기값 복구</translation>
+    </message>
+    <message>
+        <source>Warning! Low quality may result in low resolution image.</source>
+        <translation>주의! 낮은 해상도는 이미지 품질이 낮은 결과를 얻을 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation>&quot;카메라 자동 설정 허용&quot; 설정은 시스템 관리에서 비활성화됩니다.</translation>
     </message>
 </context>
 <context>
@@ -673,10 +673,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>자동 정지 설정:</translation>
     </message>
     <message>
-        <source>Restart required.</source>
-        <translation>재 시작 요청.</translation>
-    </message>
-    <message>
         <source>Misc</source>
         <translation>기타</translation>
     </message>
@@ -697,10 +693,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>추가 버퍼링:</translation>
     </message>
     <message>
-        <source>Disable only if the client takes too much CPU.</source>
-        <translation>클라이언트가 너무 많은 CPU를 사용하는 경우 사용하지 않음.</translation>
-    </message>
-    <message>
         <source>Browse logs</source>
         <translation>찾기 로그</translation>
     </message>
@@ -711,6 +703,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Run application when PC boots up:</source>
         <translation>PC시작 시 자동 실행:</translation>
+    </message>
+    <message>
+        <source>Restart required</source>
+        <translation>재 시작 요청</translation>
     </message>
 </context>
 <context>
@@ -736,24 +732,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;알람/이벤트 정책 관리 열기 (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>&amp;Camera List</source>
         <translation>카메라 목록(&amp;C)</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;이벤트 로그 열기 (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;카메라 목록 열기 (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&amp;Health Monitoring</source>
@@ -836,6 +820,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Loading image... Please wait.</source>
         <translation>이미지 로딩중...기다려주세요.</translation>
+    </message>
+    <message>
+        <source>&lt;No image&gt;</source>
+        <translation>&lt;이미지 없음&gt;</translation>
     </message>
 </context>
 <context>
@@ -1088,12 +1076,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>초</translation>
     </message>
     <message>
-        <source>This option will not affect Recording Schedule.
-Recording Schedule is always based on Server Time.</source>
-        <translation>이 설정은 녹화 설정에는 영향을 미치지 않습니다.
-녹화 일정은 항시 서버 시간을 기준으로 합니다.</translation>
-    </message>
-    <message>
         <source>Background Animation</source>
         <translation>배경 효과</translation>
     </message>
@@ -1337,18 +1319,6 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QObject</name>
     <message>
-        <source>b/s</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Kb/s</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Mb/s</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Stops</source>
         <translation>정지</translation>
     </message>
@@ -1431,46 +1401,44 @@ Recording Schedule is always based on Server Time.</source>
         <translation>상세보기 복사</translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
-Built for %5-%6 with %7.&lt;br/&gt;
-</source>
+        <source>%1 uses the following external libraries:</source>
+        <translation>다음 외부 라이브러리에 %1 사용:</translation>
+    </message>
+    <message>
+        <source>OpenGL version</source>
         <translation></translation>
     </message>
     <message>
-        <source>Server at %2: v%1&lt;br/&gt;</source>
-        <translation>%2 서버: v%1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</source>
-        <translation>&lt;b&gt;서버&lt;/b&gt;에 &lt;b&gt;접속&lt;/b&gt;할 수 없습니다.&lt;br&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br/&gt;
-&lt;br /&gt;
-&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
-&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
-&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
-&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
-&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
-&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
-</source>
+        <source>OpenGL renderer</source>
         <translation></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</source>
+        <source>OpenGL vendor</source>
         <translation></translation>
     </message>
     <message>
-        <source>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br/&gt;
-&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;
-&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br/&gt;
-&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br/&gt;
-</source>
+        <source>OpenGL max texture size</source>
         <translation></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Support&lt;/b&gt;: %1</source>
-        <translation>&lt;b&gt;지원&lt;/b&gt;: %1</translation>
+        <source>Support</source>
+        <translation>지원</translation>
+    </message>
+    <message>
+        <source>Server at %2: v%1</source>
+        <translation>%2 서버 :v%1</translation>
+    </message>
+    <message>
+        <source>%1 version %2 (%3).</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Built for %1-%2 with %3.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Client is not connected to any server</source>
+        <translation>클라이언트는 어떤 서버에도 접속하지 못함</translation>
     </message>
 </context>
 <context>
@@ -1482,17 +1450,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <source>Saving...</source>
         <translation>저장중...</translation>
-    </message>
-</context>
-<context>
-    <name>QnAction</name>
-    <message>
-        <source>%n</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -2592,31 +2549,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
 </context>
 <context>
-    <name>QnAutoTester</name>
-    <message>
-        <source>Time to wait before finishing the test, in milliseconds. Default is %1.</source>
-        <translation>테스트가 완료하기 전 기다려야 하는 시간. 기본 %1.</translation>
-    </message>
-    <message>
-        <source>Substring that must be present in one of the resources.</source>
-        <translation>문자열이 반드시 하나는 있어야합니다.</translation>
-    </message>
-    <message>
-        <source>Show this help screen.</source>
-        <translation>도움말 열기.</translation>
-    </message>
-    <message>
-        <source>All tests completed successfully.
-</source>
-        <translation>모든 테스트 완료.</translation>
-    </message>
-    <message>
-        <source>Test for resource substring &apos;%1&apos; failed.
-</source>
-        <translation>리소스에서 &apos;%1&apos; 문자열에 대한 테스트가 실패하였습니다.</translation>
-    </message>
-</context>
-<context>
     <name>QnBlinkingImageButtonWidget</name>
     <message>
         <source>You have new notifications</source>
@@ -2831,12 +2763,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>규칙 초기화 확인</translation>
     </message>
     <message>
-        <source>Are you sure you want to reset rules to the defaults?
-This action CANNOT be undone!</source>
-        <translation>규칙을 기본값으로 초기화 합니까?
-이 동작은 원상태로 돌려 질 수 없습니다!</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>오류</translation>
     </message>
@@ -2879,6 +2805,14 @@ This action CANNOT be undone!</source>
     <message>
         <source>Some rules are not valid. Should they be disabled?</source>
         <translation>약간의 규칙은 유효하지 않습니다. 비활성화 하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to reset rules to the defaults?</source>
+        <translation>규칙을 기본값으로 다시 설정하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation>이 작업은 취소할 수 없음!</translation>
     </message>
 </context>
 <context>
@@ -2931,12 +2865,6 @@ This action CANNOT be undone!</source>
         <translation>오류</translation>
     </message>
     <message>
-        <source>Server is offline.
-Camera addition is possible for online servers only.</source>
-        <translation>서버가 오프라인입니다.
-카메라 등록은 서버가 연결된 상태에서만 가능합니다.</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>완료</translation>
     </message>
@@ -2980,20 +2908,6 @@ Camera addition is possible for online servers only.</source>
         <source>Success</source>
         <translation>성공</translation>
     </message>
-    <message numerus="yes">
-        <source>%n camera(s) added successfully.
-It might take a few moments to populate them in the tree.</source>
-        <translation>
-            <numerusform>%n 카메라 추가를 성공하였습니다.
-목록에 등록하는 동안 일정 시간이 소요됩니다.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Error while adding camera(s).</source>
-        <translation>
-            <numerusform>%n 카메라를 추가하는 동안 오류가 발생함.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Server went offline, search aborted.</source>
         <translation>서버가 오프라인되어, 검색이 중단됨.</translation>
@@ -3034,15 +2948,37 @@ It might take a few moments to populate them in the tree.</source>
         <source>Select target server...</source>
         <translation>대상 서버 선택...</translation>
     </message>
+    <message>
+        <source>Examples:</source>
+        <translation>예시:</translation>
+    </message>
+    <message>
+        <source>Server is offline.</source>
+        <translation>오프라인.</translation>
+    </message>
+    <message>
+        <source>Camera addition is possible for online servers only.</source>
+        <translation>카메라 추가는 온라인 서버에서만 가능합니다.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras added successfully.</source>
+        <translation>
+            <numerusform>%n 카메라 추가 성공.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>It might take a few moments to populate them in the tree.</source>
+        <translation>목록에 추가하는데 시간이 소요됩니다.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding %n cameras.</source>
+        <translation>
+            <numerusform>%n 카메라를 추가하는 동안 오류 발생.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
-    <message>
-        <source>Please wait while settings are being loaded.
-This can take a lot of time.</source>
-        <translation>설정을 읽는 동안 잠시 기다려주십시오.
-시간이 많이 소요될 수 있습니다.</translation>
-    </message>
     <message>
         <source>Applying settings...</source>
         <translation>설정 적용 중...</translation>
@@ -3063,6 +2999,14 @@ This can take a lot of time.</source>
         <source>Failed to save the following parameters (%1):
 %2</source>
         <translation>현재의 변수의 적용에 실패하였습니다 (%1): %2</translation>
+    </message>
+    <message>
+        <source>Please wait while settings are being loaded.</source>
+        <translation>설정을 불러오는 동안 잠시 기다려주세요.</translation>
+    </message>
+    <message>
+        <source>This can take a lot of time.</source>
+        <translation>많은 시간이 소요될 수 있습니다.</translation>
     </message>
 </context>
 <context>
@@ -3442,16 +3386,6 @@ This can take a lot of time.</source>
         <translation>입력된 로그인 또는 비밀번호가 맞지 않습니다, 다시 시도해 주세요.</translation>
     </message>
     <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation>서버 연결이 되지 않습니다.
-입력 정보가 올바르지 않으니, 다시 시도하여 주십시오.
-
-만약 오류가 지속될 경우, 관리자에게 문의하여 주십시오.</translation>
-    </message>
-    <message>
         <source>You are trying to connect to incompatible Server.</source>
         <translation>호환되지 않는 서버입니다.</translation>
     </message>
@@ -3468,96 +3402,96 @@ If this error persists, please contact your VMS administrator.</source>
         <translation>클라이언트</translation>
     </message>
     <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
-        <translation>연결하려는 서버의 버젼이 맞지 않습니다:
- - Client version: %1.
- - Server version: %2.
-이 버젼과는 호환되지 않습니다. %3로 업데이트 바랍니다</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation>연결하려는 서버의 버젼이 맞지 않습니다:
- - Client version: %1.
- - Server version: %2.
-%3 보다 낮은 버젼에 대한 호환성 모드는 지원하지 않습니다.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-An error has occurred while trying to restart in compatibility mode.</source>
-        <translation>선택된 서버의 버젼이 다릅니다:
- - Client version: %1.
- - Server version: %2.
-다시 시작하는 동안 호환성 모드에서 오류가 발생하였습니다.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - EC version: %2.
-You need to download client %3 to connect</source>
-        <translation>선택된 서버의 버젼이 다릅니다:
- - Client version: %1.
- - EC version: %2.
-%3에 연결하여 클라리언트를 다운 받드십시오</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation>선택된 서버의 버젼이 다릅니다:
- - Client version: %1.
- - Server version: %2.
-서버에 연결하기 위해 클라이언트의 다른 버젼이 필요합니다.</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Client version %3 is required to connect to this Server.
-Download version %3?</source>
-        <translation>연결하려는 서버의 버젼이 맞지 않습니다:
- - Client version: %1.
- - Server version: %2.
-서버를 연결하기 위해 %3 버젼의 클라이언트가 필요합니다.
-%3 버젼을 다운받으시겠습니까?</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Would you like to restart the Client in compatibility mode?</source>
-        <translation>연결하려는 서버의 버젼이 맞지 않습니다:
- - Client version: %1.
- - Server version: %2.
-호환성 모드로 재 시작 하시겠습니까?</translation>
-    </message>
-    <message>
         <source>Launcher process is not found</source>
         <translation>시작 프로세서를 찾을 수 없음</translation>
-    </message>
-    <message>
-        <source>Cannot restart the Client in compatibility mode.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>호환성 모드로 재시작 할 수 없습니다.
-프로그램을 닫으신 후에 시작 메뉴의 바로가기를 사용하여 다시 시작하십시오.</translation>
     </message>
     <message>
         <source>Failure</source>
         <translation>실패</translation>
     </message>
     <message>
-        <source>Failed to launch compatibility version %1
-Try to restore version %1?</source>
-        <translation>호환성 버젼 %1을 시작하는데 실패하였습니다
-%1 버젼으로 복원하시겠습니까?</translation>
+        <source>Connection to the Server could not be established.</source>
+        <translation>서버에 연결을 설정할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Connection details that you have entered are incorrect, please try again.</source>
+        <translation>연결 정보 입력이 유효하지 않습니다, 다시 시도해 주세요.</translation>
+    </message>
+    <message>
+        <source>If this error persists, please contact your VMS administrator.</source>
+        <translation>오류가 지속될 경우, 관리자에게 문의하시기 바랍니다.</translation>
+    </message>
+    <message>
+        <source> - Client version: %1.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source> - Server version: %1.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Server which has a different version:</source>
+        <translation>연결하려는 서버의 버전이 다름:</translation>
+    </message>
+    <message>
+        <source>These versions are not compatible. Please update your %1.</source>
+        <translation>호환되지 않는 버젼입니다.%1 의 업데이트가 필요합니다.</translation>
+    </message>
+    <message>
+        <source>Compatibility mode for versions lower than %1 is not supported.</source>
+        <translation>%1 보다 낮은 버젼은 호환성 모드를 지원하지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Selected Server has a different version:</source>
+        <translation>선택된 서버의 버젼이 다름:</translation>
+    </message>
+    <message>
+        <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
+        <translation>다른 버전의 클라이언트는 이 서버에 연결을 설정하기 위해 필요합니다.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to restart in compatibility mode.</source>
+        <translation>호환성 모드에서 다시 시작하는 동안 오류가 발생 하였습니다.</translation>
+    </message>
+    <message>
+        <source>Client version %1 is required to connect to this Server.</source>
+        <translation>이 서버에 접속하려면 %1 클라이언트의 버전이 필요합니다.</translation>
+    </message>
+    <message>
+        <source>Download version %1?</source>
+        <translation>다운로드 버전 %1?</translation>
+    </message>
+    <message>
+        <source>Would you like to restart the Client in compatibility mode?</source>
+        <translation>호환성 모드에서 클라이언트를 다시 시작하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>Cannot restart the Client in compatibility mode.</source>
+        <translation>호환성 모드에서 클라이언트를 다시 시작할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>프로그램을 닫아주세요, 그리고 시작메뉴의 바로가기를 통해 다시 시작해 주세요.</translation>
+    </message>
+    <message>
+        <source>Failed to launch compatibility version %1</source>
+        <translation>%1 호환성 버젼의 시작을 실패하였습니다</translation>
+    </message>
+    <message>
+        <source>Try to restore version %1?</source>
+        <translation>%1 버전으로 복원하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>Server has a different version:</source>
+        <translation>다른 버전의 서버:</translation>
+    </message>
+    <message>
+        <source>You will be asked to restart the client in compatibility mode.</source>
+        <translation>호환성 모드에서 클라이언트를 다시 시작해야 합니다.</translation>
+    </message>
+    <message>
+        <source>You will be asked to update your %1</source>
+        <translation>%1로의 업데이트가 필요함</translation>
     </message>
 </context>
 <context>
@@ -3565,63 +3499,6 @@ Try to restore version %1?</source>
     <message>
         <source>Request timed out.</source>
         <translation>요청 시간 초과.</translation>
-    </message>
-    <message>
-        <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation>입력된 로그인 또는 비밀번호가 맞지 않습니다, 다시 시도해 주세요.</translation>
-    </message>
-    <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation>서버 연결이 되지 않습니다.
-입력 정보가 올바르지 않으니, 다시 시도하여 주십시오.
-
-만약 오류가 지속될 경우, 관리자에게 문의하여 주십시오.</translation>
-    </message>
-    <message>
-        <source>You are trying to connect to incompatible Server.</source>
-        <translation>호환되지 않는 서버입니다.</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation>서버 버젼이 맞지 않습니다.
- - Client version: %1.
- - Server version: %2.
-%3 보다 낮은 버젼에 대한 호환성 모드는 지원하지 않습니다.</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-You will be asked to restart the client in compatibility mode.</source>
-        <translation>서버의 버젼이 맞지 않습니다:
- - Client version: %1.
- - Server version: %2.
-호환성 모드에서 다시 시작하라는 메시지가 표시 됩니다.</translation>
-    </message>
-    <message>
-        <source>Server</source>
-        <translation>서버</translation>
-    </message>
-    <message>
-        <source>Client</source>
-        <translation>클라이언트</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
-        <translation>서버의 버젼이 맞지 않습니다 :
- - Client version: %1.
- - Server version: %2.
-
-이 버젼은 호환되지 않습니다. %3 버젼으로 업데이트 하세요</translation>
     </message>
     <message>
         <source>Success</source>
@@ -3675,8 +3552,7 @@ These versions are not compatible. Please update your %3</source>
     </message>
     <message>
         <source>Database backup is being downloaded from the server. Please wait.</source>
-        <translation>데이터베이스 백업 서버에 다운로드 되고 있습니다. 잠시만 기다려주세요.
-</translation>
+        <translation>데이터베이스 백업이 서버로부터 다운로드 되고 있습니다. 잠시만 기다려주세요.</translation>
     </message>
     <message>
         <source>Information</source>
@@ -3869,15 +3745,6 @@ These versions are not compatible. Please update your %3</source>
         <translation>움직임 영상</translation>
     </message>
     <message>
-        <source>
-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source> (%1 times)</source>
-        <translation>(%1 번)</translation>
-    </message>
-    <message>
         <source>Date/Time</source>
         <translation>날짜/시간</translation>
     </message>
@@ -3908,6 +3775,10 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <source>Administrators Only</source>
         <translation>관리자만</translation>
+    </message>
+    <message>
+        <source>%1 times</source>
+        <translation>%1 회</translation>
     </message>
 </context>
 <context>
@@ -3970,6 +3841,25 @@ These versions are not compatible. Please update your %3</source>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation>&apos;%1&apos; 폴더가 존재하지 않습니다.</translation>
     </message>
+    <message>
+        <source>Disable only if the client takes too much CPU</source>
+        <translation>너무 많은 CPU를 사용하는 경우 비활성화</translation>
+    </message>
+</context>
+<context>
+    <name>QnGeneralSystemAdministrationWidget</name>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation>알람/이벤트 규칙 관리메뉴 열기</translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation>이벤트 로그 열기</translation>
+    </message>
+    <message>
+        <source>Open Camera List</source>
+        <translation>카메라 목록 열기</translation>
+    </message>
 </context>
 <context>
     <name>QnGenericTabbedDialog</name>
@@ -3982,9 +3872,8 @@ These versions are not compatible. Please update your %3</source>
         <translation>종료 및 확인</translation>
     </message>
     <message>
-        <source>Unsaved changes will be lost. Save the following pages?
-</source>
-        <translation>저장되지 않은 변경 사항이 손실되었습니다. 이 페이지를 저장하시겠습니까?</translation>
+        <source>Unsaved changes will be lost. Save the following pages?</source>
+        <translation>저장을 선택하지 않으면 변경 값이 손실됩니다. 아래 설정을 저장하시겠습니까?</translation>
     </message>
 </context>
 <context>
@@ -4062,28 +3951,16 @@ These versions are not compatible. Please update your %3</source>
         <translation>%1의 내보내기 파일을 만들 수 없습니다</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%2&quot;...</source>
-        <translation>&quot;%2&quot;로 내보내기...</translation>
-    </message>
-    <message>
         <source>Could not export camera %1</source>
         <translation>%1 카메라를 내보낼 수 없습니다</translation>
+    </message>
+    <message>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation>&quot;%1&quot;로 내보내기...</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
-    <message>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;이미지 없음&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be loaded&gt;</source>
-        <translation>&lt;이미지를 읽어올 수 없음&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be uploaded&gt;</source>
-        <translation>&lt;이미지를 업로드 할 수 없음&gt;</translation>
-    </message>
     <message>
         <source>Select file...</source>
         <translation>파일선택...</translation>
@@ -4091,6 +3968,38 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <source>Pictures %1</source>
         <translation>사진 %1</translation>
+    </message>
+    <message>
+        <source>&lt;No picture&gt;</source>
+        <translation>&lt;사진 없음&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Error while loading picture&gt;</source>
+        <translation>&lt;사진 로딩 중 오류&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Error while uploading picture&gt;</source>
+        <translation>&lt;사진 업데이트 중 오류&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be read&gt;</source>
+        <translation>&lt;사진파일을 읽을 수 없음&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
+        <translation>&lt;사진의 사이즈가 너무 큽니다. 최대 크기는 %1 Mb 입니다.&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be loaded&gt;</source>
+        <translation>&lt;사진을 읽어오지 못합니다.&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutTabBar</name>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>%1 사용자의 화면</translation>
     </message>
 </context>
 <context>
@@ -4196,39 +4105,8 @@ These versions are not compatible. Please update your %3</source>
         <translation>해당 프로그램의 인증키 :</translation>
     </message>
     <message>
-        <source>
-%1 %2</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>
-At least %n %2 are required</source>
-        <translation>
-            <numerusform>최소 %2 또는 %n이 필요함</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>
-%n %2 are currently in use</source>
-        <translation>
-            <numerusform>%n %2 현재 사용 중입니다</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Obtaining licenses from Server...</source>
         <translation>서버로부터 인증키를 얻어오는 중...</translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial or trial license.</source>
-        <translation>유효하지 않은 인증키 입니다.
-구매하신 또는 평가판 인증키를 등록하십시오.</translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial license.</source>
-        <translation>유효하지 않은 인증키입니다.
-구매하신 인증키를 등록하십시오.</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
@@ -4287,10 +4165,40 @@ Please activate your commercial license.</source>
         <translation>인증이 완료 되었습니다.</translation>
     </message>
     <message>
-        <source>Network error has occurred during automatic license activation.
-Try to activate your license manually.</source>
-        <translation>자동 인증키 활성화 하는 동안 네트워크 오류가 발생하였습니다.
-수동 인증 방식을 사용하세요.</translation>
+        <source>%1 %2</source>
+        <translation>%1 %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %2 are required</source>
+        <translation>
+            <numerusform>최소한 %n %2 이 필요함</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %2 are currently in use</source>
+        <translation>
+            <numerusform>%n %2 현재 사용 중</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed.</source>
+        <translation>유효한 인증키가 설치 되어있지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Please activate your commercial or trial license.</source>
+        <translation>정식판 또는 평가판의 인증키를 입력하여 주세요.</translation>
+    </message>
+    <message>
+        <source>Please activate your commercial license.</source>
+        <translation>정식판의 인증키를 입력하여 주십시오.</translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation.</source>
+        <translation>자동 키 인증 중 네트워크의 오류가 발생하였습니다.</translation>
+    </message>
+    <message>
+        <source>Try to activate your license manually.</source>
+        <translation>수동으로 인증키를 활성화 합니다.</translation>
     </message>
 </context>
 <context>
@@ -4418,10 +4326,8 @@ Try to activate your license manually.</source>
         <translation>연결 정보 삭제</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete the connection
-%1?</source>
-        <translation>연결 정보를 삭제하시겠습니까
-%1?</translation>
+        <source>Are you sure you want to delete this connection: %1?</source>
+        <translation>연결을 삭제하시겠습니까: %1?</translation>
     </message>
 </context>
 <context>
@@ -4482,6 +4388,10 @@ Try to activate your license manually.</source>
         <source>Crop</source>
         <translation>잘라내기</translation>
     </message>
+    <message>
+        <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
+        <translation>이 옵션은 저장 일정에 영향을 주지 않습니다. 저장 일정은 항상 서버 시간을 기준으로 합니다.</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
@@ -4522,10 +4432,6 @@ Try to activate your license manually.</source>
         <translation>고-해상도</translation>
     </message>
     <message>
-        <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7</translation>
-    </message>
-    <message>
         <source>LIVE</source>
         <translation>라이브</translation>
     </message>
@@ -4555,16 +4461,6 @@ Try to activate your license manually.</source>
     <message>
         <source>The new system will have password and name from the system:</source>
         <translation>새 시스템은 시스템에서 암호와 이름을 갖게 됨:</translation>
-    </message>
-    <message>
-        <source>Success!
-
-The system was configured successfully.
-The servers from the remote system should appear in your system soon.</source>
-        <translation>성공!
-
-시스템의 설정이 완료되었습니다.
-원격 시스템에서 서버는 곧 시스템에 표시됩니다.</translation>
     </message>
     <message>
         <source>http(s)://host:port</source>
@@ -4633,6 +4529,18 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <source>Cannot merge systems.</source>
         <translation>시스템 조정을 할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Success!</source>
+        <translation>성공!</translation>
+    </message>
+    <message>
+        <source>The system was configured successfully.</source>
+        <translation>시스템의 설정을 완료함.</translation>
+    </message>
+    <message>
+        <source>The servers from the remote system should appear in your system soon.</source>
+        <translation>원격 시스템에서 서버는 곧 표시 됩니다.</translation>
     </message>
 </context>
 <context>
@@ -4720,6 +4628,21 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
 </context>
 <context>
+    <name>QnNetworkSpeedStrings</name>
+    <message>
+        <source>b/s</source>
+        <translation>b/s</translation>
+    </message>
+    <message>
+        <source>Kb/s</source>
+        <translation>Kb/s</translation>
+    </message>
+    <message>
+        <source>Mb/s</source>
+        <translation>Mb/s</translation>
+    </message>
+</context>
+<context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
         <source>%n more item(s)</source>
@@ -4763,10 +4686,6 @@ The servers from the remote system should appear in your system soon.</source>
         <translation>%1초 까지 음원 클립</translation>
     </message>
     <message>
-        <source>Custom Title:</source>
-        <translation>사용자 타이틀:</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>오류</translation>
     </message>
@@ -4794,6 +4713,10 @@ The servers from the remote system should appear in your system soon.</source>
         <source>Confirm file deletion</source>
         <translation>파일 삭제 확인</translation>
     </message>
+    <message>
+        <source>Custom title:</source>
+        <translation>사용자 표제:</translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundModel</name>
@@ -4817,8 +4740,12 @@ The servers from the remote system should appear in your system soon.</source>
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
-        <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
-        <translation>닫기 (&lt;b&gt;우측 클릭&lt;/b&gt;)</translation>
+        <source>Close</source>
+        <translation>닫기</translation>
+    </message>
+    <message>
+        <source>Right Click</source>
+        <translation>우측 클릭</translation>
     </message>
 </context>
 <context>
@@ -4873,14 +4800,18 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
 </context>
 <context>
-    <name>QnPerformance</name>
+    <name>QnPerformanceTest</name>
+    <message>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <translation>시스템의 성능은 설정 모드의 %1 동작에서만 허용한다.</translation>
+    </message>
+    <message>
+        <source>For full-featured mode please use another computer.</source>
+        <translation>전체 기능 모드 사용을 위해 다른 시스템을 이용해 주세요.</translation>
+    </message>
     <message>
         <source>Warning</source>
         <translation>주의</translation>
-    </message>
-    <message>
-        <source>Performance of this computer allows running %1 in configuration mode only. For full-featured mode please use another computer.</source>
-        <translation>이 시스템의 성능 상 %1 카메라의 설정만을 지원합니다. 모든 기능을 사용하시려면 다른 시스템을 사용하여 주시기 바랍니다.</translation>
     </message>
 </context>
 <context>
@@ -4921,20 +4852,20 @@ The servers from the remote system should appear in your system soon.</source>
         <translation>응용 프로그램을 다시 시작한 후에 변경 내용이 적용 됩니다.프로그램을 다시 시작하시겠습니까?</translation>
     </message>
     <message>
-        <source>Settings file is read-only. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation>Settings file is read-only. Please contact your system administrator.
-All changes will be lost after program exit.</translation>
-    </message>
-    <message>
-        <source>Settings cannot be saved. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation>설정은 저장할 수 없습니다. 시스템 관리자에 게 문의 하시기 바랍니다.
-모든 변경 내용이 프로그램 종료 후 손실 됩니다.</translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation>정보</translation>
+    </message>
+    <message>
+        <source>Settings file is read-only. Please contact your system administrator.</source>
+        <translation>설정파일은 읽기 전용입니다. 시스템 관리자에게 문의하세요.</translation>
+    </message>
+    <message>
+        <source>All changes will be lost after program exit.</source>
+        <translation>모든 변경 항목은 프로그램 종료 후에 손실됩니다.</translation>
+    </message>
+    <message>
+        <source>Settings cannot be saved. Please contact your system administrator.</source>
+        <translation>설정을 저장하지 못했습니다. 시스템 관리자에게 문의하세요.</translation>
     </message>
 </context>
 <context>
@@ -4951,34 +4882,12 @@ All changes will be lost after program exit.</source>
         <translation>카메라 위치를 가져올 수 없음</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>%1 카메라에서 현 위치를 가져오는 동안 오류가 발생하였습니다.
-
-카메라가 온라인으로 전환될 때까지 기다려 주십시오.</translation>
-    </message>
-    <message>
         <source>Could not set position for camera</source>
         <translation>카메라의 위치를 설정할 수 없음</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>%1 카메라에서 현 위치를 설정하는 동안 오류가 발생하였습니다.
-
-카메라가 온라인으로 전환될 때까지 기다려 주십시오.</translation>
-    </message>
-    <message>
         <source>Remove preset</source>
         <translation>프리셋 삭제</translation>
-    </message>
-    <message>
-        <source>This preset is used in some tours.
-These tours will become invalid if you remove it.</source>
-        <translation>몇몇 투어에서 이 프리셋을 사용합니다.
-제거할 경우 설정하신 투어는 사용되지 않습니다.</translation>
     </message>
     <message>
         <source>Do not show again.</source>
@@ -4995,6 +4904,26 @@ These tours will become invalid if you remove it.</source>
     <message>
         <source>Changes are not saved. Do you want to save them?</source>
         <translation>변경사항이 저장되지 않았습니다. 저장하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>This preset is used in some tours.</source>
+        <translation>이 프리셋은 몇몇 투어설정에서 사용합니다.</translation>
+    </message>
+    <message>
+        <source>These tours will become invalid if you remove it.</source>
+        <translation>만약 삭제할 경우 이 투어는 잘못 동작할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation>%1 카메라의 현재 위치를 가져오는 동안 오류가 발생하였습니다.</translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation>카메라를 연결하는 동안 잠시 기다려주세요.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
+        <translation>%1 카메라의 현재 위치를 설정하는 동안 오류가 발생하였습니다.</translation>
     </message>
 </context>
 <context>
@@ -5435,20 +5364,6 @@ These tours will become invalid if you remove it.</source>
         <translation>주의</translation>
     </message>
     <message>
-        <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation>보관소의 재 동기화 루틴을 실행하려고합니다.
-주의! 재 동기화 진행 중 하드 디스크 사용량이 증가할 것입니다. 저장소의 전체 크기에 따라 폴더 이동, 이름변경 또는 기타 교체의 과정에는 몇 시간이 걸릴 수 있습니다.
-데이터를 잃지 않고 작업을 다쉬 취소할 수 있습니다. 계속 하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>Rebuild archive index</source>
-        <translation>인덱스 보관소 재정비</translation>
-    </message>
-    <message>
-        <source>Fast initial scan in progress</source>
-        <translation>진행의 빠른 초기 검색</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>완료</translation>
     </message>
@@ -5475,6 +5390,30 @@ These tours will become invalid if you remove it.</source>
     <message>
         <source>Add external Storage...</source>
         <translation>외부 저장 장치 추가...</translation>
+    </message>
+    <message>
+        <source>You are about to launch the archive re-synchronization routine.</source>
+        <translation>저장기의 재동기화 절차가 시행 될 것입니다.</translation>
+    </message>
+    <message>
+        <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
+        <translation>주의! 재 동기화가 진행되는 동안 하드 디스크 사용량이 증가 됩니다. 저장기 전체 크기에 따라 몇 시간이 소요될 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
+        <translation>현 진행은 보관 폴더의 이동, 변경 및 교체를 할 경우 필요합니다. 데이터 손실 없이 작업의 재 구성을 위해 취소 할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to continue?</source>
+        <translation>계속 진행 하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
+        <translation>저장기 인덱스 재 구성이 &apos;%1&apos; 진행 중 입니다</translation>
+    </message>
+    <message>
+        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
+        <translation>저장기의 빠른 스캔이 &apos;%1&apos; 진행 중</translation>
     </message>
 </context>
 <context>
@@ -5603,12 +5542,6 @@ These tours will become invalid if you remove it.</source>
         <translation>오류</translation>
     </message>
     <message>
-        <source>Cannot cancel update at this state.
-Please wait until update is finished</source>
-        <translation>현재 취소할 수 없는 상태입니다.
-업데이트가 완료 될 때까지 잠시 기다려 주세요</translation>
-    </message>
-    <message>
         <source>Update finished... 100%</source>
         <translation>업데이트 완료... 100%</translation>
     </message>
@@ -5635,12 +5568,6 @@ Please wait until update is finished</source>
     <message>
         <source>Launcher process is not found</source>
         <translation>시작 프로세서를 찾을 수 없음</translation>
-    </message>
-    <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>클라이언트를 다시 시작할 수 없습니다.
-응용 프로그램을 종료 하고 시작 메뉴에 바로가기를 사용하여 다시 시작 하십시오.</translation>
     </message>
     <message>
         <source>Update cancelled</source>
@@ -5770,6 +5697,26 @@ Please close the application and start it again using the shortcut in the start 
         <source>Installing updates... %1%</source>
         <translation>업데이트 설치 중... %1%</translation>
     </message>
+    <message>
+        <source>Cannot cancel update at this state.</source>
+        <translation>현 상태에서는 업데이트를 취소할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Please wait until update is finished</source>
+        <translation>업데이트가 완료 될때까지 잠시 기다려주세요</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation>클라이언트를 재 시작할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>프로그램을 닫아주세요, 그리고 시작메뉴의 바로가기를 통해 다시 시작해 주세요.</translation>
+    </message>
+    <message>
+        <source>Check for updates automatically</source>
+        <translation>자동 업데이트 체크</translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -5841,10 +5788,12 @@ Please close the application and start it again using the shortcut in the start 
         <translation>모션 영역 초기화 확인</translation>
     </message>
     <message>
-        <source>Are you sure you want to reset motion regions to the defaults?
-This action CANNOT be undone!</source>
-        <translation>모션영역을 재 설정 하시겠습니까?
-이 작업을 취소할 수 없습니다.!</translation>
+        <source>Are you sure you want to reset motion regions to the defaults?</source>
+        <translation>모션 영역 설정을 기본설정으로 변경 하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation>이 작업을 취소할 수 없음!</translation>
     </message>
 </context>
 <context>
@@ -5981,6 +5930,22 @@ This action CANNOT be undone!</source>
         <source>Provided storage path does not define a valid external storage.</source>
         <translation>외부 저장소 정보가 유효하지 않아 저장 경로를 사용할 수 없습니다.</translation>
     </message>
+    <message>
+        <source>Windows Network Shared Resource</source>
+        <translation>윈도우 네트워크 공유 리스소</translation>
+    </message>
+    <message>
+        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
+        <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+    </message>
+    <message>
+        <source>Coldstore Network Storage</source>
+        <translation>Coldstore Network Storage</translation>
+    </message>
+    <message>
+        <source>coldstore://&lt;Address&gt;</source>
+        <translation>coldstore://&lt;Address&gt;</translation>
+    </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
@@ -6062,99 +6027,116 @@ This action CANNOT be undone!</source>
 <context>
     <name>QnTimeSlider</name>
     <message>
-        <source>NO THUMBNAILS
-AVAILABLE</source>
-        <translation>미리보기 제거
-사용</translation>
-    </message>
-    <message>
-        <source>ms</source>
-        <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <source>NO THUMBNAILS AVAILABLE</source>
+        <translation>가능한 미리보기 없음</translation>
     </message>
     <message>
         <source>auto</source>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <comment>AM/PM usage based on user&apos;s system locale.</comment>
+        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>자동</translation>
     </message>
     <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>ms</translation>
+    </message>
+    <message>
         <source>s</source>
-        <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Suffix for displaying seconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>s</translation>
     </message>
     <message>
         <source>m</source>
-        <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Suffix for displaying minutes on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>m</translation>
     </message>
     <message>
         <source>h</source>
-        <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Suffix for displaying hours on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>h</translation>
     </message>
     <message>
         <source>d</source>
-        <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Suffix for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>d</translation>
     </message>
     <message>
         <source>M</source>
-        <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Suffix for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>M</translation>
     </message>
     <message>
         <source>y</source>
-        <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Suffix for displaying years on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>y</translation>
     </message>
     <message>
         <source>dd MMMM</source>
-        <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
-        <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
-----------
-Format for displaying year caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying years on timeline</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>MINUTES</comment>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>HOURS</comment>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>yyyy</translation>
     </message>
 </context>
 <context>
@@ -6539,26 +6521,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>Enter new name for the selected item:</source>
         <translation>선택된 항목에 대한 새 이름 설정: </translation>
     </message>
-    <message numerus="yes">
-        <source>These %n cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>%n 카메라가 자동으로 찾아졌습니다.
-이 카메라들은 삭제 후에도 다시 자동으로 찾아집니다.
-삭제하시겠습니까?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these %1 cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>%1 카메라 중 %n 이 자동으로 찾아졌습니다.
-이 카메라들은 삭제 후에도 다시 자동으로 찾아집니다.
-삭제하시겠습니까?</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Delete Resources</source>
         <translation>리소스 삭제</translation>
@@ -6568,14 +6530,6 @@ Are you sure you want to delete them?</source>
         <translation>
             <numerusform>%n 아이템들을 저장 할 수 없습니다.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. 
-
-Error description: &apos;%2&apos;</source>
-        <translation>서버의 리소스 삭제를 시도하는 동안 오류가 발생했습니다.
-
-오류 내용: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Server v%1 at %2&lt;br/&gt;</source>
@@ -6612,12 +6566,6 @@ Error description: &apos;%2&apos;</source>
         <translation>시작프로세서를 찾을 수 없음</translation>
     </message>
     <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>클라이언트를 다시 시작할 수 없습니다.
-응용 프로그램을 종료 하고 시작 메뉴에 바로가기를 사용하여 다시 시작 하십시오.</translation>
-    </message>
-    <message>
         <source>User Settings</source>
         <translation>사용자 설정</translation>
     </message>
@@ -6628,10 +6576,6 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation>이미지 처리 시간이 많이 걸릴 수 있습니다. 기다려 주십시오.</translation>
-    </message>
-    <message>
-        <source>Image cannot be uploaded</source>
-        <translation>이미지를 업로드 할 수 없음</translation>
     </message>
     <message>
         <source>Could not delete resource</source>
@@ -6654,6 +6598,50 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <source>New layout</source>
         <translation>새 레이아웃</translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n cameras are auto-discovered.</source>
+        <translation>
+            <numerusform>자동 검색을 통해 %n 카메라가 검색되었습니다.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>They may be auto-discovered again after removing.</source>
+        <translation>목록 삭제 후 자동 검색을 통해 다시 검색될 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete them?</source>
+        <translation>삭제 하시겠습니까?</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these %1 cameras are auto-discovered.</source>
+        <translation>
+            <numerusform>%1 카메라의 %n 이 자동 검색 되었습니다.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to delete a resource from Server. </source>
+        <translation>서버로 부터 리소스의 삭제를 시도하는 동안 오류가 발생하였습니다.</translation>
+    </message>
+    <message>
+        <source>Error description: &apos;%1&apos;</source>
+        <translation>오류 설명: &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation>클라이언트를 재 시작할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>프로그램을 닫아주세요, 그리고 시작메뉴의 바로가기를 통해 다시 시작해 주세요.</translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation>사진이 너무 큽니다. 최대 사이즈는 %1 Mb 입니다</translation>
+    </message>
+    <message>
+        <source>Error while uploading picture.</source>
+        <translation>사진을 업로드 하는 동안 오류가 발생하였습니다.</translation>
     </message>
 </context>
 <context>
@@ -6786,14 +6774,6 @@ Please close the application and start it again using the shortcut in the start 
         <translation>주의</translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation>총 30분 이상을 데이터를 여러개의 연속된 비디오 파일로 백업 받을 수 있습니다.
-기가바이트 이상의 저장 공간이 필요할 수 있으며, 저장 장치의 대역에 따라 시간이 오래걸릴 수 있습니다.
-계속 진행하시겠습니까?</translation>
-    </message>
-    <message>
         <source>AVI (*.avi)</source>
         <translation></translation>
     </message>
@@ -6902,20 +6882,28 @@ Do you want to continue?</source>
         <translation>읽기 전용 파일 생성</translation>
     </message>
     <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation>총 30분 이상의 데이터를 받는 경우 여러개의 연속된 비디오 파일을 생성합니다.
-기가바이트 이상의 저장 공간이 필요할 수 있으며, 저장 장치의 대역에 따라 시간이 오래걸릴 수 있습니다.
-계속 진행하시겠습니까?</translation>
-    </message>
-    <message>
         <source>Could not export video</source>
         <translation>비디오 파일을 내보낼 수 없음</translation>
     </message>
     <message>
         <source>Export successfully finished.</source>
         <translation>내보내기가 성공적으로 완료 되었습니다.</translation>
+    </message>
+    <message>
+        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
+        <translation>추출하려는 비디오 시퀀스가 30분 이상이 소요되는 데이터입니다.</translation>
+    </message>
+    <message>
+        <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
+        <translation>현 작업은 HDD의 공간이 기가바이트 이상이 필요 한 작업이며, 연결 속도에 따라 완료는데 다소 시간이 소요될 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Do you want to continue?</source>
+        <translation>계속 진행 하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
+        <translation>추출하려는 여러 비디오 시퀀스가 30분 이상이 소요되는 데이터입니다.</translation>
     </message>
 </context>
 <context>
@@ -6953,20 +6941,24 @@ Do you want to continue?</source>
         <translation>선택된 서버 시스템에 성공적으로 연결되었습니다!</translation>
     </message>
     <message>
-        <source>Authentification failed.
-Please, check the password you have entered.</source>
-        <translation>인증 오류.
-입력하신 비밀번호를 확인하여 주십시오.</translation>
-    </message>
-    <message>
         <source>Could not configure the selected servers.</source>
         <translation>선택된 서버의 설정을 할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Could not update the selected servers.
-You can try to update the servers again in the System Administration.</source>
-        <translation>선택된 서버에 업데이트가 되지 않습니다.
-관리자 권한으로 업데이트를 다시 시도하십시오.</translation>
+        <source>Authentication failed.</source>
+        <translation>인증 실패.</translation>
+    </message>
+    <message>
+        <source>Please, check the password you have entered.</source>
+        <translation>입력하신 비밀번호를 다시 확인하십시오.</translation>
+    </message>
+    <message>
+        <source>Could not update the selected servers.</source>
+        <translation>선택된 서버를 업데이트 할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration.</source>
+        <translation>시스템 관리 설정에서 서버의 업데이트를 다시 시도할 수 있습니다.</translation>
     </message>
 </context>
 <context>
@@ -7055,25 +7047,24 @@ You can try to update the servers again in the System Administration.</source>
         <translation>모든 카메라</translation>
     </message>
     <message>
-        <source>&apos;Live&apos;</source>
-        <extracomment>Time slider&apos;s tooltip for position on live. Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for. That&apos;s where these single quotes come from.</extracomment>
-        <translation>&apos;라이브&apos;</translation>
-    </message>
-    <message>
-        <source>yyyy MMM dd
-hh:mm:ss</source>
+        <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <source>mm:ss</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation></translation>
     </message>
     <message>
-        <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for short local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <source>yyyy MMM dd</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation>yyyy MMM dd</translation>
+    </message>
+    <message>
+        <source>Live</source>
+        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
+        <translation>라이브</translation>
     </message>
 </context>
 <context>
@@ -7083,24 +7074,8 @@ hh:mm:ss</source>
         <translation>카메라 위치를 가져올 수 없음</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>%1 카메라에서 현 위치를 가져오는 동안 오류가 발생하였습니다.
-
-카메라가 온라인으로 전환될 때까지 기다려 주십시오.</translation>
-    </message>
-    <message>
         <source>Could not set position for camera</source>
         <translation>카메라의 위치를 설정할 수 없음</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>%1 카메라에서 현 위치를 설정하는 동안 오류가 발생하였습니다.
-
-카메라가 온라인으로 전환될 때까지 기다려 주십시오.</translation>
     </message>
     <message>
         <source>Could not set position to camera</source>
@@ -7109,6 +7084,18 @@ Please wait for the camera to go online.</source>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation>PTZ_교정_%1.jpg</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation>%1 카메라에서 현재 위치를 가져오는 동안 오류가 발생하였습니다.</translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation>카메라를 연결하는 동안 잠시 기다려주세요.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
+        <translation>%1 카메라의 현재 위치를 설정하는 동안 오류가 발생하였습니다.</translation>
     </message>
 </context>
 <context>
@@ -7189,10 +7176,6 @@ Please wait for the camera to go online.</source>
         <translation>최신 버젼 사용 가능</translation>
     </message>
     <message>
-        <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
-        <translation>새 버젼 &lt;b&gt;%1&lt;/b&gt; 사용 가능합니다.</translation>
-    </message>
-    <message>
         <source>Would you like to update?</source>
         <translation>업데이트 하시겠습니까?</translation>
     </message>
@@ -7216,18 +7199,20 @@ Please wait for the camera to go online.</source>
         <source>Release Notes</source>
         <translation>업데이트 내용</translation>
     </message>
+    <message>
+        <source>Please update %1 Client.</source>
+        <translation>%1 클라이언트를 업데이트 하세요.</translation>
+    </message>
+    <message>
+        <source>New version %1 is available.</source>
+        <translation>새로운 %1 버전 사용 가능.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
         <source>Control session is already running</source>
         <translation>제어 세션이 이미 동작 중입니다</translation>
-    </message>
-    <message>
-        <source>Could not start control session.
-Another user is already controlling this screen.</source>
-        <translation>제어 세션이 시작 되지 않았습니다.
-다른 사용자가 이미 이 화면을 제어 중입니다.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7326,11 +7311,6 @@ Another user is already controlling this screen.</source>
         <translation>비디오 월 중지</translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?
-You&apos;ll have to start it manually.</source>
-        <translation>비디오 월을 중지 하시겠습니까? 이 경우 수동 시작을 하셔야 합니다.</translation>
-    </message>
-    <message>
         <source>New Matrix %1</source>
         <translation>새 매트릭스 %1</translation>
     </message>
@@ -7351,6 +7331,22 @@ You&apos;ll have to start it manually.</source>
         <translation>
             <numerusform>%n 매트릭스를 영구 삭제 하시겠습니까?</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Could not start control session.</source>
+        <translation>제어 세션을 시작할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Another user is already controlling this screen.</source>
+        <translation>다른 사용자가 이 스크린을 제어하고 있습니다.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop the Video Wall?</source>
+        <translation>비디어 월의 정지하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>You&apos;ll have to start it manually.</source>
+        <translation>수동으로 시작해야 합니다.</translation>
     </message>
 </context>
 <context>
@@ -7862,10 +7858,6 @@ You&apos;ll have to start it manually.</source>
         <translation>신뢰할 수 없는 연결</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(권장)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>Secure connection using TLS</source>
         <translation>TLS를 이용한 보안 연결</translation>
     </message>
@@ -7904,6 +7896,10 @@ You&apos;ll have to start it manually.</source>
     <message>
         <source>Cancel</source>
         <translation>취소</translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
+        <translation>(추천)</translation>
     </message>
 </context>
 <context>

@@ -38,11 +38,8 @@ QnVMax480LiveProvider::~QnVMax480LiveProvider()
 
 QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData())
         return getMetaData();
@@ -60,7 +57,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
 
     if (!m_needStop) 
     {
-        QnAbstractMediaDataPtr media = result.dynamicCast<QnAbstractMediaData>();
+        QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(result);
         if (media && (media->dataType != QnAbstractMediaData::EMPTY_DATA)) {
             m_lastMediaTimer.restart();
             if (getResource()->getStatus() == Qn::Unauthorized || getResource()->getStatus() == Qn::Offline)
@@ -71,7 +68,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
         }
     }
 
-    return result.dynamicCast<QnAbstractMediaData>();
+    return std::dynamic_pointer_cast<QnAbstractMediaData>(result);
 }
 
 bool QnVMax480LiveProvider::canChangeStatus() const
@@ -80,8 +77,9 @@ bool QnVMax480LiveProvider::canChangeStatus() const
 }
 
 
-CameraDiagnostics::Result QnVMax480LiveProvider::openStream()
+CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(bool isCameraControlRequired)
 {
+    Q_UNUSED(isCameraControlRequired);
     if (m_opened)
         return CameraDiagnostics::NoErrorResult();
 

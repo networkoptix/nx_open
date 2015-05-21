@@ -2,6 +2,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <utils/media/nalUnits.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
@@ -208,7 +209,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
     return true;
 }
 
-QnResourceAudioLayoutPtr QnAacRtpParser::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnAacRtpParser::getAudioLayout()
 {
     return m_audioLayout;
 }

@@ -7,9 +7,10 @@
 
 #include "http/httptypes.h"
 #include "../common/util.h"
+#include "network/authenticate_helper.h"
 
 
-static const int MAX_LINE_LENGTH = 1024*16;
+//static const int MAX_LINE_LENGTH = 1024*16;
 
 using namespace std;
 
@@ -230,8 +231,6 @@ int CLSimpleHTTPClient::readHeaders()
     while (eofPos == 0)
     {
         int readed = m_sock->recv(curPtr, left);
-        if( readed == 0 )
-            return CL_NOT_HTTP; //connection closed before we could read some http header(s)
         if (readed < 1)
             return CL_TRANSPORT_ERROR;
         curPtr += readed;
@@ -289,8 +288,13 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
     return doGET(requestStr.toUtf8(), recursive);
 }
 
-CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recursive)
+CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recursive)
 {
+    QByteArray requestStr = _requestStr;
+    if( !requestStr.startsWith('/') )
+        requestStr.insert(0, '/');
+
+
     if (!m_sock)
         return CL_TRANSPORT_ERROR;
 
@@ -311,8 +315,6 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         QByteArray request;
 
         request.append("GET ");
-        if( !requestStr.startsWith('/') )
-            request.append('/');
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
@@ -347,7 +349,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         //got following status line: http/1.1 401 n/a, and this method returned CL_TRANSPORT_ERROR
         nx_http::StatusLine statusLine;
         if( !statusLine.parse( m_responseLine ) )
-            return CL_NOT_HTTP;
+            return CL_TRANSPORT_ERROR;
 
         //if (!m_responseLine.contains("200 ok") && !m_responseLine.contains("204 no content"))// not ok
         if( statusLine.statusCode != nx_http::StatusCode::ok && statusLine.statusCode != nx_http::StatusCode::noContent )
@@ -477,7 +479,7 @@ void CLSimpleHTTPClient::getAuthInfo()
     QList<QByteArray> authParams = wwwAuth.split(',');
     for (int i = 0; i < authParams.size(); ++i)
     {
-        QList<QByteArray> param = authParams[i].split('=');
+        QList<QByteArray> param = QnAuthHelper::smartSplit(authParams[i], '=');
         if (param.size() > 1) 
         {
             param[0] = param[0].trimmed();

@@ -20,24 +20,25 @@
 #include <utils/network/tcp_connection_priv.h>
 
 #include <utils/xml/camera_advanced_param_reader.h>
+#include "http/custom_headers.h"
 
 
 namespace {
-	//!max time (milliseconds) to wait for async operation completion
-	static const unsigned long MAX_WAIT_TIMEOUT_MS = 15000;
+    //!max time (milliseconds) to wait for async operation completion
+    static const unsigned long MAX_WAIT_TIMEOUT_MS = 15000;
 }
 
 
 
 struct AwaitedParameters {
     QnResourcePtr resource;
-	QSet<QString> requested;
+    QSet<QString> requested;
     QnCameraAdvancedParamValueList result;
 };
 
 QnCameraSettingsRestHandler::QnCameraSettingsRestHandler():
-	base_type(),
-	m_paramsReader(new QnCachingCameraAdvancedParamsReader())
+    base_type(),
+    m_paramsReader(new QnCachingCameraAdvancedParamsReader())
 {
 }
 
@@ -45,45 +46,45 @@ QnCameraSettingsRestHandler::~QnCameraSettingsRestHandler()
 {}
 
 int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) {
-    
+
     NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. Received request %1").arg(path), cl_logDEBUG1 );
 
-	if (!params.contains(lit("res_id"))) {
-		NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No res_id param in request %1. Ignoring...").arg(path), cl_logWARNING );
-		return CODE_BAD_REQUEST;
-	}
+    if (!params.contains(lit("res_id"))) {
+        NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No res_id param in request %1. Ignoring...").arg(path), cl_logWARNING );
+        return CODE_BAD_REQUEST;
+    }
 
-	QString cameraPhysicalId = params[lit("res_id")];
-	QnResourcePtr camera = QnResourcePool::instance()->getNetResourceByPhysicalId( cameraPhysicalId );
-	if(!camera) {
-		NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. Unknown camera %1 in request %2. Ignoring...").arg(cameraPhysicalId).arg(path), cl_logWARNING );
-		return CODE_NOT_FOUND;
-	}
+    QString cameraPhysicalId = params[lit("res_id")];
+    QnResourcePtr camera = qnResPool->getNetResourceByPhysicalId( cameraPhysicalId );
+    if(!camera) {
+        NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. Unknown camera %1 in request %2. Ignoring...").arg(cameraPhysicalId).arg(path), cl_logWARNING );
+        return CODE_NOT_FOUND;
+    }
 
-	/* Clean params that are not keys. */
+    /* Clean params that are not keys. */
     QnRequestParams locParams = params;
-	locParams.remove(lit("x-server-guid"));
-	locParams.remove(lit("res_id"));
+    locParams.remove(Qn::SERVER_GUID_HEADER_NAME);
+    locParams.remove(lit("res_id"));
 
-	/* Filter allowed parameters. */
+    /* Filter allowed parameters. */
     QnCameraAdvancedParams cameraParameters = m_paramsReader->params(camera);
-	auto allowedParams = cameraParameters.allParameterIds();
+    auto allowedParams = cameraParameters.allParameterIds();
 
-	for(auto iter = locParams.begin(); iter != locParams.end();) {
-		if (allowedParams.contains(iter.key()))
-			++iter;
-		else
-			iter = locParams.erase(iter);
-	}
+    for(auto iter = locParams.begin(); iter != locParams.end();) {
+        if (allowedParams.contains(iter.key()))
+            ++iter;
+        else
+            iter = locParams.erase(iter);
+    }
 
     //TODO it would be nice to fill reasonPhrase too
     if( locParams.empty() ) {
-		NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No valid param names in request %1").arg(path), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No valid param names in request %1").arg(path), cl_logWARNING );
         return CODE_BAD_REQUEST;
-	}
+    }
 
     Operation operation;
-	QString action = extractAction(path);
+    QString action = extractAction(path);
     if( action == "getCameraParam" ) {
         if (cameraParameters.packet_mode)
             operation = Operation::GetParamsBatch;
@@ -110,9 +111,9 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
 
     QnCameraAdvancedParamValueList values;
     for(auto iter = locParams.cbegin(); iter != locParams.cend(); ++iter) {
-		QnCameraAdvancedParamValue param(iter.key(), iter.value());
+        QnCameraAdvancedParamValue param(iter.key(), iter.value());
         values << param;
-		awaitedParams.requested << param.id;
+        awaitedParams.requested << param.id;
     }
     processOperation(camera, operation, values);
 
@@ -125,13 +126,13 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
         {
             const qint64 curClock = asyncOpCompletionTimer.elapsed();
 
-			/* Out of time, returning what we have. */
+            /* Out of time, returning what we have. */
             if( curClock >= (int)MAX_WAIT_TIMEOUT_MS )
                 break;
-            
+
             m_cond.wait( &m_mutex, MAX_WAIT_TIMEOUT_MS - curClock );
 
-			/* Received all parameters. */
+            /* Received all parameters. */
             if( awaitedParams.requested.empty() )
                 break;
         }
@@ -141,8 +142,8 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
     disconnectFromResource(camera, operation);
 
     //serializing answer
-	QnCameraAdvancedParamValueList reply = awaitedParams.result;
-	result.setReply(reply);
+    QnCameraAdvancedParamValueList reply = awaitedParams.result;
+    result.setReply(reply);
 
     NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. request %1 processed successfully").arg(path), cl_logDEBUG1 );
     return CODE_OK;
@@ -213,17 +214,17 @@ void QnCameraSettingsRestHandler::asyncParamGetComplete(const QnResourcePtr &res
     for( std::set<AwaitedParameters*>::const_iterator
         it = m_awaitedParamsSets.begin();
         it != m_awaitedParamsSets.end();
-        ++it )
+    ++it )
     {
-		auto awaitedParams = (*it);
+        auto awaitedParams = (*it);
         if(!awaitedParams || awaitedParams->resource != resource)
             continue;
 
-		if (!awaitedParams->requested.contains(id))
-			continue;
+        if (!awaitedParams->requested.contains(id))
+            continue;
 
-		if (success)
-			awaitedParams->result << QnCameraAdvancedParamValue(id, value);
+        if (success)
+            awaitedParams->result << QnCameraAdvancedParamValue(id, value);
 
         awaitedParams->requested.remove(id);
     }
@@ -250,7 +251,7 @@ void QnCameraSettingsRestHandler::asyncParamsGetComplete(const QnResourcePtr &re
 
         for (const QnCameraAdvancedParamValue &value: values) {
             if (!awaitedParams->requested.contains(value.id))
-                 continue;
+                continue;
             awaitedParams->result << value;
         }
         awaitedParams->requested.clear();

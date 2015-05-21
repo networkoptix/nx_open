@@ -1,7 +1,5 @@
 #include "misc_manager.h"
 
-#include "utils/network/global_module_finder.h"
-#include "utils/network/router.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include "nx_ec/data/api_license_overflow_data.h"
@@ -9,17 +7,14 @@
 namespace ec2 {
 
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &transaction) {
-    QnModuleInformation moduleInformation;
-    QnGlobalModuleFinder::fillFromApiModuleData(transaction.params, &moduleInformation);
-    emit moduleChanged(moduleInformation, transaction.params.isAlive);
+    emit moduleChanged(transaction.params.moduleInformation, transaction.params.isAlive);
 }
 
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleDataList> &transaction) {
-    for (const ApiModuleData &data: transaction.params) {
-        QnModuleInformation moduleInformation;
-        QnGlobalModuleFinder::fillFromApiModuleData(data, &moduleInformation);
-        emit moduleChanged(moduleInformation, data.isAlive);
-    }
+    QList<QnModuleInformationWithAddresses> modules;
+    for (const ApiModuleData &data: transaction.params)
+        modules.append(data.moduleInformation);
+    emit gotInitialModules(modules);
 }
 
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &transaction) {
@@ -36,7 +31,7 @@ template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::~QnMiscManager() {}
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformation, isAlive);
 
@@ -47,7 +42,7 @@ int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInfor
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnModuleInformationWithAddresses> &moduleInformationList, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformationList);
 
@@ -69,24 +64,26 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &systemNam
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const {
+QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive) const {
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo);
-    QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
+    transaction.params.moduleInformation = moduleInformation;
     transaction.params.isAlive = isAlive;
+    transaction.isLocal = true;
 
     return transaction;
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformation> &moduleInformationList) const {
+QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformationWithAddresses> &moduleInformationList) const {
     QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
     for (const QnModuleInformation &moduleInformation: moduleInformationList) {
         ApiModuleData data;
-        QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
+        data.moduleInformation = moduleInformation;
         data.isAlive = true;
         transaction.params.push_back(data);
     }
+    transaction.isLocal = true;
 
     return transaction;
 }

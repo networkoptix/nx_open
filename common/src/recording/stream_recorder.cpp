@@ -9,6 +9,7 @@
 #include <core/resource/resource_consumer.h>
 #include <core/resource/resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/media_resource.h>
 
 #include <core/datapacket/abstract_data_packet.h>
 #include <core/datapacket/media_data_packet.h>
@@ -36,6 +37,7 @@ static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
 static const int STORE_QUEUE_SIZE = 50;
 
+#if 0
 static QRectF cwiseMul(const QRectF &l, const QSizeF &r) 
 {
     return QRectF(
@@ -45,6 +47,7 @@ static QRectF cwiseMul(const QRectF &l, const QSizeF &r)
         l.height() * r.height()
         );
 }
+#endif
 
 QString QnStreamRecorder::errorString(int errCode) {
     switch (errCode) {
@@ -141,12 +144,6 @@ void QnStreamRecorder::close()
             fileFinished(fileDuration, m_fileName, m_mediaProvider, QnFfmpegHelper::getFileSizeByIOContext(m_ioContext));
         }
 
-        for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
-        {
-            if (m_formatCtx->streams[i]->codec->codec)
-                avcodec_close(m_formatCtx->streams[i]->codec);
-        }
-        
         if (m_ioContext)
         {
             QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);
@@ -219,7 +216,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         close();
     }
 
-    QnConstAbstractMediaDataPtr md = qSharedPointerDynamicCast<const QnAbstractMediaData>(nonConstData);
+    QnConstAbstractMediaDataPtr md = std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
     if (!md)
         return true; // skip unknown data
 
@@ -305,7 +302,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     if (md->dataType == QnAbstractMediaData::META_V1)
-        return saveMotion(md.dynamicCast<const QnMetaDataV1>());
+        return saveMotion(std::dynamic_pointer_cast<const QnMetaDataV1>(md));
 
     if (m_endDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
         // if multifile recording allowed, recreate file if recording hole is detected
@@ -326,7 +323,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
     if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
     {
-        const QnCompressedAudioData* ad = dynamic_cast<const QnCompressedAudioData*>(md.data());
+        const QnCompressedAudioData* ad = dynamic_cast<const QnCompressedAudioData*>(md.get());
         assert( ad->context );
         QnCodecAudioFormat audioFormat(ad->context);
         if (!m_firstTime && audioFormat != m_prevAudioFormat) {
@@ -335,7 +332,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         m_prevAudioFormat = audioFormat; 
     }
     
-    QnConstCompressedVideoDataPtr vd = qSharedPointerDynamicCast<const QnCompressedVideoData>(md);
+    QnConstCompressedVideoDataPtr vd = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
     //if (!vd)
     //    return true; // ignore audio data
 
@@ -430,7 +427,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
     else
         avPkt.dts = dts;
-    const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.data());
+    const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
     if (video && (quint64)video->pts != AV_NOPTS_VALUE)
         avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base) + (avPkt.dts-dts);
     else
@@ -439,7 +436,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
     avPkt.data = const_cast<quint8*>((const quint8*)md->data());    //const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
-    avPkt.size = md->dataSize();
+    avPkt.size = static_cast<int>(md->dataSize());
     avPkt.stream_index= streamIndex;
 
     if (avPkt.pts < avPkt.dts)
@@ -457,7 +454,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         if (m_needCalcSignature) 
         {
             if (md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY))
-                m_lastIFrame = md.dynamicCast<const QnCompressedVideoData>();
+                m_lastIFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
             AVCodecContext* srcCodec = m_formatCtx->streams[streamIndex]->codec;
             QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
             //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);

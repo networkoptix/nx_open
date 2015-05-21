@@ -164,8 +164,9 @@ TEST( QnCamLicenseUsageHelperTest, checkAnalogEncoderGroups )
  */
 TEST( QnCamLicenseUsageHelperTest, borrowForAnalogEncoder )
 {
-    int overflow = 2;
-    ASSERT_LT(overflow, camerasPerAnalogEncoder);   //assert test correctness
+    int overflow = camerasPerAnalogEncoder - 1;
+    if (overflow <= 0)
+        return;
 
     QnLicensePoolScaffold licPoolScaffold;
     QnResourcePoolScaffold resPoolScaffold;
@@ -259,8 +260,9 @@ TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCameras )
  */
 TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCamerasOverflow )
 {
-    int overflow = 2;
-    ASSERT_LT(overflow, camerasPerAnalogEncoder);   //assert test correctness
+    int overflow = camerasPerAnalogEncoder - 1;
+    if (overflow <= 0)
+        return;
 
     QnResourcePoolScaffold resPoolScaffold;
     auto cameras = resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder + overflow, false);

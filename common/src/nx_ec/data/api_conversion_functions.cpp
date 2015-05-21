@@ -28,7 +28,7 @@
 #include "api_camera_attributes_data.h"
 #include "api_camera_data_ex.h"
 #include "api_camera_bookmark_data.h"
-#include "api_camera_server_item_data.h"
+#include "api_camera_history_data.h"
 #include "api_email_data.h"
 #include "api_full_info_data.h"
 #include "api_layout_data.h"
@@ -278,7 +278,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
 {
-    dst.reserve( dst.size()+src.size() );
+    dst.reserve( dst.size() + static_cast<int>(src.size()) );
     for( const ApiCameraAttributesData& cameraAttrs: src )
     {
         QnCameraUserAttributesPtr dstElement( new QnCameraUserAttributes() );
@@ -332,53 +332,6 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
     }
 }
 
-
-////////////////////////////////////////////////////////////
-//// QnCameraHistoryItem
-////////////////////////////////////////////////////////////
-
-void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst) {
-    dst.cameraUniqueId = src.cameraUniqueId;
-    dst.serverGuid = src.mediaServerGuid;
-    dst.timestamp = src.timestamp;
-}
-
-void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
-    dst.cameraUniqueId = src.cameraUniqueId;
-    dst.mediaServerGuid = src.serverGuid;
-    dst.timestamp = src.timestamp;
-}
-
-void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
-{
-    /* CameraUniqueId -> (Timestamp -> ServerGuid). */
-    QMap<QString, QMap<qint64, QnUuid> > history;
-
-    /* Fill temporary history map. */
-    for (auto pos = src.begin(); pos != src.end(); ++pos)
-        history[pos->cameraUniqueId][pos->timestamp] = pos->serverGuid;
-
-    for(auto pos = history.begin(); pos != history.end(); ++pos) {
-        QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
-
-        if (pos.value().isEmpty())
-            continue;
-
-        QMapIterator<qint64, QnUuid> camit(pos.value());
-        camit.toFront();
-
-        cameraHistory->setCameraUniqueId(pos.key());
-        while (camit.hasNext())
-        {
-            camit.next();
-            cameraHistory->addTimePeriod(camit.key(), camit.value());
-        }
-
-        dst.append(cameraHistory);
-    }
-}
-
-
 void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst) {
     dst.host = src.server;
     dst.port = src.port;
@@ -412,7 +365,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.videowalls, dst.resources);
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
-    fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
+    dst.camerasWithArchiveList = src.cameraHistory;
     dst.allProperties = src.allProperties;
     fromApiToResourceList(src.storages, dst.resources, ctx);
     dst.resStatusList = src.resStatusList;
@@ -677,7 +630,7 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
 }
 
 void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {
-    dst.reserve( dst.size()+src.size() );
+    dst.reserve( dst.size() + static_cast<int>(src.size()) );
     for( const ApiMediaServerUserAttributesData& serverAttrs: src )
     {
         QnMediaServerUserAttributesPtr dstElement( new QnMediaServerUserAttributes() );

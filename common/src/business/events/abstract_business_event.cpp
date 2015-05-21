@@ -124,9 +124,9 @@ namespace QnBusiness
     }
 }
 
-QnAbstractBusinessEvent::QnAbstractBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStamp):
+QnAbstractBusinessEvent::QnAbstractBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStampUsec):
     m_eventType(eventType),
-    m_timeStamp(timeStamp),
+    m_timeStampUsec(timeStampUsec),
     m_resource(resource),
     m_toggleState(toggleState)
 {
@@ -139,7 +139,7 @@ QnAbstractBusinessEvent::~QnAbstractBusinessEvent()
 QnBusinessEventParameters QnAbstractBusinessEvent::getRuntimeParams() const {
     QnBusinessEventParameters params;
     params.eventType = m_eventType;
-    params.eventTimestamp = m_timeStamp;
+    params.eventTimestampUsec = m_timeStampUsec;
     params.eventResourceId = m_resource ? m_resource->getId() : QnUuid();
 
     return params;

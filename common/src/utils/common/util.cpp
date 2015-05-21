@@ -178,9 +178,17 @@ qint64 getDiskTotalSpace(const QString& root)
 };
 
 #else 
+
+//TODO #ak introduce single function for getting partition info 
+    //and place platform-specific code in a single pace
+
+#ifdef __APPLE__
+#define statvfs64 statvfs
+#endif
+
 qint64 getDiskFreeSpace(const QString& root) {
-    struct statvfs buf;
-    if (statvfs(root.toUtf8().data(), &buf) == 0)
+    struct statvfs64 buf;
+    if (statvfs64(root.toUtf8().data(), &buf) == 0)
     {
         //qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
         //TODO #ak if we run under root, MUST use buf.f_bfree, else buf.f_bavail
@@ -195,8 +203,8 @@ qint64 getDiskFreeSpace(const QString& root) {
 }
 
 qint64 getDiskTotalSpace(const QString& root) {
-    struct statvfs buf;
-    if (statvfs(root.toUtf8().data(), &buf) == 0)
+    struct statvfs64 buf;
+    if (statvfs64(root.toUtf8().data(), &buf) == 0)
     {
         qint64 disk_size = buf.f_blocks * (qint64) buf.f_frsize;
         //qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
@@ -338,7 +346,38 @@ QByteArray formatJSonString(const QByteArray& data)
     return result;
 }
 
-QString dateTimeToHTTPFormat(const QDateTime& value)
+static const char* weekDaysStr[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+static const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+QByteArray dateTimeToHTTPFormat(const QDateTime& value)
 {
-    return QString(lit("%1 GMT")).arg(QLocale::c().toString(value.toUTC(), lit("ddd, dd MMM yyyy HH:mm:ss")));
+    static const int SECONDS_PER_MINUTE = 60;
+    static const int SECONDS_PER_HOUR = 3600;
+
+    if( value.isNull() || !value.isValid() )
+        return QByteArray();
+
+    const QDate& date = value.date();
+    const QTime& time = value.time();
+    const int offsetFromUtcSeconds = value.offsetFromUtc();
+    const int offsetFromUtcHHMM = 
+        (offsetFromUtcSeconds / SECONDS_PER_HOUR) * 100 +
+        (offsetFromUtcSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
+
+    char strDateBuf[256];
+    sprintf( strDateBuf, "%s, %02d %s %d %02d:%02d:%02d %+05d",
+        weekDaysStr[date.dayOfWeek()-1],
+        date.day(),
+        months[date.month()-1],
+        date.year(),
+        time.hour(),
+        time.minute(),
+        time.second(),
+        offsetFromUtcHHMM );
+
+    return QByteArray( strDateBuf );
+
+
+
+    //return QString(lit("%1 GMT")).arg(QLocale::c().toString(value.toUTC(), lit("ddd, dd MMM yyyy HH:mm:ss")));
 }

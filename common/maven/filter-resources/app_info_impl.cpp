@@ -55,7 +55,13 @@ QString QnAppInfo::boostVersion() {
 }
 
 QString QnAppInfo::armBox() {
+    //#ak for now box has sense value on ARM devices only. 
+        //On other platforms it is used by build system for internal purposes
+#ifdef __arm__
     return QStringLiteral("${box}");
+#else
+    return QString();
+#endif
 }
 
 bool QnAppInfo::beta() {
@@ -80,6 +86,10 @@ QString QnAppInfo::productNameLong() {
 
 QString QnAppInfo::customizationName() {
     return QStringLiteral("${customization}");
+}
+
+QString QnAppInfo::defaultLanguage() {
+    return QStringLiteral("${translation1}");
 }
 
 QString QnAppInfo::clientExecutableName() {

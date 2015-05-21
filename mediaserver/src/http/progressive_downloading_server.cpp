@@ -93,7 +93,7 @@ public:
             qint64 firstTime = lastTime - tmpQueue.size() * timeResolution;
             for (int i = 0; i < tmpQueue.size(); ++i)
             {
-                const QnAbstractMediaDataPtr& srcMedia = qSharedPointerDynamicCast<QnAbstractMediaData>(tmpQueue.atUnsafe(i));
+                const QnAbstractMediaDataPtr& srcMedia = std::dynamic_pointer_cast<QnAbstractMediaData>(tmpQueue.atUnsafe(i));
                 QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(srcMedia->clone());
                 media->timestamp = firstTime + i*timeResolution;
                 m_dataQueue.push(media);
@@ -123,7 +123,7 @@ protected:
                 return;
             }
         }
-        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(data.data());
+        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(data.get());
         if (m_needKeyData && media)
         {
             if (!(media->flags & AV_PKT_FLAG_KEY))
@@ -141,7 +141,7 @@ protected:
             doRealtimeDelay( data );
 
 
-        const QnAbstractMediaDataPtr& media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+        const QnAbstractMediaDataPtr& media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
 
         if (media->dataType == QnAbstractMediaData::EMPTY_DATA) {
             if (media->timestamp == DATETIME_NOW)
@@ -503,6 +503,7 @@ void QnProgressiveDownloadingConsumer::run()
             extraParams.setCustomAR(customAR);
             
             d->transcoder.setExtraTranscodeParams(extraParams);
+            d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 
         if (d->transcoder.setVideoCodec(

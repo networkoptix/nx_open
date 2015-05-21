@@ -17,7 +17,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStream() override;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
@@ -34,7 +34,7 @@ private:
 
     QStringList getRTPurls() const;
     int toAxisQuality(Qn::StreamQuality quality);
-    void parseMotionInfo(QnCompressedVideoDataPtr videoData);
+    void parseMotionInfo(QnCompressedVideoData* videoData);
     void processTriggerData(const quint8* payload, int len);
 
     void fillMotionInfo(const QRect& rect);

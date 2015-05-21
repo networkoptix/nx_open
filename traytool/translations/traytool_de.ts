@@ -8,10 +8,12 @@
         <translation>System Tray</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.
-Application will now quit.</source>
-        <translation>Es gibt keinen  System Tray auf diesem System.
-Die Applikation beendet sich jetzt.</translation>
+        <source>There is no system tray on this system.</source>
+        <translation>Es gibt kein System Tray auf diesem System.</translation>
+    </message>
+    <message>
+        <source>Application will now quit.</source>
+        <translation>Die Anwendung beendet sich jetzt.</translation>
     </message>
 </context>
 <context>
@@ -44,15 +46,9 @@ Die Applikation beendet sich jetzt.</translation>
         <translation>Kein Zugriff auf installierten Dienst</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to access installed services:
- %1</source>
-        <translation>Folgender Fehler trat beim Zugriff auf den installierten Dienst auf:
- %1</translation>
-    </message>
-    <message>
         <source>No %1 services installed</source>
         <translatorcomment>What is &quot;No&quot; - is it № or &quot;Nein&quot;?</translatorcomment>
-        <translation>No %1 Dienste wurden installiert installed</translation>
+        <translation>No %1 Dienste wurden installiert</translation>
     </message>
     <message>
         <source>Media server has been stopped</source>
@@ -98,7 +94,7 @@ Die Applikation beendet sich jetzt.</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation>Beenden {&amp;Q)</translation>
+        <translation>&amp;Beenden</translation>
     </message>
     <message>
         <source>Show &amp;Media Server Log</source>
@@ -106,7 +102,7 @@ Die Applikation beendet sich jetzt.</translation>
     </message>
     <message>
         <source>Start Media Server</source>
-        <translation>Starte Media-Server</translation>
+        <translation>Media-Server starten</translation>
     </message>
     <message>
         <source>Stop Media Server</source>
@@ -115,6 +111,10 @@ Die Applikation beendet sich jetzt.</translation>
     <message>
         <source>Media Server Web Page</source>
         <translation>Media-Server Webseite</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation>Ein Fehler trat auf beim Versuch auf diese installierten Dienste zuzugreifen:</translation>
     </message>
 </context>
 </TS>

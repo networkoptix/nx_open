@@ -47,7 +47,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
     if (m_media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         m_ctxSended.clear();
 
-    QnConstMetaDataV1Ptr metadata = qSharedPointerDynamicCast<const QnMetaDataV1>(m_media);
+    QnConstMetaDataV1Ptr metadata = std::dynamic_pointer_cast<const QnMetaDataV1>(m_media);
     if (!metadata && m_media->compressionType)
     {
         QnMediaContextPtr currentContext = m_media->context;
@@ -102,14 +102,15 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     if (m_curDataBuffer == m_media->data())
     {
         // send data with RTP headers
-        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.data());
-        const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(m_media.data());
+        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.get());
+        const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(m_media.get());
+#if 0
         int ffHeaderSize = RTSP_FFMPEG_GENERIC_HEADER_SIZE;
         if (video)
             ffHeaderSize += RTSP_FFMPEG_VIDEO_HEADER_SIZE;
         else if (metadata)
             ffHeaderSize += RTSP_FFMPEG_METADATA_HEADER_SIZE;
-
+#endif
         //m_mutex.unlock();
 
         //buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
@@ -149,7 +150,7 @@ quint32 QnRtspFfmpegEncoder::getSSRC()
 
 bool QnRtspFfmpegEncoder::getRtpMarker()
 {
-    int dataRest = m_media->data() + m_media->dataSize() - m_curDataBuffer;
+    int dataRest = m_media->data() + static_cast<int>(m_media->dataSize()) - m_curDataBuffer;
     return m_isLastDataContext || dataRest == 0;
 }
 
@@ -163,7 +164,7 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
     return RTP_FFMPEG_GENERIC_CODE;
 }
 
-QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
+QByteArray QnRtspFfmpegEncoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
 {
     if (!m_codecCtxData.isEmpty()) {
         QString result(lit("a=fmtp:%1 config=%2\r\n"));

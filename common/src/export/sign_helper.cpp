@@ -5,9 +5,11 @@
 
 #include "core/datapacket/video_data_packet.h"
 #include "licensing/license.h"
+#include "utils/media/nalUnits.h"
 #include "utils/common/util.h"
 #include "utils/common/scoped_painter_rollback.h"
 #include "utils/math/math.h"
+#include "utils/media/ffmpeg_helper.h"
 
 extern "C" {
 #include <libswscale/swscale.h>
@@ -70,8 +72,10 @@ QnSignHelper::QnSignHelper():
     m_licensedToStr = tr("Trial license");
     for (const QnLicensePtr& license: list)
     {
-        if (license->type() != Qn::LC_Trial)
+        if (license->type() != Qn::LC_Trial && license->isValid()) {
             m_licensedToStr = license->name();
+            break;
+        }
     }
 }
 
@@ -404,7 +408,7 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     QString profile;
     extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), sps, pps, spsReady, ppsReady);
     if ((!spsReady || !ppsReady) && iFrame)
-        extractSpsPpsFromPrivData((quint8*)iFrame->data(), iFrame->dataSize(), sps, pps, spsReady, ppsReady);
+        extractSpsPpsFromPrivData((quint8*)iFrame->data(), static_cast<int>(iFrame->dataSize()), sps, pps, spsReady, ppsReady);
     if (spsReady && ppsReady)
     {
         if (sps.profile_idc >= 100)
@@ -440,7 +444,7 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
 
     extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), oldSps, oldPps, spsReady, ppsReady);
     if ((!spsReady || !ppsReady) && iFrame)
-        extractSpsPpsFromPrivData((quint8*)iFrame->data(), iFrame->dataSize(), oldSps, oldPps, spsReady, ppsReady);
+        extractSpsPpsFromPrivData((quint8*)iFrame->data(), static_cast<int>(iFrame->dataSize()), oldSps, oldPps, spsReady, ppsReady);
 
     if (!spsReady || !ppsReady)
         return out_size;
@@ -667,9 +671,8 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     generatedFrame->channelNumber = 0; 
 error_label:
     delete [] videoBuf;
-    avcodec_close(videoCodecCtx);
+    QnFfmpegHelper::deleteCodecContext(videoCodecCtx);
     av_free(frame);
-    av_free(videoCodecCtx);
 
     return generatedFrame;
 }

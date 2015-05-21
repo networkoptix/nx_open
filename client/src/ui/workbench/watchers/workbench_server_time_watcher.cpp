@@ -97,11 +97,11 @@ void QnWorkbenchServerTimeWatcher::timerEvent(QTimerEvent *event) {
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || !server->getProperty(lit("guid")).isEmpty()) // TODO: #dklychkov add a proper way to check for fake servers
+    if (!server || QnMediaServerResource::isFakeServer(resource))
         return;
 
-    connect(server.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
-    connect(server.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
+    connect(server.data(), &QnMediaServerResource::apiUrlChanged, this, &QnWorkbenchServerTimeWatcher::at_server_apiUrlChanged);
+    connect(server.data(), &QnMediaServerResource::statusChanged, this, &QnWorkbenchServerTimeWatcher::at_resource_statusChanged);
     sendRequest(server);
 }
 
@@ -114,8 +114,9 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
     disconnect(server.data(), NULL, this, NULL);
 }
 
-void QnWorkbenchServerTimeWatcher::at_server_serverIfFound(const QnMediaServerResourcePtr &resource) {
-    sendRequest(resource);
+void QnWorkbenchServerTimeWatcher::at_server_apiUrlChanged(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    sendRequest(server);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resource_statusChanged(const QnResourcePtr &resource) {

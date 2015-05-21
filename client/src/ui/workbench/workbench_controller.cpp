@@ -945,6 +945,7 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) 
     QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
 
     QPoint newDragDelta = mapper()->mapDeltaToGridF(totalDelta).toPoint();
+    //TODO: #GDM revert if
     if(newDragDelta != m_dragDelta) {
         display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::Initial);
 
@@ -1007,7 +1008,6 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) 
                 replacedGeometries.push_back(workbenchItem->geometry().adjusted(-m_dragDelta.x(), -m_dragDelta.y(), -m_dragDelta.x(), -m_dragDelta.y()));
 
             m_dragGeometries.append(replacedGeometries);
-            finished = true;
         }
 
         QnWorkbenchLayout::Disposition disposition;
@@ -1150,10 +1150,11 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 
     if (workbench()->item(Qn::RaisedRole) != workbenchItem) {
         /* Don't raise if there's only one item in the layout. */
-        QRectF enclosingRect = display()->itemEnclosingGeometry(widget->item());
-        enclosingRect = dilated(enclosingRect, enclosingRect.size() * raisedGeometryThreshold);
-        if (enclosingRect.contains(display()->raisedGeometry(widget)))
-            return;
+        QRectF occupiedGeometry = widget->geometry();
+        occupiedGeometry = dilated(occupiedGeometry, occupiedGeometry.size() * raisedGeometryThreshold);
+
+        if (occupiedGeometry.contains(display()->raisedGeometry(widget->geometry(), widget->rotation())))
+            workbenchItem = NULL;
 
         workbench()->setItem(Qn::RaisedRole, workbenchItem);
         return;

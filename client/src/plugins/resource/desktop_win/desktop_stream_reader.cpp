@@ -124,8 +124,9 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
     return QnAbstractMediaDataPtr();
 }
 
-CameraDiagnostics::Result QnDesktopStreamreader::openStream()
+CameraDiagnostics::Result QnDesktopStreamreader::openStreamInternal(bool isCameraControlRequired)
 {
+    Q_UNUSED(isCameraControlRequired);
     if (init())
     {
         m_initialized = true;
@@ -142,8 +143,7 @@ void QnDesktopStreamreader::closeStream()
     delete m_grabber;
     m_grabber = 0;
 
-    if (m_videoCodecCtx)
-        avcodec_close(m_videoCodecCtx);
+    QnFfmpegHelper::deleteCodecContext(m_videoCodecCtx);
     m_videoCodecCtx = 0;
     if (m_frame)
         av_free(m_frame);

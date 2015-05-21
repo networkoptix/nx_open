@@ -81,10 +81,6 @@
         <translation>Событие</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Когда&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>at</source>
         <translation>на</translation>
     </message>
@@ -101,16 +97,20 @@
         <translation>Действие</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>&lt;Select at least one camera&gt;</source>
         <translation>&lt;Выберите хотя бы одну камеру&gt;</translation>
     </message>
     <message>
         <source>Comments:</source>
         <translation>Комментарий:</translation>
+    </message>
+    <message>
+        <source>When</source>
+        <translation>Если</translation>
+    </message>
+    <message>
+        <source>Do</source>
+        <translation>То</translation>
     </message>
 </context>
 <context>
@@ -146,10 +146,6 @@
 </context>
 <context>
     <name>CameraAdditionDialog</name>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Например:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
     <message>
         <source>IP, hostname, RTSP link...</source>
         <translation>IP, доменное имя, RTSP ссылка...</translation>
@@ -200,10 +196,6 @@
         <translation>Идет поиск...</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Найденные камеры:&lt;/b&gt;</translation>
-    </message>
-    <message>
         <source>Manuf.</source>
         <translation>Произв.</translation>
     </message>
@@ -238,6 +230,10 @@
     <message>
         <source>Name</source>
         <translation>Имя</translation>
+    </message>
+    <message>
+        <source>Discovered Cameras:</source>
+        <translation>Найденные камеры:</translation>
     </message>
 </context>
 <context>
@@ -330,10 +326,6 @@
         <source>High quality</source>
         <translation>Высокое качество</translation>
     </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Внимание! Установка низкого качества приведет к уменьшению разрешения &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
     <message utf8="true">
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation>Внимание! Установка высокого качества может привести к перегрузке процессора,ошибкам сети и прочим проблемам.</translation>
@@ -377,6 +369,14 @@
     <message>
         <source>Restore Defaults</source>
         <translation>По умолчанию</translation>
+    </message>
+    <message>
+        <source>Warning! Low quality may result in low resolution image.</source>
+        <translation>Внимание! Низкое качество может привести к низкому разрешению изображения.</translation>
+    </message>
+    <message>
+        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation>Настройка &quot;Разрешить системе оптимизировать настройки камер&quot; отключена в диалоге &quot;Администрирование системы&quot;</translation>
     </message>
 </context>
 <context>
@@ -678,10 +678,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Прочее</translation>
     </message>
     <message>
-        <source>Restart required.</source>
-        <translation>Требуется перезапуск.</translation>
-    </message>
-    <message>
         <source>Downmix audio from 5.1 to 2.1:</source>
         <translation>Микшировать звук 5.1 в 2.1:</translation>
     </message>
@@ -702,16 +698,16 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Двояная буферизация:</translation>
     </message>
     <message>
-        <source>Disable only if the client takes too much CPU.</source>
-        <translation>Отключайте только если клиент потребляет слишком много ресурсов ЦП.</translation>
-    </message>
-    <message>
         <source>Browse logs</source>
         <translation>Просмотр журнала событий</translation>
     </message>
     <message>
         <source>Clear local cache</source>
         <translation>Очистить локальный кэш</translation>
+    </message>
+    <message>
+        <source>Restart required</source>
+        <translation>Требуется перезапуск</translation>
     </message>
 </context>
 <context>
@@ -737,24 +733,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Открыть диалог Связь с событием (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>&amp;Camera List</source>
         <translation>Список &amp;камер</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Открыть Журнал событий (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Открыть Спиок камер (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&amp;Health Monitoring</source>
@@ -837,6 +821,10 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <source>Loading image... Please wait.</source>
         <translation>Загрузка изображения... Пожалуйста, подождите.</translation>
+    </message>
+    <message>
+        <source>&lt;No image&gt;</source>
+        <translation>&lt;Нет изображения&gt;</translation>
     </message>
 </context>
 <context>
@@ -1089,12 +1077,6 @@ Short for &quot;seconds&quot;</extracomment>
         <translation>с</translation>
     </message>
     <message>
-        <source>This option will not affect Recording Schedule.
-Recording Schedule is always based on Server Time.</source>
-        <translation>Эта настройка не повлияет на Расписание записи.
-Расписание записи всегда настраивается по серверному времени.</translation>
-    </message>
-    <message>
         <source>Background Animation</source>
         <translation>Анимация фона</translation>
     </message>
@@ -1128,7 +1110,7 @@ Recording Schedule is always based on Server Time.</source>
     </message>
     <message>
         <source>Image:</source>
-        <translation>Изображение</translation>
+        <translation>Изображение:</translation>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
@@ -1358,18 +1340,6 @@ Recording Schedule is always based on Server Time.</source>
         <translation>Происходит</translation>
     </message>
     <message>
-        <source>b/s</source>
-        <translation>бит/с</translation>
-    </message>
-    <message>
-        <source>Kb/s</source>
-        <translation>Кбит/с</translation>
-    </message>
-    <message>
-        <source>Mb/s</source>
-        <translation>Мбит/с</translation>
-    </message>
-    <message>
         <source>Parameter 1 is null.</source>
         <translation>Параметр 1 - null.</translation>
     </message>
@@ -1448,57 +1418,45 @@ Recording Schedule is always based on Server Time.</source>
         <translation>Копировать в буфер</translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
-Built for %5-%6 with %7.&lt;br/&gt;
-</source>
-        <translation>&lt;b&gt;%1&lt;/b&gt; версия %2 (%3).&lt;br/&gt;
-Сборка для %5-%6 с помощью %7.&lt;br/&gt;</translation>
+        <source>%1 uses the following external libraries:</source>
+        <translation>%1 использует следующие библиотеки:</translation>
     </message>
     <message>
-        <source>Server at %2: v%1&lt;br/&gt;</source>
-        <translation>Сервер %2: в.%1&lt;br/&gt;</translation>
+        <source>OpenGL version</source>
+        <translation>Версия OpenGL</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</source>
-        <translation>&lt;b&gt;Клиент&lt;/b&gt; не подключен к &lt;b&gt;Серверу&lt;/b&gt;.&lt;br&gt;</translation>
+        <source>OpenGL renderer</source>
+        <translation>Движок OpenGL</translation>
     </message>
     <message>
-        <source>&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br/&gt;
-&lt;br /&gt;
-&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
-&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
-&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
-&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
-&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
-&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
-</source>
-        <translation>&lt;b&gt;%1 %2&lt;/b&gt; использует следующие сторонние библиотеки:&lt;br/&gt;
-&lt;br /&gt;
-&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
-&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
-&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
-&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
-&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
-&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;</translation>
+        <source>OpenGL vendor</source>
+        <translation>Производитель драйвера OpenGL</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</source>
-        <translation>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</translation>
+        <source>OpenGL max texture size</source>
+        <translation>Размер текстур OpenGL</translation>
     </message>
     <message>
-        <source>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br/&gt;
-&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;
-&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br/&gt;
-&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br/&gt;
-</source>
-        <translation>&lt;b&gt;OpenGL версия&lt;/b&gt;: %1.&lt;br/&gt;
-&lt;b&gt;OpenGL драйвер&lt;/b&gt;: %2.&lt;br/&gt;
-&lt;b&gt;OpenGL производитель&lt;/b&gt;: %3.&lt;br/&gt;
-&lt;b&gt;OpenGL макс. размер текстур&lt;/b&gt;: %4.&lt;br/&gt;</translation>
+        <source>Support</source>
+        <translation>Техническая поддержка</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Support&lt;/b&gt;: %1</source>
-        <translation>&lt;b&gt;Поддержка&lt;/b&gt;: %1</translation>
+        <source>Server at %2: v%1</source>
+        <translation>Сервер %2: v%1</translation>
+    </message>
+    <message>
+        <source>%1 version %2 (%3).</source>
+        <translation>%1 версии %2 (%3).</translation>
+    </message>
+    <message>
+        <source>Built for %1-%2 with %3.</source>
+        <translatorcomment>Платформа %1-%2, компилятор %3.</translatorcomment>
+        <translation>Built for %1-%2 with %3.</translation>
+    </message>
+    <message>
+        <source>Client is not connected to any server</source>
+        <translation>Нет соединения с сервером</translation>
     </message>
 </context>
 <context>
@@ -1510,17 +1468,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <source>Saving...</source>
         <translation>Сохранение...</translation>
-    </message>
-</context>
-<context>
-    <name>QnAction</name>
-    <message>
-        <source>%n</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -2290,10 +2237,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Установить как фон на раскладку</translation>
     </message>
     <message>
-        <source>Picture Settings...</source>
-        <translation>Настройки изображения...</translation>
-    </message>
-    <message>
         <source>Layout Settings...</source>
         <translation>Настройки раскладки...</translation>
     </message>
@@ -2577,6 +2520,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>S</source>
         <translation></translation>
     </message>
+    <message>
+        <source>File Settings...</source>
+        <translation>Настройки...</translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
@@ -2617,31 +2564,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <source>Preview</source>
         <translation>Предпросмотр</translation>
-    </message>
-</context>
-<context>
-    <name>QnAutoTester</name>
-    <message>
-        <source>Time to wait before finishing the test, in milliseconds. Default is %1.</source>
-        <translation>Время ожидания окончания теста (в миллисекундах). По умолчанию %1.</translation>
-    </message>
-    <message>
-        <source>Substring that must be present in one of the resources.</source>
-        <translation>Подстрока, которая должна присутствовать в списке ресурсов.</translation>
-    </message>
-    <message>
-        <source>Show this help screen.</source>
-        <translation>Показать это сообщение.</translation>
-    </message>
-    <message>
-        <source>All tests completed successfully.
-</source>
-        <translation>Все тесты успешно выполнены.</translation>
-    </message>
-    <message>
-        <source>Test for resource substring &apos;%1&apos; failed.
-</source>
-        <translation>Тест для подстроки %1 выполнен неудачно.</translation>
     </message>
 </context>
 <context>
@@ -2893,11 +2815,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Подтверждение сброса</translation>
     </message>
     <message>
-        <source>Are you sure you want to reset rules to the defaults?
-This action CANNOT be undone!</source>
-        <translation>Вы уверены, что Вы хотите вернуть правила к значениям по умолчанию? Это действие необратимо!</translation>
-    </message>
-    <message>
         <source>Error while receiving rules.</source>
         <translation>Ошибка при получении правил.</translation>
     </message>
@@ -2924,6 +2841,14 @@ This action CANNOT be undone!</source>
     <message>
         <source>Some rules are not valid. Should they be disabled?</source>
         <translation>Некоторые правила некорректны. Отключить их?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to reset rules to the defaults?</source>
+        <translation>Подтвердите сброс правил к настройкам по умолчанию</translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation>Это действие не может быть отменено!</translation>
     </message>
 </context>
 <context>
@@ -2972,11 +2897,6 @@ This action CANNOT be undone!</source>
         <translation>Длбавить камеры...</translation>
     </message>
     <message>
-        <source>Server is offline.
-Camera addition is possible for online servers only.</source>
-        <translation>Сервер не в сети. Добавление камер возможно только на активный сервер.</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>Завершено</translation>
     </message>
@@ -3015,14 +2935,6 @@ Camera addition is possible for online servers only.</source>
     <message>
         <source>Finishing search...</source>
         <translation>Поиск заканчивается...</translation>
-    </message>
-    <message numerus="yes">
-        <source>Error while adding camera(s).</source>
-        <translation>
-            <numerusform>Ошибка при добавлении камеры.</numerusform>
-            <numerusform>Ошибка при добавлении камер.</numerusform>
-            <numerusform>Ошибка при добавлении камер.</numerusform>
-        </translation>
     </message>
     <message>
         <source>Server went offline, search aborted.</source>
@@ -3076,27 +2988,41 @@ Camera addition is possible for online servers only.</source>
         <source>Select target server...</source>
         <translation>Выберите целевой сервер...</translation>
     </message>
+    <message>
+        <source>Examples:</source>
+        <translation>Примеры:</translation>
+    </message>
+    <message>
+        <source>Server is offline.</source>
+        <translation>Сервер не в сети.</translation>
+    </message>
+    <message>
+        <source>Camera addition is possible for online servers only.</source>
+        <translation>Добавление камер возможно только на работающем сервере.</translation>
+    </message>
     <message numerus="yes">
-        <source>%n camera(s) added successfully.
-It might take a few moments to populate them in the tree.</source>
+        <source>%n cameras added successfully.</source>
         <translation>
-            <numerusform>%n камера успешно добавлена.
-Через некоторое время она отобразится в дереве.</numerusform>
-            <numerusform>%n камеры успешно добавлена.
-Через некоторое время она отобразится в дереве.</numerusform>
-            <numerusform>%n камер успешно добавлена.
-Через некоторое время она отобразится в дереве.</numerusform>
+            <numerusform>%n камера успешно добавлена.</numerusform>
+            <numerusform>%n камеры успешно добавлены.</numerusform>
+            <numerusform>%n камер успешно добавлено.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>It might take a few moments to populate them in the tree.</source>
+        <translation>Камеры появятся в системе через некоторое время.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding %n cameras.</source>
+        <translation>
+            <numerusform>Ошибка при добавлении %n камеры.</numerusform>
+            <numerusform>Ошибка при добавлении %n камер.</numerusform>
+            <numerusform>Ошибка при добавлении %n камер.</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
-    <message>
-        <source>Please wait while settings are being loaded.
-This can take a lot of time.</source>
-        <translation>Пожалуйста, дождитесь загрузки настроек.
-Это может занять некоторое время.</translation>
-    </message>
     <message>
         <source>Applying settings...</source>
         <translation>Применение настроек...</translation>
@@ -3118,6 +3044,14 @@ This can take a lot of time.</source>
 %2</source>
         <translation>Ошибка сохранения параметров (%1):
 %2</translation>
+    </message>
+    <message>
+        <source>Please wait while settings are being loaded.</source>
+        <translation>Пожалуйста, подождите завершения загрузки настроек.</translation>
+    </message>
+    <message>
+        <source>This can take a lot of time.</source>
+        <translation>Это может занять некоторое время.</translation>
     </message>
 </context>
 <context>
@@ -3513,16 +3447,6 @@ This can take a lot of time.</source>
         <translation>Введенные имя пользователя или пароль некорректны, пожалуйста, попробуйте снова.</translation>
     </message>
     <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation>Соединение с сервером не может быть установлено.
-Введены некорректные параметры подключения, исправьте их и попробуйте ещё раз.
-
-Если ошибка будет повторяться, обратитесь к администратору системы.</translation>
-    </message>
-    <message>
         <source>You are trying to connect to incompatible Server.</source>
         <translation>Вы пытаетесь подключиться к несовместимому серверу.</translation>
     </message>
@@ -3539,96 +3463,96 @@ If this error persists, please contact your VMS administrator.</source>
         <translation>Клиент</translation>
     </message>
     <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
-        <translation>Вы собираетесь подключиться к серверу другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Эти версии несовместимы. Пожалуйста, обновите %3</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation>Вы собираетесь подключиться к серверу другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Режим совместимости для версий ниже %3 не поддерживается.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-An error has occurred while trying to restart in compatibility mode.</source>
-        <translation>Выбран сервер другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Произшла ошибка при попытке запуска в режиме совместимости.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - EC version: %2.
-You need to download client %3 to connect</source>
-        <translation>Выбран сервер другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Для подключения к серверу нужен клиент версии %3.</translation>
-    </message>
-    <message>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation>Выбран сервер другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Для подключения к серверу нужен клиент другой версии.</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Client version %3 is required to connect to this Server.
-Download version %3?</source>
-        <translation>Вы собираетесь подключиться к серверу другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Для подключения к этому серверу требуется клиент версии %3.
-Скачать версию %3?</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Server which has a different version:
- - Client version: %1.
- - Server version: %2.
-Would you like to restart the Client in compatibility mode?</source>
-        <translation>Вы собираетесь подключиться к серверу другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Перезапустить клиент в режиме совместимости?</translation>
-    </message>
-    <message>
         <source>Launcher process is not found</source>
         <translation>Процесс Launcher не найден</translation>
-    </message>
-    <message>
-        <source>Cannot restart the Client in compatibility mode.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>Невозможно запустить клиент в режиме совместимости.
-Пожалуйста, закройте приложение и запустите его заново с помощью ярлыка в меню запуска.</translation>
     </message>
     <message>
         <source>Failure</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <source>Failed to launch compatibility version %1
-Try to restore version %1?</source>
-        <translation>Ошибка запуска режима совместимости с версией %1
-Попытаться восстановить версию %1?</translation>
+        <source>Connection to the Server could not be established.</source>
+        <translation>Невозвожно подключиться к серверу.</translation>
+    </message>
+    <message>
+        <source>Connection details that you have entered are incorrect, please try again.</source>
+        <translation>Введённые данные для подключения некорректны, попробуйте снова.</translation>
+    </message>
+    <message>
+        <source>If this error persists, please contact your VMS administrator.</source>
+        <translation>Если ошибка остаётся, обратитесь к администратору системы.</translation>
+    </message>
+    <message>
+        <source> - Client version: %1.</source>
+        <translation> - Версия клиента: %1.</translation>
+    </message>
+    <message>
+        <source> - Server version: %1.</source>
+        <translation> - Версия сервера: %1.</translation>
+    </message>
+    <message>
+        <source>You are about to connect to Server which has a different version:</source>
+        <translation>Вы пытаетесь подключиться к серверу другой версии:</translation>
+    </message>
+    <message>
+        <source>These versions are not compatible. Please update your %1.</source>
+        <translation>Данные версии несовместимы. Пожалуйста, обновите ваш %1.</translation>
+    </message>
+    <message>
+        <source>Compatibility mode for versions lower than %1 is not supported.</source>
+        <translation>Режим совместимости для версий ниже %1 не поддерживается.</translation>
+    </message>
+    <message>
+        <source>Selected Server has a different version:</source>
+        <translation>Выбранный сервер имеет другую версию:</translation>
+    </message>
+    <message>
+        <source>The other version of the Client is needed in order to establish the connection to this Server.</source>
+        <translation>Для подключения к данному серверу требуется другая версия клиента.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to restart in compatibility mode.</source>
+        <translation>Ошибка при перезапуске в режиме совместимости.</translation>
+    </message>
+    <message>
+        <source>Client version %1 is required to connect to this Server.</source>
+        <translation>Для подключения к данному серверу требуется клиент версии %1.</translation>
+    </message>
+    <message>
+        <source>Download version %1?</source>
+        <translation>Скачать версию %1?</translation>
+    </message>
+    <message>
+        <source>Would you like to restart the Client in compatibility mode?</source>
+        <translation>Перезапустить клиент в режиме совместимости?</translation>
+    </message>
+    <message>
+        <source>Cannot restart the Client in compatibility mode.</source>
+        <translation>Невозможно перезапустить клиент в режиме совместимости.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>Похалуйста закройте приложение и запустите его, используя ярлык в меню Пуск.</translation>
+    </message>
+    <message>
+        <source>Failed to launch compatibility version %1</source>
+        <translation>Ошибка запуска совместимой версии %1</translation>
+    </message>
+    <message>
+        <source>Try to restore version %1?</source>
+        <translation>Попробовать восстановить версию %1?</translation>
+    </message>
+    <message>
+        <source>Server has a different version:</source>
+        <translation>Сервер имеет отличающуюся версию:</translation>
+    </message>
+    <message>
+        <source>You will be asked to restart the client in compatibility mode.</source>
+        <translation>Система запросит разрешение на перезапуск клиента в режиме совместимости.</translation>
+    </message>
+    <message>
+        <source>You will be asked to update your %1</source>
+        <translation>Система запросит разрешение на обновление %1</translation>
     </message>
 </context>
 <context>
@@ -3636,62 +3560,6 @@ Try to restore version %1?</source>
     <message>
         <source>Request timed out.</source>
         <translation>Истекло время ожидания ответа на запрос.</translation>
-    </message>
-    <message>
-        <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation>Введенные имя пользователя или пароль некорректны, пожалуйста, попробуйте снова.</translation>
-    </message>
-    <message>
-        <source>Connection to the Server could not be established.
-Connection details that you have entered are incorrect, please try again.
-
-If this error persists, please contact your VMS administrator.</source>
-        <translation>Соединение с сервером не может быть установлено.
-Введены неправильные данные для подключения. Исправьте их и попробуйте ещё  раз.
-
-Если эта ошибка повторится, свяжитесь с вашим администратором.</translation>
-    </message>
-    <message>
-        <source>You are trying to connect to incompatible Server.</source>
-        <translation>Вы пытаетесь подключиться к несовместимому серверу.</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation>Выбран сервер другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Режим совместимости для версий ниже %3 не поддерживается.</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-You will be asked to restart the client in compatibility mode.</source>
-        <translation>Выбран сервер другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Вам придётся перезапустить клиент в режиме совместимости.</translation>
-    </message>
-    <message>
-        <source>Server</source>
-        <translation>Сервер</translation>
-    </message>
-    <message>
-        <source>Client</source>
-        <translation>Клиент</translation>
-    </message>
-    <message>
-        <source>Server has a different version:
- - Client version: %1.
- - Server version: %2.
-These versions are not compatible. Please update your %3</source>
-        <translation>Выбран сервер другой версии:
- - Версия клиента: %1.
- - Версия сервера: %2.
-Эти версии несовместимы. Обновите %3</translation>
     </message>
     <message>
         <source>Failed</source>
@@ -3944,16 +3812,6 @@ These versions are not compatible. Please update your %3</source>
         <translation>Движение в видео</translation>
     </message>
     <message>
-        <source>
-</source>
-        <translation>
-</translation>
-    </message>
-    <message>
-        <source> (%1 times)</source>
-        <translation>(%1 раз)</translation>
-    </message>
-    <message>
         <source>Date/Time</source>
         <translation>Дата/Время</translation>
     </message>
@@ -3984,6 +3842,10 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <source>Administrators Only</source>
         <translation>Только администраторам</translation>
+    </message>
+    <message>
+        <source>%1 times</source>
+        <translation>%1 раз</translation>
     </message>
 </context>
 <context>
@@ -4046,6 +3908,25 @@ These versions are not compatible. Please update your %3</source>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation>Папка %1 не существует.</translation>
     </message>
+    <message>
+        <source>Disable only if the client takes too much CPU</source>
+        <translation>Отключайте только в случае слишком большой загрузки процессора</translation>
+    </message>
+</context>
+<context>
+    <name>QnGeneralSystemAdministrationWidget</name>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation>Открыть Связь с событием</translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation>Открыть Журнал событий</translation>
+    </message>
+    <message>
+        <source>Open Camera List</source>
+        <translation>Открыть Список камер</translation>
+    </message>
 </context>
 <context>
     <name>QnGenericTabbedDialog</name>
@@ -4058,9 +3939,8 @@ These versions are not compatible. Please update your %3</source>
         <translation>Закрыть окно</translation>
     </message>
     <message>
-        <source>Unsaved changes will be lost. Save the following pages?
-</source>
-        <translation>Несохраненные изменения будут утеряны. Сохранить следующие страницы?</translation>
+        <source>Unsaved changes will be lost. Save the following pages?</source>
+        <translation>Несохранённые изменения будут потеряны. Сохранить следующие страницы?</translation>
     </message>
 </context>
 <context>
@@ -4138,28 +4018,16 @@ These versions are not compatible. Please update your %3</source>
         <translation>Невозможно создать файл %1</translation>
     </message>
     <message>
-        <source>Exporting to &quot;%2&quot;...</source>
-        <translation>Экспорт в &quot;%2&quot;...</translation>
-    </message>
-    <message>
         <source>Could not export camera %1</source>
         <translation>Невозможно выполнить экспорт камеры %1</translation>
+    </message>
+    <message>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation>Экспорт в &quot;%1&quot;...</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
-    <message>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;Нет изображения&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be loaded&gt;</source>
-        <translation>&lt;Изображение не может быть загружено&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Image cannot be uploaded&gt;</source>
-        <translation>&lt;Изображение не может быть загружено на сервер&gt;</translation>
-    </message>
     <message>
         <source>Select file...</source>
         <translation>Выбрать файл...</translation>
@@ -4167,6 +4035,38 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <source>Pictures %1</source>
         <translation>Изображения %1</translation>
+    </message>
+    <message>
+        <source>&lt;No picture&gt;</source>
+        <translation>&lt;Без изображения&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Error while loading picture&gt;</source>
+        <translation>&lt;Ошибка при загрузке изображения&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Error while uploading picture&gt;</source>
+        <translation>&lt;Ошибка загрузки изображения на сервер&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be read&gt;</source>
+        <translation>&lt;Изображение не читается&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
+        <translation>&lt;Слишком большое изображение. Максимальный размер %1 МБ&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Picture cannot be loaded&gt;</source>
+        <translation>&lt;Невозможно загрузить изображение&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutTabBar</name>
+    <message>
+        <source>%1&apos;s Screen</source>
+        <comment>%1 means user&apos;s name</comment>
+        <translation>Экран %1</translation>
     </message>
 </context>
 <context>
@@ -4274,50 +4174,8 @@ These versions are not compatible. Please update your %3</source>
         <translation>ПО лицензировано для:</translation>
     </message>
     <message>
-        <source>
-%1 %2</source>
-        <translation>
-%1 %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>
-At least %n %2 are required</source>
-        <translation>
-            <numerusform>
-Требуется как минимум %n %2</numerusform>
-            <numerusform>
-Требуется как минимум %n %2</numerusform>
-            <numerusform>
-Требуется как минимум %n %2</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>
-%n %2 are currently in use</source>
-        <translation>
-            <numerusform>
-%n %2 используется</numerusform>
-            <numerusform>
-%n %2 используются</numerusform>
-            <numerusform>
-%n %2 используются</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Obtaining licenses from Server...</source>
         <translation>Получение лицензий с сервера...</translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial or trial license.</source>
-        <translation>У вас не установлена действующая лицензия.
-Активируйте коммерческую или демонстрационную лицензию.</translation>
-    </message>
-    <message>
-        <source>You do not have a valid license installed.
-Please activate your commercial license.</source>
-        <translation>У вас не установлена действующая лицензия.
-Активируйте коммерческую лицензию.</translation>
     </message>
     <message>
         <source>Copy to Clipboard</source>
@@ -4368,17 +4226,52 @@ Please activate your commercial license.</source>
         <translation>Этот лицензионный ключ уже был активирован на аппаратный ID %1. Свяжитесь со службой поддержки для получения лицензии.</translation>
     </message>
     <message>
-        <source>Network error has occurred during automatic license activation.
-Try to activate your license manually.</source>
-        <translation>При автоматической активации лицензий произошла сетевая ошибка. Попробуйте активировать лицензию вручную.</translation>
-    </message>
-    <message>
         <source>The license is already activated.</source>
         <translation>Лицензия уже активирована.</translation>
     </message>
     <message>
         <source>License was successfully activated.</source>
         <translation>Лицензия успешно активирована.</translation>
+    </message>
+    <message>
+        <source>%1 %2</source>
+        <translation>%1% %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %2 are required</source>
+        <translation>
+            <numerusform>Требуется по крайней мере %n %2</numerusform>
+            <numerusform>Требуется по крайней мере %n %2</numerusform>
+            <numerusform>Требуется по крайней мере %n %2</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %2 are currently in use</source>
+        <translation>
+            <numerusform>%n %2 используется</numerusform>
+            <numerusform>%n %2 используются</numerusform>
+            <numerusform>%n %2 используются</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>You do not have a valid license installed.</source>
+        <translation>Не установлена действующая лицензия.</translation>
+    </message>
+    <message>
+        <source>Please activate your commercial or trial license.</source>
+        <translation>Активируйте коммерческую или демо лицензию.</translation>
+    </message>
+    <message>
+        <source>Please activate your commercial license.</source>
+        <translation>Активируйте коммерческую лицензию.</translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation.</source>
+        <translation>При автоматической активации лицензии возникла сетевая ошибка.</translation>
+    </message>
+    <message>
+        <source>Try to activate your license manually.</source>
+        <translation>Попробуйте активировать лицензию вручную.</translation>
     </message>
 </context>
 <context>
@@ -4506,9 +4399,8 @@ Try to activate your license manually.</source>
         <translation>Удалить соединени(я)</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete the connection
-%1?</source>
-        <translation>Вы уверены, что хотите удалить содинение %1?</translation>
+        <source>Are you sure you want to delete this connection: %1?</source>
+        <translation>Вы уверены, что хотите удалить данное подключение: %1?</translation>
     </message>
 </context>
 <context>
@@ -4569,6 +4461,25 @@ Try to activate your license manually.</source>
         <source>Crop</source>
         <translation>Обрезать</translation>
     </message>
+    <message>
+        <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
+        <translation>Эта настройка не повлияет на Расписание записи. Расписание записи всегда ведётся с учётом времени сервера.</translation>
+    </message>
+</context>
+<context>
+    <name>QnMediaFileSettingsDialog</name>
+    <message>
+        <source>File Settings</source>
+        <translation>Настройки файла</translation>
+    </message>
+    <message>
+        <source>Picture is not loaded</source>
+        <translation>Изображение не загружено</translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens file</source>
+        <translation>Это файл записан с использованием линзы &quot;рыбий глаз&quot;</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
@@ -4609,10 +4520,6 @@ Try to activate your license manually.</source>
         <translation>Hi-Res</translation>
     </message>
     <message>
-        <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7</translation>
-    </message>
-    <message>
         <source>LIVE</source>
         <translation></translation>
     </message>
@@ -4642,16 +4549,6 @@ Try to activate your license manually.</source>
     <message>
         <source>The new system will have password and name from the system:</source>
         <translation>Новая система будет иметь пароль и имя системы:</translation>
-    </message>
-    <message>
-        <source>Success!
-
-The system was configured successfully.
-The servers from the remote system should appear in your system soon.</source>
-        <translation>Успешно!
-
-Система была успешно сконфигурирована.
-Серверы удалённой системы скоро появятся в вашей системе.</translation>
     </message>
     <message>
         <source>http(s)://host:port</source>
@@ -4720,6 +4617,18 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <source>Cannot merge systems.</source>
         <translation>Невозможно объединить системы.</translation>
+    </message>
+    <message>
+        <source>Success!</source>
+        <translation>Успешно!</translation>
+    </message>
+    <message>
+        <source>The system was configured successfully.</source>
+        <translation>Система успешно сконфигурирована.</translation>
+    </message>
+    <message>
+        <source>The servers from the remote system should appear in your system soon.</source>
+        <translation>Серверы удалённой системы должны появиться в вашей системе в ближайшее время.</translation>
     </message>
 </context>
 <context>
@@ -4807,6 +4716,21 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
 </context>
 <context>
+    <name>QnNetworkSpeedStrings</name>
+    <message>
+        <source>b/s</source>
+        <translation>бит/с</translation>
+    </message>
+    <message>
+        <source>Kb/s</source>
+        <translation>Кбит/с</translation>
+    </message>
+    <message>
+        <source>Mb/s</source>
+        <translation>Мбит/с</translation>
+    </message>
+</context>
+<context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
         <source>%n more item(s)</source>
@@ -4852,10 +4776,6 @@ The servers from the remote system should appear in your system soon.</source>
         <translation>Воспроизводить %1 секунд</translation>
     </message>
     <message>
-        <source>Custom Title:</source>
-        <translation>Другой заголовок:</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -4883,6 +4803,10 @@ The servers from the remote system should appear in your system soon.</source>
         <source>Confirm file deletion</source>
         <translation>Подтвердите удаление файла</translation>
     </message>
+    <message>
+        <source>Custom title:</source>
+        <translation>Заголовок:</translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundModel</name>
@@ -4906,8 +4830,12 @@ The servers from the remote system should appear in your system soon.</source>
 <context>
     <name>QnNotificationToolTipWidget</name>
     <message>
-        <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
-        <translation>Закрыть (&lt;b&gt;Right Click&lt;/b&gt;)</translation>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+    <message>
+        <source>Right Click</source>
+        <translation>Клик правой кнопкой</translation>
     </message>
 </context>
 <context>
@@ -4963,29 +4891,18 @@ The servers from the remote system should appear in your system soon.</source>
     </message>
 </context>
 <context>
-    <name>QnPerformance</name>
+    <name>QnPerformanceTest</name>
+    <message>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <translation>Производительность данного компьютера позволяет запускать %1 только в режиме настройки.</translation>
+    </message>
+    <message>
+        <source>For full-featured mode please use another computer.</source>
+        <translation>Для полноценного режима используйте другой компьютер.</translation>
+    </message>
     <message>
         <source>Warning</source>
         <translation>Предупреждение</translation>
-    </message>
-    <message>
-        <source>Performance of this computer allows running %1 in configuration mode only. For full-featured mode please use another computer.</source>
-        <translation>Конфигурация данного ПК позволяет запустить %1 только в режиме конфигурирования. Для полноценного режима используйте другой компьютер.</translation>
-    </message>
-</context>
-<context>
-    <name>QnPictureSettingsDialog</name>
-    <message>
-        <source>Picture Settings</source>
-        <translation>Настройки изображения</translation>
-    </message>
-    <message>
-        <source>Image is not loaded</source>
-        <translation>Изображение не загружено</translation>
-    </message>
-    <message>
-        <source>This is a fish-eye lens image</source>
-        <translation>Это камера с объективом &quot;рыбий глаз&quot; (fish-eye)</translation>
     </message>
 </context>
 <context>
@@ -5011,18 +4928,20 @@ The servers from the remote system should appear in your system soon.</source>
         <translation>Некоторые изменения вступят в силу только после перезапуска приложения. Перезапустить сейчас?</translation>
     </message>
     <message>
-        <source>Settings file is read-only. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation>Файл настроек доступен только для чтения. Пожалуйста, свяжитесь с системным администратором. Все изменения будут потеряны после завершения работы программы.</translation>
-    </message>
-    <message>
-        <source>Settings cannot be saved. Please contact your system administrator.
-All changes will be lost after program exit.</source>
-        <translation>Невозможно сохранить настройки. Пожалуйста, свяжитесь с системным администратором. Все изменения будут потеряны после завершения работы программы.</translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation>Информация</translation>
+    </message>
+    <message>
+        <source>Settings file is read-only. Please contact your system administrator.</source>
+        <translation>Файл настроек доступен только для чтения. Свяжитесь с вашим администратором.</translation>
+    </message>
+    <message>
+        <source>All changes will be lost after program exit.</source>
+        <translation>Все изменения будут потеряны после завершения работы.</translation>
+    </message>
+    <message>
+        <source>Settings cannot be saved. Please contact your system administrator.</source>
+        <translation>Невозможно сохранить настройки. Свяжитесь с вашим администратором.</translation>
     </message>
 </context>
 <context>
@@ -5039,34 +4958,12 @@ All changes will be lost after program exit.</source>
         <translation>Невозможно получить положение камеры</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>Ошибка при получении текущего положения с камеры %1.
-
-Пожалуйста, подождите, пока камера включится.</translation>
-    </message>
-    <message>
         <source>Could not set position for camera</source>
         <translation>Невозможно задать положение камеры</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>Ошибка при попытке задать положение камере %1.
-
-Пожалуйста, подождите, пока камера включится.</translation>
-    </message>
-    <message>
         <source>Remove preset</source>
         <translation>Удалить позицию</translation>
-    </message>
-    <message>
-        <source>This preset is used in some tours.
-These tours will become invalid if you remove it.</source>
-        <translation>Эта позиция используется в некоторых маршрутах обхода. 
-Эти маршруты станут некорректными после удаления.</translation>
     </message>
     <message>
         <source>Changes are not saved. Do you want to save them?</source>
@@ -5083,6 +4980,26 @@ These tours will become invalid if you remove it.</source>
     <message>
         <source>PTZ configuration is not saved</source>
         <translation>Настройки PTZ не сохранены</translation>
+    </message>
+    <message>
+        <source>This preset is used in some tours.</source>
+        <translation>Данная предустановка используется в некоторых турах.</translation>
+    </message>
+    <message>
+        <source>These tours will become invalid if you remove it.</source>
+        <translation>Данный туры станут недоступны, если вы удалите её.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation>Ошибка при получении текущей позиции с камеры %1.</translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation>Пожалуйста дождитесь включения камеры.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
+        <translation>Ошибка при попытке изменить положение камеры %1.</translation>
     </message>
 </context>
 <context>
@@ -5533,18 +5450,6 @@ These tours will become invalid if you remove it.</source>
         <translation>Предупреждение</translation>
     </message>
     <message>
-        <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation>Сейчас будет запущена процедура восстановления архива. ВНИМАНИЕ! Использование жесткого диска будет выше! В зависимости от общего объема архива это может занять несколько часов. Процесс восстановления необходим, если архив был перемещен, переименован или заменен. Вы можете отменить операцию восстановления в любое время без потери данных. Продолжить?</translation>
-    </message>
-    <message>
-        <source>Rebuild archive index</source>
-        <translation>Восстановить архив</translation>
-    </message>
-    <message>
-        <source>Fast initial scan in progress</source>
-        <translation>Запущен быстрый поиск</translation>
-    </message>
-    <message>
         <source>Finished</source>
         <translation>Завершено</translation>
     </message>
@@ -5571,6 +5476,30 @@ These tours will become invalid if you remove it.</source>
     <message>
         <source>Add external Storage...</source>
         <translation>Добавить внешнее хранилище...</translation>
+    </message>
+    <message>
+        <source>You are about to launch the archive re-synchronization routine.</source>
+        <translation>Вы собираетесь запустить ресинхронизацию архива.</translation>
+    </message>
+    <message>
+        <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
+        <translation>ВНИМАНИЕ! Использование жесткого диска возрастёт в процессе ресинхронизации! В зависимости от общего объёма архива, процесс может занять несколько часов.</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
+        <translation>Данная процедура необходима только в том случае, если папки архива были перемещены, переименованы или заменены. Вы можете прервать процесс в любой момент без потери данных.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to continue?</source>
+        <translation>Вы уверены, что хотите продолжить?</translation>
+    </message>
+    <message>
+        <source>Rebuild archive index for storage &apos;%1&apos; in progress</source>
+        <translation>Идёт восстановление индекса архива для хранилища &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Fast archive scan for storage &apos;%1&apos; in progress </source>
+        <translation>Идёт быстрое сканирование архива для хранилища &apos;%1&apos; </translation>
     </message>
 </context>
 <context>
@@ -5699,11 +5628,6 @@ These tours will become invalid if you remove it.</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <source>Cannot cancel update at this state.
-Please wait until update is finished</source>
-        <translation>Сейчас невозможно отменить обновление. Пожалуйста подождите пока процесс обновления завершится</translation>
-    </message>
-    <message>
         <source>Update finished... 100%</source>
         <translation>Обновление завершено... 100%</translation>
     </message>
@@ -5730,12 +5654,6 @@ Please wait until update is finished</source>
     <message>
         <source>Launcher process is not found</source>
         <translation>Процесс Launcher не найден</translation>
-    </message>
-    <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>Невозможно перезапустить клиент.
-Пожалуйста, закройте приложение и запустите его заново, используя ярлык в меню Пуск.</translation>
     </message>
     <message>
         <source>Update cancelled</source>
@@ -5873,6 +5791,26 @@ Please close the application and start it again using the shortcut in the start 
         <source>Installing updates... %1%</source>
         <translation>Установка обновлений... %1%</translation>
     </message>
+    <message>
+        <source>Cannot cancel update at this state.</source>
+        <translation>Невозможно отменить обновление на данном этапе.</translation>
+    </message>
+    <message>
+        <source>Please wait until update is finished</source>
+        <translation>Пожалуйста, дождитесь завершения обновления</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation>Невозможно перезапустить клиент.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>Пожалуйста, закройте приложение и запустите его, используя ярлык в меню Пуск.</translation>
+    </message>
+    <message>
+        <source>Check for updates automatically</source>
+        <translation>Автоматически проверять наличие обновлений</translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -5944,10 +5882,12 @@ Please close the application and start it again using the shortcut in the start 
         <translation>Подтвердите сброс регионов детекции движения</translation>
     </message>
     <message>
-        <source>Are you sure you want to reset motion regions to the defaults?
-This action CANNOT be undone!</source>
-        <translation>Вы уверены, что хотите сбросить регионы детекции движения к настройкам по-умолчанию?
-Это НЕОБРАТИМОЕ действие!</translation>
+        <source>Are you sure you want to reset motion regions to the defaults?</source>
+        <translation>Вы уверены, что хотите сбросить регионы детекции движения к стандартным?</translation>
+    </message>
+    <message>
+        <source>This action CANNOT be undone!</source>
+        <translation>Данное действие НЕОБРАТИМО!</translation>
     </message>
 </context>
 <context>
@@ -6084,6 +6024,22 @@ This action CANNOT be undone!</source>
         <source>Provided storage path does not define a valid external storage.</source>
         <translation>Введённый путь не указывает на корректное внешнее хранилище.</translation>
     </message>
+    <message>
+        <source>Windows Network Shared Resource</source>
+        <translation>Общий ресурс сети Windows</translation>
+    </message>
+    <message>
+        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
+        <translation>\\&lt;Имя компьютера&gt;\&lt;Папка&gt;</translation>
+    </message>
+    <message>
+        <source>Coldstore Network Storage</source>
+        <translation>Сетевое хранилище Coldstore</translation>
+    </message>
+    <message>
+        <source>coldstore://&lt;Address&gt;</source>
+        <translation>coldstore://&lt;Адрес&gt;</translation>
+    </message>
 </context>
 <context>
     <name>QnSystemAdministrationDialog</name>
@@ -6165,99 +6121,116 @@ This action CANNOT be undone!</source>
 <context>
     <name>QnTimeSlider</name>
     <message>
-        <source>NO THUMBNAILS
-AVAILABLE</source>
-        <translation>МИНИАТЮРЫ 
-НЕДОСТУПНЫ</translation>
-    </message>
-    <message>
-        <source>ms</source>
-        <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>мс</translation>
+        <source>NO THUMBNAILS AVAILABLE</source>
+        <translation>НЕТ МИНИАТЮР</translation>
     </message>
     <message>
         <source>auto</source>
-        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>none</translation>
+        <comment>AM/PM usage based on user&apos;s system locale.</comment>
+        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>auto</translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>ms</translation>
     </message>
     <message>
         <source>s</source>
-        <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>с</translation>
+        <comment>Suffix for displaying seconds on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>s</translation>
     </message>
     <message>
         <source>m</source>
-        <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>м</translation>
+        <comment>Suffix for displaying minutes on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>m</translation>
     </message>
     <message>
         <source>h</source>
-        <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>ч</translation>
+        <comment>Suffix for displaying hours on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>h</translation>
     </message>
     <message>
         <source>d</source>
-        <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>д</translation>
+        <comment>Suffix for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>d</translation>
     </message>
     <message>
         <source>M</source>
-        <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>М</translation>
+        <comment>Suffix for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>M</translation>
     </message>
     <message>
         <source>y</source>
-        <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>г</translation>
+        <comment>Suffix for displaying years on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>y</translation>
     </message>
     <message>
         <source>dd MMMM</source>
-        <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying days on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM</translation>
     </message>
     <message>
         <source>MMMM</source>
-        <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying months on timeline.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
-----------
-Format for displaying year caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying years on timeline</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>MINUTES</comment>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
-        <comment>HOURS</comment>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation>yyyy</translation>
     </message>
 </context>
 <context>
@@ -6601,12 +6574,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation>Процесс Launcher не найден</translation>
     </message>
     <message>
-        <source>Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>Невозможно перезапустить клиент.
-Пожалуйста, закройте приложение и запустите его заново, используя ярлык в меню Пуск.</translation>
-    </message>
-    <message>
         <source>Process is in progress</source>
         <translation>Процесс выполняется</translation>
     </message>
@@ -6662,26 +6629,6 @@ Please close the application and start it again using the shortcut in the start 
         <source>Enter new name for the selected item:</source>
         <translation>Введите новое имя для выбранного элемента:</translation>
     </message>
-    <message numerus="yes">
-        <source>These %n cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>Эта камера найдена автоматически. Она может быть снова найдена после удаления. Вы точно хотите её удалить?</numerusform>
-            <numerusform>Эти %n камеры найдены автоматически. Они могут быть снова найдены после удаления. Вы точно хотите удалить их?</numerusform>
-            <numerusform>Эти %n камер найдены автоматически. Они могут быть снова найдены после удаления. Вы точно хотите удалить их?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of these %1 cameras are auto-discovered.
-They may be auto-discovered again after removing.
-Are you sure you want to delete them?</source>
-        <translation>
-            <numerusform>%n из этих %1 камер найдена автоматически. Она может быть снова найдена после удаления. Вы точно хотите удалить её?</numerusform>
-            <numerusform>%n из этих %1 камер найдены автоматически. Они могут быть снова найдены после удаления. Вы точно хотите удалить их?</numerusform>
-            <numerusform>%n из этих %1 камер найдены автоматически. Они могут быть снова найдены после удаления. Вы точно хотите удалить их?</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Delete Resources</source>
         <translation>Удалить ресурсы</translation>
@@ -6693,12 +6640,6 @@ Are you sure you want to delete them?</source>
             <numerusform>Не получается сохранить эти %n элементa.</numerusform>
             <numerusform>Не получается сохранить эти %n элементов.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to delete a resource from Server. 
-
-Error description: &apos;%2&apos;</source>
-        <translation>Произошла ошибка при попытке удаления ресурса с сервера. Описание ошибки: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Server v%1 at %2&lt;br/&gt;</source>
@@ -6756,10 +6697,6 @@ Error description: &apos;%2&apos;</source>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation>Обработка изображения может занять длительное время. Наберитесь терпения.</translation>
     </message>
-    <message>
-        <source>Image cannot be uploaded</source>
-        <translation>Невозможно загрузить изображение</translation>
-    </message>
     <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
@@ -6775,6 +6712,54 @@ Error description: &apos;%2&apos;</source>
     <message>
         <source>Version Mismatch</source>
         <translation>Несоответствие версий</translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n cameras are auto-discovered.</source>
+        <translation>
+            <numerusform>Автоматически обнаружена %n камера.</numerusform>
+            <numerusform>Автоматически обнаружены %n камеры.</numerusform>
+            <numerusform>Автоматически обнаружены %n камер.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>They may be auto-discovered again after removing.</source>
+        <translation>Они снова могут быть автоматически обнаружены после удаления.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete them?</source>
+        <translation>Вы уверены, что хотите удалить их?</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these %1 cameras are auto-discovered.</source>
+        <translation>
+            <numerusform>%n из этих %1 камер обнаружена автоматически.</numerusform>
+            <numerusform>%n из этих %1 камер обнаружены автоматически.</numerusform>
+            <numerusform>%n из этих %1 камер обнаружены автоматически.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to delete a resource from Server. </source>
+        <translation>Ошибка при удалении ресурса с сервера.</translation>
+    </message>
+    <message>
+        <source>Error description: &apos;%1&apos;</source>
+        <translation>Описание ошибки: &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.</source>
+        <translation>Невозможно перезапустить клиент.</translation>
+    </message>
+    <message>
+        <source>Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation>Пожалуйста, закройте приложение и запустите его заново, используя ярлык в меню Пуск.</translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation>Слишком большое изображение. Максимальный размер - %1 МБ</translation>
+    </message>
+    <message>
+        <source>Error while uploading picture.</source>
+        <translation>Ошибка загрузки изображения.</translation>
     </message>
 </context>
 <context>
@@ -6909,14 +6894,6 @@ Error description: &apos;%2&apos;</source>
         <translation>Предупреждение</translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation>Вы собираетесь экспортировать видеоролик продолжительностью более 30 минут.
-Для этого может потребоваться более гигабайта на жёстком диске и, в зависимости от скорости подключения, может занять неколько минут.
-Продолжить?</translation>
-    </message>
-    <message>
         <source>AVI (*.avi)</source>
         <translation>AVI (*.avi)</translation>
     </message>
@@ -6947,10 +6924,6 @@ Do you want to continue?</source>
     <message>
         <source>Bottom right corner (requires transcoding)</source>
         <translation>Нижний правый угол (требуется перекодирование)</translation>
-    </message>
-    <message>
-        <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>Перекодировать видео для обеспечения WYSIWYG</translation>
     </message>
     <message>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
@@ -7029,16 +7002,28 @@ Do you want to continue?</source>
         <translation>Сделать доступным только для чтения</translation>
     </message>
     <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
-It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
-Do you want to continue?</source>
-        <translation>Вы собираетесь экспортировать несколько видеороликов общей продолжительностью более 30 минут.
-Для этого может потребоваться более гигабайта на жёстком диске и, в зависимости от скорости подключения, может занять неколько минут.
-Продолжить?</translation>
-    </message>
-    <message>
         <source>Could not export video</source>
         <translation>Невозможно экспортировать видео</translation>
+    </message>
+    <message>
+        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
+        <translation>Вы собираетесь экспортировать фрагмент длительностью более 30 минут.</translation>
+    </message>
+    <message>
+        <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
+        <translation>Для этого может потребоваться более гигабайта свободного пространства на жёстком диске, и, в зависимости от скорости вашего подключения, процесс может занять несколько минут.</translation>
+    </message>
+    <message>
+        <source>Do you want to continue?</source>
+        <translation>Продолжить?</translation>
+    </message>
+    <message>
+        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
+        <translation>Вы собираетесь экспортировать фрагменты общей длительностью более 30 минут.</translation>
+    </message>
+    <message>
+        <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
+        <translation>Применить фильтры: Переворот, Развертка, Коррекция изображения, Соотношение сторон (требуется транскодирование)</translation>
     </message>
 </context>
 <context>
@@ -7076,19 +7061,24 @@ Do you want to continue?</source>
         <translation>Выбранные сервера были успешно добавлен в систему!</translation>
     </message>
     <message>
-        <source>Authentification failed.
-Please, check the password you have entered.</source>
-        <translation>Ошибка аутентификации.
-Пожалуйста, проверьте пароль, который вы ввели.</translation>
-    </message>
-    <message>
         <source>Could not configure the selected servers.</source>
         <translation>Невозможно сконфигурировать выбранные сервера.</translation>
     </message>
     <message>
-        <source>Could not update the selected servers.
-You can try to update the servers again in the System Administration.</source>
-        <translation>Невозможно обновить выбранные сервера. Вы можете попытаться обновить сервера снова с помощью &quot;Администрирование системы&quot;.</translation>
+        <source>Authentication failed.</source>
+        <translation>Ошибка авторизации.</translation>
+    </message>
+    <message>
+        <source>Please, check the password you have entered.</source>
+        <translation>Пожалуйста, проверьте введённый паоль.</translation>
+    </message>
+    <message>
+        <source>Could not update the selected servers.</source>
+        <translation>Невозможно обновить выбранные серверы.</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration.</source>
+        <translation>Вы можете попробовать еще раз обновить серверы в Администрировании системы.</translation>
     </message>
 </context>
 <context>
@@ -7107,8 +7097,7 @@ You can try to update the servers again in the System Administration.</source>
     </message>
     <message>
         <source>Layout with the same name already exists and you do not have the rights to overwrite it.</source>
-        <translation>Раскладка с таким именем уже существует
-и у Вас нет прав на её изменение.</translation>
+        <translation>Раскладка с таким именем уже существует и у Вас нет прав на её изменение.</translation>
     </message>
     <message>
         <source>Layout with the same name already exists. Do you want to overwrite it?</source>
@@ -7186,25 +7175,24 @@ You can try to update the servers again in the System Administration.</source>
         <translation>Все камеры</translation>
     </message>
     <message>
-        <source>&apos;Live&apos;</source>
-        <extracomment>Time slider&apos;s tooltip for position on live. Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for. That&apos;s where these single quotes come from.</extracomment>
-        <translation>&apos;В реальном времени&apos;</translation>
-    </message>
-    <message>
-        <source>yyyy MMM dd
-hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>hh:mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation>hh:mm:ss</translation>
     </message>
     <message>
         <source>mm:ss</source>
-        <extracomment>This is a date/time format for time slider&apos;s tooltip for short local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation></translation>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation>mm:ss</translation>
+    </message>
+    <message>
+        <source>yyyy MMM dd</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation>yyyy MMM dd</translation>
+    </message>
+    <message>
+        <source>Live</source>
+        <extracomment>Time slider&apos;s tooltip for position on live.</extracomment>
+        <translation>В режиме реального времени</translation>
     </message>
 </context>
 <context>
@@ -7212,14 +7200,6 @@ hh:mm:ss</source>
     <message>
         <source>Could not get position from camera</source>
         <translation>Невозможно получить положение камеры</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to get current position from camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>Ошибка при получении текущего положения с камеры %1.
-
-Пожалуйста, подождите, пока камера включится.</translation>
     </message>
     <message>
         <source>Could not set position for camera</source>
@@ -7230,16 +7210,20 @@ Please wait for the camera to go online.</source>
         <translation>Невозможно задать положение камеры</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to set current position for camera %1.
-
-Please wait for the camera to go online.</source>
-        <translation>Ошибка при попытке задать положение камере %1.
-
-Пожалуйста, подождите, пока камера включится.</translation>
-    </message>
-    <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.</source>
+        <translation>Ошибка при получении текущей позиции с камеры %1.</translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation>Пожалуйста дождитесь включения камеры.</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.</source>
+        <translation>Ошибка при попытке изменить положение камеры %1.</translation>
     </message>
 </context>
 <context>
@@ -7320,10 +7304,6 @@ Please wait for the camera to go online.</source>
         <translation>Доступна более новая версия</translation>
     </message>
     <message>
-        <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
-        <translation>Доступна новая версия &lt;b&gt;%1&lt;/b&gt;.</translation>
-    </message>
-    <message>
         <source>Would you like to update?</source>
         <translation>Вы хотите обновиться?</translation>
     </message>
@@ -7347,17 +7327,20 @@ Please wait for the camera to go online.</source>
         <source>Release Notes</source>
         <translation>Заметки к релизу</translation>
     </message>
+    <message>
+        <source>Please update %1 Client.</source>
+        <translation>Пожалуйста обновите клиент %1.</translation>
+    </message>
+    <message>
+        <source>New version %1 is available.</source>
+        <translation>Доступна новая версия %1.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
         <source>Control session is already running</source>
         <translation>Сессия управления уже запущена</translation>
-    </message>
-    <message>
-        <source>Could not start control session.
-Another user is already controlling this screen.</source>
-        <translation>Невозможно начать сессию управления. Другой пользователь уже управляет этим экраном.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7460,11 +7443,6 @@ Another user is already controlling this screen.</source>
         <translation>Подвердите остановку видеостены</translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?
-You&apos;ll have to start it manually.</source>
-        <translation>Вы уверены, что хотите остановить видеостену? Вам придется запустить ее вручную.</translation>
-    </message>
-    <message>
         <source>New Matrix %1</source>
         <translation>Новая матрица %1</translation>
     </message>
@@ -7487,6 +7465,22 @@ You&apos;ll have to start it manually.</source>
             <numerusform>Вы уверены, что хотите навсегда удалить эти %n матрицы?</numerusform>
             <numerusform>Вы уверены, что хотите навсегда удалить эти %n матриц?</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Could not start control session.</source>
+        <translation>Невозможно начать сессию управления.</translation>
+    </message>
+    <message>
+        <source>Another user is already controlling this screen.</source>
+        <translation>Другой пользователь уже управляет данным экраном.</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop the Video Wall?</source>
+        <translation>Вы уверены, что хотите отключить видеостену.</translation>
+    </message>
+    <message>
+        <source>You&apos;ll have to start it manually.</source>
+        <translation>Вам придётся запустить её вручную.</translation>
     </message>
 </context>
 <context>
@@ -7998,10 +7992,6 @@ You&apos;ll have to start it manually.</source>
         <translation>Незащищенное соединение</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(рекомендуется)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>Secure connection using TLS</source>
         <translation>Защищенное соединение с TLS</translation>
     </message>
@@ -8040,6 +8030,10 @@ You&apos;ll have to start it manually.</source>
     <message>
         <source>Cancel</source>
         <translation>Отмена</translation>
+    </message>
+    <message>
+        <source>(recommended)</source>
+        <translation>(рекомендованные)</translation>
     </message>
 </context>
 <context>

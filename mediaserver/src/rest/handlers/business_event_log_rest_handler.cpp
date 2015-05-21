@@ -13,6 +13,7 @@
 #include "utils/common/util.h"
 
 #include <media_server/serverutil.h>
+#include "recording/time_period.h"
 
 int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {

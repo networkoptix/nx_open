@@ -83,6 +83,11 @@ public:
     void setExportScheduleButtonEnabled(bool enabled);
     int maxRecordedDays() const;
     int minRecordedDays() const;
+
+    //TODO: #GDM #TR workaround against string freeze
+    void showMaxFpsWarning(int setValue, int maxValue);
+    void showMaxDualStreamingWarning(int setValue, int maxValue);
+
     static const int RecordedDaysDontChange = INT_MAX;
 signals:
     void archiveRangeChanged();
@@ -105,6 +110,8 @@ private slots:
     void updateLicensesButtonVisible();
     void updateRecordSpinboxes();
     void updateMaxFpsValue(bool motionPlusLqToggled);
+
+    void updateColors();
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();

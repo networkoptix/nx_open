@@ -7,8 +7,12 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/performance.h>
+#include <utils/common/log.h>
+
 #include <client/client_globals.h>
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+
 #include <ui/dialogs/message_box.h>
 
 #ifdef Q_OS_LINUX
@@ -19,8 +23,8 @@
 #endif
 
 void QnPerformanceTest::detectLightMode() {
-    if (qnSettings->lightModeOverride() != -1) {
-        qnSettings->setLightMode(static_cast<Qn::LightModeFlags>(qnSettings->lightModeOverride()));
+    if (qnRuntime->lightModeOverride() != -1) {
+        qnSettings->setLightMode(static_cast<Qn::LightModeFlags>(qnRuntime->lightModeOverride()));
         return;
     }
 
@@ -31,7 +35,7 @@ void QnPerformanceTest::detectLightMode() {
     QString cpuName = QnPerformance::cpuName();
     QRegExp poorCpuRegExp(lit("Intel\\(R\\) (Atom\\(TM\\)|Celeron\\(R\\)) CPU .*"));
     poorCpu = poorCpuRegExp.exactMatch(cpuName);
-    qDebug() << "QnPerformanceTest: CPU: " << cpuName << " poor: " << poorCpu;
+    NX_LOG(lit("QnPerformanceTest: CPU: \"%1\" poor: %2").arg(cpuName).arg(poorCpu), cl_logINFO);
 
     // Create OpenGL context and check GL_RENDERER
     if (Display *display = QX11Info::display()) {
@@ -43,7 +47,7 @@ void QnPerformanceTest::detectLightMode() {
                 QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
                 QRegExp poorRendererRegExp(lit("Gallium .* on llvmpipe .*|Mesa DRI Intel\\(R\\) Bay Trail.*"));
                 poorGpu = poorRendererRegExp.exactMatch(renderer);
-                qDebug() << "QnPerformanceTest: Renderer: " << renderer << " poor: " << poorGpu;
+                NX_LOG(lit("QnPerformanceTest: Renderer: \"%1\" poor: %2").arg(renderer).arg(poorGpu), cl_logINFO);
 
                 glXDestroyContext(display, context);
             }
@@ -53,17 +57,14 @@ void QnPerformanceTest::detectLightMode() {
 #endif
 
     if (poorCpu && poorGpu) {
-         qnSettings->setLightMode(Qn::LightModeFull);
-        // TODO: #dklychkov change context in translate()
-        QnMessageBox::warning(
-            NULL,
-            0,
-            QCoreApplication::translate("QnPerformance", "Warning"),
-            QCoreApplication::translate("QnPerformance", "Performance of this computer allows running %1 in configuration mode only. "
-                                                         "For full-featured mode please use another computer.").
-                    arg(QnAppInfo::productNameLong()),
-            QMessageBox::StandardButtons(QMessageBox::Ok),
-            QMessageBox::Ok
-        );
+        qnSettings->setLightMode(Qn::LightModeFull);
+        QString message = QCoreApplication::translate("QnPerformanceTest",
+                                                      "Performance of this computer allows running %1 in configuration mode only.")
+                          .arg(QnAppInfo::productNameLong());
+        message += lit(" ");
+        message += QCoreApplication::translate("QnPerformanceTest", "For full-featured mode please use another computer.");
+        QnMessageBox::warning(NULL, 0,
+                              QCoreApplication::translate("QnPerformanceTest", "Warning"), message,
+                              QMessageBox::StandardButtons(QMessageBox::Ok), QMessageBox::Ok);
     }
 }

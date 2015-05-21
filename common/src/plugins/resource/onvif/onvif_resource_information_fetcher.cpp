@@ -13,6 +13,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "plugins/resource/flex_watch/flexwatch_resource.h"
 #include "plugins/resource/axis/axis_onvif_resource.h"
+#include "plugins/resource/avigilon/avigilon_resource.h"
 #include "../vista/vista_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
@@ -276,6 +277,7 @@ QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manu
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& model, 
     const QString& mac, const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const
 {
+    Q_UNUSED(discoveryIp)
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
 
@@ -347,6 +349,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
     else if (manufacture.toLower().contains(QLatin1String("vista")))
         resource = QnPlOnvifResourcePtr(new QnVistaResource());
+    else if (manufacture.toLower().contains(QLatin1String("avigilon")))
+        resource = QnPlOnvifResourcePtr(new QnAvigilonResource());
 #ifdef ENABLE_AXIS
     else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());

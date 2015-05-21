@@ -11,7 +11,6 @@
 #include <update/task/wait_compatible_servers_peer_task.h>
 #include <update/media_server_update_tool.h>
 
-#include <utils/network/global_module_finder.h>
 #include <utils/common/software_version.h>
 
 
@@ -152,7 +151,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         if (!server->getModuleInformation().hasCompatibleVersion()) {
             m_updateTargets.insert(server->getId());
         } else {
-            QnUuid originalId = QnUuid(server->getProperty(lit("guid")));
+            QnUuid originalId = server->getOriginalGuid();
             if (!originalId.isNull())
                 m_waitTargets.insert(server->getId(), originalId);
         }

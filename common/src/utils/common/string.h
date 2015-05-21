@@ -78,5 +78,6 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
 
 void trimInPlace( QString* const str, const QString& symbols = QLatin1String(" ") );
 
+QString htmlBold(const QString &source);
 
 #endif // QN_STRING_H

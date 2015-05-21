@@ -1,18 +1,18 @@
 #include "route.h"
 
-bool QnRoute::isValid() const {
+bool QnOldRoute::isValid() const {
     return !points.isEmpty();
 }
 
-bool QnRoute::isEqual(const QnRoute &other) const {
+bool QnOldRoute::isEqual(const QnOldRoute &other) const {
     return points == other.points;
 }
 
-int QnRoute::length() const {
+int QnOldRoute::length() const {
     return points.size();
 }
 
-bool QnRoute::addPoint(const QnRoutePoint &point, int weight) {
+bool QnOldRoute::addPoint(const QnRoutePoint &point, int weight) {
     // prevent loops in routes
     for (const QnRoutePoint &p: points) {
         if (p.peerId == point.peerId)
@@ -24,7 +24,7 @@ bool QnRoute::addPoint(const QnRoutePoint &point, int weight) {
     return true;
 }
 
-bool QnRoute::containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const {
+bool QnOldRoute::containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const {
     QnUuid prevId = first;
     for (auto it = points.begin(); it != points.end(); ++it) {
         if (prevId == from)
@@ -34,7 +34,7 @@ bool QnRoute::containsConnection(const QnUuid &first, const QnUuid &from, const 
     return false;
 }
 
-bool QnRoute::containsPoint(const QnUuid &id) const {
+bool QnOldRoute::containsPoint(const QnUuid &id) const {
     for (const QnRoutePoint &point: points) {
         if (point.peerId == id)
             return true;
@@ -42,15 +42,15 @@ bool QnRoute::containsPoint(const QnUuid &id) const {
     return false;
 }
 
-bool QnRoute::operator <(const QnRoute &other) const {
+bool QnOldRoute::operator <(const QnOldRoute &other) const {
     if (weight != other.weight)
         return weight < other.weight;
     else
         return points.size() < other.points.size();
 }
 
-QnRoute QnRoute::operator +(const QnRoute &other) const {
-	QnRoute route = *this;
+QnOldRoute QnOldRoute::operator +(const QnOldRoute &other) const {
+	QnOldRoute route = *this;
 	route.points.append(other.points);
 	route.weight += other.weight;
 	return route;

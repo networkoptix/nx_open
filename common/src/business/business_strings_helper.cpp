@@ -16,8 +16,10 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include "core/resource/camera_history.h"
 
 
 namespace {
@@ -209,20 +211,24 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case ServerConflictEvent: {
-        QnCameraConflictList conflicts;
-        conflicts.sourceServer = params.source;
-        conflicts.decode(params.conflicts);
-        int n = 0;
-        for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
-            const QString &server = itr.key();
-            result += delimiter;
-            result += tr("Conflicting Server #%1: %2").arg(++n).arg(server);
-            int m = 0;
-            for (const QString &camera: conflicts.camerasByServer[server]) {
+        if (!params.conflicts.isEmpty()) {
+            QnCameraConflictList conflicts;
+            conflicts.sourceServer = params.source;
+            conflicts.decode(params.conflicts);
+            int n = 0;
+            for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
+                const QString &server = itr.key();
                 result += delimiter;
-                result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
-            }
+                result += tr("Conflicting Server #%1: %2").arg(++n).arg(server);
+                int m = 0;
+                for (const QString &camera: conflicts.camerasByServer[server]) {
+                    result += delimiter;
+                    result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
+                }
 
+            }
+        } else {
+            result += tr("Conflicting Server: %1").arg(params.source);
         }
         break;
     }
@@ -317,7 +323,7 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
 
 
 QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount) {
-    quint64 ts = params.eventTimestamp;
+    quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
 
     int count = qMax(aggregationCount, 1);
@@ -332,7 +338,7 @@ QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParame
 }
 
 QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount) {
-    quint64 ts = params.eventTimestamp;
+    quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
 
     int count = qMax(aggregationCount, 1);
@@ -459,33 +465,30 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(
 
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool /*isPublic*/) {
     QnUuid id = params.eventResourceId;
-    QnNetworkResourcePtr res = !id.isNull() ? 
-                            qnResPool->getResourceById(id).dynamicCast<QnNetworkResource>() : 
-                            QnNetworkResourcePtr();
-    if (!res)
+    if (id.isNull())
         return QString();
 
-    QnResourcePtr mserverRes = res->getParentResource();
+    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById(id).dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return QString();
+
+    QnMediaServerResourcePtr mserverRes = camera->getParentResource().dynamicCast<QnMediaServerResource>();
     if (!mserverRes)
         return QString();
+    
+    quint64 timeStampMs = params.eventTimestampUsec / 1000;
+    QnMediaServerResourcePtr newServer = qnCameraHistoryPool->getMediaServerOnTime(camera, timeStampMs);
+    if (newServer)
+        mserverRes = newServer;
 
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
-    quint64 ts = params.eventTimestamp;
-
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
-    if (history) {
-        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, false);
-        if (newServer)
-            mserverRes = newServer;
-    }
-
     if (resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
         QUrl mserverUrl = mserverRes->getUrl();
         appServerUrl.setHost(mserverUrl.host());
     }
 
     QString result(lit("https://%1:%2/web/camera?physical_id=%3&pos=%4"));
-    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(res->getPhysicalId()).arg(ts/1000);
+    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getPhysicalId()).arg(timeStampMs);
 
     return result;
 }

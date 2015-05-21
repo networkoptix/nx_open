@@ -15,25 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnAbstractStorageResource</name>
-    <message>
-        <source>Windows Network Shared Resource</source>
-        <translation>윈도우 네트워크 공유 리소스</translation>
-    </message>
-    <message>
-        <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>\\&lt;컴퓨터 이름&gt;\&lt;폴더&gt;</translation>
-    </message>
-    <message>
-        <source>Coldstore Network Storage</source>
-        <translation>방한 네트워크 저장 장치</translation>
-    </message>
-    <message>
-        <source>coldstore://&lt;Address&gt;</source>
-        <translation>방한://&lt;주소&gt;</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>User Defined (%1)</source>
@@ -289,6 +270,10 @@
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
         <translation>%1 HDD/SSD 디스크 꽉참. VMS에 관리되지 않는 과도한 데이터가 포함되어 있음.</translation>
     </message>
+    <message>
+        <source>Conflicting Server: %1</source>
+        <translation>서버 충돌 : %1</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -297,74 +282,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server %1 is not available.
- Check that Server is up and running.</source>
-        <translation>%1 서버가 유효하지 않습니다.
-서버를 실행하여 확인하십시오.</translation>
-    </message>
-    <message>
-        <source>Received bad response from Server %1: &quot;%2&quot;.
- Check if Server is up and has the proper version.</source>
-        <translation>%1 서버로 부터 잘못된 응답이 전달됨: &quot;%2&quot;.
-서버를 실행하시어 올바른 버젼인지 확인하십시오.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.
- Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>%1 url media를 열 수 없습니다. %2 media 포트에 연결하지 못했습니다.
-%2 포트에 반드시 접근할 수 있어야 합니다.(기타 전달된). 다음 웹페이지에서 공장초기값으로 복원한 후 카메라를 다시 부팅하십시오.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>%1 url 미디어 서버를 열 수 없습니다. %2 포트의 연결이 예기치 않게 끊어졌습니다.
-카메라 네트워크 환경을 다시 확인하십시오. 카메라를 재부팅합니다.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>카메라 응답을 분석할 수 없습니다. Url %1, 요청명 %2.
-카메라를 재부팅 하시고 , 웹페이지를 통해 공장 초기화로 복원하여 주세요. 마지막으로, 펌웨어 업데이트를 시도하여 주시고 만약 문제가 지속되면 지원 센터에 문의하여 주세요.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>%1 url의 미디어 트랙을 지원하지 않습니다.
-카메라를 재부팅하신 후에, 웹페이지를 통해 공장 초기값으로 복원하십시오. 마지막으로 펌웨어 업데이트를 시도합니다. 만약 문제가 지속되면 관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>%1. Url에 대한 권한이 없습니다.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.
- Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>%1 url 미디어를 열수 없습니다. %2 미디어 프로토콜은 지원하지 않습니다.
-웹페이지를 통해 공장 초기값으로 복원하십시오. 마지막으로 펌웨어 업데이트를 시도합니다. 만약 문제가 지속되면 관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
-        <source>Failed to configure parameter %1.
- First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>%1 변수 설정에 실패하였습니다.
-먼저 저장설정은 켜신 후에(만약 끔상태이면) 카메라 설정의 프레임을 낮춰주세요. 만약 실패하면 웹페이지를 통해 공장 초기값으로 복원하십시오. 만약 문제가 지속되면 관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
-        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
- Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>%2 오류와 함께 %1 카메라 요청이 실패하였습니다.
-카메라를 재부팅하신 후에, 웹페이지를 통해 공장 초기값으로 복원하십시오. 마지막으로 펌웨어 업데이트를 시도합니다. 만약 문제가 지속되면 관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
-        <source>Unknown Camera Issue.
- Please contact support.</source>
-        <translation>알수없는 카메라 이슈가 발생하였습니다.
-관리자의 지원을 받으십시오.</translation>
-    </message>
-    <message>
-        <source>An input/output error has occurred. OS message: &quot;%1&quot;.
- Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>입/출력에서 문제가 발생했습니다. OS 메세지 : &quot;%1&quot;.
-카메라가 네트워크에 정상적으로 연결되어있는지 확인하십시오. 그리고 카메라를 재 시작하세요.</translation>
     </message>
     <message>
         <source>Invalid data was received from the camera: %1.</source>
@@ -383,20 +302,6 @@
         <translation>카메라 초기화 진행 중</translation>
     </message>
     <message>
-        <source>
-
-Parameters: </source>
-        <translation>
-
-매개 변수:</translation>
-    </message>
-    <message>
-        <source>Cannot connect to http port %1.
- Make sure the camera is plugged into the network.</source>
-        <translation>%1 http 포트를 연결할 수 없습니다.
-카메라가 네트워크에 연결 되어있는지 확인하십시오.</translation>
-    </message>
-    <message>
         <source>Server has been stopped.</source>
         <translation>서버가 중지 되었습니다.</translation>
     </message>
@@ -407,6 +312,98 @@ Parameters: </source>
     <message>
         <source>(unknown)</source>
         <translation>(알수없음)</translation>
+    </message>
+    <message>
+        <source>Server %1 is not available.</source>
+        <translation>서버 %1 을 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Check that Server is up and running.</source>
+        <translation>서버가 실행되고 동작하는지 확인하세요.</translation>
+    </message>
+    <message>
+        <source>Received bad response from Server %1: &quot;%2&quot;.</source>
+        <translation>%1 서버로 부터 잘못된 응답이 접수됨 : &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Check if Server is up and has the proper version.</source>
+        <translation>서버가 동작하고 있다면, 적절한 버전인지 확인하세요.</translation>
+    </message>
+    <message>
+        <source>Cannot connect to http port %1.</source>
+        <translation>http 포트 %1에 연결할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Make sure the camera is plugged into the network.</source>
+        <translation>카메라가 네트워크에 연결이 되어있는지 확인 하세요.</translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
+        <translation>%1 미디어 URL을 열수 없습니다. %2 미디어 포트의 연결에 실패하였습니다.</translation>
+    </message>
+    <message>
+        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation>%2 포트에 접근할 수 있는지 확인하세요. 그리고 카메라를 재시작하십시오, 그런 다음 웹페이지에서 공장 초기화값으로 복원해주세요.</translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation>미디어 URL %1 을 열수 없습니다. %2 포트의 연결이 예기치 못한 문제로 종료되었습니다.</translation>
+    </message>
+    <message>
+        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation>카메라가 네트워크에 연결되어있는지 확인하세요. 그리고 카메라의 재부팅을 시도해주세요.</translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. Url %1, request name %2.</source>
+        <translation>카메라 응답을 분석할 수 없습니다. URL %1, %2 이름으로 요청하세요.</translation>
+    </message>
+    <message>
+        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation>카메라를 재 시작하세요, 그리고 웹페이지를 통해 공장초기화로 복원해 주세요.</translation>
+    </message>
+    <message>
+        <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
+        <translation>마지막으로, 카메라 업데잍를 시도합니다. 만약 문제가 지속될 경우 고객지원으로 연락해 주세요.</translation>
+    </message>
+    <message>
+        <source>No supported media tracks at url %1.</source>
+        <translation>URL %1의 미디어트랙을 지원하지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
+        <translation>%1 미디어 URL을 열수 없습니다. %2 미디어 프로토콜을 지원하지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Failed to configure parameter %1.</source>
+        <translation>%1 변수 구성에 실패하였습니다.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
+        <translation>먼저, 녹화설정을 시작해주세요. (만약 OFF라면) 그리고 카메라 설정의 프레임을 감소시켜주세요.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
+        <translation>만약 도움이 되지 않는다면, 카메라 웹페이지에서 공장 초기화값을 복원해주세요. 그래도 문제가 지속될 경우 고객 지원으로 연락해주세요.</translation>
+    </message>
+    <message>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>&quot;%2&quot; 오류와 함께 &quot;%1&quot;의 카메라 요청이 실패하였습니다.</translation>
+    </message>
+    <message>
+        <source>Unknown Camera Issue.</source>
+        <translation>알수없는 카메라 이슈.</translation>
+    </message>
+    <message>
+        <source>Please contact support.</source>
+        <translation>고객 지원으로 연락해 주세요.</translation>
+    </message>
+    <message>
+        <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
+        <translation>입, 출력 오류가 발생하였습니다. OS 메세지 : &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <source>Parameters:</source>
+        <translation>변수:</translation>
     </message>
 </context>
 <context>
@@ -790,10 +787,6 @@ Parameters: </source>
         <translation>서버 연결 실패</translation>
     </message>
     <message>
-        <source>Select server for others to synchronise time with</source>
-        <translation>다른 서버에서 시간 동기화로 선택됨</translation>
-    </message>
-    <message>
         <source>Error while sending email</source>
         <translation>이메일을 보내는 동안 오류 발생</translation>
     </message>
@@ -806,55 +799,60 @@ Parameters: </source>
         <translation>저장기 구성이 되어있지 않음</translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed.</source>
-        <translation>인덱스 저장소의 재정비가 완료 되었습니다.</translation>
-    </message>
-    <message>
         <source>Email address is not set for user %1</source>
         <translation>%1 사용자에 대한 이메일 주소가 설정되지 않음</translation>
-    </message>
-    <message>
-        <source>Email address is not set.
-You cannot receive system notifications via email.</source>
-        <translation>이메일 주소가 설정되지 않았습니다. 이메일을 통한 알람 정보를 받을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.
-You cannot receive system notifications via email.</source>
-        <translation>이메일 서버가 설정되지 않았습니다. 이메일을 통한 알람 정보를 받을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.
-They cannot receive system notifications via email.</source>
-        <translation>일부 사용자가 이메일 주소를 설정하지 않았습니다. 그들은 이메일을 통해 알람을 받을 수 없습니다.</translation>
     </message>
     <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
         <translation>여러 서버는 각각 다른 시간을 가지고 있어 올바른 시간을 자동으로 감지 될 수 없습니다.</translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:
-%1.</source>
-        <translation>서버의 저장기 용량이 꽉참 :
-%1.</translation>
+        <source>Select server for others to synchronize time with</source>
+        <translation>타 위치에서 시간 동기화 서버로 선택 함</translation>
     </message>
     <message>
-        <source>Storages are not configured on the following Server:
-%1.</source>
-        <translation>서버의 저장기 구성이 되어있지 않음:
-%1.</translation>
+        <source>Rebuilding archive index is completed</source>
+        <translation>저장기 인덱서의 재 설정이 완료됨</translation>
     </message>
     <message>
-        <source>Rebuilding archive index is completed on the following Server:
-%1.</source>
-        <translation>서버의 인덱스 저장소 재정비가 완료 됨:
-%1.</translation>
+        <source>Email address is not set.</source>
+        <translation>이메일 주소를 설정하지 않았습니다.</translation>
     </message>
     <message>
-        <source>You have no licenses.
-You cannot record video from cameras.</source>
-        <translation>인증키가 존재하지 않습니다.
-카메라의 비디오를 저장할 수 없습니다.</translation>
+        <source>You cannot receive system notifications via email.</source>
+        <translation>이메일을 통해 시스템 알람을 받을 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Email server is not set.</source>
+        <translation>이메일 서버가 설정되어있지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Some users have not set their email addresses.</source>
+        <translation>일부 사용자가 이메일 주소를 설정하지 않았습니다.</translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications via email.</source>
+        <translation>그들은 이메일을 통해 시스템 알람을 받을 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Storages are full on the following Server:</source>
+        <translation>용량이 부족한 서버 목록:</translation>
+    </message>
+    <message>
+        <source>Storages are not configured on the following Server:</source>
+        <translation>저장기 설정이 되지 않은 서버 목록:</translation>
+    </message>
+    <message>
+        <source>You have no licenses.</source>
+        <translation>인증키가 없습니다.</translation>
+    </message>
+    <message>
+        <source>You cannot record video from cameras.</source>
+        <translation>카메라에서 비디오를 저장할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Rebuilding archive index is completed on the following Server:</source>
+        <translation>저장기 인덱스 재 설정이 완료된 서버 목록:</translation>
     </message>
 </context>
 <context>

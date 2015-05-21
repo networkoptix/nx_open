@@ -27,11 +27,11 @@ QnISDStreamReader::~QnISDStreamReader()
     stop();
 }
 
-static const int BYTES_PER_KB = 1024;
+//static const int BYTES_PER_KB = 1024;
 
 #define USE_VBR
 
-CameraDiagnostics::Result QnISDStreamReader::openStream()
+CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired)
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -44,16 +44,18 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
     int port = QUrl(res->getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
     CLSimpleHTTPClient http (res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
 
-    if (isCameraControlRequired())
+    if (isCameraControlRequired)
     {
         QByteArray request;
         QString result;
         QTextStream t(&result);
 
+#ifndef USE_VBR
         //const QnSecurityCamResource* cameraRes = dynamic_cast<const QnSecurityCamResource*>(m_resource.data());
         //Q_ASSERT( cameraRes );
         //const bool isAmbarellaFirmware = cameraRes->getModel().indexOf(lit("4K")) != -1;
         const bool isAmbarellaChipset = true; 
+#endif
 
         if (role == Qn::CR_SecondaryLiveVideo)
         {
@@ -178,11 +180,8 @@ void QnISDStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData())
         return getMetaData();
@@ -194,7 +193,7 @@ QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
         rez = m_rtpStreamParser.getNextData();
         if (rez) 
         {
-            QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
+            //QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(rez);
             //ToDo: if (videoData)
             //    parseMotionInfo(videoData);
 

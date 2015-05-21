@@ -155,12 +155,12 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
     }
 
     setProperty(MAX_FPS_PARAM_NAME, m_maxFps);
-
+    /*
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_resolution, CODEC_ID_H264 ) ); //QnStardotStreamReader always requests h.264
-    saveResolutionList( mediaStreams );
-
+    saveMediaStreamInfoIfNeeded( mediaStreams );
+    */
     saveParams();
 
     setMotionMaskPhysical(0);

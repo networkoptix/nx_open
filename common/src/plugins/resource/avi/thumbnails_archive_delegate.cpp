@@ -56,12 +56,12 @@ qint64 QnThumbnailsArchiveDelegate::seek (qint64 time, bool findIFrame)
     return m_baseDelegate->seek(time, findIFrame);
 }
 
-QnResourceVideoLayoutPtr QnThumbnailsArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnThumbnailsArchiveDelegate::getVideoLayout()
 {
     return m_baseDelegate->getVideoLayout();
 }
 
-QnResourceAudioLayoutPtr QnThumbnailsArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnThumbnailsArchiveDelegate::getAudioLayout()
 {
     return m_baseDelegate->getAudioLayout();
 }
@@ -76,8 +76,23 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
 
     bool delegateForMediaStep = m_baseDelegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessMediaStep;
     bool holeDetected = false;
-    if (!delegateForMediaStep) {
+    if (!delegateForMediaStep) 
+    {
+        qint64 startTime = m_baseDelegate->startTime();
+        if (startTime != AV_NOPTS_VALUE) {
+            qint64 outerSteps = (startTime - m_currentPos) / m_frameStep;
+            if (outerSteps > 0)
+                m_currentPos += outerSteps * m_frameStep;
+        }
+
         qint64 seekRez = m_baseDelegate->seek(m_currentPos, true);
+        while (seekRez == -1 && m_currentPos < m_rangeEnd && m_rangeEnd != AV_NOPTS_VALUE) {
+            m_currentPos += m_frameStep;
+            seekRez = m_baseDelegate->seek(m_currentPos, true);
+        }
+        if (seekRez == -1)
+            return QnAbstractMediaDataPtr();
+
         holeDetected = seekRez > m_currentPos;
         m_currentPos = seekRez - (seekRez-m_currentPos)%m_frameStep;
     }

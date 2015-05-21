@@ -6,6 +6,7 @@
 
 #include <api/media_server_connection.h>
 
+#include <utils/common/value_cache.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 
@@ -21,8 +22,6 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
 public:
-    static const QString USE_PROXY;
-
     QnMediaServerResource(const QnResourceTypePool* resTypePool);
     virtual ~QnMediaServerResource();
 
@@ -37,7 +36,7 @@ public:
     virtual void setName( const QString& name ) override;
     void setServerName( const QString& name );
 
-    void setApiUrl(const QString& restUrl);
+    void setApiUrl(const QString& apiUrl);
     QString getApiUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
@@ -59,12 +58,7 @@ public:
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    void determineOptimalNetIF();
-    void setPrimaryIF(const QString& primaryIF);
-    /*!
-        \return If there is route to mediaserver, ip address of mediaserver. If there is no route, string \a USE_PROXY
-    */
-    QString getPrimaryIF() const;
+    void setPrimaryAddress(const SocketAddress &primaryAddress);
 
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
@@ -97,6 +91,14 @@ public:
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
+    /** Original GUID is set for incompatible servers when their getGuid() getter returns a fake GUID.
+     * This allows us to hold temporary fake server dublicates in the resource pool.
+     */
+    QnUuid getOriginalGuid() const;
+    /** Set original GUID. No signals emmited after this method because the original GUID should not be changed after resource creation. */
+    void setOriginalGuid(const QnUuid &guid);
+    static bool isFakeServer(const QnResourcePtr &resource);
+
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
     void setStorageDataToUpdate(const QnAbstractStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);
@@ -105,13 +107,14 @@ public:
     */
     QPair<int, int> saveUpdatedStorages();
 private slots:
-    void at_httpClientDone( const nx_http::AsyncHttpClientPtr& client );
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
+    void atResourceChanged();
+    void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
-    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
+    void apiUrlChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);
@@ -121,13 +124,11 @@ signals:
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
-    QString m_primaryIf;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
     //QnAbstractStorageResourceList m_storages;
-    bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
@@ -136,11 +137,17 @@ private:
     QElapsedTimer m_statusTimer;
     QString m_authKey;
 
+    QnUuid m_originalGuid;
+
     // used for client purpose only. Can be moved to separete class
     QnAbstractStorageResourceList m_storagesToUpdate;
     ec2::ApiIdDataList m_storagesToRemove;
 
+    CachedValue<Qn::PanicMode> m_panicModeCache;
+
     mutable QnResourcePtr m_firstCamera;
+
+    Qn::PanicMode calculatePanicMode() const;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

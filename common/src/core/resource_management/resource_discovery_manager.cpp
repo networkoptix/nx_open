@@ -78,8 +78,8 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager()
     m_discoveryUpdateIdx(0),
     m_serverOfflineTimeout(20 * 1000)
 {
-    connect(QnResourcePool::instance(), &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
-    connect(QnResourcePool::instance(), &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
@@ -182,9 +182,12 @@ void QnResourceDiscoveryManager::run()
 }
 
 static const int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
+static const int MIN_DISCOVERY_SEARCH_MS = 1000 * 15;
 
 void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
+    QElapsedTimer discoveryTime;
+    discoveryTime.restart();
     if( UPNPDeviceSearcher::instance() )
         UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
 
@@ -228,7 +231,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
         }
     }
 
-    m_timer->start( GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS );
+    m_timer->start( qMax(GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS, int(MIN_DISCOVERY_SEARCH_MS - discoveryTime.elapsed()) ));
 }
 
 void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList& resources)
@@ -275,7 +278,9 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     QnUuid ownGuid = qnCommon->moduleGUID();
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
-    if (!mServer || !ownServer)
+    if (!mServer)
+        return true; // can take foreign camera is camera's server is absent
+    if (!ownServer)
         return false;
 
     if (camera->hasFlags(Qn::desktop_camera))
@@ -321,7 +326,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     
     for (auto itr = candidates.begin(); itr != candidates.end(); ++itr)
     {
-        QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(qnResPool->getResourceByUniqId(itr.key()));
+        QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(qnResPool->getResourceByUrl(itr.key()));
         if (!camera || !camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
             cameras.insert(itr.key(), itr.value());
     }
@@ -402,6 +407,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             case DiscoveryMode::partiallyEnabled:
                 if( !qnResPool->getResourceByUniqId(it->first->getUniqueId()) )
                     continue;   //ignoring newly discovered camera
+                it->first->addFlags(Qn::search_upd_only);
                 break;
 
             case DiscoveryMode::disabled:

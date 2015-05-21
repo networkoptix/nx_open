@@ -145,19 +145,24 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     QnResourceList& result,
     const QByteArray& responseData,
     const QHostAddress& discoveryAddress,
-    const QHostAddress& /*foundHostAddress*/ )
+    const QHostAddress& foundHostAddress )
 {
+    Q_UNUSED(discoveryAddress)
+    Q_UNUSED(foundHostAddress)
+
     QList<QnNetworkResourcePtr> local_result;
 
 
     QString smac;
-    QString name;
+    QString name(lit("ISDcam"));
 
-    int iqpos = responseData.indexOf("ISD");
-
-
-    if (iqpos<0)
-        return local_result;
+    if (!responseData.contains("ISD")) {
+        // check for new ISD models. it has been rebrended
+        if (responseData.contains("DWcam"))
+            name = lit("DWcam");
+        else
+            return local_result; // not found
+    }
 
     int macpos = responseData.indexOf("macaddress=");
     if (macpos < 0)
@@ -166,30 +171,6 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     macpos += QString(QLatin1String("macaddress=")).length();
     if (macpos + 12 > responseData.size())
         return local_result;
-
-
-    //name = responseData.mid();
-    name = QLatin1String("ISDcam");
-//
-//    for (int i = iqpos; i < macpos; i++)
-//    {
-//        name += QLatin1Char(responseData[i]);
-//    }
-//
-    name.replace(QLatin1Char(' '), QString()); // remove spaces
-    name.replace(QLatin1Char('-'), QString()); // remove spaces
-    name.replace(QLatin1Char('\t'), QString()); // remove tabs
-
-    //macpos++; // -
-//
-//    while(responseData.at(macpos)==' ')
-//        ++macpos;
-//
-//
-//    if (macpos+12 > responseData.size())
-//        return QnNetworkResourcePtr(0);
-//
-
 
     for (int i = 0; i < 12; i++)
     {
@@ -229,7 +210,8 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(smac));
-
+    if (name == lit("DWcam"))
+        resource->setDefaultAuth(QLatin1String("admin"), QLatin1String("admin"));
     local_result.push_back(resource);
 
     return local_result;

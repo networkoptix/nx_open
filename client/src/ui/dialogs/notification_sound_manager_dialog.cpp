@@ -11,6 +11,8 @@
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/media/audio_player.h>
@@ -20,6 +22,8 @@ QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *pare
     ui(new Ui::QnNotificationSoundManagerDialog)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::EventsActions_PlaySound_Help);
 
     ui->listView->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
 
@@ -68,7 +72,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     QString title;
 
     dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
-    dialog->addLineEdit(tr("Custom Title:"), &title); // TODO: #Elric #TR no caps in 2nd word
+    dialog->addLineEdit(tr("Custom title:"), &title);
     if(!dialog->exec())
         return;
 

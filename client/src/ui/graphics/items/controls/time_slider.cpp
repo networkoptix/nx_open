@@ -23,11 +23,14 @@
 #include <ui/common/geometry.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider_pixmap_cache.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
+
+#include <ui/help/help_topics.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -275,7 +278,13 @@ class QnTimeSliderChunkPainter {
 public:
     QnTimeSliderChunkPainter(QnTimeSlider *slider, QPainter *painter): 
         m_slider(slider), 
-        m_painter(painter) 
+        m_painter(painter),
+        m_centralPosition(0),
+        m_centralCoordinate(0),
+        m_minChunkLength(0),
+        m_position(0),
+        m_pendingLength(0),
+        m_pendingPosition(0)
     {
         assert(m_painter && m_slider);
 
@@ -475,6 +484,10 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(this)),
     m_localOffset(0)
+
+    , m_lastLineBarMousePos()
+    , m_lastLineBarValue()
+    , m_bookmarksViewer(QnBookmarksViewer::create(parent))
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -528,8 +541,8 @@ QnTimeSlider::~QnTimeSlider() {
 
 void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTimeStep> *relativeSteps) {
     //: Translate this into 'none' or 'forced' if you want to switch off automatic detection of
-    //: AM/PM usage based on user's system locale. Do not translate this string unless you know what you're doing.
-    QString ampmUsage = tr("auto"); // TODO: #Elric #tr AM_PM_USAGE as 2nd param
+    //: Do not translate this string unless you know what you're doing.
+    QString ampmUsage = tr("auto", "AM/PM usage based on user's system locale.");
     
     bool ampm;
     if(ampmUsage == lit("forced")) {
@@ -540,58 +553,58 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTim
         ampm = QLocale::system().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
     }
 
-    //: Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you're doing.
-    QString msSuffix = tr("ms");
+    //: Do not translate this string unless you know what you're doing.
+    QString msSuffix = tr("ms", "Suffix for displaying milliseconds on timeline.");
 
-    //: Suffix for displaying seconds on timeline. Do not translate this string unless you know what you're doing.
-    QString sSuffix = tr("s");
+    //: Do not translate this string unless you know what you're doing.
+    QString sSuffix = tr("s", "Suffix for displaying seconds on timeline.");
 
-    //: Suffix for displaying minutes on timeline. Do not translate this string unless you know what you're doing.
-    QString mSuffix = tr("m");
+    //: Do not translate this string unless you know what you're doing.
+    QString mSuffix = tr("m", "Suffix for displaying minutes on timeline.");
 
-    //: Suffix for displaying hours on timeline. Do not translate this string unless you know what you're doing.
-    QString hSuffix = tr("h");
+    //: Do not translate this string unless you know what you're doing.
+    QString hSuffix = tr("h", "Suffix for displaying hours on timeline.");
 
-    //: Suffix for displaying days on timeline. Do not translate this string unless you know what you're doing.
-    QString dSuffix = tr("d");
+    //: Do not translate this string unless you know what you're doing.
+    QString dSuffix = tr("d", "Suffix for displaying days on timeline.");
 
-    //: Suffix for displaying months on timeline. Do not translate this string unless you know what you're doing.
-    QString moSuffix = tr("M");
+    //: Do not translate this string unless you know what you're doing.
+    QString moSuffix = tr("M", "Suffix for displaying months on timeline.");
 
-    //: Suffix for displaying years on timeline. Do not translate this string unless you know what you're doing.
-    QString ySuffix = tr("y");
-
-
-    //: Format for displaying days on timeline. Do not translate this string unless you know what you're doing.
-    QString dFormat = tr("dd MMMM");
-
-    //: Format for displaying months on timeline. Do not translate this string unless you know what you're doing.
-    QString moFormat = tr("MMMM");
-
-    //: Format for displaying years on timeline. Do not translate this string unless you know what you're doing.
-    QString yFormat = tr("yyyy"); // TODO: #Elric #TR duplicate with dateYearsFormat
+    //: Do not translate this string unless you know what you're doing.
+    QString ySuffix = tr("y", "Suffix for displaying years on timeline.");
 
 
-    //: Format for displaying minute caption in timeline's header, without am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateMinsFormat = tr("dd MMMM yyyy hh:mm", "MINUTES");
+    //: Do not translate this string unless you know what you're doing.
+    QString dFormat = tr("dd MMMM", "Format for displaying days on timeline.");
 
-    //: Format for displaying minute caption in timeline's header, with am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateMinsApFormat = tr("dd MMMM yyyy hh:mm ap");
+    //: Do not translate this string unless you know what you're doing.
+    QString moFormat = tr("MMMM", "Format for displaying months on timeline.");
 
-    //: Format for displaying hour caption in timeline's header, without am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateHoursFormat = tr("dd MMMM yyyy hh:mm", "HOURS");
+    //: Do not translate this string unless you know what you're doing.
+    QString yFormat = tr("yyyy", "Format for displaying years on timeline");
 
-    //: Format for displaying hour caption in timeline's header, with am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateHoursApFormat = tr("dd MMMM yyyy h ap");
 
-    //: Format for displaying day caption in timeline's header. Do not translate this string unless you know what you're doing.
-    QString dateDaysFormat = tr("dd MMMM yyyy");
+    //: Do not translate this string unless you know what you're doing.
+    QString dateMinsFormat = tr("dd MMMM yyyy hh:mm", "Format for displaying minute caption in timeline's header, without am/pm indicator.");
 
-    //: Format for displaying month caption in timeline's header. Do not translate this string unless you know what you're doing.
-    QString dateMonthsFormat = tr("MMMM yyyy");
+    //: Do not translate this string unless you know what you're doing.
+    QString dateMinsApFormat = tr("dd MMMM yyyy hh:mm ap", "Format for displaying minute caption in timeline's header, with am/pm indicator.");
 
-    //: Format for displaying year caption in timeline's header. Do not translate this string unless you know what you're doing.
-    QString dateYearsFormat = tr("yyyy");
+    //: Do not translate this string unless you know what you're doing.
+    QString dateHoursFormat = tr("dd MMMM yyyy hh:mm", "Format for displaying hour caption in timeline's header, without am/pm indicator.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString dateHoursApFormat = tr("dd MMMM yyyy h ap", "Format for displaying hour caption in timeline's header, with am/pm indicator.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString dateDaysFormat = tr("dd MMMM yyyy", "Format for displaying day caption in timeline's header.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString dateMonthsFormat = tr("MMMM yyyy", "Format for displaying month caption in timeline's header.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString dateYearsFormat = tr("yyyy", "Format for displaying year caption in timeline's header");
 
     *absoluteSteps <<
         QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   msSuffix,       QString(),          false) <<
@@ -809,7 +822,31 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
             m_animating = true;
             setAnimationStart(start);
             setAnimationEnd(end);
-        } else {
+        }
+        else 
+        {
+            if (!m_lastLineBarMousePos.isNull())
+            {
+                if ((m_lastLineBarValue >= start) && (m_lastLineBarValue <= end))
+                {
+                    const qreal endDiff = std::abs(m_windowEnd - end);
+                    const qreal startDiff = std::abs(m_windowStart - start);
+                    const qreal maxDiff = std::max(startDiff, endDiff);
+                    enum { kMinUpdateInterval = 1000 };
+                    if (maxDiff > kMinUpdateInterval)
+                    {
+                        const qreal coeff = (m_lastLineBarValue - start) / (end - start);
+                        m_lastLineBarMousePos = QPointF(coeff * rulerRect().width() , m_lastLineBarMousePos.y());
+                        m_bookmarksViewer->updatePosition(QPointF(mapToParent(m_lastLineBarMousePos).x(), 0), true);
+                    }
+                }
+                else
+                {
+                    m_lastLineBarMousePos = QPointF();
+                    m_bookmarksViewer->hide();
+                }
+            }
+            
             m_windowStart = start;
             m_windowEnd = end;
 
@@ -940,7 +977,7 @@ void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader, qreal aspectR
     updateThumbnailsStepSize(true); // TODO: #Elric
 
     if(m_thumbnailsLoader)
-        foreach(const QnThumbnail &thumbnail, loader->thumbnails())
+        foreach(const QnThumbnail &thumbnail, m_thumbnailsLoader->thumbnails())
             addThumbnail(thumbnail);
 }
 
@@ -1242,6 +1279,28 @@ bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
     return m_lastMinuteIndicatorVisible[line];
 }
 
+QnBookmarksViewer *QnTimeSlider::bookmarksViewer()
+{
+    return m_bookmarksViewer;
+}
+
+int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
+    if (thumbnailsRect().contains(pos))
+        return Qn::MainWindow_Thumbnails_Help;
+    bool hasMotion = false;
+    for (int i = 0; i < m_lineCount; i++) {
+        if (!timePeriods(i, Qn::MotionContent).empty()) {
+            hasMotion = true;
+            break;
+        }
+    }
+
+    if (hasMotion)
+        return Qn::MainWindow_MediaItem_SmartSearch_Help;
+
+    return Qn::MainWindow_Slider_Timeline_Help;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
@@ -1249,7 +1308,7 @@ bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
 void QnTimeSlider::updatePixmapCache() {
     m_pixmapCache->setFont(font());
     m_pixmapCache->setColor(palette().color(QPalette::WindowText));
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16); 
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16); 
 
     updateLineCommentPixmaps();
     updateTickmarkTextSteps();
@@ -1860,7 +1919,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
                 continue;
             }
             
-            if(pos[i]->durationMs != -1)
+            if(!pos[i]->isInfinite())
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 
@@ -2376,12 +2435,16 @@ void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 
 void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverEnterEvent(event);
-
+    
+    grabMouse();
+    
     unsetCursor();
 }
 
 void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
+
+    ungrabMouse();
 
     unsetCursor();
 
@@ -2440,9 +2503,33 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     event->accept();
 }
 
-void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) 
+{
     dragProcessor()->mouseMoveEvent(this, event);
 
+    const auto pos = event->pos();
+    const bool isGrabbing = (scene()->mouseGrabberItem() == this);
+    if (!rulerRect().contains(pos) && isGrabbing)
+    {
+        ungrabMouse();
+        m_bookmarksViewer->hideDelayed();
+    }
+    else
+    {
+        const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
+        if (lineBarRect.contains(pos))
+        {
+            m_lastLineBarMousePos = pos;
+            m_lastLineBarValue = valueFromPosition(pos);
+
+            m_bookmarksViewer->updatePosition(QPointF(mapToParent(pos).x(), 0), false);
+            bookmarksUnderCursorUpdated(pos);
+        }
+        else if (isGrabbing)
+        {
+            m_bookmarksViewer->hideDelayed();
+        }
+    }
     event->accept();
 }
 

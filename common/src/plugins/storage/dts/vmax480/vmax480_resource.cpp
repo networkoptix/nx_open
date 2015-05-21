@@ -144,9 +144,11 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 
     //detecting and saving selected resolutions
+    /*
     CameraMediaStreams mediaStreams;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, QSize(640, 480), CODEC_ID_H264 ) );
-    saveResolutionList( mediaStreams );
+    saveMediaStreamInfoIfNeeded( mediaStreams );
+    */
 
     saveParams();
 
@@ -155,7 +157,7 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     if (chunkReader == 0) {
         m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
         m_chunkReaderMap.insert(getHostAddress(), m_chunkReader);
-        connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)));
+        connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)), Qt::DirectConnection);
         m_chunkReader->start();
     }
 
@@ -249,7 +251,7 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
 QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
 {
     Q_UNUSED(detailLevel)
-    if (!m_chunks.isEmpty())
+    if (!m_chunks.empty())
         startTimeMs = qMin(startTimeMs, m_chunks.last().startTimeMs);
 
     QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);

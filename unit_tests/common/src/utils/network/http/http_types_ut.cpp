@@ -386,4 +386,114 @@ TEST( HttpHeaderTest, AcceptEncoding_parse )
         ASSERT_FALSE( acceptEncoding.encodingIsAllowed("identity") );
         ASSERT_FALSE( acceptEncoding.encodingIsAllowed("qweasd123") );
     }
+
+    {
+        nx_http::header::AcceptEncodingHeader acceptEncoding( "gzip;q=1.0, identity;q=0.5, *;q=0" );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("gzip") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("deflate") );
+        ASSERT_TRUE( acceptEncoding.encodingIsAllowed("identity") );
+        ASSERT_FALSE( acceptEncoding.encodingIsAllowed("qweasd123") );
+    }
+}
+
+
+//////////////////////////////////////////////
+//   nx_http::RequestLine
+//////////////////////////////////////////////
+
+TEST( HttpRequestTest, RequestLine_parse )
+{
+    {
+        nx_http::RequestLine requestLine;
+        ASSERT_TRUE( requestLine.parse( nx_http::BufferType( "GET /hren/hren/hren?hren=hren&hren HTTP/1.0" ) ) );
+        ASSERT_EQ( requestLine.method, nx_http::BufferType("GET") );
+        ASSERT_EQ( requestLine.url, QUrl("/hren/hren/hren?hren=hren&hren") );
+        ASSERT_EQ( requestLine.urlPostfix, QString() );
+        ASSERT_EQ( requestLine.version, nx_http::http_1_0 );
+    }
+
+    {
+        nx_http::RequestLine requestLine;
+        ASSERT_TRUE( requestLine.parse( nx_http::BufferType( "  PUT   /abc?def=ghi&jkl   HTTP/1.1" ) ) );
+        ASSERT_EQ( requestLine.method, nx_http::BufferType("PUT") );
+        ASSERT_EQ( requestLine.url, QUrl("/abc?def=ghi&jkl") );
+        ASSERT_EQ( requestLine.urlPostfix, QString() );
+        ASSERT_EQ( requestLine.version, nx_http::http_1_1 );
+    }
+
+    {
+        nx_http::RequestLine requestLine;
+        ASSERT_FALSE( requestLine.parse( nx_http::BufferType( "GET    HTTP/1.1" ) ) );
+        ASSERT_FALSE( requestLine.parse( nx_http::BufferType() ) );
+    }
+}
+
+
+
+//////////////////////////////////////////////
+//   nx_http::Request
+//////////////////////////////////////////////
+
+static const nx::Buffer HTTP_REQUEST(
+    "PLAY rtsp://192.168.0.25:7001/00-1A-07-0A-3A-88 RTSP/1.0\r\n"
+    "CSeq: 2\r\n"
+    "Range: npt=1423440107300000-1423682432925000\r\n"
+    "Scale: 1\r\n"
+    "x-guid: {ff69b2e0-1f1e-4512-8eb9-4d20b33587dc}\r\n"
+    "Session: \r\n"
+    "User-Agent: Network Optix\r\n"
+    "x-play-now: true\r\n"
+    "x-media-step: 9693025000\r\n"
+    "Authorization: Basic YWRtaW46MTIz\r\n"
+    "x-server-guid: {d1a49afe-a2a2-990a-2c54-b77e768e6ad2}\r\n"
+    "x-media-quality: low\r\n"
+    "\r\n" );
+
+TEST( HttpRequestTest, Request_parse )
+{
+    nx_http::Request request;
+    ASSERT_TRUE( request.parse( HTTP_REQUEST ) );
+    ASSERT_EQ( nx_http::getHeaderValue( request.headers, "x-media-step" ).toLongLong(), 9693025000LL );
+}
+
+
+//////////////////////////////////////////////
+//   Via header tests
+//////////////////////////////////////////////
+
+TEST( HttpHeaderTest, WWWAuthenticate_parse )
+{
+    {
+        static const char testData[] = "Digest realm=\"AXIS_ACCC8E338EDF\", nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", algorithm=MD5, qop=\"auth\"";
+
+        nx_http::header::WWWAuthenticate auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData(testData, sizeof(testData)-1) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::digest );
+        ASSERT_EQ( auth.params.size(), 4 );
+        ASSERT_EQ( auth.params["realm"], "AXIS_ACCC8E338EDF" );
+        ASSERT_EQ( auth.params["algorithm"], "MD5" );
+        ASSERT_EQ( auth.params["qop"], "auth" );
+        ASSERT_EQ( auth.params["nonce"], "p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad" );
+    }
+
+    {
+        static const char testData[] = "Digest realm=AXIS_ACCC8E338EDF, nonce=\"p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad\", algorithm=MD5, qop=auth";
+
+        nx_http::header::WWWAuthenticate auth;
+        ASSERT_TRUE( auth.parse( QByteArray::fromRawData(testData, sizeof(testData)-1) ) );
+        ASSERT_EQ( auth.authScheme, nx_http::header::AuthScheme::digest );
+        ASSERT_EQ( auth.params.size(), 4 );
+        ASSERT_EQ( auth.params["realm"], "AXIS_ACCC8E338EDF" );
+        ASSERT_EQ( auth.params["algorithm"], "MD5" );
+        ASSERT_EQ( auth.params["qop"], "auth" );
+        ASSERT_EQ( auth.params["nonce"], "p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad" );
+    }
+
+    //TODO #ak uncomment and fix!
+    //{
+    //    static const char testData[] = "Digest realm=AXIS_ACCC8E338EDF, nonce=p65VeyEWBQA=0b7e4955ab1d73d00a4b903c19d91c67931ef7ad, algorithm=MD5, qop=auth";
+
+    //    nx_http::header::WWWAuthenticate auth;
+    //    ASSERT_FALSE( auth.parse( QByteArray::fromRawData(testData, sizeof(testData)-1) ) );
+    //}
 }

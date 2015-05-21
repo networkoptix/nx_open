@@ -12,7 +12,6 @@
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
 #include "plugins/resource/server_camera/server_camera.h"
-#include "utils/network/global_module_finder.h"
 
 #include <utils/common/app_info.h>
 
@@ -24,6 +23,7 @@ QnClientMessageProcessor::QnClientMessageProcessor():
     m_holdConnection(false)
 {
     m_status.setState(QnConnectionState::Disconnected);
+    connect(this, &QnClientMessageProcessor::connectionClosed, m_incompatibleServerWatcher, &QnIncompatibleServerWatcher::stop);
 }
 
 void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection) {
@@ -41,7 +41,6 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
         data.peer.id = qnCommon->remoteGUID();
         qnCommon->setRemoteGUID(QnUuid());
         m_connected = false;
-        m_incompatibleServerWatcher->stop();
         emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QnUuid());
@@ -54,22 +53,26 @@ QnConnectionState QnClientMessageProcessor::connectionState() const {
     return m_status.state();
 }
 
+QnIncompatibleServerWatcher *QnClientMessageProcessor::incompatibleServerWatcher() const {
+    return m_incompatibleServerWatcher;
+}
+
 void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
     if (m_holdConnection == holdConnection)
         return;
 
     m_holdConnection = holdConnection;
 
-    if (!m_holdConnection && !m_connected && !qnCommon->remoteGUID().isNull()) {
-        m_incompatibleServerWatcher->stop();
+    if (!m_holdConnection && !m_connected && !qnCommon->remoteGUID().isNull())
         emit connectionClosed();
-    }
 }
 
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
     base_type::connectToConnection(connection);
-    connect( connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-        this, &QnClientMessageProcessor::at_systemNameChangeRequested );
+    connect(connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+            this, &QnClientMessageProcessor::at_systemNameChangeRequested);
+    connect(connection->getMiscManager(), &ec2::AbstractMiscManager::gotInitialModules,
+            this, &QnClientMessageProcessor::at_gotInitialModules);
 }
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -155,10 +158,8 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 
     m_connected = false;
 
-    if (!m_holdConnection) {
+    if (!m_holdConnection)
         emit connectionClosed();
-        m_incompatibleServerWatcher->stop();
-    }
 }
 
 void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
@@ -168,10 +169,16 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
     qnCommon->setLocalSystemName(systemName);
 }
 
+void QnClientMessageProcessor::at_gotInitialModules(const QList<QnModuleInformationWithAddresses> &modules) {
+    m_incompatibleServerWatcher->start();
+    m_incompatibleServerWatcher->createModules(modules);
+}
+
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    m_incompatibleServerWatcher->stop();
-    m_incompatibleServerWatcher->start();
     m_status.setState(QnConnectionState::Ready);
+
+    /* Get server time as soon as we setup connection. */
+    qnSyncTime->currentMSecsSinceEpoch();
 }

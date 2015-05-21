@@ -116,18 +116,6 @@ const QVector<QnUuid>& QnAbstractBusinessAction::getResources() const {
     return m_resources;
 }
 
-QnResourceList QnAbstractBusinessAction::getResourceObjects() const
-{
-    QnResourceList result;
-    for(const QnUuid& id: m_resources)
-    {
-        QnResourcePtr res = qnResPool->getResourceById(id);
-        if (res)
-            result << res;
-    }
-    return result;
-}
-
 void QnAbstractBusinessAction::setParams(const QnBusinessActionParameters& params) {
     m_params = params;
 }

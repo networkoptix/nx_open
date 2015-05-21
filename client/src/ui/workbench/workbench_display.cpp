@@ -20,6 +20,7 @@
 #include <utils/common/variant_timer.h>
 #include <utils/aspect_ratio.h>
 
+#include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
 #include <common/common_meta_types.h>
 
@@ -133,12 +134,6 @@ namespace {
 
     /** Maximal expanded size of a raised widget, relative to viewport size. */
     const qreal maxExpandedSize = 0.5;
-
-    /** Viewport lower size boundary, in scene coordinates. */
-    const QSizeF viewportLowerSizeBound = QSizeF(qnGlobals->workbenchUnitSize() * 0.05, qnGlobals->workbenchUnitSize() * 0.05);
-
-    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings
-    const qreal selectedFrameWidth = defaultFrameWidth * 2; // TODO: #Elric same here
 
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;
@@ -481,6 +476,7 @@ void QnWorkbenchDisplay::initSceneView() {
 
     /* Run handlers. */
     at_workbench_currentLayoutChanged();
+    at_mapper_spacingChanged();
 }
 
 void QnWorkbenchDisplay::initBoundingInstrument() {
@@ -596,24 +592,13 @@ void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
     item->setOpacity(0.0);
 }
 
-QRectF QnWorkbenchDisplay::raisedGeometry(QnResourceWidget *widget) const {
-    if (!widget->item())
-        return QRectF();
-
-    QRectF enclosingGeometry = itemEnclosingGeometry(widget->item());
-
-    QRectF originGeometry = enclosingGeometry;
-    if (widget->hasAspectRatio())
-        originGeometry = expanded(widget->aspectRatio(), originGeometry, Qt::KeepAspectRatio);
-
-    raisedConeItem(widget)->setOriginGeometry(originGeometry);
-
+QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const {
+    QRectF occupiedGeometry = QnGeometry::rotated(widgetGeometry, rotation);
     QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
-
-    QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
+    QSizeF newWidgetSize = occupiedGeometry.size() * focusExpansion;
 
     qreal magicConst = maxExpandedSize;
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         magicConst = 0.8;   //TODO: #Elric magic const
     else
     if (
@@ -626,15 +611,15 @@ QRectF QnWorkbenchDisplay::raisedGeometry(QnResourceWidget *widget) const {
     QPointF viewportCenter = viewportGeometry.center();
 
     /* Allow expansion no further than the maximal size, but no less than current size. */
-    newWidgetSize =  bounded(newWidgetSize, maxWidgetSize,   Qt::KeepAspectRatio);
-    newWidgetSize = expanded(newWidgetSize, enclosingGeometry.size(), Qt::KeepAspectRatio);
+    newWidgetSize =  bounded(newWidgetSize, maxWidgetSize,              Qt::KeepAspectRatio);
+    newWidgetSize = expanded(newWidgetSize, occupiedGeometry.size(),    Qt::KeepAspectRatio);
 
     /* Calculate expansion values. Expand towards the screen center. */
     qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
-    calculateExpansionValues(enclosingGeometry.left(), enclosingGeometry.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
-    calculateExpansionValues(enclosingGeometry.top(),  enclosingGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
+    calculateExpansionValues(occupiedGeometry.left(),   occupiedGeometry.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
+    calculateExpansionValues(occupiedGeometry.top(),    occupiedGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
 
-    return enclosingGeometry.adjusted(xp1, yp1, xp2, yp2);
+    return rotated(occupiedGeometry.adjusted(xp1, yp1, xp2, yp2), -rotation);
 }
 
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) {
@@ -924,7 +909,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
     widget->setFrameOpacity(m_frameOpacity);
-    widget->setFrameWidth(defaultFrameWidth);
+    widget->setFrameWidth(qnGlobals->defaultFrameWidth());
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -1280,7 +1265,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
             : layoutBoundingRect.united(backgroundBoundingRect);
 
     /* Do not add additional spacing in following cases: */
-    bool noAdjust = qnSettings->isVideoWallMode()                           /*< Videowall client. */
+    bool noAdjust = qnRuntime->isVideoWallMode()                           /*< Videowall client. */
         || !backgroundBoundingRect.isNull();                                /*< There is a layout background. */
 
     if (noAdjust)
@@ -1296,6 +1281,14 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const {
     } else {
         return m_viewportAnimator->accessor()->get(m_view).toRectF();
     }
+}
+
+QRectF QnWorkbenchDisplay::boundedViewportGeometry() const {
+    if(m_view == NULL)
+        return QRectF();
+
+    QRect boundedRect = QnGeometry::eroded(m_view->viewport()->rect(), viewportMargins());
+    return QnSceneTransformations::mapRectToScene(m_view, boundedRect);
 }
 
 QPoint QnWorkbenchDisplay::mapViewportToGrid(const QPoint &viewportPoint) const {
@@ -1374,22 +1367,27 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     QnResourceWidget *zoomedWidget = m_widgetByRole[Qn::ZoomedRole];
     QnResourceWidget *raisedWidget = m_widgetByRole[Qn::RaisedRole];
 
+    /* Calculate rotation. */
+    qreal rotation = item->rotation();
+    if(item->data<bool>(Qn::ItemFlipRole, false))
+        rotation += 180;
+
     QRectF enclosingGeometry = itemEnclosingGeometry(item);
 
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
         ensureRaisedConeItem(widget);
-        enclosingGeometry = raisedGeometry(widget);
+        QRectF targetGeometry = widget->calculateGeometry(enclosingGeometry, rotation);
+        raisedConeItem(widget)->setOriginGeometry(rotated(targetGeometry, rotation));
+        QRectF raisedGeometry = this->raisedGeometry(targetGeometry, rotation);
+        qreal scale = scaleFactor(targetGeometry.size(), raisedGeometry.size(), Qt::KeepAspectRatio);
+        enclosingGeometry = scaled(enclosingGeometry, scale, enclosingGeometry.center());
+        enclosingGeometry.moveCenter(enclosingGeometry.center() + raisedGeometry.center() - targetGeometry.center());
     }
 
     /* Update Z value. */
     if(widget == raisedWidget || widget == zoomedWidget)
         bringToFront(widget);
-
-    /* Calculate rotation. */
-    qreal rotation = item->rotation();
-    if(item->data<bool>(Qn::ItemFlipRole, false))
-        rotation += 180;
 
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
@@ -1444,7 +1442,7 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
     }
 
     m_boundingInstrument->setPositionBounds(m_view, moveRect);
-    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
+    m_boundingInstrument->setSizeBounds(m_view, qnGlobals->viewportLowerSizeBound(), Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
@@ -1573,7 +1571,9 @@ void QnWorkbenchDisplay::updateFrameWidths() {
         return;
 
     foreach(QnResourceWidget *widget, this->widgets())
-        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() ? selectedFrameWidth : defaultFrameWidth);
+        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() 
+            ? qnGlobals->selectedFrameWidth() 
+            : qnGlobals->defaultFrameWidth());
 }
 
 void QnWorkbenchDisplay::updateCurtainedCursor() {
@@ -1689,7 +1689,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->pleaseStop();
         }
 
-        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid())) {
+        if(QnMediaResourcePtr resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>()) {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
             connect(m_loader, &QnThumbnailsLoader::thumbnailLoaded, this,       &QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded);
@@ -1831,10 +1831,11 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
         qDebug() << "thumbnail with time" << dt(thumbnail.actualTime()) << "set to widget" << dt(bestMatching->item()->data<qint64>(Qn::ItemTimeRole, -1));
 #endif
 
+        qint64 targetTime = bestMatching->item()->data<qint64>(Qn::ItemTimeRole, 0);
         bestMatching->display()->camDisplay()->setMTDecoding(false);
         bestMatching->display()->camDisplay()->putData(thumbnail.data());
         bestMatching->display()->camDisplay()->start();
-        bestMatching->display()->archiveReader()->startPaused();
+        bestMatching->display()->archiveReader()->startPaused(targetTime * 1000ll);
     }
 
 }

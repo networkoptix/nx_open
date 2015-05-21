@@ -16,6 +16,7 @@
 
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_type.h>
@@ -51,6 +52,7 @@
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/videowall_settings_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -68,6 +70,9 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
@@ -264,7 +269,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_licensesHelper(new QnVideoWallLicenseUsageHelper())
 {
-    m_videoWallMode.active = qnSettings->isVideoWallMode();
+    m_videoWallMode.active = qnRuntime->isVideoWallMode();
     m_videoWallMode.opening = false;
     m_videoWallMode.ready = false;
     m_controlMode.active = false;
@@ -328,7 +333,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             setControlMode(false);
             QMessageBox::warning(mainWindow(),
                 tr("Control session is already running"),
-                tr("Could not start control session.\nAnother user is already controlling this screen."));
+                tr("Could not start control session.") + L'\n' + tr("Another user is already controlling this screen."));
         }
         
     });
@@ -507,16 +512,17 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
     if (!canStartVideowall(videoWall)) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
-            tr("There are no offline videowall items attached to this pc.")); //TODO: #VW #TR
+            tr("There are no offline videowall items attached to this pc."));
         return;
     }
 
     QMessageBox::StandardButton button = 
-        QMessageBox::question(
+        QnMessageBox::question(
             mainWindow(),
+            Qn::Videowall_VwModeWarning_Help,
             tr("Switch to Video Wall Mode..."),
             tr("Video Wall will be started now. Do you want to close this %1 Client instance?")
-                .arg(QnAppInfo::productNameLong()), //TODO: #VW #TR
+                .arg(QnAppInfo::productNameLong()),
             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
             QMessageBox::Yes
             );
@@ -919,7 +925,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
 
         QMessageBox::warning(mainWindow(),
             tr("Control session is already running"),
-            tr("Could not start control session.\nAnother user is already controlling this screen."));
+            tr("Could not start control session.") + L'\n' + tr("Another user is already controlling this screen."));
 
         return false;
     }
@@ -1161,15 +1167,21 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QnUuid::createUuid());
-    if (filtered.size() == 1)
-        layout->setName(generateUniqueLayoutName(context()->user(),
-                                                 filtered.first()->getName(),
-                                                 tr("%1 (%2)")
-                                                 .arg(filtered.first()->getName())
-                                                 .arg(lit("%1"))
-                                                 ));
-    else
+    if (filtered.size() == 1) {
+        QnResourcePtr resource = filtered.first();
+        if (resource->hasFlags(Qn::desktop_camera))
+            layout->setName(resource->getName());
+        else
+            layout->setName(generateUniqueLayoutName(context()->user(),
+                                                     resource->getName(),
+                                                     tr("%1 (%2)")
+                                                     .arg(resource->getName())
+                                                     .arg(lit("%1"))
+                                                     ));
+    }
+    else {
         layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
+    }
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 
@@ -1216,7 +1228,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Video Wall..."));
-    dialog->setText(tr("Enter the name of the Video Wall to create:")); //TODO: #VW #TR
+    dialog->setText(tr("Enter the name of the Video Wall to create:"));
     dialog->setName(proposedName);
     dialog->setWindowModality(Qt::ApplicationModal);
 
@@ -1363,8 +1375,8 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
 
     if (QMessageBox::warning(mainWindow(),
         tr("Confirm Video Wall stop"),
-        tr("Are you sure you want to stop the Video Wall?\n"\
-        "You'll have to start it manually."),
+        tr("Are you sure you want to stop the Video Wall?") + L'\n' 
+      + tr("You'll have to start it manually."),
         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
         QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
@@ -1685,7 +1697,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered() {
     if (matrix.layoutByItem.isEmpty()) {
         QMessageBox::information(mainWindow(),
             tr("Invalid matrix"),
-            tr("You have no layouts on the screens. Matrix cannot be saved.")); //TODO: #VW #TR
+            tr("You have no layouts on the screens. Matrix cannot be saved."));
         return;
     }
 

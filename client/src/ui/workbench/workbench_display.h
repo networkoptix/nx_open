@@ -256,6 +256,11 @@ public:
     QRectF viewportGeometry() const;
 
     /**
+     * \returns                         Current viewport geometry, in scene coordinates, calculated taking viewport margins into account.
+     */
+    QRectF boundedViewportGeometry() const;
+
+    /**
      * This function can be used in case the "actual" viewport differs from the 
      * "real" one. This can be the case if control panels are drawn on the scene.
      *
@@ -308,13 +313,13 @@ public:
      * Status function to know if we are changing layout now.
      * \returns true if we are changing layout
      */
-    bool isChangingLayout() const { return m_inChangeLayout; } // TODO: #Elric this is evil
+    bool isChangingLayout() const { return m_inChangeLayout; } // TODO: #GDM this is evil
 
     QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
 
     void ensureRaisedConeItem(QnResourceWidget *widget);
 
-    QRectF raisedGeometry(QnResourceWidget *widget) const;
+    QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
 
     QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
 

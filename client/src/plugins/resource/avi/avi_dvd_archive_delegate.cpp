@@ -481,9 +481,9 @@ bool QnAVIDvdArchiveDelegate::switchToFile(int newFileIndex)
                     int angle = 0;
                     int start_cell = p_pgc->program_map[ pgn - 1 ] - 1;
                     int next_cell = start_cell;
-                    for(int cur_cell = start_cell; next_cell < p_pgc->nr_of_cells; )
+                    while(next_cell < p_pgc->nr_of_cells)
                     {
-                        cur_cell = next_cell;
+                        int cur_cell = next_cell;
 
                         /* Check if we're entering an angle block. */
                         if( p_pgc->cell_playback[ cur_cell ].block_type == BLOCK_TYPE_ANGLE_BLOCK )

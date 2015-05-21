@@ -38,6 +38,9 @@
 #include <ui/workbench/extensions/workbench_layout_export_tool.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+
 #include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
 #include <utils/common/string.h>
@@ -206,9 +209,9 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             QMessageBox::warning(
                 mainWindow(),
                 tr("Warning"),
-                tr("You are about to export a video sequence that is longer than 30 minutes.\n"
-                   "It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n"
-                   "Do you want to continue?"),
+                tr("You are about to export a video sequence that is longer than 30 minutes.") + L'\n' 
+              + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
+              + tr("Do you want to continue?"),
                 QMessageBox::Yes | QMessageBox::No,
                 QMessageBox::No
                 ) == QMessageBox::No)
@@ -275,6 +278,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
+        setHelpTopic(dialog.data(), Qn::Exporting_Help);
+
         QnAbstractWidgetControlDelegate* delegate = NULL;
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
@@ -292,7 +297,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         bool doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
         if (doTranscode) 
         {
-            dialog->addCheckBox(tr("Transcode video to guarantee WYSIWYG"), &doTranscode, delegate);
+            dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)"), &doTranscode, delegate);
         }
 
         if (!dialog->exec())
@@ -319,7 +324,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         }
 
         if (dialog->selectedNameFilter().contains(aviFileFilter)) {
-            QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(widget->resource()->toResourcePtr());
+            QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(widget->resource());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
@@ -572,6 +577,8 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         dialog->setAcceptMode(QFileDialog::AcceptSave);
         dialog->addCheckBox(tr("Make file read-only"), &readOnly);
 
+        setHelpTopic(dialog.data(), Qn::Exporting_Layout_Help);
+
         if (!dialog->exec())
             return false;
 
@@ -648,9 +655,9 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
         int button = QMessageBox::question(
             mainWindow(),
             tr("Warning"),
-            tr("You are about to export several video sequences with a total length exceeding 30 minutes. \n"
-               "It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n"
-               "Do you want to continue?"),
+            tr("You are about to export several video sequences with a total length exceeding 30 minutes.") + L'\n' 
+          + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n' 
+          + tr("Do you want to continue?"),
                QMessageBox::Yes | QMessageBox::No
             );
         if(button == QMessageBox::No)

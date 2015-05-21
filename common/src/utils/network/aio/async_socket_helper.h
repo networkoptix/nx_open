@@ -178,7 +178,9 @@ public:
 
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
-        assert( buf->capacity() > buf->size() );
+        //this assert is not critical but is a signal of possible 
+            //ineffective memory usage in calling code
+        Q_ASSERT( buf->capacity() > buf->size() );
 
         if( buf->capacity() == buf->size() )
             buf->reserve( DEFAULT_RESERVE_SIZE );
@@ -457,7 +459,7 @@ private:
                     else
                     {
                         m_sendBufPos += bytesWritten;
-                        if( m_sendBufPos == (size_t)m_sendBuffer->size() )
+                        if( m_sendBufPos == m_sendBuffer->size() )
                             sendHandlerLocal( SystemError::noError, m_sendBufPos );
                     }
                 }

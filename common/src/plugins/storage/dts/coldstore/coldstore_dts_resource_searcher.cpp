@@ -147,10 +147,8 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
                 responseData.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
 
-                QString sender;
-                quint16 senderPort;
-
-                int readed = recvSocket.recvFrom(responseData.data(), responseData.size(), sender, senderPort);
+                SocketAddress remoteEndpoint;
+                int readed = recvSocket.recvFrom(responseData.data(), responseData.size(), &remoteEndpoint);
                 if (readed < 157)
                     continue;
                 responseData = responseData.left(readed);
@@ -164,7 +162,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
                     continue;
                 
 
-                server_list.push_back(QHostAddress(sender));
+                server_list.push_back(QHostAddress(remoteEndpoint.address.toString()));
 
                 
             }
@@ -174,8 +172,6 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
 
         for(const QHostAddress& srv: server_list)
         {
-//			NX_LOG(QLatin1String("Found CS = "), srv.name, cl_logALWAYS);
-
             if (!m_factoryList.contains(srv.toString()))
                 m_factoryList[srv.toString()] =  new QnColdstoreDTSreaderFactory(srv.toString());
 
@@ -199,8 +195,6 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
     QByteArray ipba = addr.toString().toLatin1();
     const char* ip = ipba.data();
     
-//	NX_LOG(QLatin1String("CS checking for files"), cl_logALWAYS);
-
     if (sfs_client->Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)
     {
         delete sfs_client;
@@ -230,8 +224,6 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
         resultBA.data(),
     &return_results_sizeI, &return_results_countI);
     Q_UNUSED(status)
-
-//	NX_LOG(QLatin1String("CS checking for files, returned: "), (int)return_results_countI, cl_logALWAYS);
 
     char *data = resultBA.data();
     const char* endpoint = data + return_results_sizeI;

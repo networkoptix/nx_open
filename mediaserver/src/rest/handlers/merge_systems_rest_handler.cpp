@@ -24,6 +24,7 @@
 #include "api/model/ping_reply.h"
 
 namespace {
+    const int requestTimeout = 60000;
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 }
 
@@ -85,7 +86,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     auth.setPassword(password);
 
     CLSimpleHTTPClient client(url, 10000, auth);
-    CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated"));
+    CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated?showAddresses=true"));
 
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
@@ -102,7 +103,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
 
     QnJsonRestResult json;
     QJson::deserialize(data, &json);
-    QnModuleInformation moduleInformation;
+    QnModuleInformationWithAddresses moduleInformation;
     QJson::deserialize(json.reply(), &moduleInformation);
 
     if (moduleInformation.systemName.isEmpty()) {
@@ -137,6 +138,11 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             return nx_http::StatusCode::ok;
         }
 
+        if (!backupDatabase()) {
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
+            return nx_http::StatusCode::ok;
+        }
+
         if (!applyCurrentSettings(url, user, password, currentPassword, admin, mergeOneServer)) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
@@ -144,21 +150,19 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     }
 
     /* Save additional address if needed */
-    if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
-        if (!moduleInformation.remoteAddresses.contains(url.host())) {
-            QUrl simpleUrl;
-            simpleUrl.setScheme(lit("http"));
-            simpleUrl.setHost(url.host());
-            if (url.port() != moduleInformation.port)
-                simpleUrl.setPort(url.port());
-            ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-        }
-        QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
+    if (!moduleInformation.remoteAddresses.contains(url.host())) {
+        QUrl simpleUrl;
+        simpleUrl.setScheme(lit("http"));
+        simpleUrl.setHost(url.host());
+        if (url.port() != moduleInformation.port)
+            simpleUrl.setPort(url.port());
+        ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
+    QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
 
     /* Connect to server if it is compatible */
     if (compatible && QnServerConnector::instance())
-        QnServerConnector::instance()->addConnection(moduleInformation, url);
+        QnServerConnector::instance()->addConnection(moduleInformation, SocketAddress(url.host(), moduleInformation.port));
 
     result.setReply(moduleInformation);
 
@@ -171,12 +175,14 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     authenticator.setUser(user);
     authenticator.setPassword(password);
 
+    QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
+
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     /* Change system name of the selected server */
     if (oneServer) {
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
         CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&sysIdTime=%2&tranLogTime=%3")
-            .arg(qnCommon->localSystemName())
+            .arg(systemName)
             .arg(qnCommon->systemIdentityTime())
             .arg(ec2Connection->getTransactionLogTime()));
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
@@ -184,7 +190,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     }
 
     {   /* Save current admin inside the remote system */
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
 
         ec2::ApiUserData userData;
         ec2::fromResourceToApi(admin, userData);
@@ -200,9 +206,9 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     /* Change system name of the remote system */
     if (!oneServer) {
         authenticator.setPassword(currentPassword);
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
         CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true&sysIdTime=%2&tranLogTime=%3")
-            .arg(qnCommon->localSystemName())
+            .arg(systemName)
             .arg(qnCommon->systemIdentityTime())
             .arg(ec2Connection->getTransactionLogTime()));
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
@@ -223,7 +229,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
 
         ec2::ApiUserDataList users;
         {
-            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
             CLHttpStatus status = client.doGET(lit("/ec2/getUsers"));
             if (status != CLHttpStatus::CL_HTTP_SUCCESS)
                 return false;
@@ -234,7 +240,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
             QJson::deserialize(data, &users);
         }
         {
-            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
             CLHttpStatus status = client.doGET(lit("/api/ping"));
             if (status != CLHttpStatus::CL_HTTP_SUCCESS)
                 return false;
@@ -248,6 +254,12 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
                 remoteSysTime = reply.sysIdTime;
                 remoteTranLogTime = reply.tranLogTime;
             }
+        }
+        {
+            CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
+            CLHttpStatus status = client.doGET(lit("/api/backupDatabase"));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
         }
 
         QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());

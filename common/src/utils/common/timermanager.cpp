@@ -65,6 +65,13 @@ TimerManager::TimerManager()
 
 TimerManager::~TimerManager()
 {
+    stop();
+    delete m_impl;
+    m_impl = NULL;
+}
+
+void TimerManager::stop()
+{
     {
         QMutexLocker lk( &m_impl->mtx );
         m_impl->terminated = true;
@@ -72,9 +79,6 @@ TimerManager::~TimerManager()
     }
 
     wait();
-
-    delete m_impl;
-    m_impl = NULL;
 }
 
 quint64 TimerManager::addTimer(
@@ -138,13 +142,6 @@ void TimerManager::joinAndDeleteTimer( const quint64& timerID )
 
     //since mutex is locked and m_impl->runningTaskID != timerID, timer handler is not running at the moment
     m_impl->deleteTaskNonSafe( timerID );
-}
-
-Q_GLOBAL_STATIC( TimerManager, staticInstance );
-
-TimerManager* TimerManager::instance()
-{
-    return staticInstance();
 }
 
 static const unsigned int ERROR_SKIP_TIMEOUT_MS = 3000;

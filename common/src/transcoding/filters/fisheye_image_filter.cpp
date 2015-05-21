@@ -62,6 +62,7 @@ static qreal qSlowCos(qreal angle) {
 #define cos qSlowCos
 #endif // Q_CC_GNU
 
+#if 0
 static bool saveTransformImage(const QPointF *transform, int width, int height, const QString &fileName) {
     QImage image(width, height, QImage::Format_ARGB32);
 
@@ -78,7 +79,7 @@ static bool saveTransformImage(const QPointF *transform, int width, int height, 
     
     return image.save(fileName);
 }
-
+#endif
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 // constant values that will be needed
@@ -249,7 +250,7 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
 void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageSize, int plane, qreal aspectRatio)
 {
     qreal kx = 2.0*tan(m_itemDewarping.fov/2.0);
-    qreal ky = kx/aspectRatio;
+    // qreal ky = kx/aspectRatio;
 
     float fovRot = sin(m_itemDewarping.xAngle)*qDegreesToRadians(m_mediaDewarping.fovRot);
     qreal xShift, yShift, yPos;

@@ -41,6 +41,7 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
         switch( m_state )
         {
             case State::init:
+            case State::done:   //to support stream of gzipped files
                 zResult = inflateInit2(&m_zStream, 16+MAX_WBITS);
                 if( zResult != Z_OK )
                 {
@@ -133,7 +134,7 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
             }
 
             case State::failed:
-            case State::done:
+            //case State::done:
                 break;
 
             default:

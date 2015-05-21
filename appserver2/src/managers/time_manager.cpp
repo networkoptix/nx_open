@@ -409,6 +409,7 @@ namespace ec2
                                 0 );
                         }
                         lk.unlock();
+                        WhileExecutingDirectCall callGuard( this );
                         emit timeChanged( curSyncTime );
                     }
                 }
@@ -438,6 +439,7 @@ namespace ec2
         peerSystemTimeReceivedNonSafe( tran.params );
 
         lk.unlock();
+        WhileExecutingDirectCall callGuard( this );
         emit peerTimeChanged( tran.params.peerID, getSyncTime(), tran.params.peerSysTime );
     }
 
@@ -449,6 +451,7 @@ namespace ec2
                 QMutexLocker lk( &m_mutex );
                 peerSystemTimeReceivedNonSafe( data );
             }
+            WhileExecutingDirectCall callGuard( this );
             emit peerTimeChanged( data.peerID, getSyncTime(), data.peerSysTime );
         }
     }
@@ -569,46 +572,51 @@ namespace ec2
             }
         }
         lock->unlock();
-        emit timeChanged( curSyncTime );
+        {
+            WhileExecutingDirectCall callGuard( this );
+            emit timeChanged( curSyncTime );
+        }
         lock->relock();
     }
 
     void TimeSynchronizationManager::onNewConnectionEstablished(QnTransactionTransport* transport )
     {
         using namespace std::placeholders;
-        transport->getSocket()->toggleStatisticsCollection( true );
-        transport->setBeforeSendingChunkHandler( std::bind( &TimeSynchronizationManager::onBeforeSendingHttpChunk, this, _1, _2 ) );
-        transport->setHttpChunkExtensonHandler( std::bind( &TimeSynchronizationManager::onRecevingHttpChunkExtensions, this, _1, _2 ) );
+        auto transportSocket = transport->getSocket();
+        if( transportSocket )
+            transportSocket->toggleStatisticsCollection( true );
+        transport->setBeforeSendingChunkHandler( std::bind( &TimeSynchronizationManager::onBeforeSendingTransaction, this, _1, _2 ) );
+        transport->setHttpChunkExtensonHandler( std::bind( &TimeSynchronizationManager::onTransactionReceived, this, _1, _2 ) );
     }
 
     //!used to pass time sync information between peers
-    static const QByteArray TIME_SYNC_EXTENSION_NAME( "time_sync_" );
+    static const QByteArray TIME_SYNC_EXTENSION_NAME( "NX-TIME-SYNC-DATA" );
 
-    void TimeSynchronizationManager::onBeforeSendingHttpChunk(
+    void TimeSynchronizationManager::onBeforeSendingTransaction(
         QnTransactionTransport* /*transport*/,
-        std::vector<nx_http::ChunkExtension>* const extensions )
+        nx_http::HttpHeaders* const headers )
     {
         //synchronizing time with every transaction, why not?
-        //NOTE shitty iOS does not support http chunk extensions properly, so avoiding using ,=
-        extensions->emplace_back( nx_http::ChunkExtension(TIME_SYNC_EXTENSION_NAME + getTimeSyncInfo().toString(), nx_http::StringType()) );
+        headers->emplace( TIME_SYNC_EXTENSION_NAME, getTimeSyncInfo().toString() );
     }
 
     static const int MAX_RTT_TIME_MS = 10*1000;
 
-    void TimeSynchronizationManager::onRecevingHttpChunkExtensions(
+    void TimeSynchronizationManager::onTransactionReceived(
         QnTransactionTransport* transport,
-        const std::vector<nx_http::ChunkExtension>& extensions )
+        const nx_http::HttpHeaders& extensions )
     {
         for( auto extension : extensions )
         {
-            if( extension.first.startsWith( TIME_SYNC_EXTENSION_NAME ) )
+            if( extension.first == TIME_SYNC_EXTENSION_NAME )
             {
-                const nx_http::StringType& serializedTimeSync = extension.first.mid( TIME_SYNC_EXTENSION_NAME.size() );
+                const nx_http::StringType& serializedTimeSync = extension.second;
 
                 //taking into account tcp connection round trip time
                 unsigned int rttMillis = 0;
                 StreamSocketInfo sockInfo;
-                if( transport->getSocket()->getConnectionStatistics( &sockInfo ) )
+                auto transportSocket = transport->getSocket();
+                if( transportSocket && transportSocket->getConnectionStatistics( &sockInfo ) )
                     rttMillis = sockInfo.rttVar;
 
                 TimeSyncInfo remotePeerTimeSyncInfo;
@@ -700,6 +708,7 @@ namespace ec2
             ((peersByTimePriorityFlags.cbegin()->first & peerTimeSynchronizedWithInternetServer) == 0) )    //those servers do not have internet access
 #endif
         {
+            WhileExecutingDirectCall callGuard( this );
             //multiple peers have same priority, user selection is required
             emit primaryTimeServerSelectionRequired();
         }

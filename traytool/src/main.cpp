@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         QMessageBox::critical(
             NULL, 
             QObject::tr("System Tray"), 
-            QObject::tr("There is no system tray on this system.\nApplication will now quit.")
+            QObject::tr("There is no system tray on this system.") + L'\n' + QObject::tr("Application will now quit.")
             );
         return 1;
     }

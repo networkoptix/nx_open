@@ -31,7 +31,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         ioBlockSize = MSSettings::roSettings()->value( nx_ms_conf::IO_BLOCK_SIZE, nx_ms_conf::DEFAULT_IO_BLOCK_SIZE ).toInt();
         ffmpegBufferSize = MSSettings::roSettings()->value( nx_ms_conf::FFMPEG_BUFFER_SIZE, nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE ).toInt();;
 #ifdef Q_OS_WIN
-        if (MSSettings::roSettings()->value("disableDirectIO").toInt() != 1)
+        if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
@@ -44,7 +44,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
 
 bool QnFileStorageResource::updatePermissions() const
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexPermission);
     if (m_durty) {
         m_durty = false;
         QUrl storageUrl(getUrl());
@@ -58,7 +58,8 @@ bool QnFileStorageResource::updatePermissions() const
             netRes.lpRemoteName = (LPWSTR) path.constData();
             LPWSTR password = (LPWSTR) storageUrl.password().constData();
             LPWSTR user = (LPWSTR) storageUrl.userName().constData();
-            WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0);
+            if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
+                return false;
         }
 #endif
     }
@@ -107,8 +108,8 @@ bool QnFileStorageResource::renameFile(const QString& oldName, const QString& ne
 bool QnFileStorageResource::removeDir(const QString& url)
 {
     updatePermissions();
-    qnFileDeletor->deleteDir(removeProtocolPrefix(url));
-    return true;
+    QDir dir;
+    return dir.rmdir(removeProtocolPrefix(url));
 }
 
 bool QnFileStorageResource::isDirExists(const QString& url)
@@ -131,13 +132,15 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
-    updatePermissions();
+    if (!updatePermissions())
+        return -1;
     return getDiskFreeSpace(getPath());
 }
 
 qint64 QnFileStorageResource::getTotalSpace()
 {
-    updatePermissions();
+    if (!updatePermissions())
+        return -1;
     return getDiskTotalSpace(getPath());
 }
 
@@ -159,7 +162,8 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
     if( !isStorageDirMounted() )
         return false;
 
-    updatePermissions();
+    if (!updatePermissions())
+		return false;
 
     if (hasFlags(Qn::deprecated))
         return false;
@@ -193,7 +197,8 @@ bool QnFileStorageResource::isStorageAvailable()
     if( !isStorageDirMounted() )
         return false;
 
-    updatePermissions();
+    if (!updatePermissions())
+		return false;
 
     QString tmpDir = closeDirPath(getPath()) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
@@ -296,8 +301,9 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
 
 bool QnFileStorageResource::isStorageDirMounted()
 {
+    const QString& notResolvedStoragePath = closeDirPath(getPath());
+    const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
     //on unix, checking that storage directory is mounted, if it is to be mounted
-    const QString& storagePath = QDir(closeDirPath(getPath())).canonicalPath();   //following symbolic link
 
     QStringList mountPoints;
     if( !readTabFile( lit("/etc/fstab"), &mountPoints ) )
@@ -332,6 +338,7 @@ bool QnFileStorageResource::isStorageDirMounted()
         }
     }
 
+    NX_LOG( lit("Storage %1 is mounted (mount point %2)").arg(storagePath).arg(storageMountPoint), cl_logDEBUG2 );
     return true;
 }
 #endif    // _WIN32

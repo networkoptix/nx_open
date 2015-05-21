@@ -17,6 +17,7 @@ extern "C"
 #include "utils/network/tcp_connection_priv.h"
 #include <utils/math/math.h>
 #include "core/resource/network_resource.h"
+#include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
@@ -60,7 +61,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         if (params[i].first == "res_id" || params[i].first == "physicalId")
         {
             resParamFound = true;
-            res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getNetResourceByPhysicalId(params[i].second));
+            res = qSharedPointerDynamicCast<QnVirtualCameraResource> (qnResPool->getNetResourceByPhysicalId(params[i].second));
             if (!res)
                 errStr = QString("Camera resource %1 not found").arg(params[i].second);
         }

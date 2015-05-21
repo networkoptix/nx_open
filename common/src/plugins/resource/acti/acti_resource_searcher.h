@@ -3,8 +3,6 @@
 
 #ifdef ENABLE_ACTI
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
 #include <QtCore/QElapsedTimer>
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
 
@@ -30,7 +28,7 @@ public:
 protected:
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const QString& host,
+        const HostAddress& host,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         const QAuthenticator &auth,
@@ -65,6 +63,8 @@ private:
 
 private slots:
     void at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply);
+private:
+    QnUuid m_resTypeId;
 };
 
 #endif // #ifdef ENABLE_ACTI

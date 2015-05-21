@@ -9,6 +9,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <network/authenticate_helper.h>
 #include <utils/network/router.h>
+#include "http/custom_headers.h"
 
 
 // -------------------------------------------------------------------------- //
@@ -17,8 +18,7 @@
 QnNetworkProxyFactory::QnNetworkProxyFactory() {}
 QnNetworkProxyFactory::~QnNetworkProxyFactory() {}
 
-QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, QnNetworkProxyFactory::WhereToPlaceProxyCredentials credentialsBehavior) {
-    Q_UNUSED(credentialsBehavior)
+QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName) {
     const QNetworkProxy &proxy = proxyToResource(resource);
 
     switch (proxy.type()) {
@@ -27,16 +27,18 @@ QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourceP
     case QNetworkProxy::HttpProxy: {
         QUrl url(baseUrl);
         QUrlQuery query(url.query());
-        query.addQueryItem(lit("proxy"), resource->getId().toString());
-        url.setQuery(query);
+        if (proxyQueryParameterName.isEmpty())
+            url.setPath(lit("/proxy/%1%2").arg(resource->getId().toString()).arg(url.path()));
+        else
+            query.addQueryItem(proxyQueryParameterName, resource->getId().toString());
 
+        url.setQuery(query);
         url.setHost(proxy.hostName());
         url.setPort(proxy.port());
 
-        if (!url.userName().isEmpty()) {
+        if (!proxy.user().isEmpty()) {
             QUrlQuery urlQuery(url);
             urlQuery.addQueryItem(lit("proxy_auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(proxy.user(), proxy.password())));
-            urlQuery.addQueryItem(lit("auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam(url.userName(), url.password())));
             url.setQuery(urlQuery);
         }
 
@@ -64,9 +66,9 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
 
     QUrlQuery urlQuery(query.url());
 
-    QnUuid resourceGuid = QnUuid(urlQuery.queryItemValue(lit("x-camera-guid")));
+    QnUuid resourceGuid = QnUuid(urlQuery.queryItemValue(QString::fromLatin1(Qn::CAMERA_GUID_HEADER_NAME)));
     if (resourceGuid.isNull())
-        resourceGuid = QnUuid(urlQuery.queryItemValue(lit("x-server-guid")));
+        resourceGuid = QnUuid(urlQuery.queryItemValue(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME)));
 
     if (resourceGuid.isNull())
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
@@ -92,18 +94,14 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resour
     }
 
     if (server) {
-        QnUuid id = QnUuid::fromStringSafe(server->getProperty(lit("guid")));
+        QnUuid id = server->getOriginalGuid();
 		if (id.isNull())
 			id = server->getId();
-
         QnRoute route = QnRouter::instance()->routeTo(id);
-        if (route.isValid()) {
-            /* Requests to cameras should be always proxied.
-               Requests to servers should be proxied wher the server is not directly available from the client. */
-            if (camera || route.points.size() > 1) {
-                return QNetworkProxy(QNetworkProxy::HttpProxy, route.points.first().host, route.points.first().port,
-                                     QnAppServerConnectionFactory::url().userName(), QnAppServerConnectionFactory::url().password());
-            }
+        if (!route.gatewayId.isNull()) {
+            Q_ASSERT(!route.addr.isNull());
+            return QNetworkProxy(QNetworkProxy::HttpProxy, route.addr.address.toString(), route.addr.port,
+                                    QnAppServerConnectionFactory::url().userName(), QnAppServerConnectionFactory::url().password());
         }
     }
 

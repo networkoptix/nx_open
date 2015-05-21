@@ -113,15 +113,14 @@ void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, QString 
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())
     {
-        QString remoteAddress;
-        quint16 remotePort;
-        int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), remoteAddress, remotePort);
+        SocketAddress remoteEndpoint;
+        int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), &remoteEndpoint );
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
-            if (m_localAddressList.contains(remoteAddress))
+            if (m_localAddressList.contains(remoteEndpoint.address.toString()))
                 continue; // ignore own packets
             if (localAddress.isEmpty())
-                localAddress = getBestLocalAddress(remoteAddress);
+                localAddress = getBestLocalAddress(remoteEndpoint.address.toString());
 
             const std::list<std::pair<long, ConsumerDataList> >::iterator itEnd = m_data.end();
             for( std::list<std::pair<long, ConsumerDataList> >::iterator
@@ -129,7 +128,7 @@ void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, QString 
                 it != itEnd;
                 ++it )
             {
-                it->second.append(ConsumerData(responseData, localAddress, remoteAddress));
+                it->second.append(ConsumerData(responseData, localAddress, remoteEndpoint.address.toString()));
             }
         }
     }

@@ -34,9 +34,7 @@ void QnServerCamera::setIframeDistance(int frames, int timems)
 
 QnConstResourceVideoLayoutPtr QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
-    Q_UNUSED(dataProvider)
-    // todo: layout must be loaded in resourceParams
-    return QnVirtualCameraResource::getVideoLayout();
+    return QnVirtualCameraResource::getVideoLayout(dataProvider);
 }
 
 QnConstResourceAudioLayoutPtr QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
@@ -73,4 +71,11 @@ void QnServerCamera::setParentId(const QnUuid& parent)
         if (!oldValue.isNull())
             emit statusChanged(toSharedPointer(this));
     }
+}
+
+void QnServerCamera::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) 
+{
+    if (other->getParentId() != m_parentId)
+        modifiedFields << "statusChanged";
+    QnVirtualCameraResource::updateInner(other, modifiedFields);
 }

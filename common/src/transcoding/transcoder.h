@@ -4,6 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QString>
+#include <QtCore/QQueue>
 #include <QSharedPointer>
 
 extern "C"
@@ -13,7 +14,6 @@ extern "C"
 
 #include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
-#include "core/resource/media_resource.h"
 #include "filters/abstract_image_filter.h"
 #include "filters/filter_helper.h"
 

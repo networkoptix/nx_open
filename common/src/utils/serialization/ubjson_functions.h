@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <array>
 
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -262,12 +263,14 @@ void serialize(const QnUuid &value, QnUbjsonWriter<Output> *stream) {
     QnUbjson::serialize(value.toRfc4122(), stream);
 }
 
+
 template <class Input>
-bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target) {
-    QByteArray tmp;
-    if(!QnUbjson::deserialize(stream, &tmp) || tmp.size() != 16)
+bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target) 
+{
+    std::array<char, 16> tmp;
+    if(!stream->template readBinaryData<>(&tmp))
         return false;
-    *target = QnUuid::fromRfc4122(tmp);
+    *target = QnUuid::fromRfc4122(QByteArray::fromRawData(tmp.data(), static_cast<int>(tmp.size())));
     return true;
 }
 

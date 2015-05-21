@@ -1,12 +1,17 @@
+#include "common/common_globals.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/user_resource.h"
 #include "proxy_sender_connection_processor.h"
 #include "network/universal_request_processor_p.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
+#include "utils/common/log.h"
+#include "utils/network/http/asynchttpclient.h"
+#include "utils/common/synctime.h"
+
 #include "universal_tcp_listener.h"
 
 #include <QtCore/QElapsedTimer>
-
-#include <common/common_globals.h>
 
 
 static const int SOCKET_TIMEOUT = 1000 * 5;
@@ -15,12 +20,15 @@ static const int PROXY_KEEP_ALIVE_INTERVAL = 60 * 1000;
 class QnProxySenderConnectionPrivate: public QnUniversalRequestProcessorPrivate
 {
 public:
-    QUrl proxyServerUrl;
-    QString guid;
+    SocketAddress proxyServerUrl;
+    QnUuid guid;
 };
 
-QnProxySenderConnection::QnProxySenderConnection(const QUrl& proxyServerUrl, const QString& guid, QnTcpListener* owner):
-    QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate, QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket()), owner, false)
+QnProxySenderConnection::QnProxySenderConnection(
+        const SocketAddress& proxyServerUrl, const QnUuid& guid,
+        QnUniversalTcpListener* owner)
+    : QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate,
+        QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket()), owner, false)
 {
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;
@@ -41,21 +49,22 @@ QByteArray QnProxySenderConnection::readProxyResponse()
     size_t bufLen = 0;
     while (d->socket->isConnected() && !m_needStop && bufLen < sizeof(buffer))
     {
-        int readed = d->socket->recv(buffer + bufLen, sizeof(buffer) - bufLen);
+        int readed = d->socket->recv(buffer + bufLen, sizeof(buffer) - static_cast<unsigned int>(bufLen));
         if (readed < 1)
             return QByteArray();
         bufLen += readed;
-        QByteArray result = QByteArray::fromRawData((const char*)buffer, bufLen);
+        QByteArray result = QByteArray::fromRawData((const char*)buffer, static_cast<int>(bufLen));
         if (QnTCPConnectionProcessor::isFullMessage(result))
             return result;
     }
+
     return QByteArray();
 }
 
 void QnProxySenderConnection::addNewProxyConnect()
 {
     Q_D(QnProxySenderConnection);
-    (dynamic_cast<QnUniversalTcpListener*>(d->owner))->addProxySenderConnections(1);
+    d->owner->addProxySenderConnections(d->proxyServerUrl, 1);
 }
 
 void QnProxySenderConnection::doDelay()
@@ -75,10 +84,45 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
     while (!m_needStop && d->socket->isConnected() && totalSend < data.length())
     {
         int sended = d->socket->send(data.mid(totalSend));
-        if (sended > 0)
-            totalSend += sended;
+        if (sended <= 0)
+            return sended;
+        totalSend += sended;
     }
     return totalSend;
+}
+
+static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
+{
+    const QByteArray H_REALM("NX");
+    const QByteArray H_METHOD("CONNECT");
+    const QByteArray H_PATH("/proxy-reverse");
+    const QByteArray H_AUTH("auth-int");
+
+    const auto admin = qnResPool->getAdministrator();
+    const auto time = qnSyncTime->currentUSecsSinceEpoch();
+
+    nx_http::header::WWWAuthenticate authHeader;
+    authHeader.authScheme = nx_http::header::AuthScheme::digest;
+    authHeader.params["nonce"] = QString::number(time, 16).toLatin1();
+    authHeader.params["realm"] = H_REALM;
+
+    nx_http::header::DigestAuthorization digestHeader;
+    if (!nx_http::AsyncHttpClient::calcDigestResponse(
+                H_METHOD, admin->getName(), boost::none, admin->getDigest(),
+                url, authHeader, &digestHeader))
+        return QByteArray();
+
+    return QString(QLatin1String(
+       "%1 %2 HTTP/1.1\r\n" \
+       "Host: %3\r\n" \
+       "Authorization: %4\r\n" \
+       "NX-User-Name: %5\r\n" \
+       "X-Server-Uuid: %6\r\n" \
+       "\r\n"))
+            .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
+            .arg(url.toString()).arg(QString::fromUtf8(digestHeader.toString()))
+            .arg(admin->getName()).arg(serverUuid.toString())
+            .toUtf8();
 }
 
 void QnProxySenderConnection::run()
@@ -87,31 +131,35 @@ void QnProxySenderConnection::run()
 
     initSystemThreadId();
 
-    if (!d->socket->connect(d->proxyServerUrl.host(), d->proxyServerUrl.port(), SOCKET_TIMEOUT)) {
-        doDelay();
-        addNewProxyConnect();
+    auto proxyRequest = makeProxyRequest(d->guid, QUrl(d->proxyServerUrl.address.toString()));
+    if (proxyRequest.isEmpty())
+    {
+        NX_LOG(lit("QnProxySenderConnection: can not generate request")
+               .arg(d->proxyServerUrl.toString()), cl_logWARNING);
         return;
     }
+
+    if (!d->socket->connect(d->proxyServerUrl, SOCKET_TIMEOUT))
+        return;
 
     d->socket->setSendTimeout(SOCKET_TIMEOUT);
     d->socket->setRecvTimeout(SOCKET_TIMEOUT);
 
-    QByteArray proxyRequest = QString(lit("CONNECT %1 PROXY/1.0\r\n\r\n")).arg(d->guid).toUtf8();
-
-    // send proxy response
     int sended = sendRequest(proxyRequest);
-    if (sended < proxyRequest.length()) {
-        doDelay();
-        addNewProxyConnect();
+    if (sended < proxyRequest.length())
+    {
+        NX_LOG(lit("QnProxySenderConnection: can not send request to %1")
+               .arg(d->proxyServerUrl.toString()), cl_logWARNING);
+        d->socket->close();
         return;
     }
 
-
-    // read proxy response
     QByteArray response = readProxyResponse();
-    if (response.isEmpty() && !response.startsWith("PROXY")) {
-        doDelay();
-        addNewProxyConnect();
+    if (response.isEmpty())
+    {
+        NX_LOG(lit("QnProxySenderConnection: no response from %1")
+               .arg(d->proxyServerUrl.toString()), cl_logWARNING);
+        d->socket->close();
         return;
     }
 
@@ -125,7 +173,7 @@ void QnProxySenderConnection::run()
         if (gotRequest)
         {
             timer.restart();
-            if (d->clientRequest.startsWith("PROXY"))
+            if (d->clientRequest.startsWith("HTTP 200 OK"))
                 gotRequest = false; // proxy keep-alive packets
             else
                 break;
@@ -139,12 +187,9 @@ void QnProxySenderConnection::run()
     if (!gotRequest && timer.elapsed() < PROXY_KEEP_ALIVE_INTERVAL)
         doDelay();
 
-    if (!m_needStop) {
-        addNewProxyConnect();
-        if (gotRequest)
-        {
-            parseRequest();
-            processRequest();
-        }
+    if (!m_needStop && gotRequest)
+    {
+        parseRequest();
+        processRequest();
     }
 }

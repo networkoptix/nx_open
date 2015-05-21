@@ -19,7 +19,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
         QnAbstractMediaDataPtr media = serverDelegate.getNextData();
         if (!media || media->timestamp == DATETIME_NOW)
             break;
-        video = media.dynamicCast<QnCompressedVideoData>();
+        video = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
     }
 
     // if ceilTime specified try frame with time > requested time (round time to ceil)
@@ -30,7 +30,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
             QnAbstractMediaDataPtr media2 = serverDelegate.getNextData();
             if (!media2 || media2->timestamp == DATETIME_NOW)
                 break;
-            QnCompressedVideoDataPtr video2 = media2.dynamicCast<QnCompressedVideoData>();
+            QnCompressedVideoDataPtr video2 = std::dynamic_pointer_cast<QnCompressedVideoData>(media2);
             if (video2 && (video2->flags & AV_PKT_FLAG_KEY))
                 return video2;
         }
@@ -261,9 +261,8 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
         int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, outFrame.data());
         result.append((const char*) m_videoEncodingBuffer, encoded);
         qFreeAligned(m_videoEncodingBuffer);
-        avcodec_close(videoEncoderCodecCtx);
     }
-    av_freep(&videoEncoderCodecCtx);
+    QnFfmpegHelper::deleteCodecContext(videoEncoderCodecCtx);
 
     return result;
 }

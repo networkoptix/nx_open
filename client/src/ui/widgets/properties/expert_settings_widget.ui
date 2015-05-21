@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>864</width>
-    <height>461</height>
+    <width>982</width>
+    <height>514</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -21,7 +21,16 @@
    <item>
     <widget class="QWidget" name="assureWidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -40,7 +49,16 @@
          <item>
           <widget class="QWidget" name="horizontalWidget" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item>
@@ -58,6 +76,13 @@
              </widget>
             </item>
            </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="settingsDisabledWarningLabel">
+           <property name="text">
+            <string>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -183,13 +208,22 @@
          <item>
           <widget class="QWidget" name="widget" native="true">
            <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item>
              <widget class="QLabel" name="lowQualityWarningLabel">
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Warning! Low quality may result in low resolution image.</string>
               </property>
              </widget>
             </item>
@@ -355,5 +389,6 @@
    </item>
   </layout>
  </widget>
+ <resources/>
  <connections/>
 </ui>

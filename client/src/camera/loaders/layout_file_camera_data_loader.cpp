@@ -16,13 +16,13 @@ namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
 
-QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
     QnAbstractCameraDataLoader(resource, dataType, parent)
 {
 
 }
 
-QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent):
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent):
     QnAbstractCameraDataLoader(resource, dataType, parent),
     m_data(data)
 {
@@ -35,12 +35,9 @@ QnLayoutFileCameraDataLoader::~QnLayoutFileCameraDataLoader()
     //qFreeAligned(m_motionData);
 }
 
-QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent)
+QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const QnAviResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent)
 {
-    QnAviResourcePtr localFile = resource.dynamicCast<QnAviResource>();
-    if (!localFile)
-        return NULL;
-    QnLayoutFileStorageResourcePtr storage = localFile->getStorage().dynamicCast<QnLayoutFileStorageResource>();
+    QnLayoutFileStorageResourcePtr storage = resource->getStorage().dynamicCast<QnLayoutFileStorageResource>();
     if (!storage)
         return NULL;
 
@@ -56,15 +53,14 @@ QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const Qn
    
 }
 
-int QnLayoutFileCameraDataLoader::loadChunks(const QnTimePeriod &period)
+int QnLayoutFileCameraDataLoader::loadChunks()
 {
-    Q_UNUSED(period)
     int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-    emit delayedReady(m_data, handle);
+    emit delayedReady(m_data, QnTimePeriod(0, QnTimePeriod::infiniteDuration()), handle);
     return handle;
 }
 
-int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const QList<QRegion> &motionRegions)
+int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions)
 {
     QVector<char*> masks;
     for (int i = 0; i < motionRegions.size(); ++i) {
@@ -75,23 +71,18 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const Q
     QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
     if (!aviRes)
         return -1;
-    QVector<QnTimePeriodList> periods;
+    std::vector<QnTimePeriodList> periods;
     for (int channel = 0; channel < motionRegions.size(); ++channel)
     {
         const QnMetaDataLightVector& m_motionData = aviRes->getMotionBuffer(channel);
         if (!m_motionData.empty())
         {
-            periods << QnTimePeriodList();
-            QnMetaDataLightVector::const_iterator itrStart = qUpperBound(m_motionData.begin(), m_motionData.end(), period.startTimeMs);
-            QnMetaDataLightVector::const_iterator itrEnd = qUpperBound(itrStart, m_motionData.end(), period.endTimeMs());
+            periods.push_back(QnTimePeriodList());
 
-            if (itrStart > m_motionData.begin() && itrStart[-1].endTimeMs() > period.startTimeMs)
-                --itrStart;
-
-            for (QnMetaDataLightVector::const_iterator itr = itrStart; itr != itrEnd; ++itr)
+            for (auto itr = m_motionData.begin(); itr != m_motionData.end(); ++itr)
             {
                 if (itr->channel <= motionRegions.size() && QnMetaDataV1::matchImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
-                    periods.last() << QnTimePeriod(itr->startTimeMs, itr->durationMs);
+                    periods.rbegin()->push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
             }
         }
     }
@@ -103,23 +94,23 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const Q
 
 
     int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-    emit delayedReady(result, handle);
+    emit delayedReady(result, QnTimePeriod(0, QnTimePeriod::infiniteDuration()), handle);
     return handle;
 }
 
-int QnLayoutFileCameraDataLoader::load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
+int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
     Q_UNUSED(resolutionMs)
 
     switch (m_dataType) {
     case Qn::RecordedTimePeriod:
-        return loadChunks(period);
+        return loadChunks();
     case Qn::MotionTimePeriod:
         {
             QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
             for (const QRegion &region: motionRegions) 
             {
                 if (!region.isEmpty())
-                    return loadMotion(period, motionRegions);
+                    return loadMotion(motionRegions);
             }
             qWarning() << "empty motion region";
         }
