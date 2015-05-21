@@ -1103,6 +1103,8 @@ namespace ec2
         for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules()) {
             QnModuleInformationWithAddresses moduleInformationWithAddress(moduleInformation);
             SocketAddress primaryAddress = moduleFinder->primaryAddress(moduleInformation.id);
+        	if (primaryAddress.isNull())
+            	continue;
             moduleInformationWithAddress.remoteAddresses.insert(primaryAddress.address.toString());
             moduleInformationWithAddress.port = primaryAddress.port;
             transaction.params.push_back(ApiModuleData(std::move(moduleInformationWithAddress), true));

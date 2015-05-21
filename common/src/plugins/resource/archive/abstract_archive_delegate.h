@@ -60,8 +60,8 @@ public:
         \param chunkInfo If not NULL, implementation fills this structure with info of chunk, containing found position
     */
     virtual qint64 seek (qint64 time, bool findIFrame) = 0;
-    virtual QnResourceVideoLayoutPtr getVideoLayout() = 0;
-    virtual QnResourceAudioLayoutPtr getAudioLayout() = 0;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() = 0;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout() = 0;
 
     virtual AVCodecContext* setAudioChannel(int num) { Q_UNUSED(num); return 0; }
     
