@@ -137,7 +137,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_currentTime(kInvalidTime)
     , m_bookmarks()
     , m_bookmarksBeginPosition(m_bookmarks.cbegin())
-    , m_dataLoader(context->instance<QnCameraDataManager>()->loader(m_resource->toResourcePtr()))
+    , m_dataLoader(context->instance<QnCameraDataManager>()->loader(m_resource))
 {
     updateBookmarks();
     connect(m_dataLoader, &QnCachingCameraDataLoader::bookmarksChanged, this, &QnMediaResourceWidget::updateBookmarks);
@@ -1119,7 +1119,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
-        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(m_resource->toResourcePtr());
+        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(m_resource);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online);
         else
@@ -1343,10 +1343,6 @@ void QnMediaResourceWidget::updateBookmarks()
 
 void QnMediaResourceWidget::updateCurrentTime(qreal timeMs)
 {
-    if (m_bookmarks.empty())
-    {
-        int i = 0;
-    }
     if (timeMs < m_currentTime)
         m_bookmarksBeginPosition = m_bookmarks.cbegin();
 

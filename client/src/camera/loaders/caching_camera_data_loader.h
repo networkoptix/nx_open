@@ -26,9 +26,11 @@ class QnCachingCameraDataLoader: public Connective<QObject> {
 public: 
     virtual ~QnCachingCameraDataLoader();
 
-    QnCachingCameraDataLoader(const QnResourcePtr &resource, QObject *parent = NULL);
+    QnCachingCameraDataLoader(const QnMediaResourcePtr &resource, QObject *parent = NULL);
 
-    QnResourcePtr resource() const;
+    QnMediaResourcePtr resource() const;
+
+    static bool supportedResource(const QnMediaResourcePtr &resource);
         
     const QList<QRegion> &motionRegions() const;
     void setMotionRegions(const QList<QRegion> &motionRegions);
@@ -76,7 +78,7 @@ private:
 private:
     bool m_enabled;
 
-    QnResourcePtr m_resource;
+    QnMediaResourcePtr m_resource;
   
     QElapsedTimer m_previousRequestTime[Qn::TimePeriodContentCount];
 

@@ -135,8 +135,8 @@ protected:
 
     void setPlayingTemporary(bool playing);
 
-    QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);
-    QnThumbnailsLoader *thumbnailLoader(QnResourceWidget *widget);
+    QnThumbnailsLoader *thumbnailLoader(const QnMediaResourcePtr &resource);
+    QnThumbnailsLoader *thumbnailLoaderByWidget(QnMediaResourceWidget *widget);
     void clearLoaderCache();
 protected slots:
     void updateCentralWidget();
@@ -189,8 +189,8 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(const QnResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
-    void updateLoaderBookmarks(const QnResourcePtr &resource);
+    void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
+    void updateLoaderBookmarks(const QnMediaResourcePtr &resource);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
@@ -210,7 +210,7 @@ protected slots:
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
-    QnCachingCameraDataLoader* loaderByWidget(const QnResourceWidget* widget, bool createIfNotExists = true);
+    QnCachingCameraDataLoader* loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
 
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
     void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
@@ -226,7 +226,7 @@ private:
     QnSearchQueryStrategy *m_searchQueryStrategy;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
-    QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
+    QMultiHash<QnMediaResourcePtr, QHashDummyValue> m_syncedResources;
 
     QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
@@ -261,7 +261,7 @@ private:
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
    
-    QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
+    QHash<QnMediaResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
     QnCameraBookmarkTags m_bookmarkTags;
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;

@@ -12,13 +12,16 @@ QnCameraDataManager::QnCameraDataManager(QObject *parent /*= 0*/):
 
 QnCameraDataManager::~QnCameraDataManager() {}
 
-QnCachingCameraDataLoader* QnCameraDataManager::loader(const QnResourcePtr &resource, bool createIfNotExists) {
-    QHash<QnResourcePtr, QnCachingCameraDataLoader *>::const_iterator pos = m_loaderByResource.find(resource);
+QnCachingCameraDataLoader* QnCameraDataManager::loader(const QnMediaResourcePtr &resource, bool createIfNotExists) {
+    QHash<QnMediaResourcePtr, QnCachingCameraDataLoader *>::const_iterator pos = m_loaderByResource.find(resource);
     if(pos != m_loaderByResource.end())
         return *pos;
 
     if (!createIfNotExists)
-        return NULL;
+        return nullptr;
+
+    if (!QnCachingCameraDataLoader::supportedResource(resource))
+        return nullptr;
 
     QnCachingCameraDataLoader *loader = new QnCachingCameraDataLoader(resource, this);
     connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, [this, resource](Qn::TimePeriodContent type, qint64 startTimeMs) {
@@ -32,7 +35,7 @@ QnCachingCameraDataLoader* QnCameraDataManager::loader(const QnResourcePtr &reso
     return loader;
 }
 
-QnCameraBookmarkList QnCameraDataManager::bookmarks(const QnResourcePtr &resource) const {
+QnCameraBookmarkList QnCameraDataManager::bookmarks(const QnMediaResourcePtr &resource) const {
     if (!m_loaderByResource.contains(resource))    
         return QnCameraBookmarkList();
     return m_loaderByResource[resource]->bookmarks();

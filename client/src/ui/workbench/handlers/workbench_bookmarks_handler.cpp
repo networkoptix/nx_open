@@ -90,6 +90,7 @@ ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;
 
@@ -123,6 +124,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;
 
@@ -150,6 +152,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
         return;
 
@@ -175,7 +178,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle) {
-    QnResourcePtr camera = m_processingBookmarks.take(handle);
+    auto camera = m_processingBookmarks.take(handle);
     if (status != 0 || !camera)
         return;
 
@@ -189,7 +192,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
 
 
 void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraBookmark &bookmark, int handle) {
-    QnResourcePtr camera = m_processingBookmarks.take(handle);
+    auto camera = m_processingBookmarks.take(handle);
     if (status != 0 || !camera)
         return;
 
@@ -202,7 +205,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraB
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraBookmark &bookmark, int handle) {
-    QnResourcePtr camera = m_processingBookmarks.take(handle);
+    auto camera = m_processingBookmarks.take(handle);
     if (status != 0 || !camera)
         return;
 

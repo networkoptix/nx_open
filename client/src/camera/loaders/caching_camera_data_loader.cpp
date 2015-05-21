@@ -21,11 +21,12 @@ namespace {
     const qint64 requestIntervalMs = 30 * 1000;
 }
 
-QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnResourcePtr &resource, QObject *parent):
+QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &resource, QObject *parent):
     base_type(parent),
     m_enabled(true),
     m_resource(resource)
 {
+    Q_ASSERT_X(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
     init();
     initLoaders();
 
@@ -43,7 +44,14 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnResourcePtr &resour
 QnCachingCameraDataLoader::~QnCachingCameraDataLoader() {
 }
 
+bool QnCachingCameraDataLoader::supportedResource(const QnMediaResourcePtr &resource) {
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    QnAviResourcePtr aviFile = resource.dynamicCast<QnAviResource>();
+    return camera || aviFile;
+}
+
 void QnCachingCameraDataLoader::init() {
+    //TODO: #GDM 2.4 move to camera history
     if(m_resource.dynamicCast<QnNetworkResource>()) {
         connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
     }
@@ -91,7 +99,7 @@ bool QnCachingCameraDataLoader::enabled() const {
     return m_enabled;
 }
 
-QnResourcePtr QnCachingCameraDataLoader::resource() const {
+QnMediaResourcePtr QnCachingCameraDataLoader::resource() const {
     return m_resource;
 }
 
@@ -331,3 +339,4 @@ void QnCachingCameraDataLoader::updateBookmarks() {
     load(Qn::BookmarkData, requestedPeriod, resolutionMs);
     */
 }
+

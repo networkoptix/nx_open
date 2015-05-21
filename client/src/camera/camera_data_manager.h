@@ -17,16 +17,16 @@ public:
     explicit QnCameraDataManager(QObject *parent = 0);
     virtual ~QnCameraDataManager();
    
-    QnCachingCameraDataLoader *loader(const QnResourcePtr &resource, bool createIfNotExists = true);
+    QnCachingCameraDataLoader *loader(const QnMediaResourcePtr &resource, bool createIfNotExists = true);
 
-    QnCameraBookmarkList bookmarks(const QnResourcePtr &resource) const;
+    QnCameraBookmarkList bookmarks(const QnMediaResourcePtr &resource) const;
 
     void clearCache();
 signals:
-    void periodsChanged(const QnResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
-    void bookmarksChanged(const QnResourcePtr &resource);
+    void periodsChanged(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
+    void bookmarksChanged(const QnMediaResourcePtr &resource);
 private:
-    mutable QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
+    mutable QHash<QnMediaResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
 };
 
 #endif // CAMERA_DATA_MANAGER_H
