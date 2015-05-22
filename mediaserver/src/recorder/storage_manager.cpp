@@ -779,13 +779,16 @@ void QnStorageManager::clearDbByChunk(DeviceFileCatalogPtr catalog, const Device
 
 void QnStorageManager::clearMaxDaysData()
 {
-    clearMaxDaysData(m_devFileCatalog[QnServer::HiQualityCatalog]);
-    clearMaxDaysData(m_devFileCatalog[QnServer::LowQualityCatalog]);
+    clearMaxDaysData(QnServer::HiQualityCatalog);
+    clearMaxDaysData(QnServer::LowQualityCatalog);
 }
 
-void QnStorageManager::clearMaxDaysData(const FileCatalogMap &catalogMap)
+void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
 {
     QMutexLocker lock(&m_mutexCatalog);
+
+    const FileCatalogMap &catalogMap = m_devFileCatalog[catalogIdx];
+
     for(const DeviceFileCatalogPtr& catalog: catalogMap.values()) {
         QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(catalog->cameraUniqueId()).dynamicCast<QnSecurityCamResource>();
         if (camera && camera->maxDays() > 0) {
