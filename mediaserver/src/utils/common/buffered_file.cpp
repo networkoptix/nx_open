@@ -294,6 +294,7 @@ bool QBufferedFile::updatePos()
         m_filePos = qPower2Floor((quint64) m_lastSeekPos, SECTOR_SIZE);
         if (!m_fileEngine.seek(m_filePos))
             return false;
+        m_actualFileSize = qMax(m_lastSeekPos, m_actualFileSize); // extend file on seek if need
         if (!prepareBuffer(m_lastSeekPos - m_filePos))
             return false;
     }
@@ -356,21 +357,26 @@ qint64 QBufferedFile::writeData ( const char * data, qint64 len )
     return rez;
 }
 
-bool QBufferedFile::prepareBuffer(int bufOffset)
+bool QBufferedFile::prepareBuffer(int bufferSize)
 {
-    if (m_filePos == 0 && (int) m_cachedBuffer.size() > bufOffset)
+    if (m_filePos == 0 && (int) m_cachedBuffer.size() > bufferSize)
     {
         m_cycleBuffer.push_back(m_cachedBuffer.data(), m_cachedBuffer.size());
     }
     else {
-        qint64 toRead = qPower2Ceil((quint32) bufOffset, SECTOR_SIZE);
+        qint64 toRead = qPower2Ceil((quint32) bufferSize, SECTOR_SIZE);
         int readed = m_fileEngine.read(m_tmpBuffer.data(), toRead);
         if (readed == -1)
             return false;
         m_cycleBuffer.push_back(m_tmpBuffer.data(), qMin((qint64) readed, m_actualFileSize - m_filePos));
+        if (m_cycleBuffer.size() < bufferSize) {
+            std::vector<char> fillerData;
+            fillerData.resize(bufferSize - m_cycleBuffer.size());
+            m_cycleBuffer.push_back(fillerData.data(), fillerData.size());
+        }
         m_fileEngine.seek(m_filePos);
     }
-    m_bufferPos = bufOffset;
+    m_bufferPos = bufferSize;
     return true;
 }
 
