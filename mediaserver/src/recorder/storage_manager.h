@@ -82,7 +82,7 @@ public:
     
     void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
     void clearMaxDaysData();
-    void clearMaxDaysData(const FileCatalogMap &catalogMap);
+    void clearMaxDaysData(QnServer::ChunksCatalog catalogIdx);
 
     void deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 minTime);
     void clearDbByChunk(DeviceFileCatalogPtr catalog, const DeviceFileCatalog::Chunk& chunk);
