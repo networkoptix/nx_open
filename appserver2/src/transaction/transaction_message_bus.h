@@ -88,7 +88,7 @@ namespace ec2
             QMutexLocker lock(&m_mutex);
             if (m_connections.isEmpty())
                 return;
-            QnTransactionTransportHeader ttHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers);
+            QnTransactionTransportHeader ttHeader(connectedPeers() << m_localPeer.id, dstPeers);
             ttHeader.fillSequence();
             sendTransactionInternal(tran, ttHeader);
         }
@@ -207,7 +207,7 @@ namespace ec2
         */
         bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport);
 
-        QnPeerSet connectedPeers(ApiCommand::Value command) const;
+        QnPeerSet connectedPeers() const;
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 
