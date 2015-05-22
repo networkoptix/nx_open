@@ -122,10 +122,13 @@ public:
             if (scanData.partialScan)
             {
                 QMap<DeviceFileCatalogPtr, qint64> catalogToScan; // key - catalog, value - start scan time;
-                for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::LowQualityCatalog])
-                    catalogToScan.insert(catalog, catalog->lastChunkStartTime());
-                for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::HiQualityCatalog])
-                    catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                {
+                    QMutexLocker lock(&m_owner->m_mutexCatalog);
+                    for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::LowQualityCatalog])
+                        catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                    for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::HiQualityCatalog])
+                        catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                }
                 int totalStep = catalogToScan.size();
                 int currentStep = 0;
                 for(auto itr = catalogToScan.begin(); itr != catalogToScan.end(); ++itr) 
