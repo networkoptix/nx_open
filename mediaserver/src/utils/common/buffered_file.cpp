@@ -172,9 +172,11 @@ QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int min
 {
     m_systemDependentFlags = 0;
     m_minBufferSize = minBufferSize;
+    m_isDirectIO = false;
     m_bufferPos = 0;
     m_actualFileSize = 0;
-    m_isDirectIO = false;
+    m_filePos = 0;
+    m_openMode = QIODevice::NotOpen;
 }
 
 QBufferedFile::~QBufferedFile()
