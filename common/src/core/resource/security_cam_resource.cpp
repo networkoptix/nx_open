@@ -43,9 +43,9 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_advancedWorking(false),
     m_manuallyAdded(false),
 	m_cachedLicenseType(Qn::LC_Count),
-    m_cachedHasDualStreaming2(
-        [this]()->bool{ return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse; },
-        &m_mutex ),
+    //m_cachedHasDualStreaming2( // UNDO c29dd798445d
+    //    [this]()->bool{ return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse; },
+    //    &m_mutex ),
     m_cachedSupportedMotionType(
         std::bind( &QnSecurityCamResource::calculateSupportedMotionType, this ),
         &m_mutex ),
@@ -282,7 +282,8 @@ QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const {
 }
 
 bool QnSecurityCamResource::hasDualStreaming2() const {
-    return m_cachedHasDualStreaming2.get();
+    //return m_cachedHasDualStreaming2.get(); // UNDO c29dd798445d
+    return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse;
 }
 
 bool QnSecurityCamResource::hasDualStreaming() const {
@@ -859,7 +860,7 @@ Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const {
 void QnSecurityCamResource::resetCachedValues()
 {
     //resetting cached values
-    m_cachedHasDualStreaming2.reset();
+    //m_cachedHasDualStreaming2.reset(); // UNDO c29dd798445d
     m_cachedSupportedMotionType.reset();
     m_cachedCameraCapabilities.reset();
     m_cachedIsDtsBased.reset();
