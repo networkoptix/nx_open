@@ -201,7 +201,12 @@ case "$1" in
             $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
         fi
 
-	if [ -d $EC_DIR/var/hostedfiles -a ! -d $BASE_DIR/var/vms_storedfiles ]; then
+        EC_GUID="$($EC_CFG_HELPER ecsGuid)"
+        [ -n "$EC_GUID" ] && $CFG_HELPER ecsGuid "$EC_GUID"
+
+
+        if [ -d $EC_DIR/var/hostedfiles -a ! -d $BASE_DIR/var/vms_storedfiles ]; then
+            [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
             mv $EC_DIR/var/hostedfiles $BASE_DIR/var/vms_storedfiles
         fi
 
