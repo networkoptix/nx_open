@@ -33,7 +33,7 @@ Description: Allow system to optimize cameras settings (Recommended)
 
 Template: ${deb.customization.company.name}-mediaserver/allowCollectStatistics
 Type: boolean
-Description: Allow system to collect anonymous usage statistics
+Description: Send usage and crash statistics to software developers
 
 Template: ${deb.customization.company.name}-mediaserver/present-mediaserver-eula
 Type: note
