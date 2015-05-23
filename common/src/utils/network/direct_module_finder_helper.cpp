@@ -35,8 +35,9 @@ namespace {
     }
 }
 
-QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder) :
+QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFinder, bool clientMode) :
     base_type(moduleFinder),
+    m_clientMode(clientMode),
     m_moduleFinder(moduleFinder)
 {
     Q_ASSERT(moduleFinder);
@@ -82,15 +83,17 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
     }
 
     for (const QUrl &url: server->getAdditionalUrls()) {
-        QUrl turl = makeUrl(url.host(), port);
+        QUrl turl = makeUrl(url.host(), url.port(port));
         additionalUrls.insert(turl);
         addUrl(turl, m_urls);
     }
 
-    for (const QUrl &url: server->getIgnoredUrls()) {
-        QUrl turl = makeUrl(url.host(), port);
-        ignoredUrls.insert(turl);
-        addUrl(turl, m_ignoredUrls);
+    if (!m_clientMode) {
+        for (const QUrl &url: server->getIgnoredUrls()) {
+            QUrl turl = makeUrl(url.host(), url.port(port));
+            ignoredUrls.insert(turl);
+            addUrl(turl, m_ignoredUrls);
+        }
     }
 
     m_serverUrlsById[serverId] = urls;
@@ -118,8 +121,10 @@ void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resourc
     for (const QUrl &url: m_additionalServerUrlsById.take(serverId))
         removeUrl(url, m_urls);
 
-    for (const QUrl &url: m_ignoredServerUrlsById.take(serverId))
-        removeUrl(url, m_ignoredUrls);
+    if (!m_clientMode) {
+        for (const QUrl &url: m_ignoredServerUrlsById.take(serverId))
+            removeUrl(url, m_ignoredUrls);
+    }
 
     updateModuleFinder();
 }

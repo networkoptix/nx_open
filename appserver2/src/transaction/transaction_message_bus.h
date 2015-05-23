@@ -43,7 +43,30 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer, qint64 remoteSystemIdentityTime);
+        void gotConnectionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            QSharedPointer<AbstractStreamSocket> socket,
+            ConnectionType::Type connectionType,
+            const ApiPeerData& remotePeer,
+            qint64 remoteSystemIdentityTime,
+            const nx_http::Request& request,
+            const QByteArray& contentEncoding );
+        //!Report socket to receive transactions from
+        /*!
+            \param requestBuf Contains serialized \a request and (possibly) partial (or full) message body
+        */
+        void gotIncomingTransactionsConnectionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            const QSharedPointer<AbstractStreamSocket>& socket,
+            const ApiPeerData &remotePeer,
+            qint64 remoteSystemIdentityTime,
+            const nx_http::Request& request,
+            const QByteArray& requestBuf );
+        //!Process transaction received via standard HTTP server interface
+        bool gotTransactionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            const nx_http::Request& request,
+            const QByteArray& requestMsgBody );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -219,10 +242,14 @@ namespace ec2
         void removePeersWithTimeout(const QSet<QnUuid>& lostPeers);
         QSet<QnUuid> checkAlivePeerRouteTimeout();
         void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
+        int distanceToPeer(const QnUuid& dstPeer) const;
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
-        void at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader);
+        void at_gotTransaction(
+            Qn::SerializationFormat tranFormat,
+            const QByteArray &serializedTran,
+            const QnTransactionTransportHeader &transportHeader);
         void doPeriodicTasks();
         bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
         void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);

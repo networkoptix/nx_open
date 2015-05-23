@@ -10,11 +10,8 @@
 //// QnCameraUserAttributePool
 ////////////////////////////////////////////////////////////
 
-static QnCameraUserAttributePool* QnCameraUserAttributePool_instance = nullptr;
-
 QnCameraUserAttributePool::QnCameraUserAttributePool()
 {
-    QnCameraUserAttributePool_instance = this;
     setElementInitializer( []( const QnUuid& cameraID, QnCameraUserAttributesPtr& userAttributes ){
         userAttributes = QnCameraUserAttributesPtr( new QnCameraUserAttributes() );
         userAttributes->cameraID = cameraID;
@@ -22,10 +19,7 @@ QnCameraUserAttributePool::QnCameraUserAttributePool()
 }
 
 QnCameraUserAttributePool::~QnCameraUserAttributePool()
-{
-    assert( QnCameraUserAttributePool_instance == this );
-    QnCameraUserAttributePool_instance = nullptr;
-}
+{}
 
 QnCameraUserAttributesList QnCameraUserAttributePool::getAttributesList( const QList<QnUuid>& idList )
 {
@@ -34,9 +28,4 @@ QnCameraUserAttributesList QnCameraUserAttributePool::getAttributesList( const Q
     for( const QnUuid id: idList )
         valList.push_back( get(id) );
     return valList;
-}
-
-QnCameraUserAttributePool* QnCameraUserAttributePool::instance()
-{
-    return QnCameraUserAttributePool_instance;
 }

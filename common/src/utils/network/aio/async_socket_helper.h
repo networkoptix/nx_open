@@ -479,7 +479,7 @@ private:
                     else
                     {
                         m_sendBufPos += bytesWritten;
-                        if( m_sendBufPos == (size_t)m_sendBuffer->size() )
+                        if( m_sendBufPos == m_sendBuffer->size() )
                             sendHandlerLocal( SystemError::noError, m_sendBufPos );
                     }
                 }

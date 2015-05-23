@@ -1,21 +1,38 @@
 #ifndef QN_TIME_PERIOD_LIST_H
 #define QN_TIME_PERIOD_LIST_H
 
-#include <vector>
+//#define QN_TIME_PERIODS_STD
 
+#ifdef QN_TIME_PERIODS_STD
+#include <vector>
+#else
 #include <QtCore/QVector>
+#endif
+
+#include <api/api_fwd.h>
 
 #include "time_period.h"
-
-class QnTimePeriodListTimeIterator;
+#include "utils/common/uuid.h"
 
 /**
  * A sorted list of time periods that basically is an implementation of 
  * an interval container concept.
  */
-class QnTimePeriodList: public QVector<QnTimePeriod> {
+class QnTimePeriodList: 
+#ifdef QN_TIME_PERIODS_STD
+    public std::vector<QnTimePeriod>
+#else
+    public QVector<QnTimePeriod> 
+#endif
+{
+#ifdef QN_TIME_PERIODS_STD
+    typedef std::vector<QnTimePeriod> base_type;
+#else
+    typedef QVector<QnTimePeriod> base_type;
+#endif
+
 public:
-    QnTimePeriodList(): QVector<QnTimePeriod>() {}
+    QnTimePeriodList();
     QnTimePeriodList(const QnTimePeriod &singlePeriod);
 
     /**
@@ -41,6 +58,9 @@ public:
 
     QnTimePeriodList intersected(const QnTimePeriod &period) const;
 
+    /** Get list of periods, that starts in the target period. */
+    QnTimePeriodList intersectedPeriods(const QnTimePeriod &period) const;
+
     /**
      * \returns                         Total duration of all periods in this list,
      *                                  or -1 if the last time period of this list is infinite.
@@ -49,8 +69,21 @@ public:
      */
     qint64 duration() const;
 
-    inline QnTimePeriodListTimeIterator timeBegin() const;
-    inline QnTimePeriodListTimeIterator timeEnd() const;
+    /**
+     * \returns                         Bounding period for this period list.
+     * \param truncateInfinite          Whether the infinite period should be truncated to fixed value.
+     */
+    QnTimePeriod boundingPeriod(qint64 truncateInfinite = QnTimePeriod::infiniteDuration()) const;
+
+#ifdef QN_TIME_PERIODS_STD
+    const QnTimePeriod &first() const { return *begin(); }
+    QnTimePeriod &first() { return *begin(); }
+
+    const QnTimePeriod &last() const { return *(end() - 1); }
+    QnTimePeriod &last() { return *(end() - 1); }
+
+    bool isEmpty() const { return empty(); }
+#endif
 
     /** 
      * Encode (compress) data to a byte array. 
@@ -89,91 +122,43 @@ public:
      */
     qint64 roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const;
 
-    static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
+    /** Merge some time period lists into one. */
+    static QnTimePeriodList mergeTimePeriods(const std::vector<QnTimePeriodList>& periods);
+
+    /** Update tail of the period list with provided tail.
+     * 
+     * \param[in] periods               Base list.
+     * \param[in] tail                  List of updates.
+     * \param[in] dividerPoint          Point where the tail should be appended.
+     * \returns                         Updated list.
+     */
+    static void overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList &tail, qint64 dividerPoint);
+
+    /** Union two time period lists. Does not delete periods from the base list.
+     * 
+     * \param[in] basePeriods           Base list.
+     * \param[in] appendingPeriods      Appending list.
+     * \returns                         Merged list.
+     */
+    static void unionTimePeriods(QnTimePeriodList& basePeriods, const QnTimePeriodList &appendingPeriods);
+
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
-};
-
-
-
-/**
- * Iterator that presents a view into time period list as a list of time values
- * that this list contains. This allows for duration-based iteration through
- * the time period list.
- */
-class QnTimePeriodListTimeIterator {
-public:
-    typedef QnTimePeriodListTimeIterator        this_type;
-    typedef QnTimePeriodList::const_iterator    base_type;
-
-    /* We don't really satisfy the requirements of a random access iterator, 
-     * but we implement the interface. */
-    typedef std::random_access_iterator_tag     iterator_category; 
-
-    typedef qint64                              value_type;
-    typedef qint64                              difference_type;
-    typedef const qint64 *                      pointer;
-    typedef qint64                              reference;
-
-    QnTimePeriodListTimeIterator(): m_position(0) {}
-    QnTimePeriodListTimeIterator(const base_type &base, qint64 position): m_base(base), m_position(0) { *this += position; }
-    QnTimePeriodListTimeIterator(const this_type &other): m_base(other.m_base), m_position(other.m_position) {}
-
-    reference operator*() const { return m_base->startTimeMs + m_position; }
-    reference operator[](difference_type d) const { return *(*this + d); }
-
-    this_type operator+(difference_type d) const { this_type result = *this; result += d; return result; }
-    this_type &operator++() { return *this += 1; }
-    this_type operator++(int) { this_type result = *this; ++*this; return result; }
-
-    this_type operator-(difference_type d) const { this_type result = *this; result -= d; return result; }
-    this_type &operator--() { return *this -= 1;}
-    this_type operator--(int) { this_type result = *this; --*this; return result; }
-    this_type &operator-=(difference_type d) { return *this += -d; }
-
-    this_type &operator+=(difference_type d) {
-        m_position += d;
-
-        if(d <= 0) {
-            /* It is important that (d == 0) case is processed here
-             * as we don't want base iterator to be dereferenced in this case. */
-            while(m_position < 0) {
-                m_base--;
-                m_position += m_base->durationMs;
-            }
-        } else {
-            while(m_position > m_base->durationMs && m_base->durationMs != -1) {
-                m_position -= m_base->durationMs;
-                m_base++;
-            }
-        }
-
-        return *this;
-    }
-
-    bool operator==(const this_type &other) const { return m_base == other.m_base && m_position == other.m_position; }
-    bool operator!=(const this_type &other) const { return !(*this == other); }
-
-    bool operator<(const this_type &other) const { return m_base < other.m_base || (m_base == other.m_base && m_position < other.m_position); }
-    bool operator<=(const this_type &other) const { return m_base < other.m_base || (m_base == other.m_base && m_position <= other.m_position); }
-    bool operator>(const this_type &other) const { return !(*this <= other); }
-    bool operator>=(const this_type &other) const { return !(*this < other); }
 
 private:
-    /** Position in the base time period list. */
-    base_type m_base;
-
-    /** Position inside the current time period. */
-    qint64 m_position;
+    void excludeTimePeriod(const QnTimePeriod &period);
 };
 
-inline QnTimePeriodListTimeIterator QnTimePeriodList::timeBegin() const {
-    return QnTimePeriodListTimeIterator(begin(), 0);
-}
+struct MultiServerPeriodData
+{
+    /** Guid of the server, owning this periods. */
+    QnUuid guid;
+    QnTimePeriodList periods;
+};
 
-inline QnTimePeriodListTimeIterator QnTimePeriodList::timeEnd() const {
-    return QnTimePeriodListTimeIterator(end(), 0);
-}
+QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData, (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time)(eq));
 
 Q_DECLARE_METATYPE(QnTimePeriodList);
+Q_DECLARE_METATYPE(MultiServerPeriodDataList);
+
 
 #endif // QN_TIME_PERIOD_LIST_H

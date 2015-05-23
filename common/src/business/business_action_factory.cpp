@@ -1,5 +1,7 @@
 #include "business_action_factory.h"
 
+#include <common/common_module.h>
+
 #include <business/actions/camera_output_business_action.h>
 #include <business/actions/panic_business_action.h>
 #include <business/actions/recording_business_action.h>
@@ -26,6 +28,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnB
     //TODO: #GDM #Business check resource type?
 
     QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
+    runtimeParams.sourceServerId = qnCommon->moduleGUID();
 
     QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);
 

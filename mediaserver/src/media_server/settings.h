@@ -40,13 +40,11 @@ namespace nx_ms_conf
     static const QLatin1String HLS_REMOVED_LIVE_CHUNKS_TO_KEEP( "hlsRemovedChunksToKeep" );
     static const unsigned int DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP = -1;
 
-    //!Port, onvif events are accepted on. Currently, only camera input events are handled. It is used with cameras that do not support onvif pullpoint subscription
-    static const QLatin1String SOAP_PORT( "soapPort" );
-    static const int DEFAULT_SOAP_PORT = 8083;
-
     //!Write block size. This block is always aligned to file system sector size
     static const QLatin1String IO_BLOCK_SIZE( "ioBlockSize" );
     static const int DEFAULT_IO_BLOCK_SIZE = 4*1024*1024;
+
+    static const QLatin1String DISABLE_DIRECT_IO ("disableDirectIO");
 
     //!Size of data to keep in memory after each write
     /*!
@@ -60,7 +58,7 @@ namespace nx_ms_conf
     static const int DEFAULT_HLS_INACTIVITY_PERIOD = 150;
 
     static const QLatin1String RESOURCE_INIT_THREADS_COUNT( "resourceInitThreadsCount" );
-    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
+    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 32;
 
     static const QLatin1String SSL_CERTIFICATE_PATH( "sslCertificatePath" );
 

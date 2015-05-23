@@ -8,9 +8,9 @@ Resource Tree (Empty Space) - working_with_a_resource_tree.htm
 Resource Tree - Search (Empty Space) - search.htm
 Playback Panel (empty Space) - playback_panel.htm
 FullScreen Button on top - full_screen_and_windowed_mode.htm
-Local Settings -> Look and Feel - customizing_product_name.htm
-Analog cameras (items in Scene) if not licensed - obtaining_and_activating_hd_witness_licenses.htm
-Licenses Form - obtaining_and_activating_hd_witness_licenses.htm
+Local Settings -> Look and Feel - customizing_product.name.htm
+Analog cameras (items in Scene) if not licensed - obtaining_and_Activating_VMS_Licenses.htm
+Licenses Form - obtaining_and_Activating_VMS_Licenses.htm
 Server in tree - Configuring_Media_Servers_Additional_Settings_(Ad.htm
 Media Server Settings (upper part) - configuring_media_servers_additional_settings_(ad.htm
 Media Server Settings (storage part) - configuring_media_server_storages_(admin_only).htm
@@ -21,7 +21,7 @@ Connect to Current System -> Password - join_server_from_different_sys.htm
 Merge Systems - merge_all_servers_to_another_s.htm
 Routing Management - configuring_routing_within_mul.htm
 Time Sync - configuring_time_synchronizati.htm
-Component version mismatch Form (Servers are diff. version) - upgrading_product_name.htm
+Component version mismatch Form (Servers are diff. version) - Upgrading_VMS.htm
 System Admin Form (Empty Space) - system-wide_configurations.htm
 System Admin Form, Cameras List - viewing_full_cameras_list.htm
 Cameras List - viewing_full_cameras_list.htm
@@ -46,7 +46,7 @@ IP Camera Properties (Recording tab, min/max section) - configuring_maximum_and_
 IP Camera Properties (Motion Detection tab) - setting_up_motion_mask_and_motion_sensitivity_(adm.htm
 IP Camera Properties (Advanced tab) - configuring_proprietary_camera_parameters.htm
 Expert tab in camera settings (Empty space) - adjusting_second_stream_qualit.htm
-Expert tab, Keep Camera streams and profile settings checkbox - preventing_product_name_from_c.htm
+Expert tab, Keep Camera streams and profile settings checkbox - preventing_VMS_from_C.htm
 Expert tab, Do not archive primary stream - disabling_recording_of_primary.htm
 Expert tab, Do not archive secondary stream - disabling_recording_of_primary.htm
 Expert tab, RTP Transport - Setting_Up_Camera_Transport_Pr.htm
@@ -124,8 +124,8 @@ Screenshot Saving Form - Taking_a_Screenshot.htm
 Tour in progress - Tours.htm
 Local Settings - Screen Recording - Setting_up_Screen_Recording.htm
 Screen Recording button on top - Performing_Screen_Recording.htm
-System Admin - Upgrade - Upgrading_PRODUCT.NAME.htm
-Local Settings - Autorun when PC boots - Run_DISPLAY.PRODUCT.NAME_when_.htm
+System Admin - Upgrade - Upgrading_VMS.htm
+Local Settings - Autorun when PC boots - Run_VMS_when_.htm
 Offline cameras diagnostics (offline camera or diagnostics form) - diagnosing_offline_cameras.htm
 Local Settings - Double Buffering - Double_Buffering.htm
 Rebuild Archive part of Media Server's settings - restoring_broken_archive.htm

@@ -20,6 +20,7 @@
 #include "ec2_thread_pool.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_camera_data_ex.h"
+#include "nx_ec/data/api_camera_history_data.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -27,9 +28,12 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
+#include "http/http_transaction_receiver.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
+
+static const char INCOMING_TRANSACTIONS_PATH[] = "ec2/forward_events";
 
 namespace ec2
 {
@@ -110,6 +114,7 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
     {
         universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
+        universalTcpListener->addHandler<QnHttpTransactionReceiver>("HTTP", INCOMING_TRANSACTIONS_PATH);
 
         m_sslEnabled = universalTcpListener->isSslEnabled();
     }
@@ -163,11 +168,9 @@ namespace ec2
         //AbstractCameraManager::getUserAttributes
         registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::getCameraUserAttributes );
         //AbstractCameraManager::addCameraHistoryItem
-        registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
-        //AbstractCameraManager::removeCameraHistoryItem
-        registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::removeCameraHistoryItem );
+        registerUpdateFuncHandler<ApiServerFootageData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryItems
-        registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
+        registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
         //AbstractCameraManager::getCamerasEx
@@ -279,6 +282,11 @@ namespace ec2
 
         registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
             std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
+
+        //using HTTP processor since HTTP REST does not support HTTP interleaving
+        //restProcessorPool->registerHandler(
+        //    QLatin1String(INCOMING_TRANSACTIONS_PATH),
+        //    new QnRestTransactionReceiver() );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
@@ -334,8 +342,8 @@ namespace ec2
 #if 1
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::connect, loginInfo, func );
+        m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
+            addr, ApiCommand::connect, std::nullptr_t(), func );
 #else
         //TODO: #ak following does not compile due to msvc2012 restriction: no more than 6 arguments to std::bind
         using namespace std::placeholders;
@@ -534,8 +542,8 @@ namespace ec2
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            addr, ApiCommand::testConnection, loginInfo, func );
+        m_remoteQueryProcessor.processQueryAsync<std::nullptr_t, QnConnectionInfo>(
+            addr, ApiCommand::testConnection, std::nullptr_t(), func );
         return reqID;
     }
 

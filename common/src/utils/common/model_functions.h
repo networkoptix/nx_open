@@ -12,6 +12,7 @@
 #include <utils/serialization/sql_functions.h>
 #include <utils/serialization/ubjson_functions.h>
 #include <utils/serialization/xml_functions.h>
+#include <utils/serialization/compressed_time_functions.h>
 #include <utils/math/fuzzy.h>
 
 namespace QnHashAutomation {

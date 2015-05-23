@@ -81,8 +81,8 @@ namespace ec2
         }
 
         static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
-    private:
 
+    private:
         mutable QMutex m_mutex;
         QCache<CacheKey, const QByteArray> m_cache;
     };

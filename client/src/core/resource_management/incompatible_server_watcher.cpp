@@ -5,7 +5,6 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/log.h>
 #include <common/common_module.h>
-#include <client/client_message_processor.h>
 
 namespace {
 
@@ -35,7 +34,7 @@ QnMediaServerResourcePtr makeResource(const QnModuleInformationWithAddresses &mo
 
     server->setId(QnUuid::createUuid());
     server->setStatus(initialStatus, true);
-    server->setProperty(lit("guid"), moduleInformation.id.toString());
+    server->setOriginalGuid(moduleInformation.id);
 
     updateServer(server, moduleInformation);
 
@@ -51,8 +50,6 @@ bool isSuitable(const QnModuleInformation &moduleInformation) {
 QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(QObject *parent) :
     QObject(parent)
 {
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened, this, &QnIncompatibleServerWatcher::start);
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed, this, &QnIncompatibleServerWatcher::stop);
 }
 
 QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher() {
@@ -87,6 +84,30 @@ void QnIncompatibleServerWatcher::stop() {
     }
 }
 
+void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep) {
+    QMutexLocker lock(&m_mutex);
+
+    auto it = m_moduleInformationById.find(id);
+    if (it == m_moduleInformationById.end())
+        return;
+
+    it->keep = keep;
+
+    if (!it->removed)
+        return;
+
+    m_moduleInformationById.erase(it);
+
+    lock.unlock();
+
+    removeResource(getFakeId(id));
+}
+
+void QnIncompatibleServerWatcher::createModules(const QList<QnModuleInformationWithAddresses> &modules) {
+    for (const QnModuleInformationWithAddresses &moduleInformation: modules)
+        at_moduleChanged(moduleInformation, true);
+}
+
 void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
@@ -105,7 +126,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
         removeResource(getFakeId(id));
     } else if (status == Qn::Offline) {
         QMutexLocker lock(&m_mutex);
-        QnModuleInformationWithAddresses moduleInformation = m_moduleInformationById.value(id);
+        QnModuleInformationWithAddresses moduleInformation = m_moduleInformationById.value(id).moduleInformation;
         lock.unlock();
         if (!moduleInformation.id.isNull())
             addResource(moduleInformation);
@@ -113,14 +134,30 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
 }
 
 void QnIncompatibleServerWatcher::at_moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive) {
+    QMutexLocker lock(&m_mutex);
+    auto it = m_moduleInformationById.find(moduleInformation.id);
+
     if (!isAlive) {
-        removeResource(getFakeId(moduleInformation.id));
-        QMutexLocker lock(&m_mutex);
+        if (it == m_moduleInformationById.end())
+            return;
+
+        if (it->keep) {
+            it->removed = true;
+            return;
+        }
+
         m_moduleInformationById.remove(moduleInformation.id);
-        return;
+
+        lock.unlock();
+        removeResource(getFakeId(moduleInformation.id));
     } else {
-        QMutexLocker lock(&m_mutex);
-        m_moduleInformationById.insert(moduleInformation.id, moduleInformation);
+        if (it != m_moduleInformationById.end()) {
+            it->removed = false;
+            it->moduleInformation = moduleInformation;
+        } else {
+            m_moduleInformationById.insert(moduleInformation.id, moduleInformation);
+        }
+
         lock.unlock();
         addResource(moduleInformation);
     }
@@ -159,7 +196,7 @@ void QnIncompatibleServerWatcher::addResource(const QnModuleInformationWithAddre
     } else {
         // update the resource
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO); //TODO: #GDM Fix assert
+        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
         updateServer(server, moduleInformation);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")

@@ -2517,7 +2517,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>File Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>檔案設定...</translation>
     </message>
 </context>
 <context>
@@ -4410,15 +4410,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <source>File Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>檔案設定</translation>
     </message>
     <message>
         <source>Picture is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>影像尚未讀取</translation>
     </message>
     <message>
         <source>This is a fish-eye lens file</source>
-        <translation type="unfinished"></translation>
+        <translation>此為魚眼影像檔案</translation>
     </message>
 </context>
 <context>
@@ -6916,7 +6916,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>套用過濾器: 影像翻轉, 魚眼校正, 影像強化, 自定義長寬比 (須重新轉碼)</translation>
     </message>
 </context>
 <context>

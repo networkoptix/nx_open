@@ -110,7 +110,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
     m_hasStorageChanges(false),
-    m_maxCamerasAdjusted(false)
+    m_maxCamerasAdjusted(false),
+    m_rebuildWasCanceled(false)
 {
     ui->setupUi(this);
 
@@ -141,7 +142,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->installEventFilter(signalizer);
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
     connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
-    connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString)), this, SLOT(at_updateRebuildInfo()));
+    connect(m_server, &QnMediaServerResource::apiUrlChanged, this, &QnServerSettingsDialog::at_updateRebuildInfo);
     for (const auto& storage: m_server->getStorages())
         connect(storage.data(), &QnResource::statusChanged, this, &QnServerSettingsDialog::at_updateRebuildInfo);
 
@@ -317,7 +318,7 @@ static const int EDGE_SERVER_MAX_CAMERAS = 1;
 
 void QnServerSettingsDialog::updateFromResources() 
 {
-    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    sendStorageSpaceRequest();
     updateRebuildUi(QnStorageScanData());
 
     if (m_server->getStatus() == Qn::Online)
@@ -489,8 +490,10 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
     RebuildAction action;
     if (m_rebuildState.state > Qn::RebuildState_None) {
         action = RebuildAction_Cancel;
+        m_rebuildWasCanceled = true;
     } else {
         action = RebuildAction_Start;
+        m_rebuildWasCanceled = false;
     }
 
     if (action == RebuildAction_Start)
@@ -520,6 +523,10 @@ void QnServerSettingsDialog::at_updateRebuildInfo()
         updateRebuildUi(QnStorageScanData());
 }
 
+void QnServerSettingsDialog::sendStorageSpaceRequest() {
+    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+}
+
 void QnServerSettingsDialog::sendNextArchiveRequest()
 {
     m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
@@ -530,6 +537,7 @@ void QnServerSettingsDialog::updateRebuildUi(const QnStorageScanData& reply) {
      m_rebuildState = reply;
 
      ui->rebuildGroupBox->setEnabled(reply.state != Qn::RebuildState_Unknown);
+     //TODO: #TR #gdm remove trailing spaces from messages
      QString status;
      if (!reply.path.isEmpty()) {
          if (reply.state == Qn::RebuildState_FullScan)
@@ -549,7 +557,7 @@ void QnServerSettingsDialog::updateRebuildUi(const QnStorageScanData& reply) {
      ui->rebuildStartButton->setEnabled(reply.state == Qn::RebuildState_None);
      ui->rebuildStopButton->setEnabled(reply.state == Qn::RebuildState_FullScan);
 
-     if (oldState.state == Qn::RebuildState_FullScan && reply.state == Qn::RebuildState_None) {
+     if (oldState.state == Qn::RebuildState_FullScan && reply.state == Qn::RebuildState_None && !m_rebuildWasCanceled) {
          emit rebuildArchiveDone();
          QMessageBox::information(this,
          tr("Finished"),
@@ -591,6 +599,8 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnStorageS
 
     if (reply.state > Qn::RebuildState_None)
         QTimer::singleShot(500, this, SLOT(sendNextArchiveRequest()));
+    else
+        sendStorageSpaceRequest();
 }
 
 void QnServerSettingsDialog::at_pingButton_clicked() {

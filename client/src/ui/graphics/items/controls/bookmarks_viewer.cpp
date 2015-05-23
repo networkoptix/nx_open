@@ -599,19 +599,19 @@ bool QnBookmarksViewer::Impl::event(QEvent *event)
     {
     case kBookmarksUpdateEventId: 
     {
-        const auto const updateEvent = static_cast<UpdateBokmarksEvent *>(event);
+        const auto updateEvent = static_cast<UpdateBokmarksEvent *>(event);
         updateBookmarksImpl(updateEvent->bookmarks(), updateEvent->parameters());
         break;
     }
     case kBookmarkEditActionEventId:
     {
-        const auto const bookmarkActionEvent = static_cast<BookmarkActionEvent *>(event);
+        const auto bookmarkActionEvent = static_cast<BookmarkActionEvent *>(event);
         emit m_owner->editBookmarkClicked(bookmarkActionEvent->bookmark(), bookmarkActionEvent->params());
         break;
     }
     case kBookmarkRemoveActionEventId:
     {
-        const auto const bookmarkActionEvent = static_cast<BookmarkActionEvent *>(event);
+        const auto bookmarkActionEvent = static_cast<BookmarkActionEvent *>(event);
         emit m_owner->removeBookmarkClicked(bookmarkActionEvent->bookmark(), bookmarkActionEvent->params());
         break;
     }

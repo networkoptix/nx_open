@@ -51,7 +51,6 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
         if(resource == currentLayoutResource) {
             bold = videoWallControlMode != uuid.isNull(); /* Bold current layout if we are not in control mode
                                                             and bold current videowall - if in. */
-            bold = true; /* Bold current layout. */
         } else if(parentResource == currentLayoutResource) {
             bold = true; /* Bold items of the current layout. */
         } else if(uuid.isNull() && workbench() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()) {

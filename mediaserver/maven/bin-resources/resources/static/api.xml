@@ -4,15 +4,734 @@
     xsi:noNamespaceSchemaLocation="api.xsd">
     <groups>
         <group>
-            <groupName>Media server API</groupName>
-            <urlPrefix>/api</urlPrefix>
-            <groupDescription>This group contains functions related to single media
-                server</groupDescription>
+            <groupName>System API</groupName>
+            <urlPrefix>/ec2</urlPrefix>
+            <groupDescription>This group contains functions related to whole system (all servers).</groupDescription>
             <functions>
                 <function>
+                    <name>getResourceTypes</name>
+                    <description>Read all resource types. Resource type contain object type such as
+                        'Server', 'Camera' e.t.c. Also, resource types contain additional information
+                        for cameras such as maximum fps, resolution, e.t.c</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getResourceParams</name>
+                    <description>Read resource (camera, user or server) additional parameters (camera firmware version, e.t.c).
+                                 List of parameters depends of resource type.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>id</name>
+                            <description>Resource unique ID</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getMediaServersEx</name>
+                    <description>Return server list</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getCamerasEx</name>
+                    <description>Read camera list</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>id</name>
+                            <description>Server unique ID</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Returns camera list data formatted in a requested format</caption>
+                        <attributes>
+                            <attribute>
+                                <name>addParams</name>
+                                <description>List of additional parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c</description>
+                            </attribute>
+                            <attribute>
+                                <name>audioEnabled</name>
+                                <description>Server will push audio stream from a camera if parameter is true</description>
+                            </attribute>
+                            <attribute>
+                                <name>controlEnabled</name>
+                                <description>Server will manage camera (change resolution, fps, create profiles e.t.c) if parameter if true</description>
+                            </attribute> 
+                            <attribute>
+                                <name>dewarpingParams</name>
+                                <description>Json string with dewarping parameters</description>
+                            </attribute> 
+                            <attribute>
+                                <name>groupId</name>
+                                <description>Internal group identifier. It is used for grouping channels for multi-channels cameras together. </description>
+                            </attribute> 
+                            <attribute>
+                                <name>groupName</name>
+                                <description>Group name. This name can be changed by user</description>
+                            </attribute> 
+                            <attribute>
+                                <name>id</name>
+                                <description>Object ID. All ID for all objects in a system is GUIDs</description>
+                            </attribute> 
+                            <attribute>
+                                <name>login</name>
+                                <description>Login for camera authentication</description>
+                            </attribute> 
+                            <attribute>
+                                <name>mac</name>
+                                <description>camera MAC address</description>
+                            </attribute> 
+                            <attribute>
+                                <name>manuallyAdded</name>
+                                <description>True if user added camera manually</description>
+                            </attribute> 
+                            <attribute>
+                                <name>maxArchiveDays</name>
+                                <description>Maximum archive duration in days for this camera. If value less or equal to zero, it is not used</description>
+                            </attribute> 
+                            <attribute>
+                                <name>minArchiveDays</name>
+                                <description>Minimum archive duration in days for this camera. If value less or equal to zero, it is not used</description>
+                            </attribute> 
+                            <attribute>
+                                <name>model</name>
+                                <description>Camera model</description>
+                            </attribute> 
+                            <attribute>
+                                <name>motionMask</name>
+                                <description>Camera's motion mask. This string defines several rectangles via ':' delimiter. Each rectangle is described by 5 digits: sensitivity, x,y(for left top corner), width, height</description>
+                            </attribute> 
+                            <attribute>
+                                <name>motionType</name>
+                                <description>If value is 'MT_SoftwareGrid' then server determine motion, otherwise camera built-in motion will be used</description>
+                            </attribute> 
+                            <attribute>
+                                <name>name</name>
+                                <description>Camera name</description>
+                            </attribute> 
+                            <attribute>
+                                <name>parentId</name>
+                                <description>Camera's server ID</description>
+                            </attribute> 
+                            <attribute>
+                                <name>physicalId</name>
+                                <description>Camera unique identifier. This identifier is used in all requests related to a camera. For instance, in RTSP requests</description>
+                            </attribute> 
+                            <attribute>
+                                <name>password</name>
+                                <description>Password for camera authentication</description>
+                            </attribute> 
+                            <attribute>
+                                <name>scheduleEnabled</name>
+                                <description>Do record camera archive if true</description>
+                            </attribute> 
+                            <attribute>
+                                <name>scheduleTasks</name>
+                                <description>List of 'scheduleTask' objects with camera recording schedule.</description>
+                            </attribute> 
+                            <attribute>
+                                <name>secondaryStreamQuality</name>
+                                <description>Secondary stream quality. Possible values:'SSQualityLow', 'SSQualityMedium', 'SSQualityHigh', 'SSQualityDontUse' </description>
+                            </attribute> 
+                            <attribute>
+                                <name>status</name>
+                                <description>Camera status. Possible values are: 'Offline', 'Online', 'Recording'</description>
+                            </attribute> 
+                            <attribute>
+                                <name>statusFlags</name>
+                                <description>Usually this field is zero. Non zero value is used to mark that a lot of network issues was occurred with this camera</description>
+                            </attribute> 
+                            <attribute>
+                                <name>typeId</name>
+                                <description>Unique ID with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
+                                                                        Detailed type information can be obtained via 'getResourceTypes' request.</description>
+                            </attribute> 
+                            <attribute>
+                                <name>url</name>
+                                <description>Camera plain IP address or full http url if camera was added manually. Also, for multichannel encoders full url is used</description>
+                            </attribute> 
+                            <attribute>
+                                <name>vendor</name>
+                                <description>Camera manufacturer</description>
+                            </attribute>
+                        </attributes>
+                    </result>
+                </function>
+                <function>
+                    <name>getCameraHistoryItems</name>
+                    <description>Read information about which server hold camera in some time
+                        period. This information is used for archive play if camera was moved from
+                        one server to another.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getCameraBookmarkTags</name>
+                    <description>Reserved for future use</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getBusinessRules</name>
+                    <description>Return business rules</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getUsers</name>
+                    <description>Return users registered in the system. User's password contain MD5
+                        hash data with salt</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getVideowalls</name>
+                    <description>Return list of video walls</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getLayouts</name>
+                    <description>Return list of user layout</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>listDirectory</name>
+                    <description>Return list of folders and files in a virtual FS stored inside
+                        database. This function is used to add files (such audio for notifications)
+                        to database.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>folder</name>
+                            <description>Folder name in a virtual FS</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getStoredFile</name>
+                    <description>Read file data from a virtual FS</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getSettings</name>
+                    <description>Read general system settings such as email address
+                        e.t.c</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getCurrentTime</name>
+                    <description>Read current time</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getFullInfo</name>
+                    <description>Read all data such as all servers, cameras, users
+                        e.t.c</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getLicenses</name>
+                    <description>Read license list</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>folder</name>
+                            <description>File name</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+        <group>
+            <groupName>Server API</groupName>
+            <urlPrefix>/api</urlPrefix>
+            <groupDescription>This group contains functions related to a single server</groupDescription>
+            <functions>
+                <function proprietary="true">
                     <name>execAction</name>
-                    <description>Execute business action. Action data should bin in a internal
-                        binary format. This method is going to be refactor at next
+                    <description>Execute business action. Action data should be in a internal
+                        binary format. This method is going to be refactored at next
                         version.</description>
                     <method>POST</method>
                     <params/>
@@ -58,7 +777,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Return media server event log in proprietary binary format</caption>
+                        <caption>Return server event log in proprietary binary format</caption>
                     </result>
                 </function>
                 <function>
@@ -79,12 +798,11 @@
                             <values>
                                 <value>
                                     <name>mediaServerAvailability</name>
-                                    <description>Checks media server availability</description>
+                                    <description>Checks server availability</description>
                                 </value>
                                 <value>
                                     <name>cameraAvailability</name>
-                                    <description>Checks if camera is accessible from media
-                                        server</description>
+                                    <description>Checks if camera is accessible from the server</description>
                                 </value>
                                 <value>
                                     <name>mediaStreamAvailability</name>
@@ -106,7 +824,7 @@
                 <function>
                     <name>setCameraParam</name>
                     <description>Sets values of several camera parameters. This parameters are used
-                        on a advanced Tab in camera settings. For instance: brightness, contrast
+                        on the Advanced tab in camera settings. For instance: brightness, contrast
                         e.t.c.</description>
                     <method>POST</method>
                     <params>
@@ -126,7 +844,7 @@
                     </params>
                     <result>
                         <caption>Returns OK if all parameters have been set, otherwise returns error 500
-                        (Internal server error) and result of setting for every param.</caption>
+                        (Internal server error) and result of setting for every parameter.</caption>
                     </result>
                 </function>
                 <function>
@@ -151,7 +869,7 @@
                     </params>
                     <result>
                         <caption>Returns required parameter values in form of paramName=paramValue, each
-                        param on new line</caption>
+                        parameter on new line</caption>
                     </result>
                 </function>
                 <function>
@@ -169,7 +887,7 @@
                             <name>time</name>
                             <description>required image time. Microseconds since 1970 UTC or string
                                 in format 'YYYY-MM-DDThh24:mi:ss.zzz'. Date format is auto detected.
-                                Also, addition special values are allowed.</description>
+                                Also, additional special values are allowed.</description>
                             <optional>false</optional>
                             <values>
                                 <value>
@@ -283,19 +1001,19 @@
                     <params>
                         <param>
                             <name>start_ip</name>
-                            <description>First ip address in range to scan.</description>
+                            <description>First IP address in range to scan.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
                         <param>
                             <name>end_ip</name>
-                            <description>Last ip address in range to scan.</description>
+                            <description>Last IP address in range to scan.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
                         <param>
                             <name>port</name>
-                            <description>Camera(s) port to check. Port is autodetected if parameter
+                            <description>Camera(s) port to check. Port is auto-detected if parameter
                                 is absent.</description>
                             <optional>true</optional>
                             <values/>
@@ -319,7 +1037,7 @@
                 </function>
                 <function>
                     <name>manualCamera/status</name>
-                    <description>Get manual addition progress.</description>
+                    <description>Get manual adding progress.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -335,7 +1053,7 @@
                 </function>
                 <function>
                     <name>manualCamera/stop</name>
-                    <description>Stop manual addition progress.</description>
+                    <description>Stop manual adding progress.</description>
                     <method>POST</method>
                     <params>
                         <param>
@@ -406,7 +1124,7 @@
                         </param>
                         <param>
                             <name>password</name>
-                            <description>System admin password.</description>
+                            <description>System administrator password.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
@@ -423,7 +1141,8 @@
                 </function>
                 <function>
                     <name>ptz</name>
-                    <description>Perform reading or writting PTZ operation</description>
+                    <description>Perform reading or writing PTZ operation</description>
+                    <method>GET</method>
                     <params>
                         <param>
                             <name>resourceId</name>
@@ -446,11 +1165,11 @@
                                 </value>
                                 <value>
                                     <name>AbsoluteDeviceMovePtzCommand</name>
-                                    <description>Move camera to absolute pozition. Parameters xPos, yPos and zPos are used in range defined by camera. Parameter speed is used in range [0..1.0].</description>
+                                    <description>Move camera to absolute position. Parameters xPos, yPos and zPos are used in range defined by camera. Parameter speed is used in range [0..1.0].</description>
                                 </value>
                                 <value>
                                     <name>AbsoluteLogicalMovePtzCommand</name>
-                                    <description>Move camera to absolute pozition. Parameters xPos, yPos range are: [-180..+180]. Parameter zPos range is: [0..180] (field of view in degree). Parameters speed range is: [0..1.0].</description>
+                                    <description>Move camera to absolute position. Parameters xPos, yPos range are: [-180..+180]. Parameter zPos range is: [0..180] (field of view in degree). Parameters speed range is: [0..1.0].</description>
                                 </value>
                                 <value>
                                     <name>GetDevicePositionPtzCommand</name>
@@ -493,7 +1212,7 @@
                 </function>
                 <function>
                     <name>rebuildArchive</name>
-                    <description>Start or stop rebuilding of media server archive.</description>
+                    <description>Start or stop server archive rebuilding.</description>
                     <method>POST</method>
                     <params>
                         <param>
@@ -504,7 +1223,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Rebuild progress if no input param specified or XML with OK message or
+                        <caption>Rebuild progress if no input parameter specified or XML with OK message or
                         error code.</caption>
                     </result>
                 </function>
@@ -538,9 +1257,9 @@
                         </param>
                         <param>
                             <name>filter</name>
-                            <description>This paremeter is used for motion search (periodsType must be 1). Match motion on a video by specified rect. 
+                            <description>This parameter is used for motion search (periodsType must be 1). Match motion on a video by specified rectangle. 
                                 Filter format is: &lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;
-                                rect format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
+                                rectangle format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
                                 'x' and 'width' in range [0..43], 'y' and 'height' in range [0..31].
                             </description>
                             <optional>true</optional>
@@ -575,11 +1294,7 @@
                                     <name>1</name>
                                     <description>Only chunk with motion (parameter motionRegions required)</description>
                                 </value>
-                                <value>
-                                    <name>2</name>
-                                    <description>Bookmarks (reserverd for future use)</description>
-                                </value>
-                            </values>
+                             </values>
                         </param>
                     </params>
                     <result>
@@ -607,8 +1322,7 @@
                 </function>
                 <function>
                     <name>storageStatus</name>
-                    <description>Check if specified folder can be used as media server
-                        storage.</description>
+                    <description>Check if specified folder can be used as a server storage.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -620,7 +1334,7 @@
                     </params>
                     <result>
                         <caption>JSON data. 'OK' if specified folder may be used for writing on
-                        mediaServer. Otherwise returns 'FAIL' </caption>
+                        the server. Otherwise returns 'FAIL' </caption>
                     </result>
                 </function>
                 <function>
@@ -648,7 +1362,7 @@
                         <caption>JSON data.</caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>installUpdate</name>
                     <description>Updates server by the package contained in POST body</description>
                     <method>POST</method>
@@ -663,7 +1377,14 @@
                         INSTALLATION_ERROR if the server couldn't execute installation script.</caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
+                    <name>installUpdate</name>
+                    <description>Install update from zip package which should be in the request body.</description>
+                    <method>POST</method>
+                    <params/>
+                    <result/>
+                </function>
+                <function proprietary="true">
                     <name>onEvent</name>
                     <description>Process business event from external system. Reserved for future
                         use.</description>
@@ -675,23 +1396,26 @@
                     <name>discoveredPeers</name>
                     <description>Returns a list of the discovered peers.</description>
                     <method>GET</method>
-                    <params/>
-                    <result><caption>JSON with a list of the discovered peers</caption></result>
+                    <params>
+                        <param>
+                            <name>showAddresses</name>
+                            <description>Set it to true to show server addresses.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON with a list of the discovered peers</caption>
+                    </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>restart</name>
                     <description>Restart the server.</description>
                     <method>GET</method>
                     <params/>
                     <result/>
                 </function>
-                <function>
-                    <name>installUpdate</name>
-                    <description>Install update from zip package which should be in the request body.</description>
-                    <method>POST</method>
-                    <params/>
-                    <result/>
-                </function>
+
                 <function>
                     <name>moduleInformation</name>
                     <description>Get information about the server.</description>
@@ -724,70 +1448,6 @@
                     </result>
                 </function>
                 <function>
-                    <name>routingInformation/connections</name>
-                    <description>Get all connections found  in the current system.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>target</name>
-                            <description>Show connections from this peer</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>JSON with connection list.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>routingInformation/cachedRoutes</name>
-                    <description>Get a list of cached routes.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>target</name>
-                            <description>Show to this peer</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>JSON with route list.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>routingInformation/routeTo</name>
-                    <description>Get the shortest route to the specified peer.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>target</name>
-                            <description>GUID or host:port of the target.</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>JSON with route.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>routingInformation/rules</name>
-                    <description>Get routing rules.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>target</name>
-                            <description>Show rules for the specified peer.</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>JSON with rules.</caption>
-                    </result>
-                </function>
-                <function>
                     <name>configure</name>
                     <description>Configure server parameters.</description>
                     <method>GET</method>
@@ -812,13 +1472,13 @@
                         </param>
                         <param>
                             <name>password</name>
-                            <description>New admin password.</description>
+                            <description>New administrator password.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
                         <param>
                             <name>oldPassword</name>
-                            <description>Old admin password.</description>
+                            <description>Old administrator password.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
@@ -830,7 +1490,7 @@
                         </caption>
                     </result>
                 </function>
-                <function>
+                <function proprietary="true">
                     <name>mergeSystems</name>
                     <description>Merge two systems.</description>
                     <method>GET</method>
@@ -843,13 +1503,13 @@
                         </param>
                         <param>
                             <name>password</name>
-                            <description>Admin password of the target system.</description>
+                            <description>Administrator password of the target system.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
                         <param>
                             <name>currentPassword</name>
-                            <description>Admin password of the current system.</description>
+                            <description>Administrator password of the current system.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
@@ -860,11 +1520,11 @@
                             <values>
                                 <value>
                                     <name>true</name>
-                                    <description>The current system will get system name and admin password of the target system.</description>
+                                    <description>The current system will get system name and administrator password of the target system.</description>
                                 </value>
                                 <value>
                                     <name>false</name>
-                                    <description>The target system will get system name and admin password of the current system.</description>
+                                    <description>The target system will get system name and administrator password of the current system.</description>
                                 </value>
                             </values>
                         </param>
@@ -891,666 +1551,26 @@
                 </function>
             </functions>
         </group>
+
         <group>
-            <groupName>General API</groupName>
-            <urlPrefix>/ec2</urlPrefix>
-            <groupDescription>This group contains functions related to whole system (all media
-                servers).</groupDescription>
-            <functions>
-                <function>
-                    <name>getResourceTypes</name>
-                    <description>Read all resource types. Resource type contain object type such as
-                        'Server', 'Camera' e.t.c. Also, resource types contain addition information
-                        for cameras such as maximum fps, resolution e.t.c</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getResourceParams</name>
-                    <description>Read resource (camera, user or server) addition parameters (camera
-                        firmware version e.t.c). List of parameters depends of resource
-                        type.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>id</name>
-                            <description>Resource unique ID</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getMediaServersEx</name>
-                    <description>Return media server list</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getCamerasEx</name>
-                    <description>Read camera list</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>id</name>
-                            <description>Media server unique ID</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Returns camera list data formatted in a requested format</caption>
-                            <attributes>
-                                <attribute> <name>addParams</name> <description>List of addition parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c</description>  </attribute>
-                                <attribute> <name>audioEnabled</name> <description>Media server will push audio stream from a camera if parameter is true</description></attribute>
-                                <attribute> <name>controlEnabled</name> <description>Media server will manage camera (change resolution, fps, create profiles e.t.c) if parameter if true</description></attribute> 
-                                <attribute><name>dewarpingParams</name> <description>Json string with dewarping parameters</description></attribute> 
-                                <attribute><name>groupId</name> <description>Internal group identifier. It is used for grouping channels for multi-channels cameras together. </description></attribute> 
-                                <attribute><name>groupName</name> <description>Group name. This name can be changed by user</description></attribute> 
-                                <attribute><name>id</name> <description>Object ID. All ID for all objects in a system is GUIDs</description></attribute> 
-                                <attribute><name>login</name> <description>Login for camera authentication</description></attribute> 
-                                <attribute><name>mac</name> <description>camera MAC address</description></attribute> 
-                                <attribute><name>manuallyAdded</name> <description>True if user added camera manually</description></attribute> 
-                                <attribute><name>maxArchiveDays</name> <description>Maximum archive duration in days for this camera. If value less or equal to zero, it is not used</description></attribute> 
-                                <attribute><name>minArchiveDays</name> <description>Minimum archive duration in days for this camera. If value less or equal to zero, it is not used</description></attribute> 
-                                <attribute><name>model</name> <description>Camera model</description></attribute> 
-                                <attribute><name>motionMask</name> <description>Camera's motion mask. This string defines several rects via ':' delimiter. Each rect is described by 5 digits: sensitivity, x,y(for left top corner), width, height</description></attribute> 
-                                <attribute><name>motionType</name> <description>If value is 'MT_SoftwareGrid' then media server determine motion, otherwise camera built-in motion will be used</description></attribute> 
-                                <attribute><name>name</name> <description>Camera name</description></attribute> 
-                                <attribute><name>parentId</name> <description>Camera's server ID</description></attribute> 
-                                <attribute><name>physicalId</name> <description>Camera unique identifier. This identifier is used in all requests related to a camera. For instance, in RTSP requests</description></attribute> 
-                                <attribute><name>password</name> <description>Password for camera authentication</description></attribute> 
-                                <attribute><name>scheduleEnabled</name> <description>Do record camera archive if true</description></attribute> 
-                                <attribute><name>scheduleTasks</name> <description>List of 'scheduleTask' objects with camera recording schedule.</description></attribute> 
-                                <attribute><name>secondaryStreamQuality</name> <description>Secondary stream quality. Possible values:'SSQualityLow', 'SSQualityMedium', 'SSQualityHigh', 'SSQualityDontUse' </description></attribute> 
-                                <attribute><name>status</name> <description>Camera status. Possible values are: 'Offline', 'Online', 'Recording'</description></attribute> 
-                                <attribute><name>statusFlags</name> <description>Usually this field is zero. Non zero value is used to mark that a lot of network issues was occurred with this camera</description></attribute> 
-                                <attribute><name>typeId</name> <description>Unique ID with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
-                                                                        Detailed type information can be obtained via 'getResourceTypes' request.</description></attribute> 
-                                <attribute><name>url</name> <description>Camera plain ip address or full http url if camera was added manually. Also, for multichannel encoders full url is used</description></attribute> 
-                                <attribute><name>vendor</name> <description>Camera manufacturer</description></attribute>
-                            </attributes>
-                    </result>
-                </function>
-                <function>
-                    <name>getCameraHistoryItems</name>
-                    <description>Read information about which server hold camera in some time
-                        period. This information is used for archive play if camera was moved from
-                        one media server to another.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getCameraBookmarkTags</name>
-                    <description>Reserved for future use</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getBusinessRules</name>
-                    <description>Return business rules</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getUsers</name>
-                    <description>Return users registered in the system. User's password contain MD5
-                        hash data with salt</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getVideowalls</name>
-                    <description>Return list of video walls</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getLayouts</name>
-                    <description>Return list of user layout</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>listDirectory</name>
-                    <description>Return list of folders and files in a virtual FS stored inside
-                        database. This function is used to add files (such audio for notifications)
-                        to database.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>folder</name>
-                            <description>Folder name in a virtual FS</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getStoredFile</name>
-                    <description>Read file data from a virtual FS</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>folder</name>
-                            <description>File name</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getSettings</name>
-                    <description>Read general system settings such as email address
-                        e.t.c</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>folder</name>
-                            <description>File name</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getCurrentTime</name>
-                    <description>Read current time</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>folder</name>
-                            <description>File name</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getFullInfo</name>
-                    <description>Read all data such as all media servers, cameras, users
-                        e.t.c</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>folder</name>
-                            <description>File name</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>getLicenses</name>
-                    <description>Read license list</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>universal binary json data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>folder</name>
-                            <description>File name</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
-                </function>
-            </functions>
-        </group>
-        <group>
-            <groupName>RTSP API</groupName>
+            <groupName>Video API</groupName>
             <urlPrefix/>
             <groupDescription>
-                            This group contains information about media server RTSP api.
-                            RTSP api is accessible on the same port as HTTP requests. To request video for camera use:
-                        </groupDescription>
+                This group contains information about accessing cameras' live video and footage.
+            </groupDescription>
             <functions>
+
                 <function>
                     <name>&lt;physicalId&gt;</name>
                     <description>
                                         Open RTSP video from a camera. It is not an exact method name. It means that RTSP url may contain any camera unique ID. For instance:
                                         rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p
-                                        </description>
+                    </description>
                     <method>PLAY</method>
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>By default media server opens camera from live position. This parameter defines position in an archive in microseconds in a UTC format.
+                            <description>By default server opens camera from live position. This parameter defines position in an archive in microseconds in a UTC format.
                                                         Position can be passed via standard RTSP attribute as well as via URL parameter</description>
                             <optional>true</optional>
                         </param>
@@ -1584,8 +1604,8 @@
                                     <description/>
                                 </value>
                                 <value>
-                                    <name>mpjeg</name>
-                                    <description/>
+                                    <name>mjpeg</name>
+                                    <description>Motion JPEG</description>
                                 </value>
                                 <value>
                                     <name>mpeg4</name>
@@ -1600,7 +1620,7 @@
                         <param>
                             <name>stream</name>
                             <description>Open high quality stream if parameter is 0 or low quality stream if parameter is 1. 
-                                         By default media server auto detect preffered stream index based on destination resolution.</description>
+                                         By default server auto detect preferred stream index based on destination resolution.</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1613,22 +1633,48 @@
                         <caption>Return RTSP video stream</caption>
                     </result>
                 </function>
-            </functions>
-        </group>
-        <group>
-            <groupName>Http Live Streaming (HLS)</groupName>
-            <urlPrefix/>
-            <groupDescription>
-                            This group contains information about accessing server's media streams with HLS protocol.
-                            This protocol is supported by iOS-based devices (iPhone, iPad).
-                            HLS is available on the same port as HTTP and RTSP. To request video use:
-            </groupDescription>
-            <functions>
+
                 <function>
-                    <name>&lt;physicalId&gt;</name>
+                    <name>media/&lt;physicalId&gt;.&lt;format&gt;</name>
                     <description>
-                        Url format for opening camera stream with HLS:
-                        http://&lt;server_ip&gt;:&lt;port&gt;/hls/&lt;physicalId&gt;.m3u
+                        Url format for opening camera stream using HTTP protocol. Codec and stream format can be specified in url parameters.
+                        Live stream and archive can be downloaded. If required and possible, media stream transcoding is performed on-the-fly.
+                        Stream format can be one of following: webm, mpegts, mp4, 3gp, mjpeg (motion jpeg)                        
+                        Example: http://&lt;server_ip&gt;:&lt;port&gt;/media/12AB42FD5912.webm
+                    </description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>resolution</name>
+                            <description>Video stream resolution. Example: 720x576, 1920x1080, 720p, 1080p. By default, 640x480 is used</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>pos</name>
+                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions in milliseconds from epoch (1970-01-01 00:00, UTC). Otherwise, LIVE stream is provided</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rotation</name>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>sfd</name>
+                            <description>Stand Frame Duration. If parameter is present, video speed is limited by real time.</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Video stream in requested format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>hls/&lt;physicalId&gt;.m3u</name>
+                    <description>
+                            Url format for opening camera stream with Http Live Streaming (HLS).
+                            This protocol is supported by iOS-based devices (iPhone, iPad).
+                            Example: http://&lt;server_ip&gt;:&lt;port&gt;/hls/12AB42FD5912.m3u
                     </description>
                     <method>GET</method>
                     <params>
@@ -1657,68 +1703,20 @@
                         <caption>Video stream in mpeg-2/ts format</caption>
                     </result>
                 </function>
-            </functions>
-        </group>
-        <group>
-            <groupName>Progressive downloading</groupName>
-            <urlPrefix>media</urlPrefix>
-            <groupDescription>
-                Progressive downloading is method of receiving media stream using HTTP protocol. Codec and stream format can be specified in url parameters.
-                Live stream and archive can be downloaded. If required, media stream transcoding is performed on-the-fly
-            </groupDescription>
-            <functions>
                 <function>
-                    <name>&lt;physicalId&gt;</name>
+                    <name>hls/&lt;physicalId&gt;.&lt;format&gt;</name>
                     <description>
-                        Url format:
-                        http://&lt;server_ip&gt;:&lt;port&gt;/media/&lt;physicalId&gt;.&lt;format&gt;
-                        Stream format can be one of following: webm, mpegts, mp4, 3gp, mpjpeg (motion jpeg)
-                    </description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>resolution</name>
-                            <description>Video stream resolution. Example: 720x576, 1920x1080, 720p, 1080p. By default, 640x480 is used</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>pos</name>
-                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions in milliseconds from epoch (1970-01-01 00:00, UTC). Otherwise, LIVE stream is provided</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>rotation</name>
-                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
-                            <optional>true</optional>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Video stream in requested format</caption>
-                    </result>
-                </function>
-            </functions>
-        </group>
-        <group>
-            <groupName>Archive fragment downloading</groupName>
-            <urlPrefix>hls</urlPrefix>
-            <groupDescription>
-                Allows to download fragment of archive by specifying fragment start time and duration.
-                Fragment can be downloaded in mpeg-2/ts (.ts) format or matroska (.mkv).
-                No transcoding is done
-            </groupDescription>
-            <functions>
-                <function>
-                    <name>&lt;physicalId&gt;</name>
-                    <description>
-                        Url format:
-                        http://&lt;server_ip&gt;:&lt;port&gt;/hls/&lt;physicalId&gt;.&lt;format&gt;
+                        Url format for downloading fragment of archive by specifying fragment start time and duration.
+                        Fragment can be downloaded in mpeg-2/ts (.ts) format or matroska (.mkv).
+                        No transcoding is done.
                         Stream format can be one of following: ts, mkv
+                        Example: http://&lt;server_ip&gt;:&lt;port&gt;/hls/12AB42FD5912.mkv?startDatetime=2015-02-05T19:00&amp;duration=10
                     </description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>startDatetime</name>
-                            <description>Fragment start time in ISO format, mediaserver timezone. Example: 2015-02-05T19:00 (2015, 2 Feb 19:00)</description>
+                            <description>Fragment start time in ISO format, server time zone. Example: 2015-02-05T19:00 (2015, 2 Feb 19:00)</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1733,7 +1731,7 @@
                         </param>
                         <param>
                             <name>hi</name>
-                            <description>Return hiqh quality stream</description>
+                            <description>Return high quality stream</description>
                             <optional>true</optional>
                         </param>
                         <param>

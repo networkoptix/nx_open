@@ -977,7 +977,7 @@ void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader, qreal aspectR
     updateThumbnailsStepSize(true); // TODO: #Elric
 
     if(m_thumbnailsLoader)
-        foreach(const QnThumbnail &thumbnail, loader->thumbnails())
+        foreach(const QnThumbnail &thumbnail, m_thumbnailsLoader->thumbnails())
             addThumbnail(thumbnail);
 }
 
@@ -1289,7 +1289,7 @@ int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
         return Qn::MainWindow_Thumbnails_Help;
     bool hasMotion = false;
     for (int i = 0; i < m_lineCount; i++) {
-        if (!timePeriods(i, Qn::MotionContent).isEmpty()) {
+        if (!timePeriods(i, Qn::MotionContent).empty()) {
             hasMotion = true;
             break;
         }
@@ -1919,7 +1919,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
                 continue;
             }
             
-            if(pos[i]->durationMs != -1)
+            if(!pos[i]->isInfinite())
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 

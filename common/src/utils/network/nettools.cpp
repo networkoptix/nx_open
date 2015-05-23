@@ -347,7 +347,7 @@ struct PinagableT
 
 QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
 {
-    NX_LOG(QLatin1String("about to find all ip responded to ping...."), cl_logALWAYS);
+    NX_LOG(QLatin1String("about to find all ip responded to ping...."), cl_logINFO);
     QTime time;
     time.restart();
 
@@ -380,7 +380,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
             result.push_back(QHostAddress(addr.addr));
     }
 
-    NX_LOG(lit("Done. time elapsed = %1").arg(time.elapsed()), cl_logALWAYS);
+    NX_LOG(lit("Done. time elapsed = %1").arg(time.elapsed()), cl_logINFO);
 
     CL_LOG(cl_logDEBUG1)
     {
@@ -641,9 +641,9 @@ int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 
 #elif defined(__linux__)
 
-int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
 {
-    memset(MAC_str, 0, sizeof(MAC_str)/sizeof(*MAC_str));
+    memset(MAC_str, 0, MAC_ADDR_LEN);
 #define HWADDR_len 6
     struct ifreq ifr;
     int s = socket(AF_INET, SOCK_DGRAM, 0);

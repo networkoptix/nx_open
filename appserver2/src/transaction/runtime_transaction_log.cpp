@@ -10,6 +10,12 @@ QnRuntimeTransactionLog::QnRuntimeTransactionLog(QObject* parent):
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
 }
 
+QnRuntimeTransactionLog::~QnRuntimeTransactionLog()
+{
+    disconnect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged);
+    disconnect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged);
+}
+
 void QnRuntimeTransactionLog::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 {
     QMutexLocker lock(&m_mutex);

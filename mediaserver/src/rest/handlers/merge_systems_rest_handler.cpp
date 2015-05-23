@@ -138,6 +138,11 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             return nx_http::StatusCode::ok;
         }
 
+        if (!backupDatabase()) {
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
+            return nx_http::StatusCode::ok;
+        }
+
         if (!applyCurrentSettings(url, user, password, currentPassword, admin, mergeOneServer)) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
@@ -145,17 +150,15 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     }
 
     /* Save additional address if needed */
-    if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
-        if (!moduleInformation.remoteAddresses.contains(url.host())) {
-            QUrl simpleUrl;
-            simpleUrl.setScheme(lit("http"));
-            simpleUrl.setHost(url.host());
-            if (url.port() != moduleInformation.port)
-                simpleUrl.setPort(url.port());
-            ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-        }
-        QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
+    if (!moduleInformation.remoteAddresses.contains(url.host())) {
+        QUrl simpleUrl;
+        simpleUrl.setScheme(lit("http"));
+        simpleUrl.setHost(url.host());
+        if (url.port() != moduleInformation.port)
+            simpleUrl.setPort(url.port());
+        ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
+    QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
 
     /* Connect to server if it is compatible */
     if (compatible && QnServerConnector::instance())
@@ -251,6 +254,12 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
                 remoteSysTime = reply.sysIdTime;
                 remoteTranLogTime = reply.tranLogTime;
             }
+        }
+        {
+            CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
+            CLHttpStatus status = client.doGET(lit("/api/backupDatabase"));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
         }
 
         QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());

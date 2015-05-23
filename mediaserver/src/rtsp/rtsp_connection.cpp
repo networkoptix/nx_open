@@ -40,20 +40,21 @@
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>
+#include "http/custom_headers.h"
 
 
 class QnTcpListener;
 
 static const QByteArray ENDL("\r\n");
 
-static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
+//static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
 
 // ------------- ServerTrackInfo --------------------
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
 
 enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
-static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
+//static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
 static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
@@ -439,22 +440,22 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     return layout ? layout->channelCount() : -1;
 }
 
-QByteArray QnRtspConnectionProcessor::getRangeStr(QnArchiveStreamReader* archiveDP)
+QByteArray QnRtspConnectionProcessor::getRangeStr()
 {
     Q_D(QnRtspConnectionProcessor);
     QByteArray range;
-    if (archiveDP) 
+    if (d->archiveDP) 
     {
-        qint64 archiveEndTime = archiveDP->endTime();
-        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()); // && !endTimeInFuture;
+        qint64 archiveEndTime = d->archiveDP->endTime();
+        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
             range = "npt=";
-            if (archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
+            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += "now";
             else
-                range += QByteArray::number(archiveDP->startTime());
+                range += QByteArray::number(d->archiveDP->startTime());
 
             range += "-";
             if (endTimeIsNow)
@@ -466,15 +467,15 @@ QByteArray QnRtspConnectionProcessor::getRangeStr(QnArchiveStreamReader* archive
         {
             // use 'clock' attrubute. see RFC 2326
             range = "clock=";
-            if (archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
+            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             else
-                range += QDateTime::fromMSecsSinceEpoch(archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
             range += "-";
-            if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
+            if (QnRecordingManager::instance()->isCameraRecoring(d->archiveDP->getResource()))
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
             else
-                range += QDateTime::fromMSecsSinceEpoch(archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT).toLatin1();
         }
     }
     return range;
@@ -487,7 +488,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     if (d->archiveDP && !d->archiveDP->offlineRangeSupported())
         d->archiveDP->open();
 
-    QByteArray range = getRangeStr(d->archiveDP.data());
+    QByteArray range = getRangeStr();
     if (!range.isEmpty())
     {
         nx_http::insertOrReplaceHeader(
@@ -1070,7 +1071,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         if (nx_http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
-        d->clientGuid = nx_http::getHeaderValue(d->request.headers, "x-guid");
+        d->clientGuid = nx_http::getHeaderValue(d->request.headers, Qn::GUID_HEADER_NAME);
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
         //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
@@ -1502,4 +1503,10 @@ bool QnRtspConnectionProcessor::isTcpMode() const
 {
     Q_D(const QnRtspConnectionProcessor);
     return d->tcpMode;
+}
+
+QSharedPointer<QnArchiveStreamReader> QnRtspConnectionProcessor::getArchiveDP()
+{
+    Q_D(QnRtspConnectionProcessor);
+    return d->archiveDP;
 }

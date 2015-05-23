@@ -1,5 +1,7 @@
 #include "workbench_user_watcher.h"
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
@@ -85,7 +87,8 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
         return;
 
     setCurrentUser(QnUserResourcePtr());
-    menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+    if (!qnCommon->remoteGUID().isNull())
+        menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
 }
 
 bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user) {

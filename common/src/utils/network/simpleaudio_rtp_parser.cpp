@@ -15,8 +15,8 @@ QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
     m_frequency = 8000;
     m_channels = 1;
     m_codecId = CODEC_ID_PCM_MULAW;
-    m_sampleFormat = AV_SAMPLE_FMT_U8;
-    m_bits_per_coded_sample = 8;
+    m_sampleFormat = AV_SAMPLE_FMT_S16;
+    m_bits_per_coded_sample = 16;
 }
 
 QnSimpleAudioRtpParser::~QnSimpleAudioRtpParser()
@@ -108,7 +108,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
     return true;
 }
 
-QnResourceAudioLayoutPtr QnSimpleAudioRtpParser::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnSimpleAudioRtpParser::getAudioLayout()
 {
     return m_audioLayout;
 }

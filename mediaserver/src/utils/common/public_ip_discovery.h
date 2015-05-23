@@ -1,7 +1,6 @@
 #ifndef __PUBLIC_IP_DISCOVERY_H_
 #define __PUBLIC_IP_DISCOVERY_H_
 
-#include <QNetworkAccessManager>
 #include <QHostAddress>
 #include "utils/network/http/async_http_client_reply.h"
 

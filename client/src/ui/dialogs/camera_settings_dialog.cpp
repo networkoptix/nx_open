@@ -95,7 +95,7 @@ void QnCameraSettingsDialog::accept() {
 }
 
 void QnCameraSettingsDialog::reject() {
-    m_settingsWidget->updateFromResources();
+    m_settingsWidget->reject();
     base_type::reject();
 }
 

@@ -31,7 +31,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         ioBlockSize = MSSettings::roSettings()->value( nx_ms_conf::IO_BLOCK_SIZE, nx_ms_conf::DEFAULT_IO_BLOCK_SIZE ).toInt();
         ffmpegBufferSize = MSSettings::roSettings()->value( nx_ms_conf::FFMPEG_BUFFER_SIZE, nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE ).toInt();;
 #ifdef Q_OS_WIN
-        if (MSSettings::roSettings()->value("disableDirectIO").toInt() != 1)
+        if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
@@ -108,8 +108,8 @@ bool QnFileStorageResource::renameFile(const QString& oldName, const QString& ne
 bool QnFileStorageResource::removeDir(const QString& url)
 {
     updatePermissions();
-    qnFileDeletor->deleteDir(removeProtocolPrefix(url));
-    return true;
+    QDir dir;
+    return dir.rmdir(removeProtocolPrefix(url));
 }
 
 bool QnFileStorageResource::isDirExists(const QString& url)

@@ -122,25 +122,31 @@ bool QnThirdPartyResource::ping()
     return true;
 }
 
-bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& source )
+static const QString PROPERTIES_TO_MERGE[] = { QnThirdPartyResource::AUX_DATA_PARAM_NAME, Qn::FIRMWARE_PARAM_NAME };
+
+bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& newResource )
 {
     //TODO #ak antipattern: calling virtual function from base class
-    bool mergedSomething = base_type::mergeResourcesIfNeeded( source );
+    bool mergedSomething = base_type::mergeResourcesIfNeeded( newResource );
 
     QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
-    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
+    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(newResource);
     if (!sourceParams.isEmpty() && localParams != sourceParams) {
         QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
         mergedSomething = true;
     }
+    //TODO #ak to make minimal influence on existing code, merging only few properties. 
 
-    //TODO #ak to make minimal influence on existing code, merging only one property. 
         //But, perharps, other properties should be processed too (in QnResource)
-    const auto newAuxData = source->getProperty( AUX_DATA_PARAM_NAME );
-    if( getProperty(AUX_DATA_PARAM_NAME) != newAuxData )
+
+    for( const auto propertyName: PROPERTIES_TO_MERGE )
     {
-        setProperty( AUX_DATA_PARAM_NAME, newAuxData );
-        mergedSomething = true;
+        const auto newVal = newResource->getProperty( propertyName );
+        if( getProperty(propertyName) != newVal )
+        {
+            setProperty( propertyName, newVal );
+            mergedSomething = true;
+        }
     }
 
     return mergedSomething;
@@ -310,7 +316,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         nxcip::UsecUTCTimestamp periodEnd = nxcip::INVALID_TIMESTAMP_VALUE;
         timePeriods->get( &periodStart, &periodEnd );
 
-        resultTimePeriods << QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS );
+        resultTimePeriods.push_back(QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS ));
     }
     timePeriods->releaseRef();
 
@@ -637,7 +643,14 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
             if( QnCameraAdvacedParamsXmlParser::validateXml(&dataSource)) {
                 //parsing xml to load param list and get cameraID
                 QnCameraAdvancedParams params;
-				if (QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params))
+                bool success = QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params);
+#ifdef _DEBUG
+                if (!success) {
+                    qWarning() << "Error while parsing xml for the camera" << getPhysicalId();
+                    qWarning() << paramDescXML;
+                }
+#endif
+				if (success)
                     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), params);
             }
             else {

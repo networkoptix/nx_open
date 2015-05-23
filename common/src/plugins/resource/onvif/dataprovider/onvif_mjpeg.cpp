@@ -142,8 +142,9 @@ QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
     return videoData;
 }
 
-CameraDiagnostics::Result MJPEGStreamReader::openStream()
+CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool isCameraControlRequired)
 {
+    Q_UNUSED(isCameraControlRequired);
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 

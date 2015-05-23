@@ -2504,7 +2504,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>File Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル設定...</translation>
     </message>
 </context>
 <context>
@@ -4398,15 +4398,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <source>File Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル設定</translation>
     </message>
     <message>
         <source>Picture is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>静止画がロードされませんでした</translation>
     </message>
     <message>
         <source>This is a fish-eye lens file</source>
-        <translation type="unfinished"></translation>
+        <translation>魚眼レンズファイル</translation>
     </message>
 </context>
 <context>
@@ -6904,7 +6904,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルター、回転、歪み補正、拡張イメージ、カスタムアスペクトの適用（トランスコード必要）</translation>
     </message>
 </context>
 <context>

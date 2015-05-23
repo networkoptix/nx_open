@@ -2530,7 +2530,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>File Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateieinstellungen...</translation>
     </message>
 </context>
 <context>
@@ -3263,7 +3263,7 @@ Short for &quot;seconds&quot;</extracomment>
         <source>%1 have no output relays</source>
         <translation>
             <numerusform> %1 hat keine Ausgangsrelais</numerusform>
-            <numerusform></numerusform>
+            <numerusform> %1 hat keine Ausgangsrelais</numerusform>
         </translation>
     </message>
 </context>
@@ -3273,7 +3273,7 @@ Short for &quot;seconds&quot;</extracomment>
         <source>Recording is disabled for %1</source>
         <translation>
             <numerusform>Aufnahme deaktiviert für %1</numerusform>
-            <numerusform></numerusform>
+            <numerusform>Aufnahmen deaktiviert für %1</numerusform>
         </translation>
     </message>
 </context>
@@ -4455,15 +4455,15 @@ Short for &quot;seconds&quot;</extracomment>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <source>File Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateieinstellungen</translation>
     </message>
     <message>
         <source>Picture is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild kann nicht geladen werden</translation>
     </message>
     <message>
         <source>This is a fish-eye lens file</source>
-        <translation type="unfinished"></translation>
+        <translation>Das ist eine Datei eines Fischaugenobjektivs</translation>
     </message>
 </context>
 <context>
@@ -6988,7 +6988,7 @@ Short for &quot;seconds&quot;</extracomment>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Anwendung von Filtern: Rotation, Dewarping, Bildverbesserung, benutzerdefiniertes Seitenverhältnis (erfordert Transkodierung)</translation>
     </message>
 </context>
 <context>

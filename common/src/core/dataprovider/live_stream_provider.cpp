@@ -200,7 +200,7 @@ void QnLiveStreamProvider::setFps(float f)
     {
         QMutexLocker mtx(&m_livemutex);
 
-        if (abs(m_fps - f) < 0.1)
+        if (std::abs(m_fps - f) < 0.1)
             return; // same fps?
 
 
@@ -398,11 +398,6 @@ bool QnLiveStreamProvider::isCameraControlDisabled() const
     return camRes && camRes->isCameraControlDisabled();
 }
 
-bool QnLiveStreamProvider::isCameraControlRequired() const
-{
-    return !isCameraControlDisabled() && needConfigureProvider();
-}
-
 void QnLiveStreamProvider::filterMotionByMask(const QnMetaDataV1Ptr& motion)
 {
     motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
@@ -416,12 +411,8 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     m_videoResolutionByChannelNumber[channelNumber] = newResolution;
     onStreamResolutionChanged( channelNumber, newResolution );
 
-    if( getRole() == Qn::CR_SecondaryLiveVideo ||
-        m_cameraRes->hasCameraCapabilities( Qn::PrimaryStreamSoftMotionCapability ) || 
-        m_cameraRes->hasDualStreaming2() )
-    {
+    if( getRole() == Qn::CR_SecondaryLiveVideo)
         return;
-    }
 
     //no secondary stream and no motion, may be primary stream is now OK for motion?
     bool newValue = newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION;

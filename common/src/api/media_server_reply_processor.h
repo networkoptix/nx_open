@@ -59,6 +59,8 @@ signals:
     void finished(int status, const QnUploadUpdateReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnModuleInformation &reply, int handle, const QString &errorString);
     void finished(int status, const QList<QnModuleInformation> &reply, int handle, const QString &errorString);
+    void finished(int status, const ec2::ApiCameraHistoryDataList &reply, int handle, const QString &errorString);
+    void finished(int status, const MultiServerPeriodDataList &reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

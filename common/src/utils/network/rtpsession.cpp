@@ -19,12 +19,13 @@
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
 #include "utils/network/http/httptypes.h"
-#include "../common/sleep.h"
+#include "utils/common/sleep.h"
 #include "tcp_connection_processor.h"
 #include "simple_http_client.h"
 #include "utils/media/bitStream.h"
-#include "../common/synctime.h"
+#include "utils/common/synctime.h"
 #include "tcp_connection_priv.h"
+#include "http/custom_headers.h"
 
 
 #define DEFAULT_RTP_PORT 554
@@ -50,6 +51,7 @@ static const QString DEFAULT_REALM(lit("NetworkOptix"));
 QByteArray RTPSession::m_guid;
 QMutex RTPSession::m_guidMutex;
 
+#if 0
 static QString getValueFromString(const QString& line)
 {
     int index = line.indexOf(QLatin1Char('='));
@@ -57,6 +59,7 @@ static QString getValueFromString(const QString& line)
         return QString();
     return line.mid(index+1);
 }
+#endif
 
 // --------------------- RTPIODevice --------------------------
 
@@ -616,8 +619,8 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         m_openedTime = startTime;
     m_SessionId.clear();
     m_responseCode = CODE_OK;
-    mUrl = url;
-    m_contentBase = mUrl.toString();
+    m_url = url;
+    m_contentBase = m_url.toString();
     m_responseBufferLen = 0;
     m_rtpToTrack.clear();
     m_rtspAuthCtx.clear();
@@ -638,8 +641,8 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     int destinationPort = 0;
     if( m_proxyPort == 0 )
     {
-        targetAddress = mUrl.host();
-        destinationPort = mUrl.port(DEFAULT_RTP_PORT);
+        targetAddress = m_url.host();
+        destinationPort = m_url.port(DEFAULT_RTP_PORT);
     }
     else
     {
@@ -703,6 +706,11 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     if (m_sdpTracks.size()<=0) {
         stop();
         result = CameraDiagnostics::NoMediaTrackResult( url );
+    }
+
+    if( result )
+    {
+        NX_LOG( lit("Sucessfully opened RTSP stream %1").arg(m_url.toString()), cl_logALWAYS );
     }
 
     return result;
@@ -793,7 +801,7 @@ nx_http::Request RTPSession::createDescribeRequest()
 
     nx_http::Request request;
     request.requestLine.method = "DESCRIBE";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -830,7 +838,7 @@ bool RTPSession::sendOptions()
 {
     nx_http::Request request;
     request.requestLine.method = "OPTIONS";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -924,7 +932,7 @@ bool RTPSession::sendSetup()
             request += trackInfo->setupURL;
         }   
         else {
-            request += mUrl.toString();
+            request += m_url.toString();
             request += '/';
             request += trackInfo->setupURL;
             /*
@@ -982,7 +990,7 @@ bool RTPSession::sendSetup()
         }   
         else
         {
-            request.requestLine.url = mUrl;
+            request.requestLine.url = m_url;
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
             request.requestLine.urlPostfix = QByteArray("/") + trackInfo->setupURL;
         }
@@ -1106,7 +1114,7 @@ bool RTPSession::sendSetParameter( const QByteArray& paramName, const QByteArray
     request.messageBody.append("\r\n");
 
     request.requestLine.method = "SET_PARAMETER";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -1158,7 +1166,7 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
     if( m_numOfPredefinedChannels )
     {
         request.headers.insert( nx_http::HttpHeader( "x-play-now", "true" ) );
-        request.headers.insert( nx_http::HttpHeader( "x-guid", getGuid() ) );
+        request.headers.insert( nx_http::HttpHeader( Qn::GUID_HEADER_NAME, getGuid() ) );
     }
     return request;
 }
@@ -1213,7 +1221,7 @@ bool RTPSession::sendPause()
 {
     nx_http::Request request;
     request.requestLine.method = "PAUSE";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -1225,7 +1233,7 @@ bool RTPSession::sendTeardown()
 {
     nx_http::Request request;
     request.requestLine.method = "TEARDOWN";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -1344,7 +1352,7 @@ bool RTPSession::sendKeepAlive()
 {
     nx_http::Request request;
     request.requestLine.method = "GET_PARAMETER";
-    request.requestLine.url = mUrl;
+    request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
@@ -1756,7 +1764,9 @@ static_assert(
     MAX_BITRATE_BYTES_PER_SECOND > ADDITIONAL_READ_BUFFER_CAPACITY * 10,
     "MAX_BITRATE_BYTES_PER_SECOND MUST be 10 times greater than ADDITIONAL_READ_BUFFER_CAPACITY" );
 
+#ifdef __arm__
 static const size_t MS_PER_SEC = 1000;
+#endif
 
 int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome )
 {

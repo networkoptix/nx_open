@@ -186,13 +186,12 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     if (seekRez == -1)
         return seekRez;
     qint64 rez = m_currentChunk.startTimeMs*1000 + seekRez;
-    //NX_LOG("jump time ", t.elapsed(), cl_logALWAYS);
     /*
     QString s;
     QTextStream str(&s);
     str << "server seek:" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz") << " time=" << t.elapsed();
     str.flush();
-    NX_LOG(s, cl_logALWAYS);
+    NX_LOG(s, cl_logDEBUG2);
     */
     m_lastSeekTime = rez;
     m_afterSeek = true;
@@ -360,14 +359,14 @@ QnAbstractArchiveDelegate::ArchiveChunkInfo QnServerArchiveDelegate::getLastUsed
     return m_currentChunkInfo;
 }
 
-QnResourceVideoLayoutPtr QnServerArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnServerArchiveDelegate::getVideoLayout()
 {
     QMutexLocker lk( &m_mutex );
 
     return m_aviDelegate->getVideoLayout();
 }
 
-QnResourceAudioLayoutPtr QnServerArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnServerArchiveDelegate::getAudioLayout()
 {
     QMutexLocker lk( &m_mutex );
 

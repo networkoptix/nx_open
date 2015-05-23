@@ -50,7 +50,7 @@ QnOnvifStreamReader::~QnOnvifStreamReader()
     delete m_tmpH264Conf;
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::openStream()
+CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraControlRequired)
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -77,7 +77,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStream()
     */
 
     QString streamUrl;
-    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl( &streamUrl );
+    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl( &streamUrl, isCameraControlRequired );
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
     {
 #ifdef PL_ONVIF_DEBUG
@@ -113,7 +113,7 @@ void QnOnvifStreamReader::setCameraControlDisabled(bool value)
     CLServerPushStreamReader::setCameraControlDisabled(value);
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QString* const streamUrl )
+CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QString* const streamUrl, bool isCameraControlRequired )
 {
     //QMutexLocker lock(m_onvifRes->getStreamConfMutex());
 
@@ -121,9 +121,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     Qn::StreamQuality currentQuality = getQuality();
     Qn::StreamQuality secondaryQuality = m_onvifRes->getSecondaryStreamQuality();
 
-    if (!m_streamUrl.isEmpty() && !isCameraControlRequired())
+    if (!m_streamUrl.isEmpty() && !isCameraControlRequired)
     {
-        m_cachedFps = -1;
         *streamUrl = m_streamUrl;
         return CameraDiagnostics::NoErrorResult();
     }
@@ -139,21 +138,26 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     }
 
     m_onvifRes->beforeConfigureStream();
-    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(getRole() == Qn::CR_LiveVideo, streamUrl);
+    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(getRole() == Qn::CR_LiveVideo, streamUrl, isCameraControlRequired);
     m_onvifRes->afterConfigureStream();
 
     if (result.errorCode == CameraDiagnostics::ErrorCode::noError) {
         // cache value
         m_streamUrl = *streamUrl;
-        m_cachedQuality = currentQuality;
-        m_cachedFps = currentFps;
-        m_cachedTimer.restart();
-        m_cachedSecondaryQuality = secondaryQuality;
+        if (isCameraControlRequired) {
+            m_cachedQuality = currentQuality;
+            m_cachedFps = currentFps;
+            m_cachedTimer.restart();
+            m_cachedSecondaryQuality = secondaryQuality;
+        }
+        else {
+            m_cachedFps = -1;
+        }
     }
     return result;
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl ) const
+CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl, bool isCameraControlRequired ) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
     MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_onvifRes->getTimeDrift());
@@ -162,7 +166,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    CameraDiagnostics::Result result = fetchUpdateVideoEncoder(soapWrapper, info, isPrimary);
+    CameraDiagnostics::Result result = fetchUpdateVideoEncoder(soapWrapper, info, isPrimary, isCameraControlRequired);
     if( !result  )
         return result;
     info.videoSourceId = m_onvifRes->getVideoSourceId();
@@ -170,12 +174,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    fetchUpdateAudioEncoder(soapWrapper, info, isPrimary);
+    fetchUpdateAudioEncoder(soapWrapper, info, isPrimary, isCameraControlRequired);
 
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    result = fetchUpdateProfile(soapWrapper, info, isPrimary);
+    result = fetchUpdateProfile(soapWrapper, info, isPrimary, isCameraControlRequired);
     if( !result ) {
 #ifdef PL_ONVIF_DEBUG
         qWarning() << "ONVIF camera " << getResource()->getUrl() << ": can't prepare profile";
@@ -231,11 +235,8 @@ bool QnOnvifStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 
 QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData())
         return getMetaData();
@@ -347,6 +348,8 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
 
 CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper, const QString& profileToken, bool isPrimary, QString* const mediaUrl) const
 {
+    Q_UNUSED( isPrimary );
+
     StreamUriResp response;
     StreamUriReq request;
     onvifXsd__StreamSetup streamSetup;
@@ -400,7 +403,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const
+CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const
 {
     VideoConfigsReq request;
     VideoConfigsResp response;
@@ -426,7 +429,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoap
     //TODO: #vasilenko UTF unuse std::string
     info.videoEncoderId = QString::fromStdString(encoderParamsToSet->token);
 
-    if (!isCameraControlRequired())
+    if (!isCameraControlRequired)
         return CameraDiagnostics::NoErrorResult(); // do not update video encoder params
 
     updateVideoEncoder(*encoderParamsToSet, isPrimary);
@@ -466,7 +469,7 @@ VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response,
     return 0;
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const
+CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const
 {
     ProfilesReq request;
     ProfilesResp response;
@@ -493,7 +496,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
             return result;
     }
 
-    if (!isCameraControlRequired()) {
+    if (!isCameraControlRequired) {
         // TODO: #Elric need to untangle this evil.
         m_onvifRes->setPtzProfileToken(info.profileToken);
 
@@ -705,7 +708,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const
+CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const
 {
     AudioConfigsReq request;
     AudioConfigsResp response;
@@ -727,7 +730,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoap
     //TODO: #vasilenko UTF unuse std::string
     info.audioEncoderId = QString::fromStdString(result->token);
 
-    if (!isCameraControlRequired())
+    if (!isCameraControlRequired)
         return CameraDiagnostics::NoErrorResult();    // do not update audio encoder params
 
     updateAudioEncoder(*result, isPrimary);

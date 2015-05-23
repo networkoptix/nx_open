@@ -21,10 +21,10 @@ static const int MAX_QUEUE_SIZE = 12;
 static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 2000ll * 1000ll; // 2 seconds
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
-static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
+//static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
-static const int HIGH_QUALITY_RETRY_COUNTER = 1;
-static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
+//static const int HIGH_QUALITY_RETRY_COUNTER = 1;
+//static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
 static const int MAX_CLIENT_BUFFER_SIZE_MS = 1000*2;
 
 QHash<QHostAddress, qint64> QnRtspDataConsumer::m_lastSwitchTime;
@@ -183,16 +183,8 @@ static const int MAX_DATA_QUEUE_SIZE = 120;
 
 void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    //QnConstAbstractDataPacketPtr data = nonConstData;
-
-//    NX_LOG("queueSize=", m_dataQueue.size(), cl_logALWAYS);
-//    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-//    NX_LOG(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
-
     QMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(nonConstData);
-    //QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
-    //if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
 
     // quality control
 
@@ -445,12 +437,11 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     }
 }
 
-QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged(const QnConstAbstractMediaDataPtr& media)
+QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged()
 {
-    QnArchiveStreamReader* archiveDP = dynamic_cast<QnArchiveStreamReader*>(media->dataProvider);
+    QSharedPointer<QnArchiveStreamReader> archiveDP = m_owner->getArchiveDP();
     if (!archiveDP)
         return QByteArray();
-
     qint64 endTime = archiveDP->endTime();
     if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
         endTime = DATETIME_NOW;
@@ -458,7 +449,7 @@ QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged(const QnConstAbstractMedi
     if (archiveDP->startTime() != m_prevStartTime || endTime != m_prevEndTime) {
         m_prevStartTime = archiveDP->startTime();
         m_prevEndTime = endTime;
-        return m_owner->getRangeStr(archiveDP);
+        return m_owner->getRangeStr();
     }
     else {
         return QByteArray();
@@ -626,7 +617,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if( (++m_framesSinceRangeCheck) > FRAMES_BETWEEN_PLAY_RANGE_CHECK )
     {
         m_framesSinceRangeCheck = 0;
-        const QByteArray& newRange = getRangeHeaderIfChanged(media);
+        const QByteArray& newRange = getRangeHeaderIfChanged();
         if (!newRange.isEmpty())
             sendMetadata(newRange);
     }
@@ -667,7 +658,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
         camera = qnCameraPool->getVideoCamera(res);
     }
     int copySize = 0;
-    //if (camera && !res->hasFlags(Qn::no_last_gop))
+    if (camera) // && !res->hasFlags(Qn::no_last_gop))
         copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;

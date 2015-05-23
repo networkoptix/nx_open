@@ -18,20 +18,20 @@
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Camera output</source>
-        <translatorcomment>การส่งออกกล้อง</translatorcomment>
+        <translatorcomment>แสดงผลกล้อง</translatorcomment>
         <translation>Camera output</translation>
     </message>
     <message>
         <source>Camera output for 30 sec</source>
-        <translation>Camera output สำหรับ 30 วินาที</translation>
+        <translation>แสดงผลกล้องสำหรับ 30 วินาที</translation>
     </message>
     <message>
         <source>Bookmark</source>
-        <translation>Bookmark</translation>
+        <translation>บุ๊คมาร์ก</translation>
     </message>
     <message>
         <source>Camera recording</source>
-        <translation>การบันทึกภาพ</translation>
+        <translation>กำลังบันทึกภาพ</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>Write to log</source>
-        <translation>เขียนเพื่อเข้าสู่ระบบ</translation>
+        <translation>เขียนลงบันทึก</translation>
     </message>
     <message>
         <source>Show notification</source>
@@ -51,7 +51,7 @@
     </message>
     <message>
         <source>Repeat sound</source>
-        <translation>เสียงซ้ำ</translation>
+        <translation>เล่นเสียงซ้ำ</translation>
     </message>
     <message>
         <source>Play sound</source>
@@ -79,11 +79,11 @@
     </message>
     <message>
         <source>Camera Disconnected</source>
-        <translation>กล้องตัดการเชื่อมต่อ</translation>
+        <translation>กล้องขาดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Storage Failure</source>
-        <translation>การจัดเก็บข้อมูลความล้มเหลว</translation>
+        <translation>ที่เก็บข้อมูลผิดพลาด</translation>
     </message>
     <message>
         <source>Network Issue</source>
@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>Camera IP Conflict</source>
-        <translation>กล้อง IP ขัดแย้ง</translation>
+        <translation>กล้อง IP ขัดข้อง</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -99,23 +99,23 @@
     </message>
     <message>
         <source>Server Conflict</source>
-        <translation>ความขัดแย้งของเซิร์ฟเวอร์</translation>
+        <translation>เซิร์ฟเวอร์ ขัดข้อง</translation>
     </message>
     <message>
         <source>Server Started</source>
-        <translation>เซิร์ฟเวอร์เริ่มต้น</translation>
+        <translation>เซิร์ฟเวอร์เริ่มทำงาน</translation>
     </message>
     <message>
         <source>License Issue</source>
-        <translation>ออกใบอนุญาต</translation>
+        <translation>ปัญหาใบอนุญาต</translation>
     </message>
     <message>
         <source>Any Camera Issue</source>
-        <translation>ฉบับกล้องใด ๆ</translation>
+        <translation>ปัญหาบาง กล้อง</translation>
     </message>
     <message>
         <source>Any Server Issue</source>
-        <translation>ปัญหาที่เซิร์ฟเวอร์ใด</translation>
+        <translation>ปัญหาบางเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Any Event</source>
@@ -123,7 +123,7 @@
     </message>
     <message>
         <source>Undefined event has occurred on %1</source>
-        <translation>เหตุการณ์ที่ไม่ได้กำหนดได้ที่เกิดขึ้นใน  %1</translation>
+        <translation>เหตุการณ์ที่ไม่ได้กำหนดที่เกิดขึ้นใน  %1</translation>
     </message>
     <message>
         <source>Camera %1 was disconnected</source>
@@ -139,7 +139,7 @@
     </message>
     <message>
         <source>Storage Failure at %1</source>
-        <translation>การจัดเก็บข้อมูลความล้มเหลวที่ %1</translation>
+        <translation>ที่เก็บข้อมูลผิดพลาด %1</translation>
     </message>
     <message>
         <source>Network Issue at %1</source>
@@ -151,15 +151,15 @@
     </message>
     <message>
         <source>Camera IP Conflict at %1</source>
-        <translation>กล้อง IP ขัดแย้ง %1</translation>
+        <translation>กล้อง IP ขัดข้อง%1</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Conflict</source>
-        <translation>ความขัดแย้ง &quot;%1&quot; ของเซิร์ฟเวอร์</translation>
+        <translation>ความขัดข้อง &quot;%1&quot; ของเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Started</source>
-        <translation>เซิร์ฟเวอร์ &quot;%1&quot;เริ่มต้น</translation>
+        <translation>เซิร์ฟเวอร์ &quot;%1&quot;เริ่มทำงาน</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; had license issue</source>
@@ -175,7 +175,7 @@
     </message>
     <message>
         <source>Source: %1</source>
-        <translation>ที่มา: %1</translation>
+        <translation>แหล่งที่มา: %1</translation>
     </message>
     <message>
         <source>Url: %1</source>
@@ -191,7 +191,7 @@
     </message>
     <message>
         <source>Conflict address: %1</source>
-        <translation>ความขัดแย้งที่อยู่: %1</translation>
+        <translation>ที่อยู่ขัดข้อง: %1</translation>
     </message>
     <message>
         <source>Camera #%1 MAC: %2</source>
@@ -199,7 +199,7 @@
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
-        <translation>ที่ขัดแย้งกันเสิร์ฟ #%1: %2</translation>
+        <translation>เซิร์ฟเวอร์ที่ขัดข้อง:%1: %2</translation>
     </message>
     <message>
         <source>%2 %1</source>
@@ -233,23 +233,23 @@
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation>การเชื่อมต่อกับกล้อง (สตรีมหลัก) ถูกปิดอย่างไม่คาดคิด.</translation>
+        <translation>การเชื่อมต่อกับกล้อง (ช่องทางหลัก) ถูกปิดอย่างไม่คาดคิด.</translation>
     </message>
     <message>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation>การเชื่อมต่อกับกล้อง (สตรีมรอง) ถูกปิดอย่างไม่คาดคิด.</translation>
+        <translation>การเชื่อมต่อกับกล้อง (ช่องทางสำรอง) ถูกปิดอย่างไม่คาดคิด.</translation>
     </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation>RTP ตรวจพบการสูญเสียแพ็คเก็ต, prev seq.=%1 next seq.=%2.</translation>
+        <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย, prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
         <source>RTP packet loss detected.</source>
-        <translation>RTP ตรวจพบการสูญเสียแพ็คเก็ต.</translation>
+        <translation>RTP ตรวจพบแพ็คเก็ตสูญหาย.</translation>
     </message>
     <message>
         <source>Server terminated.</source>
-        <translation>เซิร์ฟเวอร์ยกเลิก.</translation>
+        <translation>สิ้นสุด เซิร์ฟเวอร์.</translation>
     </message>
     <message>
         <source>Server started after crash.</source>
@@ -273,7 +273,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation>เซิร์ฟเวอร์ที่ขัดแย้ง:%1</translation>
+        <translation>เซิร์ฟเวอร์ที่ขัดข้อง:%1</translation>
     </message>
 </context>
 <context>
@@ -769,7 +769,7 @@
     <name>QnSystemHealthStringsHelper</name>
     <message>
         <source>Email address is not set</source>
-        <translation>ที่อยู่อีเมล์ไม่ได้ตั้งค่า</translation>
+        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่า</translation>
     </message>
     <message>
         <source>No licenses</source>
@@ -781,15 +781,15 @@
     </message>
     <message>
         <source>Some users have not set their email addresses</source>
-        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมลของพวกเขา</translation>
+        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมล</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
-        <translation>การเชื่อมต่อกับเซิร์ฟเวอร์ขาดหายไป</translation>
+        <translation>การเชื่อมต่อกับเซิร์ฟเวอร์ขาดหาย</translation>
     </message>
     <message>
         <source>Error while sending email</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่การส่งอีเมล์</translation>
+        <translation>เกิดข้อผิดพลาดในขณะที่ส่งอีเมล</translation>
     </message>
     <message>
         <source>Storages are full</source>
@@ -801,7 +801,7 @@
     </message>
     <message>
         <source>Email address is not set for user %1</source>
-        <translation>ที่อยู่อีเมล์ไม่ได้ตั้งค่าสำหรับการใช้งาน %1</translation>
+        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่าสำหรับการใช้งาน %1</translation>
     </message>
     <message>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
@@ -817,11 +817,11 @@
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation>ที่อยู่อีเมล์ไม่ได้ตั้งค่า.</translation>
+        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่า.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation>คุณไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล์.</translation>
+        <translation>คุณไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
@@ -829,11 +829,11 @@
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมลของพวกเขา.</translation>
+        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมล.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation>พวกเขาไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล์.</translation>
+        <translation>พวกเขาไม่สามารถรับการแจ้งเตือนผ่านทางอีเมล.</translation>
     </message>
     <message>
         <source>Storages are full on the following Server:</source>
@@ -872,7 +872,7 @@
     </message>
     <message>
         <source>Unsupported Transport</source>
-        <translation>การขนส่งได้รับการสนับสนุน</translation>
+        <translation>การขนส่งไม่ได้รับการสนับสนุน</translation>
     </message>
     <message>
         <source>Internal Server Error</source>
@@ -899,14 +899,14 @@
     </message>
     <message>
         <source>Unknown Transcode Method</source>
-        <translation>Unknown Transcode Method</translation>
+        <translation>ไม่รู้จัก การแปลง </translation>
     </message>
 </context>
 <context>
     <name>QnTranslationListModel</name>
     <message>
         <source>%1 (built-in)</source>
-        <translation>%1 (ในตัว)</translation>
+        <translation>%1 (ภายใน)</translation>
     </message>
     <message>
         <source>%1 (external)</source>

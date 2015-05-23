@@ -31,10 +31,11 @@
 #include "common/common_module.h"
 
 
-static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
-static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
-static const int DB_UPDATE_PER_RECORDS = 128;
+//static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
+//static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
+//static const int DB_UPDATE_PER_RECORDS = 128;
 static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
+static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 
 
 class ScanMediaFilesTask: public QnLongRunnable
@@ -106,6 +107,7 @@ public:
             {
                 QMutexLocker lock(&m_mutex);
                 if (m_scanTasks.isEmpty()) {
+                    m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
                     m_waitCond.wait(&m_mutex, 100);
                     continue;
                 }
@@ -142,14 +144,15 @@ public:
             }
             else 
             {
+                QElapsedTimer t;
+                t.restart();
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 0.0));
                 m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::LowQualityCatalog, 0.5);
                 m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::HiQualityCatalog, 0.5);
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getPath(), 1.0));
+                qDebug() << "rebuild archive time for storage" << scanData.storage->getPath() << "is:" << t.elapsed() << "msec";
             }
             m_scanTasks.removeFirst(1);
-            if (m_scanTasks.isEmpty())
-                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
         }
     }
 };
@@ -207,6 +210,7 @@ QnStorageManager::QnStorageManager():
 
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
+    m_clearMotionTimer.restart();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -328,8 +332,14 @@ bool QnStorageManager::needToStopMediaScan() const
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
-    QMutexLocker lock(&m_rebuildStateMtx);
-    m_archiveRebuildInfo = data;
+    bool isRebuildFinished = false;
+    {
+        QMutexLocker lock(&m_rebuildStateMtx);
+        isRebuildFinished = (data.state == Qn::RebuildState_None && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
+        m_archiveRebuildInfo = data;
+    }
+    if (isRebuildFinished)
+        emit rebuildFinished();
 }
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff)
@@ -349,7 +359,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         newCatalog->doRebuildArchive(storage, rebuildPeriod);
         
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(cameraUniqueId, catalog);
-        replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
+        if (!m_rebuildCancelled)
+            replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
 
         m_archiveRebuildInfo.progress += progressCoeff / (double) list.size();
     }
@@ -625,13 +636,13 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const 
     return text;
 }
 
-void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
+void QnStorageManager::getTimePeriodInternal(std::vector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
 {
     if (catalog) {
-        periods << catalog->getTimePeriods(startTime, endTime, detailLevel);
-        if (!periods.last().isEmpty())
+        periods.push_back(catalog->getTimePeriods(startTime, endTime, detailLevel));
+        if (!periods.rbegin()->empty())
         {
-            QnTimePeriod& lastPeriod = periods.last().last();
+            QnTimePeriod& lastPeriod = periods.rbegin()->last();
             bool isActive = !camera->hasFlags(Qn::foreigner) && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
             if (lastPeriod.durationMs == -1 && !isActive)
             {
@@ -658,7 +669,7 @@ bool QnStorageManager::isArchiveTimeExists(const QString& cameraUniqueId, qint64
 
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs) {
-    QVector<QnTimePeriodList> periods;
+    std::vector<QnTimePeriodList> periods;
     for (const QnVirtualCameraResourcePtr &camera: cameras) {
         QString cameraUniqueId = camera->getUniqueId();
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
@@ -669,7 +680,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
             //TODO: #GDM #Bookmarks forbid bookmarks for the DTS cameras
             if (camera->isDtsBased()) {
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
-                    periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
+                    periods.push_back(camera->getDtsTimePeriods(startTime, endTime, detailLevel));
             } else {
                 getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(cameraUniqueId, catalog));
             }
@@ -709,8 +720,24 @@ void QnStorageManager::clearSpace()
         }
     }
 
-    clearUnusedMotion();
-    //clearCameraHistory();
+    bool readyToDeleteMotion = (m_archiveRebuildInfo.state == Qn::RebuildState_None); // do not delete motion while rebuilding in progress (just in case, unnecessary)
+    for(const QnStorageResourcePtr& storage: getAllStorages()) {
+        if (storage->getStatus() == Qn::Offline) {
+            readyToDeleteMotion = false; // offline storage may contain archive. do not delete motion so far
+            break;
+        }
+
+    }
+    if (readyToDeleteMotion)
+    {
+        if (m_clearMotionTimer.elapsed() > MOTION_CLEANUP_INTERVAL) {
+            m_clearMotionTimer.restart();
+            clearUnusedMotion();
+        }
+    }
+    else {
+        m_clearMotionTimer.restart();
+    }
 }
 
 QnStorageManager::StorageMap QnStorageManager::getAllStorages() const 
@@ -774,8 +801,8 @@ void QnStorageManager::clearUnusedMotion()
     updateRecordedMonths(m_devFileCatalog[QnServer::HiQualityCatalog], usedMonths);
     updateRecordedMonths(m_devFileCatalog[QnServer::LowQualityCatalog], usedMonths);
 
-    for(const DeviceFileCatalogPtr& catalog: m_devFileCatalog[QnServer::HiQualityCatalog].values())
-        QnMotionHelper::instance()->deleteUnusedFiles(usedMonths[catalog->cameraUniqueId()].toList(), catalog->cameraUniqueId());
+    for( const QString& dir: QDir(QnMotionHelper::getBaseDir()).entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+        QnMotionHelper::instance()->deleteUnusedFiles(usedMonths.value(dir).toList(), dir);
 }
 
 /*
@@ -791,12 +818,12 @@ void QnStorageManager::clearCameraHistory()
             itr.value() == DATETIME_NOW; // delete all history if catalog is empty
     }
 
-    QList<QnCameraHistoryItem> itemsToRemove = QnCameraHistoryPool::instance()->getUnusedItems(minTimes, qnCommon->moduleGUID());
+    QList<QnCameraHistoryItem> itemsToRemove = qnCameraHistoryPool->getUnusedItems(minTimes, qnCommon->moduleGUID());
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     for(const QnCameraHistoryItem& item: itemsToRemove) {
         ec2::ErrorCode errCode = ec2Connection->getCameraManager()->removeCameraHistoryItemSync(item);
         if (errCode == ec2::ErrorCode::ok)
-            QnCameraHistoryPool::instance()->removeCameraHistoryItem(item);
+            qnCameraHistoryPool->removeCameraHistoryItem(item);
     }
 }
 
@@ -1201,7 +1228,7 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
     QMutexLocker lock(&m_mutexStorages);
     for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
-        QString root = itr.value()->getUrl();
+        QString root = itr.value()->getPath();
         if (fileName.startsWith(root))
             return itr.value();
     }
@@ -1485,4 +1512,29 @@ bool QnStorageManager::getBookmarks(const QByteArray &cameraGuid, const QnCamera
             return false;
     }
     return true;
+}
+
+std::vector<QnUuid> QnStorageManager::getCamerasWithArchive() const
+{
+    QMutexLocker locker(&m_mutexCatalog);
+    std::set<QString> internalData;
+    std::vector<QnUuid> result;
+    getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::LowQualityCatalog]);
+    getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::HiQualityCatalog]);
+    for(const QString& uniqueId: internalData) {
+        const QnResourcePtr cam = qnResPool->getResourceByUniqId(uniqueId);
+        if (cam)
+            result.push_back(cam->getId());
+    }
+    return result;
+}
+
+void QnStorageManager::getCamerasWithArchiveInternal(std::set<QString>& result, const FileCatalogMap& catalogMap ) const
+{
+    for(auto itr = catalogMap.begin(); itr != catalogMap.end(); ++itr)
+    {
+        const DeviceFileCatalogPtr& catalog = itr.value();
+        if (!catalog->isEmpty())
+            result.insert(catalog->cameraUniqueId());
+    }
 }

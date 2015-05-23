@@ -171,7 +171,7 @@ bool QnLayoutExportTool::start() {
     foreach (const QnMediaResourcePtr &resource, m_resources) {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(resource->toResourcePtr());
+        QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(resource);
         if (loader) {
             QScopedPointer<QIODevice> chunkFile(m_storage->open(lit("chunk_%1.bin").arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly));
             QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);

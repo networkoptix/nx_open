@@ -35,6 +35,7 @@ namespace Qn
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
+    static const QString FIRMWARE_PARAM_NAME = lit("firmware");
 }
 
 #endif // QN_PARAM_H

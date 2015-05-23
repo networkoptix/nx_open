@@ -1619,13 +1619,17 @@ qint64 QnCamDisplay::getDisplayedMax() const
 
 qint64 QnCamDisplay::getDisplayedMin() const
 {
-    qint64 rez = m_display[0]->getTimestampOfNextFrameToRender();
-    for (int i = 1; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+    qint64 rez = AV_NOPTS_VALUE;
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
     {
         qint64 val = m_display[i]->getTimestampOfNextFrameToRender();
-        if ((quint64)val != AV_NOPTS_VALUE) {
+        if ((quint64)val == AV_NOPTS_VALUE)
+            continue;
+
+        if ((quint64)rez == AV_NOPTS_VALUE)
+            rez = val;
+        else
             rez = qMin(rez, val);
-        }
     }
     return rez;
 }
@@ -1654,25 +1658,20 @@ qint64 QnCamDisplay::getMinReverseTime() const
 qint64 QnCamDisplay::getNextTime() const
 {
     if( m_display[0] && m_display[0]->isTimeBlocked() )
-    {
         return m_display[0]->getTimestampOfNextFrameToRender();
-    }
+    
+    qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
+
+    if (!m_display[0])
+        return rez;
+
+    qint64 lastTime = m_display[0]->getTimestampOfNextFrameToRender();
+
+    if ((quint64)rez != AV_NOPTS_VALUE)
+        return m_speed < 0 ? qMin(rez, lastTime) : qMax(rez, lastTime);
     else
-    {
-        qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
-        qint64 lastTime = m_display[0]->getTimestampOfNextFrameToRender();
+        return lastTime;
 
-        if ((quint64)rez != AV_NOPTS_VALUE)
-            return m_speed < 0 ? qMin(rez, lastTime) : qMax(rez, lastTime);
-        else
-            return lastTime;
-
-        /*
-        return m_display[0] == NULL || (quint64)rez != AV_NOPTS_VALUE
-            ? rez
-            : m_display[0]->getTimestampOfNextFrameToRender();
-        */
-    }
 }
 
 qint64 QnCamDisplay::getDisplayedTime() const

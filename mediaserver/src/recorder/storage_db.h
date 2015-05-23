@@ -1,6 +1,8 @@
 #ifndef __STORAGE_DB_H_
 #define __STORAGE_DB_H_
 
+#include <memory>
+
 #include <QElapsedTimer>
 
 #include <core/resource/camera_bookmark_fwd.h>
@@ -34,9 +36,14 @@ public:
     bool open(const QString& fileName);
 
     bool deleteRecords(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, qint64 startTimeMs = -1);
-    void addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
-    void flushRecords();
-    bool createDatabase();
+    /*!
+        \return \a false if failed to save record to DB
+    */
+    bool addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
+    /*!
+        \return \a false if failed to save to DB
+    */
+    bool flushRecords();
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
     void beforeDelete();
@@ -47,9 +54,12 @@ public:
     bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QString& cameraUniqueId);
     bool deleteCameraBookmark(const QnCameraBookmark &bookmark);
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
+
 private:
+    bool createDatabase();
+
     virtual QnDbTransaction* getTransaction() override;
-    void flushRecordsNoLock();
+    bool flushRecordsNoLock();
     bool deleteRecordsInternal(const DeleteRecordInfo& delRecord);
     bool addRecordInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
 
@@ -57,6 +67,7 @@ private:
     QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
 
     void addCatalogFromMediaFolder(const QString& postfix, QnServer::ChunksCatalog catalog, QVector<DeviceFileCatalogPtr>& result);
+
 private:
     int m_storageIndex;
     QElapsedTimer m_lastTranTime;
@@ -80,8 +91,9 @@ private:
     QVector<DeleteRecordInfo> m_recordsToDelete;
     QMutex m_delMutex;
     QnDbTransaction m_tran;
+    bool m_needReopenDB;
 };
 
-typedef QSharedPointer<QnStorageDb> QnStorageDbPtr;
+typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;
 
 #endif // __STORAGE_DB_H_

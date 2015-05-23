@@ -697,9 +697,7 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
 
 error_label:
     qWarning() << Q_FUNC_INFO << __LINE__ << "Parse error in deserialize CodecContext";
-    if (ctx->codec)
-        avcodec_close(ctx);
-    av_free(ctx);
+    QnFfmpegHelper::deleteCodecContext(ctx);
     return 0;
 }
 
@@ -838,8 +836,7 @@ void QnFfmpegHelper::deleteCodecContext(AVCodecContext* ctx)
 {
     if (!ctx)
         return;
-    if (ctx->codec)
-        avcodec_close(ctx);
+    avcodec_close(ctx);
     av_freep(&ctx->rc_override);
     av_freep(&ctx->intra_matrix);
     av_freep(&ctx->inter_matrix);
