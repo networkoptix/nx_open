@@ -513,8 +513,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     ffmpegInit();
 
-    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true, qnSettings->isDevMode()));
-    moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true, qnRuntime->isDevMode()));
     moduleFinder->start();
 
     QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
