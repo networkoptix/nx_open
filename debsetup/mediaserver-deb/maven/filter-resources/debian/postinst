@@ -40,6 +40,7 @@ PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
 CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
+ALLOW_COLLECT_STATISTICS_DEFAULT=true
 
 function is_local_addr {
     local hostname=$1;
@@ -186,6 +187,11 @@ case "$1" in
             [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
             CAMERA_SETTINGS_OPTIMIZATION=$(ask_for_value cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION")
             $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
+
+            ALLOW_COLLECT_STATISTICS="$($CFG_HELPER allowCollectStatistics)"
+            [ -z "$ALLOW_COLLECT_STATISTICS" ] && ALLOW_COLLECT_STATISTICS=$ALLOW_COLLECT_STATISTICS_DEFAULT
+            ALLOW_COLLECT_STATISTICS=$(ask_for_value allowCollectStatistics "$ALLOW_COLLECT_STATISTICS")
+            $CFG_HELPER allowCollectStatistics "$ALLOW_COLLECT_STATISTICS"
         else
             PORT="$($CFG_HELPER port)"
             [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
