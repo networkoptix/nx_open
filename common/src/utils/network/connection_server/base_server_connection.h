@@ -40,7 +40,6 @@ namespace nx_api
             closeConnection( std::shared_ptr<CustomConnectionManagerType::ConnectionType> )
         \endcode
 
-        \todo support message interleaving
         \note This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to. 
             In other case, it is caller's responsibility to syunchronize access to the connection object.
         \note Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
@@ -53,6 +52,9 @@ namespace nx_api
     public:
         typedef BaseServerConnection<CustomConnectionType, CustomConnectionManagerType> SelfType;
 
+        /*!
+            \param connectionManager When connection is finished, \a connectionManager->closeConnection(this) is called
+        */
         BaseServerConnection(
             CustomConnectionManagerType* connectionManager,
             AbstractCommunicatingSocket* streamSocket )

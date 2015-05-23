@@ -23,7 +23,8 @@
 template<
     class ConnectionType,
     class MessageType,
-    class ProcessorDictionaryType>
+    class ProcessorDictionaryType,
+    class CompletionFuncType>
 class MessageDispatcher
 :
     public QnStoppableAsync
@@ -40,7 +41,11 @@ public:
             If handler has to save connection for later use (e.g., handler uses some async fsm) than it is strongly recommended to save weak pointer to connection, 
             not strong one! And register connection closure handler with \a BaseServerConnection::registerCloseHandler
     */
-    typedef std::function<bool(connection_type*, message_type&&)> MessageProcessorType;
+    typedef std::function<bool(
+            const connection_type&,
+            message_type&&,
+            CompletionFuncType )
+        > MessageProcessorType;
 
     //!Implementation of \a QnStoppableAsync::pleaseStop
     /*!
@@ -64,17 +69,23 @@ public:
     }
     //!Pass message to corresponding processor
     /*!
+        \param message This object is not moved in case of failure to find processor
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
+    template<class CompletionFuncRefType>
     bool dispatchRequest(
-        connection_type* conn,
+        const connection_type& conn,
         typename ProcessorDictionaryType::key_type method,
-        message_type&& message )
+        message_type&& message,
+        CompletionFuncRefType&& completionFunc )
     {
         auto it = m_processors.find( method );
         if( it == m_processors.end() )
             return false;
-        return it->second( conn, std::move(message) );
+        return it->second(
+            conn,
+            std::move(message),
+            std::forward<CompletionFuncRefType>(completionFunc) );
     }
 
 private:

@@ -88,7 +88,7 @@ namespace nx_cc
         bool resolveAsync(
             const HostAddress& hostName,
             std::vector<DnsEntry>* const dnsEntries,
-            std::function<void(std::vector<DnsEntry>)> completionHandler = std::function<void(std::vector<DnsEntry>)>() );
+            std::function<void(std::vector<DnsEntry>)> completionHandler );
         //!Calls \a DnsTable::resolveAsync and waits for completion
         std::vector<DnsEntry> resolveSync( const HostAddress& hostName );
 

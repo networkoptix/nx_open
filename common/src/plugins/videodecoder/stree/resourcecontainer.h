@@ -23,12 +23,12 @@ namespace stree
         /*!
             \return true, if resource \a resID found, false otherwise
         */
-        virtual bool get( int resID, QVariant* const value ) const = 0;
+        virtual bool getAsVariant( int resID, QVariant* const value ) const = 0;
         //!Helper function to get typed value
         /*!
             If stored value cannot be cast to type \a T, false is returned
         */
-        template<typename T> bool getTypedVal( int resID, T* const value ) const
+        template<typename T> bool get( int resID, T* const value ) const
         {
             QVariant untypedValue;
             if( !get( resID, &untypedValue ) )
@@ -37,6 +37,10 @@ namespace stree
                 return false;
             *value = untypedValue.value<T>();
             return true;
+        }
+        template<> bool get( int resID, QVariant* const value ) const
+        {
+            return getAsVariant( resID, value );
         }
     };
 
@@ -77,7 +81,7 @@ namespace stree
         ResourceContainer();
 
         //!Implementation of AbstractResourceReader::get
-        virtual bool get( int resID, QVariant* const value ) const override;
+        virtual bool getAsVariant( int resID, QVariant* const value ) const override;
         //!Implementation of AbstractResourceReader::put
         virtual void put( int resID, const QVariant& value ) override;
 
@@ -110,7 +114,7 @@ namespace stree
             QVariant value );
 
         //!Implementation of AbstractResourceReader::get
-        virtual bool get( int resID, QVariant* const value ) const;
+        virtual bool getAsVariant( int resID, QVariant* const value ) const;
         //!Implementation of AbstractResourceReader::put
         virtual void put( int resID, const QVariant& value );
 
@@ -131,7 +135,7 @@ namespace stree
         /*!
             Reads first reader. If no value found, reads second reader
         */
-        virtual bool get( int resID, QVariant* const value ) const;
+        virtual bool getAsVariant( int resID, QVariant* const value ) const;
 
     private:
         const AbstractResourceReader& m_rc1;

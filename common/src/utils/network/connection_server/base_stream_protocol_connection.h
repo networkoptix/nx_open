@@ -24,6 +24,9 @@ namespace nx_api
             //!Called for every received message 
             void processMessage( Message&& request );
         \endcode
+
+        \note SerializerType::serialize is allowed to reallocate source buffer if needed, 
+            but it is not recommended due to performance considerations!
     */
     template<
         class CustomConnectionType,
@@ -131,6 +134,8 @@ namespace nx_api
                 sendCompletionHandlerBak( SystemError::getLastOSErrorCode() );
             }
         }
+
+        //TODO #ak add message body streaming
 
         /*!
             Initiates asynchoronous message send

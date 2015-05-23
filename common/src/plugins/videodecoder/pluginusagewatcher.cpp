@@ -231,19 +231,19 @@ UsageRecord PluginUsageWatcher::currentUsage() const
         ++it )
     {
         unsigned int framePictureSize = 0;
-        if( (*it)->getTypedVal( DecoderParameter::framePictureSize, &framePictureSize ) )
+        if( (*it)->get( DecoderParameter::framePictureSize, &framePictureSize ) )
             rec.framePictureSize += framePictureSize;
 
         double fps = 0;
-        if( (*it)->getTypedVal( DecoderParameter::fps, &fps ) )
+        if( (*it)->get( DecoderParameter::fps, &fps ) )
             rec.fps += fps;
 
         quint64 pixelsPerSecond = 0;
-        if( (*it)->getTypedVal( DecoderParameter::pixelsPerSecond, &pixelsPerSecond ) )
+        if( (*it)->get( DecoderParameter::pixelsPerSecond, &pixelsPerSecond ) )
             rec.pixelsPerSecond += pixelsPerSecond;
 
         quint64 videoMemoryUsage = 0;
-        if( (*it)->getTypedVal( DecoderParameter::videoMemoryUsage, &videoMemoryUsage ) )
+        if( (*it)->get( DecoderParameter::videoMemoryUsage, &videoMemoryUsage ) )
             rec.videoMemoryUsage += videoMemoryUsage;
     }
     rec.simultaneousStreamCount = static_cast<quint32>(m_currentSessions.size());

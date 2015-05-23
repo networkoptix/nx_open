@@ -20,15 +20,11 @@ namespace nx_http
         
     SerializerState::Type MessageSerializer::serialize( nx::Buffer* const buffer, size_t* const bytesWritten )
     {
-        //TODO/IMPL: #ak introduce cool implementation (small refactor to HttpMessage::serialize is required)
+        //TODO #ak introduce cool implementation (small refactor to HttpMessage::serialize is required)
 
-        nx_http::BufferType tmpBuf;
-        m_message.serialize( &tmpBuf );
-        if( tmpBuf.size() < buffer->capacity() - buffer->size() )
-            return SerializerState::needMoreBufferSpace;
-
-        buffer->append( tmpBuf );
-        *bytesWritten = tmpBuf.size();
+        const auto bufSizeBak = buffer->size();
+        m_message.serialize( buffer );
+        *bytesWritten = buffer->size() - bufSizeBak;
         return SerializerState::done;
     }
 }

@@ -18,7 +18,7 @@ namespace nx_cc
 {
     //!Accepts connections made through mediator
     /*!
-        Receives incoming \a connection_requested indications and create cloud tunnel
+        Receives incoming \a connection_requested indications and creates cloud tunnel
         \note Uses MediatorConnection to talk to the mediator
     */
     class CloudAcceptor
