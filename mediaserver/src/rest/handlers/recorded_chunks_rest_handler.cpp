@@ -101,6 +101,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     QString callback;
     Qn::TimePeriodContent periodsType = Qn::TimePeriodContentCount;
     QString filter;
+    int limit = INT_MAX;
 
     for (int i = 0; i < params.size(); ++i)
     {
@@ -142,6 +143,8 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             filter = params[i].second;
         else if (params[i].first == "periodsType")
             periodsType = static_cast<Qn::TimePeriodContent>(params[i].second.toInt());
+        else if (params[i].first == "limit")
+            limit = qMax(0, params[i].second.toInt());
     }
     if (!urlFound)
         errStr += "Parameter physicalId must be provided. \n";
@@ -169,7 +172,10 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     switch (periodsType) {
     case Qn::RecordingContent:
         {
-            periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
+            periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, 
+                                                       detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog, limit);
+            if (limit < periods.size())
+                periods.resize(limit);
 #ifdef QN_PERIODS_HIGHLOAD_TEST
             qDebug() << now() << "chunks requested for" << physicalId << "for period" << dt(startTime) << " - " << dt(endTime);
 
