@@ -285,6 +285,7 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
+                <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
