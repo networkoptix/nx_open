@@ -77,6 +77,7 @@ public:
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
     QnStorageResourceList getStorages() const;
+    QnStorageResourceList getStoragesInLexicalOrder() const;
 
     void clearSpace();
     
