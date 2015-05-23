@@ -48,6 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">비밀번호 확인</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">세부항목 추가</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">카메라 최적화 설정 허용 (권장)</String>   
+    <String Id="AppServerDlg_AllowCollectStatistics"                Overridable="yes">Allow system to collect anonymous usage statistics</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Play with ${product.name}</String>

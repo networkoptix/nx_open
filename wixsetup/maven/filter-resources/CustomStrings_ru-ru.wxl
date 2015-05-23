@@ -48,6 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Подтвердите пароль</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Дополнительные параметры</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Разрешить системе оптимизировать настройки камер (рекомендуется)</String>   
+    <String Id="AppServerDlg_AllowCollectStatistics"                Overridable="yes">Allow system to collect anonymous usage statistics</String>   
     
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Воспроизвести с помощью ${display.product.name}</String>
