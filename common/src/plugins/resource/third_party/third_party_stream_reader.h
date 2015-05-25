@@ -33,7 +33,9 @@ public:
     static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader, int* errorCode = nullptr );
 
     //!Overrides QnLiveStreamProvider::onGotVideoFrame()
-    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData) override;
+    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
+        const QnLiveStreamParams& currentLiveParams) override;
+
     //!Overrides QnLiveStreamProvider::updateSoftwareMotion()
     virtual void updateSoftwareMotion() override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;

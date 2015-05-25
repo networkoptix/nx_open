@@ -55,7 +55,7 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
         m_mediaEncoder2Ref->releaseRef();
 }
 
-void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
+void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData, const QnLiveStreamParams& currentLiveParams )
 {
     base_type::onGotVideoFrame( videoData, m_currentLiveParams );
 }
