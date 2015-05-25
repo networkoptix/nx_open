@@ -77,10 +77,12 @@ void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, co
     m_usePrimaryRecorder = (camera->getProperty(QnMediaResource::dontRecordPrimaryStreamKey()).toInt() == 0);
     m_useSecondaryRecorder = (camera->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() == 0);
     
-    if (key == QnMediaResource::motionStreamKey()) {
-        QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        if (liveProvider)
+    QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
+    if (liveProvider) {
+        if (key == QnMediaResource::motionStreamKey())
             liveProvider->updateSoftwareMotionStreamNum();
+        else if (key == Qn::FORCE_BITRATE_PER_GOP)
+            liveProvider->pleaseReopenStream();
     }
 }
 

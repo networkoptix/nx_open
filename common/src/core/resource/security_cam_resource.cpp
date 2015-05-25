@@ -305,8 +305,7 @@ bool QnSecurityCamResource::isAnalog() const {
 }
 
 bool QnSecurityCamResource::isAnalogEncoder() const {
-    const QnSecurityCamResourcePtr ptr = toSharedPointer(const_cast<QnSecurityCamResource*> (this));
-    QnResourceData resourceData = qnCommon->dataPool()->data(ptr);
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     return resourceData.value<bool>(lit("analogEncoder"));
 }
 
@@ -869,4 +868,10 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCameraCapabilities.reset();
     m_cachedIsDtsBased.reset();
     m_motionType.reset();
+}
+
+bool QnSecurityCamResource::isBitratePerGOP() const
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    return resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP) || getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0;
 }

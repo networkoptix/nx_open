@@ -291,7 +291,7 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-
+    virtual bool isBitratePerGOP() const;
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
