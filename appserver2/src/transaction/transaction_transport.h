@@ -17,6 +17,7 @@
 #include <utils/common/uuid.h>
 #include <utils/network/abstract_socket.h>
 #include "utils/network/http/asynchttpclient.h"
+#include <utils/network/http/auth_cache.h>
 #include "utils/network/http/httpstreamreader.h"
 #include "utils/network/http/http_message_stream_parser.h"
 #include "utils/network/http/multipart_content_parser.h"
@@ -274,11 +275,13 @@ private:
     QnUuid m_connectionGuid;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
-    QUrl m_postTranUrl;
+    QUrl m_postTranBaseUrl;
     quint64 m_sendKeepAliveTask;
     nx::Buffer m_dummyReadBuffer;
     bool m_base64EncodeOutgoingTransactions;
     std::vector<nx_http::HttpHeader> m_outgoingClientHeaders;
+    size_t m_sentTranSequence;
+    nx_http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
 
 private:
     void default_initializer();
@@ -317,6 +320,7 @@ private:
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
     void startSendKeepAliveTimerNonSafe();
     void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
+    QUrl generatePostTranUrl();
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );

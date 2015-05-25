@@ -34,7 +34,7 @@
 //!if not defined, ubjson is used
 //#define USE_JSON
 #define ENCODE_TO_BASE64
-//#define PIPELINE_POST_REQUESTS
+#define PIPELINE_POST_REQUESTS
 
 
 /*!
@@ -107,6 +107,7 @@ void QnTransactionTransport::default_initializer()
     m_authOutgoingConnectionByServerKey = true;
     m_sendKeepAliveTask = 0;
     m_base64EncodeOutgoingTransactions = false;
+    m_sentTranSequence = 0;
 }
 
 QnTransactionTransport::QnTransactionTransport(
@@ -787,6 +788,13 @@ void QnTransactionTransport::monitorConnectionForClosure(
 }
 #endif
 
+QUrl QnTransactionTransport::generatePostTranUrl()
+{
+    QUrl postTranUrl = m_postTranBaseUrl;
+    postTranUrl.setPath( lit("%1/%2").arg(postTranUrl.path()).arg(++m_sentTranSequence) );
+    return postTranUrl;
+}
+
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 {
     QMutexLocker lock(&m_mutex);
@@ -831,15 +839,25 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
                 //sending transactions as a POST request
                 nx_http::Request request;
                 request.requestLine.method = nx_http::Method::POST;
-                request.requestLine.url = lit("/ec2/forward_events");
+                request.requestLine.url = generatePostTranUrl();
                 request.requestLine.version = nx_http::http_1_1;
 
                 for( const auto& header: m_outgoingClientHeaders )
                     request.headers.emplace( header );
 
+                //adding authorizationUrl
+                if( !nx_http::AuthInfoCache::addAuthorizationHeader(
+                        &request,
+                        m_httpAuthCacheItem ) )
+                {
+                    assert( false );
+                }
+
                 request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
                 addHttpChunkExtensions( &request.headers );
-                request.headers.emplace( "Content-Length", nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
+                request.headers.emplace(
+                    "Content-Length",
+                    nx_http::BufferType::number((int)(dataCtx.sourceData.size())) );
                 request.messageBody = dataCtx.sourceData;
                 dataCtx.encodedSourceData = request.serialized();
             }
@@ -895,14 +913,15 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
                 Qt::DirectConnection );
             fillAuthInfo( m_outgoingTranClient, true );
 
-            m_postTranUrl = m_remoteAddr;
+            m_postTranBaseUrl = m_remoteAddr;
 #ifdef USE_HTTP_CLIENT_TO_SEND_POST
-            m_postTranUrl.setPath(lit("/ec2/forward_events"));
-            m_postTranUrl.setQuery( QString() );
+            m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
+            m_postTranBaseUrl.setQuery( QString() );
 #endif
         }
+
         if( !m_outgoingTranClient->doPost(
-                m_postTranUrl,
+                generatePostTranUrl(),
                 m_base64EncodeOutgoingTransactions
                     ? "application/text"
                     : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
@@ -914,7 +933,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
                 ) )
         {
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("Failed to initiate POST transaction request to %1. %2").
-                arg(m_postTranUrl.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                arg(m_outgoingTranClient->url().toString()).arg(SystemError::getLastOSErrorText()),
+                cl_logWARNING );
             setStateNoLock( Error );
         }
     }
@@ -1316,7 +1336,7 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
     if( client->failed() || !client->response() )
     {
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("Unknown network error posting transaction to %1").
-            arg(m_postTranUrl.toString()), cl_logWARNING );
+            arg(m_postTranBaseUrl.toString()), cl_logWARNING );
         setStateNoLock( Error );
         return;
     }
@@ -1326,19 +1346,19 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
     {
         NX_LOG(
             QnLog::EC2_TRAN_LOG,
-            lit("Failed to authenticate on peer %1 by key. Retrying using admin credentials...").arg(m_postTranUrl.toString()),
+            lit("Failed to authenticate on peer %1 by key. Retrying using admin credentials...").arg(m_postTranBaseUrl.toString()),
             cl_logDEBUG2 );
         m_authOutgoingConnectionByServerKey = false;
         fillAuthInfo( m_outgoingTranClient, m_authOutgoingConnectionByServerKey );
         if( !m_outgoingTranClient->doPost(
-                m_postTranUrl,
+                m_postTranBaseUrl,
                 m_base64EncodeOutgoingTransactions
                     ? "application/text"
                     : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
                 nx_http::BufferType() ) )
         {
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("Failed (2) to initiate POST transaction request to %1. %2").
-                arg(m_postTranUrl.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                arg(m_postTranBaseUrl.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
             setStateNoLock( Error );
             m_outgoingTranClient.reset();
         }
@@ -1348,7 +1368,7 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
     if( client->response()->statusLine.statusCode != nx_http::StatusCode::ok )
     {
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("Server %1 returned %2 (%3) response while posting transaction").
-            arg(m_postTranUrl.toString()).arg(client->response()->statusLine.statusCode).
+            arg(m_postTranBaseUrl.toString()).arg(client->response()->statusLine.statusCode).
             arg(QLatin1String(client->response()->statusLine.reasonPhrase)), cl_logWARNING );
         setStateNoLock( Error );
         m_outgoingTranClient.reset();
@@ -1385,7 +1405,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
     if( client->failed() || !client->response() )
     {
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("Unknown network error posting transaction to %1").
-            arg(m_postTranUrl.toString()), cl_logWARNING );
+            arg(m_postTranBaseUrl.toString()), cl_logWARNING );
         setStateNoLock( Error );
         return;
     }
@@ -1397,19 +1417,19 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
     {
         NX_LOG(
             QnLog::EC2_TRAN_LOG,
-            lit("Failed to authenticate on peer %1 by key. Retrying using admin credentials...").arg(m_postTranUrl.toString()),
+            lit("Failed to authenticate on peer %1 by key. Retrying using admin credentials...").arg(m_postTranBaseUrl.toString()),
             cl_logDEBUG2 );
         m_authOutgoingConnectionByServerKey = false;
         fillAuthInfo( m_outgoingTranClient, m_authOutgoingConnectionByServerKey );
         if( !m_outgoingTranClient->doPost(
-                m_postTranUrl,
+                m_postTranBaseUrl,
                 m_base64EncodeOutgoingTransactions
                     ? "application/text"
                     : Qn::serializationFormatToHttpContentType( m_remotePeer.dataFormat ),
                 dataCtx.encodedSourceData ) )
         {
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("Failed (2) to initiate POST transaction request to %1. %2").
-                arg(m_postTranUrl.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                arg(m_postTranBaseUrl.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
             setStateNoLock( Error );
             m_outgoingTranClient.reset();
         }
@@ -1419,7 +1439,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
     if( client->response()->statusLine.statusCode != nx_http::StatusCode::ok )
     {
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("Server %1 returned %2 (%3) response while posting transaction").
-            arg(m_postTranUrl.toString()).arg(client->response()->statusLine.statusCode).
+            arg(m_postTranBaseUrl.toString()).arg(client->response()->statusLine.statusCode).
             arg(QLatin1String(client->response()->statusLine.reasonPhrase)), cl_logWARNING );
         setStateNoLock( Error );
         m_outgoingTranClient.reset();
@@ -1428,7 +1448,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
 
 #ifdef PIPELINE_POST_REQUESTS
     //----------------------------------------------------------------------------------------
-    //TODO #ak since http client does not support http interleaving we have to send 
+    //TODO #ak since http client does not support http pipelining we have to send 
         //POST requests directly from this class.
         //This block does it
     m_outgoingClientHeaders.clear();
@@ -1451,9 +1471,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
         m_outgoingClientHeaders.emplace_back(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
-    auto authorizationHeaderIter = client->request().headers.find( nx_http::header::Authorization::NAME );
-    if( authorizationHeaderIter != client->request().headers.end() )
-        m_outgoingClientHeaders.emplace_back( *authorizationHeaderIter );
+    m_httpAuthCacheItem = client->authCacheItem();
     auto nxUsernameHeaderIter = client->request().headers.find( "X-Nx-User-Name" );
     if( nxUsernameHeaderIter != client->request().headers.end() )
         m_outgoingClientHeaders.emplace_back( *nxUsernameHeaderIter );
