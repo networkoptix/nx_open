@@ -36,7 +36,7 @@ QN_HELP_TOPIC(MainWindow_Tree_Local_Help,                       "local_files_str
 QN_HELP_TOPIC(MainWindow_Tree_Recorder_Help,					"setting_up_analog_cameras.htm")
 QN_HELP_TOPIC(MainWindow_Tree_DragCameras_Help,					"swapping_cameras_between_media_servers_(admin_only.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Camera_Help,                      "configuring_cameras.htm")
-QN_HELP_TOPIC(MainWindow_Scene_Help,                            "hd_witness_user_interface_overview.htm")
+QN_HELP_TOPIC(MainWindow_Scene_Help,                            "vms_user_interface_overview.htm")
 QN_HELP_TOPIC(MainWindow_Scene_EMapping_Help,                   "e-mapping.htm") // TODO
 QN_HELP_TOPIC(MainWindow_Scene_PreviewSearch_Help,              "thumbnail_search.htm") // TODO
 QN_HELP_TOPIC(MainWindow_Scene_TourInProgress_Help,             "tours.htm")
@@ -78,7 +78,7 @@ QN_HELP_TOPIC(SystemSettings_General_TourCycleTime_Help,        "tours.htm")
 QN_HELP_TOPIC(SystemSettings_General_ShowIpInTree_Help,         "working_with_a_resource_tree.htm")
 QN_HELP_TOPIC(SystemSettings_General_Language_Help,             "changing_interface_language.htm")
 QN_HELP_TOPIC(SystemSettings_General_NetworkInterfaces_Help,    "obtaining_the_current_network_configuration.htm")
-QN_HELP_TOPIC(SystemSettings_General_Customizing_Help,          "customizing_product.name.htm")
+QN_HELP_TOPIC(SystemSettings_General_Customizing_Help,          "customizing_product_name.htm")
 QN_HELP_TOPIC(SystemSettings_General_Logs_Help,                 "collecting_logs.htm")
 QN_HELP_TOPIC(SystemSettings_General_AutoPause_Help,            "cpu_and_bandwidth_saving_durin.htm")
 QN_HELP_TOPIC(SystemSettings_General_AutoStartWithSystem_Help,  "Run_VMS_when_.htm")
