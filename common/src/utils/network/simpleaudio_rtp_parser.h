@@ -1,6 +1,8 @@
 #ifndef __G711_RTP_PARSER_H
 #define __G711_RTP_PARSER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "rtp_stream_parser.h"
 
 // used for G711, G726 e.t.c simple audio codecs with one frame per packet
@@ -26,5 +28,7 @@ private:
     CodecID m_codecId;
     AVSampleFormat m_sampleFormat;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __AAC_RTP_PARSER_H

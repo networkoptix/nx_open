@@ -1,5 +1,7 @@
 #include "qtfile_storage_resource.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDir>
 
 #include "utils/common/util.h"
@@ -131,3 +133,5 @@ bool QnQtFileStorageResource::isStorageAvailableForWriting()
 {
     return false; // it is read only file system
 }
+
+#endif //ENABLE_DATA_PROVIDERS

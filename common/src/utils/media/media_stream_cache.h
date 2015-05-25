@@ -5,6 +5,8 @@
 #ifndef MEDIASTREAMCACHE_H
 #define MEDIASTREAMCACHE_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <deque>
 #include <map>
 #include <set>
@@ -156,5 +158,7 @@ private:
     std::map<int, quint64> m_dataBlockings;
     mutable QElapsedTimer m_inactivityTimer;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //MEDIASTREAMCACHE_H

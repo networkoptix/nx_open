@@ -3,6 +3,8 @@
 
 #include <QtCore/QString>
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 extern "C"
 {
     #include <libavutil/rational.h>
@@ -245,5 +247,7 @@ private:
 	int vc1_parse_frame_header(const VC1SequenceHeader& sequenceHdr);
 	int vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr);
 };
+
+#endif //ENABLE_DATA_PROVIDERS
 
 #endif

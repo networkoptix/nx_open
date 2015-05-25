@@ -487,7 +487,9 @@ public:
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
-        LastItemDataRole
+        LastItemDataRole,
+
+        RoleCount
     };
 
     // TODO: #Elric #EC2 rename

@@ -109,11 +109,13 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
 {
     QMutexLocker lock(&m_layoutMutex);
 
+#ifdef ENABLE_DATA_PROVIDERS
     if (dataProvider) {
         QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
         if (providerLayout)
             return providerLayout;
     }
+#endif //ENABLE_DATA_PROVIDERS
 
     QString strVal = toResource()->getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
     if (strVal.isEmpty())

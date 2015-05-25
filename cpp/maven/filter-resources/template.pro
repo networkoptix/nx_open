@@ -18,6 +18,18 @@ DEFINES += ${customization.defines}
 DEFINES += ${additional.defines}
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
+android {
+  DEFINES += \
+    DISABLE_ALL_VENDORS \
+    DISABLE_THIRD_PARTY \
+    DISABLE_COLDSTORE \
+    DISABLE_MDNS \
+    DISABLE_ARCHIVE \
+    DISABLE_DATA_PROVIDERS \
+    DISABLE_SOFTWARE_MOTION_DETECTION \
+    DISABLE_SENDMAIL \
+    DISABLE_SSL
+}
 
 include( optional_functionality.pri )
 
@@ -106,6 +118,45 @@ DEPENDPATH *= $${INCLUDEPATH}
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
+android: {
+  QMAKE_PCH_OUTPUT_EXT    = .gch
+
+  QMAKE_CFLAGS_PRECOMPILE       = -x c-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}
+  QMAKE_CFLAGS_USE_PRECOMPILE   = -include ${QMAKE_PCH_OUTPUT_BASE}
+  QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}
+  QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
+}
+
+# android:contains(QMAKE_HOST.os,Windows) {
+#   # Support precompiled headers on android-mingw
+#   QMAKE_CFLAGS_PRECOMPILE       = -x c-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
+#   QMAKE_CFLAGS_USE_PRECOMPILE   = -include ${QMAKE_PCH_OUTPUT}
+#   QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
+#   QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
+# 
+#   # Make sure moc files compile
+#   QMAKE_CXXFLAGS += -fpermissive
+# 
+#   # Replace slashes in paths with backslashes
+#   OBJECTS_DIR ~= s,/,\\,g
+# 
+#   # Work around CreateProcess limit on arg size
+#   QMAKE_AR_CMD = \
+#     del /F $$OBJECTS_DIR\\_list.bat                                                 $$escape_expand(\n\t)\
+#                                                                                     $$escape_expand(\n\t)\
+#     echo @echo off                          >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo setlocal EnableDelayedExpansion    >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo for %%%%i in (%%1) do (            >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo   set OBJECT=%%%%~fi               >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo   set OBJECT=!OBJECT:\\=/!         >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo   echo !OBJECT!                    >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#     echo )                                  >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+#                                                                                     $$escape_expand(\n\t)\
+#     $$OBJECTS_DIR\\_list.bat $$OBJECTS_DIR\\*.obj >$$OBJECTS_DIR\\_objects.lst      $$escape_expand(\n\t)\
+#     $(AR) $(TARGET) @$$OBJECTS_DIR\\_objects.lst
+# }
+
+
 # Workaround for https://bugreports.qt-project.org/browse/QTBUG-29331
 QMAKE_MOC_OPTIONS += -DBOOST_MPL_IF_HPP_INCLUDED -DBOOST_TT_TYPE_WITH_ALIGNMENT_INCLUDED -DBOOST_MPL_NOT_HPP_INCLUDED -DBOOST_MPL_VOID_HPP_INCLUDED
 
@@ -136,9 +187,8 @@ win* {
   QMAKE_MOC_OPTIONS += -DQ_OS_WIN
 }
 
-## BOTH LINUX AND MAC
-unix: {
-  DEFINES += override=
+## LINUX, MAC AND ANDROID
+unix {
   DEFINES += QN_EXPORT=  
   QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Wuninitialized
   arm {
@@ -149,7 +199,7 @@ unix: {
 }
 
 ## LINUX
-unix:!mac {
+unix:!android:!mac {
   !arm {
     LIBS += ${linux.oslibs}
     QMAKE_CXXFLAGS += ${compiler.arguments}
@@ -180,3 +230,25 @@ mac {
 
   INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
 }
+
+## ANDROID
+android {
+  LIBS -= -lssl
+  LIBS += ${android.oslibs}
+
+  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
+  DEFINES += ${android.defines}
+  QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+}
+
+
+
+
+
+
+
+
+
+
+
+

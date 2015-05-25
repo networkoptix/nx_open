@@ -1,6 +1,8 @@
 #ifndef __PLAYBACK_MASK_HELPER_H__
 #define __PLAYBACK_MASK_HELPER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
@@ -22,5 +24,7 @@ private:
     QnTimePeriod m_playbackRange;
     QnTimePeriod m_curPlaybackPeriod;
 };
+
+#endif //ENABLE_DATA_PROVIDERS
 
 #endif // __PLAYBACK_MASK_HELPER_H__

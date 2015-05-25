@@ -1,3 +1,4 @@
+#ifdef ENABLE_DATA_PROVIDERS
 
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
@@ -1896,3 +1897,5 @@ RTPSession::TrackMap RTPSession::getTrackInfo() const
 {
     return m_sdpTracks;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

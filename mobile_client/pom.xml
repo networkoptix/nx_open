@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.3.0-SNAPSHOT</version>
+        <relativePath>../cpp</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.3.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mobile_client</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Mobile Client</name>
+
+    <properties>
+        <product.title>${mobile_client.name}</product.title>
+        <!--Global libs-->
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
+        <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
+        <global.libs>-lappserver2 -lcommon -lquazip -lssl -lcrypto</global.libs>
+        <!--Specific os libs used-->
+        <linux.oslibs>${ffmpeg.libs} -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac</linux.oslibs>
+        <android.oslibs/>
+        <!--Global defines-->
+        <global.defines>CL_FORCE_LOGO</global.defines>
+        <!--Specific os defines-->
+        <android.defines/>
+        <linux.defines/>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+    </profiles>
+</project>

@@ -20,8 +20,12 @@
  *                                      error checking only.
  */
 inline bool qnHasEventLoop(QThread *thread) {
+#ifndef Q_OS_ANDROID
     int loopLevel = QThreadData::get2(thread)->loopLevel;
     return loopLevel > 0;
+#else
+    return true;
+#endif
 }
 
 #endif // QN_EVENT_LOOP_H

@@ -175,6 +175,7 @@ int QnSecurityCamResource::reservedSecondStreamFps() const {
     return value.isNull() ? defaultReservedSecondStreamFps : value.toInt();
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(Qn::ConnectionRole role) {
     if (role == Qn::CR_LiveVideo || role == Qn::CR_Default || role == Qn::CR_SecondaryLiveVideo)
     {
@@ -198,6 +199,7 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     return 0;
 }
+#endif // ENABLE_DATA_PROVIDERS
 
 void QnSecurityCamResource::initializationDone() 
 {

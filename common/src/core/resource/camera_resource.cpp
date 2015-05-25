@@ -22,6 +22,8 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_lastIssueTimer()
 {}
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 QnPhysicalCameraResource::QnPhysicalCameraResource(): 
     QnVirtualCameraResource(),
     m_channelNumber(0)
@@ -424,3 +426,5 @@ bool CameraMediaStreamInfo::operator!=( const CameraMediaStreamInfo& rhs ) const
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )
+
+#endif // ENABLE_DATA_PROVIDERS

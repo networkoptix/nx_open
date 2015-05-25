@@ -25,12 +25,14 @@ CLPing::CLPing()
 
 bool CLPing::ping(const QString& ip, int retry, int /*timeoutPerRetry*/, int packetSize)
 {
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     QString cmd = QLatin1String("cmd /C ping %1 -n %2 -l %3");
     QProcess process;
     process.start(cmd.arg(ip).arg(retry).arg(packetSize));
     process.waitForFinished();
     return process.exitCode() == 0;
+#elif defined(Q_OS_ANDROID)
+    return false; // TODO: #android
 #else
     QString cmd = QLatin1String("/bin/ping %1 -c %2 -s %3");
     int rez = system(cmd.arg(ip).arg(retry).arg(packetSize).toLatin1().data());

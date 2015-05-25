@@ -5,6 +5,8 @@
 #ifndef ABSTRACTVIDEODECODERPLUGIN_H
 #define ABSTRACTVIDEODECODERPLUGIN_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 //#include <QtOpenGL/QGLContext>
 #include <QtCore/QList>
 
@@ -54,5 +56,7 @@ public:
 };
 
 Q_DECLARE_INTERFACE( QnAbstractVideoDecoderPlugin, "com.networkoptix.plugin.videodecoder/0.1" );
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //ABSTRACTVIDEODECODERPLUGIN_H

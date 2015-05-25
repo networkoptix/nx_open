@@ -318,3 +318,8 @@ app/bower_components
 plugins/acs/Paxton/packages
 plugins\acs\Paxton\CustomProperties.cs
 plugins/NxControl/NxControl.cs
+
+mobile_client/build-*
+mobile_client/x86
+mobile_client/x64
+mobile_client/arm

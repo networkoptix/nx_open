@@ -269,7 +269,10 @@ protected slots:
 protected:
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
+#ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role) override;
+#endif
+
     virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;

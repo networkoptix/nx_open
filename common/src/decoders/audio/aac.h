@@ -1,6 +1,8 @@
 #ifndef __AAC_CODEC_H
 #define __AAC_CODEC_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QByteArray>
 
 const static int AAC_HEADER_LEN = 7;
@@ -44,5 +46,7 @@ public:
     //int m_frameSize
 	int m_rdb; // ch, sr;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif

@@ -25,19 +25,21 @@
         <product.title>${appserver2.name}</product.title>  
         <!--Global libs-->		
         <qt.libs>core network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lpostproc</global.libs>
+        <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lssl -lcrypto</linux.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>                
         <mac.oslibs>-lssl -lcrypto -lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
+        <android.oslibs>-lssl -lcrypto</android.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
         <linux.defines/>
         <mac.defines/>      
+        <android.defines/>
 
         <buildLib>sharedlib</buildLib>
 
@@ -67,6 +69,21 @@
                 <buildLib>staticlib</buildLib>
             </properties>
         </profile>
+
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+
         <profile>
             <!-- Common Profile for Linux, Mac, Arm -->
             <id>unix</id>

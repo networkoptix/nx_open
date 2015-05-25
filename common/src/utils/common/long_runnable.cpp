@@ -9,7 +9,7 @@
 
 #include <common/systemexcept_win32.h>
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 #   include <sys/types.h>
 #   include <linux/unistd.h>
 static pid_t gettid(void) { return syscall(__NR_gettid); }
@@ -129,7 +129,9 @@ QnLongRunnable::QnLongRunnable():
     connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
     connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
 
+#ifndef Q_OS_ANDROID // not supported on Android
     setStackSize( DEFAULT_THREAD_STACK_SIZE );
+#endif
 }
 
 QnLongRunnable::~QnLongRunnable() {

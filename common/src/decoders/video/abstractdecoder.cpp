@@ -1,5 +1,6 @@
-
 #include "abstractdecoder.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include <iostream>
 #include <memory>
@@ -89,3 +90,5 @@ bool QnAbstractVideoDecoder::isHardwareAccelerationEnabled() const
 {
     return m_hardwareAccelerationEnabled;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

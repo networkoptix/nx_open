@@ -4,6 +4,8 @@
 
 #include "media_stream_cache.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <cstdlib>
 #include <algorithm>
 
@@ -384,3 +386,5 @@ size_t MediaStreamCache::inactivityPeriod() const
     QMutexLocker lk( &m_mutex );
     return m_inactivityTimer.elapsed();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

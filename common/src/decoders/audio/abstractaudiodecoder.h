@@ -1,6 +1,8 @@
 #ifndef abstract_audio_decoder_h_1532
 #define abstract_audio_decoder_h_1532
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "audio_struct.h"
 #include "core/datapacket/media_data_packet.h"
 #include "core/datapacket/audio_data_packet.h"
@@ -29,5 +31,7 @@ public:
       */
     static CLAbstractAudioDecoder* createDecoder(QnCompressedAudioDataPtr data);
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //abstract_audio_decoder_h_1532

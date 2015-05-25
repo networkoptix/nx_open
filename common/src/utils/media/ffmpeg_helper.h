@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_HELPER_H
 #define __FFMPEG_HELPER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/resource/resource_fwd.h"
 
 extern "C"
@@ -61,5 +63,7 @@ public:
     static qint64 getFileSizeByIOContext(AVIOContext* ioContext);
     static void deleteCodecContext(AVCodecContext* ctx);
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __FFMPEG_HELPER_H

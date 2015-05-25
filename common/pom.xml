@@ -24,17 +24,20 @@
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <!--Global libs-->
         <!-- <qt.libs>core gui network opengl xml multimedia sql</qt.libs> -->
-        <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lonvif -lquazip</global.libs>
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
+        <global.libs>-lonvif -lquazip</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
-        <linux.oslibs>-lssl -lsigar</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <windows.oslibs>${ffmpeg.libs} -lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
+        <linux.oslibs>${ffmpeg.libs} -lssl -lsigar</linux.oslibs>
+        <mac.oslibs>${ffmpeg.libs} -framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <android.oslibs>-lssl -lcrypto</android.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <linux.defines/>
         <mac.defines/>      
+        <android.defines/>
         <qt.libs>core gui network xml multimedia sql</qt.libs>
     </properties>   
 
@@ -111,6 +114,19 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>mobile</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
     </profiles>	
 
 </project>

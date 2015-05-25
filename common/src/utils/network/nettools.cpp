@@ -19,7 +19,9 @@
 #   include <arpa/inet.h>
 #   include <sys/socket.h>
 #   include <netdb.h>
-#   include <ifaddrs.h>
+#   ifndef Q_OS_ANDROID
+#      include <ifaddrs.h>
+#   endif
 #   include <unistd.h>
 #   include <net/if.h>
 #   include <sys/types.h>

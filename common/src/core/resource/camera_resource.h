@@ -56,6 +56,8 @@ const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 class CameraMediaStreams;
 class CameraMediaStreamInfo;
 
@@ -169,6 +171,8 @@ public:
 #define CameraMediaStreams_Fields (streams)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json) )
+
+#endif // ENABLE_DATA_PROVIDERS
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
 Q_DECLARE_METATYPE(QnVirtualCameraResourceList);

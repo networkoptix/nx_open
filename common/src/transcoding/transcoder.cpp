@@ -1,5 +1,7 @@
 #include "transcoder.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
 
@@ -410,3 +412,6 @@ void QnTranscoder::setExtraTranscodeParams(const QnImageFilterHelper& extraParam
 {
     m_extraTranscodeParams = extraParams;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
+

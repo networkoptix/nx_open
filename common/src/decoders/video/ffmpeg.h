@@ -1,6 +1,8 @@
 #ifndef cl_ffmpeg_h2026
 #define cl_ffmpeg_h2026
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtGui/QImage>
 
 #include "abstractdecoder.h"
@@ -115,5 +117,7 @@ private:
     bool m_forcedMtDecoding;
     qint64 m_prevTimestamp;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //cl_ffmpeg_h
