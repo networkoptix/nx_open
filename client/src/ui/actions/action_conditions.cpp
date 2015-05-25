@@ -495,7 +495,6 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 }
 
 Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameters &parameters) {
-#ifdef QN_ENABLE_BOOKMARKS
     if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;
 
@@ -514,19 +513,12 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
     }
 
     return Qn::EnabledAction;
-#else
-    return Qn::InvisibleAction;
-#endif
 }
 
 Qn::ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParameters &parameters) {
-#ifdef QN_ENABLE_BOOKMARKS
     if(!parameters.hasArgument(Qn::CameraBookmarkRole))
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
-#else
-    return Qn::InvisibleAction;
-#endif
 }
 
 Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &parameters) {

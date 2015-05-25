@@ -2494,7 +2494,6 @@ void QnWorkbenchUi::at_searchItem_paintGeometryChanged() {
 }
 
 void QnWorkbenchUi::setSearchVisible(bool visible, bool animate) {
-#ifdef QN_ENABLE_BOOKMARKS
     ensureAnimationAllowed(animate);
 
     bool changed = m_searchVisible != visible;
@@ -2504,13 +2503,9 @@ void QnWorkbenchUi::setSearchVisible(bool visible, bool animate) {
     updateSearchOpacity(animate);
     if(changed)
         updateSearchGeometry();
-#else
-    m_searchVisible = false;
-#endif
 }
 
 void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
-#ifdef QN_ENABLE_BOOKMARKS
     ensureAnimationAllowed(animate);
 
     m_inFreespace = false;
@@ -2528,10 +2523,6 @@ void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
     QnSearchLineEdit *searchWidget = navigator()->bookmarksSearchWidget();
     searchWidget->setEnabled(opened);
     action(Qn::ToggleBookmarksSearchAction)->setChecked(opened);
-#else
-    action(Qn::ToggleBookmarksSearchAction)->setChecked(false);
-    m_searchOpened = false;
-#endif
 }
 
 void QnWorkbenchUi::updateSearchOpacity(bool animate) {
@@ -2566,7 +2557,6 @@ void QnWorkbenchUi::setSearchOpacity(qreal opacity, bool animate) {
 }
 
 void QnWorkbenchUi::updateSearchVisibility(bool animate) {
-#ifdef QN_ENABLE_BOOKMARKS
     ensureAnimationAllowed(animate);
 
     bool searchVisible = action(Qn::ToggleBookmarksSearchAction)->isEnabled() && m_sliderVisible && isSliderOpened();
@@ -2578,9 +2568,6 @@ void QnWorkbenchUi::updateSearchVisibility(bool animate) {
 
     if(!searchVisible)
         setSearchOpened(false);
-#else
-    setSearchOpened(false, false);
-#endif
 }
 
 void QnWorkbenchUi::createSearchWidget() {
@@ -2597,12 +2584,6 @@ void QnWorkbenchUi::createSearchWidget() {
     connect(m_searchWidget,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
     connect(m_searchWidget,   &QGraphicsWidget::geometryChanged,          this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
     connect(m_searchWidget,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
-
-#ifndef QN_ENABLE_BOOKMARKS
-    m_searchWidget->setEnabled(false);
-    m_searchWidget->setOpacity(0);
-    m_searchWidget->setVisible(false);
-#endif
 
     // slider should be highlighted when search widget is hovered
     m_sliderOpacityProcessor->addTargetItem(m_searchWidget);
