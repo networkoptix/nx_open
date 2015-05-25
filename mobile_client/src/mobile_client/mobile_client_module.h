@@ -6,7 +6,8 @@
 class QnMobileClientModule : public QObject {
     Q_OBJECT
 public:
-    QnMobileClientModule(int &argc, char *argv[], QObject *parent = NULL);
+    QnMobileClientModule(QObject *parent = NULL);
+    ~QnMobileClientModule();
 };
 
 #endif // MOBILE_CLIENT_MODULE_H

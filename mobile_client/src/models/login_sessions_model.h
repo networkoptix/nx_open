@@ -3,8 +3,8 @@
 
 #include <QtCore/QAbstractListModel>
 
-class QnMulticastModuleFinder;
-class QnNetworkAddress;
+class QnModuleFinder;
+class SocketAddress;
 struct QnModuleInformation;
 
 struct QnLoginSession {
@@ -48,8 +48,8 @@ public slots:
     void deleteSession(const QString &id);
 
 private:
-    void at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
-    void at_moduleFinder_moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address);
+    void at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void at_moduleFinder_moduleAddressLost(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 private:
     int savedSessionIndex(int row) const;
@@ -60,7 +60,7 @@ private:
     void saveToSettings();
 
 private:
-    QScopedPointer<QnMulticastModuleFinder> m_moduleFinder;
+    QScopedPointer<QnModuleFinder> m_moduleFinder;
 
     QList<QnLoginSession> m_savedSessions;
     QList<QnLoginSession> m_discoveredSessions;

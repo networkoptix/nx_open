@@ -3,17 +3,17 @@
 #include <algorithm>
 
 #include "mobile_client/mobile_client_settings.h"
-#include "utils/network/multicast_module_finder.h"
+#include "utils/network/module_finder.h"
 
 QnLoginSessionsModel::QnLoginSessionsModel(QObject *parent) :
     QAbstractListModel(parent),
-    m_moduleFinder(new QnMulticastModuleFinder(true))
+    m_moduleFinder(new QnModuleFinder(true, false))
 {
     loadFromSettings();
 
     m_moduleFinder->start();
-    connect(m_moduleFinder.data(),  &QnMulticastModuleFinder::moduleAddressFound,   this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressFound);
-    connect(m_moduleFinder.data(),  &QnMulticastModuleFinder::moduleAddressLost,    this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressLost);
+    connect(m_moduleFinder.data(),  &QnModuleFinder::moduleAddressFound,    this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressFound);
+    connect(m_moduleFinder.data(),  &QnModuleFinder::moduleAddressLost,     this,   &QnLoginSessionsModel::at_moduleFinder_moduleAddressLost);
 
 //    QnLoginSession s;
 //    s.systemName = lit("DEMO_SYSTEM");
@@ -41,7 +41,6 @@ QnLoginSessionsModel::QnLoginSessionsModel(QObject *parent) :
 }
 
 QnLoginSessionsModel::~QnLoginSessionsModel() {
-    m_moduleFinder->stop();
 }
 
 int QnLoginSessionsModel::rowCount(const QModelIndex &parent) const {
@@ -143,10 +142,10 @@ void QnLoginSessionsModel::deleteSession(const QString &id) {
     saveToSettings();
 }
 
-void QnLoginSessionsModel::at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
+void QnLoginSessionsModel::at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
     bool found = false;
     for (const QnLoginSession &session: m_discoveredSessions) {
-        if (session.address == address.host().toString() && session.port == address.port()) {
+        if (session.address == address.address.toString() && session.port == address.port) {
             found = true;
             break;
         }
@@ -156,8 +155,8 @@ void QnLoginSessionsModel::at_moduleFinder_moduleAddressFound(const QnModuleInfo
         return;
 
     QnLoginSession session;
-    session.address = address.host().toString();
-    session.port = address.port();
+    session.address = address.address.toString();
+    session.port = address.port;
     session.systemName = moduleInformation.systemName;
 
     int row = rowCount();
@@ -166,10 +165,10 @@ void QnLoginSessionsModel::at_moduleFinder_moduleAddressFound(const QnModuleInfo
     endInsertRows();
 }
 
-void QnLoginSessionsModel::at_moduleFinder_moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
+void QnLoginSessionsModel::at_moduleFinder_moduleAddressLost(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
     int i;
     for (i = 0; i < m_discoveredSessions.size(); i++) {
-        if (m_discoveredSessions[i].address == address.host().toString() && m_discoveredSessions[i].port == moduleInformation.port)
+        if (m_discoveredSessions[i].address == address.address.toString() && m_discoveredSessions[i].port == moduleInformation.port)
             break;
     }
 
