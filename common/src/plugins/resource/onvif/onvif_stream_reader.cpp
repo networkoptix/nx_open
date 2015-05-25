@@ -251,18 +251,6 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
     return rez;
 }
 
-void QnOnvifStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnOnvifStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
 void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) const
 {
 #ifdef PL_ONVIF_DEBUG

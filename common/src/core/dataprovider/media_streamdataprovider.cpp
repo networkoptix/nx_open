@@ -150,11 +150,11 @@ const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel
     return &m_stat[channel];
 }
 
-float QnAbstractMediaStreamDataProvider::getBitrate() const
+float QnAbstractMediaStreamDataProvider::getBitrateMbps() const
 {
     float rez = 0;
     for (int i = 0; i < m_numberOfchannels; ++i)
-        rez += m_stat[i].getBitrate();
+        rez += m_stat[i].getBitrateMbps();
     return rez;
 }
 

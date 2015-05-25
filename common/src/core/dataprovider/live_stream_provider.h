@@ -30,6 +30,17 @@ public:
     virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() = 0;
 };
 
+struct QnLiveStreamParams
+{
+    Qn::StreamQuality quality;
+    Qn::SecondStreamQuality secondaryQuality;
+    mutable float fps;
+
+    QnLiveStreamParams();
+    bool operator ==(const QnLiveStreamParams& rhs);
+    bool operator !=(const QnLiveStreamParams& rhs);
+};
+
 class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
 {
 public:
@@ -38,7 +49,7 @@ public:
 
     virtual void setRole(Qn::ConnectionRole role) override;
     Qn::ConnectionRole getRole() const;
-
+    int encoderIndex() const;
 
     void setSecondaryQuality(Qn::SecondStreamQuality  quality);
     virtual void setQuality(Qn::StreamQuality q);
@@ -51,11 +62,13 @@ public:
     bool isMaxFps() const;
 
     void onPrimaryFpsUpdated(int newFps);
+    QnLiveStreamParams getLiveParams();
 
     // I assume this function is called once per video frame 
     bool needMetaData(); 
 
-    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData);
+    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
+                                 const QnLiveStreamParams& currentLiveParams);
 
     void setUseSoftwareMotion(bool value);
 
@@ -77,10 +90,10 @@ public:
     void updateSoftwareMotionStreamNum();
 
     void setOwner(QnAbstractVideoCamera* owner);
-protected:
 
-    virtual void updateStreamParamsBasedOnQuality() = 0;
-    virtual void updateStreamParamsBasedOnFps() = 0;
+protected:
+    /*! Called when @param currentStreamParams are updated */
+    virtual void pleaseReopenStream() = 0;
 
     QnMetaDataV1Ptr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
@@ -93,16 +106,15 @@ protected:
 protected:
     mutable QMutex m_livemutex;
 
-
 private:
-    //int m_NumaberOfVideoChannels;
-    Qn::StreamQuality m_quality;
+    // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopend
+    // TODO: find out the way to keep it in sync besides pleaseReopenStream() call (which causes delay)
+    QnLiveStreamParams m_newLiveParams;
+
     bool m_prevCameraControlDisabled;
     bool m_qualityUpdatedAtLeastOnce;
-
-    mutable float m_fps; //used only for live providers
-    unsigned int m_framesSinceLastMetaData; // used only for live providers
-    QTime m_timeSinceLastMetaData; //used only for live providers
+    unsigned int m_framesSinceLastMetaData;
+    QTime m_timeSinceLastMetaData;
 
     QMutex m_motionRoleMtx;
     Qn::ConnectionRole m_softMotionRole;
@@ -115,7 +127,6 @@ private:
     QnConstResourceVideoLayoutPtr m_layout;
     QnPhysicalCameraResourcePtr m_cameraRes;
     bool m_isPhysicalResource;
-    Qn::SecondStreamQuality  m_secondaryQuality;
     simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
     QElapsedTimer m_resolutionCheckTimer;
     int m_framesSincePrevMediaStreamCheck;
@@ -126,6 +137,8 @@ private:
         QSize* const newResolution,
         std::map<QString, QString>* const customStreamParams = nullptr );
     void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
+    void saveBitrateIfNotExists( const QnCompressedVideoDataPtr& videoData,
+                                 const QnLiveStreamParams& liveParams );
     void extractSpsPps(
         const QnCompressedVideoDataPtr& videoData,
         QSize* const newResolution,

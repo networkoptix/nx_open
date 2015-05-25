@@ -196,18 +196,6 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 
 }
 
-void PlDlinkStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
 //=====================================================================================
 
 int scaleInt(int value, int from, int to)

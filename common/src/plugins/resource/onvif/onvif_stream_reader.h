@@ -44,13 +44,7 @@ protected:
     virtual bool isStreamOpened() const override;
     virtual void setCameraControlDisabled(bool value) override;
 
-
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
 private:
-
-    
-    
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QStringList getRTPurls() const;
