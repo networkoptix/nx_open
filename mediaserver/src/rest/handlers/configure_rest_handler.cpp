@@ -121,7 +121,7 @@ int QnConfigureRestHandler::changePort(int port) {
     if (port < 0)
         return ResultFail;
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
         return ResultFail;
 

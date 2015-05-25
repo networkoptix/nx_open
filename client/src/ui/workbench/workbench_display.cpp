@@ -882,7 +882,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     if(resource.isNull()) {
         qnDeleteLater(item);
         return false;
@@ -1689,7 +1689,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->pleaseStop();
         }
 
-        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid())) {
+        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid())) {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
             connect(m_loader, &QnThumbnailsLoader::thumbnailLoaded, this,       &QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded);

@@ -122,7 +122,7 @@ void QnCommonModule::updateModuleInformation() {
     QnModuleInformation moduleInformationCopy = m_moduleInformation;
     lk.unlock();
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleGUID());
     if (server) {
         QnModuleInformation moduleInformation = server->getModuleInformation();
         moduleInformationCopy.port = moduleInformation.port;

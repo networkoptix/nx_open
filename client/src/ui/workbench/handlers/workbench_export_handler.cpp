@@ -467,7 +467,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
     bool hasLocal = false;
 
     foreach (const QnLayoutItemData &item, layout->getItems()) {
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(item.resource.path);
+        QnResourcePtr resource = qnResPool->getResourceByUniqueId(item.resource.path);
         if (!resource)
             continue;
         if( resource->getParentResource() == layout )
@@ -509,7 +509,7 @@ void QnWorkbenchExportHandler::removeLayoutFromPool(const QnLayoutResourcePtr &e
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         QnLayoutItemData& item = itr.value();
-        QnResourcePtr layoutRes = qnResPool->getResourceByUniqId(item.resource.path);
+        QnResourcePtr layoutRes = qnResPool->getResourceByUniqueId(item.resource.path);
         if (layoutRes)
             qnResPool->removeResource(layoutRes);
     }

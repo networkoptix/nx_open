@@ -143,7 +143,7 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
 {
     QUrl url(data.url);
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.id).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(data.id);
     if (!server) {
         if (!data.ignore) {
             QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->additionalUrls(data.id);

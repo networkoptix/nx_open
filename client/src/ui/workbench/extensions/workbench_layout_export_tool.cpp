@@ -105,7 +105,7 @@ bool QnLayoutExportTool::start() {
     foreach (QnLayoutItemData item, m_layout->getItems()) {
         QnResourcePtr resource = qnResPool->getResourceById(item.resource.id);
         if (!resource)
-            resource = qnResPool->getResourceByUniqId(item.resource.path);
+            resource = qnResPool->getResourceByUniqueId(item.resource.path);
         if (!resource)
             continue;
 
@@ -246,7 +246,7 @@ void QnLayoutExportTool::finishExport(bool success) {
         {
             m_storage->renameFile(m_storage->getUrl(), QnLayoutFileStorageResource::layoutPrefix() + m_targetFilename);
             if (m_mode == Qn::LayoutLocalSave) {
-                QnLayoutResourcePtr layout = resourcePool()->getResourceByUniqId(m_layout->getUniqueId()).dynamicCast<QnLayoutResource>();
+                QnLayoutResourcePtr layout = resourcePool()->getResourceByUniqueId<QnLayoutResource>(m_layout->getUniqueId());
                 if (layout) {
                     layout->update(m_layout);
                     snapshotManager()->store(layout);
@@ -261,7 +261,7 @@ void QnLayoutExportTool::finishExport(bool success) {
             QString newUrl = m_storage->getUrl();
 
             foreach (const QnLayoutItemData &item, m_layout->getItems()) {
-                QnAviResourcePtr aviRes = qnResPool->getResourceByUniqId(item.resource.path).dynamicCast<QnAviResource>();
+                QnAviResourcePtr aviRes = qnResPool->getResourceByUniqueId<QnAviResource>(item.resource.path);
                 if (aviRes)
                     qnResPool->updateUniqId(aviRes, QnLayoutFileStorageResource::updateNovParent(newUrl, item.resource.path));
             }
