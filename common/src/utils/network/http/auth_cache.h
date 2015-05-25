@@ -83,7 +83,11 @@ namespace nx_http
             Request* const request,
             AuthInfoCache::AuthorizationCacheItem* const authzData );
 
+        /*!
+            \param url This argument is required since \a request->requestLine.url can contain only path
+        */
         static bool addAuthorizationHeader(
+            const QUrl& url,
             Request* const request,
             AuthInfoCache::AuthorizationCacheItem authzData );
         static AuthInfoCache* instance();

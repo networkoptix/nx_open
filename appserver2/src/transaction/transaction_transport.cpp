@@ -839,7 +839,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
                 //sending transactions as a POST request
                 nx_http::Request request;
                 request.requestLine.method = nx_http::Method::POST;
-                request.requestLine.url = generatePostTranUrl();
+                const auto fullUrl = generatePostTranUrl();
+                request.requestLine.url = fullUrl.path() + (fullUrl.hasQuery() ? (QLatin1String("?") + fullUrl.query()) : QString());;
                 request.requestLine.version = nx_http::http_1_1;
 
                 for( const auto& header: m_outgoingClientHeaders )
@@ -847,6 +848,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 
                 //adding authorizationUrl
                 if( !nx_http::AuthInfoCache::addAuthorizationHeader(
+                        fullUrl,
                         &request,
                         m_httpAuthCacheItem ) )
                 {

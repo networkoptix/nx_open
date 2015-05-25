@@ -22,19 +22,21 @@ namespace nx_http
         if( authzData )
         {
             *authzData = getCachedAuthentication( url );
-            return addAuthorizationHeader( request, *authzData );
+            return addAuthorizationHeader( url, request, *authzData );
         }
         else
         {
-            return addAuthorizationHeader( request, getCachedAuthentication( url ) );
+            return addAuthorizationHeader( url, request, getCachedAuthentication( url ) );
         }
     }
 
     bool AuthInfoCache::addAuthorizationHeader(
+        const QUrl& url,
         Request* const request,
         AuthInfoCache::AuthorizationCacheItem authzData )
     {
-        if( authzData.authorizationHeader )
+        if( authzData.authorizationHeader &&
+            authzData.url == url )
         {
             //using already-known Authorization header
             nx_http::insertOrReplaceHeader(
@@ -44,7 +46,9 @@ namespace nx_http
                     authzData.authorizationHeader->toString() ) );
             return true;
         }
-        else if( authzData.wwwAuthenticateHeader )
+        else if( authzData.wwwAuthenticateHeader &&
+                 authzData.url.host() == url.host() &&
+                 authzData.url.port() == url.port() )
         {
             //generating Authorization based on previously received WWW-Authenticate header
             return addAuthorization(
