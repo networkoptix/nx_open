@@ -176,6 +176,7 @@
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
 #include "network/universal_request_processor.h"
+#include "utils/network/nettools.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -191,6 +192,7 @@ static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
+static const QByteArray SYSTEM_NAME_KEY("systemName");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -1510,7 +1512,15 @@ void QnMain::run()
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
     qnCommon->setModuleGUID(serverGuid());
-    qnCommon->setLocalSystemName(settings->value("systemName").toString());
+    QString systemName = settings->value(SYSTEM_NAME_KEY).toString();
+#ifdef __arm__
+    if (systemName.isEmpty()) {
+        systemName = QString(lit("system_%1")).arg(getMacFromPrimaryIF());
+        settings->setValue(SYSTEM_NAME_KEY, systemName);
+    }
+#endif
+    qnCommon->setLocalSystemName(systemName);
+
     qint64 systemIdentityTime = MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
     qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
@@ -1566,7 +1576,7 @@ void QnMain::run()
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
-        MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
+        MSSettings::roSettings()->setValue(SYSTEM_NAME_KEY, connectInfo.systemName);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
         MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
