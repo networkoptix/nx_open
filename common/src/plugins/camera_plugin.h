@@ -355,30 +355,6 @@ namespace nxcip
     };
 
 
-        // {D1C7F082-B6F9-45F3-82D6-3CFE3EAE0260}
-    static const nxpl::NX_GUID IID_CameraMediaEncoder3 = { { 0xd1, 0xc7, 0xf0, 0x82, 0xb6, 0xf9, 0x45, 0xf3, 0x82, 0xd6, 0x3c, 0xfe, 0x3e, 0xae, 0x2, 0x60 } };
-
-    //!Extends \a CameraMediaEncoder by allowng plugin to group stream parameters modifications
-    /*!
-        E.g., plugin wants to apply all stream changes to camera in single RPC call.
-        Plugin has to implement \a CameraMediaEncoder3::commit add set \a groupMediaParamsChangeCapability flag
-    */
-    class CameraMediaEncoder3
-    :
-        public CameraMediaEncoder2
-    {
-    public:
-        virtual ~CameraMediaEncoder3() {}
-
-        //!Apply previously changed media stream parameters (\a CameraMediaEncoder::setResolution, \a CameraMediaEncoder::setFps, \a CameraMediaEncoder::setBitrate)
-        /*!
-            \return 0 on success, otherwise - error code
-            \note This method is called only if \a groupMediaParamsChangeCapability is set
-        */
-        virtual int commit() = 0;
-    };
-
-
     class CameraPtzManager;
     class CameraMotionDataProvider;
     class CameraRelayIOManager;
@@ -452,8 +428,7 @@ namespace nxcip
             cameraParamsPersistentCapability    = 0x0800,     //!< camera parameters can be read/set even if camera is not accessible at the moment
             searchByMotionMaskCapability        = 0x1000,     //!< if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
             motionRegionCapability              = 0x2000,     //!< if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
-            groupMediaParamsChangeCapability    = 0x4000,     //!< plugin aggregates media stream parameters changes. CameraMediaEncoder3 MUST be implemented
-            needIFrameDetectionCapability       = 0x8000      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
+            needIFrameDetectionCapability       = 0x4000      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
         };
 
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)

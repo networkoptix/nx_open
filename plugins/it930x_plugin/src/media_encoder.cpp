@@ -41,11 +41,6 @@ namespace ite
 
     void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
-        if (interfaceID == nxcip::IID_CameraMediaEncoder3)
-        {
-            addRef();
-            return static_cast<nxcip::CameraMediaEncoder3*>(this);
-        }
         if (interfaceID == nxcip::IID_CameraMediaEncoder2)
         {
             addRef();
@@ -118,7 +113,7 @@ namespace ite
         }
 
         *selectedBitrateKbps = m_bitrateToSet;
-        return nxcip::NX_NO_ERROR;
+        return commit();
     }
 
     int MediaEncoder::commit()

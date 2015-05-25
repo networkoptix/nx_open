@@ -613,7 +613,6 @@ namespace ite
     int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
     {
         *capabilitiesMask = nxcip::BaseCameraManager::nativeMediaStreamCapability |
-                            nxcip::BaseCameraManager::groupMediaParamsChangeCapability |
                             nxcip::BaseCameraManager::needIFrameDetectionCapability;
         return nxcip::NX_NO_ERROR;
     }
