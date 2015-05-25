@@ -26,6 +26,8 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_pc_data.h>
 
+#include <api/global_settings.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
@@ -93,6 +95,7 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged,   this,   &QnResourcePoolModel::at_accessController_permissionsChanged);
     connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::at_context_userChanged, Qt::QueuedConnection);
     connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourcePoolModel::at_commonModule_systemNameChanged);
+    connect(QnGlobalSettings::instance(),   &QnGlobalSettings::serverAutoDiscoveryChanged,  this,   &QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged);
 
     QnResourceList resources = resourcePool()->getResources(); 
 
@@ -800,4 +803,8 @@ void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resou
 
 void QnResourcePoolModel::at_commonModule_systemNameChanged() {
     m_rootNodes[Qn::ServersNode]->update();
+}
+
+void QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged() {
+    m_rootNodes[Qn::OtherSystemsNode]->update();
 }

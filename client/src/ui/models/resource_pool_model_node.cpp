@@ -13,6 +13,8 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 
+#include <api/global_settings.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/help/help_topics.h>
@@ -302,6 +304,8 @@ bool QnResourcePoolModelNode::calculateBastard() const {
         return true;
 
     case Qn::OtherSystemsNode:
+        return !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled() || m_children.isEmpty();
+
     case Qn::RecorderNode:
     case Qn::SystemNode:
         return m_children.isEmpty();
