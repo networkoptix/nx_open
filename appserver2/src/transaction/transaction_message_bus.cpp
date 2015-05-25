@@ -409,7 +409,7 @@ namespace ec2
                 tran.params = aliveData;
                 tran.params.isAlive = true;
                 Q_ASSERT(!aliveData.peer.instanceId.isNull());
-                ttHeader.processedPeers = connectedServerPeers(tran.command) << m_localPeer.id;
+            ttHeader.processedPeers = connectedServerPeers() << m_localPeer.id;
                 ttHeader.fillSequence();
                 sendTransactionInternal(tran, ttHeader); // resend broadcast alive info for that peer
                 return false; // ignore peer offline transaction
@@ -819,7 +819,7 @@ namespace ec2
         }
 
         // do not put clients peers to processed list in case if client just reconnected to other server and previous server hasn't got update yet.
-        QnPeerSet processedPeers = transportHeader.processedPeers + connectedServerPeers(tran.command);
+    QnPeerSet processedPeers = transportHeader.processedPeers + connectedServerPeers();
         processedPeers << m_localPeer.id;
         QnTransactionTransportHeader newHeader(transportHeader);
         newHeader.processedPeers = processedPeers;
@@ -1514,13 +1514,13 @@ namespace ec2
         return m_alivePeers;
     }
 
-    QnPeerSet QnTransactionMessageBus::connectedServerPeers(ApiCommand::Value command) const
+QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
     {
         QnPeerSet result;
         for(QnConnectionMap::const_iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
         {
             QnTransactionTransport* transport = *itr;
-            if (!transport->remotePeer().isClient() && transport->isReadyToSend(command))
+        if (!transport->remotePeer().isClient() && transport->getState() == QnTransactionTransport::ReadyForStreaming)
                 result << transport->remotePeer().id;
         }
 

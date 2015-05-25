@@ -30,6 +30,7 @@ private slots:
     void at_resourceRemoved(const QnResourcePtr &resource);
     void at_resourceChanged(const QnResourcePtr &resource);
     void at_resourceAuxUrlsChanged(const QnResourcePtr &resource);
+    void at_resourceStatusChanged(const QnResourcePtr &resource);
     void at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void at_timer_timeout();
 

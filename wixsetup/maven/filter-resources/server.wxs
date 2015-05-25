@@ -39,6 +39,7 @@
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                         <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
                         <RegistryValue Type="string" Name="cameraSettingsOptimization" Value="[ALLOW_CAMERA_CHANGES]"/>
+                        <RegistryValue Type="string" Name="allowCollectStatistics" Value="[ALLOW_COLLECT_STATISTICS]"/>
                     </RegistryKey>
                 </Component>
 

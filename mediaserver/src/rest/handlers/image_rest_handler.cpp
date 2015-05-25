@@ -23,6 +23,7 @@ extern "C"
 #include "decoders/video/ffmpeg.h"
 #include "qmath.h"
 #include "camera/get_image_helper.h"
+#include <utils/common/util.h>
 
 int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
 {

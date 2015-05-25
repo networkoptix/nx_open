@@ -72,6 +72,11 @@ void QnDirectModuleFinder::removeUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::checkUrl(const QUrl &url) {
+    if (QThread::currentThread() != thread()) {
+        QMetaObject::invokeMethod(this, "checkUrl", Q_ARG(QUrl, url));
+        return;
+    }
+
     enqueRequest(trimmedUrl(url));
 }
 
