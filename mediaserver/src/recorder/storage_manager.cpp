@@ -695,10 +695,10 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const 
 }
 
 void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, 
-                                             qint64 detailLevel, const DeviceFileCatalogPtr &catalog, int limit)
+                                             qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
 {
     if (catalog) {
-        periods << catalog->getTimePeriods(startTime, endTime, detailLevel, limit);
+        periods << catalog->getTimePeriods(startTime, endTime, detailLevel);
         if (!periods.last().isEmpty())
         {
             QnTimePeriod& lastPeriod = periods.last().last();
@@ -743,13 +743,13 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
                     periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
             } else {
-                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(cameraUniqueId, catalog), limit);
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(cameraUniqueId, catalog));
             }
         }
 
     }
 
-    return QnTimePeriodList::mergeTimePeriods(periods);
+    return QnTimePeriodList::mergeTimePeriods(periods, limit);
 }
 
 void QnStorageManager::clearSpace()
@@ -818,7 +818,11 @@ QnStorageResourceList QnStorageManager::getStoragesInLexicalOrder() const
     // duplicate storage path's aren't used any more
     QMutexLocker lock(&m_mutexStorages);
     QnStorageResourceList result = m_storageRoots.values();
-    std::sort(result.begin(), result.end(), [](QnStorageResourcePtr& storage1, QnStorageResourcePtr& storage2) { return storage1->getPath() < storage2->getPath(); } );
+    std::sort(result.begin(), result.end(),
+              [](const QnStorageResourcePtr& storage1, const QnStorageResourcePtr& storage2)
+    {
+        return storage1->getPath() < storage2->getPath();
+    });
     return result;
 }
 
