@@ -55,11 +55,6 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
         m_mediaEncoder2Ref->releaseRef();
 }
 
-void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
-{
-    base_type::onGotVideoFrame( videoData, m_currentLiveParams );
-}
-
 static int sensitivityToMask[10] = 
 {
     255, //  0

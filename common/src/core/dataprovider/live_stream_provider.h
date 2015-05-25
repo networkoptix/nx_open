@@ -68,7 +68,8 @@ public:
     bool needMetaData(); 
 
     virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
-                                 const QnLiveStreamParams& currentLiveParams);
+                                 const QnLiveStreamParams& currentLiveParams,
+                                 bool isCameraControlRequired);
 
     void setUseSoftwareMotion(bool value);
 

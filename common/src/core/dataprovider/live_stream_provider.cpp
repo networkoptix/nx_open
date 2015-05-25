@@ -284,12 +284,13 @@ bool QnLiveStreamProvider::needMetaData()
 }
 
 void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
-                                           const QnLiveStreamParams& currentLiveParams)
+                                           const QnLiveStreamParams& currentLiveParams,
+                                           bool isCameraControlRequired)
 {
     m_framesSinceLastMetaData++;
 
     saveMediaStreamParamsIfNeeded(videoData);
-    if (m_framesSinceLastMetaData == SAVE_BITRATE_FRAME)
+    if (isCameraControlRequired && m_framesSinceLastMetaData == SAVE_BITRATE_FRAME)
         saveBitrateIfNotExists(videoData, currentLiveParams);
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
