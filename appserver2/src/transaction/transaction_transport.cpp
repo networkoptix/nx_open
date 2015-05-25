@@ -838,7 +838,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
             {
                 //sending transactions as a POST request
                 nx_http::Request request;
-                request.requestLine.method = nx_http::Method::POST;
+                request.requestLine.method = nx_http::Method::PUT;
                 const auto fullUrl = generatePostTranUrl();
                 request.requestLine.url = fullUrl.path() + (fullUrl.hasQuery() ? (QLatin1String("?") + fullUrl.query()) : QString());;
                 request.requestLine.version = nx_http::http_1_1;
@@ -922,7 +922,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 #endif
         }
 
-        if( !m_outgoingTranClient->doPost(
+        if( !m_outgoingTranClient->doPut(
                 generatePostTranUrl(),
                 m_base64EncodeOutgoingTransactions
                     ? "application/text"
@@ -1352,7 +1352,7 @@ void QnTransactionTransport::openPostTransactionConnectionDone( const nx_http::A
             cl_logDEBUG2 );
         m_authOutgoingConnectionByServerKey = false;
         fillAuthInfo( m_outgoingTranClient, m_authOutgoingConnectionByServerKey );
-        if( !m_outgoingTranClient->doPost(
+        if( !m_outgoingTranClient->doPut(
                 m_postTranBaseUrl,
                 m_base64EncodeOutgoingTransactions
                     ? "application/text"
@@ -1423,7 +1423,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
             cl_logDEBUG2 );
         m_authOutgoingConnectionByServerKey = false;
         fillAuthInfo( m_outgoingTranClient, m_authOutgoingConnectionByServerKey );
-        if( !m_outgoingTranClient->doPost(
+        if( !m_outgoingTranClient->doPut(
                 m_postTranBaseUrl,
                 m_base64EncodeOutgoingTransactions
                     ? "application/text"

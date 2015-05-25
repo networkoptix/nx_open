@@ -87,7 +87,8 @@ void QnRestConnectionProcessor::run()
         if (d->request.requestLine.method.toUpper() == "GET") {
             rez = handler->executeGet(url.path(), params, d->responseBody, contentType, this);
         }
-        else if (d->request.requestLine.method.toUpper() == "POST") {
+        else if (d->request.requestLine.method.toUpper() == "POST" || 
+                 d->request.requestLine.method.toUpper() == "PUT") {
             rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->responseBody, contentType, this);
         }
         else {
