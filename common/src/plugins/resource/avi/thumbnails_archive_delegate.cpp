@@ -56,12 +56,12 @@ qint64 QnThumbnailsArchiveDelegate::seek (qint64 time, bool findIFrame)
     return m_baseDelegate->seek(time, findIFrame);
 }
 
-QnResourceVideoLayoutPtr QnThumbnailsArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnThumbnailsArchiveDelegate::getVideoLayout()
 {
     return m_baseDelegate->getVideoLayout();
 }
 
-QnResourceAudioLayoutPtr QnThumbnailsArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnThumbnailsArchiveDelegate::getAudioLayout()
 {
     return m_baseDelegate->getAudioLayout();
 }

@@ -20,13 +20,15 @@ public:
 
     void addUrl(const QUrl &url);
     void removeUrl(const QUrl &url);
-    void checkUrl(const QUrl &url);
     void setUrls(const QSet<QUrl> &urls);
 
     QSet<QUrl> urls() const;
 
     void start();
     void pleaseStop();
+
+public slots:
+    void checkUrl(const QUrl &url);
 
 signals:
     void responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);

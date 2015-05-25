@@ -3,6 +3,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "api/app_server_connection.h"
 #include "core/resource/media_server_resource.h"
+#include "core/resource/user_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include <core/resource_management/incompatible_server_watcher.h>
@@ -109,6 +110,11 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
+
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
+        if (user->isAdmin())
+            qnCommon->updateModuleInformation();
+    }
 }
 
 void QnClientMessageProcessor::resetResources(const QnResourceList& resources) {
@@ -181,4 +187,6 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 
     /* Get server time as soon as we setup connection. */
     qnSyncTime->currentMSecsSinceEpoch();
+
+    qnCommon->updateModuleInformation();
 }

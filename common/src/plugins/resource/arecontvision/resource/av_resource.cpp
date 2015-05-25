@@ -360,7 +360,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &param, QVariant &
     QString request = lit("get?") + param;
 
     CLHttpStatus status = connection.doGET(request);
-    if (status == CL_HTTP_AUTH_REQUIRED)
+    if (status == CL_HTTP_AUTH_REQUIRED && !getId().isNull())
         setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)

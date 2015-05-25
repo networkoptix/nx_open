@@ -7,7 +7,6 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <transaction/transaction_message_bus.h>
 #include <utils/common/log.h>
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
@@ -18,6 +17,8 @@
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
 #include "media_server/server_message_processor.h"
+#include "core/resource/network_resource.h"
+#include "transaction/transaction_message_bus.h"
 
 #include "proxy_connection_processor_p.h"
 #include "http/custom_headers.h"
@@ -233,7 +234,12 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             dstRoute.id = itr->second;
     }
 
-    if (!dstRoute.id.isNull())
+
+    if (dstRoute.id == qnCommon->moduleGUID() && !cameraGuid.isNull()) {
+        if (QnNetworkResourcePtr camera = qnResPool->getResourceById(cameraGuid).dynamicCast<QnNetworkResource>())
+            dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
+    }
+    else if (!dstRoute.id.isNull())
         dstRoute = QnRouter::instance()->routeTo(dstRoute.id);
     else
         dstRoute.addr = SocketAddress(dstUrl.host(), dstUrl.port(80));
