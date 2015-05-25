@@ -1109,7 +1109,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::findExistingResourceLayout(cons
         if(!data.resource.id.isNull()) {
             existingResource = qnResPool->getResourceById(data.resource.id);
         } else {
-            existingResource = qnResPool->getResourceByUniqId(data.resource.path);
+            existingResource = qnResPool->getResourceByUniqueId(data.resource.path);
         }
         if (existingResource == resource)
             return layout;
@@ -1152,7 +1152,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
     foreach (const QnResourcePtr &resource, resources) {
         if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
             foreach (const QnLayoutItemData &item, layout->getItems()) {
-                addToFiltered(qnResPool->getResourceByUniqId(item.resource.path));
+                addToFiltered(qnResPool->getResourceByUniqueId(item.resource.path));
             }
         } else {            
             addToFiltered(resource);
@@ -1639,7 +1639,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     if (!context()->user())
         return;
 
-    QnVirtualCameraResourcePtr desktopCamera = qnResPool->getResourceByUniqId(qnCommon->moduleGUID().toString()).dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr desktopCamera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(qnCommon->moduleGUID().toString());
     if (!desktopCamera || !desktopCamera->hasFlags(Qn::desktop_camera))
         return;
 
