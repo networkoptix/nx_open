@@ -48,8 +48,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 
-#include <crash_reporter.h>
-
 #include <events/mserver_business_rule_processor.h>
 
 #include <media_server/media_server_module.h>
@@ -1966,7 +1964,7 @@ void QnMain::run()
     }
 
     // TODO: fix VS supports init lists
-    const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API, &stats::SR_SERVER_NO_AUTH };
+    const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
     for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
     {
         const QString& param = **it;
@@ -2165,7 +2163,7 @@ void QnMain::at_appStarted()
         return;
 
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
-    ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator(), MSSettings::runTimeSettings());
+    m_crashReporter.scanAndReportAsync(qnResPool->getAdministrator(), MSSettings::runTimeSettings());
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)

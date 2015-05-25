@@ -4,6 +4,8 @@ static const QString CPU_X86       = lit("x86");
 static const QString CPU_X86_64    = lit("x86_64");
 static const QString CPU_IA64      = lit("ia64");
 static const QString CPU_ARM       = lit("arm");
+static const QString CPU_ARM6      = lit("armv6");
+static const QString CPU_ARM7      = lit("armv7");
 static const QString CPU_UNKNOWN   = lit("unknown");
 
 const HardwareInformation& HardwareInformation::instance()
@@ -16,12 +18,27 @@ const QString& compileCpuArchicture()
 {
     #if defined(__i386__) || defined(_M_IX86)
         return CPU_X86;
+
     #elif defined(__x86_64__) || defined(_M_AMD64)
         return CPU_X86_64;
+
     #elif defined(__ia64__) || defined(_M_IX86)
         return CPU_IA64;
+
     #elif defined(__arm__) || defined(_M_ARM)
-        return CPU_ARM;
+        #if defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_6J__) || defined(__ARM_ARCH_6K__)
+                || defined(__ARM_ARCH_6Z__) || defined(__ARM_ARCH_6ZK__)
+                || (_M_ARM == 6)
+            return CPU_ARM6;
+
+        #elif defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7R__)
+                || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7S__)
+                || (_M_ARM == 7)
+            return CPU_ARM7;
+
+        #else
+            return CPU_ARM;
+        #endif
     #else
         return CPU_UNKNOWN;
     #endif

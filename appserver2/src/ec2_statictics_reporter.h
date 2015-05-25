@@ -31,7 +31,6 @@ namespace ec2
         static const QString SR_LAST_TIME;
         static const QString SR_TIME_CYCLE;
         static const QString SR_SERVER_API;
-        static const QString SR_SERVER_NO_AUTH;
         static const QString SYSTEM_ID;
 
         // server information

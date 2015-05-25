@@ -112,8 +112,7 @@ namespace nx_http
     bool AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody,
-        const nx_http::HttpHeaders& customHeaders)
+        const nx_http::StringType& messageBody)
     {
         resetDataBeforeNewRequest();
         m_url = url;
@@ -122,7 +121,6 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
         m_request.headers.insert( make_pair("Content-Encoding", "identity") );
-        m_request.headers.insert( customHeaders.begin(), customHeaders.end() );
         m_request.messageBody = messageBody;
         return initiateHttpMessageDelivery( url );
     }

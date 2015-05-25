@@ -4,7 +4,7 @@
 #include <common/systemexcept_win32.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/concurrent.h>
+#include <utils/common/synctime.h>
 
 #include "ec2_thread_pool.h"
 
@@ -15,24 +15,33 @@ static const QString DATE_FORMAT = lit("yyyy-MM-dd_hh-mm-ss");
 static const QString SERVER_API_COMMAND = lit("crashserver/api/report");
 static const QString LAST_CRASH = lit("statisticsReportLastCrash");
 static const uint SENDING_MIN_INTERVAL = 24 * 60 * 60; /* secs => a day */
+static const uint SENDING_MAX_SIZE = 32 * 1024 * 1024; /* 30 mb */
 
 namespace ec2 {
 
-void CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
+CrashReporter::~CrashReporter()
+{
+    QMutexLocker lock(&m_mutex);
+    m_activeCollection.cancel();
+    m_activeCollection.waitForFinished();
+    m_activeHttpClients.clear();
+}
+
+bool CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
 {
     if (admin->getProperty(Ec2StaticticsReporter::SR_ALLOWED).toInt() == 0)
     {
         qDebug() << "CrashReporter::scanAndReport: sending is not allowed";
-        return;
+        return false;
     }
 
     const auto lastTime = QDateTime::fromString(
             settings->value(LAST_CRASH, "").toString(), DATE_FORMAT);
-    if (QDateTime::currentDateTime() < lastTime.addSecs(SENDING_MIN_INTERVAL))
+    if (qnSyncTime->currentDateTime() < lastTime.addSecs(SENDING_MIN_INTERVAL))
     {
         qDebug() << lit("CrashReporter::scanAndReport: previous crash was reported %1")
             .arg(lastTime.toString(DATE_FORMAT));
-        return;
+        return false;
     }
 
     #if defined( _WIN32 )
@@ -50,21 +59,34 @@ void CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
     const QString configApi = admin->getProperty(Ec2StaticticsReporter::SR_SERVER_API);
     const QString serverApi = configApi.isEmpty() ? Ec2StaticticsReporter::DEFAULT_SERVER_API : configApi;
     const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
-    const bool auth = admin->getProperty(Ec2StaticticsReporter::SR_SERVER_NO_AUTH).toInt() == 0;
 
-    // all crashes are going to be send in different threads
     qDebug() << "CrashReporter::scanAndReport:" << crashDir.absolutePath() << "for files:" << crashFilter;
-    const auto crashes = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files, QDir::Time);
-    if (crashes.size()) CrashReporter::send(url, crashes.last(), auth, settings);
+    auto crashes = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files, QDir::Time);
+    while (!crashes.isEmpty())
+    {
+        const auto& crash = crashes.last();
+
+        // FIXME: figure out what to do with the rest of core dumps and also outdated ones
+        if (crash.size() < SENDING_MAX_SIZE)
+            return CrashReporter::send(url, crash, settings);
+
+        crashes.pop_back();
+    }
 }
 
 void CrashReporter::scanAndReportAsync(QnUserResourcePtr admin, QSettings* settings)
 {
-    QnConcurrent::run(Ec2ThreadPool::instance(),
-                      std::bind(&CrashReporter::scanAndReport, admin, settings));
+    QMutexLocker lock(&m_mutex);
+
+    // This function is not supposed to be called more then once per binary, but anyway:
+    m_activeCollection.waitForFinished();
+
+    m_activeCollection = QnConcurrent::run(Ec2ThreadPool::instance(), [=](){
+        return scanAndReport(admin, settings);
+    });
 }
 
-void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool auth, QSettings* settings)
+bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSettings* settings)
 {
     auto filePath = crash.absoluteFilePath();
     QFile file(filePath);
@@ -74,32 +96,42 @@ void CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, bool aut
     {
         qDebug() << "CrashReporter::send: Error:" << filePath << "is not readable or empty:" 
                  << file.errorString();
-        return;
+        return false;
     }
 
     auto httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-    auto report = new CrashReporter(crash, settings, httpClient.get());
-    connect(httpClient.get(), &nx_http::AsyncHttpClient::done,
-            report, &CrashReporter::finishReport, Qt::DirectConnection);
+    auto report = new ReportData(crash, settings, *this, httpClient.get());
+    QObject::connect(httpClient.get(), &nx_http::AsyncHttpClient::done,
+                    report, &ReportData::finishReport, Qt::DirectConnection);
 
-    if (auth)
+    httpClient->setUserName(Ec2StaticticsReporter::AUTH_USER);
+    httpClient->setUserPassword(Ec2StaticticsReporter::AUTH_PASSWORD);
+
     {
-        httpClient->setUserName(Ec2StaticticsReporter::AUTH_USER);
-        httpClient->setUserPassword(Ec2StaticticsReporter::AUTH_PASSWORD);
+        QMutexLocker lock(&m_mutex);
+        m_activeHttpClients.insert(httpClient);
     }
 
-    // keep client alive until the job is done
-    c_activeHttpClients.insert(httpClient);
-
     qDebug() << "CrashReporter::send:" << filePath << "to" << serverApi;
-    httpClient->doPost(serverApi, "application/octet-stream",
-                       content, report->makeHttpHeaders());
+    httpClient->setAdditionalHeaders(report->makeHttpHeaders());
+    return httpClient->doPost(serverApi, "application/octet-stream", content);
 }
 
-void CrashReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient) const
+ReportData::ReportData(const QFileInfo& crashFile, QSettings* settings,
+                                      CrashReporter& host, QObject* parent)
+    : QObject(parent)
+    , m_crashFile(crashFile)
+    , m_settings(settings)
+    , m_host(host)
 {
-    // no reason to keep client alive any more
-    c_activeHttpClients.erase(httpClient);
+}
+
+void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
+{
+    {
+        QMutexLocker lock(&m_host.m_mutex);
+        m_host.m_activeHttpClients.erase(httpClient);
+    }
 
     if (!httpClient->hasRequestSuccesed())
     {
@@ -109,11 +141,11 @@ void CrashReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient) const
     }
 
     QFile::remove(m_crashFile.absoluteFilePath());
-    m_settings->setValue(LAST_CRASH, QDateTime::currentDateTime().toString(DATE_FORMAT));
+    m_settings->setValue(LAST_CRASH, qnSyncTime->currentDateTime().toString(DATE_FORMAT));
     m_settings->sync();
 }
 
-nx_http::HttpHeaders CrashReporter::makeHttpHeaders() const
+nx_http::HttpHeaders ReportData::makeHttpHeaders() const
 {
     auto fileName = m_crashFile.fileName();
 #if defined( _WIN32 )
@@ -134,14 +166,5 @@ nx_http::HttpHeaders CrashReporter::makeHttpHeaders() const
     headers.insert(std::make_pair("Nx-Extension", extension.toStdString().c_str()));
     return headers;
 }
-
-CrashReporter::CrashReporter(const QFileInfo& crashFile, QSettings* settings, QObject* parent)
-    : QObject(parent)
-    , m_crashFile(crashFile)
-    , m_settings(settings)
-{
-}
-
-std::set<nx_http::AsyncHttpClientPtr> CrashReporter::c_activeHttpClients;
 
 } // namespace ec2

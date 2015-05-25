@@ -1,7 +1,9 @@
 #include "ec2_statictics_reporter.h"
 
 #include "ec2_connection.h"
-#include "core/resource_management/resource_properties.h"
+
+#include <core/resource_management/resource_properties.h>
+#include <utils/common/synctime.h>
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
 static const bool DEFAULT_SERVER_AUTH = true;
@@ -20,7 +22,6 @@ namespace ec2
     const QString Ec2StaticticsReporter::SR_LAST_TIME = lit("statisticsReportLastTime");
     const QString Ec2StaticticsReporter::SR_TIME_CYCLE = lit("statisticsReportTimeCycle");
     const QString Ec2StaticticsReporter::SR_SERVER_API = lit("statisticsReportServerApi");
-    const QString Ec2StaticticsReporter::SR_SERVER_NO_AUTH = lit("statisticsReportServerNoAuth");
     const QString Ec2StaticticsReporter::SYSTEM_ID = lit("systemId");
 
     const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit("http://stats.networkoptix.com");
@@ -186,7 +187,7 @@ namespace ec2
             return;
         }
         
-        const QDateTime now = QDateTime::currentDateTime();
+        const QDateTime now = qnSyncTime->currentDateTime();
         const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), DATE_FORMAT);
 
         const uint timeCycle = secsWithPostfix(m_admin->getProperty(SR_TIME_CYCLE), DEFAULT_TIME_CYCLE);
@@ -230,11 +231,8 @@ namespace ec2
         connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done,
                 this, &Ec2StaticticsReporter::finishReport, Qt::DirectConnection);
 
-        if (m_admin->getProperty(SR_SERVER_NO_AUTH).toInt() == 0)
-        {
-            m_httpClient->setUserName(AUTH_USER);
-            m_httpClient->setUserPassword(AUTH_PASSWORD);
-        }
+        m_httpClient->setUserName(AUTH_USER);
+        m_httpClient->setUserPassword(AUTH_PASSWORD);
 
         const QString configApi = m_admin->getProperty(SR_SERVER_API);
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
@@ -274,7 +272,7 @@ namespace ec2
                    .arg(httpClient->url().toString()), cl_logINFO);
             
             m_plannedReportTime = boost::none;
-            m_admin->setProperty(SR_LAST_TIME, QDateTime::currentDateTime().toString(DATE_FORMAT));
+            m_admin->setProperty(SR_LAST_TIME, qnSyncTime->currentDateTime().toString(DATE_FORMAT));
             propertyDictionary->saveParams(m_admin->getId());
         }
         else

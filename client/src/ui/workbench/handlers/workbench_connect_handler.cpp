@@ -61,8 +61,6 @@
 #include <utils/network/router.h>
 #include <utils/reconnect_helper.h>
 
-#include <crash_reporter.h>
-
 #include "compatibility.h"
 
 namespace {
@@ -101,7 +99,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
 
         menu()->trigger(Qn::VersionMismatchMessageAction);
 
-        ec2::CrashReporter::scanAndReportAsync(qnResPool->getAdministrator(), qnSettings->rawSettings());
+        m_crashReporter.scanAndReportAsync(qnResPool->getAdministrator(), qnSettings->rawSettings());
     });
 
     QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
