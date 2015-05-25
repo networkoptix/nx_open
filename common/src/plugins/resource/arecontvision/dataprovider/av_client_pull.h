@@ -25,12 +25,9 @@ public:
 
 
 protected:
-    virtual void updateStreamParamsBasedOnFps() override {};
-    virtual void updateStreamParamsBasedOnQuality() override; 
-    //virtual void updateCameraMotion(const QnMotionRegion& region) override;
+    virtual void pleaseReopenStream(bool qualityChanged = true) override;
 
-
-    int getBitrate() const;
+    int getBitrateMbps() const;
     bool isH264() const;
     void updateCameraParams();
 

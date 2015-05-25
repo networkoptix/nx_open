@@ -26,9 +26,6 @@ protected:
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
-
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
     virtual void beforeRun() override;
     virtual void afterRun() override;
 

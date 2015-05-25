@@ -61,7 +61,7 @@ void QnPlAVClinetPullStreamReader::updateCameraParams()
     }
 
     if (needUpdate)
-        updateStreamParamsBasedOnQuality();  // to update stream params
+        pleaseReopenStream();
 }
 
 QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
@@ -69,8 +69,11 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
     stop();
 }
 
-void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
+void QnPlAVClinetPullStreamReader::pleaseReopenStream(bool qualityChanged)
 {
+    if (!qualityChanged)
+        return;
+
     QMutexLocker mtx(&m_mutex);
 
     QString resolution;
@@ -149,8 +152,7 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
     }
 }
 
-
-int QnPlAVClinetPullStreamReader::getBitrate() const
+int QnPlAVClinetPullStreamReader::getBitrateMbps() const
 {
     return getResource()->getProperty(lit("Bitrate")).toInt();
 }

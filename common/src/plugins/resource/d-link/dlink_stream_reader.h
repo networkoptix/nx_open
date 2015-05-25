@@ -20,10 +20,6 @@ protected:
     virtual bool isStreamOpened() const override;
 
     virtual QString composeVideoProfile(bool isCameraControlRequired);
-
-
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
     virtual void pleaseStop() override;
 
 private:

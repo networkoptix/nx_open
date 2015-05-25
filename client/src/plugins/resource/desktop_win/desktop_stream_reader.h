@@ -22,9 +22,7 @@ protected:
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
-    
-    virtual void updateStreamParamsBasedOnQuality() override {}
-    virtual void updateStreamParamsBasedOnFps() override {}
+    virtual void pleaseReopenStream(bool /*qualityChanged*/) override {}
 
 private:
     bool init();

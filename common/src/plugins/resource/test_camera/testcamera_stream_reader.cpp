@@ -142,14 +142,4 @@ bool QnTestCameraStreamReader::isStreamOpened() const
     return m_tcpSock->isConnected();
 }
 
-void QnTestCameraStreamReader::updateStreamParamsBasedOnQuality()
-{
-    pleaseReOpen();
-}
-
-void QnTestCameraStreamReader::updateStreamParamsBasedOnFps()
-{
-    pleaseReOpen();
-}
-
 #endif // #ifdef ENABLE_TEST_CAMERA

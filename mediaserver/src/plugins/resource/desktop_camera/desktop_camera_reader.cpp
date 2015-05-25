@@ -172,11 +172,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
     return result;
 }
 
-void QnDesktopCameraStreamReader::updateStreamParamsBasedOnQuality()
-{
-}
-
-void QnDesktopCameraStreamReader::updateStreamParamsBasedOnFps()
+void QnDesktopCameraStreamReader::pleaseReopenStream(const QnLiveStreamParams&)
 {
 }
 

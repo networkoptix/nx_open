@@ -65,6 +65,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
         m_openStreamResult = openStreamInternal(isControlRequired);
         m_needControlTimer.restart();
         m_openedWithStreamCtrl = isControlRequired;
+        m_currentLiveParams = getLiveParams();
     }
 
     {
@@ -209,7 +210,7 @@ void CLServerPushStreamReader::run()
         {
             m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
             if (lp)
-                lp->onGotVideoFrame(videoData);
+                lp->onGotVideoFrame(videoData, m_currentLiveParams);
         }
         if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
@@ -249,9 +250,10 @@ void CLServerPushStreamReader::afterRun()
     m_resource->disconnect(this, SLOT(at_resourceChanged(QnResourcePtr)));
 }
 
-void CLServerPushStreamReader::pleaseReOpen()
+void CLServerPushStreamReader::pleaseReopenStream(bool /*qualityChanged*/)
 {
-    m_needReopen = true;
+    if (isRunning())
+        m_needReopen = true;
 }
 
 void CLServerPushStreamReader::at_resourceChanged(const QnResourcePtr& res)
@@ -259,7 +261,7 @@ void CLServerPushStreamReader::at_resourceChanged(const QnResourcePtr& res)
     Q_ASSERT_X(res == getResource(), Q_FUNC_INFO, "Make sure we are listening to correct resource");
     if (QnSecurityCamResourcePtr camera = res.dynamicCast<QnSecurityCamResource>()) {
         if (m_cameraAudioEnabled != camera->isAudioEnabled())
-            pleaseReOpen();
+            pleaseReopenStream();
         m_cameraAudioEnabled = camera->isAudioEnabled();
     }
 }

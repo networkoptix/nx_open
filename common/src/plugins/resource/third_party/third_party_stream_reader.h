@@ -37,15 +37,13 @@ public:
     //!Overrides QnLiveStreamProvider::updateSoftwareMotion()
     virtual void updateSoftwareMotion() override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
     virtual int getLastResponseCode() const override;
-
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
 
     virtual void pleaseStop() override;
     virtual void beforeRun() override;
