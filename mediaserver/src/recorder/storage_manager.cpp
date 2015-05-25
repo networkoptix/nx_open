@@ -818,7 +818,11 @@ QnStorageResourceList QnStorageManager::getStoragesInLexicalOrder() const
     // duplicate storage path's aren't used any more
     QMutexLocker lock(&m_mutexStorages);
     QnStorageResourceList result = m_storageRoots.values();
-    std::sort(result.begin(), result.end(), [](QnStorageResourcePtr& storage1, QnStorageResourcePtr& storage2) { return storage1->getPath() < storage2->getPath(); } );
+    std::sort(result.begin(), result.end(),
+              [](const QnStorageResourcePtr& storage1, const QnStorageResourcePtr& storage2)
+    {
+        return storage1->getPath() < storage2->getPath();
+    });
     return result;
 }
 
