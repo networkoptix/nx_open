@@ -443,7 +443,7 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
 }
 
 
-QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periodLists)
+QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periodLists, int limit)
 {
     QVector<QnTimePeriodList> nonEmptyPeriods;
     for (const QnTimePeriodList &periodList: periodLists)
@@ -490,6 +490,8 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
 
             // add chunk to merged data
             if (result.empty()) {
+                if (result.size() >= limit)
+                    return result;
                 result.push_back(startPeriod);
                 if (startPeriod.isInfinite())
                     return result;
@@ -500,8 +502,11 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
                     Q_ASSERT_X(!last.isInfinite(), Q_FUNC_INFO, "This should never happen");
                     if (last.isInfinite())
                         last.startTimeMs = qMin(last.startTimeMs, startPeriod.startTimeMs);
-                    else if (startPeriod.startTimeMs > last.startTimeMs+last.durationMs)
+                    else if (startPeriod.startTimeMs > last.startTimeMs+last.durationMs) {
+                        if (result.size() >= limit)
+                            return result;
                         result.push_back(startPeriod);
+                    }
                     else 
                         last.durationMs = QnTimePeriod::infiniteDuration();
                     /* Last element is live and starts before all of rest - no need to process other elements. */
@@ -509,6 +514,8 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
                 } else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime) {
                     last.durationMs = qMax(last.durationMs, minStartTime + startPeriod.durationMs - last.startTimeMs);
                 } else {
+                    if (result.size() >= limit)
+                        return result;
                     result.push_back(startPeriod);
                 }
             } 
