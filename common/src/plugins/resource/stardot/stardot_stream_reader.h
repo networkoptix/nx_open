@@ -21,10 +21,6 @@ protected:
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
-
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
-
     virtual void pleaseStop() override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 private:

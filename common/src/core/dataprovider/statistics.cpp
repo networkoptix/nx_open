@@ -26,7 +26,7 @@ void QnStatistics::resetStatistics()
 
     m_current_stat = 0;
 
-    m_bitrate = 0;
+    m_bitrateMbps = 0;
     m_framerate = 0;
 
     m_runing = true;
@@ -94,7 +94,7 @@ void QnStatistics::onData(unsigned int datalen)
 
         int time = (CL_STATS_NUM-1)*CL_STATISTICS_UPDATE_PERIOD_MS;
 
-        m_bitrate = total_bytes*8*1000.0/time/(1024*1024);
+        m_bitrateMbps = total_bytes*8*1000.0/time/(1024*1024);
         m_framerate = total_frames*1000.0/time;
     }
 
@@ -106,10 +106,10 @@ void QnStatistics::onData(unsigned int datalen)
 
 }
 
-float QnStatistics::getBitrate() const
+float QnStatistics::getBitrateMbps() const
 {
     QMutexLocker locker(&m_mutex);
-    return m_bitrate;
+    return m_bitrateMbps;
 }
 
 float QnStatistics::getFrameRate() const
@@ -120,7 +120,7 @@ float QnStatistics::getFrameRate() const
 
 int QnStatistics::getFrameSize() const
 {
-    return getBitrate()/8*1024 / getFrameRate();
+    return getBitrateMbps()/8*1024 / getFrameRate();
 }
 
 void QnStatistics::onBadSensor()

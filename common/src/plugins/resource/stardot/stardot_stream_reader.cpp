@@ -111,18 +111,6 @@ QnAbstractMediaDataPtr QnStardotStreamReader::getNextData()
     return rez;
 }
 
-void QnStardotStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnStardotStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
 QnConstResourceAudioLayoutPtr QnStardotStreamReader::getDPAudioLayout() const
 {
     return m_multiCodec.getAudioLayout();

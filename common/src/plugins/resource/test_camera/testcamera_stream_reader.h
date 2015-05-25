@@ -21,8 +21,6 @@ protected:
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
     int receiveData(quint8* buffer, int size);
 private:
     std::unique_ptr<AbstractStreamSocket> m_tcpSock;

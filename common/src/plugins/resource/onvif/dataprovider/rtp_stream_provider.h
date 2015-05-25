@@ -22,11 +22,8 @@ protected:
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
+    virtual void pleaseReopenStream() override {}
 
-
-    void updateStreamParamsBasedOnQuality() override {}
-
-    void updateStreamParamsBasedOnFps() override {}
 private:
     QnMulticodecRtpReader m_rtpReader;
     QString m_request;

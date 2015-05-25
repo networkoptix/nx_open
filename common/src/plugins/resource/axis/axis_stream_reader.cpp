@@ -405,18 +405,6 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
     return rez;
 }
 
-void QnAxisStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnAxisStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
 QnConstResourceAudioLayoutPtr QnAxisStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();

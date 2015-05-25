@@ -149,6 +149,25 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
     return rez;
 }
 
+bool QnPhysicalCameraResource::saveBitrateIfNotExists( const CameraBitrateInfo& bitrateInfo )
+{
+    auto bitrateInfos = QJson::deserialized<CameraBitrates>(
+        getProperty( Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME ).toLatin1() );
+
+    if ( std::find_if( bitrateInfos.streams.begin(), bitrateInfos.streams.end(),
+                       [ & ]( const CameraBitrateInfo& info )
+                       { return info.encoderIndex == bitrateInfo.encoderIndex; })
+          == bitrateInfos.streams.end() )
+    {
+        bitrateInfos.streams.push_back( std::move( bitrateInfo ) );
+        setProperty( Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME,
+                     QString::fromUtf8( QJson::serialized( bitrateInfos ) ) );
+        return true;
+    }
+
+    return false;
+}
+
 bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMediaStreamInfo& oldParams)
 {
     if (newParams.codec != oldParams.codec)
@@ -408,6 +427,14 @@ int QnVirtualCameraResource::issuesTimeoutMs() {
 
 const QLatin1String CameraMediaStreamInfo::anyResolution( "*" );
 
+QString CameraMediaStreamInfo::resolutionToString( const QSize& resolution )
+{
+    if ( !resolution.isValid() )
+        return anyResolution;
+
+    return QString::fromLatin1("%1x%2").arg(resolution.width()).arg(resolution.height());
+}
+
 bool CameraMediaStreamInfo::operator==( const CameraMediaStreamInfo& rhs ) const
 {
     return transcodingRequired == rhs.transcodingRequired
@@ -423,4 +450,7 @@ bool CameraMediaStreamInfo::operator!=( const CameraMediaStreamInfo& rhs ) const
     return !( *this == rhs );
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
+        (CameraMediaStreamInfo)(CameraMediaStreams) \
+        (CameraBitrateInfo)(CameraBitrates), \
+        (json), _Fields )

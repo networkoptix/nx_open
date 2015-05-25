@@ -55,9 +55,9 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
         m_mediaEncoder2Ref->releaseRef();
 }
 
-void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
+void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData, const QnLiveStreamParams& currentLiveParams )
 {
-    base_type::onGotVideoFrame( videoData );
+    base_type::onGotVideoFrame( videoData, m_currentLiveParams );
 }
 
 static int sensitivityToMask[10] = 
@@ -379,18 +379,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     }
 
     return rez;
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
