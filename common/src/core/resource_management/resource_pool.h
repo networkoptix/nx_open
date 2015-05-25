@@ -91,6 +91,13 @@ public:
         return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
     }
 
+    template <class Resource>
+    QnSharedResourcePointer<Resource> getResourceById(const QnUuid &id) const {
+        QMutexLocker locker(&m_resourcesMtx);
+        auto itr = m_resources.find(id);
+        return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
+    }
+
     QnResourcePtr getResourceById(const QnUuid &id) const;
 
     QnResourcePtr getResourceByUniqueId(const QString &id) const;

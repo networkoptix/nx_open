@@ -114,6 +114,11 @@ void QnSecurityCamResource::setCameraName( const QString& newCameraName )
     QnResource::setName( newCameraName );
 }
 
+QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
+    return getParentResource().dynamicCast<QnMediaServerResource>();
+}
+
+
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
 }

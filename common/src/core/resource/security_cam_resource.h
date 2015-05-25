@@ -44,6 +44,8 @@ public:
     */
     void setCameraName( const QString& newCameraName );
 
+    QnMediaServerResourcePtr getParentServer() const;
+
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;

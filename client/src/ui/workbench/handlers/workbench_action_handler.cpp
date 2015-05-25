@@ -1750,7 +1750,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         
         if (camera && nodeType == Qn::EdgeNode) {
-            if (mServer = resource->getParentResource().dynamicCast<QnMediaServerResource>())
+            if (mServer = camera->getParentServer())
                 mServer->setName(name);
         }
 

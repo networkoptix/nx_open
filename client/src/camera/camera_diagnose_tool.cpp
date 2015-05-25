@@ -24,14 +24,11 @@ namespace CameraDiagnostics
         m_step( Step::mediaServerAvailability ),
         m_result( false )
     {
-        QnResourcePtr resource = QnResourcePool::instance()->getResourceById( cameraID );
-        if( !resource )
-            return;
-        QnSecurityCamResourcePtr secCamRes = resource.dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResourcePtr secCamRes = qnResPool->getResourceById( cameraID ).dynamicCast<QnSecurityCamResource>();
         if( !secCamRes )
             return;
 
-        QnMediaServerResourcePtr serverResource = qSharedPointerDynamicCast<QnMediaServerResource>(QnResourcePool::instance()->getResourceById(resource->getParentId()));
+        QnMediaServerResourcePtr serverResource = secCamRes->getParentServer();
         if( !serverResource )
             return;
         m_serverConnection = serverResource->apiConnection();
