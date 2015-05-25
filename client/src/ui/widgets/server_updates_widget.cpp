@@ -675,7 +675,7 @@ QString QnServerUpdatesWidget::serverNamesString(const QSet<QnUuid> &serverIds) 
     QString result;
 
     for (const QnUuid &id: serverIds) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(id);
         if (!server)
             continue;
 

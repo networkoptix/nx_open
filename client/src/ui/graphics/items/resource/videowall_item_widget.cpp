@@ -432,7 +432,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
 
 void QnVideowallItemWidget::updateLayout() {
     QnVideoWallItem item = m_videowall->items()->getItem(m_itemUuid);
-    QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+    QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(item.layout);
     if (m_layout == layout)
         return;
 

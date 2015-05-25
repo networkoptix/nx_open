@@ -137,7 +137,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
     case ServerColumn:
         {
             QnUuid serverId = license->serverId();
-            QnMediaServerResourcePtr server = qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+            QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverId);
             if (!server) {
                 item->setText(tr("<Server not found>"));
                 item->setData(QVariant(), Qt::DecorationRole);

@@ -183,7 +183,7 @@ QnMediaServerResourceList QnCameraHistory::getAllCameraServersInternal(const QnT
 
     for (QnServerHistoryMap::const_iterator itr = itrStart; itr != itrEnd; ++itr)
     {
-        QnMediaServerResourcePtr mServer = qnResPool->getResourceById(itr.value()).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(itr.value());
         if (mServer)
             rez.insert(mServer);
     }
@@ -244,7 +244,7 @@ QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QString& uniqueId
 QnMediaServerResourceList QnCameraHistoryPool::getCurrentServer(const QnNetworkResourcePtr &camera) const
 {
     QnMediaServerResourceList rez;
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(camera->getParentId());
     if (server)
         rez << server;
     return rez;

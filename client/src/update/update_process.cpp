@@ -360,7 +360,7 @@ void QnUpdateProcess::installIncompatiblePeers() {
 void QnUpdateProcess::at_restUpdateTask_peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id) {
     QnPeerUpdateInformation info = m_updateInformationById.take(incompatibleId);
     info.stage = QnPeerUpdateStage::Init;
-    info.server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+    info.server = qnResPool->getResourceById<QnMediaServerResource>(id);
     m_updateInformationById.insert(id, info);
     emit targetsChanged(QSet<QnUuid>::fromList(m_updateInformationById.keys()));
     emit peerStageChanged(id, QnPeerUpdateStage::Init);
@@ -385,7 +385,7 @@ void QnUpdateProcess::prepareToUpload() {
     setStage(QnFullUpdateStage::Push);
 
     foreach (const QnUuid &target, m_targetPeerIds) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(target).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(target);
         if (!server || server->getStatus() != Qn::Online)
             m_failedPeerIds.insert(target);
     }

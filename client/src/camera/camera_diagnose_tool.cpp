@@ -24,7 +24,7 @@ namespace CameraDiagnostics
         m_step( Step::mediaServerAvailability ),
         m_result( false )
     {
-        QnSecurityCamResourcePtr secCamRes = qnResPool->getResourceById( cameraID ).dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResourcePtr secCamRes = qnResPool->getResourceById<QnSecurityCamResource>( cameraID );
         if( !secCamRes )
             return;
 

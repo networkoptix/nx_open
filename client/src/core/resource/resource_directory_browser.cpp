@@ -168,7 +168,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
         layout->setId(QnUuid(data.data()));
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceById(layout->getId()).dynamicCast<QnLayoutResource>();
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceById<QnLayoutResource>(layout->getId());
         if (existingLayout)
             return existingLayout;
 

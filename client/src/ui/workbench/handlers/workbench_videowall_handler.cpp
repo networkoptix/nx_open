@@ -574,7 +574,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
     updateMainWindowGeometry(item.screenSnaps); //TODO: #GDM check if it is needed at all
 
-    QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+    QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(item.layout);
 
     if (workbench()->currentLayout() && workbench()->currentLayout()->resource() == layout)
         return;
@@ -863,7 +863,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
     }
     case QnVideoWallControlMessage::Identify:
     {
-        QnVideoWallResourcePtr videoWall = qnResPool->getResourceById(m_videoWallMode.guid).dynamicCast<QnVideoWallResource>();
+        QnVideoWallResourcePtr videoWall = qnResPool->getResourceById<QnVideoWallResource>(m_videoWallMode.guid);
         if (!videoWall)
             return;
 
@@ -1034,7 +1034,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {
 
     m_videoWallMode.opening = false;
 
-    QnVideoWallResourcePtr videoWall = qnResPool->getResourceById(m_videoWallMode.guid).dynamicCast<QnVideoWallResource>();
+    QnVideoWallResourcePtr videoWall = qnResPool->getResourceById<QnVideoWallResource>(m_videoWallMode.guid);
     if (!videoWall || videoWall->items()->getItems().isEmpty()) {
         if (!videoWall)
             qWarning() << "Warning: videowall not exists, cannot start videowall on this pc";
@@ -1491,7 +1491,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered() {
 
         QnLayoutResourcePtr layoutResource = item.layout.isNull()
             ? QnLayoutResourcePtr()
-            : qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+            : qnResPool->getResourceById<QnLayoutResource>(item.layout);
 
         if (!layoutResource) {
             layoutResource = constructLayout(QnResourceList());
@@ -1571,7 +1571,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
         return;
 
     /* Layout that is currently on the drop-target item. */
-    QnLayoutResourcePtr currentLayout = qnResPool->getResourceById(targetIndex.item().layout).dynamicCast<QnLayoutResource>();
+    QnLayoutResourcePtr currentLayout = qnResPool->getResourceById<QnLayoutResource>(targetIndex.item().layout);
 
     Qt::KeyboardModifiers keyboardModifiers = parameters.argument<Qt::KeyboardModifiers>(Qn::KeyboardModifiersRole);
 
@@ -1586,7 +1586,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
         foreach (const QnVideoWallItemIndex &index, videoWallItems) {
             if (!index.isValid())
                 continue;
-            if (QnLayoutResourcePtr layout = qnResPool->getResourceById(index.item().layout).dynamicCast<QnLayoutResource>())
+            if (QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(index.item().layout))
                 targetResources << layout;
         }
 
@@ -2491,7 +2491,7 @@ void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourceP
 
         // add new layout if needed
         {
-            QnLayoutResourcePtr layoutResource = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+            QnLayoutResourcePtr layoutResource = qnResPool->getResourceById<QnLayoutResource>(item.layout);
             if (!layoutResource)
                 return;
 
