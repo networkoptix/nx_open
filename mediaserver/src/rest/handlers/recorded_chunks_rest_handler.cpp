@@ -18,57 +18,12 @@
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
-    QnChunksRequestData request;
-    QByteArray errStr;
-    QByteArray errStrPhysicalId;
-    bool urlFound = false;
     
-    ChunkFormat format = ChunkFormat_Unknown;
-    QString callback;
-    QString filter;
-
-    for (int i = 0; i < params.size(); ++i)
-    {
-        if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
-        {
-            urlFound = true;
-            QString physicalId = params[i].second.trimmed();
-            QnVirtualCameraResourcePtr res = qnResPool->getNetResourceByPhysicalId(physicalId).dynamicCast<QnVirtualCameraResource>();
-            if (res == 0)
-                errStrPhysicalId += QByteArray("Resource with physicalId '") + physicalId.toUtf8() + QByteArray("' not found. \n");
-            else 
-                request.resList << res;
-        }
-        else if (params[i].first == "startTime") 
-        {
-            request.startTimeMs = parseDateTime(params[i].second.toUtf8());
-        }
-        else if (params[i].first == "endTime") {
-            request.endTimeMs = parseDateTime(params[i].second.toUtf8());
-        }
-        else if (params[i].first == "detail")
-            request.detailLevel = params[i].second.toLongLong();
-        else if (params[i].first == "format") 
-        {
-            if (params[i].second == "bin")
-                format = ChunkFormat_Binary;
-            else if (params[i].second == "bii")
-                format = ChunkFormat_BinaryIntersected;
-            else if (params[i].second == "xml")
-                format = ChunkFormat_XML;
-            else if (params[i].second == "txt")
-                format = ChunkFormat_Text;
-            else
-                format = ChunkFormat_Json;
-        }
-        else if (params[i].first == "callback")
-            callback = params[i].second;
-        else if (params[i].first == "filter")
-            filter = params[i].second;
-        else if (params[i].first == "periodsType")
-            request.periodsType = static_cast<Qn::TimePeriodContent>(params[i].second.toInt());
-    }
-    if (!urlFound)
+    QByteArray errStr;
+    QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+    QString callback = params.value("callback");
+    
+    if (request.resList.isEmpty())
         errStr += "Parameter physicalId must be provided. \n";
     if (request.startTimeMs < 0)
         errStr += "Parameter startTime must be provided. \n";
@@ -76,9 +31,8 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         errStr += "Parameter endTime must be provided. \n";
     if (request.detailLevel < 0)
         errStr += "Parameter detail must be provided. \n";
-
-    if (request.resList.isEmpty())
-        errStr += errStrPhysicalId;
+    if (request.format == Qn::UnsupportedFormat)
+        errStr += "Parameter format must be provided. \n";
 
     auto errLog = [&](const QString &errText) {
         result.append("<root>\n");
@@ -92,7 +46,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     
     QnTimePeriodList periods = QnChunksRequestHelper::load(request);
 
-    switch(format) 
+    switch(request.format) 
     {
         case ChunkFormat_Binary:
             result.append("BIN");
