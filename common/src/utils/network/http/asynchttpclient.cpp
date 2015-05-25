@@ -126,6 +126,21 @@ namespace nx_http
         return initiateHttpMessageDelivery( url );
     }
 
+    bool AsyncHttpClient::doPut(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        const nx_http::StringType& messageBody )
+    {
+        resetDataBeforeNewRequest();
+        m_url = url;
+        composeRequest( nx_http::Method::PUT );
+        m_request.headers.insert( make_pair("Content-Type", contentType) );
+        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
+        //TODO #ak support chunked encoding & compression
+        m_request.messageBody = messageBody;
+        return initiateHttpMessageDelivery( url );
+    }
+
     const nx_http::Request& AsyncHttpClient::request() const
     {
         return m_request;
@@ -705,7 +720,10 @@ namespace nx_http
                 HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()) );
 
         //if that url has already been authenticated, adding same authentication info to the request
-        if( !AuthInfoCache::instance()->addAuthorizationHeader(
+        //first request per tcp-connection always uses authentication
+        //    This is done due to limited AuthInfoCache implementation
+        if( m_authCacheItem.url.isEmpty() ||
+            !AuthInfoCache::instance()->addAuthorizationHeader(
                 m_url,
                 &m_request,
                 &m_authCacheItem ) )
@@ -760,6 +778,7 @@ namespace nx_http
             //TODO #ak MUST add to cache only after OK response
             m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
                 m_url,
+                m_request.requestLine.method,
                 m_userName.toLatin1(),
                 m_userPassword.toLatin1(),
                 boost::optional<BufferType>(),
@@ -839,6 +858,7 @@ namespace nx_http
             //TODO #ak MUST add to cache only after OK response
             m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
                 m_url,
+                m_request.requestLine.method,
                 m_userName.toLatin1(),
                 m_authType == authDigestWithPasswordHash
                     ? boost::optional<BufferType>()

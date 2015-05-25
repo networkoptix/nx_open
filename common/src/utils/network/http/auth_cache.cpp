@@ -21,12 +21,12 @@ namespace nx_http
     {
         if( authzData )
         {
-            *authzData = getCachedAuthentication( url );
+            *authzData = getCachedAuthentication( url, request->requestLine.method );
             return addAuthorizationHeader( url, request, *authzData );
         }
         else
         {
-            return addAuthorizationHeader( url, request, getCachedAuthentication( url ) );
+            return addAuthorizationHeader( url, request, getCachedAuthentication( url, request->requestLine.method ) );
         }
     }
 
@@ -35,6 +35,9 @@ namespace nx_http
         Request* const request,
         AuthInfoCache::AuthorizationCacheItem authzData )
     {
+        if( request->requestLine.method != authzData.method )
+            return false;
+
         if( authzData.authorizationHeader &&
             authzData.url == url )
         {
@@ -70,13 +73,18 @@ namespace nx_http
         return AuthInfoCache_instance();
     }
 
-    AuthInfoCache::AuthorizationCacheItem AuthInfoCache::getCachedAuthentication( const QUrl& url )
+    AuthInfoCache::AuthorizationCacheItem AuthInfoCache::getCachedAuthentication(
+        const QUrl& url,
+        const StringType& method ) const
     {
         std::lock_guard<std::mutex> lk( m_mutex );
 
         AuthorizationCacheItem authzItem;
-        if( !m_cachedAuthorization )
+        if( !m_cachedAuthorization ||
+            m_cachedAuthorization->method != method )
+        {
             return authzItem;
+        }
 
         if( m_cachedAuthorization->url.host() != url.host() ||
             m_cachedAuthorization->url.port() != url.port() )

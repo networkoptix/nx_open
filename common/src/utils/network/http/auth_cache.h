@@ -28,6 +28,7 @@ namespace nx_http
         {
         public:
             QUrl url;
+            StringType method;
             StringType userName;
             boost::optional<StringType> password;
             boost::optional<BufferType> ha1;
@@ -41,6 +42,7 @@ namespace nx_http
             >
             AuthorizationCacheItem(
                 const QUrl& url,
+                const StringType& method,
                 const StringType& userName,
                 boost::optional<StringType> password,
                 boost::optional<BufferType> ha1,
@@ -48,6 +50,7 @@ namespace nx_http
                 AuthorizationRef&& authorization )
             :
                 url( url ),
+                method( method ),
                 userName( userName ),
                 password( std::move(password) ),
                 ha1( std::move(ha1) ),
@@ -74,7 +77,7 @@ namespace nx_http
                 std::forward<AuthorizationCacheItemRef>(item) ) );
         }
 
-        //!Adds Authorization header to \a request, if possible
+        //!Adds Authorization header to \a request, if corresponding data can be found in cache
         /*!
             \return \a true if necessary information has been found in cache and added to \a request. \a false otherwise
         */
@@ -98,9 +101,11 @@ namespace nx_http
             //TODO #ak (2.4) this information should stored globally depending on server endpoint, server path, user credentials 
         */
         std::unique_ptr<AuthorizationCacheItem> m_cachedAuthorization;
-        std::mutex m_mutex;
+        mutable std::mutex m_mutex;
 
-        AuthorizationCacheItem getCachedAuthentication( const QUrl& url );
+        AuthorizationCacheItem getCachedAuthentication(
+            const QUrl& url,
+            const StringType& method ) const;
 
         AuthInfoCache( const AuthInfoCache& );
         AuthInfoCache& operator=( const AuthInfoCache& );
