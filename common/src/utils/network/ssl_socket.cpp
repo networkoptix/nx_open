@@ -173,7 +173,6 @@ namespace {
 // dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
     static std::unique_ptr<std::mutex[]> kOpenSSLGlobalLock;
-#if 0
     void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
         Q_UNUSED(file);
         Q_UNUSED(line);
@@ -184,8 +183,7 @@ namespace {
             kOpenSSLGlobalLock.get()[type].unlock();
         }
     }
-#endif
-static std::once_flag kOpenSSLGlobalLockFlag;
+    static std::once_flag kOpenSSLGlobalLockFlag;
 
     void OpenSSLInitGlobalLock() {
         Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
@@ -193,6 +191,7 @@ static std::once_flag kOpenSSLGlobalLockFlag;
         kOpenSSLGlobalLock.reset( new std::mutex[CRYPTO_num_locks()] );
         CRYPTO_set_locking_callback(OpenSSLGlobalLock);
     }
+}
 
 void InitOpenSSLGlobalLock() {
     std::call_once(kOpenSSLGlobalLockFlag,OpenSSLInitGlobalLock);
