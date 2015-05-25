@@ -121,7 +121,6 @@ Page {
 
     QnSessionEditDialog {
         id: sessionEditDialog
-        visible: false
         onAccepted: LoginDialogFunctions.connectToServer(address, port, user, password)
         onVisibleChanged: {
             if (!visible)

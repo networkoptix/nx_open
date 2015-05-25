@@ -39,7 +39,7 @@ Page {
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: video.bottom
-        anchors.topMargin: units.dp(36)
+        anchors.topMargin: Units.dp(36)
 
         fontInfo: {
             "size": 56,
@@ -54,8 +54,8 @@ Page {
         iconName: "av/pause"
         anchors.horizontalCenter: parent.horizontalCenter
         y: (video.height + timeline.y) / 2 - height / 2
-        width: units.dp(56)
-        height: units.dp(56)
+        width: Units.dp(56)
+        height: Units.dp(56)
     }
 
     // timeline dummy
@@ -64,7 +64,7 @@ Page {
 
         anchors.bottom: parent.bottom
         width: parent.width
-        height: units.dp(92)
+        height: Units.dp(92)
 
         color: theme.accentColor
     }

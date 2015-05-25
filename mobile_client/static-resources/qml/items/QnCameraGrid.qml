@@ -6,7 +6,7 @@ import "../main.js" as Main
 GridView {
     id: gridView
 
-    property real spacing: units.dp(8)
+    property real spacing: Units.dp(8)
 
     cellWidth: width / 2
     cellHeight: cellWidth / 4 * 3
@@ -40,7 +40,7 @@ GridView {
             id: label
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.margins: units.dp(8)
+            anchors.margins: Units.dp(8)
             text: resourceName
         }
 

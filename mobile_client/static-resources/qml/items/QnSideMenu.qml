@@ -47,7 +47,7 @@ Item {
             Rectangle {
                 id: dragger
                 height: rootItem.height
-                width: rootItem.opened ? rootItem.width : units.dp(36)
+                width: rootItem.opened ? rootItem.width : Units.dp(36)
 
                 color: "black"
                 opacity: rootItem.opened ? (panel.width - flickable.contentX) / panel.width * 0.4 : 0

@@ -25,7 +25,7 @@ Item {
 
         ThinDivider {}
 
-        ListItem.Header {
+        ListItem.Subheader {
             text: qsTr("Recent cameras")
         }
     }
@@ -40,7 +40,7 @@ Item {
         ListItem.Standard {
             text: qsTr("Logout")
 
-            onTriggered: connectionManager.disconnectFromServer()
+            onClicked: connectionManager.disconnectFromServer()
         }
     }
 }

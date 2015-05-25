@@ -9,31 +9,29 @@ Dialog {
 
     positiveButtonText: qsTr("Connect")
 
-    Column {
-        TextField {
-            id: addressField
-            placeholderText: qsTr("Address")
-            floatingLabel: true
-        }
+    TextField {
+        id: addressField
+        placeholderText: qsTr("Address")
+        floatingLabel: true
+    }
 
-        TextField {
-            id: portField
-            placeholderText: qsTr("Port")
-            floatingLabel: true
-        }
+    TextField {
+        id: portField
+        placeholderText: qsTr("Port")
+        floatingLabel: true
+    }
 
-        TextField {
-            id: userField
-            placeholderText: qsTr("User")
-            floatingLabel: true
-        }
+    TextField {
+        id: userField
+        placeholderText: qsTr("User")
+        floatingLabel: true
+    }
 
-        TextField {
-            id: passwordField
-            placeholderText: qsTr("Password")
-            floatingLabel: true
-            echoMode: TextInput.Password
-        }
+    TextField {
+        id: passwordField
+        placeholderText: qsTr("Password")
+        floatingLabel: true
+        echoMode: TextInput.Password
     }
 
     function openNewSession() {
@@ -44,7 +42,7 @@ Dialog {
         password = ""
         addressField.forceActiveFocus()
 
-        open()
+        show()
     }
 
     function openExistingSession(_systemName, _address, _port, _user, _password) {
@@ -56,6 +54,6 @@ Dialog {
         userField.selectAll()
         userField.forceActiveFocus()
 
-        open()
+        show()
     }
 }
