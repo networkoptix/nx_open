@@ -59,7 +59,7 @@ Page {
         section.criteria: ViewSection.FullString
         section.labelPositioning: ViewSection.CurrentLabelAtStart | ViewSection.InlineLabels
 
-        section.delegate: ListItem.Header {
+        section.delegate: ListItem.Subheader {
             Rectangle {
                 anchors.fill: parent
                 color: theme.backgroundColor
@@ -89,7 +89,7 @@ Page {
 
             selected: sessionsList.selection.indexOf(sessionId) != -1
 
-            onTriggered: {
+            onClicked: {
                 if (sessionsList.selection.length) {
                     if (user)
                         LoginDialogFunctions.select(sessionId)
@@ -113,7 +113,7 @@ Page {
         anchors {
             bottom: parent.bottom
             right: parent.right
-            margins: units.dp(16)
+            margins: Units.dp(16)
         }
         iconName: "content/add"
         onClicked: sessionEditDialog.openNewSession()

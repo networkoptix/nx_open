@@ -4,7 +4,7 @@
 #include <QtCore/QThread>
 
 #ifndef Q_OS_ANDROID
-#   include <QtCore/5.2.1/QtCore/private/qthread_p.h>
+#   include <QtCore/5.4.1/QtCore/private/qthread_p.h>
 #endif
 
 /**

@@ -4,7 +4,7 @@
 #include <QtCore/QDateTime>
 #include <QtQuick/QQuickItem>
 
-#include <time_period_list.h>
+#include <recording/time_period_list.h>
 
 class QnTimelinePrivate;
 class QSGGeometryNode;

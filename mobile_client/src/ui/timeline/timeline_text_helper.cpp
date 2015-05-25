@@ -19,7 +19,7 @@ public:
     QnTimelineTextHelperPrivate(const QFont &font) :
         fm(font),
         lineHeight(fm.height()),
-        digitWidth(fm.size(Qt::TextSingleLine, "0").width())
+        digitWidth(fm.size(Qt::TextSingleLine, lit("0")).width())
     {}
 
     void drawNumbers(QPainter *painter) {
@@ -103,5 +103,5 @@ QImage QnTimelineTextHelper::texture() const {
 }
 
 int QnTimelineTextHelper::maxCharWidth() const {
-    return d->fm.size(Qt::TextSingleLine, "m").width();
+    return d->fm.size(Qt::TextSingleLine, lit("m")).width();
 }

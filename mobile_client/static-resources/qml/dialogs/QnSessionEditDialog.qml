@@ -7,7 +7,7 @@ Dialog {
     property alias user: userField.text
     property alias password: passwordField.text
 
-    positiveBtnText: qsTr("Connect")
+    positiveButtonText: qsTr("Connect")
 
     Column {
         TextField {
@@ -32,7 +32,7 @@ Dialog {
             id: passwordField
             placeholderText: qsTr("Password")
             floatingLabel: true
-            input.echoMode: TextInput.Password
+            echoMode: TextInput.Password
         }
     }
 
@@ -53,7 +53,7 @@ Dialog {
         port = _port
         user = _user ? _user : "admin"
         password = _password
-        userField.input.selectAll()
+        userField.selectAll()
         userField.forceActiveFocus()
 
         open()

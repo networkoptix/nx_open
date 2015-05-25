@@ -234,7 +234,7 @@ QnTimeline::QnTimeline(QQuickItem *parent) :
                                      << tr("Oct") << tr("Nov") << tr("Dec");
 
     QStringList suffixList;
-    suffixList << "ms" << "s" << "m" << "h" << ":00";
+    suffixList << lit("ms") << lit("s") << lit("m") << lit("h") << lit(":00");
     for (const QString &month : QnTimelineZoomLevel::monthsNames)
         suffixList.append(month);
 
@@ -712,7 +712,8 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
                 continue;
             }
 
-            if(!pos[i]->isInfinite())
+//            if(!pos[i]->isInfinite())
+            if(!pos[i]->durationMs == -1)
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 
