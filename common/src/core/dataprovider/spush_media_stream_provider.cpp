@@ -250,7 +250,7 @@ void CLServerPushStreamReader::afterRun()
     m_resource->disconnect(this, SLOT(at_resourceChanged(QnResourcePtr)));
 }
 
-void CLServerPushStreamReader::pleaseReopenStream(bool /*qualityChanged*/)
+void CLServerPushStreamReader::pleaseReopenStream()
 {
     if (isRunning())
         m_needReopen = true;

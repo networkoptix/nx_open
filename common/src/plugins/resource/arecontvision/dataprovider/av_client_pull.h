@@ -25,7 +25,7 @@ public:
 
 
 protected:
-    virtual void pleaseReopenStream(bool qualityChanged = true) override;
+    virtual void pleaseReopenStream() override;
 
     int getBitrateMbps() const;
     bool isH264() const;

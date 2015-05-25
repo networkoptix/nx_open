@@ -25,7 +25,7 @@ protected:
     //!Implementation of QnAbstractMediaStreamProvider::isStreamOpened
     virtual bool isStreamOpened() const override;
 
-    virtual void pleaseReopenStream(bool /*qualityChanged*/) override {};
+    virtual void pleaseReopenStream() override {};
 
 private:
     std::unique_ptr<CLSimpleHTTPClient> mHttpClient;

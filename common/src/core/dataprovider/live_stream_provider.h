@@ -93,7 +93,7 @@ public:
 
 protected:
     /*! Called when @param currentStreamParams are updated */
-    virtual void pleaseReopenStream(bool qualityChanged = true) = 0;
+    virtual void pleaseReopenStream() = 0;
 
     QnMetaDataV1Ptr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();

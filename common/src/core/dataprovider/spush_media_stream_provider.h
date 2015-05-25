@@ -37,7 +37,7 @@ private slots:
 protected:
     QnLiveStreamParams m_currentLiveParams;
 
-    virtual void pleaseReopenStream(bool qualityChanged = true) override;
+    virtual void pleaseReopenStream() override;
     virtual void beforeRun() override;
     virtual void afterRun() override;
     virtual bool canChangeStatus() const;

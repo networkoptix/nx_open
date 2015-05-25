@@ -165,7 +165,7 @@ void PlDroidStreamReader::closeStream()
     m_tcpSock->close();
 }
 
-void PlDroidStreamReader::pleaseReopenStream(bool /*qualityChanged*/)
+void PlDroidStreamReader::pleaseReopenStream()
 {
 }
 

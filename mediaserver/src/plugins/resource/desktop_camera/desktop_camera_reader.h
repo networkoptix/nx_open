@@ -24,7 +24,7 @@ protected:
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
-    virtual void pleaseReopenStream(const QnLiveStreamParams&) override;
+    virtual void pleaseReopenStream() override;
     virtual void pleaseStop() override;
 
 private:

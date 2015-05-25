@@ -122,13 +122,15 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
     {
         // must be primary, so should inform secondary
         if (m_owner)
+        {
             if (auto lp = m_owner->getSecondaryReader())
             {
                 lp->setQuality(m_cameraRes->getSecondaryStreamQuality());
                 lp->onPrimaryFpsUpdated(getFps());
             }
+        }
 
-        pleaseReopenStream(false);
+        pleaseReopenStream();
     }
 }
 
@@ -224,7 +226,7 @@ void QnLiveStreamProvider::setFps(float f)
         }
     }
 
-    pleaseReopenStream(false);
+    pleaseReopenStream();
 }
 
 float QnLiveStreamProvider::getFps() const

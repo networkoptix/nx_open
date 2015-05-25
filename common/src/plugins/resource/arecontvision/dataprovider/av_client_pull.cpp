@@ -69,11 +69,8 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
     stop();
 }
 
-void QnPlAVClinetPullStreamReader::pleaseReopenStream(bool qualityChanged)
+void QnPlAVClinetPullStreamReader::pleaseReopenStream()
 {
-    if (!qualityChanged)
-        return;
-
     QMutexLocker mtx(&m_mutex);
 
     QString resolution;
