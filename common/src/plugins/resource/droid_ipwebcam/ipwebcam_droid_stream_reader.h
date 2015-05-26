@@ -19,9 +19,6 @@ protected:
     virtual void closeStream() ;
     virtual bool isStreamOpened() const;
 
-    void updateStreamParamsBasedOnQuality() override {};
-    void updateStreamParamsBasedOnFps() override {};
-
 private:
     CLSimpleHTTPClient* mHttpClient;
 

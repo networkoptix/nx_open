@@ -212,18 +212,6 @@ QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
     return rez;
 }
 
-void QnISDStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnISDStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
 QnConstResourceAudioLayoutPtr QnISDStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();

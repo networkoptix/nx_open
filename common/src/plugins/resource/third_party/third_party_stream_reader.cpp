@@ -55,11 +55,6 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
         m_mediaEncoder2Ref->releaseRef();
 }
 
-void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
-{
-    base_type::onGotVideoFrame( videoData );
-}
-
 static int sensitivityToMask[10] = 
 {
     255, //  0
@@ -379,18 +374,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     }
 
     return rez;
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const

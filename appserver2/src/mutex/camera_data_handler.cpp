@@ -25,7 +25,7 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 
     if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX)) 
     {
-        QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (ownServer && !ownServer->isRedundancy()) {
             QString cameraName = name.mid(CAM_INS_PREFIX.length());
             if (cameraName.toLocal8Bit() == QByteArray(mac))

@@ -20,14 +20,9 @@ protected:
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
-
-
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
-
     virtual void pleaseStop() override;
-private:
 
+private:
     QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);
     QnAbstractMediaDataPtr getNextDataMJPEG();
     virtual QnMetaDataV1Ptr getCameraMetadata() override;

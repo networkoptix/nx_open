@@ -71,5 +71,6 @@ static const int MAC_ADDR_LEN = 18;
     \return 0 on success, -1 in case of error. Use errno to get error code
 */
 QN_EXPORT int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host);
+QN_EXPORT QString getMacFromPrimaryIF();
 
 #endif //cl_net_tools_1232

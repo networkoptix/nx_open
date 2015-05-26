@@ -1,4 +1,7 @@
 #include "desktop_camera_connection.h"
+
+#include <common/common_module.h>
+
 #include "core/resource/media_server_resource.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "api/app_server_connection.h"
@@ -191,7 +194,7 @@ QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, c
 {
     m_auth.username = QnAppServerConnectionFactory::url().userName();
     m_auth.password = QnAppServerConnectionFactory::url().password();
-    m_auth.clientGuid = QnAppServerConnectionFactory::clientGuid();
+    m_auth.clientGuid = qnCommon->moduleGUID();
 }
 
 QnDesktopCameraConnection::~QnDesktopCameraConnection()
@@ -236,7 +239,7 @@ void QnDesktopCameraConnection::run()
 
             connection = new CLSimpleHTTPClient(m_server->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
-            connection->addHeader("user-id", m_auth.clientGuid.toUtf8());
+            connection->addHeader("user-id", m_auth.clientGuid.toString().toUtf8());
         }
 
         CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));

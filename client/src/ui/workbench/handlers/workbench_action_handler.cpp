@@ -1133,7 +1133,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
     if (!server)
         /* If target server is not provided, open the server we are currently connected to. */
-        server = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
+        server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
 
     if (!server)
         return;
@@ -1750,7 +1750,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         
         if (camera && nodeType == Qn::EdgeNode) {
-            if (mServer = resource->getParentResource().dynamicCast<QnMediaServerResource>())
+            if (mServer = camera->getParentServer())
                 mServer->setName(name);
         }
 

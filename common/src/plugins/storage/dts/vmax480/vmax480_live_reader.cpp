@@ -131,18 +131,6 @@ void QnVMax480LiveProvider::afterRun()
     closeStream();
 }
 
-void QnVMax480LiveProvider::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnVMax480LiveProvider::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
 int QnVMax480LiveProvider::getChannel() const
 {
     return m_resource.dynamicCast<QnPhysicalCameraResource>()->getChannel();

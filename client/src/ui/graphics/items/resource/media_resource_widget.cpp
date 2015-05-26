@@ -914,7 +914,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
             continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
-        mbps += statistics->getBitrate();
+        mbps += statistics->getBitrateMbps();
     }
 
     QSize size = m_display->camDisplay()->getRawDataSize();

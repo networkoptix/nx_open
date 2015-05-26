@@ -47,7 +47,7 @@ QnReconnectHelper::InterfaceInfo::InterfaceInfo():
 
 QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
     QObject(parent),
-    m_currentServer(qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>()),
+    m_currentServer(qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID())),
     m_currentUrl(QnAppServerConnectionFactory::url())
 {
     m_userName = m_currentUrl.userName();

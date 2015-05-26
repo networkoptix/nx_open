@@ -236,7 +236,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
 
     if (dstRoute.id == qnCommon->moduleGUID() && !cameraGuid.isNull()) {
-        if (QnNetworkResourcePtr camera = qnResPool->getResourceById(cameraGuid).dynamicCast<QnNetworkResource>())
+        if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
             dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
     }
     else if (!dstRoute.id.isNull())

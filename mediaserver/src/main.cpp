@@ -183,6 +183,7 @@
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
 #include "network/universal_request_processor.h"
+#include "utils/network/nettools.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -198,6 +199,7 @@ static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
+static const QByteArray SYSTEM_NAME_KEY("systemName");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -822,7 +824,6 @@ void initAppServerConnection(QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     NX_LOG(lit("Connect to server %1").arg(urlNoPassword.toString()), cl_logINFO);
-    QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
     QnAppServerConnectionFactory::setUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
@@ -1187,7 +1188,7 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 
     at_localInterfacesChanged();
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (server) {
         Qn::ServerFlags serverFlags = server->getServerFlags();
         if (m_publicAddress.isNull())
@@ -1245,9 +1246,9 @@ void QnMain::at_connectionOpened()
     if (isStopping())
         return;
     if (m_firstRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::ServerStartedReason, QString());
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById<QnMediaServerResource>(serverGuid()), m_firstRunningTime*1000, QnBusiness::ServerStartedReason, QString());
     if (!m_startMessageSent) {
-        qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
+        qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceById<QnMediaServerResource>(serverGuid()), qnSyncTime->currentUSecsSinceEpoch());
         m_startMessageSent = true;
     }
     m_firstRunningTime = 0;
@@ -1256,7 +1257,7 @@ void QnMain::at_connectionOpened()
 void QnMain::at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address)
 {
     qnBusinessRuleConnector->at_mediaServerConflict(
-                qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(),
+                qnResPool->getResourceById<QnMediaServerResource>(serverGuid()),
                 qnSyncTime->currentUSecsSinceEpoch(),
                 moduleInformation,
                 QUrl(lit("http://%1").arg(address.toString())));
@@ -1524,7 +1525,15 @@ void QnMain::run()
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
     qnCommon->setModuleGUID(serverGuid());
-    qnCommon->setLocalSystemName(settings->value("systemName").toString());
+    QString systemName = settings->value(SYSTEM_NAME_KEY).toString();
+#ifdef __arm__
+    if (systemName.isEmpty()) {
+        systemName = QString(lit("system_%1")).arg(getMacFromPrimaryIF());
+        settings->setValue(SYSTEM_NAME_KEY, systemName);
+    }
+#endif
+    qnCommon->setLocalSystemName(systemName);
+
     qint64 systemIdentityTime = MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
     qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
@@ -1581,7 +1590,7 @@ void QnMain::run()
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
-        MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
+        MSSettings::roSettings()->setValue(SYSTEM_NAME_KEY, connectInfo.systemName);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
         MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");

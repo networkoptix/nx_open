@@ -61,7 +61,7 @@ void QnInstallUpdatesPeerTask::doStart() {
         return;
     }
 
-    m_ecServer = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
+    m_ecServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
 
     connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
 
@@ -183,7 +183,7 @@ void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<Q
         return;
 
     for (const QnModuleInformation &moduleInformation: modules) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
         if (!server)
             continue;
 

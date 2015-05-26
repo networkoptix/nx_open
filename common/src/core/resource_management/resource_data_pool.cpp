@@ -44,7 +44,7 @@ QnResourceData QnResourceDataPool::data(const QString &key) const {
     return m_dataByKey.value(key.toLower());
 }
 
-QnResourceData QnResourceDataPool::data(const QnSecurityCamResourcePtr &camera) const {
+QnResourceData QnResourceDataPool::data(const QnConstSecurityCamResourcePtr &camera) const {
     if (!camera)
         return QnResourceData();
 

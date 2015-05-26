@@ -18,6 +18,7 @@ namespace Qn
     static const QString MOTION_MASK_WINDOW_CNT_PARAM_NAME = lit("motionMaskWindowCnt");
     static const QString MOTION_SENS_WINDOW_CNT_PARAM_NAME = lit("motionSensWindowCnt");
     static const QString FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
+    static const QString FORCE_BITRATE_PER_GOP = lit("bitratePerGOP");
     /*!
         String parameter with following values allowed:\n
         - \a softwaregrid. Software motion calculated on mediaserver
@@ -30,6 +31,7 @@ namespace Qn
     static const QString CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME = lit("defaultCredentials");
     static const QString CAMERA_CAPABILITIES_PARAM_NAME = lit("cameraCapabilities");
     static const QString CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = lit("mediaStreams");
+    static const QString CAMERA_BITRATE_INFO_LIST_PARAM_NAME = lit("bitrateInfos");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
     //!Contains XML describing camera parameteres. If empty, :camera_settings/camera_settings.xml file is used
     static const QString PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME = lit("physicalCameraSettingsXml");
