@@ -320,7 +320,6 @@ void QnRtspClientArchiveDelegate::close()
     QMutexLocker lock(&m_mutex);
     //m_waitBOF = false;
     m_rtspSession.stop();
-    m_rtpData = 0;
     m_lastPacketFlags = -1;
     m_opened = false;
     m_audioLayout.reset();
@@ -433,7 +432,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     receiveTimer.restart();
     while(!result)
     {
-        if (!m_rtpData){
+        if (!m_rtpData || (!m_opened && !m_closing)) {
             //m_rtspSession.stop(); // reconnect
             reopen();
             return result;
