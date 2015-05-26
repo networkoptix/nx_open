@@ -116,6 +116,9 @@
                                                       select="$groupName"/>_method_<xsl:value-of
                                                       select="$quotedName"/></xsl:attribute>
                                                 <h4>
+                                                    <xsl:if test="caption">
+                                                        <div class="label label-info"><xsl:value-of select="caption"/><br/></div>
+                                                    </xsl:if>
                                                     <span class="label label-info"><xsl:value-of
                                                       select="method"/></span>
                                                     <span class="label label-default">
