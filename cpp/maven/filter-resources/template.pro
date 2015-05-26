@@ -139,12 +139,7 @@ win* {
 ## BOTH LINUX AND MAC
 unix: {
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Wuninitialized
-  arm {
-    QMAKE_CXXFLAGS += -std=c++0x
-  } else {
-    QMAKE_CXXFLAGS += -std=c++11
-  }
+  QMAKE_CXXFLAGS += -std=c++11 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Wuninitialized
 }
 
 ## LINUX

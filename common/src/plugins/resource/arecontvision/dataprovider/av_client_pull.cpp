@@ -72,7 +72,7 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
 void QnPlAVClinetPullStreamReader::pleaseReopenStream()
 {
     QMutexLocker mtx(&m_mutex);
-
+    QnLiveStreamParams params = getLiveParams();
     QString resolution;
     if (getRole() == Qn::CR_LiveVideo)
         resolution = QLatin1String("full");
@@ -80,7 +80,7 @@ void QnPlAVClinetPullStreamReader::pleaseReopenStream()
         resolution = QLatin1String("half");
 
     QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
-    Qn::StreamQuality q = getQuality();
+    Qn::StreamQuality q = params.quality;
     switch (q)
     {
     case Qn::QualityHighest:

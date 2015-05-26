@@ -41,7 +41,7 @@ QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
     return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
 }
 
-CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     // configure stream params
 
@@ -52,11 +52,11 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     QString SET_AUDIO(QLatin1String("CHANNEL=%1&V2_AUDIO_ENABLED=%2"));
 
     m_multiCodec.setRole(m_role);
-    int fps = m_actiRes->roundFps(getFps(), m_role);
+    int fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
     QSize resolution = m_actiRes->getResolution(m_role);
     QString resolutionStr = formatResolutionStr(resolution);
-    int bitrate = m_actiRes->suggestBitrateKbps(getQuality(), resolution, fps);
+    int bitrate = m_actiRes->suggestBitrateKbps(params.quality, resolution, fps);
     bitrate = m_actiRes->roundBitrate(bitrate);
     QString bitrateStr = formatBitrateStr(bitrate);
     QString encoderStr(QLatin1String("H264"));

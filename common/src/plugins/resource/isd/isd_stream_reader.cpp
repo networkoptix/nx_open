@@ -31,7 +31,7 @@ QnISDStreamReader::~QnISDStreamReader()
 
 #define USE_VBR
 
-CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -79,9 +79,9 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         }
         else
         {
-            const float fps = getFps();
+            const float fps = params.fps;
             const QSize resolution = res->getPrimaryResolution();
-            const int desiredBitrateKbps = res->suggestBitrateKbps(getQuality(), resolution, fps);
+            const int desiredBitrateKbps = res->suggestBitrateKbps(params.quality, resolution, fps);
             t << "VideoInput.1.h264.1.Resolution=" << resolution.width() << "x" << resolution.height() << "\r\n";
             t << "VideoInput.1.h264.1.FrameRate=" << fps << "\r\n";
 #ifndef USE_VBR

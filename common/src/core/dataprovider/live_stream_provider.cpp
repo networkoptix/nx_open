@@ -9,11 +9,12 @@
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10*1000;
 static const int SAVE_BITRATE_FRAME = 300; // value TBD
+static const float FPS_NOT_INITIALIZED = -1.0;
 
 QnLiveStreamParams::QnLiveStreamParams():
     quality(Qn::QualityNormal),
     secondaryQuality(Qn::SSQualityNotDefined),
-    fps(-1.0)
+    fps(FPS_NOT_INITIALIZED)
 {
 }
 
@@ -126,7 +127,7 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
             if (auto lp = m_owner->getSecondaryReader())
             {
                 lp->setQuality(m_cameraRes->getSecondaryStreamQuality());
-                lp->onPrimaryFpsUpdated(getFps());
+                lp->onPrimaryFpsUpdated(getLiveParams().fps);
             }
         }
 
@@ -147,12 +148,6 @@ void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
     }
 
     pleaseReopenStream();
-}
-
-Qn::StreamQuality QnLiveStreamProvider::getQuality() const
-{
-    QMutexLocker mtx(&m_livemutex);
-    return m_newLiveParams.quality;
 }
 
 Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
@@ -211,7 +206,7 @@ void QnLiveStreamProvider::setFps(float f)
             return; // same fps?
 
 
-        m_newLiveParams.fps = qMin((int)f, m_cameraRes->getMaxFps());
+        m_newLiveParams.fps = qMax(1, qMin((int)f, m_cameraRes->getMaxFps()));
         f = m_newLiveParams.fps;
 
     }
@@ -229,17 +224,11 @@ void QnLiveStreamProvider::setFps(float f)
     pleaseReopenStream();
 }
 
-float QnLiveStreamProvider::getFps() const
+float QnLiveStreamProvider::getDefaultFps() const
 {
-    QMutexLocker mtx(&m_livemutex);
-
-    if (m_newLiveParams.fps < 0) // setfps never been called
-        m_newLiveParams.fps = m_cameraRes->getMaxFps() - 2; // 2 here is out of the blue; just somthing not maximum
-
-    m_newLiveParams.fps = qMin((int)m_newLiveParams.fps, m_cameraRes->getMaxFps());
-    m_newLiveParams.fps = qMax((int)m_newLiveParams.fps, 1);
-
-    return m_newLiveParams.fps;
+    Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
+    float maxFps = m_cameraRes->getMaxFps();
+    return qMax(1.0, sharingMethod ==  Qn::NoFpsSharing ? maxFps : maxFps - 2);
 }
 
 bool QnLiveStreamProvider::isMaxFps() const
@@ -355,6 +344,8 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 {
     QMutexLocker lock(&m_livemutex);
+    if (m_newLiveParams.fps == FPS_NOT_INITIALIZED)
+        m_newLiveParams.fps = getDefaultFps();
     return m_newLiveParams;
 }
 
