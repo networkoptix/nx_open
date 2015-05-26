@@ -10,7 +10,7 @@ static const int OUTPUT_BUFFER_SIZE = 16*1024;
 
 GZipUncompressor::GZipUncompressor( const std::shared_ptr<AbstractByteStreamFilter>& nextFilter )
 :
-    AbstractByteStreamConverter( nextFilter ),
+    AbstractByteStreamFilter( nextFilter ),
     m_state( State::init )
 {
     memset( &m_zStream, 0, sizeof(m_zStream) );

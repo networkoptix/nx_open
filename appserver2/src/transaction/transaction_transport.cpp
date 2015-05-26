@@ -142,18 +142,31 @@ QnTransactionTransport::QnTransactionTransport(
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
     using namespace std::placeholders;
-    auto processTranFunc = std::bind(
-        &QnTransactionTransport::receivedTransactionViaInternalTunnel,
-        this,
-        _1 );
     if( m_contentEncoding == "gzip" )
     {
         m_compressResponseMsgBody = true;
     }
-    m_incomingTransactionsRequestsParser = std::make_shared<nx_http::HttpMessageStreamParser>();
-    m_incomingTransactionsRequestsParser->setNextFilter(
-        std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
-    m_incomingTransactionStreamParser = m_incomingTransactionsRequestsParser;
+    
+    //creating parser sequence: http_msg_stream_parser -> ext_headers_processor -> transaction handler
+    auto incomingTransactionsRequestsParser = std::make_shared<nx_http::HttpMessageStreamParser>();
+    std::weak_ptr<nx_http::HttpMessageStreamParser> incomingTransactionsRequestsParserWeak(
+        incomingTransactionsRequestsParser );
+
+    auto extensionHeadersProcessor = makeFilterWithFunc( //this filter receives single HTTP message 
+        [this, incomingTransactionsRequestsParserWeak]() {
+            if( auto incomingTransactionsRequestsParserStrong = incomingTransactionsRequestsParserWeak.lock() )
+                processChunkExtensions( incomingTransactionsRequestsParserStrong->currentMessage().headers() );
+        } );
+
+    extensionHeadersProcessor->setNextFilter( makeCustomOutputStream(
+        std::bind(
+            &QnTransactionTransport::receivedTransactionNonSafe,
+            this,
+            std::placeholders::_1 ) ) );
+
+    incomingTransactionsRequestsParser->setNextFilter( std::move(extensionHeadersProcessor) );
+
+    m_incomingTransactionStreamParser = std::move(incomingTransactionsRequestsParser);
 
     startSendKeepAliveTimerNonSafe();
 
@@ -188,13 +201,21 @@ QnTransactionTransport::QnTransactionTransport( const ApiPeerData &localPeer )
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 
-    auto processTranFunc = std::bind(
-        &QnTransactionTransport::receivedTransactionViaInternalTunnel,
-        this,
-        std::placeholders::_1 );
+    //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
-    m_multipartContentParser->setNextFilter(
-        std::make_shared<CustomOutputStream<decltype(processTranFunc)> >(processTranFunc) );
+    std::weak_ptr<nx_http::MultipartContentParser> multipartContentParserWeak( m_multipartContentParser );
+    auto extensionHeadersProcessor = makeFilterWithFunc( //this filter receives single multipart message 
+        [this, multipartContentParserWeak]() {
+            if( auto multipartContentParser = multipartContentParserWeak.lock() )
+                processChunkExtensions( multipartContentParser->prevFrameHeaders() );
+        } );
+    extensionHeadersProcessor->setNextFilter( makeCustomOutputStream(
+        std::bind(
+            &QnTransactionTransport::receivedTransactionNonSafe,
+            this,
+            std::placeholders::_1 ) ) );
+    m_multipartContentParser->setNextFilter( std::move(extensionHeadersProcessor) );
+
     m_incomingTransactionStreamParser = m_multipartContentParser;
 }
 
@@ -241,16 +262,7 @@ void QnTransactionTransport::addData(QByteArray&& data)
         m_dataToSend.push_back( data.toBase64() );
     else
         m_dataToSend.push_back( std::move( data ) );
-    if( m_dataToSend.size() == 1 )
-        serializeAndSendNextDataBuffer();
-}
-
-void QnTransactionTransport::addEncodedData(QByteArray&& data)
-{
-    QMutexLocker lock(&m_mutex);
-    DataToSend dataToSend;
-    dataToSend.encodedSourceData = std::move( data );
-    m_dataToSend.push_back( std::move( dataToSend ) );
+    data.clear();   //cause I can!
     if( m_dataToSend.size() == 1 )
         serializeAndSendNextDataBuffer();
 }
@@ -577,24 +589,8 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     scheduleAsyncRead();
 }
 
-void QnTransactionTransport::receivedTransactionViaInternalTunnel( const QnByteArrayConstRef& tranDataWithHeader )
+void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstRef& tranDataWithHeader )
 {
-    if( m_peerRole == prOriginating )
-        receivedTransactionNonSafe(
-            m_multipartContentParser->prevFrameHeaders(),
-            tranDataWithHeader );
-    else    //m_peerRole == prAccepting
-        receivedTransactionNonSafe(
-            m_incomingTransactionsRequestsParser->currentMessage().headers(),
-            tranDataWithHeader );
-}
-
-void QnTransactionTransport::receivedTransactionNonSafe(
-    const nx_http::HttpHeaders& headers,
-    const QnByteArrayConstRef& tranDataWithHeader )
-{
-    processChunkExtensions( headers );
-
     if( tranDataWithHeader.isEmpty() )
         return; //it happens in case of keep-alive message
 
@@ -655,19 +651,19 @@ void QnTransactionTransport::receivedTransaction(
 {
     QMutexLocker lock(&m_mutex);
 
+    processChunkExtensions( headers );
+
     if( nx_http::getHeaderValue(
             headers,
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
     {
-        receivedTransactionNonSafe(
-            headers,
-            QByteArray::fromBase64( tranData.toByteArrayWithRawData() ) );
+        const auto& decodedTranData = QByteArray::fromBase64( tranData.toByteArrayWithRawData() );
+        //TODO #ak decodedTranData can contain multiple transactions
+        receivedTransactionNonSafe( decodedTranData );
     }
     else
     {
-        receivedTransactionNonSafe(
-            headers,
-            tranData );
+        receivedTransactionNonSafe( tranData );
     }
 }
 
@@ -733,7 +729,6 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
     if( !m_remotePeer.isServer() )
         return; //not sending keep-alive to a client
 
-    //TODO #ak keep-alive timer 
     if( m_peerRole == prAccepting )
     {
         assert( m_outgoingDataSocket );
@@ -1029,8 +1024,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         if( contentEncodingIter->second == "gzip" )
         {
             //enabling decompression of received transactions
-            m_incomingTransactionStreamParser = std::make_shared<GZipUncompressor>();
-            m_incomingTransactionStreamParser->setNextFilter( m_multipartContentParser );
+            auto ungzip = std::make_shared<GZipUncompressor>();
+            ungzip->setNextFilter( std::move(m_incomingTransactionStreamParser) );
+            m_incomingTransactionStreamParser = std::move(ungzip);
         }
         else
         {
@@ -1058,11 +1054,13 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 m_httpClient->response()->headers,
                 Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
-            //inserting base64 decoder after m_multipartContentParser
-            std::shared_ptr<AbstractByteStreamFilter> lastFilterBak = m_multipartContentParser->nextFilter();
-            auto base64DecoderFilter = std::make_shared<Base64DecoderFilter>();
-            m_multipartContentParser->setNextFilter( base64DecoderFilter );
-            base64DecoderFilter->setNextFilter( lastFilterBak );
+            //TODO #ak base64-encoded data can contain multiple transactions
+
+            //inserting base64 decoder before the last filter
+            m_incomingTransactionStreamParser = nx_bsf::insert(
+                m_incomingTransactionStreamParser,
+                nx_bsf::last( m_incomingTransactionStreamParser ),
+                std::make_shared<Base64DecoderFilter>() );
         }
 
         m_incomingDataSocket = m_httpClient->takeSocket();

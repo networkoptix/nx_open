@@ -341,7 +341,7 @@ namespace nx_http
         if( contentEncodingIter != m_httpMessage.headers().end() &&
             contentEncodingIter->second != "identity" )
         {
-            AbstractByteStreamConverter* contentDecoder = createContentDecoder( contentEncodingIter->second );
+            AbstractByteStreamFilter* contentDecoder = createContentDecoder( contentEncodingIter->second );
             if( contentDecoder == nullptr )
                 return false;   //cannot decode message body
             //all operations with m_msgBodyBuffer MUST be done with m_mutex locked
@@ -545,7 +545,7 @@ namespace nx_http
         return 0;
     }
 
-    AbstractByteStreamConverter* HttpStreamReader::createContentDecoder( const nx_http::StringType& encodingName )
+    AbstractByteStreamFilter* HttpStreamReader::createContentDecoder( const nx_http::StringType& encodingName )
     {
         if( encodingName == "gzip" )
             return new GZipUncompressor();

@@ -18,7 +18,7 @@ namespace nx_http
     */
     class MultipartContentParser
     :
-        public AbstractByteStreamConverter
+        public AbstractByteStreamFilter
     {
     public:
         MultipartContentParser();

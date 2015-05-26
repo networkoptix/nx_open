@@ -18,7 +18,7 @@
 //!Deflates gzip-compressed stream. Suitable for decoding gzip http content encoding
 class GZipUncompressor
 :
-    public AbstractByteStreamConverter
+    public AbstractByteStreamFilter
 {
 public:
     GZipUncompressor( const std::shared_ptr<AbstractByteStreamFilter>& nextFilter = std::shared_ptr<AbstractByteStreamFilter>() );

@@ -19,7 +19,7 @@ namespace nx_http
     */
     class HttpMessageStreamParser
     :
-        public AbstractByteStreamConverter
+        public AbstractByteStreamFilter
     {
     public:
         HttpMessageStreamParser();
@@ -32,7 +32,7 @@ namespace nx_http
 
         //!Returns previous http message
         /*!
-            Message is available only within \a AbstractByteStreamConverter::processData call of the next filter
+            Message is available only within \a AbstractByteStreamFilter::processData call of the next filter
         */
         nx_http::Message currentMessage() const;
 

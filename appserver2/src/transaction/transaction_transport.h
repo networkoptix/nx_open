@@ -266,11 +266,10 @@ private:
     qint64 m_remoteIdentityTime;
     nx_http::HttpStreamReader m_httpStreamReader;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
-    std::shared_ptr<nx_http::HttpMessageStreamParser> m_incomingTransactionsRequestsParser;
     ConnectionType::Type m_connectionType;
     PeerRole m_peerRole;
     QByteArray m_contentEncoding;
-    std::shared_ptr<AbstractByteStreamConverter> m_incomingTransactionStreamParser;
+    std::shared_ptr<AbstractByteStreamFilter> m_incomingTransactionStreamParser;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
@@ -289,8 +288,6 @@ private:
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray&& data);
-    //!\a data will be sent as-is with no HTTP encoding applied
-    void addEncodedData(QByteArray&& data);
     /*!
         \return in case of success returns number of bytes read from \a data. In case of parse error returns 0
         \note In case of error \a chunkHeader contents are undefined
@@ -312,10 +309,7 @@ private:
     */
     void scheduleAsyncRead();
     bool readCreateIncomingTunnelMessage();
-    void receivedTransactionViaInternalTunnel( const QnByteArrayConstRef& tranDataWithHeader );
-    void receivedTransactionNonSafe(
-        const nx_http::HttpHeaders& headers,
-        const QnByteArrayConstRef& tranData );
+    void receivedTransactionNonSafe( const QnByteArrayConstRef& tranData );
     void startListeningNonSafe();
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
     void startSendKeepAliveTimerNonSafe();

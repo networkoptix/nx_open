@@ -16,7 +16,7 @@
 */
 class Base64DecoderFilter
 :
-    public AbstractByteStreamConverter
+    public AbstractByteStreamFilter
 {
 public:
     Base64DecoderFilter();
