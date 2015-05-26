@@ -32,11 +32,6 @@ public:
     static CodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
     static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader, int* errorCode = nullptr );
 
-    //!Overrides QnLiveStreamProvider::onGotVideoFrame()
-    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
-        const QnLiveStreamParams& currentLiveParams) override;
-
-    //!Overrides QnLiveStreamProvider::updateSoftwareMotion()
     virtual void updateSoftwareMotion() override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 

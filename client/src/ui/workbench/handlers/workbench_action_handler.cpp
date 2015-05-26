@@ -473,7 +473,8 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
 }
 
 void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
-    qnRedAssController->setMode(resolutionMode);
+    if (qnRedAssController)
+        qnRedAssController->setMode(resolutionMode);
 }
 
 QnCameraSettingsDialog *QnWorkbenchActionHandler::cameraSettingsDialog() const {
@@ -624,7 +625,8 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(Qn::RadassAutoAction)->setChecked(true);
-    qnRedAssController->setMode(Qn::AutoResolution);
+    if (qnRedAssController)
+        qnRedAssController->setMode(Qn::AutoResolution);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1751,7 +1753,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         
         if (camera && nodeType == Qn::EdgeNode) {
-            if (mServer = resource->getParentResource().dynamicCast<QnMediaServerResource>())
+            if (mServer = camera->getParentServer())
                 mServer->setName(name);
         }
 

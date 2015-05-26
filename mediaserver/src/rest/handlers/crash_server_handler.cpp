@@ -8,6 +8,11 @@
 #ifdef _WIN32
 #include <common/systemexcept_win32.h>
 #endif
+
+#ifdef __linux__
+#include <common/systemexcept_linux.h>
+#endif
+
 #include <utils/common/log.h>
 #include <utils/network/http/httptypes.h>
 
@@ -25,6 +30,11 @@ int QnCrashServerHandler::executeGet(
 #ifdef _WIN32
     const bool createFullCrashDump = params.contains(lit("full"));
     win32_exception::setCreateFullCrashDump( createFullCrashDump );
+#endif
+
+#ifdef __linux__
+    const bool createFullCrashDump = params.contains(lit("full"));
+    linux_exception::setSignalHandlingDisabled( createFullCrashDump );
 #endif
 
     NX_LOG( lit("Received request to kill server. Killing..."), cl_logALWAYS );

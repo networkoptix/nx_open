@@ -107,7 +107,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &ca
         return;
 
     m_camera = camera;
-    m_server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    m_server = camera->getParentServer();
     setupRtspSession(camera, m_server, &m_rtspSession, m_playNowModeAllowed);
 }
 
@@ -133,7 +133,7 @@ QString QnRtspClientArchiveDelegate::getUrl(const QnVirtualCameraResourcePtr &ca
     // if camera is null we can't get its parent in any case
     QnMediaServerResourcePtr server = (_server || (!camera))
         ? _server 
-        : camera->getParentResource().dynamicCast<QnMediaServerResource>();
+        : camera->getParentServer();
     if (!server)
         return QString();
     QString url = server->getUrl() + QLatin1Char('/');
@@ -209,7 +209,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 timeUsec) {
     if (!m_camera)
         return QnMediaServerResourcePtr();
-    QnMediaServerResourcePtr currentServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr currentServer = m_camera->getParentServer();
 
     if (timeUsec == DATETIME_NOW)
         return currentServer;
@@ -334,7 +334,6 @@ void QnRtspClientArchiveDelegate::close()
     QMutexLocker lock(&m_mutex);
     //m_waitBOF = false;
     m_rtspSession.stop();
-    m_rtpData = 0;
     m_lastPacketFlags = -1;
     m_opened = false;
     m_audioLayout.reset();
@@ -447,7 +446,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     receiveTimer.restart();
     while(!result)
     {
-        if (!m_rtpData){
+        if (!m_rtpData || (!m_opened && !m_closing)) {
             //m_rtspSession.stop(); // reconnect
             reopen();
             return result;

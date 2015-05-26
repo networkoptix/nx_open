@@ -64,7 +64,7 @@ namespace {
     }
 
     QSet<QUrl> ignoredUrlsForServer(const QnUuid &id) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(id);
         if (!server)
             return QSet<QUrl>();
 
@@ -228,8 +228,6 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
     qint64 currentTime = m_elapsedTimer.elapsed();
 
-    m_lastResponse[address] = currentTime;
-
     QMutexLocker lk(&m_itemsMutex);
 
     ModuleItem &item = m_moduleItemById[moduleInformation.id];
@@ -281,6 +279,8 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         foreach (const SocketAddress &address, item.addresses)
             removeAddress(address, true);
     }
+
+    m_lastResponse[address] = currentTime;
 
     if (item.moduleInformation != moduleInformation) {
         NX_LOG(lit("QnModuleFinder. Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);

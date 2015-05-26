@@ -37,7 +37,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
     else if (eventType.isEmpty())
         errStr = tr("Parameter 'event_type' is absent or empty. \n");
     else {
-        resource= qnResPool->getResourceByUniqId(resourceId);
+        resource= qnResPool->getResourceByUniqueId(resourceId);
         if (!resource) {
             resource= qnResPool->getResourceById(QnUuid(resourceId));
             if (!resource)

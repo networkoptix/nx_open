@@ -210,7 +210,7 @@ void CLServerPushStreamReader::run()
         {
             m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
             if (lp)
-                lp->onGotVideoFrame(videoData, m_currentLiveParams);
+                lp->onGotVideoFrame(videoData, m_currentLiveParams, isCameraControlRequired());
         }
         if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;

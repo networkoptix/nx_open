@@ -711,7 +711,7 @@ void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
     if(!item.resource.id.isNull()) { // TODO: #EC2
         resource = resourcePool()->getResourceById(item.resource.id);
     } else {
-        resource = resourcePool()->getResourceByUniqId(item.resource.path);
+        resource = resourcePool()->getResourceByUniqueId(item.resource.path);
     }
     //Q_ASSERT(resource);   //too many strange situations with invalid resources in layout items
 

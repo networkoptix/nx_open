@@ -29,7 +29,7 @@ namespace ec2
         QString comment;
         QString schedule;
 
-        bool system; // system rule cannot be deleted 
+        bool system; // system rule cannot be deleted
     };
 #define ApiBusinessRuleData_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState)(actionType)(actionResourceIds)(actionParams) \
     (aggregationPeriod)(disabled)(comment)(schedule)(system)

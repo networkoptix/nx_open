@@ -57,6 +57,7 @@ public:
     }
 
     static QnUuid fromRfc4122( const QByteArray& bytes );
+    static QnUuid fromHardwareId( const QByteArray& bytes );
     static QnUuid createUuid();
 
     /*! Construct QnUuid from string representation.

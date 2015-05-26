@@ -138,7 +138,7 @@ void QnClientPullMediaStreamProvider::run()
         {
             m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(videoData->dataSize()));
             if (lp)
-                lp->onGotVideoFrame(videoData, getLiveParams());
+                lp->onGotVideoFrame(videoData, getLiveParams(), false);
         }
         if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;

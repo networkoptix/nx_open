@@ -236,6 +236,7 @@ void QnDesktopCameraConnection::run()
             QAuthenticator auth;
             auth.setUser(m_auth.username);
             auth.setPassword(m_auth.password);
+
             connection = new CLSimpleHTTPClient(m_server->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
             connection->addHeader("user-id", m_auth.clientGuid.toString().toUtf8());
