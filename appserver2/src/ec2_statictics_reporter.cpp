@@ -10,7 +10,6 @@ static const bool DEFAULT_SERVER_AUTH = true;
 
 static const uint DELAY_RATIO = 50;    /* 50% about 15 days */
 static const uint TIMER_CYCLE = 60000; /* msecs, update state every minute */
-static const QString DATE_FORMAT = lit("yyyy-MM-dd hh:mm:ss");
 static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 
 static const QString ALREADY_IN_PROGRESS = lit("already in progress");
@@ -188,7 +187,7 @@ namespace ec2
         }
         
         const QDateTime now = qnSyncTime->currentDateTime().toUTC();
-        const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), DATE_FORMAT);
+        const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), Qt::ISODate);
 
         const uint timeCycle = secsWithPostfix(m_admin->getProperty(SR_TIME_CYCLE), DEFAULT_TIME_CYCLE);
         const uint maxDelay = timeCycle * DELAY_RATIO / 100;
@@ -202,8 +201,8 @@ namespace ec2
             m_plannedReportTime = lastTime.addSecs(timeCycle + delay);
             
             NX_LOG(lit("Ec2StaticticsReporter: Last report was at %1, the next planned for %2")
-                   .arg(lastTime.isValid() ? lastTime.toString(DATE_FORMAT) : lit("NEWER"))
-                   .arg(m_plannedReportTime->toString(DATE_FORMAT)), cl_logINFO);
+                   .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))
+                   .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
         }
 
         if (*m_plannedReportTime > now)
@@ -274,7 +273,7 @@ namespace ec2
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
 
-            m_admin->setProperty(SR_LAST_TIME, now.toString(DATE_FORMAT));
+            m_admin->setProperty(SR_LAST_TIME, now.toString(Qt::ISODate));
             propertyDictionary->saveParams(m_admin->getId());
         }
         else
@@ -282,6 +281,7 @@ namespace ec2
             NX_LOG(lit("Ec2StaticticsReporter: Could not send report to %1, retry after random delay...")
                    .arg(httpClient->url().toString()), cl_logWARNING);
         }
+
         setupTimer();
     }
 }

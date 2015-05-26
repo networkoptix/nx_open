@@ -43,13 +43,13 @@ bool CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
 
     const auto now = qnSyncTime->currentDateTime().toUTC();
     const auto lastTime = QDateTime::fromString(
-            settings->value(LAST_CRASH, "").toString(), DATE_FORMAT);
+            settings->value(LAST_CRASH, "").toString(), Qt::ISODate);
 
     if (now < lastTime.addSecs(SENDING_MIN_INTERVAL) &&
         lastTime < now.addSecs(SENDING_MIN_INTERVAL)) // avoid possible long resync problem
     {
         qDebug() << lit("CrashReporter::scanAndReport: previous crash was reported %1")
-            .arg(lastTime.toString(DATE_FORMAT));
+            .arg(lastTime.toString(Qt::ISODate));
         return false;
     }
 
@@ -151,8 +151,10 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
         return;
     }
 
+    const auto now = qnSyncTime->currentDateTime().toUTC();
     QFile::remove(m_crashFile.absoluteFilePath());
-    m_settings->setValue(LAST_CRASH, qnSyncTime->currentDateTime().toUTC().toString(DATE_FORMAT));
+
+    m_settings->setValue(LAST_CRASH, now.toString(Qt::ISODate));
     m_settings->sync();
 }
 
@@ -166,7 +168,7 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
 #endif
     auto version = QnAppInfo::applicationFullVersion();
     auto systemInfo = QnAppInfo::applicationSystemInfo();
-    auto timestamp = m_crashFile.created().toString(DATE_FORMAT);
+    auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd hh:mm:ss");
     auto extension = fileName.split(QChar('.')).last();
 
     nx_http::HttpHeaders headers;
