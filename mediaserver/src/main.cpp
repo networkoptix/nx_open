@@ -1516,7 +1516,6 @@ void QnMain::run()
     qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
-    QScopedPointer<TimerManager> timerManager(new TimerManager());
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 
     ec2::ApiRuntimeData runtimeData;

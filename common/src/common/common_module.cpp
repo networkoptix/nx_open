@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <utils/common/product_features.h>
+#include <utils/common/timermanager.h>
 
 
 QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
@@ -24,6 +25,7 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     
     /* Init statics. */
     qnProductFeatures();
+    store<TimerManager>(new TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
