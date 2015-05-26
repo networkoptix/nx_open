@@ -1473,6 +1473,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ToggleTourModeAction).
         flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Start Tour")).
         toggledText(tr("Stop Tour")).
         shortcut(tr("Alt+T")).
