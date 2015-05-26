@@ -344,6 +344,9 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
+    if (qnSettings->isActiveXMode() || qnSettings->isVideoWallMode())
+        return;
+
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
     dialogConstructor.resetGeometry();
 

@@ -6,6 +6,8 @@
 
 #include "client_meta_types.h"
 
+#include <redass/redass_controller.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 
@@ -37,6 +39,8 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
 
     QnClientSettings *settings = new QnClientSettings(isLocalSettings);
     common->store<QnClientSettings>(settings);
+
+    common->store<QnRedAssController>(new QnRedAssController());
 
     common->setModuleGUID(QnUuid::createUuid());
 }

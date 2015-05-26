@@ -995,7 +995,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 }
             }
         }
-        qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
+        if (qnRedAssController)
+            qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
     return true;
@@ -1033,7 +1034,8 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     m_widgetByItem.remove(item);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
         m_widgetByRenderer.remove(mediaWidget->renderer());
-        qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
+        if (qnRedAssController)
+            qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
     }
 
     if(destroyWidget) {

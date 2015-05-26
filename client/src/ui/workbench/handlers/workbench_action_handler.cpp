@@ -471,7 +471,8 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
 }
 
 void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
-    qnRedAssController->setMode(resolutionMode);
+    if (qnRedAssController)
+        qnRedAssController->setMode(resolutionMode);
 }
 
 QnCameraSettingsDialog *QnWorkbenchActionHandler::cameraSettingsDialog() const {
@@ -628,7 +629,8 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(Qn::RadassAutoAction)->setChecked(true);
-    qnRedAssController->setMode(Qn::AutoResolution);
+    if (qnRedAssController)
+        qnRedAssController->setMode(Qn::AutoResolution);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
