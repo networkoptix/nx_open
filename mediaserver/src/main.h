@@ -7,6 +7,7 @@
 #include <api/common_message_processor.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <crash_reporter.h>
 
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
@@ -83,6 +84,7 @@ private:
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;
     mutable QMutex m_stopMutex;
+    ec2::CrashReporter m_crashReporter;
 };
 
 #endif // MAIN_H

@@ -9,9 +9,9 @@
 #include <memory>
 
 #include "base_ec2_connection.h"
+#include "ec2_statictics_reporter.h"
 #include "database/db_manager.h"
 #include "server_query_processor.h"
-
 
 namespace ec2
 {
@@ -33,11 +33,14 @@ namespace ec2
         virtual QString authInfo() const override;
 
         bool initialized() const;
+
+        Ec2StaticticsReporter* getStaticticsReporter();
     
     private:
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;
+        std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;
     };
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
 }

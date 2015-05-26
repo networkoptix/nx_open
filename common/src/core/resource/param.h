@@ -40,6 +40,12 @@ namespace Qn
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
+
+    // Hardware information  
+    static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
+    static const QString CPU_MODEL_NAME = lit("cpuModelName");
+    static const QString PHISICAL_MEMORY = lit("phisicalMemory");
+    static const QString BETA = lit("beta");
 }
 
 #endif // QN_PARAM_H

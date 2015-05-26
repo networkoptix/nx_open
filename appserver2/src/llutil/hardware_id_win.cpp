@@ -346,8 +346,9 @@ void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings
         NULL                         // Reserved
         );
 
-
-    if (FAILED(hres))
+	// NOTE: on the client CoInitializeSecurity might be already executed,
+	//       which should not leed to the error
+    if (FAILED(hres) && hres != RPC_E_TOO_LATE)
     {
         std::ostringstream os;
         os << "Failed to initialize security. Error code = 0x"
