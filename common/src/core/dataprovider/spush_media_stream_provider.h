@@ -41,7 +41,7 @@ protected:
     virtual void beforeRun() override;
     virtual void afterRun() override;
     virtual bool canChangeStatus() const;
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) = 0;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) = 0;
 
 private:
     virtual CameraDiagnostics::Result openStream() override final;

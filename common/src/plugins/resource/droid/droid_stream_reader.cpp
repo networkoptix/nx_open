@@ -72,7 +72,7 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
     return result;
 }
 
-CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
     m_gotSDP =  false;
