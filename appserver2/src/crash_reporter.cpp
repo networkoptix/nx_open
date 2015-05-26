@@ -21,10 +21,16 @@ namespace ec2 {
 
 CrashReporter::~CrashReporter()
 {
-    QMutexLocker lock(&m_mutex);
+    // wait for the last scanAndReportAsync
     m_activeCollection.cancel();
     m_activeCollection.waitForFinished();
-    m_activeHttpClients.clear();
+
+    // cancel async IO
+    std::set<nx_http::AsyncHttpClientPtr> httpClients;
+    {
+        QMutexLocker lock(&m_mutex);
+        std::swap(httpClients, m_activeHttpClients);
+    }
 }
 
 bool CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
@@ -35,9 +41,12 @@ bool CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
         return false;
     }
 
+    const auto now = qnSyncTime->currentDateTime().toUTC();
     const auto lastTime = QDateTime::fromString(
             settings->value(LAST_CRASH, "").toString(), DATE_FORMAT);
-    if (qnSyncTime->currentDateTime() < lastTime.addSecs(SENDING_MIN_INTERVAL))
+
+    if (now < lastTime.addSecs(SENDING_MIN_INTERVAL) &&
+        lastTime < now.addSecs(SENDING_MIN_INTERVAL)) // avoid possible long resync problem
     {
         qDebug() << lit("CrashReporter::scanAndReport: previous crash was reported %1")
             .arg(lastTime.toString(DATE_FORMAT));
@@ -106,19 +115,21 @@ bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSetting
 
     httpClient->setUserName(Ec2StaticticsReporter::AUTH_USER);
     httpClient->setUserPassword(Ec2StaticticsReporter::AUTH_PASSWORD);
+    httpClient->setAdditionalHeaders(report->makeHttpHeaders());
 
+    QMutexLocker lock(&m_mutex);
+    qDebug() << "CrashReporter::send:" << filePath << "to" << serverApi;
+    if (httpClient->doPost(serverApi, "application/octet-stream", content))
     {
-        QMutexLocker lock(&m_mutex);
         m_activeHttpClients.insert(httpClient);
+        return true;
     }
 
-    qDebug() << "CrashReporter::send:" << filePath << "to" << serverApi;
-    httpClient->setAdditionalHeaders(report->makeHttpHeaders());
-    return httpClient->doPost(serverApi, "application/octet-stream", content);
+    return false;
 }
 
 ReportData::ReportData(const QFileInfo& crashFile, QSettings* settings,
-                                      CrashReporter& host, QObject* parent)
+                       CrashReporter& host, QObject* parent)
     : QObject(parent)
     , m_crashFile(crashFile)
     , m_settings(settings)
@@ -141,7 +152,7 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
     }
 
     QFile::remove(m_crashFile.absoluteFilePath());
-    m_settings->setValue(LAST_CRASH, qnSyncTime->currentDateTime().toString(DATE_FORMAT));
+    m_settings->setValue(LAST_CRASH, qnSyncTime->currentDateTime().toUTC().toString(DATE_FORMAT));
     m_settings->sync();
 }
 

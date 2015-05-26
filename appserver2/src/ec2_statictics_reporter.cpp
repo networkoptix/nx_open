@@ -187,7 +187,7 @@ namespace ec2
             return;
         }
         
-        const QDateTime now = qnSyncTime->currentDateTime();
+        const QDateTime now = qnSyncTime->currentDateTime().toUTC();
         const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), DATE_FORMAT);
 
         const uint timeCycle = secsWithPostfix(m_admin->getProperty(SR_TIME_CYCLE), DEFAULT_TIME_CYCLE);
@@ -271,8 +271,10 @@ namespace ec2
             NX_LOG(lit("Ec2StaticticsReporter: Statistics report successfully sent to %1")
                    .arg(httpClient->url().toString()), cl_logINFO);
             
+            const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
-            m_admin->setProperty(SR_LAST_TIME, qnSyncTime->currentDateTime().toString(DATE_FORMAT));
+
+            m_admin->setProperty(SR_LAST_TIME, now.toString(DATE_FORMAT));
             propertyDictionary->saveParams(m_admin->getId());
         }
         else
