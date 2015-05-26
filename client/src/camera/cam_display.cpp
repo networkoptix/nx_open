@@ -936,6 +936,8 @@ void QnCamDisplay::processNewSpeed(float speed)
     {
         //m_dataQueue.clear();
         clearVideoQueue();
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
+            m_display[i]->afterJump();
         QMutexLocker lock(&m_timeMutex);
         m_lastDecodedTime = AV_NOPTS_VALUE;
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
