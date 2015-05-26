@@ -326,7 +326,6 @@ private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
     void repeatDoGet();
-    void openPostTransactionConnectionDone( const nx_http::AsyncHttpClientPtr& );
     void postTransactionDone( const nx_http::AsyncHttpClientPtr& );
 };
 
