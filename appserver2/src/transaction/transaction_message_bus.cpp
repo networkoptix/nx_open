@@ -1398,8 +1398,8 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
 void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
     const QnUuid& connectionGuid,
     const QSharedPointer<AbstractStreamSocket>& socket,
-    const ApiPeerData &remotePeer,
-    qint64 remoteSystemIdentityTime,
+    const ApiPeerData &/*remotePeer*/,
+    qint64 /*remoteSystemIdentityTime*/,
     const nx_http::Request& request,
     const QByteArray& requestBuf )
 {

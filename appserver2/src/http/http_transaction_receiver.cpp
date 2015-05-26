@@ -34,12 +34,12 @@ namespace ec2
     }
 
     int QnRestTransactionReceiver::executePost(
-        const QString& path,
+        const QString& /*path*/,
         const QnRequestParamList& /*params*/,
         const QByteArray& body,
-        const QByteArray& srcBodyContentType,
-        QByteArray& resultBody,
-        QByteArray& contentType,
+        const QByteArray& /*srcBodyContentType*/,
+        QByteArray& /*resultBody*/,
+        QByteArray& /*contentType*/,
         const QnRestConnectionProcessor* connection )
     {
         auto connectionGuidIter = connection->request().headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );

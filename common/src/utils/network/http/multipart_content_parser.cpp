@@ -136,6 +136,9 @@ namespace nx_http
                 case readingUnsizedBinaryData:
                     readUnsizedBinaryData( data, &offset );
                     break;
+
+                default:
+                    return false;
             }
         }
 

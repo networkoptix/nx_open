@@ -794,7 +794,7 @@ QUrl QnTransactionTransport::generatePostTranUrl()
 
 void QnTransactionTransport::aggregateOutgoingTransactionsNonSafe()
 {
-    static const size_t MAX_AGGREGATED_TRAN_SIZE_BYTES = 128*1024;
+    static const int MAX_AGGREGATED_TRAN_SIZE_BYTES = 128*1024;
     //std::deque<DataToSend> m_dataToSend;
     //searching first transaction not being sent currently
     auto saveToIter = std::find_if(
