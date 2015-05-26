@@ -875,7 +875,8 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
     case QnVideoWallControlMessage::RadassModeChanged: 
     {
         Qn::ResolutionMode resolutionMode = static_cast<Qn::ResolutionMode>(message[valueKey].toInt());
-        qnRedAssController->setMode(resolutionMode);
+        if (qnRedAssController)
+            qnRedAssController->setMode(resolutionMode);
         break;
     }
     default:
