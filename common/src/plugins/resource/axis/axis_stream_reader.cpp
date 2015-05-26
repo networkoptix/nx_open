@@ -56,7 +56,7 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
     }
 }
 
-CameraDiagnostics::Result QnAxisStreamReader::openStream()
+CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraControlRequired)
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -193,7 +193,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     // --------------- update or insert new profile ----------------------
     
-    if (action == QByteArray("add") || isCameraControlRequired())
+    if (action == QByteArray("add") || isCameraControlRequired)
     {
         QString streamProfile;
         QTextStream str(&streamProfile);
@@ -375,11 +375,8 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
     if (getRole() == Qn::CR_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid) 
         m_axisRes->readMotionInfo();
 
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData()) 
         return getMetaData();

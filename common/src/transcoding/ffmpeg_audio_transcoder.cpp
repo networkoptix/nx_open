@@ -4,6 +4,7 @@
 
 #include "core/datapacket/audio_data_packet.h"
 #include "utils/media/audio_processor.h"
+#include "utils/media/ffmpeg_helper.h"
 
 
 static const int MAX_AUDIO_JITTER = 1000 * 200;
@@ -34,16 +35,8 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
     if (m_resampleCtx)
         audio_resample_close(m_resampleCtx);
 
-    if (m_encoderCtx) {
-        avcodec_close(m_encoderCtx);
-        av_free(m_encoderCtx);
-    }
-
-    if (m_decoderContext) {
-        avcodec_close(m_decoderContext);
-        av_free(m_decoderContext);
-    }
-
+    QnFfmpegHelper::deleteCodecContext(m_encoderCtx);
+    QnFfmpegHelper::deleteCodecContext(m_decoderContext);
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)

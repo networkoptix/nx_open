@@ -19,7 +19,7 @@ public:
     virtual void close() override;
     virtual qint64 seek(qint64 time, bool findIFrame) override;
     virtual qint64 endTime() override;
-    virtual QnResourceVideoLayoutPtr getVideoLayout() override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
 
     static QString addDirPath(const QString sourceDir, const QString& postfix);
 

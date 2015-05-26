@@ -332,7 +332,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #include <iostream>
 
 #ifndef API_TEST_MAIN
-#define ENABLE_DYNAMIC_CUSTOMIZATION
+//#define ENABLE_DYNAMIC_CUSTOMIZATION
 
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // these functions should be called in every thread that wants to use rand() and qrand()
@@ -582,8 +582,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     ffmpegInit();
 
-    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true));
-    moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true, qnSettings->isDevMode()));
     moduleFinder->start();
 
     QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
@@ -833,6 +832,10 @@ int main(int argc, char **argv)
 
     QnClientModule client(argc, argv);
 
+#ifdef Q_OS_WIN
+    win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
+#endif
+        
     QnSessionManager::instance();
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );

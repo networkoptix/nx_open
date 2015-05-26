@@ -61,9 +61,11 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
             someLicenseWillBeBlocked = true;
     }
 
-    foreach(const QnLicensePtr &license, qnLicensePool->getLicenses()) 
+    foreach(const QnLicensePtr &license, qnLicensePool->getLicenses())
     {
-        if (someLicenseWillBeBlocked && !qnLicensePool->isLicenseValid(license))
+        QnLicense::ErrorCode errorCode;
+
+        if (someLicenseWillBeBlocked && !qnLicensePool->isLicenseValid(license, &errorCode) && errorCode != QnLicense::Expired)
         {
             licenses.push_back(license);
             licenseWarningStates[license->key()].lastWarningTime = currentTime;

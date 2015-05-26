@@ -16,12 +16,14 @@
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
 #include "settings.h"
+#include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_connection_data.h"
 #include "api/app_server_connection.h"
 #include "utils/network/router.h"
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
+#include "http/custom_headers.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
@@ -71,18 +73,30 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (isServer) 
     {
-        if (resource->getId() != ownMediaServer->getId())
-            resource->addFlags( Qn::foreigner );
-    }
+        if (resource->getId() == ownMediaServer->getId()) {
+            ec2::ApiMediaServerData ownData;
 
-    // We are always online
-    if (isServer && resource->getId() == serverGuid()) 
-    {
-        if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined) {
-            qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
-            resource->setStatus(Qn::Online);
+            ec2::ApiMediaServerData newData;
+
+            ec2::fromResourceToApi(ownMediaServer, ownData);
+            ec2::fromResourceToApi(resource.staticCast<QnMediaServerResource>(), newData);
+
+            if (ownData != newData) {
+                QnMediaServerResourcePtr savedServer;
+                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(ownMediaServer, &savedServer);
+                return;
+            }
+
+            // We are always online
+            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined) {
+                qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
+                resource->setStatus(Qn::Online);
+            }
+        } else {
+            resource->addFlags(Qn::foreigner);
         }
     }
+
     QnUuid resId = resource->getId();
     if (QnResourcePtr ownResource = qnResPool->getResourceById(resId))
         ownResource->update(resource);
@@ -180,7 +194,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 
 bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
 {
-    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( "X-server-guid" );
+    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
     if( xServerGuidIter != request.headers.end() )
     {
         const nx_http::BufferType& desiredServerGuid = xServerGuidIter->second;
@@ -189,13 +203,13 @@ bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
     }
 
     nx_http::BufferType desiredCameraGuid;
-    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( "x-camera-guid" );
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     if( xCameraGuidIter != request.headers.end() )
     {
         desiredCameraGuid = xCameraGuidIter->second;
     }
     else {
-        desiredCameraGuid = request.getCookieValue("x-camera-guid");
+        desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
     }
     if (!desiredCameraGuid.isEmpty()) {
         QnResourcePtr camera = qnResPool->getResourceById(desiredCameraGuid);
