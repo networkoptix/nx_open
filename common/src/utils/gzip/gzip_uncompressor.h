@@ -25,7 +25,7 @@ public:
     virtual ~GZipUncompressor();
 
     //!Implementation of \a AbstractByteStreamFilter::processData
-    virtual void processData( const QnByteArrayConstRef& data ) override;
+    virtual bool processData( const QnByteArrayConstRef& data ) override;
     //!Implementation of \a AbstractByteStreamFilter::flush
     virtual size_t flush() override;
 

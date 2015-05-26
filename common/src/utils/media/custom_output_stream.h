@@ -23,9 +23,11 @@ public:
     }
 
     //!Implementation of \a AbstractByteStreamFilter::processData
-    virtual void processData( const QnByteArrayConstRef& data )
+    virtual bool processData( const QnByteArrayConstRef& data )
     {
+        //TODO #ak support functor with return value
         m_func( data );
+        return true;
     }
 
     //!Implementation of \a AbstractByteStreamFilter::flush
@@ -56,10 +58,10 @@ public:
     }
 
     //!Implementation of \a AbstractByteStreamFilter::processData
-    virtual void processData( const QnByteArrayConstRef& data )
+    virtual bool processData( const QnByteArrayConstRef& data )
     {
         m_func();
-        nextFilter()->processData( data );
+        return nextFilter()->processData( data );
     }
 
     //!Implementation of \a AbstractByteStreamFilter::flush

@@ -23,10 +23,10 @@ GZipUncompressor::~GZipUncompressor()
     inflateEnd( &m_zStream );
 }
 
-void GZipUncompressor::processData( const QnByteArrayConstRef& data )
+bool GZipUncompressor::processData( const QnByteArrayConstRef& data )
 {
     if( data.isEmpty() )
-        return;
+        return true;
 
     int zFlushMode = Z_NO_FLUSH;
 
@@ -74,8 +74,7 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
                         else if( m_zStream.avail_in == 0 )
                         {
                             //input depleted
-                            m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
-                            return;
+                            return m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
                         }
                         else    //m_zStream.avail_out > 0 && m_zStream.avail_in > 0
                         {
@@ -123,7 +122,7 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
                         {
                             if( m_zStream.avail_out > 0 )
                                m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
-                            return;
+                            return true;
                         }
 
                     default:
@@ -143,6 +142,8 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
 
         break;
     }
+
+    return true;
 }
 
 size_t GZipUncompressor::flush()

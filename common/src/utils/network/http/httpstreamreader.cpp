@@ -95,7 +95,8 @@ namespace nx_http
                         {
                             if( !m_codedMessageBodyBuffer.isEmpty() )
                             {
-                                m_contentDecoder->processData( m_codedMessageBodyBuffer );  //result of processing is appended to m_msgBodyBuffer
+                                if( !m_contentDecoder->processData( m_codedMessageBodyBuffer ) )  //result of processing is appended to m_msgBodyBuffer
+                                    return false;
                                 m_codedMessageBodyBuffer.clear();
                             }
                         }

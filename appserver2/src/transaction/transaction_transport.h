@@ -270,6 +270,7 @@ private:
     PeerRole m_peerRole;
     QByteArray m_contentEncoding;
     std::shared_ptr<AbstractByteStreamFilter> m_incomingTransactionStreamParser;
+    std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
@@ -288,11 +289,6 @@ private:
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray&& data);
-    /*!
-        \return in case of success returns number of bytes read from \a data. In case of parse error returns 0
-        \note In case of error \a chunkHeader contents are undefined
-    */
-    int readChunkHeader(const quint8* data, int dataLen, nx_http::ChunkHeader* const chunkHeader);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
@@ -315,6 +311,7 @@ private:
     void startSendKeepAliveTimerNonSafe();
     void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
     QUrl generatePostTranUrl();
+    void aggregateOutgoingTransactionsNonSafe();
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );

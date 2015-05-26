@@ -27,12 +27,20 @@ public:
 
     virtual ~AbstractByteStreamFilter() {}
 
-    virtual void processData( const QnByteArrayConstRef& data ) = 0;
+    /*!
+        \return \a false in case of error
+    */
+    virtual bool processData( const QnByteArrayConstRef& data ) = 0;
     //!Implementation SHOULD process any cached data. This method is usually signals end of source data
     /*!
         \return > 0, if some data has been flushed, 0 if no data to flush
     */
-    virtual size_t flush() = 0;
+    virtual size_t flush()
+    {
+        if( !m_nextFilter )
+            return 0;
+        return m_nextFilter->flush();
+    }
 
     /*!
         This method is virtual to allow it to become thread-safe in successor

@@ -7,10 +7,11 @@
 #include <QtCore/QTimer>
 
 #include <nx_ec/ec_proto_version.h>
-#include <utils/media/custom_output_stream.h>
+#include <utils/bsf/sized_data_decoder.h>
+#include <utils/common/timermanager.h>
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
-#include <utils/common/timermanager.h>
+#include <utils/media/custom_output_stream.h>
 #include <utils/network/http/base64_decoder_filter.h>
 
 #include "transaction_message_bus.h"
@@ -259,20 +260,27 @@ void QnTransactionTransport::addData(QByteArray&& data)
 {
     QMutexLocker lock(&m_mutex);
     if( m_base64EncodeOutgoingTransactions )
-        m_dataToSend.push_back( data.toBase64() );
+    {
+        //adding size before transaction data
+        const uint32_t dataSize = htonl(data.size());
+        QByteArray dataWithSize;
+        dataWithSize.resize( sizeof(dataSize) + data.size() );
+        //TODO #ak too many memcopy here. Should use stream base64 encoder to write directly to the output buffer
+        memcpy( dataWithSize.data(), &dataSize, sizeof(dataSize) );
+        memcpy(
+            dataWithSize.data()+sizeof(dataSize),
+            data.constData(),
+            data.size() );
+        data.clear();   //cause I can!
+        m_dataToSend.push_back( std::move(dataWithSize) );
+        aggregateOutgoingTransactionsNonSafe();
+    }
     else
+    {
         m_dataToSend.push_back( std::move( data ) );
-    data.clear();   //cause I can!
+    }
     if( m_dataToSend.size() == 1 )
         serializeAndSendNextDataBuffer();
-}
-
-int QnTransactionTransport::readChunkHeader(const quint8* data, int dataLen, nx_http::ChunkHeader* const chunkHeader)
-{
-    const int bytesRead = chunkHeader->parse( QByteArray::fromRawData(reinterpret_cast<const char*>(data), dataLen) );
-    return bytesRead  == -1 
-        ? 0   //parse error
-        : bytesRead;
 }
 
 void QnTransactionTransport::closeSocket()
@@ -578,7 +586,8 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     assert( m_state == ReadyForStreaming );
 
     //parsing and processing input data
-    m_incomingTransactionStreamParser->processData( m_readBuffer );
+    if( !m_incomingTransactionStreamParser->processData( m_readBuffer ) )
+        return setStateNoLock( State::Error );
 
     m_readBuffer.resize(0);
 
@@ -658,8 +667,18 @@ void QnTransactionTransport::receivedTransaction(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
     {
         const auto& decodedTranData = QByteArray::fromBase64( tranData.toByteArrayWithRawData() );
-        //TODO #ak decodedTranData can contain multiple transactions
-        receivedTransactionNonSafe( decodedTranData );
+        //decodedTranData can contain multiple transactions
+        if( !m_sizedDecoder )
+        {
+            m_sizedDecoder = std::make_shared<nx_bsf::SizedDataDecodingFilter>();
+            m_sizedDecoder->setNextFilter( makeCustomOutputStream(
+                std::bind(
+                    &QnTransactionTransport::receivedTransactionNonSafe,
+                    this,
+                    std::placeholders::_1 ) ) );
+        }
+        if( !m_sizedDecoder->processData( decodedTranData ) )
+            return setStateNoLock( State::Error );
     }
     else
     {
@@ -703,7 +722,8 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     m_incomingDataSocket = socket;
 
     //checking transactions format
-    m_incomingTransactionStreamParser->processData( requestBuf );
+    if( !m_incomingTransactionStreamParser->processData( requestBuf ) )
+        return setStateNoLock( State::Error );
 
     startListeningNonSafe();
 }
@@ -772,6 +792,34 @@ QUrl QnTransactionTransport::generatePostTranUrl()
     return postTranUrl;
 }
 
+void QnTransactionTransport::aggregateOutgoingTransactionsNonSafe()
+{
+    static const size_t MAX_AGGREGATED_TRAN_SIZE_BYTES = 128*1024;
+    //std::deque<DataToSend> m_dataToSend;
+    //searching first transaction not being sent currently
+    auto saveToIter = std::find_if(
+        m_dataToSend.begin(),
+        m_dataToSend.end(),
+        []( const DataToSend& data )->bool { return data.encodedSourceData.isEmpty(); } );
+    if( std::distance( saveToIter, m_dataToSend.end() ) < 2 )
+        return; //nothing to aggregate
+
+    //aggregating. Transaction data already contains size
+    auto it = std::next(saveToIter);
+    for( ;
+        it != m_dataToSend.end();
+        ++it )
+    {
+        if( saveToIter->sourceData.size() + it->sourceData.size() > MAX_AGGREGATED_TRAN_SIZE_BYTES )
+            break;
+
+        saveToIter->sourceData += it->sourceData;
+        it->sourceData.clear();
+    }
+    //erasing aggregated transactions
+    m_dataToSend.erase( std::next(saveToIter), it );
+}
+
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 {
     QMutexLocker lock(&m_mutex);
@@ -783,6 +831,10 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 {
     assert( !m_dataToSend.empty() );
     DataToSend& dataCtx = m_dataToSend.front();
+
+    if( m_base64EncodeOutgoingTransactions )
+        dataCtx.sourceData = dataCtx.sourceData.toBase64(); //TODO #ak should use streaming base64 encoder in addData method
+
     if( dataCtx.encodedSourceData.isEmpty() )
     {
         if( m_peerRole == prAccepting )
@@ -1054,13 +1106,19 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 m_httpClient->response()->headers,
                 Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
-            //TODO #ak base64-encoded data can contain multiple transactions
 
             //inserting base64 decoder before the last filter
             m_incomingTransactionStreamParser = nx_bsf::insert(
                 m_incomingTransactionStreamParser,
                 nx_bsf::last( m_incomingTransactionStreamParser ),
                 std::make_shared<Base64DecoderFilter>() );
+
+            //base64-encoded data contains multiple transactions so
+            //    inserting sized data decoder after base64 decoder
+            m_incomingTransactionStreamParser = nx_bsf::insert(
+                m_incomingTransactionStreamParser,
+                nx_bsf::last( m_incomingTransactionStreamParser ),
+                std::make_shared<nx_bsf::SizedDataDecodingFilter>() );
         }
 
         m_incomingDataSocket = m_httpClient->takeSocket();
@@ -1102,7 +1160,8 @@ void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPt
 void QnTransactionTransport::processTransactionData(const QByteArray& data)
 {
     Q_ASSERT( m_peerRole == prOriginating );
-    m_incomingTransactionStreamParser->processData( data );
+    if( !m_incomingTransactionStreamParser->processData( data ) )
+        return setStateNoLock( State::Error );
 }
 
 bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
