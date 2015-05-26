@@ -33,6 +33,7 @@ extern "C"
 #include "plugins/resource/avi/avi_resource.h"
 
 #include <recording/time_period.h>
+#include "core/resource/media_server_resource.h"
 
 namespace {
     const qint64 defaultUpdateInterval = 10 * 1000; /* 10 seconds. */
@@ -52,7 +53,7 @@ namespace {
 
 //#define QN_THUMBNAILS_LOADER_DEBUG
 
-QnThumbnailsLoader::QnThumbnailsLoader(const QnResourcePtr &resource, QnThumbnailsLoader::Mode mode):
+QnThumbnailsLoader::QnThumbnailsLoader(const QnMediaResourcePtr &resource, QnThumbnailsLoader::Mode mode):
     m_mutex(QMutex::NonRecursive),
     m_resource(resource),
     m_mode(mode),
@@ -72,6 +73,11 @@ QnThumbnailsLoader::QnThumbnailsLoader(const QnResourcePtr &resource, QnThumbnai
     m_generation(0),
     m_cachedAspectRatio(0.0)
 {
+    Q_ASSERT_X(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
+
+    if (!supportedResource(resource))
+        return;
+
     connect(this, SIGNAL(updateProcessingLater()), this, SLOT(updateProcessing()), Qt::QueuedConnection);
 
     start();
@@ -86,7 +92,13 @@ QnThumbnailsLoader::~QnThumbnailsLoader() {
     qFreeAligned(m_scaleBuffer);
 }
 
-QnResourcePtr QnThumbnailsLoader::resource() const {
+bool QnThumbnailsLoader::supportedResource(const QnMediaResourcePtr &resource) {
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    QnAviResourcePtr aviFile = resource.dynamicCast<QnAviResource>();
+    return camera || aviFile;
+}
+
+QnMediaResourcePtr QnThumbnailsLoader::resource() const {
     /* Resource is immutable, so we don't need a lock here. */
 
     return m_resource;
@@ -395,10 +407,14 @@ void QnThumbnailsLoader::process() {
 #endif
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
+    QnAviResourcePtr aviFile = qSharedPointerDynamicCast<QnAviResource>(m_resource);
+
     if (camera) {
-        QnMediaServerResourceList servers = QnCameraHistoryPool::instance()->getOnlineCameraServers(camera, period);
-        for (int i = 0; i < servers.size(); ++i) 
+        QnMediaServerResourceList servers = qnCameraHistoryPool->getCameraFootageData(camera, period);        
+        for(const QnMediaServerResourcePtr &server: servers)
         {
+            if (server->getStatus() != Qn::Online)
+                continue;
             QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
             rtspDelegate->setMultiserverAllowed(false);
             if (m_mode == Mode::Default)
@@ -407,21 +423,14 @@ void QnThumbnailsLoader::process() {
                 rtspDelegate->setQuality(MEDIA_Quality_High, true);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
             rtspDelegate->setCamera(camera);
-            rtspDelegate->setFixedServer(servers[i]);
+            rtspDelegate->setFixedServer(server);
             delegates << thumbnailDelegate;
         }
     }
-    else {
-        QnAviArchiveDelegatePtr aviDelegate;
-
-        QnAviResourcePtr aviFile = qSharedPointerDynamicCast<QnAviResource>(m_resource);
-        if (aviFile)
-            aviDelegate = QnAviArchiveDelegatePtr(aviFile->createArchiveDelegate());
-        else
-            aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate);
-
+    else if (aviFile) {
+        QnAviArchiveDelegatePtr aviDelegate = QnAviArchiveDelegatePtr(aviFile->createArchiveDelegate());
         QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(aviDelegate));
-        if (thumbnailDelegate->open(m_resource))
+        if (thumbnailDelegate->open(m_resource->toResourcePtr()))
             delegates << thumbnailDelegate;
     }
 
@@ -454,7 +463,7 @@ void QnThumbnailsLoader::process() {
             outFrame->setUseExternalData(false);
 
             while (frame && !m_needStop) {
-                if (!m_resource->hasFlags(Qn::utc))
+                if (!m_resource->toResourcePtr()->hasFlags(Qn::utc))
                     frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
 
                 timingsQueue << frame->timestamp;

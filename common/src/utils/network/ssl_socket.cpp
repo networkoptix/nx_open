@@ -21,7 +21,7 @@
 #undef min
 #endif
 
-static const int BUFFER_SIZE = 1024;
+//static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
     // TODO: public methods are visible to all, quite bad
@@ -201,7 +201,7 @@ namespace {
     };
 
     static std::unique_ptr<OpenSSLGlobalLockContext> kOpenSSLGlobalLock;
-
+#if 0
     void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
         Q_UNUSED(file);
         Q_UNUSED(line);
@@ -212,7 +212,7 @@ namespace {
             kOpenSSLGlobalLock->locks.get()[type].unlock();
         }
     }
-
+#endif
     void OpenSSLInitGlobalLockInternal()
     {
         Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
@@ -1532,7 +1532,7 @@ int QnSSLSocket::mode() const {
 }
 
 // ------------------------------ QnMixedSSLSocket -------------------------------------------------------
-static const int TEST_DATA_LEN = 3;
+//static const int TEST_DATA_LEN = 3;
 class QnMixedSSLSocketPrivate: public QnSSLSocketPrivate
 {
 public:

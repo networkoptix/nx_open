@@ -52,7 +52,7 @@ namespace
     {
         return SOAP_OK;
     }
-
+#if 0
     //Socket send through UdpSocket
     int gsoapFsend(struct soap *soap, const char *s, size_t n)
     {
@@ -60,7 +60,7 @@ namespace
         qSocket->sendTo(s, static_cast<unsigned int>(n), WSDD_MULTICAST_ENDPOINT);
         return SOAP_OK;
     }
-
+#endif
     static const char STATIC_DISCOVERY_MESSAGE[] = "\
 <s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
 <s:Header>\
@@ -110,7 +110,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
         qSocket->sendTo(data.data(), data.size(), WSDD_MULTICAST_ENDPOINT);
         return SOAP_OK;
     }
-
+#if 0
     int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
     {
         //avoiding sending numerous data
@@ -130,6 +130,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
         socket->sendTo(data.data(), data.size(), SocketAddress( soap->host, WSDD_MULTICAST_PORT ) );
         return SOAP_OK;
     }
+#endif
 }
 
 

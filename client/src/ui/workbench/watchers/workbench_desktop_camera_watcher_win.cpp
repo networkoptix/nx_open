@@ -30,8 +30,7 @@ QnWorkbenchDesktopCameraWatcher::~QnWorkbenchDesktopCameraWatcher() {
 }
 
 void QnWorkbenchDesktopCameraWatcher::initialize() {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
-    setServer(server);
+    setServer(qnCommon->currentServer());
 }
 
 void QnWorkbenchDesktopCameraWatcher::deinitialize() {

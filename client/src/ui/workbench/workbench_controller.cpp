@@ -945,6 +945,7 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) 
     QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
 
     QPoint newDragDelta = mapper()->mapDeltaToGridF(totalDelta).toPoint();
+    //TODO: #GDM revert if
     if(newDragDelta != m_dragDelta) {
         display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::Initial);
 
@@ -1007,7 +1008,6 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) 
                 replacedGeometries.push_back(workbenchItem->geometry().adjusted(-m_dragDelta.x(), -m_dragDelta.y(), -m_dragDelta.x(), -m_dragDelta.y()));
 
             m_dragGeometries.append(replacedGeometries);
-            finished = true;
         }
 
         QnWorkbenchLayout::Disposition disposition;

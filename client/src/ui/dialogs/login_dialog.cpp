@@ -306,7 +306,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
 
             QString title;
             if (!data.systemName.isEmpty())
-                title = lit("%1 - (%2:%3)").arg(data.systemName).arg(url.host()).arg(url.port());
+                title = lit("%3 - (%1:%2)").arg(url.host()).arg(url.port()).arg(data.systemName);
             else
                 title = lit("%1:%2").arg(url.host()).arg(url.port());
             if (!isCompatible)

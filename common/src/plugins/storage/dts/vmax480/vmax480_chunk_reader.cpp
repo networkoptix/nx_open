@@ -237,10 +237,10 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
             }
         }
 
-        if (!dayPeriods.isEmpty()) {
-            QVector<QnTimePeriodList> allPeriods;
-            allPeriods << m_chunks[ch];
-            allPeriods << dayPeriods;
+        if (!dayPeriods.empty()) {
+            std::vector<QnTimePeriodList> allPeriods;
+            allPeriods.push_back(m_chunks[ch]);
+            allPeriods.push_back(dayPeriods);
             m_chunks[ch] = QnTimePeriodList::mergeTimePeriods(allPeriods);
         }
     }
@@ -250,10 +250,10 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
 
 void QnVMax480ChunkReader::addChunk(QnTimePeriodList& chunks, const QnTimePeriod& period)
 {
-    if (!chunks.isEmpty() && chunks.last().endTimeMs() == period.startTimeMs)
+    if (!chunks.empty() && chunks.last().endTimeMs() == period.startTimeMs)
         chunks.last().addPeriod(period);
     else
-        chunks << period;
+        chunks.push_back(period);
 }
 
 #endif // #ifdef ENABLE_VMAX

@@ -302,7 +302,7 @@ private:
     QString m_model;
     QString m_vendor;
     mutable Qn::LicenseType m_cachedLicenseType;
-    CachedValue<bool> m_cachedHasDualStreaming2;
+    //CachedValue<bool> m_cachedHasDualStreaming2; // UNDO c29dd798445d: do not work with cam restored from db. Do not emit signal
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
@@ -311,7 +311,7 @@ private:
     Qn::MotionType calculateMotionType() const;
 
 private slots:
-    void updateCachedValues();
+    void resetCachedValues();
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

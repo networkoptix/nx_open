@@ -25,19 +25,19 @@ public:
      * @brief append                                Append other set of time periods.
      * @param other                                 Other data struct.
      */
-    virtual void append(const QnAbstractCameraDataPtr &other) override;
+    virtual void update(const QnAbstractCameraDataPtr &other, const QnTimePeriod &updatedPeriod) override;
 
     /**
      * @brief append                                Append several sets of time periods at once.
      * @param other                                 List of data structs to append.
      */
-    virtual void append(const QList<QnAbstractCameraDataPtr> &other) override;
+    virtual void mergeInto(const QList<QnAbstractCameraDataPtr> &other) override;
 
     /**
      * @brief append                                Append other set of time periods.
      * @param other                                 Plain list of time periods.
      */
-    void append(const QnTimePeriodList &other);
+    void update(const QnTimePeriodList &other, const QnTimePeriod &updatedPeriod);
 
     /**
      * @brief clear                                 Remove all bookmarks from the struct.
@@ -60,9 +60,9 @@ public:
     /**
      * @brief trim                                  Trim the last time period if it is not finished.
      * @param trimTime                              Value to be set as the end time of the last time period.
-     * @return                                      True if the list was modifed, false otherwise.
+     * @return                                      True if the list was modified, false otherwise.
      */
-    bool trim(qint64 trimTime);
+    virtual bool trim(qint64 trimTime) override;
 private:
     /** List of the stored time periods. */
     QnTimePeriodList m_data;

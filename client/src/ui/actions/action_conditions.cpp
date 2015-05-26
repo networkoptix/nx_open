@@ -334,7 +334,7 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
                 return Qn::InvisibleAction;
 
             /* Incompatible resources cannot be renamed */
-            if (target->getStatus() == Qn::Incompatible)
+            if (QnMediaServerResource::isFakeServer(target))
                 return Qn::InvisibleAction;
 
             return Qn::EnabledAction;
@@ -495,7 +495,6 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 }
 
 Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameters &parameters) {
-#ifdef QN_ENABLE_BOOKMARKS
     if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;
 
@@ -514,22 +513,12 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
     }
 
     return Qn::EnabledAction;
-#else
-    Q_UNUSED(parameters)
-    return Qn::InvisibleAction;
-#endif
 }
 
-
 Qn::ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParameters &parameters) {
-#ifdef QN_ENABLE_BOOKMARKS
     if(!parameters.hasArgument(Qn::CameraBookmarkRole))
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
-#else
-    Q_UNUSED(parameters)
-    return Qn::InvisibleAction;
-#endif
 }
 
 Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &parameters) {
@@ -658,11 +647,12 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     bool isExportedLayout = snapshotManager()->isFile(layout);
 
     foreach (const QnResourcePtr &resource, resources) {
-        if (resource->getStatus() == Qn::Incompatible)
-            continue;
-
         //TODO: #GDM #Common refactor duplicated code
         bool isServer = resource->hasFlags(Qn::server);
+
+        if (isServer && QnMediaServerResource::isFakeServer(resource))
+            continue;
+
         bool isMediaResource = resource->hasFlags(Qn::media);
         bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
@@ -1010,7 +1000,7 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
         return Qn::InvisibleAction;
 
     /* Do not check real pointer type to speed up check. */
-    QnResourcePtr desktopCamera = qnResPool->getResourceByUniqId(QnAppServerConnectionFactory::clientGuid());
+    QnResourcePtr desktopCamera = qnResPool->getResourceByUniqId(qnCommon->moduleGUID().toString());
 #ifdef DESKTOP_CAMERA_DEBUG
     Q_ASSERT_X(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == qnCommon->remoteGUID()), 
         Q_FUNC_INFO, 
@@ -1071,4 +1061,20 @@ Qn::ActionVisibility QnItemsCountActionCondition::check(const QnActionParameters
     int count = workbench()->currentLayout()->items().size();
 
     return (m_count == MultipleItems && count > 1) || (m_count == count) ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+
+Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources) {
+    bool found = false;
+    foreach (const QnResourcePtr &resource, resources) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        if (QnMediaServerResource::isFakeServer(resource))
+            found = true;
+        else if (m_all)
+            return Qn::InvisibleAction;
+    }
+    return found ? Qn::EnabledAction : Qn::InvisibleAction;
 }

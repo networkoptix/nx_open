@@ -14,6 +14,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
@@ -28,13 +29,16 @@
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/fisheye_home_ptz_controller.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
@@ -59,17 +63,20 @@
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
+#include <core/resource/camera_history.h>
 
 //TODO: #Elric remove
 #include <camera/loaders/caching_camera_data_loader.h>
-#include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 
 #include <utils/license_usage_helper.h>
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
-namespace {
+namespace 
+{
+    enum { kInvalidTime = 0 };
+
     bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &object, QString *name) {
         switch(object.type) {
         case Qn::PresetPtzObject: {
@@ -108,19 +115,47 @@ namespace {
 } // anonymous namespace
 
 
-QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
-    QnResourceWidget(context, item, parent),
-    m_display(NULL),
-    m_renderer(NULL),
-    m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false),
-    m_homePtzController(NULL)
+QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent)
+    : QnResourceWidget(context, item, parent)
+    , m_resource(base_type::resource().dynamicCast<QnMediaResource>())
+    , m_camera(base_type::resource().dynamicCast<QnVirtualCameraResource>())
+    , m_display(nullptr)
+    , m_renderer(nullptr)
+    , m_motionSelection()
+    , m_motionSelectionPathCache()
+    , m_paintedChannels()
+    , m_motionSensitivity()
+    , m_motionSensitivityValid(false)
+    , m_binaryMotionMask()
+    , m_binaryMotionMaskValid(false)
+    , m_motionSelectionCacheValid(false)
+    , m_sensStaticText()
+    , m_ptzController(nullptr)
+    , m_homePtzController(nullptr)
+    , m_dewarpingParams()
+
+    , m_currentTime(kInvalidTime)
+    , m_bookmarks()
+    , m_bookmarksBeginPosition(m_bookmarks.cbegin())
+    , m_dataLoader(context->instance<QnCameraDataManager>()->loader(m_resource))
 {
-    m_resource = base_type::resource().dynamicCast<QnMediaResource>();
+    updateBookmarks();
+    connect(m_dataLoader, &QnCachingCameraDataLoader::bookmarksChanged, this, &QnMediaResourceWidget::updateBookmarks);
+    connect(m_dataLoader, &QnCachingCameraDataLoader::loadingFailed, this, [this]()
+    {
+        m_bookmarks = QnCameraBookmarkList();
+        m_bookmarksBeginPosition = m_bookmarks.cbegin();
+    });
+    connect(m_dataLoader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type)
+    {
+        if (type == Qn::BookmarksContent)
+        {
+            updateBookmarks();
+        }
+    });
+
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
-    m_camera = base_type::resource().dynamicCast<QnVirtualCameraResource>();
-
 
     // TODO: #Elric
     // Strictly speaking, this is a hack.
@@ -178,7 +213,53 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up buttons. */
+    createButtons();
 
+    if(m_camera) {
+        QTimer *timer = new QTimer(this);
+
+        connect(timer,              &QTimer::timeout,                                   this,   &QnMediaResourceWidget::updateIconButton);
+        connect(context->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::offsetsChanged, this, &QnMediaResourceWidget::updateIconButton);
+        connect(m_camera.data(),    &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateIconButton);
+        connect(m_camera.data(),    &QnSecurityCamResource::scheduleTasksChanged,       this,   &QnMediaResourceWidget::updateIconButton);
+        timer->start(1000 * 60); /* Update icon button every minute. */
+
+        connect(statusOverlayWidget(), &QnStatusOverlayWidget::diagnosticsRequested,    this,   &QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested);
+        bool diagnosticsAllowed = menu()->canTrigger(Qn::CameraDiagnosticsAction, m_camera);
+        statusOverlayWidget()->setDiagnosticsVisible(diagnosticsAllowed);
+    }
+
+    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM #Common get rid of resourceChanged
+
+    connect(this, &QnResourceWidget::zoomRectChanged, this, &QnMediaResourceWidget::at_zoomRectChanged);
+    connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged, this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
+
+    at_camDisplay_liveChanged();
+    at_ptzButton_toggled(false);
+    at_histogramButton_toggled(item->imageEnhancement().enabled);
+    updateButtonsVisibility();
+    updateIconButton();
+
+    updateTitleText();
+    updateCursor();
+    updateFisheye();
+    setImageEnhancement(item->imageEnhancement());
+}
+
+QnMediaResourceWidget::~QnMediaResourceWidget() {
+    ensureAboutToBeDestroyedEmitted();
+
+    if (m_display)
+        m_display->removeRenderer(m_renderer);
+
+    m_renderer->destroyAsync();
+
+    foreach(__m128i *data, m_binaryMotionMask)
+        qFreeAligned(data);
+    m_binaryMotionMask.clear();
+}
+
+void QnMediaResourceWidget::createButtons() {
     {
         QnImageButtonWidget *screenshotButton = new QnImageButtonWidget();
         screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
@@ -218,7 +299,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         fishEyeButton->setCheckable(true);
         fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
         fishEyeButton->setToolTip(tr("Dewarping"));
-        fishEyeButton->setChecked(item->dewarpingParams().enabled);
+        fishEyeButton->setChecked(item()->dewarpingParams().enabled);
         setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
         connect(fishEyeButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_fishEyeButton_toggled);
         buttonBar()->addButton(FishEyeButton, fishEyeButton);
@@ -241,13 +322,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         enhancementButton->setCheckable(true);
         enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
         enhancementButton->setToolTip(tr("Image Enhancement"));
-        enhancementButton->setChecked(item->imageEnhancement().enabled);
+        enhancementButton->setChecked(item()->imageEnhancement().enabled);
         setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
         connect(enhancementButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_histogramButton_toggled);
         buttonBar()->addButton(EnhancementButton, enhancementButton);
     }
 
-    if (qnSettings->isDevMode()) {
+    if (qnRuntime->isDevMode()) {
         QnImageButtonWidget *debugScreenshotButton = new QnImageButtonWidget();
         debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
         debugScreenshotButton->setCheckable(false);
@@ -259,48 +340,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         buttonBar()->addButton(DbgScreenshotButton, debugScreenshotButton);
     }
 
-    if(m_camera) {
-        QTimer *timer = new QTimer(this);
+  
 
-        connect(timer,              &QTimer::timeout,                                   this,   &QnMediaResourceWidget::updateIconButton);
-        connect(context->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::offsetsChanged, this, &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera.data(),    &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera.data(),    &QnSecurityCamResource::scheduleTasksChanged,       this,   &QnMediaResourceWidget::updateIconButton);
-        timer->start(1000 * 60); /* Update icon button every minute. */
-
-        connect(statusOverlayWidget(), &QnStatusOverlayWidget::diagnosticsRequested,    this,   &QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested);
-        statusOverlayWidget()->setDiagnosticsVisible(true);
-    }
-
-    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM #Common get rid of resourceChanged
-
-    connect(this, &QnResourceWidget::zoomRectChanged, this, &QnMediaResourceWidget::at_zoomRectChanged);
-    connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged, this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
-
-    at_camDisplay_liveChanged();
-    at_ptzButton_toggled(false);
-    at_histogramButton_toggled(item->imageEnhancement().enabled);
-    updateButtonsVisibility();
-    updateIconButton();
-
-    updateTitleText();
-    updateCursor();
-    updateFisheye();
-    setImageEnhancement(item->imageEnhancement());
 }
 
-QnMediaResourceWidget::~QnMediaResourceWidget() {
-    ensureAboutToBeDestroyedEmitted();
-
-    if (m_display)
-        m_display->removeRenderer(m_renderer);
-
-    m_renderer->destroyAsync();
-
-    foreach(__m128i *data, m_binaryMotionMask)
-        qFreeAligned(data);
-    m_binaryMotionMask.clear();
-
+void QnMediaResourceWidget::createCustomOverlays() {
+    /* Bookmarks text overlay. */ 
 }
 
 const QnMediaResourcePtr &QnMediaResourceWidget::resource() const {
@@ -609,7 +654,25 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
     if(isOverlayVisible() && isInfoVisible())
+    {
+        if (m_resource->toResource()->flags() & Qn::utc)
+        { 
+            // get timestamp from the first channel that was painted
+            int channel = std::distance(m_paintedChannels.cbegin(),
+                std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
+            if (channel >= channelCount())
+                channel = 0;
+            
+            enum { kFactor = 1000 };
+            updateCurrentTime(m_renderer->getTimestampOfNextFrameToRender(channel) / kFactor);
+        }
+        else
+        {
+            updateCurrentTime(kInvalidTime);
+        }
+
         updateInfoTextLater();
+    }
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
@@ -801,7 +864,10 @@ float QnMediaResourceWidget::visualAspectRatio() const {
     if (qFuzzyIsNull(customAspectRatio))
         return base_type::visualAspectRatio();
 
-    qreal aspectRatio = customAspectRatio * QnGeometry::aspectRatio(channelLayout()->size());
+    qreal aspectRatio = customAspectRatio;
+    if (zoomRect().isNull())
+        aspectRatio *= QnGeometry::aspectRatio(channelLayout()->size());
+
     return QnAspectRatio::isRotated90(rotation()) ? 1 / aspectRatio : aspectRatio;
 }
 
@@ -908,7 +974,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
             continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
-        mbps += statistics->getBitrate();
+        mbps += statistics->getBitrateMbps();
     }
 
     QSize size = m_display->camDisplay()->getRawDataSize();
@@ -928,22 +994,12 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 #endif
 
     QString timeString;
-    if (m_resource->toResource()->flags() & Qn::utc) { /* Do not show time for regular media files. */
-
-        // get timestamp from the first channel that was painted
-        int channel = std::distance(m_paintedChannels.cbegin(),
-            std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
-        if (channel >= channelCount())
-            channel = 0;
-
-        qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(channel) / 1000;
-        if(qnSettings->timeMode() == Qn::ServerTimeMode)
-            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
-
+    if (m_resource->toResource()->flags() & Qn::utc)
+    { 
+        /* Do not show time for regular media files. */
         timeString = m_display->camDisplay()->isRealTimeSource() 
             ? tr("LIVE") 
-            : QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"));
-        
+            : QDateTime::fromMSecsSinceEpoch(m_currentTime).toString(lit("hh:mm:ss.zzz"));
     }
 
     return lit("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
@@ -969,7 +1025,7 @@ QString QnMediaResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
 
-    if (qnSettings->isDevMode())
+    if (qnRuntime->isDevMode())
         result |= DbgScreenshotButton;
 
     if(!(resource()->toResource()->flags() & Qn::still_image))
@@ -1035,7 +1091,7 @@ QCursor QnMediaResourceWidget::calculateCursor() const {
 }
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
-    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
         return Qn::VideowallWithoutLicenseOverlay;
 
     QnResourcePtr resource = m_display->resource();
@@ -1057,13 +1113,13 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_camera && m_camera->isDtsBased() && m_camera->isScheduleDisabled()) {
         return Qn::AnalogWithoutLicenseOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivity)) {
-        if (!qnSettings->isVideoWallMode())
+        if (!qnRuntime->isVideoWallMode())
             return Qn::PausedOverlay;
         return Qn::EmptyOverlay;
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
-        QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
+        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(m_resource);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online);
         else
@@ -1274,4 +1330,39 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
+}
+
+void QnMediaResourceWidget::updateBookmarks()
+{
+    m_bookmarks = m_dataLoader->bookmarks();
+    m_bookmarksBeginPosition = m_bookmarks.cbegin();
+
+    if (m_currentTime != kInvalidTime)
+        updateCurrentTime(m_currentTime);
+}
+
+void QnMediaResourceWidget::updateCurrentTime(qreal timeMs)
+{
+    if (timeMs < m_currentTime)
+        m_bookmarksBeginPosition = m_bookmarks.cbegin();
+
+    m_bookmarksBeginPosition = std::find_if(m_bookmarksBeginPosition, m_bookmarks.cend()
+        , [timeMs](const QnCameraBookmark &bookmark) -> bool
+    {
+        return (bookmark.endTimeMs() >= timeMs);
+    });
+
+    m_currentTime = timeMs;
+
+    static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
+
+    QString text;
+    auto itBookmark = m_bookmarksBeginPosition;
+    while((itBookmark != m_bookmarks.cend()) && (itBookmark->startTimeMs <= timeMs))
+    {
+        text += outputTemplate.arg(itBookmark->name, itBookmark->description);
+        ++itBookmark;
+    }
+
+    setBookmarksLabelText(text);
 }

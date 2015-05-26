@@ -5,6 +5,7 @@ import sys
 import os
 import argparse
 import xml.etree.ElementTree as ET
+from common_module import init_color,info,green,warn,err
 
 projects = ['common', 'client', 'traytool']
 
@@ -14,28 +15,6 @@ numerus = ['%n']
 
 verbose = False
 noTarget = False
-
-class ColorDummy():
-    class Empty(object):
-        def __getattribute__(self, name):
-            return ''
-    
-    Style = Empty()
-    Fore = Empty()
-
-colorer = ColorDummy()
-
-def info(message):
-    print colorer.Style.BRIGHT + message.encode('utf-8')
-    
-def green(message):
-    print colorer.Style.BRIGHT + colorer.Fore.GREEN + message.encode('utf-8')
-        
-def warn(message):
-    print colorer.Style.BRIGHT + colorer.Fore.YELLOW + message.encode('utf-8')
-        
-def err(message):
-    print colorer.Style.BRIGHT + colorer.Fore.RED + message.encode('utf-8')
 
 class ValidationResult():
     error = 0
@@ -179,10 +158,7 @@ def main():
     noTarget = args.no_target
     
     if args.color:
-        from colorama import Fore, Back, Style, init
-        init(autoreset=True) # use Colorama to make Termcolor work on Windows too
-        global colorer
-        import colorama as colorer
+        init_color()
 
     scriptDir = os.path.dirname(os.path.abspath(__file__))   
     rootDir = os.path.join(scriptDir, '..')

@@ -8,6 +8,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 
+#if 0
 namespace {
     QUrl trimmedUrl(const QUrl &url) {
         QUrl newUrl;
@@ -17,6 +18,7 @@ namespace {
         return newUrl;
     }
 }
+#endif
 
 QnServerConnector::QnServerConnector(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),

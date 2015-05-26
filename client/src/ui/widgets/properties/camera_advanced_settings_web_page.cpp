@@ -8,6 +8,7 @@
 #include <QNetworkCookieJar>
 #include <QNetworkCookie>
 #include "core/resource/resource.h"
+#include "http/custom_headers.h"
 
 class QnCustomCookieJar: public QNetworkCookieJar
 {
@@ -23,7 +24,7 @@ public:
     {
         QList<QNetworkCookie> result;
         if (m_camRes)
-            result << QNetworkCookie("x-camera-guid", m_camRes->getId().toByteArray());
+            result << QNetworkCookie(Qn::CAMERA_GUID_HEADER_NAME, m_camRes->getId().toByteArray());
         return result;
     }
 private:
@@ -36,7 +37,6 @@ CameraAdvancedSettingsWebPage::CameraAdvancedSettingsWebPage( QObject* parent )
 {
     m_cookieJar = new QnCustomCookieJar(this);
     networkAccessManager()->setCookieJar(m_cookieJar);
-    //networkAccessManager()->cookieJar()->insertCookie(QNetworkCookie("x-camera-guid", "{123-123-123}"));
 }
 
 QString	CameraAdvancedSettingsWebPage::userAgentForUrl( const QUrl& /*url*/ ) const

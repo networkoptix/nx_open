@@ -67,15 +67,19 @@ struct QnCalendarColors {
     QColor selection;
     QColor primaryRecording;
     QColor secondaryRecording;
+    QColor primaryBookmark;
+    QColor secondaryBookmark;
     QColor primaryMotion;
     QColor secondaryMotion;
     QColor separator;
 
     /* These are defined in calendar_item_delegate.cpp. */
-    QColor primary(int fillType) const;
-    QColor secondary(int fillType) const;
+    QColor getBackground(int fillType
+        , bool isPrimary) const;
+    QColor getMotionBackground(bool isPrimary) const;
 };
-#define QnCalendarColors_Fields (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator)
+#define QnCalendarColors_Fields (selection)(primaryRecording)(secondaryRecording)\
+    (primaryBookmark)(secondaryBookmark)(primaryMotion)(secondaryMotion)(separator)
 
 
 struct QnStatisticsColors {

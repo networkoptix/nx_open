@@ -58,7 +58,6 @@ namespace QnBusiness {
         switch(actionType) {
         case UndefinedAction:
         case CameraOutputOnceAction:
-        case BookmarkAction:
         case SendMailAction:
         case DiagnosticsAction:
         case ShowPopupAction:
@@ -70,6 +69,7 @@ namespace QnBusiness {
         case CameraRecordingAction:
         case PanicRecordingAction:
         case PlaySoundAction:
+        case BookmarkAction:
             return true;
 
         default:
@@ -82,7 +82,7 @@ namespace QnBusiness {
         result
             << CameraOutputAction
             << CameraOutputOnceAction
-            //<< BookmarkAction
+            << BookmarkAction
             << CameraRecordingAction
             << PanicRecordingAction
             << SendMailAction
@@ -93,7 +93,6 @@ namespace QnBusiness {
             << SayTextAction;
         return result;
     }
-
 }
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams):

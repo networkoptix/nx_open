@@ -123,6 +123,7 @@ private:
 
     void updateMotionWidgetNeedControlMaxRect();
     void updateMotionAvailability();
+    void updateMotionCapabilities();
     void updateRecordingParamsAvailability();
 
     void disconnectFromMotionWidget();

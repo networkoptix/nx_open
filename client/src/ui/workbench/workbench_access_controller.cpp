@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
@@ -42,6 +43,10 @@ QnWorkbenchAccessController::~QnWorkbenchAccessController() {
 }
 
 Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &resource) const {
+    if (resource == m_user)
+        if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
+            return Qn::GlobalViewerPermissions;
+
     if (!m_dataByResource.contains(resource)) {
         Q_ASSERT(resource);
         if (resource && !resource->resourcePool())         /* Calculated permissions should always exist for all resources in the pool. */
@@ -56,14 +61,14 @@ bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, 
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
 
-Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {
-    if (qnSettings->isVideoWallMode())
-        return Qn::GlobalViewerPermissions;
-
+Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {  
     return globalPermissions(m_user);
 }
 
 Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResourcePtr &user) const {
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
+        return Qn::GlobalViewerPermissions;
+
     Qn::Permissions result(0);
 
     if(!user)

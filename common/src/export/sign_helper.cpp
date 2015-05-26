@@ -5,9 +5,11 @@
 
 #include "core/datapacket/video_data_packet.h"
 #include "licensing/license.h"
+#include "utils/media/nalUnits.h"
 #include "utils/common/util.h"
 #include "utils/common/scoped_painter_rollback.h"
 #include "utils/math/math.h"
+#include "utils/media/ffmpeg_helper.h"
 
 extern "C" {
 #include <libswscale/swscale.h>
@@ -669,9 +671,8 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     generatedFrame->channelNumber = 0; 
 error_label:
     delete [] videoBuf;
-    avcodec_close(videoCodecCtx);
+    QnFfmpegHelper::deleteCodecContext(videoCodecCtx);
     av_free(frame);
-    av_free(videoCodecCtx);
 
     return generatedFrame;
 }

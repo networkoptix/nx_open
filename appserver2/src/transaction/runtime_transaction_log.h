@@ -20,6 +20,7 @@ namespace ec2
     public:
 
         QnRuntimeTransactionLog(QObject* parent = NULL);
+		~QnRuntimeTransactionLog();
 
         void clearOldRuntimeData(const QnTranStateKey& key);
         void clearRuntimeData(const QnUuid& id);

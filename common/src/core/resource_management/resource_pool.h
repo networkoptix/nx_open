@@ -12,6 +12,8 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_criterion.h>
 
+#include <utils/common/singleton.h>
+
 class QnResource;
 class QnNetworkResource;
 class CLRecorderDevice;
@@ -27,7 +29,7 @@ class CLRecorderDevice;
  *
  * If resource is conflicting it must not be placed in resource pool.
  */
-class QN_EXPORT QnResourcePool : public QObject
+class QN_EXPORT QnResourcePool : public QObject, public Singleton<QnResourcePool>
 {
     Q_OBJECT
 
@@ -40,11 +42,8 @@ public:
         AllResources
     };
 
-    QnResourcePool();
+    QnResourcePool(QObject* parent = NULL);
     ~QnResourcePool();
-
-    static void initStaticInstance( QnResourcePool* inst );
-    static QnResourcePool* instance();
 
     // this function will add or update existing resources
     // keeps database ID ( if possible )

@@ -346,7 +346,55 @@ QByteArray formatJSonString(const QByteArray& data)
     return result;
 }
 
-QString dateTimeToHTTPFormat(const QDateTime& value)
+static const char* weekDaysStr[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+static const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+QByteArray dateTimeToHTTPFormat(const QDateTime& value)
 {
-    return QString(lit("%1 GMT")).arg(QLocale::c().toString(value.toUTC(), lit("ddd, dd MMM yyyy HH:mm:ss")));
+    static const int SECONDS_PER_MINUTE = 60;
+    static const int SECONDS_PER_HOUR = 3600;
+
+    if( value.isNull() || !value.isValid() )
+        return QByteArray();
+
+    const QDate& date = value.date();
+    const QTime& time = value.time();
+    const int offsetFromUtcSeconds = value.offsetFromUtc();
+    const int offsetFromUtcHHMM = 
+        (offsetFromUtcSeconds / SECONDS_PER_HOUR) * 100 +
+        (offsetFromUtcSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
+
+    char strDateBuf[256];
+    sprintf( strDateBuf, "%s, %02d %s %d %02d:%02d:%02d %+05d",
+        weekDaysStr[date.dayOfWeek()-1],
+        date.day(),
+        months[date.month()-1],
+        date.year(),
+        time.hour(),
+        time.minute(),
+        time.second(),
+        offsetFromUtcHHMM );
+
+    return QByteArray( strDateBuf );
+
+
+
+    //return QString(lit("%1 GMT")).arg(QLocale::c().toString(value.toUTC(), lit("ddd, dd MMM yyyy HH:mm:ss")));
+}
+
+qint64 parseDateTime(const QString& dateTime) {
+    if (dateTime.toLower().trimmed() == QLatin1String("now"))
+    {
+        return DATETIME_NOW;
+    }
+    else if( dateTime.contains(L'T') || (dateTime.contains(L'-') && !dateTime.startsWith(L'-')) )
+    {
+        QStringList dateTimeParts = dateTime.split(L'.');
+        QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);
+        if (dateTimeParts.size() > 1)
+            tmpDateTime = tmpDateTime.addMSecs(dateTimeParts[1].toInt()/1000);
+        return tmpDateTime.toMSecsSinceEpoch() * 1000;
+    }
+    else
+        return dateTime.toLongLong();
 }

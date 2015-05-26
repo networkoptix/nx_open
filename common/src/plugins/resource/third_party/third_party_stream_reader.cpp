@@ -55,9 +55,9 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
         m_mediaEncoder2Ref->releaseRef();
 }
 
-void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
+void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData, const QnLiveStreamParams& currentLiveParams )
 {
-    base_type::onGotVideoFrame( videoData );
+    base_type::onGotVideoFrame( videoData, m_currentLiveParams );
 }
 
 static int sensitivityToMask[10] = 
@@ -111,7 +111,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     camManager2->releaseRef();
 }
 
-CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
+CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCameraControlRequired)
 {
     if( isStreamOpened() )
         return CameraDiagnostics::NoErrorResult();
@@ -136,7 +136,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
 
     m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
 
-    if( isCameraControlRequired() )
+    if( isCameraControlRequired )
     {
         if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
         {
@@ -302,11 +302,7 @@ void ThirdPartyStreamReader::onStreamResolutionChanged( int /*channelNumber*/, c
 QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 {
     if( !isStreamOpened() )
-    {
-        openStream();
-        if( !isStreamOpened() )
-            return QnAbstractMediaDataPtr(0);
-    }
+        return QnAbstractMediaDataPtr(0);
 
     if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetaData() )
         return getMetaData();
@@ -383,18 +379,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     }
 
     return rez;
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const

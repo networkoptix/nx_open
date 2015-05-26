@@ -42,8 +42,8 @@ struct FffmpegLog
 CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
-    m_width(0),
-    m_height(0),
+    //m_width(0),
+    //m_height(0),
     m_codecId(codec_id),
     m_showmotion(false),
     m_decodeMode(DecodeMode_Full),
@@ -82,11 +82,8 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
     closeDecoder();
 
-    if( m_passedContext )
-    {
-        avcodec_close(m_passedContext);
-        av_freep(&m_passedContext);
-    }
+    QnFfmpegHelper::deleteCodecContext(m_passedContext);
+    m_passedContext = 0;
 
     if( m_swDecoderCount )
         m_swDecoderCount->deref();
@@ -115,10 +112,8 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 
 void CLFFmpegVideoDecoder::closeDecoder()
 {
-    if (m_context) {
-        avcodec_close(m_context);
-        av_freep(&m_context);
-    }
+    QnFfmpegHelper::deleteCodecContext(m_context);
+    m_context = 0;
 #ifdef _USE_DXVA
     m_decoderContext.close();
 #endif
@@ -252,10 +247,8 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     
     
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
-    if (m_context) {
-        avcodec_close(m_context);
-        av_freep(&m_context);
-    }
+    QnFfmpegHelper::deleteCodecContext(m_context);
+    m_context = 0;
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
     if (m_passedContext) {

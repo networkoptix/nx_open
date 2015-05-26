@@ -51,7 +51,7 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
 }
 
 
-CameraDiagnostics::Result PlDlinkStreamReader::openStream()
+CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraControlRequired)
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -68,7 +68,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
     }
 
     //==== profile setup
-    QString prifileStr = composeVideoProfile();
+    QString prifileStr = composeVideoProfile(isCameraControlRequired);
 
     if (prifileStr.length()==0)
     {
@@ -102,7 +102,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         requestedUrl.setPath( prifileStr );
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
-    if (isCameraControlRequired()) {
+    if (isCameraControlRequired) {
         if (role != Qn::CR_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
         {
             res->setMotionMaskPhysical(0);
@@ -196,18 +196,6 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 
 }
 
-void PlDlinkStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
 //=====================================================================================
 
 int scaleInt(int value, int from, int to)
@@ -273,7 +261,7 @@ QString PlDlinkStreamReader::getQualityString() const
     return info.possibleQualities[qualityIndex];
 }
 
-QString PlDlinkStreamReader::composeVideoProfile() 
+QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired) 
 {
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
     QnDlink_cam_info info = res->getCamInfo();
@@ -303,7 +291,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     QTextStream t(&result);
 
     t << "config/video.cgi?profileid=" << profileNum;
-    if (isCameraControlRequired())
+    if (isCameraControlRequired)
     {
         t << "&resolution=" << resolution.width() << "x" << resolution.height() << "&";
 

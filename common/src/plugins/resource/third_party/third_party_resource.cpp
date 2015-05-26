@@ -11,19 +11,18 @@
 #include <memory>
 
 #include <QtCore/QStringList>
-#include <QtXmlPatterns/QAbstractMessageHandler>
-#include <QtXmlPatterns/QXmlSchema>
-#include <QtXmlPatterns/QXmlSchemaValidator>
 
-#include <utils/common/log.h>
+#include <core/resource/camera_advanced_param.h>
 
 #include "api/app_server_connection.h"
-#include "camera_params_description_xml_helper.h"
 #include "motion_data_picture.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
 #include "third_party_archive_delegate.h"
 #include "third_party_ptz_controller.h"
 #include "third_party_stream_reader.h"
+
+#include <utils/common/log.h>
+#include <utils/xml/camera_advanced_param_reader.h>
 
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
@@ -70,22 +69,11 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
     return new QnThirdPartyPtzController( toSharedPointer().staticCast<QnThirdPartyResource>(), ptzManager );
 }
 
-bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val )
-{
+bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
     QMutexLocker lk( &m_mutex );
 
     if( !m_cameraManager3 )
         return false;
-
-    auto settingIter = m_cameraSettings.find( param );
-    if( settingIter == m_cameraSettings.end() )
-        return false;
-
-    if( settingIter->second.getType() == CameraSetting::Group )
-        return true;
-
-    QString paramNameInternal = param;
-    paramNameInternal.replace( lit("%%"), lit("/") );
 
     static const size_t DEFAULT_PARAM_VALUE_BUF_SIZE = 256;
     int valueBufSize = DEFAULT_PARAM_VALUE_BUF_SIZE;
@@ -95,16 +83,14 @@ bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val
     for( int i = 0; i < 2; ++i )
     {
         result = m_cameraManager3->getParamValue(
-            paramNameInternal.toUtf8().constData(),
+            id.toUtf8().constData(),
             valueBuf.get(),
             &valueBufSize );
         switch( result )
         {
             case nxcip::NX_NO_ERROR:
             {
-                CameraSetting outVal = settingIter->second;
-                outVal.setCurrent( QString::fromUtf8( valueBuf.get(), valueBufSize ) );
-                val = outVal.serializeToStr();
+                value = QString::fromUtf8( valueBuf.get(), valueBufSize );
                 return true;
             }
             case nxcip::NX_MORE_DATA:
@@ -115,30 +101,20 @@ bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val
         }
         break;
     }
-
     //TODO #ak return error description
-
     return false;
 }
 
-bool QnThirdPartyResource::setParamPhysical( const QString& param, const QVariant& val )
-{
+bool QnThirdPartyResource::setParamPhysical(const QString& id, const QString &value) {
     QMutexLocker lk( &m_mutex );
     if( !m_cameraManager3 )
         return false;
 
-    QString paramNameInternal = param;
-    paramNameInternal.replace( lit("%%"), lit("/") );
-
-    //TODO #ak return error description
-    CameraSetting newValue;
-    if( !newValue.deserializeFromStr( val.toString() ) )
-        return false;
-
     return m_cameraManager3->setParamValue(
-        paramNameInternal.toUtf8().constData(),
-        newValue.getCurrent().str().toUtf8().constData() ) == nxcip::NX_NO_ERROR;
+        id.toUtf8().constData(),
+        value.toUtf8().constData() ) == nxcip::NX_NO_ERROR;
 }
+
 
 bool QnThirdPartyResource::ping()
 {
@@ -153,7 +129,14 @@ bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& n
     //TODO #ak antipattern: calling virtual function from base class
     bool mergedSomething = base_type::mergeResourcesIfNeeded( newResource );
 
+    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
+    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(newResource);
+    if (!sourceParams.isEmpty() && localParams != sourceParams) {
+        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
+        mergedSomething = true;
+    }
     //TODO #ak to make minimal influence on existing code, merging only few properties. 
+
         //But, perharps, other properties should be processed too (in QnResource)
 
     for( const auto propertyName: PROPERTIES_TO_MERGE )
@@ -333,7 +316,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         nxcip::UsecUTCTimestamp periodEnd = nxcip::INVALID_TIMESTAMP_VALUE;
         timePeriods->get( &periodStart, &periodEnd );
 
-        resultTimePeriods << QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS );
+        resultTimePeriods.push_back(QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS ));
     }
     timePeriods->releaseRef();
 
@@ -655,38 +638,22 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         if( paramDescXMLStr != nullptr )
         {
             QByteArray paramDescXML = QByteArray::fromRawData( paramDescXMLStr, static_cast<int>(strlen(paramDescXMLStr)) );
-            QUrl schemaUrl( lit("qrc:/camera_settings/camera_settings.xsd") );
+            QBuffer dataSource(&paramDescXML);
 
-            //validating xml
-            QXmlSchema schema;
-            schema.load(schemaUrl);
-            Q_ASSERT( schema.isValid() );
-            ParamsXMLValidationMessageHandler msgHandler;
-            QXmlSchemaValidator validator( schema );
-            validator.setMessageHandler( &msgHandler );
-            if( validator.validate( paramDescXML ) )
-            {
+            if( QnCameraAdvacedParamsXmlParser::validateXml(&dataSource)) {
                 //parsing xml to load param list and get cameraID
-
-                QMutexLocker lk( &m_mutex );
-                m_cameraSettings.clear();
-                CameraParamsReader cameraSettingsReader( &m_cameraSettings, this->toSharedPointer() );
-                if( !cameraSettingsReader.read() || !cameraSettingsReader.proceed() )
-                {
-                    NX_LOG( lit("Could not parse camera parameters description xml"), cl_logWARNING );
+                QnCameraAdvancedParams params;
+                bool success = QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params);
+#ifdef _DEBUG
+                if (!success) {
+                    qWarning() << "Error while parsing xml for the camera" << getPhysicalId();
+                    qWarning() << paramDescXML;
                 }
-                else if( cameraSettingsReader.foundCameraNames().size() != 1 )
-                {
-                    NX_LOG( lit("Invalid camera parameters description xml! It contains more than one <camera> element"), cl_logWARNING );
-                }
-                else
-                {
-                    setProperty( Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME, QString::fromUtf8(paramDescXML) );
-                    setProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME, cameraSettingsReader.foundCameraNames().front() );
-                }
+#endif
+				if (success)
+                    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), params);
             }
-            else
-            {
+            else {
                 NX_LOG( lit("Could not validate camera parameters description xml"), cl_logWARNING );
             }
         }
@@ -696,8 +663,6 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         QMutexLocker lk( &m_mutex );
         m_selectedEncoderResolutions = std::move( selectedEncoderResolutions );
     }
-
-    //saveMediaStreamInfoIfNeeded( mediaStreams );
 
     saveParams();
 

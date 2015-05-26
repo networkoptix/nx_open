@@ -12,7 +12,9 @@ class QnProxySenderConnectionPrivate;
 class QnProxySenderConnection: public QnUniversalRequestProcessor
 {
 public:
-    QnProxySenderConnection(const QUrl& proxyServerUrl, const QString& guid, QnTcpListener* owner);
+    QnProxySenderConnection(const SocketAddress& proxyServerUrl, const QnUuid& guid,
+                            QnUniversalTcpListener* owner);
+
     virtual ~QnProxySenderConnection();
 protected:
     virtual void run() override;

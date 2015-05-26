@@ -17,8 +17,6 @@ enum {
 // -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
-static QnSyncTime* QnSyncTime_instance = nullptr;
-
 QnSyncTime::QnSyncTime()
 :
     m_lastReceivedTime( 0 ),
@@ -27,20 +25,10 @@ QnSyncTime::QnSyncTime()
     m_syncTimeRequestIssued( false )
 {
     reset();
-
-    assert( QnSyncTime_instance == nullptr );
-    QnSyncTime_instance = this;
 }
 
-QnSyncTime::~QnSyncTime()
-{
-    QnSyncTime_instance = nullptr;
-}
+QnSyncTime::~QnSyncTime() {}
 
-QnSyncTime* QnSyncTime::instance()
-{
-    return QnSyncTime_instance;
-}
 
 void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newTime)
 {

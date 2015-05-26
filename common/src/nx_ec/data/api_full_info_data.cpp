@@ -19,7 +19,7 @@
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"
 #include "api_camera_attributes_data.h"
-#include "api_camera_server_item_data.h"
+#include "api_camera_history_data.h"
 #include "api_camera_bookmark_data.h"
 #include "api_email_data.h"
 #include "api_layout_data.h"

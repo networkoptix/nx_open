@@ -2,13 +2,25 @@
 
 #include <common/common_module.h>
 
-QnMediaServerModule::QnMediaServerModule(int &argc, char **argv, QObject *parent):
+#ifdef ENABLE_ONVIF
+#include <soap/soapserver.h>
+#endif
+
+QnMediaServerModule::QnMediaServerModule(QObject *parent):
     QObject(parent) 
 {
     Q_INIT_RESOURCE(mediaserver);
     Q_INIT_RESOURCE(appserver2);
 
-    m_common = new QnCommonModule(argc, argv, this);
+
+#ifdef ENABLE_ONVIF
+    QnSoapServer *soapServer = new QnSoapServer();
+    store<QnSoapServer>(soapServer);
+    soapServer->bind();
+    soapServer->start();     //starting soap server to accept event notifications from onvif cameras
+#endif //ENABLE_ONVIF
+
+    m_common = new QnCommonModule(this);
 }
 
 QnMediaServerModule::~QnMediaServerModule() {

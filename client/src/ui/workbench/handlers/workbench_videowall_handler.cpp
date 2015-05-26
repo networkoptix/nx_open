@@ -16,6 +16,7 @@
 
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_type.h>
@@ -268,7 +269,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_licensesHelper(new QnVideoWallLicenseUsageHelper())
 {
-    m_videoWallMode.active = qnSettings->isVideoWallMode();
+    m_videoWallMode.active = qnRuntime->isVideoWallMode();
     m_videoWallMode.opening = false;
     m_videoWallMode.ready = false;
     m_controlMode.active = false;
@@ -1638,7 +1639,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     if (!context()->user())
         return;
 
-    QnVirtualCameraResourcePtr desktopCamera = qnResPool->getResourceByUniqId(QnAppServerConnectionFactory::clientGuid()).dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr desktopCamera = qnResPool->getResourceByUniqId(qnCommon->moduleGUID().toString()).dynamicCast<QnVirtualCameraResource>();
     if (!desktopCamera || !desktopCamera->hasFlags(Qn::desktop_camera))
         return;
 

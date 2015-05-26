@@ -21,10 +21,10 @@ static const int MAX_QUEUE_SIZE = 12;
 static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 2000ll * 1000ll; // 2 seconds
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
-static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
+//static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
-static const int HIGH_QUALITY_RETRY_COUNTER = 1;
-static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
+//static const int HIGH_QUALITY_RETRY_COUNTER = 1;
+//static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
 static const int MAX_CLIENT_BUFFER_SIZE_MS = 1000*2;
 
 QHash<QHostAddress, qint64> QnRtspDataConsumer::m_lastSwitchTime;
@@ -658,7 +658,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
         camera = qnCameraPool->getVideoCamera(res);
     }
     int copySize = 0;
-    //if (camera && !res->hasFlags(Qn::no_last_gop))
+    if (camera) // && !res->hasFlags(Qn::no_last_gop))
         copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;

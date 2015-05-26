@@ -14,20 +14,20 @@ public:
     ~QnArecontPanoramicResource();
     bool getDescription();
 
-    bool getParamPhysical(int channel, const QString& name, QVariant &val);
+    bool getParamPhysicalByChannel(int channel, const QString& name, QString &val);
 
     void updateFlipState();
     virtual bool isAbstractResource() const override { return false; }
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
-    virtual bool setParamPhysical(const QString &param, const QVariant &val) override;
+    virtual bool setParamPhysical(const QString &id, const QString &value) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 private:
-    bool setSpecialParam(const QString& name, const QVariant& val);
+    bool setSpecialParam(const QString& id, const QString& value);
     bool setResolution(bool full);
     bool setCamQuality(int q);
     QnConstResourceVideoLayoutPtr getDefaultVideoLayout() const;

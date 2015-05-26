@@ -19,12 +19,13 @@
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
 #include "utils/network/http/httptypes.h"
-#include "../common/sleep.h"
+#include "utils/common/sleep.h"
 #include "tcp_connection_processor.h"
 #include "simple_http_client.h"
 #include "utils/media/bitStream.h"
-#include "../common/synctime.h"
+#include "utils/common/synctime.h"
 #include "tcp_connection_priv.h"
+#include "http/custom_headers.h"
 
 
 #define DEFAULT_RTP_PORT 554
@@ -50,6 +51,7 @@ static const QString DEFAULT_REALM(lit("NetworkOptix"));
 QByteArray RTPSession::m_guid;
 QMutex RTPSession::m_guidMutex;
 
+#if 0
 static QString getValueFromString(const QString& line)
 {
     int index = line.indexOf(QLatin1Char('='));
@@ -57,6 +59,7 @@ static QString getValueFromString(const QString& line)
         return QString();
     return line.mid(index+1);
 }
+#endif
 
 // --------------------- RTPIODevice --------------------------
 
@@ -1163,7 +1166,7 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
     if( m_numOfPredefinedChannels )
     {
         request.headers.insert( nx_http::HttpHeader( "x-play-now", "true" ) );
-        request.headers.insert( nx_http::HttpHeader( "x-guid", getGuid() ) );
+        request.headers.insert( nx_http::HttpHeader( Qn::GUID_HEADER_NAME, getGuid() ) );
     }
     return request;
 }
@@ -1761,7 +1764,9 @@ static_assert(
     MAX_BITRATE_BYTES_PER_SECOND > ADDITIONAL_READ_BUFFER_CAPACITY * 10,
     "MAX_BITRATE_BYTES_PER_SECOND MUST be 10 times greater than ADDITIONAL_READ_BUFFER_CAPACITY" );
 
+#ifdef __arm__
 static const size_t MS_PER_SEC = 1000;
+#endif
 
 int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome )
 {

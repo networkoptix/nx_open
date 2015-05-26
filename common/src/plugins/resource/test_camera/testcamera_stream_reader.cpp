@@ -35,11 +35,8 @@ int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)
 
 QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData()) 
         return getMetaData();
@@ -105,8 +102,9 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     return rez;
 }
 
-CameraDiagnostics::Result QnTestCameraStreamReader::openStream()
+CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCameraControlRequired)
 {
+    Q_UNUSED(isCameraControlRequired);
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
     
@@ -142,16 +140,6 @@ void QnTestCameraStreamReader::closeStream()
 bool QnTestCameraStreamReader::isStreamOpened() const
 {
     return m_tcpSock->isConnected();
-}
-
-void QnTestCameraStreamReader::updateStreamParamsBasedOnQuality()
-{
-    pleaseReOpen();
-}
-
-void QnTestCameraStreamReader::updateStreamParamsBasedOnFps()
-{
-    pleaseReOpen();
 }
 
 #endif // #ifdef ENABLE_TEST_CAMERA

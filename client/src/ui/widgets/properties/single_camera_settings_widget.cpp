@@ -14,6 +14,7 @@
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -193,6 +194,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateIpAddressText()));
         connect(m_camera, &QnResource::urlChanged,      this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM also listen to hostAddress changes?
         connect(m_camera, &QnResource::resourceChanged, this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM why?
+        connect(m_camera, &QnResource::resourceChanged,   this, &QnSingleCameraSettingsWidget::updateMotionCapabilities);
     }
 
     updateFromResource(!isVisible());
@@ -455,16 +457,21 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
             ui->cameraMotionButton->setChecked(m_camera->getMotionType() != Qn::MT_SoftwareGrid);
             ui->softwareMotionButton->setChecked(m_camera->getMotionType() == Qn::MT_SoftwareGrid);
 
-            m_cameraSupportsMotion = m_camera->hasMotion();
-            ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
-            ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
+            updateMotionCapabilities();
 
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);
+                m_imageProvidersByResourceId[m_camera->getId()] = new QnSingleThumbnailLoader(
+                    m_camera, 
+                    m_camera->getParentResource().dynamicCast<QnMediaServerResource>(),
+                    -1,
+                    -1,
+                    fisheyeThumbnailSize, 
+                    QnSingleThumbnailLoader::JpgFormat,
+                    this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }
@@ -645,6 +652,12 @@ void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
         return;
     
     ui->cameraScheduleWidget->setRecordingParamsAvailability(!m_camera->hasParam(lit("noRecordingParams")));
+}
+
+void QnSingleCameraSettingsWidget::updateMotionCapabilities() {
+    m_cameraSupportsMotion = m_camera ? m_cameraSupportsMotion = m_camera->hasMotion() : false;
+    ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
+    ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {

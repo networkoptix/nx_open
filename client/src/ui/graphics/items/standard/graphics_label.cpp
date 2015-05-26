@@ -8,6 +8,7 @@
 
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/common/geometry.h>
+#include <ui/style/skin.h>
 
 // -------------------------------------------------------------------------- //
 // GraphicsLabelPrivate
@@ -17,9 +18,6 @@ void GraphicsLabelPrivate::init() {
 
     performanceHint = GraphicsLabel::NoCaching;
     alignment = Qt::AlignTop | Qt::AlignLeft;
-
-    pixmap = QPixmap(lit(":/skin_dark/buttons/add.png"));
-
     q->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred, QSizePolicy::Label));
 }
 

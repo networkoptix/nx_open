@@ -36,7 +36,7 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionParamsField)
-        ui->adminsCheckBox->setChecked(model->actionParams().userGroup == QnBusinessActionParameters::AdminOnly);
+        ui->adminsCheckBox->setChecked(model->actionParams().userGroup == QnBusiness::AdminOnly);
 }
 
 void QnPopupBusinessActionWidget::paramsChanged() {
@@ -45,8 +45,8 @@ void QnPopupBusinessActionWidget::paramsChanged() {
 
     QnBusinessActionParameters params;
     params.userGroup = ui->adminsCheckBox->isChecked()
-                                             ? QnBusinessActionParameters::AdminOnly
-                                             : QnBusinessActionParameters::EveryOne;
+                                             ? QnBusiness::AdminOnly
+                                             : QnBusiness::EveryOne;
     model()->setActionParams(params);
 }
 

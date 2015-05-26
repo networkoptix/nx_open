@@ -36,6 +36,7 @@ namespace ec2
             /* Connection */
             testConnection              = 100,  /*< ApiLoginData */
             connect                     = 101,  /*< ApiLoginData */
+            openReverseConnection       = 102,  /*< ApiReverseConnectionData */
 
             /* Common resource */
             saveResource                = 200,  /*< ApiResourceData */
@@ -56,12 +57,12 @@ namespace ec2
             saveCamera                  = 301,  /*< ApiCameraData */
             saveCameras                 = 302,  /*< ApiCameraDataList */
             removeCamera                = 303,  /*< ApiIdData */
-            getCameraHistoryItems       = 304,  /*< ApiCameraServerItemDataList */
-            addCameraHistoryItem        = 305,  /*< ApiCameraServerItemData */
+            getCameraHistoryItems       = 304,  /*< ApiServerFootageDataList */
+            addCameraHistoryItem        = 305,  /*< ApiServerFootageData */
             addCameraBookmarkTags       = 306,  /*< ApiCameraBookmarkTagDataList */
             getCameraBookmarkTags       = 307,  /*< ApiCameraBookmarkTagDataList */
             removeCameraBookmarkTags    = 308,
-            removeCameraHistoryItem     = 309,  /*< ApiCameraServerItemData */
+            removeCameraHistoryItem     = 309,  /*< ApiServerFootageData */
             saveCameraUserAttributes    = 310,  /*< ApiCameraAttributesData */
             saveCameraUserAttributesList= 311,  /*< ApiCameraAttributesDataList */
             getCameraUserAttributes     = 312,  /*< ApiCameraAttributesDataList */
@@ -166,8 +167,11 @@ namespace ec2
         QString toString( Value val );
         Value fromString(const QString& val);
 
-        /** Check if transaction can be sent independently of current connection state. MUST have sequence field filled. */
+        /** Check if transaction can be sent independently of current syncronisation state.
+         *  These transactions are rather commands then data transfers. */
         bool isSystem( Value val );
+
+        /** Check if transaction should be written to data base. */
         bool isPersistent( Value val );
     }
 

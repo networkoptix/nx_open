@@ -342,9 +342,9 @@ namespace Qn {
         BusinessEventsAction,
 
         /**
-         * Opens business events log dialog.
+         * Opens bookmarks dialog.
          */
-        BusinessEventsLogAction,
+        OpenBookmarksSearchAction,
 
         /**
          * Opens camera list dialog.
@@ -946,6 +946,16 @@ namespace Qn {
         PinTreeAction,
 
         /**
+         * Pins/unpins calendar and day/time view
+         */
+        PinCalendarAction,
+
+        /** 
+         * Minimazes day/time view
+         */
+        MinimizeDayTimeViewAction,
+
+        /**
          * Shows/hides slider.
          */
         ToggleSliderAction,
@@ -1139,10 +1149,21 @@ namespace Qn {
 
 } // namespace Qn
 
+namespace QnActionTypes {
+    enum ClientMode {
+        DesktopMode         = 0x1,
+        VideoWallMode       = 0x2,
+        ActiveXMode         = 0x4,
+        AnyMode             = 0xFF
+    };
+    Q_DECLARE_FLAGS(ClientModes, ClientMode)
+}
+
 Q_DECLARE_METATYPE(Qn::ActionId);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionParameterTypes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionTypes::ClientModes);
 
 #endif // QN_ACTIONS_H

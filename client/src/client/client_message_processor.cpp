@@ -3,6 +3,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "api/app_server_connection.h"
 #include "core/resource/media_server_resource.h"
+#include "core/resource/user_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include <core/resource_management/incompatible_server_watcher.h>
@@ -23,6 +24,7 @@ QnClientMessageProcessor::QnClientMessageProcessor():
     m_holdConnection(false)
 {
     m_status.setState(QnConnectionState::Disconnected);
+    connect(this, &QnClientMessageProcessor::connectionClosed, m_incompatibleServerWatcher, &QnIncompatibleServerWatcher::stop);
 }
 
 void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection) {
@@ -68,8 +70,10 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
 
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
     base_type::connectToConnection(connection);
-    connect( connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-        this, &QnClientMessageProcessor::at_systemNameChangeRequested );
+    connect(connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+            this, &QnClientMessageProcessor::at_systemNameChangeRequested);
+    connect(connection->getMiscManager(), &ec2::AbstractMiscManager::gotInitialModules,
+            this, &QnClientMessageProcessor::at_gotInitialModules);
 }
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -106,6 +110,11 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
+
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
+        if (user->isAdmin())
+            qnCommon->updateModuleInformation();
+    }
 }
 
 void QnClientMessageProcessor::resetResources(const QnResourceList& resources) {
@@ -166,8 +175,18 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
     qnCommon->setLocalSystemName(systemName);
 }
 
+void QnClientMessageProcessor::at_gotInitialModules(const QList<QnModuleInformationWithAddresses> &modules) {
+    m_incompatibleServerWatcher->start();
+    m_incompatibleServerWatcher->createModules(modules);
+}
+
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);
+
+    /* Get server time as soon as we setup connection. */
+    qnSyncTime->currentMSecsSinceEpoch();
+
+    qnCommon->updateModuleInformation();
 }

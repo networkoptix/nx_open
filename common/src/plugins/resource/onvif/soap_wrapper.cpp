@@ -128,7 +128,7 @@ const int SOAP_CONNECT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
 const int SOAP_ACCEPT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");
-static const int DIGEST_TIMEOUT_SEC = 60;
+//static const int DIGEST_TIMEOUT_SEC = 60;
 
 
 // -------------------------------------------------------------------------- //

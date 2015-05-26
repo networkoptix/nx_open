@@ -408,7 +408,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         return;
 
     QThreadPool tp;
-    tp.setMaxThreadCount(16);
+    tp.setMaxThreadCount(4);
     QMutex scanFilesMutex;
     for(const auto& fi: files)
     {
@@ -779,7 +779,7 @@ void DeviceFileCatalog::close()
 {
 }
 
-QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)
+QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, int limit)
 {
     //qDebug() << "find period from " << QDateTime::fromMSecsSinceEpoch(startTime).toString("hh:mm:ss.zzz") << "to" << QDateTime::fromMSecsSinceEpoch(endTime).toString("hh:mm:ss.zzz");
 
@@ -802,7 +802,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         return result;
 
     size_t firstIndex = itr - m_chunks.begin();
-    result << QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs);
+    result.push_back(QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs));
 
     for (size_t i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
     {
@@ -813,7 +813,9 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         else {
             if (last.durationMs < detailLevel && result.size() > 1)
                 result.pop_back();
-            result << QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs);
+            if (result.size() >= limit)
+                break;
+            result.push_back(QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs));
         }
     }
     //if (!result.isEmpty())

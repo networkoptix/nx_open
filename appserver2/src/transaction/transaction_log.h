@@ -16,7 +16,7 @@
 #include "nx_ec/data/api_tran_state_data.h"
 #include "nx_ec/data/api_layout_data.h"
 #include "nx_ec/data/api_videowall_data.h"
-#include "nx_ec/data/api_camera_server_item_data.h"
+#include "nx_ec/data/api_camera_history_data.h"
 #include "nx_ec/data/api_stored_file_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_license_data.h"
@@ -161,7 +161,7 @@ namespace ec2
         QnUuid transactionHash(const ApiVideowallData& params) const              { return params.id; }
         QnUuid transactionHash(const ApiBusinessRuleData& params) const           { return params.id; }
         QnUuid transactionHash(const ApiIdData& params) const                     { return params.id; }
-        QnUuid transactionHash(const ApiCameraServerItemData& params) const       { return makeHash(params.cameraUniqueId.toUtf8(), QByteArray::number(params.timestamp)); }
+        QnUuid transactionHash(const ApiServerFootageData& params) const       { return makeHash(params.serverGuid.toRfc4122(), "history"); }
         QnUuid transactionHash(const ApiResourceStatusData& params) const      { return makeHash(params.id.toRfc4122(), "status"); }
         QnUuid transactionHash(const ApiResourceParamWithRefData& param) const;
         QnUuid transactionHash(const ApiStoredFileData& params) const             { return makeHash(params.path.toUtf8()); }
@@ -208,6 +208,7 @@ namespace ec2
         QnUuid transactionHash(const ApiUpdateSequenceData& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiTranSyncDoneData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiLicenseOverflowData& ) const            { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
+        QnUuid transactionHash(const ApiReverseConnectionData& ) const          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
         void fillPersistentInfo(QnAbstractTransaction& tran);

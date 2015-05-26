@@ -1196,7 +1196,7 @@ static int CrackDiscKey( dvdcss_t dvdcss, quint8 *p_disc_key )
     }
 
     /* Initing our Really big table */
-    BigTable = (unsigned int*) malloc( 16777216 * sizeof(int) );
+    BigTable = (unsigned int*) malloc( 16777216 * sizeof(unsigned int) );
     memset( BigTable, 0 , 16777216 * sizeof(int) );
     if( BigTable == NULL )
     {

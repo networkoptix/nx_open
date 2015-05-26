@@ -359,8 +359,8 @@ public:
     enum CameraDataType {
         RecordedTimePeriod,
         MotionTimePeriod,
-        BookmarkTimePeriod,
-        BookmarkData,
+        BookmarkTimePeriod, /// Used for retreiving general time periods of bookmarks
+        BookmarkData,       /// Used for retreiving bookmarks data
 
         CameraDataTypeCount
     };
@@ -578,6 +578,7 @@ public:
         BnsFormat           = 2,
         CsvFormat           = 3,
         XmlFormat           = 4,
+        CompressedPeriodsFormat = 5, // used for chunks data only
 
         UnsupportedFormat   = -1
     };
@@ -585,6 +586,15 @@ public:
 
     const char* serializationFormatToHttpContentType(SerializationFormat format);
     SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
+
+    enum TTHeaderFlag
+    {
+        TT_None          = 0x0, 
+        TT_ProxyToClient = 0x1
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TTHeaderFlag)
+    Q_DECLARE_FLAGS(TTHeaderFlags, TTHeaderFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(TTHeaderFlags)
 
     enum LicenseType 
     {
@@ -647,7 +657,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
-        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState),
+        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
+        (Qn::TTHeaderFlag),
     (metatype)(lexical)
 )
 
@@ -658,6 +669,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzDataFields),
+    (metatype)(numeric)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::TTHeaderFlags),
     (metatype)(numeric)
 )
 
