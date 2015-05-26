@@ -64,7 +64,7 @@ void QnIncompatibleServerWatcher::start() {
 }
 
 void QnIncompatibleServerWatcher::stop() {
-    disconnect(QnCommonMessageProcessor::instance(), 0, this, 0);
+    disconnect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
     disconnect(qnResPool, 0, this, 0);
 
     QList<QnUuid> ids;
@@ -195,6 +195,8 @@ void QnIncompatibleServerWatcher::addResource(const QnModuleInformationWithAddre
         // update the resource
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
+        if (!server)
+            return;
         updateServer(server, moduleInformation);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
