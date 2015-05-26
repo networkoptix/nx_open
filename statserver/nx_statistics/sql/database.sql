@@ -2,7 +2,7 @@
 --
 -- Host: 127.0.0.1    Database: nx_statistics
 -- ------------------------------------------------------
--- Server version	5.5.41-0ubuntu0.14.04.1
+-- Server version    5.5.41-0ubuntu0.14.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -90,7 +90,9 @@ CREATE TABLE `clients` (
   `phisicalMemory` bigint(20) unsigned DEFAULT NULL,
   `openGLRenderer` varchar(45) DEFAULT NULL,
   `openGLVendor` varchar(45) DEFAULT NULL,
-  `openGLVersion` varchar(45) DEFAULT NULL
+  `openGLVersion` varchar(45) DEFAULT NULL,
+  `skin` varchar(45) DEFAULT NULL,
+  `systemInfo` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

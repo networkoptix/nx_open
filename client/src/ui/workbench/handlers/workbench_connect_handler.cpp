@@ -57,6 +57,7 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/collection.h>
 #include <utils/common/synctime.h>
+#include <utils/common/system_information.cpp>
 #include <utils/network/module_finder.h>
 #include <utils/network/router.h>
 #include <utils/reconnect_helper.h>
@@ -267,6 +268,14 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     {
         const auto hwId = LLUtil::getMainHardwareIds(0, qnSettings->rawSettings()).last();
         clientData.id = QnUuid::fromHardwareId(hwId);
+
+        const auto skin = qnSettings->clientSkin();
+        /**/ if (skin == Qn::DarkSkin) clientData.skin = lit("Dark");
+        else if (skin == Qn::LightSkin) clientData.skin = lit("Light");
+        else clientData.skin = lit("Unknown");
+
+        const auto systemInfo = QnSystemInformation::currentSystemInformation();
+        clientData.systemInfo = systemInfo.toString();
 
         const auto& hw = HardwareInformation::instance();
         clientData.phisicalMemory = hw.phisicalMemory;
