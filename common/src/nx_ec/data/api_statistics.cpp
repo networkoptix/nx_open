@@ -80,7 +80,8 @@ namespace ec2 {
         }
 
         name        = parsed[lit("NAME")];
-		licenseType = parsed[lit("CLASS")];
+        key         = parsed[lit("SERIAL")];
+        licenseType = parsed[lit("CLASS")];
         cameraCount = parsed[lit("COUNT")].toLongLong();
         version     = parsed[lit("VERSION")];
         brand       = parsed[lit("BRAND")];

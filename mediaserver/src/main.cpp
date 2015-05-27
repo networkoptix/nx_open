@@ -1200,6 +1200,12 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
             ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
             ec2Connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }
+
+        const auto publicIp = m_publicAddress.toString();
+        if (server->getProperty(Qn::PUBLIC_IP) != publicIp) {
+            server->setProperty(Qn::PUBLIC_IP, publicIp);
+            propertyDictionary->saveParams(server->getId());
+        }
     }
 }
 
@@ -1789,6 +1795,13 @@ void QnMain::run()
         const auto isBeta = QString::number(QnAppInfo::beta() ? 1 : 0);
         if (server->getProperty(Qn::BETA) != isBeta)
             server->setProperty(Qn::BETA, isBeta);
+
+        if (!m_publicAddress.isNull())
+        {
+            const auto publicIp = m_publicAddress.toString();
+            if (server->getProperty(Qn::PUBLIC_IP) != publicIp)
+                server->setProperty(Qn::PUBLIC_IP, publicIp);
+        }
 
         propertyDictionary->saveParams(server->getId());
 

@@ -29,3 +29,4 @@ def sendmail(sender, reciever, subject, text):
     if cmd.wait() != 0:
         raise OSError("Command '%s' has failed: %s" % (SENDMAIL, err))
     return out
+

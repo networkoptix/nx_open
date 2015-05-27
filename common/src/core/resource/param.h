@@ -46,6 +46,7 @@ namespace Qn
     static const QString CPU_MODEL_NAME = lit("cpuModelName");
     static const QString PHISICAL_MEMORY = lit("phisicalMemory");
     static const QString BETA = lit("beta");
+    static const QString PUBLIC_IP = lit("publicIp");
 }
 
 #endif // QN_PARAM_H

@@ -5,7 +5,7 @@
 from flask import Flask, request
 from adapters import SqlAdapter
 
-import json
+import json, os
 
 app = Flask(__name__)
 
@@ -18,7 +18,20 @@ def getAdapter():
     if not hasattr(app, 'sqlConnection'):
         raise app.SqlError(0, 'Database is not configured')
     db = app.sqlConnector.connect(**app.sqlConnection)
-    return SqlAdapter(db, app.logger)
+
+    ipResolve = None
+    if hasattr(app, 'geoipDb') and os.path.isfile(app.geoipDb):
+        from geoip2.database import Reader as IpReader
+        reader = IpReader(app.geoipDb)
+        cache = {}
+        def resolve(ip):
+            if ip not in cache:
+                cache[ip] = reader.country(ip).country.iso_code
+            print cache[ip]
+            return cache[ip]
+        ipResolve = resolve
+
+    return SqlAdapter(db, app.logger, ipResolve)
 
 @app.route('/api/report', methods=['POST'])
 def report():

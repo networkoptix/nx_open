@@ -19,12 +19,13 @@ class SqlAdapter(object):
         ') AS %(table)s_latest'
     ))
 
-    def __init__(self, db, log):
+    def __init__(self, db, log, ipResolve=None):
         '''Initializes adapter to work with [sql]
         '''
         self._db = db
         self._cursor = self._db.cursor()
         self._log = log
+        self._ipResolve = ipResolve or (lambda x: '')
 
     def report(self, data):
         '''Saves report [data] into database tables
@@ -39,7 +40,9 @@ class SqlAdapter(object):
                 for storage in ms['storages']:
                     self._save('storages', storage, systemId)
                 del ms['storages']
-            self._save('mediaservers', ms, systemId)
+            self._save('mediaservers', ms, systemId, transforms=[
+                ('publicIp', 'country', self._ipResolve),
+            ])
         for table in ['clients', 'cameras', 'businessRules', 'licenses']:
             for item in data.get(table, []):
                 self._save(table, item, systemId)
@@ -95,12 +98,16 @@ class SqlAdapter(object):
             self._cursor.execute('DELETE FROM %s' % tbl)
         self._db.commit()
 
-    def _save(self, table, data, systemId):
+    def _save(self, table, data, systemId, transforms=[]):
         data['systemId'] = systemId
         if data.has_key('addParams'):
             for ap in data['addParams']:
                 data[ap['name']] = ap['value']
             del data['addParams']
+        for source, target, function in transforms:
+            if data.has_key(source):
+                data[target] = function(data[source])
+                del data[source]
         field_names = self._field_names(table)
         etc = {}
         for name, value in data.items():
