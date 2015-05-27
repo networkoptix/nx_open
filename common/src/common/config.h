@@ -42,10 +42,8 @@ static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 
 
 /* Define override specifier. */
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || (defined(__GNUC__) && GCC_VERSION >= 40700)
 #   define override override
-#elif defined(__GNUC__) && GCC_VERSION < 40700
-#   define override
 #else
 #   define override
 #endif

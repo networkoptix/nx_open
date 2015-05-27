@@ -22,4 +22,4 @@ midl %bebin_path%\%CONFIG%\%LIBNAME%.idl /nologo /tlb %bebin_path%\%CONFIG%\%LIB
 cd %bebin_path%\%CONFIG%
 tlbimp /keyfile:%AXHDW%\Sign.snk /out:Interop.${ax.className}_${nxec.ec2ProtoVersion}.dll %LIBNAME%.dll 
 regsvr32 /s %LIBNAME%.dll
-AxImp /keyfile:%AXHDW%\Sign.snk /rcw:Interop.${ax.className}_${nxec.ec2ProtoVersion}.dll /out:AxInterop.${ax.className}_${nxec.ec2ProtoVersion}.dll %LIBNAME%.dll
+AxImp /ignoreregisteredocx /keyfile:%AXHDW%\Sign.snk /rcw:Interop.${ax.className}_${nxec.ec2ProtoVersion}.dll /out:AxInterop.${ax.className}_${nxec.ec2ProtoVersion}.dll %LIBNAME%.dll

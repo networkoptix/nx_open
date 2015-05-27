@@ -695,10 +695,10 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const 
 }
 
 void QnStorageManager::getTimePeriodInternal(std::vector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, 
-                                             qint64 detailLevel, const DeviceFileCatalogPtr &catalog, int limit)
+                                             qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
 {
     if (catalog) {
-        periods.push_back(catalog->getTimePeriods(startTime, endTime, detailLevel, limit));
+        periods.push_back(catalog->getTimePeriods(startTime, endTime, detailLevel));
         if (!periods.rbegin()->empty())
         {
             QnTimePeriod& lastPeriod = periods.rbegin()->last();
@@ -743,13 +743,13 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnVirtualCameraResou
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
                     periods.push_back(camera->getDtsTimePeriods(startTime, endTime, detailLevel));
             } else {
-                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(cameraUniqueId, catalog), limit);
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(cameraUniqueId, catalog));
             }
         }
 
     }
 
-    return QnTimePeriodList::mergeTimePeriods(periods);
+    return QnTimePeriodList::mergeTimePeriods(periods, limit);
 }
 
 void QnStorageManager::clearSpace()
@@ -818,7 +818,11 @@ QnStorageResourceList QnStorageManager::getStoragesInLexicalOrder() const
     // duplicate storage path's aren't used any more
     QMutexLocker lock(&m_mutexStorages);
     QnStorageResourceList result = m_storageRoots.values();
-    std::sort(result.begin(), result.end(), [](QnStorageResourcePtr& storage1, QnStorageResourcePtr& storage2) { return storage1->getPath() < storage2->getPath(); } );
+    std::sort(result.begin(), result.end(),
+              [](const QnStorageResourcePtr& storage1, const QnStorageResourcePtr& storage2)
+    {
+        return storage1->getPath() < storage2->getPath();
+    });
     return result;
 }
 
@@ -857,7 +861,7 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
     const FileCatalogMap &catalogMap = m_devFileCatalog[catalogIdx];
 
     for(const DeviceFileCatalogPtr& catalog: catalogMap.values()) {
-        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(catalog->cameraUniqueId()).dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());
         if (camera && camera->maxDays() > 0) {
             qint64 timeToDelete = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->maxDays();
             deleteRecordsToTime(catalog, timeToDelete);
@@ -936,7 +940,7 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
         if (curMinTime != (qint64)AV_NOPTS_VALUE && curMinTime < minTime)
         {
             if (useMinArchiveDays) {
-                QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(itr.key()).dynamicCast<QnSecurityCamResource>();
+                QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(itr.key());
                 if (camera && camera->minDays() > 0) {
                     qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->minDays();
                     if (threshold < curMinTime)
@@ -1600,7 +1604,7 @@ std::vector<QnUuid> QnStorageManager::getCamerasWithArchive() const
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::LowQualityCatalog]);
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::HiQualityCatalog]);
     for(const QString& uniqueId: internalData) {
-        const QnResourcePtr cam = qnResPool->getResourceByUniqId(uniqueId);
+        const QnResourcePtr cam = qnResPool->getResourceByUniqueId(uniqueId);
         if (cam)
             result.push_back(cam->getId());
     }

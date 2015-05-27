@@ -34,6 +34,7 @@
 //!if not defined, ubjson is used
 //#define USE_JSON
 #define ENCODE_TO_BASE64
+//#define PIPELINE_POST_REQUESTS
 
 
 /*!
@@ -384,7 +385,7 @@ void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& ht
         return;
     }
 
-    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (ownServer && authByKey) 
     {
         httpClient->setUserName(ownServer->getId().toString().toLower());    
@@ -1425,6 +1426,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
         return;
     }
 
+#ifdef PIPELINE_POST_REQUESTS
     //----------------------------------------------------------------------------------------
     //TODO #ak since http client does not support http interleaving we have to send 
         //POST requests directly from this class.
@@ -1467,6 +1469,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
         &m_dummyReadBuffer,
         std::bind(&QnTransactionTransport::monitorConnectionForClosure, this, _1, _2) );
     //----------------------------------------------------------------------------------------
+#endif //PIPELINE_POST_REQUESTS
 
     m_dataToSend.pop_front();
     if( m_dataToSend.empty() )

@@ -55,27 +55,10 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSiz
     float frameRateFactor = fps/1.0f;
 
     float result = qualityFactor*frameRateFactor * resolutionFactor;
-
-    return qMax(192, result);
-
-    /*
-    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
-
-    int hiEnd = 1024*10;
-    int lowEnd = 1024*1;
-
-    float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
-    resolutionFactor = pow(resolutionFactor, (float)0.5);
-
-    float frameRateFactor = fps/30.0;
-    frameRateFactor = pow(frameRateFactor, (float)0.4);
-
-    int result = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
-    result *= (resolutionFactor * frameRateFactor);
-
-    return qMax(192,result);
-    */
+    result = qMax(192.0, result);
+    if (isBitratePerGOP())
+        result = result * (30.0 / (qreal)fps);
+    return (int) result;
 }
 
 int QnPhysicalCameraResource::getChannel() const
@@ -161,6 +144,25 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
     for (const auto& streamInfo: streams.streams)
         rez |= saveMediaStreamInfoIfNeeded(streamInfo);
     return rez;
+}
+
+bool QnPhysicalCameraResource::saveBitrateIfNotExists( const CameraBitrateInfo& bitrateInfo )
+{
+    auto bitrateInfos = QJson::deserialized<CameraBitrates>(
+        getProperty( Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME ).toLatin1() );
+
+    if ( std::find_if( bitrateInfos.streams.begin(), bitrateInfos.streams.end(),
+                       [ & ]( const CameraBitrateInfo& info )
+                       { return info.encoderIndex == bitrateInfo.encoderIndex; })
+          == bitrateInfos.streams.end() )
+    {
+        bitrateInfos.streams.push_back( std::move( bitrateInfo ) );
+        setProperty( Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME,
+                     QString::fromUtf8( QJson::serialized( bitrateInfos ) ) );
+        return true;
+    }
+
+    return false;
 }
 
 bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMediaStreamInfo& oldParams)
@@ -409,6 +411,14 @@ int QnVirtualCameraResource::issuesTimeoutMs() {
 
 const QLatin1String CameraMediaStreamInfo::anyResolution( "*" );
 
+QString CameraMediaStreamInfo::resolutionToString( const QSize& resolution )
+{
+    if ( !resolution.isValid() )
+        return anyResolution;
+
+    return QString::fromLatin1("%1x%2").arg(resolution.width()).arg(resolution.height());
+}
+
 bool CameraMediaStreamInfo::operator==( const CameraMediaStreamInfo& rhs ) const
 {
     return transcodingRequired == rhs.transcodingRequired
@@ -424,6 +434,9 @@ bool CameraMediaStreamInfo::operator!=( const CameraMediaStreamInfo& rhs ) const
     return !( *this == rhs );
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
+        (CameraMediaStreamInfo)(CameraMediaStreams) \
+        (CameraBitrateInfo)(CameraBitrates), \
+        (json), _Fields )
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -183,7 +183,7 @@ void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<Q
         return;
 
     for (const QnModuleInformation &moduleInformation: modules) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
         if (!server)
             continue;
 

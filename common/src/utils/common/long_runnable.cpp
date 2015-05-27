@@ -8,6 +8,7 @@
 #include <QtCore/QWaitCondition>
 
 #include <common/systemexcept_win32.h>
+#include <common/systemexcept_linux.h>
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 #   include <sys/types.h>
@@ -234,11 +235,19 @@ void QnLongRunnable::at_started() {
     win32_exception::installThreadSpecificUnhandledExceptionHandler();
 #endif
 
+#ifdef __linux__
+    linux_exception::installQuitThreadBacktracer();
+#endif
+
     if(m_pool)
         m_pool->startedNotify(this);
 }
 
 void QnLongRunnable::at_finished() {
+#ifdef __linux__
+    linux_exception::uninstallQuitThreadBacktracer();
+#endif
+
     if(m_pool)
         m_pool->finishedNotify(this);
 }

@@ -15,12 +15,15 @@ namespace ec2 {
 
     struct ApiBusinessActionData;
     struct ApiBusinessRuleData;
+    struct ApiBusinessRuleStatistics;
     struct ApiCameraData;
     struct ApiCameraAttributesData;
     struct ApiCameraDataEx;
+    struct ApiCameraDataStatistics;
     struct ApiServerFootageData;
     struct ApiCameraHistoryItemData;
     struct ApiCameraHistoryData;
+    struct ApiClientInfoData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
 	struct ApiFullInfoData;
@@ -32,10 +35,12 @@ namespace ec2 {
     struct ApiLayoutData;
     struct ApiLicenseData;
     struct ApiDetailedLicenseData;
+    struct ApiLicenseStatistics;
     struct ApiLockData;
     struct ApiMediaServerData;
     struct ApiMediaServerUserAttributesData;
     struct ApiMediaServerDataEx;
+    struct ApiMediaServerDataStatistics;
     struct ApiPropertyTypeData;
     struct ApiResetBusinessRuleData;
     struct ApiResourceData;
@@ -53,6 +58,7 @@ namespace ec2 {
     struct ApiResourceStatusData;
     struct ApiReverseConnectionData;
     struct ApiStorageData;
+    struct ApiStorageDataStatistics;
     struct ApiStoredFileData;
     struct ApiStoredFilePath;
     struct ApiUserData;
@@ -77,6 +83,8 @@ namespace ec2 {
     struct ApiConnectionData;
     struct ApiSystemNameData;
     struct ApiTransactionData;
+    struct ApiSystemStatistics;
+    struct ApiStatisticsServerInfo;
 
     struct ApiTimeData;
     struct ApiPeerSystemTimeData;
@@ -91,19 +99,26 @@ namespace ec2 {
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
     typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
+    typedef std::vector<ApiBusinessRuleStatistics> ApiBusinessRuleStatisticsList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraAttributesData> ApiCameraAttributesDataList;
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
+    typedef std::vector<ApiCameraDataStatistics> ApiCameraDataStatisticsList;
+    typedef std::vector<ApiClientInfoData> ApiClientInfoDataList;
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
+    typedef std::vector<ApiDetailedLicenseData> ApiDetailedLicenseDataList;
+    typedef std::vector<ApiLicenseStatistics> ApiLicenseStatisticsList;
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
     typedef std::vector<ApiMediaServerUserAttributesData> ApiMediaServerUserAttributesDataList;
     typedef std::vector<ApiMediaServerDataEx> ApiMediaServerDataExList;
+    typedef std::vector<ApiMediaServerDataStatistics> ApiMediaServerDataStatisticsList;
     typedef std::vector<ApiPropertyTypeData> ApiPropertyTypeDataList;
     typedef std::vector<ApiResourceData> ApiResourceDataList;
     typedef std::vector<ApiResourceParamData> ApiResourceParamDataList;
     typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
     typedef std::vector<ApiStorageData> ApiStorageDataList;
+    typedef std::vector<ApiStorageDataStatistics> ApiStorageDataStatisticsList;
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
@@ -121,12 +136,15 @@ namespace ec2 {
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\
+	(ApiBusinessRuleStatistics)\
     (ApiCameraData)\
     (ApiServerFootageData)\
     (ApiCameraHistoryItemData)\
     (ApiCameraHistoryData)\
     (ApiCameraAttributesData)\
     (ApiCameraDataEx)\
+    (ApiCameraDataStatistics)\
+    (ApiClientInfoData)\
     (ApiEmailData)\
     (ApiEmailSettingsData)\
     (ApiFullInfoData)\
@@ -138,10 +156,12 @@ namespace ec2 {
     (ApiLayoutData)\
     (ApiLicenseData)\
     (ApiDetailedLicenseData)\
+    (ApiLicenseStatistics)\
     (ApiLockData)\
     (ApiMediaServerData)\
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\
+    (ApiMediaServerDataStatistics)\
     (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
@@ -161,6 +181,7 @@ namespace ec2 {
     (ApiResourceStatusData)\
     (ApiStoredFilePath)\
     (ApiStorageData)\
+    (ApiStorageDataStatistics)\
     (ApiStoredFileData)\
     (ApiUserData)\
     (ApiVideowallControlMessageData)\
@@ -188,6 +209,8 @@ namespace ec2 {
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\
     (ApiLicenseOverflowData)\
+    (ApiSystemStatistics)\
+    (ApiStatisticsServerInfo)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

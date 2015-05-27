@@ -16,7 +16,10 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
+
+#include <redass/redass_controller.h>
 #include <client/client_message_processor.h>
+#include <client/client_instance_manager.h>
 
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -55,17 +58,25 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
     /* We don't want changes in desktop color settings to mess up our custom style. */
     QApplication::setDesktopSettingsAware(false);
  
+    
+
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
-    common->setModuleGUID(QnUuid::createUuid());
 
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
     common->store<QnClientSettings>(new QnClientSettings(forceLocalSettings));
+
+    auto clientInstanceManager = new QnClientInstanceManager(); /* Depends on QnClientSettings */
+    common->store<QnClientInstanceManager>(clientInstanceManager); 
+    common->setModuleGUID(clientInstanceManager->instanceGuid());
+
     common->store<QnGlobals>(new QnGlobals());
     common->store<QnSessionManager>(new QnSessionManager());
 
     common->store<QnCameraUserAttributePool>(new QnCameraUserAttributePool());
     common->store<QnMediaServerUserAttributesPool>(new QnMediaServerUserAttributesPool());
+    common->store<QnRedAssController>(new QnRedAssController());
+
     common->store<QnSyncTime>(new QnSyncTime());
 
     common->store<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary());
@@ -87,7 +98,6 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
-    QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
 }
 

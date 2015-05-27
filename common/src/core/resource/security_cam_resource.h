@@ -44,6 +44,8 @@ public:
     */
     void setCameraName( const QString& newCameraName );
 
+    QnMediaServerResourcePtr getParentServer() const;
+
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;
@@ -292,7 +294,7 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-
+    virtual bool isBitratePerGOP() const;
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;

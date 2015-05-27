@@ -236,7 +236,7 @@ const QString &QnSearchBookmarksModel::Impl::cameraNameFromId(const QString &id)
 {
     auto it = m_camerasNames.find(id);
     if (it == m_camerasNames.end())
-        it = m_camerasNames.insert(std::make_pair(id, qnResPool->getResourceByUniqId(id)->getName())).first;
+        it = m_camerasNames.insert(std::make_pair(id, qnResPool->getResourceByUniqueId(id)->getName())).first;
     return it->second;
 }
 

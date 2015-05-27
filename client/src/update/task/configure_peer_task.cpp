@@ -42,7 +42,7 @@ void QnConfigurePeerTask::doStart() {
             continue;
         }
 
-        QnMediaServerResourcePtr ecServer = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr ecServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
         if (!ecServer) {
             m_failedPeers.insert(id);
             continue;
