@@ -129,7 +129,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
-                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), iface));
+                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
                     break;
                 }
             }
