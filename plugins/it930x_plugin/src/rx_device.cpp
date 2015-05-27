@@ -1,6 +1,8 @@
 #include <sstream>
 #include <thread>
 
+#include <plugins/camera_plugin.h>
+
 #include "timer.h"
 #include "tx_device.h"
 #include "mpeg_ts_packet.h"
@@ -31,7 +33,6 @@ namespace ite
     RxDevice::RxDevice(unsigned id)
     :   m_devReader( new DevReader() ),
         m_rxID(id),
-        m_passive(false),
         m_channel(NOT_A_CHANNEL),
         m_txs(TxDevice::CHANNELS_NUM),
         m_signalQuality(0),
@@ -343,7 +344,8 @@ namespace ite
 
     void RxDevice::processRcQueue()
     {
-        if (! m_txDev)
+        TxDevicePtr txDev = m_txDev;
+        if (! txDev)
             return;
 
         RcPacketBuffer pktBuf;
@@ -356,24 +358,58 @@ namespace ite
                 continue;
             }
 
-            m_txDev->parse(pkt);
+            txDev->parse(pkt);
         }
+    }
+
+    bool RxDevice::configureTx(unsigned encNo)
+    {
+        static const unsigned WAIT_MS = 30000;
+
+        TxDevicePtr txDev = m_txDev;
+        if (! txDev)
+            return false;
+
+        // HACK: don't want to init it twice. It should init both encoders or none.
+        if (encNo)
+        {
+             Timer::sleep(WAIT_MS * 1.2f); // wait for init in encoder 0
+             return txDev->ready();
+        }
+
+        Timer timer(true);
+        while (! txDev->ready())
+        {
+            if (timer.elapsedMS() > WAIT_MS)
+            {
+                debug_printf("[camera] break config process (timeout). Tx: %d; Rx: %d\n", txDev->txID(), rxID());
+                break;
+            }
+
+            processRcQueue();
+            updateTxParams();
+
+            Timer::sleep(50);
+        }
+
+        return txDev->ready();
     }
 
     void RxDevice::updateTxParams()
     {
-        if (! m_txDev)
+        TxDevicePtr txDev = m_txDev;
+        if (! txDev)
             return;
 
-        uint16_t id = m_txDev->cmd2update();
+        uint16_t id = txDev->cmd2update();
         if (id)
         {
-            RcCommand * pcmd = m_txDev->mkRcCmd(id);
+            RcCommand * pcmd = txDev->mkRcCmd(id);
             if (pcmd && pcmd->isValid())
                 sendRC(pcmd);
         }
         else
-            m_txDev->setReady();
+            txDev->setReady();
     }
 
     bool RxDevice::sendRC(RcCommand * cmd)
@@ -436,38 +472,52 @@ namespace ite
 
     void RxDevice::updateOSD()
     {
-        if (m_txDev)
+        TxDevicePtr txDev = m_txDev;
+
+        if (txDev && txDev->ready())
         {
-            RcCommand * pcmd = m_txDev->mkSetOSD(0);
+            RcCommand * pcmd = txDev->mkSetOSD(0);
             sendRC(pcmd, RC_ATTEMPTS());
 
-            pcmd = m_txDev->mkSetOSD(1);
+            pcmd = txDev->mkSetOSD(1);
             sendRC(pcmd, RC_ATTEMPTS());
 
-            pcmd = m_txDev->mkSetOSD(2);
+            pcmd = txDev->mkSetOSD(2);
             sendRC(pcmd, RC_ATTEMPTS());
         }
     }
 
     bool RxDevice::changeChannel(unsigned chan)
     {
-        if (m_txDev)
+        TxDevicePtr txDev = m_txDev;
+        if (txDev && txDev->ready())
         {
-            RcCommand * pcmd = m_txDev->mkSetChannel(chan);
+            RcCommand * pcmd = txDev->mkSetChannel(chan);
             return sendRC(pcmd, RC_ATTEMPTS());
         }
 
         return false;
     }
 
-    bool RxDevice::setEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps)
+    bool RxDevice::setEncoderParams(unsigned streamNo, const nxcip::LiveStreamConfig& config)
     {
-        if (m_txDev)
+        TxDevicePtr txDev = m_txDev;
+        if (txDev && txDev->ready())
         {
-            RcCommand * pcmd = m_txDev->mkSetEncoderParams(streamNo, fps, bitrateKbps);
+            RcCommand * pcmd = txDev->mkSetEncoderParams(streamNo, config.framerate, config.bitrateKbps);
             return sendRC(pcmd, RC_ATTEMPTS());
         }
 
+        return false;
+    }
+
+    //
+
+    bool RxDevice::getEncoderParams(unsigned streamNo, nxcip::LiveStreamConfig& config)
+    {
+        TxDevicePtr txDev = m_txDev;
+        if (txDev && txDev->ready())
+            return txDev->videoEncoderCfg(streamNo, config);
         return false;
     }
 
@@ -504,29 +554,16 @@ namespace ite
 
     void RxDevice::resolution(unsigned stream, int& width, int& height, float& fps)
     {
-        if (m_passive)
-        {
-            resolutionPassive(stream, width, height, fps);
-            return;
-        }
-
-        if (! m_txDev)
-        {
-            resolutionPassive(stream, width, height, fps);
-            return;
-        }
-
-        if (! m_txDev->videoSourceCfg(stream, width, height, fps))
+        TxDevicePtr txDev = m_txDev;
+        if (!txDev || !txDev->ready() || !txDev->videoSourceCfg(stream, width, height, fps))
             resolutionPassive(stream, width, height, fps);
     }
 
     unsigned RxDevice::streamsCount()
     {
-        if (m_passive)
-            return streamsCountPassive();
-
-        if (m_txDev)
-            return m_txDev->encodersCount();
+        TxDevicePtr txDev = m_txDev;
+        if (txDev && txDev->ready())
+            return txDev->encodersCount();
         return 0;
     }
 

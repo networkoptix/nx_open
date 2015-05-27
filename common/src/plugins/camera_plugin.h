@@ -1,6 +1,8 @@
 #ifndef NX_CAMERA_PLUGIN_H
 #define NX_CAMERA_PLUGIN_H
 
+#include <stdint.h>
+
 #include "camera_plugin_types.h"
 #include "plugin_api.h"
 
@@ -332,7 +334,7 @@ namespace nxcip
         }
     };
 
-        // {9A1BDA18-563C-42de-8E23-B9244FD00658}
+    // {9A1BDA18-563C-42de-8E23-B9244FD00658}
     static const nxpl::NX_GUID IID_CameraMediaEncoder2 = { { 0x9a, 0x1b, 0xda, 0x18, 0x56, 0x3c, 0x42, 0xde, 0x8e, 0x23, 0xb9, 0x24, 0x4f, 0xd0, 0x6, 0x58 } };
 
     //!Extends \a CameraMediaEncoder by adding functionality for plugin to directly provide live media stream
@@ -354,6 +356,58 @@ namespace nxcip
         virtual int getAudioFormat( AudioFormat* audioFormat ) const = 0;
     };
 
+#ifndef __GNUC__
+#pragma pack(push, 1)
+#else
+#define PACKED __attribute__((__packed__))
+#endif
+    /// Standard-layouted memory for LiveStreamConfig hierarchy
+    /// Derived classes may have only static data members or functions.
+    struct PACKED LiveStreamConfig
+    {
+        enum LiveStreamFlags
+        {
+            LIVE_STREAM_FLAG_AUDIO_ENABLED = 0x1
+        };
+
+        int32_t reserved_head;      ///< reserved, do not use
+        int32_t flags;              ///< \sa LiveStreamFlags
+        int32_t codec;              ///< \sa nxcip::CompressionType
+        int32_t width;
+        int32_t height;
+        float framerate;
+        int32_t bitrateKbps;
+        int16_t quality;
+        int16_t gopLength;
+        uint8_t reserved_tail[96];  ///< reserved, do not use
+
+        void setFlag(uint32_t f) { flags |= f; }
+        void clearFlag(uint32_t f) { flags &= ~f; }
+        bool hasFlag(uint32_t f) { return flags & f; }
+    };
+#ifndef __GNUC__
+#pragma pack(pop)
+#endif
+
+    // {D1C7F082-B6F9-45F3-82D6-3CFE3EAE0260}
+    static const nxpl::NX_GUID IID_CameraMediaEncoder3 = { { 0xd1, 0xc7, 0xf0, 0x82, 0xb6, 0xf9, 0x45, 0xf3, 0x82, 0xd6, 0x3c, 0xfe, 0x3e, 0xae, 0x2, 0x60 } };
+    class CameraMediaEncoder3
+    :
+        public CameraMediaEncoder2
+    {
+    public:
+        /// Returns (re)configured stream reader, providing live data stream
+        /*!
+            Use it instead of \a getLiveStreamReader() to avoid async \a setResolution() \a setFps() and \a setBitrate() calls.
+            BaseCameraManager::nativeMediaStreamCapability should be present.
+            \param if *reader is NULL and \a nxcip::NX_NO_ERROR is returned, \a CameraMediaEncoder::getMediaUrl() is used
+            \return error code (\a nxcip::NX_NO_ERROR on success)
+         */
+        virtual int getConfiguredLiveStreamReader(nxcip::LiveStreamConfig& config, nxcip::StreamReader ** reader) = 0;
+
+        //! \sa nxcip::CompressionType \sa nxcip::PixelFormat
+        virtual int getVideoFormat(nxcip::CompressionType * codec, nxcip::PixelFormat * pixelFormat) const = 0;
+    };
 
     class CameraPtzManager;
     class CameraMotionDataProvider;

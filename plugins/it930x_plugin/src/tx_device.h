@@ -12,6 +12,10 @@
 #include "timer.h"
 #include "object_counter.h"
 
+namespace nxcip
+{
+    struct LiveStreamConfig;
+}
 
 namespace ite
 {
@@ -165,7 +169,7 @@ namespace ite
 
         uint8_t encodersCount() const { return videoEncConfig.configListSize; }
         bool videoSourceCfg(unsigned stream, int& width, int& height, float& fps);
-        bool videoEncoderCfg(unsigned stream, int& width, int& height, float& fps, int& bitrate);
+        bool videoEncoderCfg(unsigned encNo, nxcip::LiveStreamConfig& config);
 
         //
 

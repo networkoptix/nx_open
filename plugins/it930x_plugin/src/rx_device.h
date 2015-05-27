@@ -8,6 +8,11 @@
 #include "it930x.h"
 #include "dev_reader.h"
 
+namespace nxcip
+{
+    struct LiveStreamConfig;
+}
+
 namespace ite
 {
     unsigned str2num(std::string& s);
@@ -99,6 +104,7 @@ namespace ite
         bool startSearchTx(unsigned channel, unsigned timeoutMS);
         void stopSearchTx(DevLink& outDevLink);
 
+        bool configureTx(unsigned encNo);
         void processRcQueue();
         void updateTxParams();
 
@@ -123,8 +129,8 @@ namespace ite
 
         // Encoder stuff
 
-        // TODO: getResolutions(), setResolution(), getMaxBitrate()
-        bool setEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps);
+        bool getEncoderParams(unsigned streamNo, nxcip::LiveStreamConfig& config);
+        bool setEncoderParams(unsigned streamNo, const nxcip::LiveStreamConfig& config);
 
         // TX stuff
 
@@ -268,7 +274,6 @@ namespace ite
         std::unique_ptr<DevReader> m_devReader;
         TxDevicePtr m_txDev;                    // locked Tx device (as camera)
         const uint16_t m_rxID;
-        bool m_passive;
         unsigned m_channel;
         Sync m_sync;
         std::vector<TxPresence> m_txs;

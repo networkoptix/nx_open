@@ -49,6 +49,12 @@ namespace
 
         return false;
     }
+
+    void refDeleter(nxpl::PluginInterface * ptr)
+    {
+        if( ptr )
+            ptr->releaseRef();
+    }
 }
 
 
@@ -58,8 +64,6 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
 :
     CLServerPushStreamReader( res ),
     m_camManager( camManager ),
-    m_liveStreamReader( NULL ),
-    m_mediaEncoder2Ref( NULL ),
     m_cameraCapabilities( 0 )
 {
     m_thirdPartyRes = getResource().dynamicCast<QnThirdPartyResource>();
@@ -73,14 +77,6 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
 ThirdPartyStreamReader::~ThirdPartyStreamReader()
 {
     stop();
-    if( m_liveStreamReader )
-    {
-        m_liveStreamReader->releaseRef();
-        m_liveStreamReader = NULL;
-    }
-
-    if( m_mediaEncoder2Ref )
-        m_mediaEncoder2Ref->releaseRef();
 }
 
 void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
@@ -164,38 +160,87 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
     m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
 
-    if( isCameraControlRequired )
+    m_mediaEncoder2.reset();
+    m_mediaEncoder2.reset( static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 )), refDeleter );
+
+    nxpt::ScopedRef<nxcip::CameraMediaEncoder3> mediaEncoder3(
+        (nxcip::CameraMediaEncoder3*)intf->queryInterface( nxcip::IID_CameraMediaEncoder3 ),
+        false );
+
+    if (mediaEncoder3.get()) // one-call config
     {
-        if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
+        if( isCameraControlRequired )
         {
-            if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
-                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
+            float fps = getFps();
+            Qn::StreamQuality quality = getQuality();
+            const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
+            int bitrateKbps = m_thirdPartyRes->suggestBitrateKbps( quality, QSize(resolution.width, resolution.height), fps );
+
+            nxcip::LiveStreamConfig config;
+            memset(&config, 0, sizeof(nxcip::LiveStreamConfig));
+            config.width = resolution.width;
+            config.height = resolution.height;
+            config.framerate = fps;
+            config.bitrateKbps = bitrateKbps;
+            config.quality = quality;
+            if( (m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability) && m_thirdPartyRes->isAudioEnabled() )
+                config.setFlag( nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED );
+
+            m_liveStreamReader.reset(); // release an old one first
+            nxcip::StreamReader * tmpReader = nullptr;
+            int ret = mediaEncoder3->getConfiguredLiveStreamReader( config, &tmpReader );
+            m_liveStreamReader.reset( tmpReader, refDeleter );
+
+            if( ret != nxcip::NX_NO_ERROR )
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("stream"));
+        }
+        else
+        {
+            m_liveStreamReader.reset();
+            m_liveStreamReader.reset( mediaEncoder3->getLiveStreamReader(), refDeleter );
+        }
+    }
+    else // multiple-calls config
+    {
+        if( isCameraControlRequired )
+        {
+            if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
+            {
+                if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
+                    return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
+            }
+
+            const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
+            if( resolution.width*resolution.height > 0 )
+                if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
+                    return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
+
+            float selectedFps = 0;
+            if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
+
+            int selectedBitrateKbps = 0;
+            if( cameraEncoder.setBitrate(
+                    m_thirdPartyRes->suggestBitrateKbps(getQuality(), QSize(resolution.width, resolution.height), getFps()),
+                    &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
+            {
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
+            }
         }
 
-        const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
-        if( resolution.width*resolution.height > 0 )
-            if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
-                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
-        float selectedFps = 0;
-        if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
-            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
-
-        int selectedBitrateKbps = 0;
-        if( cameraEncoder.setBitrate(
-                m_thirdPartyRes->suggestBitrateKbps(getQuality(), QSize(resolution.width, resolution.height), getFps()),
-                &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
+        if( m_mediaEncoder2 )
         {
-            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
+            m_liveStreamReader.reset();
+            m_liveStreamReader.reset( m_mediaEncoder2->getLiveStreamReader(), refDeleter );
         }
     }
 
-    m_mediaEncoder2Ref = static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 ));
-    if( m_mediaEncoder2Ref && (m_liveStreamReader = m_mediaEncoder2Ref->getLiveStreamReader()) )
+    if( m_mediaEncoder2 && m_liveStreamReader )
     {
         if( m_thirdPartyRes->isAudioEnabled() )
         {
             nxcip::AudioFormat audioFormat;
-            if( m_mediaEncoder2Ref->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
+            if( m_mediaEncoder2->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
                 initializeAudioContext( audioFormat );
         }
 
@@ -239,15 +284,10 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
 void ThirdPartyStreamReader::closeStream()
 {
-    if( m_liveStreamReader )
-    {
-        m_liveStreamReader->releaseRef();
-        m_liveStreamReader = NULL;
-    }
-    else if( m_builtinStreamReader.get() )
-    {
+    m_liveStreamReader.reset();
+
+    if( m_builtinStreamReader.get() )
         m_builtinStreamReader->closeStream();
-    }
 }
 
 bool ThirdPartyStreamReader::isStreamOpened() const
@@ -349,7 +389,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
             else
             {
                 int errorCode = 0;
-                rez = readStreamReader( m_liveStreamReader, &errorCode );
+                rez = readStreamReader( m_liveStreamReader.get(), &errorCode );
                 if( rez )
                 {
                     if( m_cameraCapabilities & nxcip::BaseCameraManager::needIFrameDetectionCapability )
@@ -371,7 +411,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                         if( !m_audioContext )
                         {
                             nxcip::AudioFormat audioFormat;
-                            if( m_mediaEncoder2Ref->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
+                            if( m_mediaEncoder2->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
                                 initializeAudioContext( audioFormat );
                         }
                         static_cast<QnCompressedAudioData*>(rez.get())->context = m_audioContext;

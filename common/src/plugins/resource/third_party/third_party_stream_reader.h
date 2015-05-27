@@ -66,11 +66,11 @@ private:
     std::unique_ptr<QnAbstractMediaStreamProvider> m_builtinStreamReader;
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
-    nxcip::StreamReader* m_liveStreamReader;
+    std::shared_ptr<nxcip::StreamReader> m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
     QSize m_videoResolution;
     QnMediaContextPtr m_audioContext;
-    nxcip::CameraMediaEncoder2* m_mediaEncoder2Ref;
+    std::shared_ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities;
 

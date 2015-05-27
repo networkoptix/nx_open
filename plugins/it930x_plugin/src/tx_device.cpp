@@ -1,8 +1,6 @@
 #include <ctime>
 
-#if 0
-#include "../../../common/src/utils/common/synctime.h"
-#endif
+#include <plugins/camera_plugin.h>
 
 #include "tx_device.h"
 
@@ -396,15 +394,17 @@ namespace ite
         return true;
     }
 
-    bool TxDevice::videoEncoderCfg(unsigned encNo, int& width, int& height, float& fps, int& bitrate)
+    bool TxDevice::videoEncoderCfg(unsigned encNo, nxcip::LiveStreamConfig& config)
     {
         if (encNo >= videoEncConfig.configListSize)
             return false;
 
-        width = videoEncConfig.configList[encNo].width;
-        height = videoEncConfig.configList[encNo].height;
-        fps = videoEncConfig.configList[encNo].frameRateLimit;
-        bitrate = videoEncConfig.configList[encNo].bitrateLimit;
+        config.width = videoEncConfig.configList[encNo].width;
+        config.height = videoEncConfig.configList[encNo].height;
+        config.framerate = videoEncConfig.configList[encNo].frameRateLimit;
+        config.bitrateKbps = videoEncConfig.configList[encNo].bitrateLimit;
+        config.quality = videoEncConfig.configList[encNo].quality;
+        config.gopLength = videoEncConfig.configList[encNo].govLength;
         return true;
     }
 
@@ -430,6 +430,7 @@ namespace ite
         return mkRcCmd(CMD_SetTransmissionParametersInput);
     }
 
+    // TODO: need lock for streams
     RcCommand * TxDevice::mkSetEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps)
     {
         if (! prepareVideoEncoderParams(streamNo))

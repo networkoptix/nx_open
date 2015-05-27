@@ -11,6 +11,14 @@ namespace ite
     INIT_OBJECT_COUNTER(StreamReader)
     DEFAULT_REF_COUNTER(StreamReader)
 
+    static DevReader * getDevReader(CameraManager * camera)
+    {
+        auto rxDevice = camera->rxDevice().lock();
+        if (rxDevice)
+            return rxDevice->reader();
+        return nullptr;
+    }
+
     StreamReader::StreamReader(CameraManager * cameraManager, int encoderNumber)
     :   m_refManager(this),
         m_cameraManager(cameraManager),
@@ -69,7 +77,7 @@ namespace ite
 
     void StreamReader::interrupt()
     {
-        DevReader * devReader = m_cameraManager->devReader();
+        DevReader * devReader = getDevReader(m_cameraManager);
         if (devReader)
         {
             m_interrupted = true;
@@ -87,7 +95,7 @@ namespace ite
         Timer timer(true);
         while (timer.elapsedMS() < TIMEOUT_MS)
         {
-            DevReader * devReader = m_cameraManager->devReader();
+            DevReader * devReader = getDevReader(m_cameraManager);
             if (! devReader)
                 break;
 
@@ -98,7 +106,9 @@ namespace ite
             if (pkt)
                 return pkt;
 
-            m_cameraManager->processRC();
+            auto rxDev = m_cameraManager->rxDevice().lock();
+            if (rxDev)
+                rxDev->processRcQueue();
         }
 
         m_interrupted = false;

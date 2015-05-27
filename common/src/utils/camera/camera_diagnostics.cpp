@@ -18,6 +18,9 @@ public:
     {
         using namespace CameraDiagnostics::ErrorCode;
 
+        static const char * strTryRebootRestoreDefs = "Please try to reboot the camera, then restore factory defaults on the web-page.";
+        static const char * strTryUdateFirmware = "Finally, try to update firmware. If the problem persists, please contact support.";
+
         int requiredParamCount = 0;
         QStringList errorMessageParts;
         switch( val )
@@ -44,7 +47,8 @@ public:
             case cannotOpenCameraMediaPort:
                 requiredParamCount = 2;
                 errorMessageParts   << tr("Cannot open media url %1. Failed to connect to media port %2.")
-                                    << tr("Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.");
+                                    << tr("Make sure port %2 is accessible (e.g. forwarded).")
+                                    << tr(strTryRebootRestoreDefs);
                 break;
             case connectionClosedUnexpectedly:
                 requiredParamCount = 2;
@@ -54,14 +58,14 @@ public:
             case responseParseError:
                 requiredParamCount = 2;
                 errorMessageParts   << tr("Could not parse camera response. Url %1, request name %2.")
-                                    << tr("Please try to reboot the camera, then restore factory defaults on the web-page.")
-                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
+                                    << tr(strTryRebootRestoreDefs)
+                                    << tr(strTryUdateFirmware);
                 break;
             case noMediaTrack:
                 requiredParamCount = 1;
                 errorMessageParts   << tr("No supported media tracks at url %1.")
-                                    << tr("Please try to reboot the camera, then restore factory defaults on the web-page.")
-                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
+                                    << tr(strTryRebootRestoreDefs)
+                                    << tr(strTryUdateFirmware);
                 break;
             case notAuthorised:
                 requiredParamCount = 1;
@@ -70,8 +74,8 @@ public:
             case unsupportedProtocol:
                 requiredParamCount = 2;
                 errorMessageParts   << tr("Cannot open media url %1. Unsupported media protocol %2.")
-                                    << tr("Please try to reboot the camera, then restore factory defaults on the web-page.")
-                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
+                                    << tr(strTryRebootRestoreDefs)
+                                    << tr(strTryUdateFirmware);
                 break;
             case cannotConfigureMediaStream:
                 requiredParamCount = 1;
@@ -82,8 +86,8 @@ public:
             case requestFailed:
                 requiredParamCount = 2;
                 errorMessageParts   << tr("Camera request \"%1\" failed with error \"%2\".")
-                                    << tr("Please try to reboot the camera, then restore factory defaults on the web-page.")
-                                    << tr("Finally, try to update firmware. If the problem persists, please contact support.");
+                                    << tr(strTryRebootRestoreDefs)
+                                    << tr(strTryUdateFirmware);
                 break;
             case notImplemented:
                 requiredParamCount = 0;
