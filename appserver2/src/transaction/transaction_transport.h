@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QElapsedTimer>
 #include <QSet>
+#include <QtCore/QWaitCondition>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -206,6 +207,13 @@ public:
         const QSharedPointer<AbstractStreamSocket>& socket,
         const nx_http::Request& request,
         const QByteArray& requestBuf );
+    //!Blocks till connection is ready to accept new transactions
+    /*!
+        \param invokeBeforeWait This handler is invoked if wait is required. Invoked with internal mutex locked
+        \note After \a invokeBeforeWait has been called this object cannot be destroyed (will block in destructor)
+            until \a QnTransactionTransport::waitForNewTransactionsReady has returned
+    */
+    void waitForNewTransactionsReady( std::function<void()> invokeBeforeWait );
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
@@ -282,6 +290,9 @@ private:
     std::vector<nx_http::HttpHeader> m_outgoingClientHeaders;
     size_t m_sentTranSequence;
     nx_http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
+    //!Number of threads waiting on \a QnTransactionTransport::waitForNewTransactionsReady
+    int m_waiterCount;
+    QWaitCondition m_cond;
 
 private:
     void default_initializer();

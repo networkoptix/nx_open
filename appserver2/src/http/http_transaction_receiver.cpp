@@ -109,8 +109,15 @@ namespace ec2
             return;
         }
 
+        QnUuid connectionGuid;
         for( ;; )
         {
+            if( !connectionGuid.isNull() )
+            {
+                //waiting for connection to be ready to receive more transactions
+                QnTransactionMessageBus::instance()->waitForNewTransactionsReady( connectionGuid );
+            }
+
             if( !readSingleRequest() )
                 return;
             
@@ -127,7 +134,18 @@ namespace ec2
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
                 return;
             }
-            const QnUuid connectionGuid( connectionGuidIter->second );
+
+            const QnUuid requestConnectionGuid( connectionGuidIter->second );
+            if( connectionGuid.isNull() )
+            {
+                connectionGuid = requestConnectionGuid;
+            }
+            else if( requestConnectionGuid != connectionGuid )
+            {
+                //not allowing to use TCP same connection for multiple transaction connections
+                sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
+                return;
+            }
 
             if( !QnTransactionMessageBus::instance()->gotTransactionFromRemotePeer(
                     connectionGuid,
