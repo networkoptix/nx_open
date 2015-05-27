@@ -138,7 +138,7 @@ void QnClientPullMediaStreamProvider::run()
         {
             m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(videoData->dataSize()));
             if (lp)
-                lp->onGotVideoFrame(videoData, getLiveParams());
+                lp->onGotVideoFrame(videoData, getLiveParams(), false);
         }
         if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
@@ -147,7 +147,7 @@ void QnClientPullMediaStreamProvider::run()
         putData(std::move(data));
 
         if (videoData && !isMaxFps())
-            m_fpsSleep.sleep(1000*1000/getFps()/numberOfChnnels);
+            m_fpsSleep.sleep(1000*1000/getLiveParams().fps/numberOfChnnels);
 
     }
 

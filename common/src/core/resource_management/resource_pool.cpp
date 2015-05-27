@@ -139,27 +139,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
 }
 
-namespace
-{
-    class MatchResourceByUniqueID
-    {
-    public:
-        MatchResourceByUniqueID( const QString& _uniqueIdToFind )
-        :
-            uniqueIdToFind( _uniqueIdToFind )
-        {
-        }
-
-        bool operator()( const QnResourcePtr& res ) const
-        {
-            return res->getUniqueId() == uniqueIdToFind;
-        }
-
-    private:
-        QString uniqueIdToFind;
-    };
-}
-
 void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
@@ -393,10 +372,10 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QStri
     return result;
 }
 
-QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &uniqueID) const
+QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString &uniqueID) const
 {
     QMutexLocker locker(&m_resourcesMtx);
-    auto itr = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByUniqueID(uniqueID));
+    auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&uniqueID](const QnResourcePtr &resource) { return resource->getUniqueId() == uniqueID; });
     return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
 }
 
@@ -408,7 +387,7 @@ void QnResourcePool::updateUniqId(const QnResourcePtr& res, const QString &newUn
 
 bool QnResourcePool::hasSuchResource(const QString &uniqid) const
 {
-    return !getResourceByUniqId(uniqid).isNull();
+    return !getResourceByUniqueId(uniqid).isNull();
 }
 
 QnResourceList QnResourcePool::getResourcesWithFlag(Qn::ResourceFlag flag) const

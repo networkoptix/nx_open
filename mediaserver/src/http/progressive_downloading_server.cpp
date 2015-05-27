@@ -481,7 +481,7 @@ void QnProgressiveDownloadingConsumer::run()
             codecParams[it->first] = it->second;
         }
 
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(resUniqueID);
+        QnResourcePtr resource = qnResPool->getResourceByUniqueId(resUniqueID);
         if (resource == 0)
         {
             d->responseBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLatin1()) + QByteArray(" not found ");

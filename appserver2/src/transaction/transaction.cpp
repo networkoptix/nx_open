@@ -144,6 +144,12 @@ namespace ec2
 
             REGISTER_COMMAND(markLicenseOverflow),
             REGISTER_COMMAND(getSettings),
+            
+            REGISTER_COMMAND(getClientInfos),
+            REGISTER_COMMAND(saveClientInfo),
+
+            REGISTER_COMMAND(getStatisticsReport),
+            REGISTER_COMMAND(triggerStatisticsReport),
 
             REGISTER_COMMAND(getTransactionLog)
         };
@@ -234,7 +240,8 @@ namespace ec2
                 val == addLicenses ||
                 val == removeLicense || 
                 val == restoreDatabase ||
-                val == markLicenseOverflow;
+                val == markLicenseOverflow ||
+                val == saveClientInfo;
         }
 
     }

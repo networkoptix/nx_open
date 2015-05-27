@@ -4,9 +4,7 @@
 
 #include "utils/common/log.h"
 
-namespace {
-    const QString desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
-}
+const QString QnResourceTypePool::desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)

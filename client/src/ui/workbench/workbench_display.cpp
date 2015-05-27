@@ -448,7 +448,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
 
-	if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+	if (canShowLayoutBackground()) {
 		m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
 		m_scene->addItem(gridBackgroundItem());
 		setLayer(gridBackgroundItem(), Qn::EMappingLayer);
@@ -584,6 +584,7 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
 }
 
 void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
+    Q_ASSERT_X(canShowLayoutBackground(), Q_FUNC_INFO, "This item is only used when layout background is active");
     QnGridRaisedConeItem* item = raisedConeItem(widget);
     if (item->scene() == m_scene)
         return;
@@ -602,7 +603,7 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
         magicConst = 0.8;   //TODO: #Elric magic const
     else
     if (
-        !(m_lightMode & Qn::LightModeNoLayoutBackground) &&
+        canShowLayoutBackground() &&
         (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
     )
         magicConst = 0.33;  //TODO: #Elric magic const
@@ -640,7 +641,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
 
-            if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+            if (canShowLayoutBackground()) {
                 ensureRaisedConeItem(oldWidget);
                 raisedConeItem(oldWidget)->setEffectEnabled(false);
                 setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
@@ -650,7 +651,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(newWidget != NULL) {
             bringToFront(newWidget);
 
-            if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+            if (canShowLayoutBackground()) {
                 ensureRaisedConeItem(newWidget);
                 setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
                 raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
@@ -747,7 +748,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (!layout)
         return;
 
-    if (m_lightMode & Qn::LightModeNoLayoutBackground)
+    if (!canShowLayoutBackground())
         return;
 
 	if (gridBackgroundItem())
@@ -882,7 +883,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     if(resource.isNull()) {
         qnDeleteLater(item);
         return false;
@@ -990,7 +991,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 }
             }
         }
-        qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
+        if (qnRedAssController)
+            qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
     return true;
@@ -1028,7 +1030,8 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     m_widgetByItem.remove(item);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
         m_widgetByRenderer.remove(mediaWidget->renderer());
-        qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
+        if (qnRedAssController)
+            qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
     }
 
     if(destroyWidget) {
@@ -1689,7 +1692,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->pleaseStop();
         }
 
-        if(QnMediaResourcePtr resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>()) {
+        if(QnMediaResourcePtr resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>()) {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
             connect(m_loader, &QnThumbnailsLoader::thumbnailLoaded, this,       &QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded);
@@ -2035,4 +2038,14 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         scene()->addItem(splashItem);
         setLayer(splashItem, Qn::EffectsLayer);
     }
+}
+
+bool QnWorkbenchDisplay::canShowLayoutBackground() const {
+    if (qnRuntime->isActiveXMode())
+        return false;
+
+    if (m_lightMode & Qn::LightModeNoLayoutBackground)
+        return false;
+
+    return true;
 }

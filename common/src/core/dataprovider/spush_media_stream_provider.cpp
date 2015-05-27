@@ -62,10 +62,10 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
             m_openStreamResult = CameraDiagnostics::InitializationInProgress();
     }
     else {
-        m_openStreamResult = openStreamInternal(isControlRequired);
+        m_currentLiveParams = getLiveParams();
+        m_openStreamResult = openStreamInternal(isControlRequired, m_currentLiveParams);
         m_needControlTimer.restart();
         m_openedWithStreamCtrl = isControlRequired;
-        m_currentLiveParams = getLiveParams();
     }
 
     {
@@ -210,7 +210,7 @@ void CLServerPushStreamReader::run()
         {
             m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
             if (lp)
-                lp->onGotVideoFrame(videoData, m_currentLiveParams);
+                lp->onGotVideoFrame(videoData, m_currentLiveParams, m_openedWithStreamCtrl);
         }
         if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;

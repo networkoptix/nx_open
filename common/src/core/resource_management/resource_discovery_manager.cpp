@@ -276,8 +276,8 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return false;
 
     QnUuid ownGuid = qnCommon->moduleGUID();
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr mServer = camera->getParentServer();
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(ownGuid);
     if (!mServer)
         return true; // can take foreign camera is camera's server is absent
     if (!ownServer)
@@ -405,7 +405,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         switch( it->second->discoveryMode() )
         {
             case DiscoveryMode::partiallyEnabled:
-                if( !qnResPool->getResourceByUniqId(it->first->getUniqueId()) )
+                if( !qnResPool->getResourceByUniqueId(it->first->getUniqueId()) )
                     continue;   //ignoring newly discovered camera
                 it->first->addFlags(Qn::search_upd_only);
                 break;
@@ -495,7 +495,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         if (needToStop())
             return false;
 
-        const QnResourcePtr& rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
+        const QnResourcePtr& rpResource = qnResPool->getResourceByUniqueId((*it)->getUniqueId());
         QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(rpResource.data());
         if (rpNetRes) {
             QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
@@ -584,7 +584,7 @@ void QnResourceDiscoveryManager::dtsAssignment()
 
         for(const QnDtsUnit& unit: unitsLst)
         {
-            QnResourcePtr res = qnResPool->getResourceByUniqId(unit.resourceID);
+            QnResourcePtr res = qnResPool->getResourceByUniqueId(unit.resourceID);
             if (!res)
                 continue;
 

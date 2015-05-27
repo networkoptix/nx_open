@@ -53,12 +53,10 @@ public:
 
     void setSecondaryQuality(Qn::SecondStreamQuality  quality);
     virtual void setQuality(Qn::StreamQuality q);
-    Qn::StreamQuality getQuality() const;
     virtual void setCameraControlDisabled(bool value);
 
     // for live providers only 
     virtual void setFps(float f);
-    float getFps() const;
     bool isMaxFps() const;
 
     void onPrimaryFpsUpdated(int newFps);
@@ -68,7 +66,8 @@ public:
     bool needMetaData(); 
 
     virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
-                                 const QnLiveStreamParams& currentLiveParams);
+                                 const QnLiveStreamParams& currentLiveParams,
+                                 bool isCameraControlRequired);
 
     void setUseSoftwareMotion(bool value);
 
@@ -90,10 +89,9 @@ public:
     void updateSoftwareMotionStreamNum();
 
     void setOwner(QnAbstractVideoCamera* owner);
-
+    virtual void pleaseReopenStream() = 0;
 protected:
     /*! Called when @param currentStreamParams are updated */
-    virtual void pleaseReopenStream() = 0;
 
     QnMetaDataV1Ptr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
@@ -102,10 +100,10 @@ protected:
         \param picSize video size in pixels
     */
     virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
-
 protected:
     mutable QMutex m_livemutex;
-
+private:
+    float getDefaultFps() const;
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopend
     // TODO: find out the way to keep it in sync besides pleaseReopenStream() call (which causes delay)

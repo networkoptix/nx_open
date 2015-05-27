@@ -26,7 +26,8 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
-    void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, const QString& userName, const QString &userId);
+    void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, 
+		                const QString& userName, const QString &userId);
 
     TCPSocketPtr getConnectionByUserId(const QString& userId);
     quint32 incCSeq(const TCPSocketPtr& socket);

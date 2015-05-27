@@ -112,7 +112,7 @@ namespace nx_http
     bool AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody )
+        const nx_http::StringType& messageBody)
     {
         resetDataBeforeNewRequest();
         m_url = url;
@@ -120,6 +120,7 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Type", contentType) );
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
+        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = messageBody;
         return initiateHttpMessageDelivery( url );
     }
@@ -147,6 +148,19 @@ namespace nx_http
         if( contentTypeIter == httpMsg.headers().end() )
             return StringType();
         return contentTypeIter->second;
+    }
+
+    bool AsyncHttpClient::hasRequestSuccesed() const
+    {
+        if (state() == sFailed)
+            return false;
+
+        if (auto resp = response())
+        {
+            auto status = resp->statusLine.statusCode;
+            return status >= 200 && status < 300; // SUCCESS codes 2XX
+        }
+        return false;
     }
 
     //!Returns current message body buffer, clearing it
