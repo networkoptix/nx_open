@@ -13,7 +13,7 @@ extern "C"
 #include <QtCore/QIODevice>
 
 
-QString codecIDToString(CodecID codecID);
+QString codecIDToString(AVCodecID codecID);
 QString getAudioCodecDescription(AVCodecContext* codecContext);
 
 
@@ -29,7 +29,7 @@ public:
     FrameType getFrameType(const quint8* data, int dataLen);
 
     AVCodecContext* getContext() const { return m_context; }
-    CodecID getCodec() const { return m_context->codec_id; }
+    AVCodecID getCodec() const { return m_context->codec_id; }
 
 private:
 
@@ -42,7 +42,7 @@ private:
     void decodeWMVSequence(const quint8* data, int size);
 private:
     AVCodecContext* m_context;
-    CodecID m_codecId;
+    AVCodecID m_codecId;
     VC1SequenceHeader* m_vcSequence;
     bool m_dataWithNalPrefixes;
 };

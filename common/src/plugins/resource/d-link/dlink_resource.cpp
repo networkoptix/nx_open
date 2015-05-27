@@ -369,7 +369,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
     //detecting and saving selected resolutions
     /*
-    const CodecID supportedCodec = !m_camInfo.hasH264.isEmpty()
+    const AVCodecID supportedCodec = !m_camInfo.hasH264.isEmpty()
         ? CODEC_ID_H264
         : (m_camInfo.hasMPEG4 ? CODEC_ID_MPEG4 : CODEC_ID_MJPEG);
     CameraMediaStreams mediaStreams;

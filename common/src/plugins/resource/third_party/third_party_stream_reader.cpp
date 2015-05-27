@@ -400,7 +400,7 @@ QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
         : (m_builtinStreamReader.get() ? m_builtinStreamReader->getAudioLayout() : QnConstResourceAudioLayoutPtr());
 }
 
-CodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compressionType )
+AVCodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compressionType )
 {
     switch( compressionType )
     {
@@ -540,7 +540,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
 
 void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat )
 {
-    const CodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
+    const AVCodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
     m_audioContext = QnMediaContextPtr( new QnMediaContext(ffmpegCodecId) );
 
     //filling mediaPacket->context

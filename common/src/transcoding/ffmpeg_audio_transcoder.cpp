@@ -8,8 +8,9 @@
 
 
 static const int MAX_AUDIO_JITTER = 1000 * 200;
+static const int AVCODEC_MAX_AUDIO_FRAME_SIZE = 192000;
 
-QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
+QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
     QnAudioTranscoder(codecId),
     m_audioEncodingBuffer(0),
     m_resampleBuffer(0),

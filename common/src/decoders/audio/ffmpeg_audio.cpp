@@ -13,6 +13,7 @@ struct AVCodecContext;
 #define INBUF_SIZE 4096
 
 extern int MAX_AUDIO_FRAME_SIZE; // TODO: #Elric this is totally evil.
+static const int AVCODEC_MAX_AUDIO_FRAME_SIZE = 192000;
 
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 
@@ -41,7 +42,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         m_first_instance = false;
     }
 
-//    CodecID codecId = internalCodecIdToFfmpeg(m_codec);
+//    AVCodecID codecId = internalCodecIdToFfmpeg(m_codec);
 
     if (m_codec != CODEC_ID_NONE)
     {

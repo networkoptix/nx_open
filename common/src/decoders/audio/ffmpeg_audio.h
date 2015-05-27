@@ -22,7 +22,7 @@ private:
     AVCodecContext *c; // TODO: #vasilenko please name these members properly
 
     static bool m_first_instance;
-    CodecID m_codec;
+    AVCodecID m_codec;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

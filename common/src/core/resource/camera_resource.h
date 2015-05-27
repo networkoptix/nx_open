@@ -128,7 +128,7 @@ public:
     CameraMediaStreamInfo(
         int _encoderIndex,
         const QSize& _resolution,
-        CodecID _codec )
+        AVCodecID _codec )
     :
         encoderIndex( _encoderIndex ),
         resolution( _resolution.isValid()
@@ -144,7 +144,7 @@ public:
         CameraMediaStreamInfo(
             int _encoderIndex,
             const QSize& _resolution,
-            CodecID _codec,
+            AVCodecID _codec,
             CustomParamDictType&& _customStreamParams )
     :
         encoderIndex( _encoderIndex ),

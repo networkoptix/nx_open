@@ -233,7 +233,7 @@ void QnVMax480ConnectionProcessor::run()
         quint8 internalCodecID = vMaxHeader[2];
         quint32 dataSize = *(quint32*)(vMaxHeader+4);
         quint64 timestamp = *(quint64*)(vMaxHeader+8);
-        CodecID codecID = CODEC_ID_NONE;
+        AVCodecID codecID = CODEC_ID_NONE;
 
         if (dataType == VMAXDT_GotArchiveRange)
         {

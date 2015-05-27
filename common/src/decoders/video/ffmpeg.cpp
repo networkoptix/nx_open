@@ -41,7 +41,7 @@ struct FffmpegLog
 };
 
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(AVCodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
     //m_width(0),
@@ -102,7 +102,7 @@ void CLFFmpegVideoDecoder::flush()
 }
 
 
-AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
+AVCodec* CLFFmpegVideoDecoder::findCodec(AVCodecID codecId)
 {
     AVCodec* codec = 0;
 

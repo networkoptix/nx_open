@@ -75,7 +75,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     }
 
     QnWritableCompressedVideoDataPtr rez(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, size, m_context));
-    rez->compressionType = (CodecID) codec;
+    rez->compressionType = (AVCodecID) codec;
 
     rez->m_data.finishWriting(size);
     rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;

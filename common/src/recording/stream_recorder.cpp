@@ -549,12 +549,13 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         for (int i = 0; i < videoChannels; ++i) 
         {
             // TODO: #vasilenko avoid using deprecated methods
-            AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
+            AVStream* videoStream = avformat_new_stream(m_formatCtx, NULL);
             if (videoStream == 0) {
                 m_lastError = VideoStreamAllocationError;
                 NX_LOG(lit("Can't allocate output stream for recording."), cl_logERROR);
                 return false;
             }
+            videoStream->id = DEFAULT_VIDEO_STREAM_ID+i;
 
             AVCodecContext* videoCodecCtx = videoStream->codec;
             videoCodecCtx->codec_id = mediaData->compressionType;
@@ -622,14 +623,15 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         {
             m_isAudioPresent = true;
             // TODO: #vasilenko avoid using deprecated methods
-            AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
+            AVStream* audioStream = avformat_new_stream(m_formatCtx, NULL);
             if (!audioStream) {
                 m_lastError = AudioStreamAllocationError;
                 NX_LOG(lit("Can't allocate output audio stream."), cl_logERROR);
                 return false;
             }
+            audioStream->id = DEFAULT_AUDIO_STREAM_ID+i;
 
-            CodecID srcAudioCodec = CODEC_ID_NONE;
+            AVCodecID srcAudioCodec = CODEC_ID_NONE;
             QnMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(i).codecContext.dynamicCast<QnMediaContext>();
             if (!mediaContext) {
                 m_lastError = InvalidAudioCodecError;
@@ -843,7 +845,7 @@ bool QnStreamRecorder::isAudioPresent() const
     return m_isAudioPresent;
 }
 
-void QnStreamRecorder::setAudioCodec(CodecID codec)
+void QnStreamRecorder::setAudioCodec(AVCodecID codec)
 {
     m_dstAudioCodec = codec;
 }

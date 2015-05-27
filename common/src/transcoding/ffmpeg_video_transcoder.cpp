@@ -10,7 +10,7 @@
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 
-QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
+QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(AVCodecID codecId):
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),

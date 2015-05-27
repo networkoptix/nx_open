@@ -295,7 +295,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     //detecting and saving selected resolutions
     /*
     CameraMediaStreams mediaStreams;
-    const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
+    const AVCodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
     mediaStreams.streams.push_back( CameraMediaStreamInfo(
         PRIMARY_ENCODER_INDEX,
         QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()),

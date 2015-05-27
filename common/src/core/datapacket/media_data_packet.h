@@ -53,7 +53,7 @@ class QnMediaContext: public QnAbstractMediaContext {
 public:
 
     QnMediaContext(AVCodecContext* ctx);
-    QnMediaContext(CodecID codecId);
+    QnMediaContext(AVCodecID codecId);
     QnMediaContext(const quint8* payload, int dataSize);
     QnMediaContext(const QByteArray& payload);
     ~QnMediaContext();
@@ -117,7 +117,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     virtual size_t dataSize() const = 0;
 
     DataType dataType;
-    CodecID compressionType;
+    AVCodecID compressionType;
     MediaFlags flags;
     quint32 channelNumber;     // video or audio channel number; some devices might have more than one sensor
     QnMediaContextPtr context;

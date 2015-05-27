@@ -43,7 +43,7 @@ namespace QnCodecParams
 class QnCodecTranscoder
 {
 public:
-    QnCodecTranscoder(CodecID codecId);
+    QnCodecTranscoder(AVCodecID codecId);
     virtual ~QnCodecTranscoder() {}
     
     /*
@@ -81,7 +81,7 @@ protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
     int m_bitrate;
-    CodecID m_codecId;
+    AVCodecID m_codecId;
     Qn::StreamQuality m_quality;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
@@ -91,7 +91,7 @@ typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 class QnVideoTranscoder: public QnCodecTranscoder
 {
 public:
-    QnVideoTranscoder(CodecID codecId);
+    QnVideoTranscoder(AVCodecID codecId);
     virtual ~QnVideoTranscoder();
 
     //!Set picture size (in pixels) of output video stream
@@ -126,7 +126,7 @@ typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
-    QnAudioTranscoder(CodecID codecId): QnCodecTranscoder(codecId) {}
+    QnAudioTranscoder(AVCodecID codecId): QnCodecTranscoder(codecId) {}
     virtual bool open(const QnConstCompressedAudioDataPtr& video) { Q_UNUSED(video) return true; }
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
@@ -168,7 +168,7 @@ public:
     * @param addition codec params. Not used if transcode method TM_NoTranscode
     */
     virtual int setVideoCodec(
-        CodecID codec,
+        AVCodecID codec,
         TranscodeMethod method,
         Qn::StreamQuality quality,
         const QSize& resolution = QSize(1024,768),
@@ -184,7 +184,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    virtual OperationResult setAudioCodec(CodecID codec, TranscodeMethod method);
+    virtual OperationResult setAudioCodec(AVCodecID codec, TranscodeMethod method);
 
     /*
     * Transcode media data and write it to specified QnByteArray
@@ -217,7 +217,7 @@ public:
         \note Does not modify existing parameters in \a params
     */
     static int suggestMediaStreamParams(
-        CodecID codec,
+        AVCodecID codec,
         QSize resolution,
         Qn::StreamQuality quality,
         QnCodecParams::Value* const params = NULL );
@@ -235,8 +235,8 @@ protected:
 
     QnVideoTranscoderPtr m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;
-    CodecID m_videoCodec;
-    CodecID m_audioCodec;
+    AVCodecID m_videoCodec;
+    AVCodecID m_audioCodec;
     bool m_videoStreamCopy;
     bool m_audioStreamCopy;
     QnByteArray m_internalBuffer;

@@ -199,13 +199,14 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
     if (m_videoCodec != CODEC_ID_NONE)
     {
         // TODO: #vasilenko avoid using deprecated methods
-        AVStream* videoStream = av_new_stream(m_formatCtx, 0);
+        AVStream* videoStream = avformat_new_stream(m_formatCtx, NULL);
         if (videoStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
             NX_LOG(m_lastErrMessage, cl_logERROR);
             return -1;
         }
+        videoStream->id = 0;
 
         //videoStream->codec = m_videoEncoderCodecCtx = avcodec_alloc_context3(0);
         m_videoEncoderCodecCtx = videoStream->codec;
@@ -279,13 +280,14 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         //Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 
         // TODO: #vasilenko avoid using deprecated methods
-        AVStream* audioStream = av_new_stream(m_formatCtx, 0);
+        AVStream* audioStream = avformat_new_stream(m_formatCtx, NULL);
         if (audioStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
             NX_LOG(m_lastErrMessage, cl_logERROR);
             return -1;
         }
+        audioStream->id = 0;
 
         AVCodec* avCodec = avcodec_find_decoder(m_audioCodec);
         if (avCodec == 0)
