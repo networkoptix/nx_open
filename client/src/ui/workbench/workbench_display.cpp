@@ -2041,7 +2041,7 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
 }
 
 bool QnWorkbenchDisplay::canShowLayoutBackground() const {
-    if (qnSettings->isActiveXMode())
+    if (qnRuntime->isActiveXMode())
         return false;
 
     if (m_lightMode & Qn::LightModeNoLayoutBackground)

@@ -13,6 +13,7 @@
 #include "action_parameter_types.h"
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
@@ -1855,7 +1856,7 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const Qn
     /* This method call means that we are opening brand new context menu.
        Following check will assure that only the latest context menu will be displayed. 
        In the standalone application it is guarantied by the qt GUI engine. */
-    if (qnSettings->isActiveXMode()) {
+    if (qnRuntime->isActiveXMode()) {
         for (auto menuObject: m_parametersByMenu.keys()) {
             if (!menuObject)
                 continue;

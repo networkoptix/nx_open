@@ -31,8 +31,6 @@ CrashReporter::~CrashReporter()
         QMutexLocker lock(&m_mutex);
         std::swap(httpClients, m_activeHttpClients);
     }
-
-    return false;
 }
 
 bool CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)

@@ -368,7 +368,7 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
-    if (qnSettings->isActiveXMode() || qnSettings->isVideoWallMode())
+    if (qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode())
         return;
 
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
