@@ -77,7 +77,7 @@ bool QnVMax480LiveProvider::canChangeStatus() const
 }
 
 
-CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
     if (m_opened)
@@ -129,18 +129,6 @@ void QnVMax480LiveProvider::afterRun()
     //msleep(300);
     CLServerPushStreamReader::afterRun();
     closeStream();
-}
-
-void QnVMax480LiveProvider::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnVMax480LiveProvider::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 int QnVMax480LiveProvider::getChannel() const

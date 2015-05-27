@@ -79,11 +79,6 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
     stop();
 }
 
-void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
-{
-    base_type::onGotVideoFrame( videoData );
-}
-
 static int sensitivityToMask[10] = 
 {
     255, //  0
@@ -135,7 +130,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     camManager2->releaseRef();
 }
 
-CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     if( isStreamOpened() )
         return CameraDiagnostics::NoErrorResult();
@@ -171,18 +166,16 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
     {
         if( isCameraControlRequired )
         {
-            float fps = getFps();
-            Qn::StreamQuality quality = getQuality();
             const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
-            int bitrateKbps = m_thirdPartyRes->suggestBitrateKbps( quality, QSize(resolution.width, resolution.height), fps );
+            int bitrateKbps = m_thirdPartyRes->suggestBitrateKbps( params.quality, QSize(resolution.width, resolution.height), params.fps );
 
             nxcip::LiveStreamConfig config;
             memset(&config, 0, sizeof(nxcip::LiveStreamConfig));
             config.width = resolution.width;
             config.height = resolution.height;
-            config.framerate = fps;
+            config.framerate = params.fps;
             config.bitrateKbps = bitrateKbps;
-            config.quality = quality;
+            config.quality = params.quality;
             if( (m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability) && m_thirdPartyRes->isAudioEnabled() )
                 config.flags |= nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED;
 
@@ -216,12 +209,12 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
                     return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
 
             float selectedFps = 0;
-            if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
+            if( cameraEncoder.setFps( params.fps, &selectedFps ) != nxcip::NX_NO_ERROR )
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
 
             int selectedBitrateKbps = 0;
             if( cameraEncoder.setBitrate(
-                    m_thirdPartyRes->suggestBitrateKbps(getQuality(), QSize(resolution.width, resolution.height), getFps()),
+                m_thirdPartyRes->suggestBitrateKbps(params.quality, QSize(resolution.width, resolution.height), params.fps),
                     &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
             {
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
@@ -453,18 +446,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     }
 
     return rez;
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const

@@ -169,6 +169,7 @@ int main( int argc, char* argv[] )
 
     ProcessUtils::initialize();
 
+    QScopedPointer<TimerManager> timerManager(new TimerManager());
     ApplauncherProcess applauncherProcess(
         &userSettings,
         &installationManager,

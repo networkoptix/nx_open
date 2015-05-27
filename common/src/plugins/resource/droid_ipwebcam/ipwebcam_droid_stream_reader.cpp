@@ -162,7 +162,7 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
 
 }
 
-CameraDiagnostics::Result QnPlDroidIpWebCamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result QnPlDroidIpWebCamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
     if (isStreamOpened())

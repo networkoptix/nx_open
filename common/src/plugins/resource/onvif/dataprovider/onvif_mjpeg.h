@@ -19,14 +19,13 @@ protected:
     //!Implementation of QnAbstractMediaStreamProvider::getNextData
     virtual QnAbstractMediaDataPtr getNextData() override;
     //!Implementation of QnAbstractMediaStreamProvider::openStream
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     //!Implementation of QnAbstractMediaStreamProvider::closeStream
     virtual void closeStream() override;
     //!Implementation of QnAbstractMediaStreamProvider::isStreamOpened
     virtual bool isStreamOpened() const override;
 
-    void updateStreamParamsBasedOnQuality() override {};
-    void updateStreamParamsBasedOnFps() override {};
+    virtual void pleaseReopenStream() override {};
 
 private:
     std::unique_ptr<CLSimpleHTTPClient> mHttpClient;

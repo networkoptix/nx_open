@@ -13,6 +13,7 @@
 #include "action_parameter_types.h"
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
@@ -1474,6 +1475,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ToggleTourModeAction).
         flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Start Tour")).
         toggledText(tr("Stop Tour")).
         shortcut(tr("Alt+T")).
@@ -1857,6 +1859,18 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
 
 
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
+    /* This method call means that we are opening brand new context menu.
+       Following check will assure that only the latest context menu will be displayed. 
+       In the standalone application it is guarantied by the qt GUI engine. */
+    if (qnRuntime->isActiveXMode()) {
+        for (auto menuObject: m_parametersByMenu.keys()) {
+            if (!menuObject)
+                continue;
+            if (QMenu* menu = qobject_cast<QMenu*>(menuObject))
+                menu->hide();
+        }
+    }
+
     return newMenu(Qn::NoAction, scope, parent, parameters, options);
 }
 

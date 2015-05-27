@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api_fwd.h>
+#include <crash_reporter.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -51,6 +52,7 @@ private:
 
     /** Flag that we should handle new connection. */
     bool m_readyForConnection;
+    ec2::CrashReporter m_crashReporter;
 };
 
 #endif // WORKBENCH_CONNECT_HANDLER_H

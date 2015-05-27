@@ -14,7 +14,7 @@ QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
 
 void QnServerInterfaceWatcher::at_connectionChanged(const QnModuleInformation &moduleInformation) 
 {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
     if (!server)
         return;
     updatePriaryInterface(server);

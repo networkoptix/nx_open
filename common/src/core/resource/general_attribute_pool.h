@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <utils/common/uuid.h>
+
 template<class KeyType, class MappedType>
 class QnGeneralAttributePool
 {

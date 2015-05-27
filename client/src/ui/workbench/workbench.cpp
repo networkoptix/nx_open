@@ -281,7 +281,7 @@ void QnWorkbench::update(const QnWorkbenchState &state) {
     clear();
 
     for(int i = 0; i < state.layoutUuids.size(); i++) {
-        QnLayoutResourcePtr resource = resourcePool()->getResourceById(state.layoutUuids[i]).dynamicCast<QnLayoutResource>();
+        QnLayoutResourcePtr resource = resourcePool()->getResourceById<QnLayoutResource>(state.layoutUuids[i]);
         if(!resource)
             continue;
 

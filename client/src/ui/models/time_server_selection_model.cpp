@@ -204,7 +204,7 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
 
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(item.peerId).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);
     QString title = server ? getFullResourceName(server, true) : tr("Server");
 
     switch (role) {
@@ -308,7 +308,7 @@ void QnTimeServerSelectionModel::updateTime() {
 void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info) {
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is added");
 #ifdef _DEBUG
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(info.uuid).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(info.uuid);
     QString title = server ? getFullResourceName(server, true) : tr("Server");
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " name is " + title.toUtf8());
 #endif // DEBUG
@@ -395,7 +395,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const {
         : localOffset*60;   
 
     foreach (const Item &item, m_items) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(item.peerId).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);
         if (!server || server->getStatus() != Qn::Online)
             continue;
 

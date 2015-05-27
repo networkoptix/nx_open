@@ -24,6 +24,7 @@ inline void serialize_field(const ec2::ApiRuntimeData &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiPeerAliveData &, QVariant *) { return; }
 inline void serialize_field(const ec2::QnTranState &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiModuleData &, QVariant *) { return; }
+inline void serialize_field(const ec2::ApiClientInfoData &, QVariant *) { return; }
 
 template<class T, class Allocator>
 inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }
@@ -38,5 +39,6 @@ inline void deserialize_field(const QVariant &, ec2::ApiPeerData *) { return; }
 inline void deserialize_field(const QVariant &, ec2::ApiRuntimeData *) { return; }
 inline void deserialize_field(const QVariant &, ec2::ApiPeerAliveData *) { return; }
 inline void deserialize_field(const QVariant &, ec2::QnTranState *) { return; }
+inline void deserialize_field(const QVariant &, ec2::ApiClientInfoData *) { return; }
 
 #endif //QN_API_MODEL_FUNCTIONS_H

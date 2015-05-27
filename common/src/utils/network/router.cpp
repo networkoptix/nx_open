@@ -33,7 +33,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     if (!connection)
         return result; // no connection to the server, can't route
 
-    bool isknownServer = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>() != 0;
+    bool isknownServer = qnResPool->getResourceById<QnMediaServerResource>(id) != 0;
     bool isClient = qnCommon->remoteGUID() != qnCommon->moduleGUID();
     if (!isknownServer && isClient) {
         result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)

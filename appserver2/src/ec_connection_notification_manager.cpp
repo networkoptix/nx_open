@@ -144,6 +144,9 @@ namespace ec2
         emit m_ecConnection->reverseConnectionRequested(tran.params);
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiClientInfoData> & /*tran*/ ) {}
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiClientInfoDataList> & /*tran*/ ) {}
+
     void ECConnectionNotificationManager::databaseReplaceRequired()
     {
         emit m_ecConnection->databaseDumped();

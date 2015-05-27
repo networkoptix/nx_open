@@ -209,7 +209,7 @@ void QnRoutingManagementWidget::submitToSettings() {
 
     for (auto it = m_changes->changes.begin(); it != m_changes->changes.end(); ++it) {
         QnUuid serverId = it.key();
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverId);
         if (!server)
             continue;
 
