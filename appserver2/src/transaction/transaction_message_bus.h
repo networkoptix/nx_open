@@ -67,6 +67,8 @@ namespace ec2
             const QnUuid& connectionGuid,
             const nx_http::Request& request,
             const QByteArray& requestMsgBody );
+        //!Blocks till connection \a connectionGuid is ready to accept new transactions
+        void waitForNewTransactionsReady( const QnUuid& connectionGuid );
         void dropConnections();
         
         ApiPeerData localPeer() const;
