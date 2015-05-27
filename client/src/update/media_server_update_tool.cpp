@@ -255,7 +255,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
             QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
             if (!server)
                 continue;
-            QnUuid realId = server->getProperty(lit("guid"));
+            QnUuid realId = server->getOriginalGuid();
             if (realId.isNull())
                 continue;
             incompatibleTargets.insert(realId);

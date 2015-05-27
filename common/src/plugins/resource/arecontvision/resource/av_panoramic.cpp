@@ -52,22 +52,13 @@ bool QnArecontPanoramicResource::getParamPhysical2(int channel, const QString& n
         return false;
 
 
-    char c_response[MAX_RESPONSE_LEN];
-
-    int result_size =  connection.read(c_response,sizeof(c_response));
-
-    if (result_size <0)
-        return false;
-
-    QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
-
+    QByteArray response;
+    connection.readAll(response);
     int index = response.indexOf('=');
     if (index==-1)
         return false;
 
-    QByteArray rarray = response.mid(index+1);
-
-    val = QLatin1String(rarray.data());
+    val = QLatin1String(response.mid(index+1));
 
     return true;
 }

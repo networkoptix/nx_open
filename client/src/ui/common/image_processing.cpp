@@ -22,6 +22,9 @@ static void gaussianBlurInternal(const QImage &src, qreal sigma, QImage &dst) {
         K[x] = static_cast<int>(256 * std::exp(-(x * x) / (2 * sigma * sigma)));
         kernelSum += K[x];
     }
+    /* This gonna never happen, just to make static analyzer feel safe =) */
+    if (kernelSum == 0)
+        kernelSum = 1;
 
     int stride = src.bytesPerLine();
     QSize size = src.size();

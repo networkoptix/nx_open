@@ -33,8 +33,6 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
     m_exportReader(0),
     m_displayStarted(false)
 {
-    if (m_resource)
-        cl_log.log(QLatin1String("Creating camera for "), m_resource->toResource()->toString(), cl_logDEBUG1);
     if (m_reader) {
         m_reader->addDataProcessor(&m_camdispay);
         if (dynamic_cast<QnAbstractArchiveReader*>(m_reader)) {
@@ -55,9 +53,6 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
 
 QnClientVideoCamera::~QnClientVideoCamera()
 {
-    if (m_resource)
-        cl_log.log(QLatin1String("Destroy camera for "), m_resource->toResource()->toString(), cl_logDEBUG1);
-
     stopDisplay();
     delete m_reader;
 }
@@ -162,6 +157,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
             emit exportFinished(InvalidResourceType, fileName);
             return;
         }
+        connect(m_exportReader, SIGNAL(finished()), m_exportReader, SLOT(deleteLater()));
         m_exportReader->setCycleMode(false);
         QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (m_exportReader->getArchiveDelegate());
         if (rtspClient) {
@@ -175,6 +171,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
             m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
         m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
+        connect(m_exportRecorder, SIGNAL(finished()), m_exportRecorder, SLOT(deleteLater()));
         if (storage)
             m_exportRecorder->setStorage(storage);
 
@@ -220,7 +217,6 @@ void QnClientVideoCamera::stopExport() {
     if (m_exportReader) {
         if (m_exportRecorder)
             m_exportReader->removeDataProcessor(m_exportRecorder);
-        connect(m_exportReader, SIGNAL(finished()), m_exportReader, SLOT(deleteLater()));
         m_exportReader->pleaseStop();
     }
     if (m_exportRecorder) {
@@ -228,7 +224,6 @@ void QnClientVideoCamera::stopExport() {
         //TODO: #vasilenko get rid of this magic
         m_exportRecorder->setNeedCalcSignature(false);
 
-        connect(m_exportRecorder, SIGNAL(finished()), m_exportRecorder, SLOT(deleteLater()));
         connect(m_exportRecorder, SIGNAL(finished()), this, SIGNAL(exportStopped()));
         m_exportRecorder->pleaseStop();
     }

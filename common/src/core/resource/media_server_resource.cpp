@@ -444,7 +444,7 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
 
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     QnModuleInformation moduleInformation;
-    moduleInformation.type = nxMediaServerId;
+    moduleInformation.type = QnModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = false;
     moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
@@ -472,6 +472,22 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
 bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags() & Qn::SF_Edge) && !server->isRedundancy();
+    return false;
+}
+
+QnUuid QnMediaServerResource::getOriginalGuid() const {
+    QMutexLocker lock(&m_mutex);
+    return m_originalGuid;
+}
+
+void QnMediaServerResource::setOriginalGuid(const QnUuid &guid) {
+    QMutexLocker lock(&m_mutex);
+    m_originalGuid = guid;
+}
+
+bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return !server->getOriginalGuid().isNull();
     return false;
 }
 
