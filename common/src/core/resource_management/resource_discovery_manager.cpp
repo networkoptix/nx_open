@@ -594,9 +594,11 @@ void QnResourceDiscoveryManager::dtsAssignment()
 
             Q_ASSERT(unit.factory!=0);
 
+#ifdef ENABLE_DATA_PROVIDERS
             vcRes->lockDTSFactory();
             vcRes->setDTSFactory(unit.factory);
             vcRes->unLockDTSFactory();
+#endif
         }
     }
 }

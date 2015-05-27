@@ -13,6 +13,7 @@
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/media_dewarping_params.h>
+#include <core/resource/resource_fwd.h>
 
 #include "motion_window.h"
 

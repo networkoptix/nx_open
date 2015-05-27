@@ -24,10 +24,12 @@ class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
 public:
     QnVirtualCameraResource();
 
+#ifdef ENABLE_DATA_PROVIDERS
     QnAbstractDTSFactory* getDTSFactory();
     void setDTSFactory(QnAbstractDTSFactory* factory);
     void lockDTSFactory();
     void unLockDTSFactory();
+#endif
 
     virtual QString getUniqueId() const override;
 

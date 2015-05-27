@@ -5,6 +5,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/serialization/lexical.h>
+#include <utils/math/fuzzy.h>
 
 #include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"

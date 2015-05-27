@@ -57,6 +57,8 @@
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
 
+#include <core/datapacket/abstract_data_packet.h>
+
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
 #include <business/business_event_rule.h>

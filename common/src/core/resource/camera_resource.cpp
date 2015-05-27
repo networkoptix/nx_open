@@ -22,6 +22,18 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_lastIssueTimer()
 {}
 
+QString QnVirtualCameraResource::getUniqueId() const
+{
+    return getPhysicalId();
+}
+
+QString QnVirtualCameraResource::toSearchString() const
+{
+    QString result;
+    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
+    return result;
+}
+
 #ifdef ENABLE_DATA_PROVIDERS
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): 
@@ -325,11 +337,6 @@ void QnVirtualCameraResource::unLockDTSFactory()
 }
 
 
-QString QnVirtualCameraResource::getUniqueId() const
-{
-    return getPhysicalId();
-}
-
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
     QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toUInt() > 0;
@@ -360,14 +367,6 @@ void QnVirtualCameraResource::saveParamsAsync()
 {
     propertyDictionary->saveParamsAsync(getId());
 }
-
-QString QnVirtualCameraResource::toSearchString() const
-{
-    QString result;
-    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
-    return result;
-}
-
 
 int QnVirtualCameraResource::saveAsync()
 {

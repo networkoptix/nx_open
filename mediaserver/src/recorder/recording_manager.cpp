@@ -39,12 +39,16 @@ static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 30;
 static const qint64 UPDATE_CAMERA_HISTORY_PERIOD_MSEC = 60 * 1000;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 class QnServerDataProviderFactory: public QnDataProviderFactory
 {
 public:
     static QnServerDataProviderFactory* instance();
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
 };
+
+#endif
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
@@ -422,7 +426,9 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
     {
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
+#ifdef ENABLE_DATA_PROVIDERS
         camera->setDataProviderFactory(QnServerDataProviderFactory::instance());
+#endif
         updateCamera(camera);
     }
 
@@ -629,6 +635,7 @@ QnRecordingManager* QnRecordingManager::instance()
     return staticInstance;
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 // --------------------- QnServerDataProviderFactory -------------------
 Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instance)
 
@@ -668,4 +675,4 @@ QnServerDataProviderFactory* QnServerDataProviderFactory::instance()
     return qn_serverDataProviderFactory_instance();
 }
 
-
+#endif
