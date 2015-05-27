@@ -106,13 +106,23 @@ bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
 }
 
 bool QnThirdPartyResource::setParamPhysical(const QString& id, const QString &value) {
+    return setParam( id.toUtf8().constData(), value.toUtf8().constData() );
+}
+
+bool QnThirdPartyResource::setParamsBegin() {
+    return setParam("", "{");   // TODO: describe in iface
+}
+
+bool QnThirdPartyResource::setParamsEnd() {
+    return setParam("", "}");   // TODO: describe in iface
+}
+
+bool QnThirdPartyResource::setParam(const char * id, const char * value) {
     QMutexLocker lk( &m_mutex );
     if( !m_cameraManager3 )
         return false;
 
-    return m_cameraManager3->setParamValue(
-        id.toUtf8().constData(),
-        value.toUtf8().constData() ) == nxcip::NX_NO_ERROR;
+    return m_cameraManager3->setParamValue( id, value ) == nxcip::NX_NO_ERROR;
 }
 
 
