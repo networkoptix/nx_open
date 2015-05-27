@@ -40,7 +40,15 @@ namespace ec2 {
 
     ApiCameraDataStatistics::ApiCameraDataStatistics(const ApiCameraDataEx&& data)
         : ApiCameraDataEx(data)
-        , addParams(getExtraParams(ApiCameraDataEx::addParams, EXCEPT_PARAMS)) {}
+        , addParams(getExtraParams(ApiCameraDataEx::addParams, EXCEPT_PARAMS))
+    {
+        const auto& defCred = Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
+        const auto it = std::find_if(ApiCameraDataEx::addParams.begin(), ApiCameraDataEx::addParams.end(),
+            [&defCred](const ApiResourceParamData& param) { return param.name == defCred; });
+
+        const bool exists = (it != ApiCameraDataEx::addParams.end()) && !it->value.isEmpty();
+        addParams.push_back(ApiResourceParamData(defCred, exists ? lit("true") : lit("false")));
+    }
 
 	const std::unordered_set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(INIT_LIST(__CAMERA_EXCEPT_PARAMS));
 
