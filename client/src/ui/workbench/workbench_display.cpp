@@ -453,7 +453,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
 
-	if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+	if (canShowLayoutBackground()) {
 		m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
 		m_scene->addItem(gridBackgroundItem());
 		setLayer(gridBackgroundItem(), Qn::EMappingLayer);
@@ -589,6 +589,7 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
 }
 
 void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
+    Q_ASSERT_X(canShowLayoutBackground(), Q_FUNC_INFO, "This item is only used when layout background is active");
     QnGridRaisedConeItem* item = raisedConeItem(widget);
     if (item->scene() == m_scene)
         return;
@@ -607,7 +608,7 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
         magicConst = 0.8;   //TODO: #Elric magic const
     else
     if (
-        !(m_lightMode & Qn::LightModeNoLayoutBackground) &&
+        canShowLayoutBackground() &&
         (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
     )
         magicConst = 0.33;  //TODO: #Elric magic const
@@ -645,7 +646,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
 
-            if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+            if (canShowLayoutBackground()) {
                 ensureRaisedConeItem(oldWidget);
                 raisedConeItem(oldWidget)->setEffectEnabled(false);
                 setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
@@ -655,7 +656,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(newWidget != NULL) {
             bringToFront(newWidget);
 
-            if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+            if (canShowLayoutBackground()) {
                 ensureRaisedConeItem(newWidget);
                 setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
                 raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
@@ -752,7 +753,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (!layout)
         return;
 
-    if (m_lightMode & Qn::LightModeNoLayoutBackground)
+    if (!canShowLayoutBackground())
         return;
 
 	if (gridBackgroundItem())
@@ -2040,4 +2041,14 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         scene()->addItem(splashItem);
         setLayer(splashItem, Qn::EffectsLayer);
     }
+}
+
+bool QnWorkbenchDisplay::canShowLayoutBackground() const {
+    if (qnSettings->isActiveXMode())
+        return false;
+
+    if (m_lightMode & Qn::LightModeNoLayoutBackground)
+        return false;
+
+    return true;
 }
