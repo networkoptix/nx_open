@@ -147,7 +147,7 @@ void QnClientPullMediaStreamProvider::run()
         putData(std::move(data));
 
         if (videoData && !isMaxFps())
-            m_fpsSleep.sleep(1000*1000/getFps()/numberOfChnnels);
+            m_fpsSleep.sleep(1000*1000/getLiveParams().fps/numberOfChnnels);
 
     }
 

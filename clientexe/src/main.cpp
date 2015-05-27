@@ -130,6 +130,7 @@ extern "C"
 #include "ui/workaround/mac_utils.h"
 #endif
 #include "api/runtime_info_manager.h"
+#include <utils/common/timermanager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -401,6 +402,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qnSettings->setVSyncEnabled(!noVSync);
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
+
+    QScopedPointer<TimerManager> timerManager(new TimerManager());
 
     
 

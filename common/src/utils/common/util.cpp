@@ -5,6 +5,10 @@
 #   include <sys/time.h>
 #endif
 
+#ifdef Q_OS_WIN32
+#   include <mmsystem.h>
+#endif
+
 #include <QtCore/QDateTime>
 #include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>

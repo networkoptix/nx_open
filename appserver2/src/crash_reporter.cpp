@@ -81,6 +81,7 @@ bool CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
 
         crashes.pop_back();
     }
+    return false;
 }
 
 void CrashReporter::scanAndReportAsync(QnUserResourcePtr admin, QSettings* settings)

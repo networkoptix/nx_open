@@ -3,8 +3,6 @@
 #include "plugins/resource/archive/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
 
-Q_GLOBAL_STATIC(QnRedAssController, inst);
-
 static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between quality switching attempts
 static const int HIGH_QUALITY_RETRY_COUNTER = 1;
 static const QSize TO_LOWQ_SCREEN_SIZE(320/1.4,240/1.4);      // put item to LQ if visual size is small
@@ -14,11 +12,6 @@ static const int TIMER_TICK_INTERVAL = 500; // at ms
 static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
 static const double FPS_EPS = 0.0001;
 static const double LQ_HQ_THRESHOLD = 1.34;
-
-QnRedAssController* QnRedAssController::instance()
-{
-    return inst();
-}
 
 QnRedAssController::QnRedAssController(): m_mutex(QMutex::Recursive), m_mode(Qn::AutoResolution)
 {

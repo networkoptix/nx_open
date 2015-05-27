@@ -463,8 +463,7 @@ bool AxHDWitness::doInitialize()
     
     ffmpegInit();
       
-    m_moduleFinder.reset(new QnModuleFinder(true));
-    m_moduleFinder->setCompatibilityMode(qnRuntime->isDevMode());
+    m_moduleFinder.reset(new QnModuleFinder(true, qnRuntime->isDevMode()));
     m_moduleFinder->start();
 
     m_router.reset(new QnRouter(m_moduleFinder.data()));

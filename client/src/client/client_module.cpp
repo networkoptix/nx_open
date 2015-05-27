@@ -16,6 +16,8 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
+
+#include <redass/redass_controller.h>
 #include <client/client_message_processor.h>
 #include <client/client_instance_manager.h>
 
@@ -73,6 +75,8 @@ QnClientModule::QnClientModule(bool forceLocalSettings, QObject *parent): QObjec
 
     common->store<QnCameraUserAttributePool>(new QnCameraUserAttributePool());
     common->store<QnMediaServerUserAttributesPool>(new QnMediaServerUserAttributesPool());
+    common->store<QnRedAssController>(new QnRedAssController());
+
     common->store<QnResourcePool>(new QnResourcePool());
     common->store<QnSyncTime>(new QnSyncTime());
 

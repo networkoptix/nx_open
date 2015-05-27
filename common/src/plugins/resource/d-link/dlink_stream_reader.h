@@ -15,11 +15,11 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired) override;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
-    virtual QString composeVideoProfile(bool isCameraControlRequired);
+    virtual QString composeVideoProfile(bool isCameraControlRequired, const QnLiveStreamParams& params);
     virtual void pleaseStop() override;
 
 private:
@@ -29,7 +29,7 @@ private:
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QString getRTPurl(int profileId) const;
-    QString getQualityString() const;
+    QString getQualityString(const QnLiveStreamParams& params) const;
     bool isTextQualities(const QStringList& qualities) const;
 private:
     QnMulticodecRtpReader m_rtpReader;
