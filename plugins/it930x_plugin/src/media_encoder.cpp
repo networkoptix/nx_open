@@ -128,10 +128,12 @@ namespace ite
         return stream;
     }
 
-    int MediaEncoder::getConfiguredLiveStreamReader(nxcip::LiveStreamConfig& config, nxcip::StreamReader ** ppStream)
+    int MediaEncoder::getConfiguredLiveStreamReader(nxcip::LiveStreamConfig * config, nxcip::StreamReader ** ppStream)
     {
-        *ppStream = nullptr;
+        if (!config)
+            return nxcip::NX_INVALID_PARAM_VALUE;
 
+        *ppStream = nullptr;
         RxDevicePtr rxDev = m_cameraManager->rxDevice().lock();
         if (! rxDev)
             return nxcip::NX_OTHER_ERROR;
@@ -147,12 +149,12 @@ namespace ite
         if (! rxDev->getEncoderParams(m_encoderNumber, curConfig))
             return nxcip::NX_TRY_AGAIN;
 
-        validate(config, curConfig);
+        validate(*config, curConfig);
 
-        if (curConfig.framerate != config.framerate ||
-            curConfig.bitrateKbps != config.bitrateKbps)
+        if (curConfig.framerate != config->framerate ||
+            curConfig.bitrateKbps != config->bitrateKbps)
         {
-            if (! rxDev->setEncoderParams(m_encoderNumber, config))
+            if (! rxDev->setEncoderParams(m_encoderNumber, *config))
                 return nxcip::NX_INVALID_PARAM_VALUE;
         }
 

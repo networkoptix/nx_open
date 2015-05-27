@@ -358,6 +358,7 @@ namespace nxcip
 
 #ifndef __GNUC__
 #pragma pack(push, 1)
+#define PACKED
 #else
 #define PACKED __attribute__((__packed__))
 #endif
@@ -370,43 +371,52 @@ namespace nxcip
             LIVE_STREAM_FLAG_AUDIO_ENABLED = 0x1
         };
 
-        int32_t reserved_head;      ///< reserved, do not use
-        int32_t flags;              ///< \sa LiveStreamFlags
-        int32_t codec;              ///< \sa nxcip::CompressionType
+        int32_t reserved_head;      //!< reserved, do not use
+        int32_t flags;              //!< \sa LiveStreamFlags
+        int32_t codec;              //!< \sa nxcip::CompressionType
         int32_t width;
         int32_t height;
         float framerate;
         int32_t bitrateKbps;
         int16_t quality;
         int16_t gopLength;
-        uint8_t reserved_tail[96];  ///< reserved, do not use
-
-        void setFlag(uint32_t f) { flags |= f; }
-        void clearFlag(uint32_t f) { flags &= ~f; }
-        bool hasFlag(uint32_t f) { return flags & f; }
+        uint8_t reserved_tail[96];  //!< reserved, do not use
     };
 #ifndef __GNUC__
 #pragma pack(pop)
 #endif
+#undef PACKED
 
     // {D1C7F082-B6F9-45F3-82D6-3CFE3EAE0260}
     static const nxpl::NX_GUID IID_CameraMediaEncoder3 = { { 0xd1, 0xc7, 0xf0, 0x82, 0xb6, 0xf9, 0x45, 0xf3, 0x82, 0xd6, 0x3c, 0xfe, 0x3e, 0xae, 0x2, 0x60 } };
+
+    //!Extends \a CameraMediaEncoder2 by adding configurede stream opening and
     class CameraMediaEncoder3
     :
         public CameraMediaEncoder2
     {
     public:
-        /// Returns (re)configured stream reader, providing live data stream
+        //!Returns configured stream reader, providing live data stream
         /*!
-            Use it instead of \a getLiveStreamReader() to avoid async \a setResolution() \a setFps() and \a setBitrate() calls.
-            BaseCameraManager::nativeMediaStreamCapability should be present.
-            \param if *reader is NULL and \a nxcip::NX_NO_ERROR is returned, \a CameraMediaEncoder::getMediaUrl() is used
-            \return error code (\a nxcip::NX_NO_ERROR on success)
-         */
-        virtual int getConfiguredLiveStreamReader(nxcip::LiveStreamConfig& config, nxcip::StreamReader ** reader) = 0;
+            \a BaseCameraManager::nativeMediaStreamCapability should be present.
 
-        //! \sa nxcip::CompressionType \sa nxcip::PixelFormat
-        virtual int getVideoFormat(nxcip::CompressionType * codec, nxcip::PixelFormat * pixelFormat) const = 0;
+            \param[in] config
+            \param[out] reader
+            \return \a nxcip::NX_NO_ERROR on success, otherwise - error code
+            \note It's possible to return both NULL as a reader and \a nxcip::NX_NO_ERROR as error code.\n
+                - \a CameraMediaEncoder::getMediaUrl() will be used in this case.
+            \note Using with this call \a setResolution(), \a setFps() and \a setBitrate() may return \a nxcip::NX_NOT_IMPLEMENTED
+        */
+        virtual int getConfiguredLiveStreamReader(LiveStreamConfig * config, StreamReader ** reader) = 0;
+
+        //!Returns video format
+        /*!
+            \param[out] codec
+            \param[out] pixelFormat
+            \return \a nxcip::NX_NO_ERROR on success, otherwise - error code
+            \sa nxcip::CompressionType \sa nxcip::PixelFormat
+        */
+        virtual int getVideoFormat(CompressionType * codec, PixelFormat * pixelFormat) const = 0;
     };
 
     class CameraPtzManager;

@@ -36,7 +36,7 @@ namespace ite
 
         // nxcip::CameraMediaEncoder3
 
-        virtual int getConfiguredLiveStreamReader(nxcip::LiveStreamConfig& , nxcip::StreamReader ** ) override;
+        virtual int getConfiguredLiveStreamReader(nxcip::LiveStreamConfig * , nxcip::StreamReader ** ) override;
         virtual int getVideoFormat(nxcip::CompressionType * codec, nxcip::PixelFormat * pixelFormat) const override;
 
     private:

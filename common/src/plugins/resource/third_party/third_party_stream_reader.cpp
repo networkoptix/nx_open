@@ -184,11 +184,11 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             config.bitrateKbps = bitrateKbps;
             config.quality = quality;
             if( (m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability) && m_thirdPartyRes->isAudioEnabled() )
-                config.setFlag( nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED );
+                config.flags |= nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED;
 
             m_liveStreamReader.reset(); // release an old one first
             nxcip::StreamReader * tmpReader = nullptr;
-            int ret = mediaEncoder3->getConfiguredLiveStreamReader( config, &tmpReader );
+            int ret = mediaEncoder3->getConfiguredLiveStreamReader( &config, &tmpReader );
             m_liveStreamReader.reset( tmpReader, refDeleter );
 
             if( ret != nxcip::NX_NO_ERROR )
