@@ -228,8 +228,6 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
     qint64 currentTime = m_elapsedTimer.elapsed();
 
-    m_lastResponse[address] = currentTime;
-
     QMutexLocker lk(&m_itemsMutex);
 
     ModuleItem &item = m_moduleItemById[moduleInformation.id];
@@ -282,6 +280,8 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             removeAddress(address, true);
     }
 
+    m_lastResponse[address] = currentTime;
+
     if (item.moduleInformation != moduleInformation) {
         NX_LOG(lit("QnModuleFinder. Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
         emit moduleChanged(moduleInformation);
@@ -314,6 +314,10 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     lk.relock();
 
     item.lastResponse = currentTime;
+
+    /* Client needs all addresses including ignored ones because of login dialog. */
+    if (ignoredAddress && !m_clientMode)
+        return;
 
     int count = item.addresses.size();
     item.addresses.insert(address);
