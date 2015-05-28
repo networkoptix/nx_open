@@ -37,6 +37,7 @@ QVariant QnFilteredResourceListModel::data(const QModelIndex &index, int role) c
     case Qn::IpAddressRole:
         return QUrl(resource->getUrl()).host();
     }
+    return QVariant();
 }
 
 QHash<int, QByteArray> QnFilteredResourceListModel::roleNames() const {

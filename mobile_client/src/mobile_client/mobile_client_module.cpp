@@ -60,7 +60,6 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
 
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
-    QnAppServerConnectionFactory::setClientGuid(common->moduleGUID().toString());
     QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
 }
 

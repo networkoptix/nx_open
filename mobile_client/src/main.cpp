@@ -82,7 +82,7 @@ int runApplication(QGuiApplication *application) {
 
     int result = runUi(application);
 
-    QnResource::stopCommandProc();
+//    QnResource::stopCommandProc();
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
     QnAppServerConnectionFactory::setUrl(QUrl());
 

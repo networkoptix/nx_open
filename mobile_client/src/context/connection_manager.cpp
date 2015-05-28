@@ -39,7 +39,8 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
         return true;
 
     QnEc2ConnectionRequestResult result;
-    m_connectHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(url, &result, &QnEc2ConnectionRequestResult::processEc2Reply);
+    m_connectHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+        url, ec2::ApiClientInfoData(), &result, &QnEc2ConnectionRequestResult::processEc2Reply);
 
     ec2::ErrorCode errorCode = static_cast<ec2::ErrorCode>(result.exec());
     if (m_connectHandle != result.handle())
