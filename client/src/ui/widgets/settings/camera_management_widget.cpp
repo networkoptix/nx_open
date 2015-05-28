@@ -38,12 +38,10 @@ void QnCameraManagementWidget::updateFromSettings() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
 
     QSet<QString> disabledVendors = settings->disabledVendorsSet();
-    if (disabledVendors.contains(lit("all")) || disabledVendors.contains(lit("all=partial")))
-        ui->autoDiscoveryCheckBox->setCheckState(Qt::CheckState::Unchecked);
-    else if (disabledVendors.isEmpty())
-        ui->autoDiscoveryCheckBox->setCheckState(Qt::CheckState::Checked);
-    else
-        ui->autoDiscoveryCheckBox->setCheckState(Qt::CheckState::PartiallyChecked);
+    bool discoveryEnabled = (!disabledVendors.contains(lit("all")) && !disabledVendors.contains(lit("all=partial"))) || settings->isServerAutoDiscoveryEnabled();
+    bool discoveryFullEnabled = disabledVendors.isEmpty() && settings->isServerAutoDiscoveryEnabled();
+    ui->autoDiscoveryCheckBox->setCheckState(discoveryEnabled ? (discoveryFullEnabled ? Qt::Checked : Qt::PartiallyChecked)
+                                                              : Qt::Unchecked);
 
     ui->autoSettingsCheckBox->setChecked(settings->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
@@ -52,10 +50,13 @@ void QnCameraManagementWidget::updateFromSettings() {
 void QnCameraManagementWidget::submitToSettings() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
     
-    if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked)
+    if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked) {
         settings->setDisabledVendors(QString());
-    else if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked)
+        settings->setServerAutoDiscoveryEnabled(true);
+    } else if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked) {
         settings->setDisabledVendors(lit("all=partial"));
+        settings->setServerAutoDiscoveryEnabled(false);
+    }
 
     settings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
     ui->settingsWarningLabel->setVisible(false);

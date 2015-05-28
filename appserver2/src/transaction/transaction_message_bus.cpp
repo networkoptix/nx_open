@@ -1498,6 +1498,19 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
     }
 }
 
+void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
+{
+    QMutexLocker lock(&m_mutex);
+    for( QnTransactionTransport* transport: m_connections )
+    {
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+        return;
+    }
+}
+
 void QnTransactionMessageBus::dropConnections()
 {
     QMutexLocker lock(&m_mutex);
