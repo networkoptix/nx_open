@@ -58,6 +58,8 @@ StreamingChunkTranscoderThread::StreamingChunkTranscoderThread()
 
 StreamingChunkTranscoderThread::~StreamingChunkTranscoderThread()
 {
+    stop();
+
     std::for_each( m_transcodeContext.cbegin(), m_transcodeContext.cend(),
         []( const std::pair<int, TranscodeContext*>& p ){ delete p.second; } );
     m_transcodeContext.clear();
