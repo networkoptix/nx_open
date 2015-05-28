@@ -4,6 +4,7 @@
 
 from flask import Flask, request
 from adapters import SqlAdapter
+from utils import GeoIp2
 
 import json, os
 
@@ -20,16 +21,10 @@ def getAdapter():
     db = app.sqlConnector.connect(**app.sqlConnection)
 
     ipResolve = None
-    if hasattr(app, 'geoipDb') and os.path.isfile(app.geoipDb):
-        from geoip2.database import Reader as IpReader
-        reader = IpReader(app.geoipDb)
-        cache = {}
-        def resolve(ip):
-            if ip not in cache:
-                cache[ip] = reader.country(ip).country.iso_code
-            print cache[ip]
-            return cache[ip]
-        ipResolve = resolve
+    if hasattr(app, 'geoipDb'):
+        ipResolve = GeoIp2.local(**app.geoipDb).resolve
+    elif hasattr(app, 'geoipWeb'):
+        ipResolve = GeoIP2.remote(**app.geoipWeb).resolve
 
     return SqlAdapter(db, app.logger, ipResolve)
 
