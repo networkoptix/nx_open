@@ -19,7 +19,7 @@
 */
 namespace nx_http
 {
-    //!Sync http client
+    //!Sync http client. This synchronous wrapper on top of \a AsyncHttpClient
     /*!
         \warning Message body is read ascynhronously to some internal buffer
     */
@@ -56,8 +56,12 @@ namespace nx_http
         const QUrl& url() const;
         StringType contentType() const;
 
+        //!See \a AsyncHttpClient::setSubsequentReconnectTries
         void setSubsequentReconnectTries( int reconnectTries );
+        //!See \a AsyncHttpClient::setTotalReconnectTries
         void setTotalReconnectTries( int reconnectTries );
+        //!See \a AsyncHttpClient::setMessageBodyReadTimeoutMs
+        void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );

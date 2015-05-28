@@ -86,8 +86,8 @@ namespace nx_http
         QMutexLocker lk( &m_mutex );
         while( !m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done) )
             m_cond.wait( lk.mutex() );
-        nx_http::BufferType result = m_msgBodyBuffer;
-        m_msgBodyBuffer.clear();
+        nx_http::BufferType result;
+        result.swap( m_msgBodyBuffer );
         return result;
     }
 
@@ -114,6 +114,11 @@ namespace nx_http
     void HttpClient::setTotalReconnectTries( int reconnectTries )
     {
         m_asyncHttpClient->setTotalReconnectTries( reconnectTries );
+    }
+
+    void HttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
+    {
+        m_asyncHttpClient->setMessageBodyReadTimeoutMs( messageBodyReadTimeoutMs );
     }
 
     void HttpClient::setUserAgent( const QString& userAgent )
