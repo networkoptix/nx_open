@@ -359,14 +359,14 @@ QnAbstractArchiveDelegate::ArchiveChunkInfo QnServerArchiveDelegate::getLastUsed
     return m_currentChunkInfo;
 }
 
-QnResourceVideoLayoutPtr QnServerArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnServerArchiveDelegate::getVideoLayout()
 {
     QMutexLocker lk( &m_mutex );
 
     return m_aviDelegate->getVideoLayout();
 }
 
-QnResourceAudioLayoutPtr QnServerArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnServerArchiveDelegate::getAudioLayout()
 {
     QMutexLocker lk( &m_mutex );
 

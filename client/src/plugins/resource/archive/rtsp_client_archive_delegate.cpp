@@ -20,6 +20,7 @@ extern "C"
 #include <core/resource/media_server_resource.h>
 
 #include <plugins/resource/server_camera/server_camera.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
 
 #include <redass/redass_controller.h>
 
@@ -30,6 +31,7 @@ extern "C"
 #include <utils/network/rtp_stream_parser.h>
 #include <utils/network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
+#include "http/custom_headers.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -68,8 +70,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
 
     if (reader)
         connect(this, SIGNAL(dataDropped(QnArchiveStreamReader*)), qnRedAssController, SLOT(onSlowStream(QnArchiveStreamReader*)));
-
-    m_defaultVideoLayout.reset( new QnDefaultResourceVideoLayout() );
 
     m_auth.username = QnAppServerConnectionFactory::url().userName();
     m_auth.password = QnAppServerConnectionFactory::url().password();
@@ -280,9 +280,11 @@ bool QnRtspClientArchiveDelegate::openInternal() {
 
         QString vLayout = m_rtspSession.getVideoLayout();
         if (!vLayout.isEmpty()) {
-            m_customVideoLayout = QnCustomResourceVideoLayout::fromString(vLayout);
-            // TODO: #Elric we need to create another layout instance, but there is no need to reparse it!
-            m_camera->setCustomVideoLayout(QnCustomResourceVideoLayout::fromString(vLayout));
+            auto newValue = QnCustomResourceVideoLayout::fromString(vLayout);
+            bool isChanged =  getVideoLayout()->toString() != newValue->toString();
+            m_customVideoLayout = newValue;
+            if(isChanged)
+                emit m_reader->videoLayoutChanged();
         }
     }
     return m_opened;
@@ -318,7 +320,6 @@ void QnRtspClientArchiveDelegate::close()
     QMutexLocker lock(&m_mutex);
     //m_waitBOF = false;
     m_rtspSession.stop();
-    m_rtpData = 0;
     m_lastPacketFlags = -1;
     m_opened = false;
     m_audioLayout.reset();
@@ -431,7 +432,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     receiveTimer.restart();
     while(!result)
     {
-        if (!m_rtpData){
+        if (!m_rtpData || (!m_opened && !m_closing)) {
             //m_rtspSession.stop(); // reconnect
             reopen();
             return result;
@@ -640,15 +641,17 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
     */
 }
 
-QnResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
 {
     if (m_customVideoLayout)
         return m_customVideoLayout;
+    else if (m_camera)
+        return m_camera->getVideoLayout();
     else
-        return m_defaultVideoLayout;
+        return QnMediaResource::getDefaultVideoLayout();
 }
 
-QnResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
 {
     if (!m_audioLayout) {
         m_audioLayout.reset( new QnResourceCustomAudioLayout() );
@@ -833,13 +836,13 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
     session->setAuth(auth, RTPSession::authDigest);
 
     if (!m_auth.videowall.isNull())
-        session->setAdditionAttribute("X-NetworkOptix-VideoWall", m_auth.videowall.toString().toUtf8());
+        session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());
 
     if (server) {
         QNetworkProxy proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);
         if (proxy.type() != QNetworkProxy::NoProxy)
             session->setProxyAddr(proxy.hostName(), proxy.port());
-        session->setAdditionAttribute("x-server-guid", server->getId().toByteArray());
+        session->setAdditionAttribute(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     }
 
     session->setTransport(QLatin1String("TCP"));

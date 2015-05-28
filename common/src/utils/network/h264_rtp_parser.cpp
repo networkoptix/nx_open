@@ -9,7 +9,7 @@
 
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
-static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
+//static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
 static const int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 CLH264RtpParser::CLH264RtpParser():

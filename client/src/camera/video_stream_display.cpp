@@ -318,8 +318,6 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
     foreach(QnAbstractRenderer* render, m_renderList)
         scaleFactor = qMin(scaleFactor, determineScaleFactor(render, channelNum, dec->getWidth(), dec->getHeight(), force_factor));
 
-    PixelFormat pixFmt = dec->GetPixelFormat();
-
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = channelNum;
 
@@ -338,10 +336,9 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
     {
         calcSampleAR(outFrame, dec);
 
-        pixFmt = dec->GetPixelFormat();
-
         if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
         {
+            PixelFormat pixFmt = dec->GetPixelFormat();
             if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
                 QnFrameScaler::downscale(tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
             else {
@@ -700,8 +697,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
         foreach(QnAbstractRenderer* render, m_renderList)
             scaleFactor = qMin(scaleFactor, determineScaleFactor(render, channel, dec->getWidth(), dec->getHeight(), force_factor));
     }
-    PixelFormat pixFmt = dec->GetPixelFormat();
-
+    
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
 
     foreach(QnAbstractRenderer* render, m_renderList)
@@ -717,12 +713,12 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
     }
     m_mtx.unlock();
 
-    pixFmt = dec->GetPixelFormat();
     if (scaleFactor == QnFrameScaler::factor_unknown) {
         foreach(QnAbstractRenderer* render, m_renderList)
             scaleFactor = qMin(scaleFactor, determineScaleFactor(render, channel, dec->getWidth(), dec->getHeight(), force_factor));
     }
 
+    PixelFormat pixFmt = dec->GetPixelFormat();
     if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
         QnFrameScaler::downscale(m_tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
     else {

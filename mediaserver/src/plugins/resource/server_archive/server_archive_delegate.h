@@ -27,8 +27,8 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnResourceVideoLayoutPtr getVideoLayout();
-    virtual QnResourceAudioLayoutPtr getAudioLayout();
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
     virtual AVCodecContext* setAudioChannel(int num);
     virtual void onReverseMode(qint64 displayTime, bool value);
@@ -78,7 +78,7 @@ private:
     QnAviResourcePtr m_newQualityFileRes;
     QnAviArchiveDelegatePtr m_newQualityAviDelegate;
 
-    bool m_sendMotion;
+    //bool m_sendMotion;
     bool m_eof;
     MediaQuality m_quality;
     QnDualQualityHelper m_dialQualityHelper;

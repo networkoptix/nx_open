@@ -113,6 +113,9 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     connect( connection->getDiscoveryManager(), &ec2::AbstractDiscoveryManager::discoveryInformationChanged,
         this, &QnCommonMessageProcessor::on_gotDiscoveryData );
+
+    auto miscManager = connection->getMiscManager();
+    connect(miscManager, &ec2::AbstractMiscManager::moduleChanged,                  this, &QnCommonMessageProcessor::moduleChanged);
 }
 
 void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -127,6 +130,7 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getStoredFileManager()->disconnect(this);
     connection->getDiscoveryManager()->disconnect(this);
     connection->getTimeManager()->disconnect(this);
+    connection->getMiscManager()->disconnect(this);
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
@@ -486,5 +490,5 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) {
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr& ) {
 }

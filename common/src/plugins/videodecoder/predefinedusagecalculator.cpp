@@ -14,11 +14,11 @@
 PredefinedUsageCalculator::PredefinedUsageCalculator(
     const stree::ResourceNameSet& rns,
     const QString& predefinedDataFilePath,
-    PluginUsageWatcher* const usageWatcher )
+    PluginUsageWatcher* const )
 :
     m_rns( rns ),
-    m_predefinedDataFilePath( predefinedDataFilePath ),
-    m_usageWatcher( usageWatcher )
+    m_predefinedDataFilePath( predefinedDataFilePath )
+    //m_usageWatcher( usageWatcher )
 {
     updateTree();
 }

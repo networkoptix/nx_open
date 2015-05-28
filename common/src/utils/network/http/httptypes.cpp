@@ -9,6 +9,8 @@
 #include <cstring>
 #include <memory>
 
+#include "version.h"
+
 #ifdef _WIN32
 static int strcasecmp(const char * str1, const char * str2) { return strcmpi(str1, str2); }
 static int strncasecmp(const char * str1, const char * str2, size_t n) { return strnicmp(str1, str2, n); }
@@ -263,6 +265,7 @@ namespace nx_http
     namespace Method
     {
         const StringType GET( "GET" );
+        const StringType HEAD( "HEAD" );
         const StringType POST( "POST" );
         const StringType PUT( "PUT" );
     }
@@ -707,70 +710,70 @@ namespace nx_http
     }
 
 
-	namespace header
-	{
-		namespace AuthScheme
-		{
-			const char* toString( Value val )
-			{
-				switch( val )
-				{
-					case basic:
-						return "Basic";
-					case digest:
-						return "Digest";
-					default:
-						return "None";
-				}
-			}
-
-			Value fromString( const char* str )
-			{
-				if( ::strcasecmp( str, "Basic" ) == 0 )
-					return basic;
-				if( ::strcasecmp( str, "Digest" ) == 0 )
-					return digest;
-				return none;
-			}
-
-			Value fromString( const ConstBufferRefType& str )
+    namespace header
+    {
+        namespace AuthScheme
+        {
+            const char* toString( Value val )
             {
-				if( str == "Basic" )
-					return basic;
-				if( str == "Digest" )
-					return digest;
-				return none;
+                switch( val )
+                {
+                    case basic:
+                        return "Basic";
+                    case digest:
+                        return "Digest";
+                    default:
+                        return "None";
+                }
+            }
+
+            Value fromString( const char* str )
+            {
+                if( ::strcasecmp( str, "Basic" ) == 0 )
+                    return basic;
+                if( ::strcasecmp( str, "Digest" ) == 0 )
+                    return digest;
+                return none;
+            }
+
+            Value fromString( const ConstBufferRefType& str )
+            {
+                if( str == "Basic" )
+                    return basic;
+                if( str == "Digest" )
+                    return digest;
+                return none;
             }
         }
 
-		///////////////////////////////////////////////////////////////////
-		//  Authorization
-		///////////////////////////////////////////////////////////////////
-		bool BasicCredentials::parse( const BufferType& /*str*/ )
-		{
+        ///////////////////////////////////////////////////////////////////
+        //  Authorization
+        ///////////////////////////////////////////////////////////////////
+        bool BasicCredentials::parse( const BufferType& /*str*/ )
+        {
             //TODO/IMPL
             Q_ASSERT( false );
             return false;
-		}
+        }
 
-		void BasicCredentials::serialize( BufferType* const dstBuffer ) const
-		{
+        void BasicCredentials::serialize( BufferType* const dstBuffer ) const
+        {
             BufferType serializedCredentials;
             serializedCredentials.append(userid);
             serializedCredentials.append(':');
             serializedCredentials.append(password);
             *dstBuffer += serializedCredentials.toBase64();
-		}
+        }
 
-		bool DigestCredentials::parse( const BufferType& /*str*/ )
-		{
-			//TODO/IMPL implementation
+        bool DigestCredentials::parse( const BufferType& /*str*/ )
+        {
+            //TODO/IMPL implementation
             Q_ASSERT( false );
             return false;
-		}
+        }
 
-		void DigestCredentials::serialize( BufferType* const dstBuffer ) const
-		{
+        void DigestCredentials::serialize( BufferType* const dstBuffer ) const
+        {
             for( QMap<BufferType, BufferType>::const_iterator
                 it = params.begin();
                 it != params.end();
@@ -783,7 +786,7 @@ namespace nx_http
                 dstBuffer->append( it.value() );
                 dstBuffer->append( "\"" );
             }
-		}
+        }
 
 
         //////////////////////////////////////////////
@@ -792,74 +795,102 @@ namespace nx_http
 
         const StringType Authorization::NAME("Authorization");
 
-		Authorization::Authorization()
-		:
-			authScheme( AuthScheme::none )
-		{
-			basic = NULL;
-		}
+        Authorization::Authorization()
+        :
+            authScheme( AuthScheme::none )
+        {
+            basic = NULL;
+        }
 
-		Authorization::Authorization( const AuthScheme::Value& authSchemeVal )
-		:
-			authScheme( authSchemeVal )
-		{
-			switch( authScheme )
-			{
-				case AuthScheme::basic:
-					basic = new BasicCredentials();
-					break;
-				
-				case AuthScheme::digest:
-					digest = new DigestCredentials();
-					break;
+        Authorization::Authorization( const AuthScheme::Value& authSchemeVal )
+        :
+            authScheme( authSchemeVal )
+        {
+            switch( authScheme )
+            {
+                case AuthScheme::basic:
+                    basic = new BasicCredentials();
+                    break;
+                
+                case AuthScheme::digest:
+                    digest = new DigestCredentials();
+                    break;
 
-				default:
-					basic = NULL;
-					break;
-			}
-		}
-
-		Authorization::~Authorization()
-		{
-			switch( authScheme )
-			{
-				case AuthScheme::basic:
-					delete basic;
+                default:
                     basic = NULL;
-					break;
-				
-				case AuthScheme::digest:
-					delete digest;
-                    digest = NULL;
-					break;
+                    break;
+            }
+        }
 
-				default:
-					break;
-			}
-		}
+        Authorization::Authorization( Authorization&& right )
+        :
+            authScheme( right.authScheme ),
+            basic( right.basic )
+        {
+            right.authScheme = AuthScheme::none;
+            right.basic = nullptr;
+        }
 
-		bool Authorization::parse( const BufferType& /*str*/ )
-		{
-			//TODO/IMPL implementation
+        Authorization::~Authorization()
+        {
+            clear();
+        }
+
+        Authorization& Authorization::operator=( Authorization&& right )
+        {
+            clear();
+
+            authScheme = right.authScheme;
+            basic = right.basic;
+
+            right.authScheme = AuthScheme::none;
+            right.basic = nullptr;
+
+            return *this;
+        }
+
+        bool Authorization::parse( const BufferType& /*str*/ )
+        {
+            //TODO/IMPL implementation
             Q_ASSERT( false );
-			return false;
-		}
+            return false;
+        }
 
-		void Authorization::serialize( BufferType* const dstBuffer ) const
-		{
+        void Authorization::serialize( BufferType* const dstBuffer ) const
+        {
             dstBuffer->append( AuthScheme::toString( authScheme ) );
             dstBuffer->append( " " );
-			if( authScheme == AuthScheme::basic )
-				basic->serialize( dstBuffer );
-			else if( authScheme == AuthScheme::digest )
-				digest->serialize( dstBuffer );
-		}
+            if( authScheme == AuthScheme::basic )
+                basic->serialize( dstBuffer );
+            else if( authScheme == AuthScheme::digest )
+                digest->serialize( dstBuffer );
+        }
 
         StringType Authorization::toString() const
         {
             BufferType dest;
             serialize( &dest );
             return dest;
+        }
+
+        void Authorization::clear()
+        {
+            switch( authScheme )
+            {
+                case AuthScheme::basic:
+                    delete basic;
+                    basic = nullptr;
+                    break;
+                
+                case AuthScheme::digest:
+                    delete digest;
+                    digest = nullptr;
+                    break;
+
+                default:
+                    break;
+            }
+            authScheme = AuthScheme::none;
         }
 
         BasicAuthorization::BasicAuthorization( const StringType& userName, const StringType& userPassword )
@@ -896,6 +927,32 @@ namespace nx_http
         {
         }
 
+        static std::vector<QnByteArrayConstRef> splitQuotedString( const QnByteArrayConstRef& src, char sep )
+        {
+            std::vector<QnByteArrayConstRef> result;
+            QnByteArrayConstRef::size_type curTokenStart = 0;
+            bool quoted = false;
+            for( QnByteArrayConstRef::size_type
+                pos = 0;
+                pos < src.size();
+                ++pos )
+            {
+                const char ch = src[pos];
+                if( !quoted && (ch == sep) )
+                {
+                    result.push_back( src.mid(curTokenStart, pos-curTokenStart) );
+                    curTokenStart = pos+1;
+                }
+                else if( ch == '"' )
+                {
+                    quoted = !quoted;
+                }
+            }
+            result.push_back( src.mid(curTokenStart) );
+
+            return result;
+        }
+
         bool WWWAuthenticate::parse( const BufferType& str )
         {
             int authSchemeEndPos = str.indexOf( " " );
@@ -904,25 +961,15 @@ namespace nx_http
 
             authScheme = AuthScheme::fromString( ConstBufferRefType(str, 0, authSchemeEndPos) );
 
-            const BufferType& authenticateParamsStr = ConstBufferRefType(str, authSchemeEndPos+1).toByteArrayWithRawData();
-            const QList<BufferType>& paramsList = authenticateParamsStr.split(',');
-            for( QList<BufferType>::const_iterator
-                it = paramsList.begin();
-                it != paramsList.end();
-                ++it )
+            const ConstBufferRefType authenticateParamsStr( str, authSchemeEndPos+1 );
+            const std::vector<ConstBufferRefType>& paramsList = splitQuotedString( authenticateParamsStr, ',' );
+            for( const ConstBufferRefType& token: paramsList )
             {
-                QList<BufferType> nameAndValue = it->trimmed().split('=');
+                const auto& nameAndValue = splitQuotedString( token.trimmed(), '=' );
                 if( nameAndValue.empty() )
                     continue;
-                BufferType value = nameAndValue.size() > 1 ? nameAndValue[1] : BufferType();
-                if( value.size() >= 2 )
-                {
-                    if( value[0] == '\"' )
-                        value.remove( 0, 1 );
-                    if( value[value.size()-1] == '\"' )
-                        value.remove( value.size()-1, 1 );
-                }
-                params.insert( nameAndValue[0].trimmed(), value );
+                ConstBufferRefType value = nameAndValue.size() > 1 ? nameAndValue[1] : ConstBufferRefType();
+                params.insert( nameAndValue[0].trimmed(), value.trimmed("\"") );
             }
 
             return true;
@@ -1377,4 +1424,41 @@ namespace nx_http
         return 0;
     }
     */
+
+
+#if defined(_WIN32)
+#   define COMMON_SERVER "Apache/2.4.10 (MSWin)"
+#   if defined(_WIN64)
+#       define COMMON_USER_AGENT "Mozilla/5.0 (Windows NT 6.1; WOW64)"
+#   else
+#       define COMMON_USER_AGENT "Mozilla/5.0 (Windows NT 6.1; Win32)"
+#   endif
+#elif defined(__linux__)
+#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   ifdef __LP64__
+#       define COMMON_USER_AGENT "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)"
+#   else
+#       define COMMON_USER_AGENT "Mozilla/5.0 (X11; Ubuntu; Linux x86; rv:36.0)"
+#   endif
+#elif defined(__APPLE__)
+#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_USER_AGENT "Mozilla/5.0 (Macosx x86_64)"
+#else   //some other unix (e.g., FreeBSD)
+#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_USER_AGENT "Mozilla/5.0"
+#endif
+
+    static const StringType defaultUserAgentString = QN_PRODUCT_NAME "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_USER_AGENT;
+
+    StringType userAgentString()
+    {
+        return defaultUserAgentString;
+    }
+
+    static const StringType defaultServerString = QN_PRODUCT_NAME "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_SERVER;
+
+    StringType serverString()
+    {
+        return defaultServerString;
+    }
 }

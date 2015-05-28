@@ -36,6 +36,10 @@
 			<includes>
 				<include>update.json</include>
 			</includes>		
-		</fileSet>				
+		</fileSet>		
+		<fileSet>
+			<directory>${environment.dir}/help/${release.version}/${customization}</directory>
+			<outputDirectory>../help</outputDirectory>	
+		</fileSet>		
 	</fileSets>
 </assembly>

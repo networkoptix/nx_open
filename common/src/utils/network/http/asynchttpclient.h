@@ -95,6 +95,7 @@ namespace nx_http
             const QUrl& url,
             const nx_http::StringType& contentType,
             const nx_http::StringType& messageBody );
+        const nx_http::Request& request() const;
         /*!
             Response is valid only after signal \a responseReceived() has been emitted
             \return Can be NULL if no response has been received yet
@@ -129,17 +130,17 @@ namespace nx_http
             If timeout has been met, connection is closed, state set to \a failed and \a AsyncHttpClient::done emitted
         */
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
-        /*!
-            By default \a true.
-            \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
-        */
-        void setDecodeChunkedMessageBody( bool val );
 
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
-        void addRequestHeader(const StringType& key, const StringType& value);
+        void addAdditionalHeader( const StringType& key, const StringType& value );
         void removeAdditionalHeader( const StringType& key );
-        void setAuthType(AuthType value);
+        template<class HttpHeadersRef>
+        void setAdditionalHeaders( HttpHeadersRef&& additionalHeaders )
+        {
+            m_additionalHeaders = std::forward<HttpHeadersRef>(additionalHeaders);
+        }
+        void setAuthType( AuthType value );
 
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
@@ -186,6 +187,11 @@ namespace nx_http
         HttpHeaders m_additionalHeaders;
         int m_awaitedMessageNumber;
         SocketAddress m_remoteEndpoint;
+        //!Authorization header, successfully used with \a m_url
+        /*!
+            //TODO #ak (2.4) this information should stored globally depending on server endpoint, server path, user credentials 
+        */
+        std::unique_ptr<nx_http::header::Authorization> m_currentUrlAuthorization;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );

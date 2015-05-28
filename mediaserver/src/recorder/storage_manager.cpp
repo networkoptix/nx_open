@@ -31,9 +31,9 @@
 #include "common/common_module.h"
 
 
-static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
-static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
-static const int DB_UPDATE_PER_RECORDS = 128;
+//static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
+//static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
+//static const int DB_UPDATE_PER_RECORDS = 128;
 static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
 static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 
@@ -122,10 +122,13 @@ public:
             if (scanData.partialScan)
             {
                 QMap<DeviceFileCatalogPtr, qint64> catalogToScan; // key - catalog, value - start scan time;
-                for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::LowQualityCatalog])
-                    catalogToScan.insert(catalog, catalog->lastChunkStartTime());
-                for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::HiQualityCatalog])
-                    catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                {
+                    QMutexLocker lock(&m_owner->m_mutexCatalog);
+                    for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::LowQualityCatalog])
+                        catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                    for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::HiQualityCatalog])
+                        catalogToScan.insert(catalog, catalog->lastChunkStartTime());
+                }
                 int totalStep = catalogToScan.size();
                 int currentStep = 0;
                 for(auto itr = catalogToScan.begin(); itr != catalogToScan.end(); ++itr) 
@@ -776,13 +779,16 @@ void QnStorageManager::clearDbByChunk(DeviceFileCatalogPtr catalog, const Device
 
 void QnStorageManager::clearMaxDaysData()
 {
-    clearMaxDaysData(m_devFileCatalog[QnServer::HiQualityCatalog]);
-    clearMaxDaysData(m_devFileCatalog[QnServer::LowQualityCatalog]);
+    clearMaxDaysData(QnServer::HiQualityCatalog);
+    clearMaxDaysData(QnServer::LowQualityCatalog);
 }
 
-void QnStorageManager::clearMaxDaysData(const FileCatalogMap &catalogMap)
+void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
 {
     QMutexLocker lock(&m_mutexCatalog);
+
+    const FileCatalogMap &catalogMap = m_devFileCatalog[catalogIdx];
+
     for(const DeviceFileCatalogPtr& catalog: catalogMap.values()) {
         QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(catalog->cameraUniqueId()).dynamicCast<QnSecurityCamResource>();
         if (camera && camera->maxDays() > 0) {
@@ -947,7 +953,7 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
 {
     Q_UNUSED(newEndTimeMs)
     int storageIndex = detectStorageIndex(resource->getUrl());
-
+    QMutexLocker lock(&m_mutexCatalog);
     for(const DeviceFileCatalogPtr& catalogHi: m_devFileCatalog[QnServer::HiQualityCatalog])
         catalogHi->deleteRecordsByStorage(storageIndex, newStartTimeMs);
     

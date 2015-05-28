@@ -346,8 +346,8 @@ QByteArray formatJSonString(const QByteArray& data)
     return result;
 }
 
-const char* weekDaysStr[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
-const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+static const char* weekDaysStr[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+static const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 QByteArray dateTimeToHTTPFormat(const QDateTime& value)
 {

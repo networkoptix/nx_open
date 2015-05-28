@@ -93,8 +93,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
-    m_lastUpdateSlider(0),
-    m_lastCameraTime(0),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -824,7 +822,6 @@ void QnWorkbenchNavigator::updateCentralWidget() {
         connect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
     updateCurrentWidget();
-    updateThumbnailsLoader();
 }
 
 void QnWorkbenchNavigator::updateCurrentWidget() {
@@ -839,6 +836,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
 
     if(m_currentWidget) {
+        m_timeSlider->setThumbnailsLoader(NULL, -1);
         if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
             foreach(QnResourceWidget *widget, m_syncedWidgets)
                 updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
@@ -898,6 +896,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updatePlaying();
     updateSpeedRange();
     updateSpeed();
+    updateThumbnailsLoader();
 
     emit currentWidgetChanged();
 }
@@ -1021,19 +1020,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
                 timeUSec *= 1000;
         }
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec < 0 ? m_timeSlider->value() : timeUSec / 1000);
-        qint64 timeNext = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? AV_NOPTS_VALUE : m_currentMediaWidget->display()->camDisplay()->getNextTime();
-
-        if (timeUSec != DATETIME_NOW && timeUSec >= 0) {
-            qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
-            if (m_lastUpdateSlider && m_lastCameraTime == timeMSec && (quint64)timeNext != AV_NOPTS_VALUE && timeNext - timeMSec <= MAX_FRAME_DURATION){
-                qint64 timeDiff = (now - m_lastUpdateSlider) * speed();
-                if (timeDiff < MAX_FRAME_DURATION)
-                    timeMSec += timeDiff;
-            } else {
-                m_lastCameraTime = timeMSec;
-                m_lastUpdateSlider = now;
-            }
-        }
 
         m_timeSlider->setValue(timeMSec, keepInWindow);
 

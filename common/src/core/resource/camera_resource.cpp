@@ -154,9 +154,9 @@ bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMedi
     if (newParams.codec != oldParams.codec)
         return false;
     bool streamParamsMatched = newParams.customStreamParams == oldParams.customStreamParams ||
-         newParams.customStreamParams.empty() && !oldParams.customStreamParams.empty();
+         (newParams.customStreamParams.empty() && !oldParams.customStreamParams.empty());
     bool resolutionMatched = newParams.resolution == oldParams.resolution ||
-         newParams.resolution == CameraMediaStreamInfo::anyResolution && oldParams.resolution != CameraMediaStreamInfo::anyResolution;
+         ((newParams.resolution == CameraMediaStreamInfo::anyResolution) && (oldParams.resolution != CameraMediaStreamInfo::anyResolution));
     return streamParamsMatched && resolutionMatched;
 }
 

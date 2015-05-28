@@ -40,20 +40,21 @@
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>
+#include "http/custom_headers.h"
 
 
 class QnTcpListener;
 
 static const QByteArray ENDL("\r\n");
 
-static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
+//static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
 
 // ------------- ServerTrackInfo --------------------
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
 
 enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
-static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
+//static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
 static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
@@ -1070,7 +1071,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         if (nx_http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
-        d->clientGuid = nx_http::getHeaderValue(d->request.headers, "x-guid");
+        d->clientGuid = nx_http::getHeaderValue(d->request.headers, Qn::GUID_HEADER_NAME);
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
         //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);

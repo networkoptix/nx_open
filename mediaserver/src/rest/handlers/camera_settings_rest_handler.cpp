@@ -15,6 +15,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/param.h>
+#include "http/custom_headers.h"
 
 
 //!max time (milliseconds) to wait for async operation completion
@@ -54,7 +55,7 @@ int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnReques
 
     QnRequestParamList locParams = params;
 
-    QnRequestParamList::iterator serverGuidIter = locParams.find(lit("x-server-guid"));
+    QnRequestParamList::iterator serverGuidIter = locParams.find(Qn::SERVER_GUID_HEADER_NAME);
     if (serverGuidIter != locParams.end())
         locParams.erase(serverGuidIter);
 

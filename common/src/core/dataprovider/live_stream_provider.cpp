@@ -200,7 +200,7 @@ void QnLiveStreamProvider::setFps(float f)
     {
         QMutexLocker mtx(&m_livemutex);
 
-        if (abs(m_fps - f) < 0.1)
+        if (std::abs(m_fps - f) < 0.1)
             return; // same fps?
 
 
@@ -396,11 +396,6 @@ bool QnLiveStreamProvider::isCameraControlDisabled() const
 {
     const QnVirtualCameraResource* camRes = dynamic_cast<const QnVirtualCameraResource*>(m_resource.data());
     return camRes && camRes->isCameraControlDisabled();
-}
-
-bool QnLiveStreamProvider::isCameraControlRequired() const
-{
-    return !isCameraControlDisabled() && needConfigureProvider();
 }
 
 void QnLiveStreamProvider::filterMotionByMask(const QnMetaDataV1Ptr& motion)

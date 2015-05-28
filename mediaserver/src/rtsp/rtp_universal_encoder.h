@@ -39,8 +39,8 @@ private:
     QnFfmpegTranscoder m_transcoder;
     CodecID m_codec;
     bool m_isVideo;
-    quint32 m_firstTime;
-    bool m_isFirstPacket;
+    //quint32 m_firstTime;
+    //bool m_isFirstPacket;
     bool m_isOpened;
 };
 

@@ -36,6 +36,7 @@
 #include "model/camera_list_reply.h"
 #include "model/configure_reply.h"
 #include "model/upload_update_reply.h"
+#include "http/custom_headers.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -88,7 +89,7 @@ namespace {
         (TestEmailSettingsObject,  "testEmailSettings")
         (ModulesInformationObject, "moduleInformationAuthenticated")
     );
-
+#if 0
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
     {
         QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
@@ -105,7 +106,7 @@ namespace {
         else
             return QByteArray();
     }
-
+#endif
 } // anonymous namespace
 
 
@@ -307,18 +308,18 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     setUrl(mserver->getApiUrl());
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
 
-    QString guid = mserver->getProperty(lit("guid")); // todo: wtf?
+    QnUuid guid = mserver->getOriginalGuid();
 
     QnRequestHeaderList queryParameters;
-	queryParameters.insert(lit("x-server-guid"), mserver->getId().toString());
+	queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), mserver->getId().toString());
 
     setExtraQueryParameters(queryParameters);
 
     QnRequestHeaderList extraHeaders;
-	extraHeaders.insert(lit("x-server-guid"), guid.isEmpty() ? mserver->getId().toString() : guid);
+	extraHeaders.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), guid.isNull() ? mserver->getId().toString() : guid.toString());
 
     if (!videowallGuid.isNull())
-        extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());
+        extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
     setExtraHeaders(extraHeaders);
 }
 
@@ -774,7 +775,7 @@ int QnMediaServerConnection::deleteBookmarkAsync(const QnNetworkResourcePtr &cam
 
 int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot) {
     QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "application/json");
+    //headers << QnRequestParam("content-type",   "application/json");
 
     QnRequestParamList params;
     params << QnRequestParam("id",               QnLexical::serialized(camera->getPhysicalId()));
@@ -798,7 +799,10 @@ int QnMediaServerConnection::uploadUpdateChunk(const QString &updateId, const QB
     params << QnRequestParam("updateId", updateId);
     params << QnRequestParam("offset", offset);
 
-    return sendAsyncPostRequest(InstallUpdateObject, params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "text/xml");
+
+    return sendAsyncPostRequest(InstallUpdateObject, headers, params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
 
 int QnMediaServerConnection::restart(QObject *target, const char *slot) {

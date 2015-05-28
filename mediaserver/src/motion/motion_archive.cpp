@@ -15,7 +15,7 @@
 
 static const char version = 1;
 static const quint16 DETAILED_AGGREGATE_INTERVAL = 3; // at seconds
-static const quint16 COARSE_AGGREGATE_INTERVAL = 3600; // at seconds
+//static const quint16 COARSE_AGGREGATE_INTERVAL = 3600; // at seconds
 
 bool operator < (const IndexRecord& first, const IndexRecord& other) { return first.start < other.start; }
 bool operator < (qint64 start, const IndexRecord& other) { return start < other.start; }
@@ -281,16 +281,16 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
     indexFile.seek(0);
     indexFile.read((char*) &indexHeader, MOTION_INDEX_HEADER_SIZE);
 
-    std::unique_ptr<quint8> tmpBuffer( new quint8[READ_BUF_SIZE] );
+    std::vector<quint8> tmpBuffer(READ_BUF_SIZE);
     while(1)
     {
-        int readed = indexFile.read((char*) tmpBuffer.get(), READ_BUF_SIZE);
+        int readed = indexFile.read((char*) &tmpBuffer[0], READ_BUF_SIZE);
         if (readed < 1)
             break;
         int records = readed / MOTION_INDEX_RECORD_SIZE;
         int oldVectorSize = index.size();
         index.resize(oldVectorSize + records);
-        memcpy(&index[oldVectorSize], tmpBuffer.get(), records * MOTION_INDEX_RECORD_SIZE);
+        memcpy(&index[oldVectorSize], &tmpBuffer[0], records * MOTION_INDEX_RECORD_SIZE);
     }
 
     return true;

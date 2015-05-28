@@ -79,16 +79,4 @@ FROM vms_kvpair_tmp kv
 CREATE UNIQUE INDEX idx_kvpair_name ON vms_kvpair (resource_guid, name);
 drop table vms_kvpair_tmp;
 
-drop table piston_nonce;
-drop table piston_token;
-drop table piston_consumer;
-drop table django_site;
-drop table django_session;
-drop table django_admin_log;
-drop table django_content_type;
-drop table auth_user_user_permissions;
-drop table auth_user_groups;
-drop table auth_group;
-drop table auth_group_permissions;
 drop table vms_property;
-drop table vms_localresource;

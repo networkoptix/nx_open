@@ -59,14 +59,8 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
     if (result!=CL_HTTP_SUCCESS)
         return result;
 
-    char c_response[200];
-    int result_size =  http.read(c_response,sizeof(c_response));
-
-    if (result_size <0)
-        return CL_TRANSPORT_ERROR;
-
-    QByteArray arr = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
-
+    QByteArray arr;
+    http.readAll(arr);
     int index = arr.indexOf('=');
     if (index==-1)
         return CL_TRANSPORT_ERROR;
@@ -366,22 +360,15 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &param, QVariant &
     QString request = lit("get?") + param;
 
     CLHttpStatus status = connection.doGET(request);
-    if (status == CL_HTTP_AUTH_REQUIRED)
+    if (status == CL_HTTP_AUTH_REQUIRED && !getId().isNull())
         setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)
         return false;
         
 
-    char c_response[MAX_RESPONSE_LEN];
-
-    int result_size =  connection.read(c_response,sizeof(c_response));
-
-    if (result_size <0)
-        return false;
-
-    QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
-
+    QByteArray response;
+    connection.readAll(response);
     int index = response.indexOf('=');
     if (index==-1)
         return false;
