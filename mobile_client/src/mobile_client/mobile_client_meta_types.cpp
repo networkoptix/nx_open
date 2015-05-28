@@ -10,9 +10,16 @@
 #include "models/login_sessions_model.h"
 #include "resources/media_resource_helper.h"
 #include "utils/mobile_app_info.h"
+#include "mobile_client/mobile_client_settings.h"
 
 void QnMobileClientMetaTypes::initialize() {
+    registerMetaTypes();
     registerQmlTypes();
+}
+
+void QnMobileClientMetaTypes::registerMetaTypes() {
+    qRegisterMetaType<QnAspectRatioHash>();
+    qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
 }
 
 void QnMobileClientMetaTypes::registerQmlTypes() {

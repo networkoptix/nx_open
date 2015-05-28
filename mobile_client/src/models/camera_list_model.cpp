@@ -10,9 +10,13 @@
 #include "models/filtered_resource_list_model.h"
 #include "camera/camera_thumbnail_cache.h"
 #include "mobile_client/mobile_client_roles.h"
+#include "mobile_client/mobile_client_settings.h"
 #include "api/network_proxy_factory.h"
 
 namespace {
+
+    const qreal defaultAspectRatio = 4.0 / 3.0;
+
     class QnFilteredCameraListModel : public QnFilteredResourceListModel {
         typedef QnFilteredResourceListModel base_type;
     public:
@@ -86,6 +90,29 @@ QnCameraListModel::QnCameraListModel(QObject *parent) :
         connect(QnCameraThumbnailCache::instance(), &QnCameraThumbnailCache::thumbnailUpdated, this, &QnCameraListModel::at_thumbnailUpdated);
 }
 
+QHash<int, QByteArray> QnCameraListModel::roleNames() const {
+    QHash<int, QByteArray> roles = QSortFilterProxyModel::roleNames();
+    roles[Qn::ItemWidthRole] = "itemWidth";
+    roles[Qn::ItemHeightRole] = "itemHeight";
+    return roles;
+}
+
+QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
+    if (role == Qn::ItemWidthRole || role == Qn::ItemHeightRole) {
+        QnUuid id = QnUuid(QSortFilterProxyModel::data(index, Qn::UuidRole).toUuid());
+        QSize size = m_sizeById.value(id);
+        if (size.isEmpty())
+            size = QSize(m_width / 2, m_width / 2 / defaultAspectRatio);
+
+        if (role == Qn::ItemWidthRole)
+            return size.width();
+        else
+            return size.height();
+    }
+
+    return QSortFilterProxyModel::data(index, role);
+}
+
 void QnCameraListModel::setServerId(const QnUuid &id) {
     m_model->setServerId(id);
     emit serverIdStringChanged();
@@ -125,6 +152,22 @@ void QnCameraListModel::refreshThumbnails(int from, int to) {
     QnCameraThumbnailCache::instance()->refreshThumbnails(ids);
 }
 
+void QnCameraListModel::updateLayout(int width, qreal desiredAspectRatio) {
+    m_width = width;
+
+    m_sizeById.clear();
+    QnAspectRatioHash aspectRatios = qnSettings->camerasAspectRatios();
+
+    int count = rowCount();
+    for (int i = 0; i < count; ++i) {
+        QnUuid id = QnUuid(index(i, 0).data(Qn::UuidRole).toUuid());
+        qreal aspectRatio = aspectRatios.value(id, defaultAspectRatio);
+        m_sizeById[id] = QSize(width / 2, width / 2 / aspectRatio);
+    }
+
+    emit dataChanged(index(0, 0), index(count - 1, 0), QVector<int>() << Qn::ItemWidthRole << Qn::ItemHeightRole);
+}
+
 bool QnCameraListModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
     QString leftName = left.data(Qn::ResourceNameRole).toString();
     QString rightName = right.data(Qn::ResourceNameRole).toString();
@@ -140,6 +183,12 @@ bool QnCameraListModel::lessThan(const QModelIndex &left, const QModelIndex &rig
 }
 
 void QnCameraListModel::at_thumbnailUpdated(const QnUuid &resourceId, const QString &thumbnailId) {
-    Q_UNUSED(thumbnailId)
     m_model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
+
+    QPixmap thumbnail = QnCameraThumbnailCache::instance()->thumbnail(thumbnailId);
+    if (!thumbnail.isNull()) {
+        QnAspectRatioHash aspectRatios = qnSettings->camerasAspectRatios();
+        aspectRatios[resourceId] = static_cast<qreal>(thumbnail.width()) / thumbnail.height();
+        qnSettings->setCamerasAspectRatios(aspectRatios);
+    }
 }

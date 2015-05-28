@@ -16,9 +16,6 @@ GridView {
     delegate: Item {
         id: wrapper
 
-        x: spacing / 4
-        y: spacing / 4
-
         width: gridView.cellWidth - spacing / 2
         height: gridView.cellHeight - spacing / 2
 

@@ -19,6 +19,7 @@ Page {
         id: listView
         anchors.fill: parent
         source: Qt.resolvedUrl(showList ?  "/qml/items/QnCameraList.qml" : "/qml/items/QnCameraGrid.qml")
+
         onLoaded: {
             item.model = camerasModel
         }
@@ -30,5 +31,11 @@ Page {
         content: QnSideBar {
             id: menuContent
         }
+    }
+
+    onWidthChanged: updateLayout()
+
+    function updateLayout() {
+        camerasModel.updateLayout(resourcesDialog.width, 3.0)
     }
 }

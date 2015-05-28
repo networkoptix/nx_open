@@ -2,12 +2,11 @@
 #define QNCAMERASMODEL_H
 
 #include <QtCore/QSortFilterProxyModel>
+#include <utils/common/id.h>
 
 namespace {
     class QnFilteredCameraListModel;
 }
-
-class QnUuid;
 
 class QnCameraListModel : public QSortFilterProxyModel {
     Q_OBJECT
@@ -22,8 +21,12 @@ public:
     QString serverIdString() const;
     void setServerIdString(const QString &id);
 
+    virtual QHash<int, QByteArray> roleNames() const;
+    virtual QVariant data(const QModelIndex &index, int role) const override;
+
 public slots:
     void refreshThumbnails(int from, int to);
+    void updateLayout(int width, qreal desiredAspectRatio);
 
 signals:
     void serverIdStringChanged();
@@ -36,6 +39,8 @@ private slots:
 
 private:
     QnFilteredCameraListModel *m_model;
+    QHash<QnUuid, QSize> m_sizeById;
+    int m_width;
 };
 
 

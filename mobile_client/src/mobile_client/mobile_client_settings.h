@@ -12,6 +12,7 @@ class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobi
 public:
     enum Variable {
         SavedSessions,
+        CamerasAspectRatios,
         VariableCount
     };
 
@@ -32,7 +33,8 @@ protected:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VariableCount)
-        QN_DECLARE_RW_PROPERTY(QVariantList,            savedSessions,      setSavedSessions,       SavedSessions,        QVariantList())
+        QN_DECLARE_RW_PROPERTY(QVariantList,                savedSessions,              setSavedSessions,           SavedSessions,              QVariantList())
+        QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           camerasAspectRatios,        setCamerasAspectRatios,     CamerasAspectRatios,        QnAspectRatioHash())
     QN_END_PROPERTY_STORAGE()
 
 private:

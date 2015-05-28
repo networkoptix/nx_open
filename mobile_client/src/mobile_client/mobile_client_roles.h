@@ -8,7 +8,10 @@ namespace Qn {
         ThumbnailRole = RoleCount + 1,
         ServerResourceRole,
         ServerNameRole,
-        IpAddressRole
+        IpAddressRole,
+
+        ItemWidthRole,
+        ItemHeightRole
     };
 
     QByteArray roleName(int role);
