@@ -8,6 +8,7 @@ import argparse
 
 targetBranch = 'prod_2.3.1';
 ignoredCommits = ['Merge', '']
+changelogText = 'Merge Changelog:'
 
 def execCommand(command):
     code = subprocess.call(command)
@@ -22,9 +23,12 @@ def getChangelog(revision):
     changelog = subprocess.check_output(command, shell=True)
     changes = sorted(set(changelog.split('\n\n')))
     
-    changes = [x.strip('\n') for x in changes if not x in ignoredCommits]
+    changes = [x.strip('\n') for x in changes if (
+        not x in ignoredCommits
+        and not changelogText in x
+        )]
     
-    changes.insert(0, 'Merge Changelog:')
+    changes.insert(0, changelogText)
     
     return '\n'.join(changes).strip('\n')
       
@@ -32,7 +36,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--target', type=str, help="Target branch")
     parser.add_argument('-r', '--rev', type=str, help="Source revision")
-    parser.add_argument('-p', '--preview', action='store_true', help="preview changes")
+    parser.add_argument('-p', '--preview', action='store_true', help="Preview changes")
     args = parser.parse_args()
 
     target = args.target
