@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>443</width>
     <height>300</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <item>
     <widget class="QCheckBox" name="autoDiscoveryCheckBox">
      <property name="text">
-      <string>Enable camera auto discovery</string>
+      <string>Enable cameras and servers auto discovery</string>
      </property>
      <property name="tristate">
       <bool>true</bool>
@@ -34,7 +34,16 @@
    <item>
     <widget class="QWidget" name="horizontalWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
