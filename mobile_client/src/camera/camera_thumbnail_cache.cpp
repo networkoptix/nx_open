@@ -108,7 +108,7 @@ void QnCameraThumbnailCache::at_thumbnailReceived(int status, const QImage &thum
 
     QString thumbnailId;
     if (status == 0) {
-        QString thumbnailId = id.toString();
+        thumbnailId = id.toString();
         if (thumbnailId.startsWith(QLatin1Char('{')))
             thumbnailId = thumbnailId.mid(1, thumbnailId.size() - 2);
         thumbnailId += lit(":");
