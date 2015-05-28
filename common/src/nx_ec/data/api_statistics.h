@@ -28,7 +28,7 @@ namespace ec2 {
 		: ApiCameraDataEx
     {
         ApiCameraDataStatistics();
-        ApiCameraDataStatistics(const ApiCameraDataEx&& data);
+        ApiCameraDataStatistics(ApiCameraDataEx&& data);
 
 		const static std::unordered_set<QString> EXCEPT_PARAMS;
 
@@ -43,7 +43,7 @@ namespace ec2 {
 		: ApiStorageData
     {
         ApiStorageDataStatistics();
-        ApiStorageDataStatistics(const ApiStorageData&& data);
+        ApiStorageDataStatistics(ApiStorageData&& data);
     };
 #define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)
 
@@ -51,7 +51,7 @@ namespace ec2 {
 		: ApiMediaServerDataEx
     {
         ApiMediaServerDataStatistics();
-        ApiMediaServerDataStatistics(const ApiMediaServerDataEx&& data);
+        ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
 
         ApiStorageDataStatisticsList    storages;
     };
@@ -72,7 +72,7 @@ namespace ec2 {
 		: ApiBusinessRuleData
 	{
         ApiBusinessRuleStatistics();
-        ApiBusinessRuleStatistics(const ApiBusinessRuleData&& data);
+        ApiBusinessRuleStatistics(ApiBusinessRuleData&& data);
 
 		// TODO: Convert enums to strings
 		// QString actionType, eventState, eventType; 
