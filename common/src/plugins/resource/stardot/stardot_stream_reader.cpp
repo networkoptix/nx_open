@@ -31,13 +31,13 @@ QnStardotStreamReader::~QnStardotStreamReader()
     stop();
 }
 
-CameraDiagnostics::Result QnStardotStreamReader::openStream()
+CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCameraControlRequired)
 {
     // configure stream params
 
     // get URL
 
-    if (isCameraControlRequired())
+    if (isCameraControlRequired)
     {
         QString request(lit("admin.cgi?image&h264_bitrate=%2&h264_framerate=%3"));
         int bitrate = m_stardotRes->suggestBitrateKbps(getQuality(), m_stardotRes->getResolution(), getFps());
@@ -90,11 +90,8 @@ void QnStardotStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnStardotStreamReader::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData())
         return getMetaData();
@@ -112,18 +109,6 @@ QnAbstractMediaDataPtr QnStardotStreamReader::getNextData()
     }
 
     return rez;
-}
-
-void QnStardotStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnStardotStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 QnConstResourceAudioLayoutPtr QnStardotStreamReader::getDPAudioLayout() const

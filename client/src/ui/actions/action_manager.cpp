@@ -733,6 +733,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::FullscreenAction).
         flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Go to Fullscreen")).
         toggledText(tr("Exit Fullscreen")).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));

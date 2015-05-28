@@ -590,8 +590,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     QByteArray digestPassword;
     qnCommon->adminPasswordData(&md5Password, &digestPassword);
     QString defaultAdminPassword = qnCommon->defaultAdminPassword();
-    if( users[0].hash.isEmpty() && defaultAdminPassword.isEmpty() ) {
-        defaultAdminPassword = lit("123");
+    if( (users[0].hash.isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty() ) {
+        defaultAdminPassword = lit("admin");
+        if (m_dbJustCreated)
+            qnCommon->setUseLowPriorityAdminPasswordHach(true);
     }
 
     QnUserResourcePtr userResource( new QnUserResource() );
@@ -1324,6 +1326,10 @@ bool QnDbManager::createDatabase()
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
 		NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
+
+        if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
+            return false;
+
         if (!migrateBusinessEvents())
             return false;
         if (!m_dbJustCreated) {

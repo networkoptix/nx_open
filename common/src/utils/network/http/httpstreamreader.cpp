@@ -16,10 +16,11 @@ namespace nx_http
     HttpStreamReader::HttpStreamReader()
     :
         m_state( waitingMessageStart ),
+        m_nextState( waitingMessageStart ),
         m_isChunkedTransfer( false ),
         m_messageBodyBytesRead( 0 ),
         m_chunkStreamParseState( waitingChunkStart ),
-        m_nextState( undefined ),
+        m_nextChunkStreamParseState( undefined ),
         m_currentChunkSize( 0 ),
         m_currentChunkBytesRead( 0 ),
         m_prevChar( 0 ),
@@ -66,15 +67,17 @@ namespace nx_http
                         //different buffers, we MUST read LF before reading message body
                     size_t bytesRead = 0;
                     m_lineSplitter.finishCurrentLineEnding(
-                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
                         data.mid( currentDataPos, count-currentDataPos ),
                         &bytesRead );
                     currentDataPos += bytesRead;
                     if( bytesProcessed )
                         *bytesProcessed = currentDataPos;
-                    m_state = readingMessageBody;
-                    if( m_breakAfterReadingHeaders )
+                    m_state = m_nextState;
+                    if( m_breakAfterReadingHeaders ||
+                        m_state == messageDone )    //MUST break parsing on message boudary so that calling entity has chance to handle message
+                    {
                         return true;
+                    }
                     break;
                 }
 
@@ -85,7 +88,6 @@ namespace nx_http
                     if( m_contentDecoder )
                     {
                         msgBodyBytesRead = readMessageBody(
-                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
                             data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data ){ m_codedMessageBodyBuffer.append(data.constData(), data.size()); } );
                         //decoding content
@@ -101,7 +103,6 @@ namespace nx_http
                     else
                     {
                         msgBodyBytesRead = readMessageBody(
-                            //QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
                             data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data )
                                 {
@@ -141,7 +142,6 @@ namespace nx_http
                     ConstBufferRefType lineBuffer;
                     size_t bytesRead = 0;
                     const bool lineFound = m_lineSplitter.parseByLines(
-                        //ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
                         data.mid( currentDataPos, count-currentDataPos ),
                         &lineBuffer,
                         &bytesRead );
@@ -229,6 +229,11 @@ namespace nx_http
         return m_currentMessageNumber;
     }
 
+    boost::optional<quint64> HttpStreamReader::contentLength() const
+    {
+        return m_contentLength;
+    }
+
     void HttpStreamReader::setBreakAfterReadingHeaders( bool val )
     {
         m_breakAfterReadingHeaders = val;
@@ -282,11 +287,15 @@ namespace nx_http
                         if( m_contentLength && m_contentLength.get() == 0 )
                         {
                             //server purposefully reported empty message body
-                            m_state = messageDone;
+                            m_state = m_lineSplitter.currentLineEndingClosed()
+                                ? messageDone
+                                : pullingLineEndingBeforeMessageBody;
+                            m_nextState = messageDone;
                         }
                         else
                         {
                             m_state = pullingLineEndingBeforeMessageBody;
+                            m_nextState = readingMessageBody;
                             m_chunkStreamParseState = waitingChunkStart;
                         }
                     }
@@ -316,6 +325,17 @@ namespace nx_http
     bool HttpStreamReader::prepareToReadMessageBody()
     {
         Q_ASSERT( m_httpMessage.type != MessageType::none );
+
+        if( m_httpMessage.type == MessageType::request )
+        {
+            if( m_httpMessage.request->requestLine.method != nx_http::Method::POST &&
+                m_httpMessage.request->requestLine.method != nx_http::Method::PUT )
+            {
+                //only POST and PUT are allowed to have message body
+                m_contentLength = 0;
+                return true;
+            }
+        }
 
         HttpHeaders::const_iterator contentEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Content-Encoding") );
         if( contentEncodingIter != m_httpMessage.headers().end() &&
@@ -406,7 +426,7 @@ namespace nx_http
                     {
                         //no extension?
                         m_chunkStreamParseState = skippingCRLF;
-                        m_nextState = readingChunkData;
+                        m_nextChunkStreamParseState = readingChunkData;
                         break;
                     }
                     else
@@ -422,7 +442,7 @@ namespace nx_http
                     if( currentChar == '\r' || currentChar == '\n' )
                     {
                         m_chunkStreamParseState = skippingCRLF;
-                        m_nextState = readingChunkData;
+                        m_nextChunkStreamParseState = readingChunkData;
                         break;
                     }
                     ++currentOffset;
@@ -443,7 +463,7 @@ namespace nx_http
                         m_lineEndingOffset = 0;
                     }
 
-                    m_chunkStreamParseState = m_nextState;
+                    m_chunkStreamParseState = m_nextChunkStreamParseState;
                     break;
 
                 case readingChunkData:
@@ -463,7 +483,7 @@ namespace nx_http
                     if( m_currentChunkBytesRead == m_currentChunkSize )
                     {
                         m_chunkStreamParseState = skippingCRLF;
-                        m_nextState = waitingChunkStart;
+                        m_nextChunkStreamParseState = waitingChunkStart;
                     }
                     break;
                 }

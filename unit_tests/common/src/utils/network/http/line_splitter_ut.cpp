@@ -31,7 +31,7 @@ namespace
 
 #if 0
 //TODO #ak uncomment and fix
-TEST( HttpLineSplitterTest, GeneralTest )
+TEST( LineSplitter, GeneralTest )
 {
     static const nx::Buffer testData = 
         "line1\r"
@@ -55,7 +55,7 @@ TEST( HttpLineSplitterTest, GeneralTest )
 }
 #endif
 
-TEST( HttpLineSplitterTest, TrailingLFTest )
+TEST( LineSplitter, TrailingLFTest )
 {
     static const nx::Buffer testData = 
         "line1\r\n"

@@ -261,9 +261,8 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
         int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, outFrame.data());
         result.append((const char*) m_videoEncodingBuffer, encoded);
         qFreeAligned(m_videoEncodingBuffer);
-        avcodec_close(videoEncoderCodecCtx);
     }
-    av_freep(&videoEncoderCodecCtx);
+    QnFfmpegHelper::deleteCodecContext(videoEncoderCodecCtx);
 
     return result;
 }

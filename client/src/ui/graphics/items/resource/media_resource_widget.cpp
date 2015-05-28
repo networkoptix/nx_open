@@ -14,6 +14,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
@@ -247,7 +248,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         buttonBar()->addButton(EnhancementButton, enhancementButton);
     }
 
-    if (qnSettings->isDevMode()) {
+    if (qnRuntime->isDevMode()) {
         QnImageButtonWidget *debugScreenshotButton = new QnImageButtonWidget();
         debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
         debugScreenshotButton->setCheckable(false);
@@ -803,7 +804,10 @@ float QnMediaResourceWidget::visualAspectRatio() const {
     if (qFuzzyIsNull(customAspectRatio))
         return base_type::visualAspectRatio();
 
-    qreal aspectRatio = customAspectRatio * QnGeometry::aspectRatio(channelLayout()->size());
+    qreal aspectRatio = customAspectRatio;
+    if (zoomRect().isNull())
+        aspectRatio *= QnGeometry::aspectRatio(channelLayout()->size());
+
     return QnAspectRatio::isRotated90(rotation()) ? 1 / aspectRatio : aspectRatio;
 }
 
@@ -910,7 +914,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
             continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
-        mbps += statistics->getBitrate();
+        mbps += statistics->getBitrateMbps();
     }
 
     QSize size = m_display->camDisplay()->getRawDataSize();
@@ -971,7 +975,7 @@ QString QnMediaResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
 
-    if (qnSettings->isDevMode())
+    if (qnRuntime->isDevMode())
         result |= DbgScreenshotButton;
 
     if(!(resource()->toResource()->flags() & Qn::still_image))
@@ -1037,7 +1041,7 @@ QCursor QnMediaResourceWidget::calculateCursor() const {
 }
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
-    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
         return Qn::VideowallWithoutLicenseOverlay;
 
     QnResourcePtr resource = m_display->resource();
@@ -1059,7 +1063,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_camera && m_camera->isDtsBased() && m_camera->isScheduleDisabled()) {
         return Qn::AnalogWithoutLicenseOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivity)) {
-        if (!qnSettings->isVideoWallMode())
+        if (!qnRuntime->isVideoWallMode())
             return Qn::PausedOverlay;
         return Qn::EmptyOverlay;
     } else if (m_display->camDisplay()->isLongWaiting()) {

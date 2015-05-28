@@ -14,6 +14,9 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 
+#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+
 #include <core/dataprovider/abstract_streamdataprovider.h>
 
 #include <core/resource/security_cam_resource.h>
@@ -75,7 +78,6 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/counter.h>
-#include <client/client_settings.h>
 
 #include "watchers/workbench_render_watcher.h"
 #include "workbench.h"
@@ -352,12 +354,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Fps counter. */
     createFpsWidget();
 
-	if (!qnSettings->isActiveXMode()) {
+	if (!qnRuntime->isActiveXMode()) {
 		/* Tree panel. */
 		createTreeWidget();
 	}
 
-	if (!qnSettings->isActiveXMode()) {
+	if (!qnRuntime->isActiveXMode()) {
 		/* Title bar. */
 		createTitleWidget();
 	}
@@ -377,7 +379,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 #endif
 
     /* Debug overlay */
-    createDebugWidget();
+//    createDebugWidget();
 
     initGraphicsMessageBox();
 
@@ -502,7 +504,7 @@ void QnWorkbenchUi::setWindowButtonsUsed(bool windowButtonsUsed) {
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     ensureAnimationAllowed(animate);
 
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         bool sliderVisible =
             navigator()->currentWidget() != NULL &&
             !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server));
@@ -685,8 +687,7 @@ void QnWorkbenchUi::tick(int deltaMSecs) {
 }
 
 void QnWorkbenchUi::at_freespaceAction_triggered() {
-	// ax 23
-	return;
+    Q_ASSERT_X(!qnRuntime->isActiveXMode(), Q_FUNC_INFO, "This function must not be called in ActiveX mode.");
 
     QAction *fullScreenAction = action(Qn::EffectiveMaximizeAction);
 
@@ -769,7 +770,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
         }
     }
 
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         switch (role) {
         case Qn::ZoomedRole:
         case Qn::RaisedRole:
@@ -2059,7 +2060,7 @@ bool QnWorkbenchUi::isSliderOpened() const {
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         opened = true;
         save = false;
     }
@@ -2093,7 +2094,7 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
     bool changed = m_sliderVisible != visible;
 
     m_sliderVisible = visible;
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         if (visible)
             m_sliderAutoHideTimer->start(sliderAutoHideTimeoutMSec);
         else
@@ -2285,7 +2286,7 @@ void QnWorkbenchUi::createSliderWidget()
     }
     m_sliderShowButton->setFocusProxy(m_sliderItem);
 
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         m_sliderShowButton->setVisible(false);
 
         m_sliderAutoHideTimer = new QTimer(this);
@@ -2357,7 +2358,7 @@ void QnWorkbenchUi::createSliderWidget()
     connect(m_sliderItem,               &QGraphicsWidget::geometryChanged,          this,           &QnWorkbenchUi::at_sliderItem_geometryChanged);
     connect(m_sliderResizerWidget,      &QGraphicsWidget::geometryChanged,          this,           &QnWorkbenchUi::at_sliderResizerWidget_geometryChanged);
     connect(navigator(),                &QnWorkbenchNavigator::currentWidgetChanged,this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    if (qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isVideoWallMode()) {
         connect(navigator(),           &QnWorkbenchNavigator::positionChanged,      this,           &QnWorkbenchUi::updateCalendarVisibilityAnimated);
         connect(navigator(),           &QnWorkbenchNavigator::speedChanged,         this,           &QnWorkbenchUi::updateCalendarVisibilityAnimated);
     }

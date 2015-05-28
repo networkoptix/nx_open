@@ -10,6 +10,7 @@
 #include <common/common_module.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -195,7 +196,7 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
         return;
     }
 
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode())
         return;
 
     QnWorkbenchLayoutList target;

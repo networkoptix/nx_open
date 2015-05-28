@@ -209,7 +209,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
     return true;
 }
 
-QnResourceAudioLayoutPtr QnAacRtpParser::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnAacRtpParser::getAudioLayout()
 {
     return m_audioLayout;
 }

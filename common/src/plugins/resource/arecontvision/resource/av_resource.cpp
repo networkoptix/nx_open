@@ -291,22 +291,6 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
-    //detecting and saving selected resolutions
-    /*
-    CameraMediaStreams mediaStreams;
-    const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo(
-        PRIMARY_ENCODER_INDEX,
-        QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()),
-        streamCodec ) );
-    QString hasDualStreaming = getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME);
-    if( hasDualStreaming.toInt() > 0 )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo(
-            SECONDARY_ENCODER_INDEX,
-            QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2),
-            streamCodec ) );
-    saveMediaStreamInfoIfNeeded( mediaStreams );
-    */
     setFirmware(firmwareVersion.toString());
     saveParams();
 
@@ -360,7 +344,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &param, QVariant &
     QString request = lit("get?") + param;
 
     CLHttpStatus status = connection.doGET(request);
-    if (status == CL_HTTP_AUTH_REQUIRED)
+    if (status == CL_HTTP_AUTH_REQUIRED && !getId().isNull())
         setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)

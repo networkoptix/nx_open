@@ -45,10 +45,11 @@ namespace ec2
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(
             const QnUuid& connectionGuid,
-            const QSharedPointer<AbstractStreamSocket>& socket,
+            QSharedPointer<AbstractStreamSocket> socket,
             ConnectionType::Type connectionType,
             const ApiPeerData& remotePeer,
             qint64 remoteSystemIdentityTime,
+            const nx_http::Request& request,
             const QByteArray& contentEncoding );
         //!Report socket to receive transactions from
         /*!
@@ -61,6 +62,11 @@ namespace ec2
             qint64 remoteSystemIdentityTime,
             const nx_http::Request& request,
             const QByteArray& requestBuf );
+        //!Process transaction received via standard HTTP server interface
+        bool gotTransactionFromRemotePeer(
+            const QnUuid& connectionGuid,
+            const nx_http::Request& request,
+            const QByteArray& requestMsgBody );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -82,7 +88,7 @@ namespace ec2
             QMutexLocker lock(&m_mutex);
             if (m_connections.isEmpty())
                 return;
-            QnTransactionTransportHeader ttHeader(connectedServerPeers(tran.command) << m_localPeer.id, dstPeers);
+            QnTransactionTransportHeader ttHeader(connectedServerPeers() << m_localPeer.id, dstPeers);
             ttHeader.fillSequence();
             sendTransactionInternal(tran, ttHeader);
         }
@@ -220,7 +226,7 @@ namespace ec2
         */
         bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader);
 
-        QnPeerSet connectedServerPeers(ApiCommand::Value command) const;
+        QnPeerSet connectedServerPeers() const;
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 
@@ -236,6 +242,7 @@ namespace ec2
         void removePeersWithTimeout(const QSet<QnUuid>& lostPeers);
         QSet<QnUuid> checkAlivePeerRouteTimeout();
         void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
+        int distanceToPeer(const QnUuid& dstPeer) const;
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

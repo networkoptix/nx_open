@@ -61,7 +61,7 @@ void QnPlAVClinetPullStreamReader::updateCameraParams()
     }
 
     if (needUpdate)
-        updateStreamParamsBasedOnQuality();  // to update stream params
+        pleaseReopenStream();
 }
 
 QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
@@ -69,7 +69,7 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
     stop();
 }
 
-void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
+void QnPlAVClinetPullStreamReader::pleaseReopenStream()
 {
     QMutexLocker mtx(&m_mutex);
 
@@ -149,8 +149,7 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
     }
 }
 
-
-int QnPlAVClinetPullStreamReader::getBitrate() const
+int QnPlAVClinetPullStreamReader::getBitrateMbps() const
 {
     return getResource()->getProperty(lit("Bitrate")).toInt();
 }
