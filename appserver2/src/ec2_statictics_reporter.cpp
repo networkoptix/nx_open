@@ -8,7 +8,10 @@
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
 static const bool DEFAULT_SERVER_AUTH = true;
 
-static const uint DELAY_RATIO = 50;    /* 50% about 15 days */
+static const uint MIN_DELAY_RATIO = 30;
+static const uint RND_DELAY_RATIO = 50;    /* 50% about 15 days */
+static const uint MAX_DELAY_RATIO = MIN_DELAY_RATIO + RND_DELAY_RATIO;
+
 static const uint TIMER_CYCLE = 60000; /* msecs, update state every minute */
 static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 
@@ -54,12 +57,15 @@ namespace ec2
 
     Ec2StaticticsReporter::Ec2StaticticsReporter(
             const AbstractUserManagerPtr& userManager,
-            const AbstractResourceManagerPtr& resourceManager)
+            const AbstractResourceManagerPtr& resourceManager,
+            const AbstractMediaServerManagerPtr& msManager)
         : m_admin(getAdmin(userManager))
         , m_desktopCameraTypeId(getDesktopCameraTypeId(resourceManager))
+        , m_msManager(msManager)
         , m_timerDisabled(false)
         , m_timerId(boost::none)
     {
+        Q_ASSERT(MAX_DELAY_RATIO <= 100);
         setupTimer();
     }
 
@@ -116,6 +122,22 @@ namespace ec2
         removeTimer();
         outData->status = JUST_INITIATED;
         return initiateReport(&outData->url);
+    }
+
+    bool Ec2StaticticsReporter::isAllowed(const AbstractMediaServerManagerPtr& msManager)
+    {
+        QnMediaServerResourceList msList;
+        if (msManager->getServersSync(QnUuid(), &msList) != ErrorCode::ok)
+            return false;
+
+        size_t disabled = std::count_if(
+                    msList.begin(), msList.end(),
+                    [](const QnMediaServerResourcePtr& ms)
+                    { return ms->getProperty(SR_ALLOWED) == lit("0"); });
+
+        // Statistics report is allowed if it is not disabled on more than a
+        // half of all mediaservers
+        return disabled <= static_cast<size_t>(msList.size() / 2);
     }
 
     QnUserResourcePtr Ec2StaticticsReporter::getAdmin(const AbstractUserManagerPtr& manager)
@@ -176,7 +198,7 @@ namespace ec2
 
     void Ec2StaticticsReporter::timerEvent()
     {
-        if (m_admin->getProperty(SR_ALLOWED).toInt() == 0)
+        if (!isAllowed(m_msManager))
         {
             NX_LOG(lit("Ec2StaticticsReporter: Automatic report system is disabled"),
                    cl_logDEBUG2);
@@ -190,15 +212,16 @@ namespace ec2
         const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), Qt::ISODate);
 
         const uint timeCycle = secsWithPostfix(m_admin->getProperty(SR_TIME_CYCLE), DEFAULT_TIME_CYCLE);
-        const uint maxDelay = timeCycle * DELAY_RATIO / 100;
+        const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
 
         if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(timeCycle + maxDelay))
         {
             static std::once_flag flag;
             std::call_once(flag, [](){ qsrand((uint)QTime::currentTime().msec()); });
 
-            const auto delay = static_cast<uint>(qrand()) % maxDelay;
-            m_plannedReportTime = lastTime.addSecs(timeCycle + delay);
+            const auto minDelay = timeCycle * MIN_DELAY_RATIO / 100;
+            const auto rndDelay = timeCycle * (static_cast<uint>(qrand()) % RND_DELAY_RATIO) / 100;
+            m_plannedReportTime = lastTime.addSecs(timeCycle + minDelay + rndDelay);
             
             NX_LOG(lit("Ec2StaticticsReporter: Last report was at %1, the next planned for %2")
                    .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))

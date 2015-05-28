@@ -1803,6 +1803,19 @@ void QnMain::run()
                 server->setProperty(Qn::PUBLIC_IP, publicIp);
         }
 
+        typedef ec2::Ec2StaticticsReporter stats;
+        const auto confStats = MSSettings::roSettings()->value(stats::SR_ALLOWED);
+        if (!confStats.isNull()) // if present
+        {
+            const auto normStats = QString::number(confStats.toBool() ? 1 : 0);
+            const auto msStats = server->getProperty(stats::SR_ALLOWED);
+            if (normStats != msStats)
+                server->setProperty(stats::SR_ALLOWED, normStats);
+
+            MSSettings::roSettings()->remove(stats::SR_ALLOWED);
+            MSSettings::roSettings()->sync();
+        }
+
         propertyDictionary->saveParams(server->getId());
 
         if (m_mediaServer.isNull())
@@ -1976,14 +1989,6 @@ void QnMain::run()
 
     typedef ec2::Ec2StaticticsReporter stats;
     bool adminParamsChanged = false;
-    if (MSSettings::roSettings()->value(stats::SR_ALLOWED, false).toBool())
-    {
-        if (adminUser->getProperty(stats::SR_ALLOWED).toInt() == 0)        // == 0 => false
-            adminUser->setProperty(stats::SR_ALLOWED, QString::number(1)); // != 0 => true
-
-        MSSettings::roSettings()->remove(stats::SR_ALLOWED);
-        adminParamsChanged = true;
-    }
 
     // TODO: fix, when VS supports init lists:
     //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
@@ -2186,7 +2191,7 @@ void QnMain::at_appStarted()
         return;
 
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
-    m_crashReporter.scanAndReportAsync(qnResPool->getAdministrator(), MSSettings::runTimeSettings());
+    m_crashReporter.scanAndReportAsync(MSSettings::runTimeSettings());
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)

@@ -86,7 +86,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
 
         /* Collect and send crash dumps if allowed */
-        m_crashReporter.scanAndReportAsync(qnResPool->getAdministrator(), qnSettings->rawSettings());
+        m_crashReporter.scanAndReportAsync(qnSettings->rawSettings());
 
         /* We are just reconnected automatically, e.g. after update. */
         if (!m_readyForConnection)

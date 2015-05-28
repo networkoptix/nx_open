@@ -17,7 +17,8 @@ namespace ec2
     public:
         /** Collects and reports statistics in automatic mode (by internal timer) */
         Ec2StaticticsReporter(const AbstractUserManagerPtr& userManager,
-                                const AbstractResourceManagerPtr& resourceManager);
+                              const AbstractResourceManagerPtr& resourceManager,
+                              const AbstractMediaServerManagerPtr& msManager);
         ~Ec2StaticticsReporter();
 
         /** Collects \class ApiSystemStatistics in the entire system */
@@ -39,6 +40,7 @@ namespace ec2
         static const QString AUTH_PASSWORD;
 
         // helpers
+        static bool isAllowed(const AbstractMediaServerManagerPtr& msManager);
         static QnUserResourcePtr getAdmin(const AbstractUserManagerPtr& manager);
         static QnUuid getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager);
 
@@ -56,6 +58,8 @@ namespace ec2
     private:
         QnUserResourcePtr m_admin;
         QnUuid m_desktopCameraTypeId;
+        AbstractMediaServerManagerPtr m_msManager;
+
         nx_http::AsyncHttpClientPtr m_httpClient;
         boost::optional<QDateTime> m_plannedReportTime;
 
