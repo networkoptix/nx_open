@@ -861,7 +861,7 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
     const FileCatalogMap &catalogMap = m_devFileCatalog[catalogIdx];
 
     for(const DeviceFileCatalogPtr& catalog: catalogMap.values()) {
-        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(catalog->cameraUniqueId()).dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());
         if (camera && camera->maxDays() > 0) {
             qint64 timeToDelete = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->maxDays();
             deleteRecordsToTime(catalog, timeToDelete);
@@ -940,7 +940,7 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
         if (curMinTime != (qint64)AV_NOPTS_VALUE && curMinTime < minTime)
         {
             if (useMinArchiveDays) {
-                QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(itr.key()).dynamicCast<QnSecurityCamResource>();
+                QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(itr.key());
                 if (camera && camera->minDays() > 0) {
                     qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->minDays();
                     if (threshold < curMinTime)

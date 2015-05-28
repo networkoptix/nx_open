@@ -68,7 +68,8 @@ public:
     bool needMetaData(); 
 
     virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
-                                 const QnLiveStreamParams& currentLiveParams);
+                                 const QnLiveStreamParams& currentLiveParams,
+                                 bool isCameraControlRequired);
 
     void setUseSoftwareMotion(bool value);
 
@@ -90,10 +91,9 @@ public:
     void updateSoftwareMotionStreamNum();
 
     void setOwner(QnAbstractVideoCamera* owner);
-
+    virtual void pleaseReopenStream() = 0;
 protected:
     /*! Called when @param currentStreamParams are updated */
-    virtual void pleaseReopenStream() = 0;
 
     QnMetaDataV1Ptr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();

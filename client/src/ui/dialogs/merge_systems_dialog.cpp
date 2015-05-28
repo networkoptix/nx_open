@@ -170,7 +170,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
 
     switch (errorCode) {
     case QnMergeSystemsTool::NoError: {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
         if (server && server->getStatus() == Qn::Online && moduleInformation.systemName == qnCommon->localSystemName()) {
             if (m_url.host() == lit("localhost") || m_url.host() == lit("127.0.0.1"))
                 updateErrorLabel(tr("Use a specific hostname or IP address rather than %1.").arg(m_url.host()));

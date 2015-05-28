@@ -96,6 +96,7 @@ extern "C"
 
 #ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
+    #include "common/systemexcept_linux.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
 #include "utils/performance_test.h"
@@ -129,6 +130,7 @@ extern "C"
 #include "ui/workaround/mac_utils.h"
 #endif
 #include "api/runtime_info_manager.h"
+#include <utils/common/timermanager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -400,6 +402,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qnSettings->setVSyncEnabled(!noVSync);
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
+
+    QScopedPointer<TimerManager> timerManager(new TimerManager());
 
     
 
@@ -727,6 +731,10 @@ int main(int argc, char **argv)
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
     win32_exception::installGlobalUnhandledExceptionHandler();
+#endif
+
+#ifdef Q_OS_LINUX
+    linux_exception::installCrashSignalHandler();
 #endif
 
 #ifdef Q_OS_MAC

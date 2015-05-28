@@ -57,7 +57,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
         return QVariant();
 
     QnVirtualCameraResourcePtr camera = m_cameras[index.row()];
-    QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = camera->getParentServer();
 
     switch(role) {
     case Qt::DecorationRole:

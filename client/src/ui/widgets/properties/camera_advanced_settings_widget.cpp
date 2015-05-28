@@ -187,7 +187,7 @@ QnMediaServerConnectionPtr QnCameraAdvancedSettingsWidget::getServerConnection()
     if (!m_camera)
         return QnMediaServerConnectionPtr();
 
-    if (QnMediaServerResourcePtr mediaServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>())
+    if (QnMediaServerResourcePtr mediaServer = m_camera->getParentServer())
         return mediaServer->apiConnection();
 
     return QnMediaServerConnectionPtr();

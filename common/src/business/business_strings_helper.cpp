@@ -464,7 +464,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool /*isPublic*/) {
     QnUuid id = params.getEventResourceId();
     QnNetworkResourcePtr res = !id.isNull() ? 
-                            qnResPool->getResourceById(id).dynamicCast<QnNetworkResource>() : 
+                            qnResPool->getResourceById<QnNetworkResource>(id) : 
                             QnNetworkResourcePtr();
     if (!res)
         return QString();

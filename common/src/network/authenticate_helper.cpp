@@ -110,7 +110,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     {
         const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue( request.headers, Qn::VIDEOWALL_GUID_HEADER_NAME );
         if (!videoWall_auth.isEmpty())
-            return (!qnResPool->getResourceById(QnUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
+            return (!qnResPool->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull());
     }
 
     if( allowedAuthMethods & AuthMethod::urlQueryParam )
@@ -253,7 +253,7 @@ bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest 
             return user->getDigest() == digest;
     }
     //checking if it videowall connect
-    return !qnResPool->getResourceById(QnUuid(login)).dynamicCast<QnVideoWallResource>().isNull();
+    return !qnResPool->getResourceById<QnVideoWallResource>(QnUuid(login)).isNull();
 }
 
 QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()

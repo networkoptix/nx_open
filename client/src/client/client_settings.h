@@ -130,6 +130,9 @@ public:
         /** Unique id for this PC for videowall construction. */
         PC_UUID,
 
+        /** Flag that client is run in ActiveX library mode. */
+        ACTIVE_X_MODE,
+
         /** Full set of background options. */
         BACKGROUND,
 
@@ -153,6 +156,7 @@ public:
      * @returns             True if settings can be saved.
      */
     bool isWritable() const;
+    QSettings* rawSettings();
 
 protected:
     virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
@@ -223,6 +227,7 @@ private:
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
         QN_DECLARE_RW_PROPERTY(QnClientBackground,          background,             setBackground,              BACKGROUND,                 QnClientBackground())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
+        QN_DECLARE_RW_PROPERTY(bool,                        isActiveXMode,          setActiveXMode,             ACTIVE_X_MODE,              false)
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))

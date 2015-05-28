@@ -882,7 +882,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     if(resource.isNull()) {
         qnDeleteLater(item);
         return false;
@@ -990,7 +990,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 }
             }
         }
-        qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
+        if (qnRedAssController)
+            qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
     return true;
@@ -1028,7 +1029,8 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     m_widgetByItem.remove(item);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
         m_widgetByRenderer.remove(mediaWidget->renderer());
-        qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
+        if (qnRedAssController)
+            qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
     }
 
     if(destroyWidget) {
@@ -1689,7 +1691,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->pleaseStop();
         }
 
-        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid())) {
+        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid())) {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
             connect(m_loader, &QnThumbnailsLoader::thumbnailLoaded, this,       &QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded);

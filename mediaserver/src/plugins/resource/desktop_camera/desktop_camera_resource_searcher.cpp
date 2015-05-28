@@ -24,7 +24,8 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 
-void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, const QString& userName, const QString &userId)
+void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, 
+													 const QString& userName, const QString &userId)
 {
     connection->setSendTimeout(1);
     QMutexLocker lock(&m_mutex);
