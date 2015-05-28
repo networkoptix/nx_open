@@ -315,6 +315,10 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
     item.lastResponse = currentTime;
 
+    /* Client needs all addresses including ignored ones because of login dialog. */
+    if (ignoredAddress && !m_clientMode)
+        return;
+
     int count = item.addresses.size();
     item.addresses.insert(address);
     m_idByAddress[address] = moduleInformation.id;
