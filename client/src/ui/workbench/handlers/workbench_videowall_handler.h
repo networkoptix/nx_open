@@ -22,6 +22,7 @@ class QnWorkbenchItem;
 class QnResourceWidget;
 class QTimer;
 class QnVideoWallLicenseUsageHelper;
+class QnUuidPool;
 
 class QnWorkbenchVideoWallHandler : public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -74,6 +75,7 @@ private:
 
     QnLayoutResourcePtr findExistingResourceLayout(const QnResourcePtr &resource) const;
     QnLayoutResourcePtr constructLayout(const QnResourceList &resources) const;
+    void cleanupUnusedLayouts();
 
     static QString shortcutPath();
     bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
@@ -186,6 +188,7 @@ private:
     } m_controlMode;
 
     QScopedPointer<QnVideoWallLicenseUsageHelper> m_licensesHelper;
+    QScopedPointer<QnUuidPool> m_uuidPool;
 };
 
 #endif // WORKBENCH_VIDEOWALL_HANDLER_H
