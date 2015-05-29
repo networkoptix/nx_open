@@ -51,6 +51,8 @@ namespace {
 
     /** Maximum sane duration: 30 minutes of recording. */
     static const qint64 maxRecordingDurationMsec = 1000 * 60 * 30;
+
+    static const QString filterSeparator(QLatin1String(";;"));
 }
 
 // -------------------------------------------------------------------------- //
@@ -225,19 +227,20 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
 
-    QString filterSeparator(QLatin1String(";;"));
     QString aviFileFilter = tr("AVI (*.avi)");
     QString mkvFileFilter = tr("Matroska (*.mkv)");
 
     QString allowedFormatFilter =
             aviFileFilter
             + filterSeparator
-            + mkvFileFilter
+            + mkvFileFilter;
+
 #ifdef Q_OS_WIN
-            + filterSeparator
-            + binaryFilterName()
+    if (!qnSettings->isActiveXMode())
+        allowedFormatFilter += 
+            filterSeparator
+            + binaryFilterName();
 #endif
-            ;
 
     QnLayoutItemData itemData = widget->item()->data();
 
@@ -281,7 +284,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         QnAbstractWidgetControlDelegate* delegate = NULL;
 #ifdef Q_OS_WIN
-        delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
+        if (!qnSettings->isActiveXMode())
+            delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
         QComboBox* comboBox = new QComboBox(dialog.data());
         comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
@@ -393,7 +397,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
-    if (selectedFilter.contains(binaryFilterName()))
+    if (!qnSettings->isActiveXMode()
+        && selectedFilter.contains(binaryFilterName()))
     {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
@@ -546,15 +551,14 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString fileName;
     bool readOnly = false;
 
+    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(QnAppInfo::organizationName());
+
 #ifdef Q_OS_WIN
-    QString filterSeparator(QLatin1String(";;"));
+    if (!qnSettings->isActiveXMode())
+        mediaFileFilter +=
+            filterSeparator
+            + binaryFilterName();
 #endif
-    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(QnAppInfo::organizationName())
-#ifdef Q_OS_WIN
-            + filterSeparator
-            + binaryFilterName()
-#endif
-            ;
 
     while (true) {
         /* Check if we were disconnected (server shut down) while the dialog was open. 
