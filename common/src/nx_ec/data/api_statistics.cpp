@@ -35,7 +35,7 @@ namespace ec2 {
             (ApiCameraDataStatistics)(ApiStorageDataStatistics)(ApiMediaServerDataStatistics) \
             (ApiLicenseStatistics)(ApiBusinessRuleStatistics) \
 			(ApiSystemStatistics)(ApiStatisticsServerInfo), \
-            (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
+            (ubjson)(xml)(json)(sql_record)(csv_record), _Fields, (optional, true))
 
     ApiCameraDataStatistics::ApiCameraDataStatistics() {}
 
