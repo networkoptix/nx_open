@@ -636,7 +636,7 @@ void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
-    if (qnRuntime->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
 
     m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
