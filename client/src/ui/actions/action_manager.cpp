@@ -402,10 +402,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::DropResourcesAction).
         flags(Qn::ResourceTarget | Qn::WidgetTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::SingleTarget | Qn::MultiTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Drop Resources"));
 
     factory(Qn::DropResourcesIntoNewLayoutAction).
         flags(Qn::ResourceTarget | Qn::WidgetTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::SingleTarget | Qn::MultiTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Drop Resources into a New Layout"));
 
     factory(Qn::DelayedOpenVideoWallItemAction).
@@ -414,10 +416,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::DelayedDropResourcesAction).
         flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Delayed Drop Resources"));
 
     factory(Qn::InstantDropResourcesAction).
         flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
         text(tr("Instant Drop Resources"));
 
     factory(Qn::MoveCameraAction).
