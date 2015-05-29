@@ -11,42 +11,78 @@ Page {
 
     property alias resourceId: resourceHelper.resourceId
     property var __currentDate: new Date()
+    property bool videoZoomed: false
+    property real timelineTextMargin: 48
+    property real cursorWidth: Units.dp(3)
 
     QnMediaResourceHelper {
         id: resourceHelper
     }
 
-    Video {
-        id: video
-
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
+    Flickable {
+        id: flickable
 
         width: parent.width
-        height: width / 4 * 3
+        height: timeline.y + timelineTextMargin
 
-        source: resourceHelper.mediaUrl
-        autoPlay: true
+        contentWidth: width
+        contentHeight: height
 
-        onStatusChanged: {
-            if (metaData.resolution)
-                height = Math.min(parent.height, parent.width / metaData.resolution.width * metaData.resolution.height)
+        PinchArea {
+            width: Math.max(flickable.contentWidth, flickable.width)
+            height: Math.max(flickable.contentHeight, flickable.height)
+
+            property real initialWidth
+            property real initialHeight
+            property real maxScale
+
+            onPinchStarted: {
+                initialWidth = flickable.contentWidth
+                initialHeight = flickable.contentHeight
+                maxScale = video.videoWidth / initialWidth
+            }
+
+            onPinchUpdated: {
+                var scale = Math.min(maxScale, pinch.scale)
+                flickable.contentX += pinch.previousCenter.x - pinch.center.x
+                flickable.contentY += pinch.previousCenter.y - pinch.center.y
+                flickable.resizeContent(initialWidth * scale, initialHeight * scale, pinch.center)
+            }
+
+            onPinchFinished: {
+                flickable.returnToBounds()
+            }
+
+            Video {
+                id: video
+
+                property int videoWidth: metaData.resolution ? metaData.resolution.width : 0
+                property int videoHeight: metaData.resolution ? metaData.resolution.height : 0
+
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                width: flickable.contentWidth
+                height: flickable.contentHeight
+
+                source: resourceHelper.mediaUrl
+                autoPlay: true
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onWheel: {
+                    var scale = wheel.angleDelta.y / 100
+                    if (scale < 0)
+                        scale = 1.0 / -scale
+
+                    scale = Math.max(Math.min(scale, video.videoWidth / flickable.contentWidth), flickable.width / flickable.contentWidth)
+                    flickable.resizeContent(flickable.contentWidth * scale, flickable.contentHeight * scale, Qt.point(wheel.x, wheel.y))
+                    flickable.returnToBounds()
+                }
+            }
         }
-    }
 
-    Label {
-        id: bigTimeLabel
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: video.bottom
-        anchors.topMargin: Units.dp(36)
-
-        fontInfo: {
-            "size": 56,
-            "font": "light"
-        }
-
-        text: __currentDate.toTimeString()
     }
 
     ActionButton {
@@ -69,13 +105,38 @@ Page {
         color: theme.accentColor
     }
 
-    Timer {
-        running: true
-        repeat: true
-        interval: 1000
+    Label {
+        id: bigTimeLabel
 
-        onTriggered: {
-            __currentDate = new Date()
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            bottom: timeline.top
+            bottomMargin: -timelineTextMargin
         }
+
+        fontInfo: {
+            "size": 56,
+            "font": "light"
+        }
+
+        text: __currentDate.toTimeString()
+
+        Timer {
+            running: true
+            repeat: true
+            interval: 1000
+
+            onTriggered: {
+                __currentDate = new Date()
+            }
+        }
+    }
+
+    Rectangle {
+        color: "white"
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: timeline.bottom
+        width: cursorWidth
+        height: timeline.height - timelineTextMargin
     }
 }
