@@ -2,6 +2,7 @@
 #include "ui_reconnect_info_dialog.h"
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/media_server_resource.h>
 
@@ -20,7 +21,7 @@ QnReconnectInfoDialog::QnReconnectInfoDialog(QWidget *parent, Qt::WindowFlags wi
 {
     ui->setupUi(this);
 
-    if (qnSettings->isActiveXMode() || qnSettings->isVideoWallMode()) {
+    if (qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode()) {
         ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(false);
         ui->buttonBox->setVisible(false);
         return;

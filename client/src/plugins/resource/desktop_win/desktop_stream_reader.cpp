@@ -124,9 +124,10 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
     return QnAbstractMediaDataPtr();
 }
 
-CameraDiagnostics::Result QnDesktopStreamreader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result QnDesktopStreamreader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
+    Q_UNUSED(params)
     if (init())
     {
         m_initialized = true;

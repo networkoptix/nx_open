@@ -102,6 +102,8 @@ private slots:
     void at_server_redundancyChanged(const QnResourcePtr &resource);
     void at_commonModule_systemNameChanged();
 
+    void at_serverAutoDiscoveryEnabledChanged();
+
 private:
     friend class QnResourcePoolModelNode;
 

@@ -31,7 +31,7 @@ Template: ${deb.customization.company.name}-mediaserver/cameraSettingsOptimizati
 Type: boolean
 Description: Allow system to optimize cameras settings (Recommended)
 
-Template: ${deb.customization.company.name}-mediaserver/allowCollectStatistics
+Template: ${deb.customization.company.name}-mediaserver/statisticsReportAllowed
 Type: boolean
 Description: Send usage and crash statistics to software developers
 

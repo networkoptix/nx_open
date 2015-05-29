@@ -88,6 +88,7 @@ QMutex QnTransactionTransport::m_staticMutex;
 
 void QnTransactionTransport::default_initializer()
 {
+    //TODO #ak make a default constructor of it after move to msvc2013
     m_lastConnectTime = 0;
     m_readSync = false;
     m_writeSync = false;
@@ -107,6 +108,7 @@ void QnTransactionTransport::default_initializer()
     m_authOutgoingConnectionByServerKey = true;
     m_sendKeepAliveTask = 0;
     m_base64EncodeOutgoingTransactions = false;
+    m_waiterCount = 0;
 }
 
 QnTransactionTransport::QnTransactionTransport(
@@ -228,6 +230,10 @@ QnTransactionTransport::~QnTransactionTransport()
     {
         QMutexLocker lk( &m_mutex );
         m_state = Closed;
+        m_cond.wakeAll();   //signalling waiters that connection is being closed
+        //waiting for waiters to quit
+        while( m_waiterCount > 0 )
+            m_cond.wait( lk.mutex() );
     }
     closeSocket();
     //not calling QnTransactionTransport::close since it will emit stateChanged, 
@@ -679,6 +685,8 @@ void QnTransactionTransport::transactionProcessed()
     QMutexLocker lock(&m_mutex);
 
     --m_postedTranCount;
+    if( m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME )
+        m_cond.wakeAll();   //signalling waiters that we are ready for new transactions once again
     if( m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME ||     //not reading futher while that much transactions are not processed yet
         m_asyncReadScheduled ||      //async read is ongoing already, overlapping reads are not supported by sockets api
         m_state > ReadyForStreaming )
@@ -713,6 +721,25 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     m_incomingTransactionStreamParser->processData( requestBuf );
 
     startListeningNonSafe();
+}
+
+void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> invokeBeforeWait )
+{
+    QMutexLocker lk( &m_mutex );
+    if( m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME )
+        return;
+
+    //waiting for some transactions to be processed
+    ++m_waiterCount;
+    if( invokeBeforeWait )
+        invokeBeforeWait();
+    while( (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME) &&
+           (m_state != Closed) )
+    {
+        m_cond.wait( lk.mutex() );
+    }
+    --m_waiterCount;
+    m_cond.wakeAll();    //signalling that we are not waiting anymore
 }
 
 void QnTransactionTransport::sendHttpKeepAlive( quint64 taskID )
@@ -778,6 +805,8 @@ void QnTransactionTransport::monitorConnectionForClosure(
     {
         return setStateNoLock( State::Error );
     }
+
+    //TODO #ak should read HTTP responses here and check result code
 
     using namespace std::placeholders;
     m_dummyReadBuffer.resize( 0 );

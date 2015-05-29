@@ -50,7 +50,7 @@ QnOnvifStreamReader::~QnOnvifStreamReader()
     delete m_tmpH264Conf;
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -77,7 +77,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
     */
 
     QString streamUrl;
-    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl( &streamUrl, isCameraControlRequired );
+    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl( &streamUrl, isCameraControlRequired, params );
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
     {
 #ifdef PL_ONVIF_DEBUG
@@ -113,12 +113,12 @@ void QnOnvifStreamReader::setCameraControlDisabled(bool value)
     CLServerPushStreamReader::setCameraControlDisabled(value);
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QString* const streamUrl, bool isCameraControlRequired )
+CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params )
 {
     //QMutexLocker lock(m_onvifRes->getStreamConfMutex());
 
-    int currentFps = getFps();
-    Qn::StreamQuality currentQuality = getQuality();
+    int currentFps = params.fps;
+    Qn::StreamQuality currentQuality = params.quality;
     Qn::StreamQuality secondaryQuality = m_onvifRes->getSecondaryStreamQuality();
 
     if (!m_streamUrl.isEmpty() && !isCameraControlRequired)
@@ -138,7 +138,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     }
 
     m_onvifRes->beforeConfigureStream();
-    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(getRole() == Qn::CR_LiveVideo, streamUrl, isCameraControlRequired);
+    CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(getRole() == Qn::CR_LiveVideo, streamUrl, isCameraControlRequired, params);
     m_onvifRes->afterConfigureStream();
 
     if (result.errorCode == CameraDiagnostics::ErrorCode::noError) {
@@ -157,7 +157,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     return result;
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl, bool isCameraControlRequired ) const
+CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params ) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
     MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_onvifRes->getTimeDrift());
@@ -166,7 +166,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    CameraDiagnostics::Result result = fetchUpdateVideoEncoder(soapWrapper, info, isPrimary, isCameraControlRequired);
+    CameraDiagnostics::Result result = fetchUpdateVideoEncoder(soapWrapper, info, isPrimary, isCameraControlRequired, params);
     if( !result  )
         return result;
     info.videoSourceId = m_onvifRes->getVideoSourceId();
@@ -270,13 +270,13 @@ void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) c
 #endif
 }
 
-void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary) const
+void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& params) const
 {
 
     encoder.Encoding = m_onvifRes->getCodec(isPrimary) == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
     //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 
-    Qn::StreamQuality quality = getQuality();
+    Qn::StreamQuality quality = params.quality;
     QSize resolution = isPrimary? m_onvifRes->getPrimaryResolution(): m_onvifRes->getSecondaryResolution();
 
     if (encoder.Encoding == onvifXsd__VideoEncoding__H264)
@@ -299,7 +299,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
 #endif
     } else 
     {
-        encoder.RateControl->FrameRateLimit = getFps();
+        encoder.RateControl->FrameRateLimit = params.fps;
         encoder.RateControl->BitrateLimit = m_onvifRes->suggestBitrateKbps(quality, resolution, encoder.RateControl->FrameRateLimit);
     }
 
@@ -391,7 +391,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired) const
+CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary, bool isCameraControlRequired, const QnLiveStreamParams& params) const
 {
     VideoConfigsReq request;
     VideoConfigsResp response;
@@ -420,7 +420,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoap
     if (!isCameraControlRequired)
         return CameraDiagnostics::NoErrorResult(); // do not update video encoder params
 
-    updateVideoEncoder(*encoderParamsToSet, isPrimary);
+    updateVideoEncoder(*encoderParamsToSet, isPrimary, params);
 
     int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
     CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
