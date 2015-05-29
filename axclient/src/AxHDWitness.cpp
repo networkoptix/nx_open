@@ -367,6 +367,7 @@ void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timest
     for (QnWorkbenchItem *item: wlayout->items())
         item->setData(Qn::ItemSliderWindowRole, qVariantFromValue(period));
 
+    m_context->navigator()->timeSlider()->setRange(period.startTimeMs, qnSyncTime->currentMSecsSinceEpoch());
     m_context->navigator()->timeSlider()->setWindow(period.startTimeMs, period.endTimeMs(), false);
 }
 
