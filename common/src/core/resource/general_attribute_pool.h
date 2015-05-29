@@ -4,6 +4,9 @@
 
 #include <utils/common/uuid.h>
 
+#include <QMutex>
+#include <QWaitCondition>
+
 template<class KeyType, class MappedType>
 class QnGeneralAttributePool
 {
