@@ -125,6 +125,7 @@
 #include <rest/handlers/current_user_rest_handler.h>
 #include <rest/handlers/backup_db_rest_handler.h>
 #include <rest/handlers/discovered_peers_rest_handler.h>
+#include <rest/handlers/active_connections_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 
 #include <rtsp/rtsp_connection.h>
@@ -1336,6 +1337,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/activeConnections", new QnActiveConnectionsRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
