@@ -12,7 +12,7 @@ QnUuidPool::QnUuidPool(const QnUuid &baseId, offset_type size /*= std::numeric_l
     m_size(size)
 {
     static_assert(std::is_unsigned<offset_type>::value, "Offset type must be unsigned");
-    static_assert(sizeof(offset_type) >= sizeof(decltype(&QUuid::data1)), "Offset type must be not greater than storage field size.");
+    static_assert(sizeof(offset_type) <= sizeof(decltype(QUuid::data1)), "Offset type must be not greater than storage field size.");
 
     m_usageData.resize(defaultPoolSize, false);
 }
