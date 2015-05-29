@@ -73,7 +73,6 @@ private:
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
 
-    QnLayoutResourcePtr findExistingResourceLayout(const QnResourcePtr &resource) const;
     QnLayoutResourcePtr constructLayout(const QnResourceList &resources) const;
     void cleanupUnusedLayouts();
 
