@@ -545,7 +545,10 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
 
-    QString suggestion = replaceNonFileNameCharacters(layout->getName(), QLatin1Char('_'));
+    QString baseName = layout->getName();
+    if (qnSettings->isActiveXMode() || baseName.isEmpty())
+        baseName = tr("exported");
+    QString suggestion = replaceNonFileNameCharacters(baseName, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, QFileInfo(suggestion).baseName());
 
     QString fileName;
