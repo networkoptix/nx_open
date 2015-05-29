@@ -174,7 +174,7 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
 #endif
     auto version = QnAppInfo::applicationFullVersion();
     auto systemInfo = QnAppInfo::applicationSystemInfo();
-    auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd hh:mm:ss");
+    auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd_hh-mm-ss");
     auto extension = fileName.split(QChar('.')).last();
 
     nx_http::HttpHeaders headers;
