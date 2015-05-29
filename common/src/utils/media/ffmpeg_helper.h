@@ -23,13 +23,14 @@ class FrameTypeExtractor
 {
 public:
     FrameTypeExtractor(AVCodecContext* context);
+    FrameTypeExtractor(CodecID id, bool nalPrefixes = true);
     ~FrameTypeExtractor();
 
     enum FrameType {UnknownFrameType, I_Frame, P_Frame, B_Frame};
     FrameType getFrameType(const quint8* data, int dataLen);
 
     AVCodecContext* getContext() const { return m_context; }
-    AVCodecID getCodec() const { return m_context->codec_id; }
+    AVCodecID getCodec() const { return m_codecId; }
 
 private:
 

@@ -255,6 +255,8 @@ public:
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QString &id, QString &value);
     virtual bool setParamPhysical(const QString &id, const QString &value);
+    virtual bool setParamsBegin();
+    virtual bool setParamsEnd();
 
     void getParamPhysicalAsync(const QString &id);
     void setParamPhysicalAsync(const QString &id, const QString &value);

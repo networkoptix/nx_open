@@ -71,6 +71,7 @@ namespace CameraDiagnostics
             badMediaStream,
             noMediaStream,
             cameraInitializationInProgress,
+            cameraPluginError,
             unknown
         };
 
@@ -221,6 +222,12 @@ namespace CameraDiagnostics
     {
     public:
         ServerTerminatedResult() : Result( ErrorCode::serverTerminated ) {}
+    };
+
+    class CameraPluginErrorResult : public Result
+    {
+    public:
+        CameraPluginErrorResult( const QString& errorMessage ) : Result( ErrorCode::cameraPluginError, errorMessage ) {}
     };
 }
 
