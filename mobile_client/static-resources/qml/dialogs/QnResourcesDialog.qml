@@ -35,6 +35,13 @@ Page {
 
     onWidthChanged: updateLayout()
 
+    Connections {
+        target: connectionManager
+        onInitialResourcesReceived: {
+            updateLayout()
+        }
+    }
+
     function updateLayout() {
         camerasModel.updateLayout(resourcesDialog.width, 3.0)
     }

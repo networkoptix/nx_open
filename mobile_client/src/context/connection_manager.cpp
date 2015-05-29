@@ -94,6 +94,9 @@ bool QnConnectionManager::connectToServer(const QUrl &url) {
     m_connected = true;
     emit connected(url);
 //    context()->setUserName(appServerUrl.userName());
+
+    connect(QnMobileClientMessageProcessor::instance(), &QnMobileClientMessageProcessor::initialResourcesReceived, this, &QnConnectionManager::initialResourcesReceived);
+
     return true;
 }
 

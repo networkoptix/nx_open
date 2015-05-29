@@ -29,6 +29,7 @@ signals:
     void connectionFailed(const QUrl &url, ConnectionStatus status);
     void disconnected();
     void systemNameChanged(const QString &systemName);
+    void initialResourcesReceived();
 
 public slots:
     bool connectToServer(const QUrl &url);
