@@ -85,6 +85,8 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         /* Reload all dialogs and dependent data. */
         context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
 
+        menu()->triggerIfPossible(Qn::AllowStatisticsReportMessageAction);
+
         /* Collect and send crash dumps if allowed */
         m_crashReporter.scanAndReportAsync(qnSettings->rawSettings());
 
@@ -98,10 +100,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         if(!watcher->hasMismatches())
             return;
 
-        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
-            return;
-
-        menu()->trigger(Qn::VersionMismatchMessageAction);
+        menu()->triggerIfPossible(Qn::VersionMismatchMessageAction);
     });
 
     QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();

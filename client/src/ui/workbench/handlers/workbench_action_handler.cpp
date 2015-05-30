@@ -15,6 +15,7 @@
 #include <QtGui/QImageWriter>
 
 #include <api/network_proxy_factory.h>
+#include <ec2_statictics_reporter.h>
 
 #include <business/business_action_parameters.h>
 
@@ -294,6 +295,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
+    connect(action(Qn::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
+
     /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
@@ -2465,6 +2468,33 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
                          tr("You are running beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
 }
+
+void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
+
+    const QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+
+    /* Check if we are not connected yet. */
+    if (servers.isEmpty())
+        return;
+
+    /* Check if user already made a decision. */
+    if (ec2::Ec2StaticticsReporter::isDefined(servers))
+        return;
+
+    //TODO: #GDM #TR
+    auto result = QMessageBox::information(
+        mainWindow(),
+        tr("Anonymous Usage Statistics"),                                   
+        tr("In order to improve our software, we periodically collect anonymous data about its work.\n"
+           "Press Yes to allow the application to send anonymous usage statistics (recommended).\n"
+           "You can change your preference at any time from the System Settings dialog, \"Send Anonymous Usage Statistics\" setting."),
+        QMessageBox::Yes | QMessageBox::No,
+        QMessageBox::Yes);
+
+    ec2::Ec2StaticticsReporter::setAllowed(servers, result == QMessageBox::Yes);
+    propertyDictionary->saveParamsAsync(idListFromResList(servers));
+}
+
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());

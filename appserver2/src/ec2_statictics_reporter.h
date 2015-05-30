@@ -39,8 +39,15 @@ namespace ec2
         static const QString AUTH_PASSWORD;
 
         // helpers
+        /** Check if user has already made a decision about this system behavior. */
+        static bool isDefined(const QnMediaServerResourceList &servers);
+        /** Check if statistics reporting is allowed in this system. */
         static bool isAllowed(const QnMediaServerResourceList &servers);
+        /** Check if statistics reporting is allowed in this system. */
         static bool isAllowed(const AbstractMediaServerManagerPtr& msManager);
+        /** Set allowed value for the following servers. */
+        static void setAllowed(const QnMediaServerResourceList &servers, bool value);
+
         static QnUserResourcePtr getAdmin(const AbstractUserManagerPtr& manager);
         static QnUuid getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager);
 

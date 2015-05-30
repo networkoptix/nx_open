@@ -3,6 +3,7 @@
 #include "ec2_connection.h"
 
 #include <boost/range/algorithm/count_if.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/synctime.h>
@@ -125,15 +126,27 @@ namespace ec2
         return initiateReport(&outData->url);
     }
 
+    bool Ec2StaticticsReporter::isDefined(const QnMediaServerResourceList &servers)
+    {
+        /* Returns if any of the server has explicitly defined value. */
+        return boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr& ms) {
+            return ms->hasProperty(Qn::STATISTICS_REPORT_ALLOWED);
+        });
+    }
+
     bool Ec2StaticticsReporter::isAllowed(const QnMediaServerResourceList &servers)
     {
-        const size_t disabled = boost::count_if(servers, [](const QnMediaServerResourcePtr& ms) {
-            return QnLexical::deserialized(ms->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true); 
-        });
-
-        // Statistics report is allowed if it is not disabled on more than a
-        // half of all mediaservers
-        return disabled <= static_cast<size_t>(servers.size() / 2);
+        int result = 0;
+        for (const QnMediaServerResourcePtr &server: servers) {
+            if (!server->hasProperty(Qn::STATISTICS_REPORT_ALLOWED))
+                continue;
+            bool allowedForServer = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
+            if (allowedForServer)
+                ++result;
+            else
+                --result;
+        }
+        return result >= 0;
     }
 
     bool Ec2StaticticsReporter::isAllowed(const AbstractMediaServerManagerPtr& msManager)
@@ -142,6 +155,13 @@ namespace ec2
         if (msManager->getServersSync(QnUuid(), &msList) != ErrorCode::ok)
             return false;
         return isAllowed(msList);
+    }
+
+    void Ec2StaticticsReporter::setAllowed(const QnMediaServerResourceList &servers, bool value)
+    {
+        const QString serializedValue = QnLexical::serialized(value);
+        for (const QnMediaServerResourcePtr &server: servers)
+            server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, serializedValue);
     }
 
     QnUserResourcePtr Ec2StaticticsReporter::getAdmin(const AbstractUserManagerPtr& manager)
