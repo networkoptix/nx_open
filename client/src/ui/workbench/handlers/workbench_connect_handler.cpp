@@ -57,7 +57,7 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/collection.h>
 #include <utils/common/synctime.h>
-#include <utils/common/system_information.cpp>
+#include <utils/common/system_information.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/router.h>
 #include <utils/reconnect_helper.h>
