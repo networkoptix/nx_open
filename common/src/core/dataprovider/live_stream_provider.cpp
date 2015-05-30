@@ -228,7 +228,7 @@ float QnLiveStreamProvider::getDefaultFps() const
 {
     Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
     float maxFps = m_cameraRes->getMaxFps();
-    return qMax(1.0, sharingMethod ==  Qn::NoFpsSharing ? maxFps : maxFps - 2);
+    return qMax(1.0, sharingMethod ==  Qn::NoFpsSharing ? maxFps : maxFps - MIN_SECOND_STREAM_FPS);
 }
 
 bool QnLiveStreamProvider::isMaxFps() const
