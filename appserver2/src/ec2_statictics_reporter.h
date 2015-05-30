@@ -28,7 +28,6 @@ namespace ec2
         ErrorCode triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData);
 
         // text strings
-        static const QString SR_ALLOWED;
         static const QString SR_LAST_TIME;
         static const QString SR_TIME_CYCLE;
         static const QString SR_SERVER_API;
@@ -40,6 +39,7 @@ namespace ec2
         static const QString AUTH_PASSWORD;
 
         // helpers
+        static bool isAllowed(const QnMediaServerResourceList &servers);
         static bool isAllowed(const AbstractMediaServerManagerPtr& msManager);
         static QnUserResourcePtr getAdmin(const AbstractUserManagerPtr& manager);
         static QnUuid getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager);

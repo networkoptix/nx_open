@@ -2,6 +2,8 @@
 
 #include "ec2_connection.h"
 
+#include <boost/range/algorithm/count_if.hpp>
+
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/synctime.h>
 
@@ -20,7 +22,6 @@ static const QString JUST_INITIATED = lit("just initiated");
 
 namespace ec2
 {
-    const QString Ec2StaticticsReporter::SR_ALLOWED = lit("statisticsReportAllowed");
     const QString Ec2StaticticsReporter::SR_LAST_TIME = lit("statisticsReportLastTime");
     const QString Ec2StaticticsReporter::SR_TIME_CYCLE = lit("statisticsReportTimeCycle");
     const QString Ec2StaticticsReporter::SR_SERVER_API = lit("statisticsReportServerApi");
@@ -124,20 +125,23 @@ namespace ec2
         return initiateReport(&outData->url);
     }
 
+    bool Ec2StaticticsReporter::isAllowed(const QnMediaServerResourceList &servers)
+    {
+        const size_t disabled = boost::count_if(servers, [](const QnMediaServerResourcePtr& ms) {
+            return QnLexical::deserialized(ms->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true); 
+        });
+
+        // Statistics report is allowed if it is not disabled on more than a
+        // half of all mediaservers
+        return disabled <= static_cast<size_t>(servers.size() / 2);
+    }
+
     bool Ec2StaticticsReporter::isAllowed(const AbstractMediaServerManagerPtr& msManager)
     {
         QnMediaServerResourceList msList;
         if (msManager->getServersSync(QnUuid(), &msList) != ErrorCode::ok)
             return false;
-
-        size_t disabled = std::count_if(
-                    msList.begin(), msList.end(),
-                    [](const QnMediaServerResourcePtr& ms)
-                    { return ms->getProperty(SR_ALLOWED) == lit("0"); });
-
-        // Statistics report is allowed if it is not disabled on more than a
-        // half of all mediaservers
-        return disabled <= static_cast<size_t>(msList.size() / 2);
+        return isAllowed(msList);
     }
 
     QnUserResourcePtr Ec2StaticticsReporter::getAdmin(const AbstractUserManagerPtr& manager)

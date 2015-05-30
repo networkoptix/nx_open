@@ -1803,16 +1803,15 @@ void QnMain::run()
                 server->setProperty(Qn::PUBLIC_IP, publicIp);
         }
 
-        typedef ec2::Ec2StaticticsReporter stats;
-        const auto confStats = MSSettings::roSettings()->value(stats::SR_ALLOWED);
+        const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
         if (!confStats.isNull()) // if present
         {
-            const auto normStats = QString::number(confStats.toBool() ? 1 : 0);
-            const auto msStats = server->getProperty(stats::SR_ALLOWED);
+            const bool normStats = confStats.toBool();
+            const bool msStats = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
             if (normStats != msStats)
-                server->setProperty(stats::SR_ALLOWED, normStats);
+                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(normStats));
 
-            MSSettings::roSettings()->remove(stats::SR_ALLOWED);
+            MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
             MSSettings::roSettings()->sync();
         }
 
