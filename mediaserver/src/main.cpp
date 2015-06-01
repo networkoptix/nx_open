@@ -125,8 +125,8 @@
 #include <rest/handlers/current_user_rest_handler.h>
 #include <rest/handlers/backup_db_rest_handler.h>
 #include <rest/handlers/discovered_peers_rest_handler.h>
-#include <rest/handlers/active_connections_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
+#include <rest/active_connections_rest_handler.h>
 
 #include <rtsp/rtsp_connection.h>
 
