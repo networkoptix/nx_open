@@ -1373,6 +1373,10 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy() {
     if (!m_timeSlider)
         return;
 
+    /* This option should never be cleared in ActiveX mode */
+    if (qnSettings->isActiveXMode())
+        return;
+
     m_timeSlider->setOption(QnTimeSlider::PreserveWindowSize, m_timeSlider->isThumbnailsVisible());
 }
 
