@@ -1746,5 +1746,28 @@
                 </function>
             </functions>
         </group>
+         <group>
+            <groupName>Proxy API</groupName>
+            <urlPrefix>/proxy</urlPrefix>
+            <groupDescription>
+                This group contains information requests proxy from one server to another
+            </groupDescription>
+            <functions>
+
+                <function>
+                    <name>&lt;protocol&gt;/&lt;server guid&gt;/&lt;api request&gt;</name>
+                    <description>
+                        Proxy methods allows to send any request to any server using the existing public connection. Can also be used to get video streams.
+                        Example: rtsp://10.0.2.1/proxy/rtsp/{72934575-ceb7-54bb-23a0-84b81cf1d3f1}/12AB42FD5912?pos=1235631&amp;resolution=240p
+                        Example: http://10.0.2.1/proxy/http/{72934575-ceb7-54bb-23a0-84b81cf1d3f1}/showLog
+                    </description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>Return result of the target api request.</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
     </groups>
 </apidoc>
