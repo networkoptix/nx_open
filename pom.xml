@@ -582,8 +582,9 @@
                 <modification>rpi</modification>
             </properties>
             <modules>
+                <module>plugins/rpi_cam</module>
                 <module>edge_firmware/rpi</module>
-            </modules>             
+            </modules>
         </profile>
 
         <!-- Banana Pie box -->
