@@ -12,10 +12,10 @@ int QnActiveConnectionsRestHandler::executeGet(const QString &path, const QnRequ
     QJsonArray connections;
     for (const ec2::QnTransportConnectionInfo &info: connectionsInfo) {
         QJsonObject map;
-        map[lit("type")] = info.incoming ? lit("incoming") : lit("outgoing");
-        map[lit("url")] = info.url.toString();
-        map[lit("remotePeerId")] = info.remotePeerId.toString();
-        map[lit("state")] = ec2::QnTransactionTransport::toString(info.state);
+        map.insert(lit("type"), info.incoming ? lit("incoming") : lit("outgoing"));
+        map.insert(lit("url"), info.url.toString());
+        map.insert(lit("remotePeerId"), info.remotePeerId.toString());
+        map.insert(lit("state"), ec2::QnTransactionTransport::toString(info.state));
         connections.append(map);
     }
 
