@@ -18,14 +18,14 @@ namespace nx_http
     */
     class MultipartContentParser
     :
-        public AbstractByteStreamConverter
+        public AbstractByteStreamFilter
     {
     public:
         MultipartContentParser();
         virtual ~MultipartContentParser();
 
         //!Implementation of AbstractByteStreamFilter::processData
-        virtual void processData( const QnByteArrayConstRef& data ) override;
+        virtual bool processData( const QnByteArrayConstRef& data ) override;
         //!Implementation of AbstractByteStreamFilter::flush
         virtual size_t flush() override;
 
@@ -72,7 +72,7 @@ namespace nx_http
         nx::Buffer m_supposedBoundary;
         nx_http::HttpHeaders m_currentFrameHeaders;
 
-        void readUnsizedBinaryData(
+        bool readUnsizedBinaryData(
             const QnByteArrayConstRef& data,
             size_t* const offset );
     };
