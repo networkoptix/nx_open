@@ -66,8 +66,11 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         const bool isProxy = static_cast<QnUniversalTcpListener*>(d->owner)->isProxy(d->request);
         QElapsedTimer t;
         t.restart();
-        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId) && d->socket->isConnected())
+        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId))
         {
+            if( !d->socket->isConnected() )
+                return false;   //connection has been closed
+
             if( d->request.requestLine.method == nx_http::Method::GET ||
                 d->request.requestLine.method == nx_http::Method::HEAD )
             {
