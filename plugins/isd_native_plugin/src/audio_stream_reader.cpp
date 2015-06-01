@@ -158,15 +158,12 @@ void AudioStreamReader::fillAudioFormat()
     {
         case EncPCM:
             m_audioFormat.compressionType = nxcip::CODEC_ID_PCM_S16LE;
-            std::cout << "CODEC_ID_PCM_S16LE" << std::endl;
             break;
         case EncUlaw:
             m_audioFormat.compressionType = nxcip::CODEC_ID_PCM_MULAW;
-            std::cout << "CODEC_ID_PCM_MULAW" << std::endl;
             break;
         case EncAAC:
             m_audioFormat.compressionType = nxcip::CODEC_ID_AAC;
-            std::cout<<"CODEC_ID_AAC"<<std::endl;
             break;
         default:
             std::cerr << "ISD plugin: unsupported audio codec: "<<m_audioInfo.encoding<<"\n";
@@ -198,8 +195,6 @@ void AudioStreamReader::fillAudioFormat()
 
 bool AudioStreamReader::initializeAmux( bool getFormatOnly )
 {
-    std::cout<<"AudioStreamReader::initializeAmux"<<std::endl;
-
     if( !m_amux )
     {
         std::unique_ptr<Amux> amux( new Amux() );
@@ -215,8 +210,6 @@ bool AudioStreamReader::initializeAmux( bool getFormatOnly )
     }
     if( getFormatOnly )
         return true;
-
-    std::cout<<"AudioStreamReader::initializeAmux. starting audio"<<std::endl;
 
     if( m_amux->StartAudio() )
     {
