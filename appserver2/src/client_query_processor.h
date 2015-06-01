@@ -27,6 +27,15 @@
 #include "utils/serialization/ubjson.h"
 #include "http/custom_headers.h"
 
+namespace {
+    Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat) {
+        Qn::SerializationFormat format = defaultFormat;
+        QString formatString = QUrlQuery(url).queryItemValue(lit("format"));
+        if (!formatString.isEmpty())
+            format = QnLexical::deserialized(formatString, defaultFormat);
+        return format;
+    }
+} // anonymous namespace
 
 namespace ec2
 {
@@ -73,7 +82,7 @@ namespace ec2
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
             QByteArray tranBuffer;
-            Qn::SerializationFormat format = Qn::UbjsonFormat; /*Qn::JsonFormat*/;
+            Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
             if( format == Qn::JsonFormat )
                 tranBuffer = QJson::serialized(tran);
             //else if( format == Qn::BnsFormat )
@@ -122,9 +131,10 @@ namespace ec2
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
-            toUrlParams( input, &query );
-            query.addQueryItem("format", QnLexical::serialized(Qn::UbjsonFormat));
-            requestUrl.setQuery( query );
+            toUrlParams(input, &query);
+            Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
+            query.addQueryItem("format", QnLexical::serialized(format));
+            requestUrl.setQuery(query);
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 

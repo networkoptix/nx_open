@@ -93,6 +93,13 @@ namespace ec2
         QUrl url = addr;
         url.setUserName(url.userName().toLower());
 
+        if (m_transactionMessageBus->localPeer().isMobileClient()) {
+            QUrlQuery query(url);
+            query.removeQueryItem(lit("format"));
+            query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+            url.setQuery(query);
+        }
+
         if (url.isEmpty())
             return testDirectConnection(url, handler);
         else
@@ -105,6 +112,13 @@ namespace ec2
     {
         QUrl url = addr;
         url.setUserName(url.userName().toLower());
+
+        if (m_transactionMessageBus->localPeer().isMobileClient()) {
+            QUrlQuery query(url);
+            query.removeQueryItem(lit("format"));
+            query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
+            url.setQuery(query);
+        }
 
         if (url.scheme() == "file")
             return establishDirectConnection(url, handler);
