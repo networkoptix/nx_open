@@ -8,6 +8,7 @@
 
 #include "av_resource.h"
 #include "av_panoramic.h"
+#include "core/resource_management/resource_properties.h"
 
 #define MAX_RESPONSE_LEN (4*1024)
 
@@ -194,11 +195,11 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const Q
         layout = m_rotatedLayout;
     }
 
-    QString oldVideoLayout = getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
+    QString oldVideoLayout = propertyDictionary->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
     QString newVideoLayout = layout->toString();
     if (newVideoLayout != oldVideoLayout) {
-        nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
-        nonConstThis->saveParams();
+        propertyDictionary->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+        propertyDictionary->saveParams(getId());
     }
 
     return layout;
