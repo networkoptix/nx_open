@@ -5,6 +5,7 @@
 
 #include "uuid.h"
 
+#include <type_traits>
 
 QnUuid::QnUuid()
 {
@@ -99,6 +100,13 @@ QnUuid QnUuid::createUuid()
 QnUuid QnUuid::fromStringSafe(const QString &uuid)
 {
     return QnUuid(QUuid(uuid));
+}
+
+QnUuid QnUuid::createUuidFromPool(const QUuid &baseId, uint offset) {
+    static_assert(sizeof(uint) <= sizeof(decltype(QUuid::data1)), "Offset type must be not greater than storage field size.");
+    QUuid result = baseId;
+    result.data1 += offset;
+    return QnUuid(result);
 }
 
 uint qHash( const QnUuid& uuid, uint seed ) throw()

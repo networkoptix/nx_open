@@ -20,13 +20,6 @@ namespace {
         quint64 pid;
     };
 
-    QnUuid generateId(const QnUuid &baseId, int offset) {
-        Q_ASSERT_X(sizeof(uint) == 4, Q_FUNC_INFO, "Make sure uuid structure is valid");
-        QUuid result = baseId.getQUuid();
-        result.data1 += offset;
-        return QnUuid(result);
-    }
-
     struct QnSharedMemoryLocker {
     public:
         QnSharedMemoryLocker(QSharedMemory *memory):
@@ -115,7 +108,7 @@ QnClientInstanceManager::QnClientInstanceManager(QObject *parent) :
             if (data[i].pid == 0) {
                 m_index = i;
                 data[i].pid = QCoreApplication::applicationPid();
-                m_instanceGuid = generateId(pcUuid, m_index);
+                m_instanceGuid = QnUuid::createUuidFromPool(pcUuid.getQUuid(), m_index);
                 break;
             }
         }

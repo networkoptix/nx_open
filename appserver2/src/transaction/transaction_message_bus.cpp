@@ -1402,8 +1402,8 @@ namespace ec2
     void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
         const QSharedPointer<AbstractStreamSocket>& socket,
-        const ApiPeerData &remotePeer,
-        qint64 remoteSystemIdentityTime,
+    const ApiPeerData &/*remotePeer*/,
+    qint64 /*remoteSystemIdentityTime*/,
         const nx_http::Request& request,
         const QByteArray& requestBuf )
     {
@@ -1497,6 +1497,19 @@ namespace ec2
             }
         }
     }
+
+void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
+{
+    QMutexLocker lock(&m_mutex);
+    for( QnTransactionTransport* transport: m_connections )
+    {
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+        return;
+    }
+}
 
     void QnTransactionMessageBus::dropConnections()
     {

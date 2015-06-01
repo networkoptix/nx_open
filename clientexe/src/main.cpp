@@ -401,10 +401,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
 
-    QScopedPointer<TimerManager> timerManager(new TimerManager());
-
-    
-
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     QString skinRoot = dynamicCustomizationPath.isEmpty() 
         ? lit(":") 

@@ -6,6 +6,8 @@
 
 #include <boost/array.hpp>
 
+#include <client/client_runtime_settings.h>
+
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
@@ -523,7 +525,10 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    setOptions(StickToMinimum | StickToMaximum | PreserveWindowSize | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick);
+    QnTimeSlider::Options defaultOptions = PreserveWindowSize | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick;
+    if (!qnRuntime->isActiveXMode())
+        defaultOptions |= StickToMinimum | StickToMaximum ;
+    setOptions(defaultOptions);
 
     setToolTipFormat(lit("hh:mm:ss"));
     setRulerHeight(60.0);

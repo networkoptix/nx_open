@@ -502,8 +502,10 @@ void QnLoginDialog::at_deleteButton_clicked() {
 void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     QSet<SocketAddress> addresses = QnModuleFinder::instance()->moduleAddresses(moduleInformation.id);
 
-    if (addresses.isEmpty())
+    if (addresses.isEmpty()) {
+        at_moduleFinder_moduleLost(moduleInformation);
         return;
+    }
 
     QnEcData data;
     data.id = moduleInformation.id;
