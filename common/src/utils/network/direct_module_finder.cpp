@@ -163,7 +163,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     if (moduleInformation.id.isNull())
         return;
 
-    if (moduleInformation.type != nxMediaServerId)
+    if (moduleInformation.type != QnModuleInformation::nxMediaServerId())
         return;
 
     if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())

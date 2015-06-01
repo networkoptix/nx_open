@@ -39,6 +39,10 @@ public:
         m_logLevel(static_cast<QnLogLevel>(0)) /* Log nothing by default. */
     {}
 
+	~QnLogPrivate() {
+		m_file.close();
+	}
+
     bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) 
     {
         m_baseName = baseName;

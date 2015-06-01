@@ -69,7 +69,7 @@ QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tags() const {
 
 
 QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const {
-    QnMediaServerResourcePtr currentServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr currentServer = camera->getParentServer();
 
     if (time == DATETIME_NOW)
         return currentServer;

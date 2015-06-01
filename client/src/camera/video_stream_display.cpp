@@ -683,7 +683,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor)
 {
     // use only 1 frame for non selected video
-    if (m_reverseMode || m_decoder.isEmpty())
+    if (m_reverseMode || m_decoder.isEmpty() || m_needResetDecoder)
         return Status_Skipped;
 
     QSharedPointer<CLVideoDecoderOutput> m_tmpFrame(new CLVideoDecoderOutput());

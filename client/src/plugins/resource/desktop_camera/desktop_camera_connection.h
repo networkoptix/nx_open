@@ -36,7 +36,7 @@ private:
     struct {
         QString username;
         QString password;
-        QString clientGuid;
+        QnUuid clientGuid;
     } m_auth;
 };
 

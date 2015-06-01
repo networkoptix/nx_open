@@ -432,7 +432,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
 
 void QnVideowallItemWidget::updateLayout() {
     QnVideoWallItem item = m_videowall->items()->getItem(m_itemUuid);
-    QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+    QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(item.layout);
     if (m_layout == layout)
         return;
 
@@ -482,7 +482,7 @@ void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overla
 bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
     QnResourcePtr resource = (!data.resource.id.isNull())
             ? qnResPool->getResourceById(data.resource.id)
-            : qnResPool->getResourceByUniqId(data.resource.path); //TODO: #EC2
+            : qnResPool->getResourceByUniqueId(data.resource.path); //TODO: #EC2
 
     bool isServer = resource && (resource->flags() & Qn::server);
 

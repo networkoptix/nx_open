@@ -25,7 +25,7 @@ QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(const QnVirtualCam
 
     QnMediaServerResourcePtr server;
     if (microSecSinceEpoch < 0 || microSecSinceEpoch == DATETIME_NOW) {
-        server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+        server = camera->getParentServer();
     }
     else {
         server = QnCameraHistoryPool::instance()->getMediaServerOnTime(camera, microSecSinceEpoch / 1000, false);

@@ -18,6 +18,7 @@
 #include "api/app_server_connection.h"
 #include "media_server/server_message_processor.h"
 #include "core/resource/network_resource.h"
+#include "transaction/transaction_message_bus.h"
 
 #include "proxy_connection_processor_p.h"
 #include "http/custom_headers.h"
@@ -29,14 +30,17 @@ static const int MAX_PROXY_TTL = 8;
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
-QnProxyConnectionProcessor::QnProxyConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+QnProxyConnectionProcessor::QnProxyConnectionProcessor(
+        QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner):
     QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, socket)
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = owner;
 }
 
-QnProxyConnectionProcessor::QnProxyConnectionProcessor(QnProxyConnectionProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+QnProxyConnectionProcessor::QnProxyConnectionProcessor(
+        QnProxyConnectionProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
+        QnUniversalTcpListener* owner):
     QnTCPConnectionProcessor(priv, socket)
 {
     Q_D(QnProxyConnectionProcessor);
@@ -104,10 +108,20 @@ static bool isLocalAddress(const QString& addr)
 }
 #endif
 
-QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, const QUrl& url)
+QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, const QUrl& url)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->dstSocket = (static_cast<QnUniversalTcpListener*> (d->owner))->getProxySocket(guid, CONNECT_TIMEOUT);
+
+    if (route.reverseConnect)
+        d->dstSocket = d->owner->getProxySocket(route.id.toString(), CONNECT_TIMEOUT,
+                                                [&](int socketCount)
+        {
+            ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
+            tran.params.targetServer = qnCommon->moduleGUID();
+            tran.params.socketCount = socketCount;
+            qnTransactionBus->sendTransaction(tran, route.id);
+        });
+
     if (!d->dstSocket) {
 
 #ifdef PROXY_STRICT_IP
@@ -128,7 +142,7 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, con
     else {
         d->dstSocket->setRecvTimeout(CONNECT_TIMEOUT);
         d->dstSocket->setSendTimeout(CONNECT_TIMEOUT);
-        return guid;
+        return route.id.toString();
     }
 
     d->dstSocket->setRecvTimeout(IO_TIMEOUT);
@@ -144,7 +158,7 @@ QUrl QnProxyConnectionProcessor::getDefaultProxyUrl()
     return QUrl(lit("http://localhost:%1").arg(d->owner->getPort()));
 }
 
-bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xServerGUID)
+bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute)
 {
     Q_D(QnProxyConnectionProcessor);
 
@@ -173,7 +187,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
 
         host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
         if (host.startsWith("{"))
-            xServerGUID = host;
+            dstRoute.id = host;
 
         urlPath = urlPath.mid(hostEndPos);
 
@@ -209,31 +223,30 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
         cameraGuid = d->request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
     if (!cameraGuid.isNull()) {
         if (QnResourcePtr camera = qnResPool->getResourceById(cameraGuid))
-            xServerGUID = camera->getParentId().toString();
+            dstRoute.id = camera->getParentId().toString();
     }
-
 
     for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
     {
         if (itr->first.toLower() == "host" && !host.isEmpty())
             itr->second = host.toUtf8();
         else if (itr->first == Qn::SERVER_GUID_HEADER_NAME)
-            xServerGUID = itr->second;
+            dstRoute.id = itr->second;
     }
 
-    QnRoute route;
-    if (QnUuid(xServerGUID) == qnCommon->moduleGUID() && !cameraGuid.isNull()) {
-        if (QnNetworkResourcePtr camera = qnResPool->getResourceById(cameraGuid).dynamicCast<QnNetworkResource>())
-            route.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
+
+    if (dstRoute.id == qnCommon->moduleGUID() && !cameraGuid.isNull()) {
+        if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
+            dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
     }
-    else if (!xServerGUID.isEmpty())
-        route = QnRouter::instance()->routeTo(xServerGUID);
+    else if (!dstRoute.id.isNull())
+        dstRoute = QnRouter::instance()->routeTo(dstRoute.id);
     else
-        route.addr = SocketAddress(dstUrl.host(), dstUrl.port(80)); // no more route. keep dst addr
+        dstRoute.addr = SocketAddress(dstUrl.host(), dstUrl.port(80));
 
-    if (route.isValid()) 
+    if (!dstRoute.addr.isNull())
     {
-        if (!route.gatewayId.isNull())
+        if (!dstRoute.gatewayId.isNull())
         {
             nx_http::StringType ttlString = nx_http::getHeaderValue(d->request.headers, Qn::PROXY_TTL_HEADER_NAME);
             bool ok;
@@ -250,14 +263,14 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             QString path = urlPath;
             if (!path.startsWith(QLatin1Char('/')))
                 path.prepend(QLatin1Char('/'));
-            if (xServerGUID.isEmpty())
+            if (dstRoute.id.isNull())
                 path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
             else
-                path.prepend(QString(lit("/proxy/%1/%2")).arg(dstUrl.scheme()).arg(xServerGUID));
+                path.prepend(QString(lit("/proxy/%1/%2")).arg(dstUrl.scheme()).arg(dstRoute.id.toString()));
             d->request.requestLine.url = path;
         }
-        dstUrl.setHost(route.addr.address.toString());
-        dstUrl.setPort(route.addr.port);
+        dstUrl.setHost(dstRoute.addr.address.toString());
+        dstUrl.setPort(dstRoute.addr.port);
 
         //adding entry corresponding to current server to Via header
         nx_http::header::Via via;
@@ -285,14 +298,14 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
 
     // update source request
     QUrl dstUrl;
-    QString xServerGUID;
-    if (!updateClientRequest(dstUrl, xServerGUID))
+    QnRoute dstRoute;
+    if (!updateClientRequest(dstUrl, dstRoute))
     {
         d->socket->close();
         return false;
     }
 
-    d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
+    d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
     if (d->lastConnectedUrl.isEmpty())
         return false; // invalid dst address
 
@@ -456,10 +469,10 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     QString path = d->request.requestLine.url.path();
                     // parse next request and change dst if required
                     QUrl dstUrl;
-                    QString xServerGUID;
-                    updateClientRequest(dstUrl, xServerGUID);
+                    QnRoute dstRoute;
+                    updateClientRequest(dstUrl, dstRoute);
                     bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
-                    bool isSameAddr = d->lastConnectedUrl == xServerGUID || d->lastConnectedUrl == dstUrl;
+                    bool isSameAddr = d->lastConnectedUrl == dstRoute.addr.toString() || d->lastConnectedUrl == dstUrl;
                     if (isSameAddr) 
                     {
                         d->dstSocket->send(d->clientRequest);
@@ -474,7 +487,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     }
                     else {
                         // new server
-                        d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
+                        d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
                         if (d->lastConnectedUrl.isEmpty()) {
                             d->socket->close();
                             return; // invalid dst address

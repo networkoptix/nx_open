@@ -12,7 +12,6 @@
 #include <utils/network/module_information.h>
 #include "nx_ec/data/api_runtime_data.h"
 
-class QnSessionManager;
 class QnResourceDataPool;
 
 /**
@@ -23,7 +22,7 @@ class QnResourceDataPool;
 class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
     Q_OBJECT
 public:
-    QnCommonModule(int &argc, char **argv, QObject *parent = NULL);
+    QnCommonModule(QObject *parent = NULL);
     virtual ~QnCommonModule();
 
     using Singleton<QnCommonModule>::instance;
@@ -35,10 +34,6 @@ public:
 
     QnResourceDataPool *dataPool() const {
         return m_dataPool;
-    }
-
-    QnSessionManager *sessionManager() const {
-        return m_sessionManager;
     }
 
     void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
@@ -108,7 +103,6 @@ protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
-    QnSessionManager *m_sessionManager;
     QnResourceDataPool *m_dataPool;
     QString m_defaultAdminPassword;
     QnUuid m_uuid;

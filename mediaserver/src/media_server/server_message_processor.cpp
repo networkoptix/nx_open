@@ -10,6 +10,7 @@
 #include <media_server/server_update_tool.h>
 #include <media_server/settings.h>
 #include <nx_ec/dummy_handler.h>
+#include <network/universal_tcp_listener.h>
 #include <utils/common/log.h>
 
 #include "serverutil.h"
@@ -35,7 +36,7 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 
 {
     QnCommonMessageProcessor::updateResource(resource);
-    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
 
     const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
     const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
@@ -126,7 +127,10 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
         this, &QnServerMessageProcessor::at_updateInstallationRequested);
 
-    connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
+    connect(connection, &ec2::AbstractECConnection::remotePeerUnauthorized,
+        this, &QnServerMessageProcessor::at_remotePeerUnauthorized);
+    connect(connection, &ec2::AbstractECConnection::reverseConnectionRequested,
+        this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
     connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
         this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) { changeSystemName(systemName, sysIdTime, tranLogTime); });
@@ -179,7 +183,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     if (addr == "localhost" || addr == "127.0.0.1")
         return true;
     if( !m_mServer )
-        m_mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        m_mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (m_mServer) 
     {
         QHostAddress hostAddr(addr);
@@ -219,6 +223,11 @@ bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
     return false;
 }
 
+
+void QnServerMessageProcessor::registerProxySender(QnUniversalTcpListener* tcpListener) {
+    m_universalTcpListener = tcpListener;
+}
+
 void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {
     qnBusinessMessageBus->at_actionReceived(action);
 }
@@ -229,6 +238,16 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
     QnServerUpdateTool::instance()->installUpdate(updateId);
+}
+
+void QnServerMessageProcessor::at_reverseConnectionRequested(const ec2::ApiReverseConnectionData &data) {
+    if (m_universalTcpListener) {
+        QnRoute route = QnRouter::instance()->routeTo(data.targetServer);
+
+        // just to be sure that we have direct access to the server
+        if (route.gatewayId.isNull() && !route.addr.isNull())
+            m_universalTcpListener->addProxySenderConnections(route.addr, data.socketCount);
+    }
 }
 
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
@@ -254,8 +273,8 @@ bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)
 
 void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId) 
 {
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
-    QnStorageResourcePtr storage = qnResPool->getResourceById(resourceId).dynamicCast<QnStorageResource>();
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(resourceId);
+    QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(resourceId);
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
     bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
     if (isOwnServer) {

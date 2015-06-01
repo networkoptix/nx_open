@@ -585,7 +585,7 @@ QnVirtualCameraResourceList QnRecordingManager::getLocalControlledCameras() cons
     QnVirtualCameraResourceList result;
     for(const QnVirtualCameraResourcePtr &camRes: cameras)
     {
-        QnMediaServerResourcePtr mServer = camRes->getParentResource().dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr mServer = camRes->getParentServer();
         if (!mServer)
             continue;
         if (mServer->getId() == qnCommon->moduleGUID() || (mServer->getServerFlags() | Qn::SF_RemoteEC))

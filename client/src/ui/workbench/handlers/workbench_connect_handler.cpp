@@ -14,6 +14,7 @@
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -26,6 +27,9 @@
 #include <core/resource_management/status_dictionary.h>
 
 #include <nx_ec/ec_proto_version.h>
+#include <llutil/hardware_id.h>
+
+#include <platform/hardware_information.h>
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
@@ -36,6 +40,7 @@
 #include <ui/dialogs/non_modal_dialog_constructor.h>
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
+#include <ui/graphics/opengl/gl_functions.h>
 
 #include <ui/style/skin.h>
 
@@ -55,7 +60,6 @@
 #include <utils/network/module_finder.h>
 #include <utils/network/router.h>
 #include <utils/reconnect_helper.h>
-
 
 #include "compatibility.h"
 
@@ -79,6 +83,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {
         /* Reload all dialogs and dependent data. */
         context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
+
+        /* Collect and send crash dumps if allowed */
+        m_crashReporter.scanAndReportAsync(qnResPool->getAdministrator(), qnSettings->rawSettings());
 
         /* We are just reconnected automatically, e.g. after update. */
         if (!m_readyForConnection)
@@ -171,15 +178,23 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     // ask user if he wants to save changes
-    if (connected() && !disconnectFromServer(false))
+    bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
+    if (connected() && !disconnectFromServer(force))
         return; 
 
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     if (url.isValid()) {
+        /* ActiveX plugin */
+        if (qnRuntime->isActiveXMode()) {
+            if (connectToServer(url, true) != ec2::ErrorCode::ok) {
+                QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
+                menu()->trigger(Qn::ExitAction);
+            }
+        } else
         /* Videowall item */
-        if (qnSettings->isVideoWallMode()) {
+        if (qnRuntime->isVideoWallMode()) {
             //TODO: #GDM #High videowall should try indefinitely
             if (connectToServer(url, true) != ec2::ErrorCode::ok) {
                 QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
@@ -248,8 +263,25 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     /* Hiding message box from previous connect. */
     hideMessageBox();
 
+    ec2::ApiClientInfoData clientData;
+    {
+        const auto hwId = LLUtil::getMainHardwareIds(0, qnSettings->rawSettings()).last();
+        clientData.id = QnUuid::fromHardwareId(hwId);
+
+        const auto& hw = HardwareInformation::instance();
+        clientData.phisicalMemory = hw.phisicalMemory;
+        clientData.cpuArchitecture = hw.cpuArchitecture;
+        clientData.cpuModelName = hw.cpuModelName;
+
+        const auto gl = QnGlFunctions::openGLCachedInfo();
+        clientData.openGLRenderer = gl.renderer;
+        clientData.openGLVersion = gl.version;
+        clientData.openGLVendor = gl.vendor;
+    }
+
     QnEc2ConnectionRequestResult result;
-    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(appServerUrl, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
+    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+        appServerUrl, clientData, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
     if (!silent)
         m_connectingMessageBox = QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX);
 
@@ -336,6 +368,9 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
+    if (qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode())
+        return;
+
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
     dialogConstructor.resetGeometry();
 

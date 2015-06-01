@@ -63,7 +63,7 @@ ec2::AbstractECConnectionPtr QnWorkbenchLayoutsHandler::connection2() const {
 }
 
 void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName) {
-    QnUserResourcePtr user = qnResPool->getResourceById(layout->getParentId()).dynamicCast<QnUserResource>();
+    QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(layout->getParentId());
 
     QnLayoutResourceList existing = alreadyExistingLayouts(newName, user, layout);
     if (!canRemoveLayouts(existing)) {

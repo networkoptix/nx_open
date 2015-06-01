@@ -21,7 +21,7 @@ QnDesktopCameraStreamReader::~QnDesktopCameraStreamReader()
     stop();
 }
 
-CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
     closeStream();
@@ -172,11 +172,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
     return result;
 }
 
-void QnDesktopCameraStreamReader::updateStreamParamsBasedOnQuality()
-{
-}
-
-void QnDesktopCameraStreamReader::updateStreamParamsBasedOnFps()
+void QnDesktopCameraStreamReader::pleaseReopenStream()
 {
 }
 

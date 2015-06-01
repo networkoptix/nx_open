@@ -10,6 +10,7 @@
 
 #include <QtCore/QThread>
 
+#include <utils/common/singleton.h>
 
 //!Interface of receiver of timer events
 class TimerEventHandler
@@ -36,6 +37,7 @@ class TimerManagerImpl;
 class TimerManager
 :
     public QThread
+    , public Singleton<TimerManager>
 {
 public:
     /*!
@@ -72,8 +74,6 @@ public:
         \note If this method is called from \a TimerEventHandler::onTimer to delete timer being executed, nothing is done
     */
     void joinAndDeleteTimer( const quint64& timerID );
-
-    static TimerManager* instance();
 
     void stop();
 protected:

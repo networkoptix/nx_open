@@ -64,7 +64,7 @@ namespace {
     }
 
     QSet<QUrl> ignoredUrlsForServer(const QnUuid &id) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(id);
         if (!server)
             return QSet<QUrl>();
 

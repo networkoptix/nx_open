@@ -48,6 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">請確認密碼</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">附加參數</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允許系統優化攝影機設定(建議)</String>   
+    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">Send usage and crash statistics to software developers</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">建立關聯 ${product.name}</String>

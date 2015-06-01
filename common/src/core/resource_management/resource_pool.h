@@ -12,6 +12,8 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_criterion.h>
 
+#include <utils/common/singleton.h>
+
 class QnResource;
 class QnNetworkResource;
 class CLRecorderDevice;
@@ -27,7 +29,7 @@ class CLRecorderDevice;
  *
  * If resource is conflicting it must not be placed in resource pool.
  */
-class QN_EXPORT QnResourcePool : public QObject
+class QN_EXPORT QnResourcePool : public QObject, public Singleton<QnResourcePool>
 {
     Q_OBJECT
 
@@ -42,9 +44,6 @@ public:
 
     QnResourcePool();
     ~QnResourcePool();
-
-    static void initStaticInstance( QnResourcePool* inst );
-    static QnResourcePool* instance();
 
     // this function will add or update existing resources
     // keeps database ID ( if possible )
@@ -85,9 +84,23 @@ public:
         return result;
     }
 
+    template <class Resource>
+    QnSharedResourcePointer<Resource> getResourceByUniqueId(const QString &id) const {
+        QMutexLocker locker(&m_resourcesMtx);
+        auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&id](const QnResourcePtr &resource) { return resource->getUniqueId() == id; });
+        return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
+    }
+
+    template <class Resource>
+    QnSharedResourcePointer<Resource> getResourceById(const QnUuid &id) const {
+        QMutexLocker locker(&m_resourcesMtx);
+        auto itr = m_resources.find(id);
+        return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
+    }
+
     QnResourcePtr getResourceById(const QnUuid &id) const;
 
-    QnResourcePtr getResourceByUniqId(const QString &id) const;
+    QnResourcePtr getResourceByUniqueId(const QString &id) const;
     void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
 
     bool hasSuchResource(const QString &uniqid) const;

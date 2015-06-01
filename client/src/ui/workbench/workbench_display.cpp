@@ -20,6 +20,7 @@
 #include <utils/common/variant_timer.h>
 #include <utils/aspect_ratio.h>
 
+#include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
 #include <common/common_meta_types.h>
 
@@ -133,12 +134,6 @@ namespace {
 
     /** Maximal expanded size of a raised widget, relative to viewport size. */
     const qreal maxExpandedSize = 0.5;
-
-    /** Viewport lower size boundary, in scene coordinates. */
-    const QSizeF viewportLowerSizeBound = QSizeF(qnGlobals->workbenchUnitSize() * 0.05, qnGlobals->workbenchUnitSize() * 0.05);
-
-    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings
-    const qreal selectedFrameWidth = defaultFrameWidth * 2; // TODO: #Elric same here
 
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;
@@ -453,7 +448,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
 
-	if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+	if (canShowLayoutBackground()) {
 		m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
 		m_scene->addItem(gridBackgroundItem());
 		setLayer(gridBackgroundItem(), Qn::EMappingLayer);
@@ -481,6 +476,7 @@ void QnWorkbenchDisplay::initSceneView() {
 
     /* Run handlers. */
     at_workbench_currentLayoutChanged();
+    at_mapper_spacingChanged();
 }
 
 void QnWorkbenchDisplay::initBoundingInstrument() {
@@ -588,6 +584,7 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
 }
 
 void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
+    Q_ASSERT_X(canShowLayoutBackground(), Q_FUNC_INFO, "This item is only used when layout background is active");
     QnGridRaisedConeItem* item = raisedConeItem(widget);
     if (item->scene() == m_scene)
         return;
@@ -602,11 +599,11 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
     QSizeF newWidgetSize = occupiedGeometry.size() * focusExpansion;
 
     qreal magicConst = maxExpandedSize;
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         magicConst = 0.8;   //TODO: #Elric magic const
     else
     if (
-        !(m_lightMode & Qn::LightModeNoLayoutBackground) &&
+        canShowLayoutBackground() &&
         (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
     )
         magicConst = 0.33;  //TODO: #Elric magic const
@@ -644,7 +641,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
 
-            if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+            if (canShowLayoutBackground()) {
                 ensureRaisedConeItem(oldWidget);
                 raisedConeItem(oldWidget)->setEffectEnabled(false);
                 setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
@@ -654,7 +651,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(newWidget != NULL) {
             bringToFront(newWidget);
 
-            if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+            if (canShowLayoutBackground()) {
                 ensureRaisedConeItem(newWidget);
                 setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
                 raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
@@ -751,7 +748,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (!layout)
         return;
 
-    if (m_lightMode & Qn::LightModeNoLayoutBackground)
+    if (!canShowLayoutBackground())
         return;
 
 	if (gridBackgroundItem())
@@ -886,7 +883,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     if(resource.isNull()) {
         qnDeleteLater(item);
         return false;
@@ -913,7 +910,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
     widget->setFrameOpacity(m_frameOpacity);
-    widget->setFrameWidth(defaultFrameWidth);
+    widget->setFrameWidth(qnGlobals->defaultFrameWidth());
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -994,7 +991,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 }
             }
         }
-        qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
+        if (qnRedAssController)
+            qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
     return true;
@@ -1032,7 +1030,8 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     m_widgetByItem.remove(item);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
         m_widgetByRenderer.remove(mediaWidget->renderer());
-        qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
+        if (qnRedAssController)
+            qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
     }
 
     if(destroyWidget) {
@@ -1269,7 +1268,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
             : layoutBoundingRect.united(backgroundBoundingRect);
 
     /* Do not add additional spacing in following cases: */
-    bool noAdjust = qnSettings->isVideoWallMode()                           /*< Videowall client. */
+    bool noAdjust = qnRuntime->isVideoWallMode()                           /*< Videowall client. */
         || !backgroundBoundingRect.isNull();                                /*< There is a layout background. */
 
     if (noAdjust)
@@ -1446,7 +1445,7 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
     }
 
     m_boundingInstrument->setPositionBounds(m_view, moveRect);
-    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
+    m_boundingInstrument->setSizeBounds(m_view, qnGlobals->viewportLowerSizeBound(), Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
@@ -1575,7 +1574,9 @@ void QnWorkbenchDisplay::updateFrameWidths() {
         return;
 
     foreach(QnResourceWidget *widget, this->widgets())
-        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() ? selectedFrameWidth : defaultFrameWidth);
+        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() 
+            ? qnGlobals->selectedFrameWidth() 
+            : qnGlobals->defaultFrameWidth());
 }
 
 void QnWorkbenchDisplay::updateCurtainedCursor() {
@@ -1691,7 +1692,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->pleaseStop();
         }
 
-        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid())) {
+        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid())) {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
             connect(m_loader, &QnThumbnailsLoader::thumbnailLoaded, this,       &QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded);
@@ -2037,4 +2038,14 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         scene()->addItem(splashItem);
         setLayer(splashItem, Qn::EffectsLayer);
     }
+}
+
+bool QnWorkbenchDisplay::canShowLayoutBackground() const {
+    if (qnRuntime->isActiveXMode())
+        return false;
+
+    if (m_lightMode & Qn::LightModeNoLayoutBackground)
+        return false;
+
+    return true;
 }

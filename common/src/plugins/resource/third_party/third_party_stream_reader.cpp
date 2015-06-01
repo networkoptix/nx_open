@@ -55,11 +55,6 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
         m_mediaEncoder2Ref->releaseRef();
 }
 
-void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
-{
-    base_type::onGotVideoFrame( videoData );
-}
-
 static int sensitivityToMask[10] = 
 {
     255, //  0
@@ -111,7 +106,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     camManager2->releaseRef();
 }
 
-CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     if( isStreamOpened() )
         return CameraDiagnostics::NoErrorResult();
@@ -149,12 +144,12 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
         float selectedFps = 0;
-        if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
+        if( cameraEncoder.setFps( params.fps, &selectedFps ) != nxcip::NX_NO_ERROR )
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
 
         int selectedBitrateKbps = 0;
         if( cameraEncoder.setBitrate(
-                m_thirdPartyRes->suggestBitrateKbps(getQuality(), QSize(resolution.width, resolution.height), getFps()),
+                m_thirdPartyRes->suggestBitrateKbps(params.quality, QSize(resolution.width, resolution.height), params.fps),
                 &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
         {
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
@@ -379,18 +374,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     }
 
     return rez;
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void ThirdPartyStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const

@@ -35,7 +35,7 @@ namespace {
      */
     bool resourceExistsInPool(const QnResourcePtr &resource) {
         bool existResource = false;
-        QnResourcePtr res = qnResPool->getResourceByUniqId(resource->getUniqueId());
+        QnResourcePtr res = qnResPool->getResourceByUniqueId(resource->getUniqueId());
         if (res && qnResPool->getResourceById(res->getParentId())) {
             existResource = true; // already in resource pool
         }

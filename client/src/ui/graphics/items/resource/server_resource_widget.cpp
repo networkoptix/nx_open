@@ -7,6 +7,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_name.h>
@@ -772,13 +773,13 @@ QString QnServerResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
     result &= (CloseButton | RotateButton | InfoButton);
-    if (!qnSettings->isVideoWallMode())
+    if (!qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode())
         result |= PingButton | ShowLogButton | CheckIssuesButton;
     return result;
 }
 
 Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
-    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
         return Qn::VideowallWithoutLicenseOverlay;
 
     if (m_resource->getStatus() == Qn::Offline)

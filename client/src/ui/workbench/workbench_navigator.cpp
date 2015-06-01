@@ -21,6 +21,7 @@ extern "C"
 #include <utils/threaded_chunks_merge_tool.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <camera/resource_display.h>
 #include <core/resource/camera_bookmark.h>
@@ -1429,7 +1430,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         return;
     }
 
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode())
         return;
 
     QnActionManager *manager = context()->menu();

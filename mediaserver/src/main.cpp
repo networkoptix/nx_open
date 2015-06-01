@@ -24,7 +24,6 @@
 #include <QtNetwork/QNetworkInterface>
 
 #include <api/app_server_connection.h>
-#include <api/session_manager.h>
 #include <api/global_settings.h>
 
 #include <appserver/processor.h>
@@ -120,6 +119,7 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
+#include <rest/handlers/iflist_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
 #include <rest/handlers/current_user_rest_handler.h>
@@ -157,6 +157,12 @@
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
 #endif
+
+#ifdef __linux__
+#include "common/systemexcept_linux.h"
+#endif
+
+#include "platform/hardware_information.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
@@ -172,11 +178,13 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "media_server/resource_status_watcher.h"
 #include "nx_ec/dummy_handler.h"
+#include "ec2_statictics_reporter.h"
 
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
 #include "network/universal_request_processor.h"
+#include "utils/network/nettools.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -192,6 +200,7 @@ static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
+static const QByteArray SYSTEM_NAME_KEY("systemName");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -816,7 +825,6 @@ void initAppServerConnection(QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     NX_LOG(lit("Connect to server %1").arg(urlNoPassword.toString()), cl_logINFO);
-    QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
     QnAppServerConnectionFactory::setUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
@@ -1181,7 +1189,7 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 
     at_localInterfacesChanged();
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (server) {
         Qn::ServerFlags serverFlags = server->getServerFlags();
         if (m_publicAddress.isNull())
@@ -1239,9 +1247,9 @@ void QnMain::at_connectionOpened()
     if (isStopping())
         return;
     if (m_firstRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::ServerStartedReason, QString());
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById<QnMediaServerResource>(serverGuid()), m_firstRunningTime*1000, QnBusiness::ServerStartedReason, QString());
     if (!m_startMessageSent) {
-        qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
+        qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceById<QnMediaServerResource>(serverGuid()), qnSyncTime->currentUSecsSinceEpoch());
         m_startMessageSent = true;
     }
     m_firstRunningTime = 0;
@@ -1250,7 +1258,7 @@ void QnMain::at_connectionOpened()
 void QnMain::at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address)
 {
     qnBusinessRuleConnector->at_mediaServerConflict(
-                qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(),
+                qnResPool->getResourceById<QnMediaServerResource>(serverGuid()),
                 qnSyncTime->currentUSecsSinceEpoch(),
                 moduleInformation,
                 QUrl(lit("http://%1").arg(address.toString())));
@@ -1331,6 +1339,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/iflist", new QnIfListRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
@@ -1366,6 +1375,7 @@ bool QnMain::initTcpListener()
 
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
+    m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();
@@ -1411,6 +1421,12 @@ void QnMain::run()
         nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
 #endif
 
+#ifdef __linux__
+    linux_exception::setSignalHandlingDisabled( MSSettings::roSettings()->value(
+        nx_ms_conf::CREATE_FULL_CRASH_DUMP,
+        nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
+#endif
+
     QString sslCertPath = MSSettings::roSettings()->value( nx_ms_conf::SSL_CERTIFICATE_PATH, getDataDirectory() + lit( "/ssl/cert.pem" ) ).toString();
     QFile f(sslCertPath);
     if (!f.open(QIODevice::ReadOnly)) {
@@ -1437,13 +1453,9 @@ void QnMain::run()
         QnSSLSocket::initSSLEngine( certData );
     }
 
-    QnSyncTime syncTime;
-
+    QScopedPointer<QnSyncTime> syncTime(new QnSyncTime());
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
-
-    // todo: #rvasilenko this class doesn't used any more on the server side
-    //QnSessionManager::instance()->start();
 
 #ifdef ENABLE_ONVIF
     QnSoapServer soapServer;    //starting soap server to accept event notifications from onvif cameras
@@ -1453,7 +1465,7 @@ void QnMain::run()
 
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
-    QnResourcePool::initStaticInstance( new QnResourcePool() );
+    std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
@@ -1515,7 +1527,15 @@ void QnMain::run()
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
     qnCommon->setModuleGUID(serverGuid());
-    qnCommon->setLocalSystemName(settings->value("systemName").toString());
+    QString systemName = settings->value(SYSTEM_NAME_KEY).toString();
+#ifdef __arm__
+    if (systemName.isEmpty()) {
+        systemName = QString(lit("system_%1")).arg(getMacFromPrimaryIF());
+        settings->setValue(SYSTEM_NAME_KEY, systemName);
+    }
+#endif
+    qnCommon->setLocalSystemName(systemName);
+
     qint64 systemIdentityTime = MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
     qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
@@ -1549,7 +1569,8 @@ void QnMain::run()
 
     while (!needToStop())
     {
-        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::url(), &ec2Connection );
+		const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
+			QnAppServerConnectionFactory::url(), ec2::ApiClientInfoData(), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {
             connectInfo = ec2Connection->connectionInfo();
@@ -1571,7 +1592,7 @@ void QnMain::run()
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
-        MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
+        MSSettings::roSettings()->setValue(SYSTEM_NAME_KEY, connectInfo.systemName);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
         MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
@@ -1644,8 +1665,6 @@ void QnMain::run()
 
     QnResource::startCommandProc();
 
-    QnResourcePool::instance(); // to initialize net state;
-
     std::unique_ptr<QnRestProcessorPool> restProcessorPool( new QnRestProcessorPool() );
 
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
@@ -1662,14 +1681,9 @@ void QnMain::run()
 
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
+    messageProcessor->registerProxySender(m_universalTcpListener);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
-
-    QUrl proxyServerUrl = ec2Connection->connectionInfo().ecUrl;
-    //proxyServerUrl.setPort(connectInfo->proxyPort);
-    m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid().toString());
-    //m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
-
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
@@ -1762,6 +1776,23 @@ void QnMain::run()
             m_mediaServer = registerServer(ec2Connection, server, isNewServerInstance);
         else
             m_mediaServer = server;
+
+        const auto hwInfo = HardwareInformation::instance();
+        if (server->getProperty(Qn::CPU_ARCHITECTURE) != hwInfo.cpuArchitecture)
+            server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+
+        if (server->getProperty(Qn::CPU_MODEL_NAME) != hwInfo.cpuModelName)
+            server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
+
+        const auto phisicalMemory = QString::number(hwInfo.phisicalMemory);
+        if (server->getProperty(Qn::PHISICAL_MEMORY) != phisicalMemory)
+            server->setProperty(Qn::PHISICAL_MEMORY, QVariant(hwInfo.phisicalMemory));
+
+        const auto isBeta = QString::number(QnAppInfo::beta() ? 1 : 0);
+        if (server->getProperty(Qn::BETA) != isBeta)
+            server->setProperty(Qn::BETA, isBeta);
+
+        propertyDictionary->saveParams(server->getId());
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
@@ -1932,6 +1963,38 @@ void QnMain::run()
         qnCommon->updateModuleInformation();
     }
 
+    typedef ec2::Ec2StaticticsReporter stats;
+    bool adminParamsChanged = false;
+    if (MSSettings::roSettings()->value(stats::SR_ALLOWED, false).toBool())
+    {
+        if (adminUser->getProperty(stats::SR_ALLOWED).toInt() == 0)        // == 0 => false
+            adminUser->setProperty(stats::SR_ALLOWED, QString::number(1)); // != 0 => true
+
+        MSSettings::roSettings()->remove(stats::SR_ALLOWED);
+        adminParamsChanged = true;
+    }
+
+    // TODO: fix, when VS supports init lists:
+    //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
+    const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
+    for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
+    {
+        const QString& param = **it;
+        const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
+        if (!val.isEmpty() && val != adminUser->getProperty(param))
+        {
+            adminUser->setProperty(param, val);
+            MSSettings::roSettings()->remove(param);
+            adminParamsChanged = true;
+        }
+    }
+
+    if (adminParamsChanged)
+    {
+        propertyDictionary->saveParams(adminUser->getId());
+        MSSettings::roSettings()->sync();
+    }
+
     QnAbstractStorageResourceList storages = m_mediaServer->getStorages();
     QnAbstractStorageResourceList modifiedStorages = createStorages(m_mediaServer);
     modifiedStorages.append(updateStorages(m_mediaServer));
@@ -2096,9 +2159,6 @@ void QnMain::run()
     fileDeletor.reset();
     storageManager.reset();
 
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
-
     m_mediaServer.clear();
 }
 
@@ -2113,7 +2173,9 @@ void QnMain::at_appStarted()
 {
     if (isStopping())
         return;
+
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
+    m_crashReporter.scanAndReportAsync(qnResPool->getAdministrator(), MSSettings::runTimeSettings());
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
@@ -2174,7 +2236,7 @@ protected:
     virtual int executeApplication() override {
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
 
         if (!m_overrideVersion.isNull())
             qnCommon->setEngineVersion(m_overrideVersion);
@@ -2230,19 +2292,11 @@ protected:
     }
 
 private:
-    QnUuid hardwareIdToUuid(const QByteArray& hardwareId) {
-        if (hardwareId.length() != 34)
-            return QnUuid();
-
-        QString hwid(hardwareId);
-        QString uuidForm = QString("%1-%2-%3-%4-%5").arg(hwid.mid(2, 8)).arg(hwid.mid(10, 4)).arg(hwid.mid(14, 4)).arg(hwid.mid(18, 4)).arg(hwid.mid(22, 12));
-        return QnUuid(uuidForm);
-    }
-
     QString hardwareIdAsGuid() {
-        QString hwID = hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false, MSSettings::roSettings())).toString();
-        std::cout << "Got hwID \"" << hwID.toStdString() << "\"" << std::endl;
-        return hwID;
+		auto hwId = LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false, MSSettings::roSettings());
+		auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
+        std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
+        return hwIdString;
     }
 
     void updateGuidIfNeeded() {
@@ -2355,6 +2409,7 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef __linux__
+    linux_exception::installCrashSignalHandler();
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
