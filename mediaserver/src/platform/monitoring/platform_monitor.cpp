@@ -1,5 +1,8 @@
 #include "platform_monitor.h"
 
+#include <utils/serialization/json_functions.h>
+#include <utils/serialization/lexical_functions.h>
+
 QList<QnPlatformMonitor::NetworkLoad> QnPlatformMonitor::totalNetworkLoad(NetworkInterfaceTypes types) {
     QList<NetworkLoad> result;
     for(const NetworkLoad &load: totalNetworkLoad())
@@ -16,3 +19,11 @@ QList<QnPlatformMonitor::PartitionSpace> QnPlatformMonitor::totalPartitionSpaceI
     return result;
 }
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor::PartitionTypes,
+    (QnPlatformMonitor::LocalDiskPartition,    "local")
+    (QnPlatformMonitor::RamDiskPartition,      "ram")
+    (QnPlatformMonitor::OpticalDiskPartition,  "optical")
+    (QnPlatformMonitor::SwapPartition,         "swap")
+    (QnPlatformMonitor::NetworkPartition,      "network")
+    (QnPlatformMonitor::UnknownPartition,      "unknown")
+)

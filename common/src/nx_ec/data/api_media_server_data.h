@@ -13,8 +13,9 @@ namespace ec2
 
         qint64          spaceLimit;
         bool            usedForWriting;
+        QString         storageType;
     };
-#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)
+#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)(storageType)
 
 
     struct ApiMediaServerData: ApiResourceData

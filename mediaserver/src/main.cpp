@@ -162,6 +162,7 @@
 #endif
 
 #include "platform/hardware_information.h"
+#include "platform/platform_abstraction.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
@@ -406,6 +407,15 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     if (resType)
         storage->setTypeId(resType->getId());
     storage->setParentId(serverGuid());
+
+    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+    const auto it = std::find_if(partitions.begin(), partitions.end(),
+                                 [&](const QnPlatformMonitor::PartitionSpace& part)
+        { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+    
+    storage->setStorageType((it != partitions.end()) ?
+        QnLexical::serialized(it->type) : lit("network"));
 
     return storage;
 }

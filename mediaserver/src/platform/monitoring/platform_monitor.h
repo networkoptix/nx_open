@@ -178,6 +178,7 @@ private:
     Q_DISABLE_COPY(QnPlatformMonitor)
 };
 
+QN_FUSION_DECLARE_FUNCTIONS(QnPlatformMonitor::PartitionTypes, (metatype)(lexical));
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnPlatformMonitor::PartitionTypes);
 
 #endif // QN_PLATFORM_MONITOR_H
