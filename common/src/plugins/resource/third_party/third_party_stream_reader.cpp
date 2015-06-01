@@ -28,7 +28,7 @@ namespace
 {
     bool isIFrame( QnAbstractMediaDataPtr packet )
     {
-        CodecID codecId = packet->compressionType;
+        AVCodecID codecId = packet->compressionType;
 
         if( !packet || codecId != CODEC_ID_H264 )
             return false;

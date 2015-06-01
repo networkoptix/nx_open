@@ -23,7 +23,7 @@ class FrameTypeExtractor
 {
 public:
     FrameTypeExtractor(AVCodecContext* context);
-    FrameTypeExtractor(CodecID id, bool nalPrefixes = true);
+    FrameTypeExtractor(AVCodecID id, bool nalPrefixes = true);
     ~FrameTypeExtractor();
 
     enum FrameType {UnknownFrameType, I_Frame, P_Frame, B_Frame};
