@@ -84,7 +84,7 @@ void serialize(const QUrl &value, QString *target) {
 
 bool deserialize(const QString &value, QUrl *target) {
     *target = QUrl(value);
-    return target->isValid();
+    return true;
 }
 
 void serialize(const QColor &value, QString *target) {
