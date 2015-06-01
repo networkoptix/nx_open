@@ -11,7 +11,6 @@
 
 void setTimeZone(const QString& timezone)
 {
-    // set time zone
     QString tz = QString(lit(":%1")).arg(timezone);
     setenv("TZ", tz.toLatin1().data(), 1);
     tzset();
@@ -31,7 +30,13 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
     Q_UNUSED(path)
     QString timezone = params.value("timezone");
     QString dateTimeStr = params.value("datetime");
-    QDateTime dateTime = QDateTime::fromString(dateTimeStr, QLatin1String("yyyy-MM-ddThh:mm:ss"));
+    QDateTime dateTime;
+    if (dateTimeStr.toLongLong() > 0)
+        dateTime = QDateTime::fromMSecsSinceEpoch(dateTimeStr.toLongLong());
+    else
+        dateTime = QDateTime::fromString(dateTimeStr, QLatin1String("yyyy-MM-ddThh:mm:ss"));
+    
+
     if (!dateTime.isValid()) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("Invalid datetime format specified"));
