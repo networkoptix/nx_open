@@ -1689,6 +1689,7 @@ void QnMain::run()
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
+    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
@@ -1708,9 +1709,8 @@ void QnMain::run()
 #ifdef EDGE_SERVER
         serverFlags |= Qn::SF_Edge;
 #endif
-        if (QnAppInfo::armBox() == "rpi") {
+        if (QnAppInfo::armBox() == "rpi" || compatibilityMode) // check compatibilityMode here for testing purpose
             serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
-        }
 
         if (!isLocal)
             serverFlags |= Qn::SF_RemoteEC;
@@ -1825,8 +1825,6 @@ void QnMain::run()
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     qnResPool->addResource(m_mediaServer);
-
-    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
 
     QString moduleName = qApp->applicationName();
     if( moduleName.startsWith( qApp->organizationName() ) )
