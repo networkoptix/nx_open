@@ -33,7 +33,7 @@ public:
 
     ValueType get() const
     {
-        SCOPED_MUTEX_LOCK( lk, m_mutex );
+        QnMutexLocker lk( m_mutex );
         if( !m_cachedVal )
         {
             lk.unlock();
@@ -55,7 +55,7 @@ public:
     void update()
     {
         const ValueType newVal = m_valGenerationFunc();
-        SCOPED_MUTEX_LOCK( lk, m_mutex );
+        QnMutexLocker lk( m_mutex );
         m_cachedVal = newVal;
     }
 

@@ -91,7 +91,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
 Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
-    SCOPED_MUTEX_LOCK( mtx, &m_livemutex);
+    QnMutexLocker mtx( &m_livemutex );
     return m_role;
 }
 
@@ -111,7 +111,7 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
 void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
 {
     {
-        SCOPED_MUTEX_LOCK( mtx, &m_livemutex);
+        QnMutexLocker mtx( &m_livemutex );
         if (m_newLiveParams.secondaryQuality == quality)
             return; // same quality
         m_newLiveParams.secondaryQuality = quality;
@@ -138,7 +138,7 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
 void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
 {
     {
-        SCOPED_MUTEX_LOCK( mtx, &m_livemutex);
+        QnMutexLocker mtx( &m_livemutex );
         if (m_newLiveParams.quality == q && m_qualityUpdatedAtLeastOnce)
             return; // same quality
 
@@ -152,7 +152,7 @@ void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
 
 Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_motionRoleMtx);
+    QnMutexLocker lock( &m_motionRoleMtx );
 
     if (m_softMotionRole == Qn::CR_Default) 
     {
@@ -200,7 +200,7 @@ bool QnLiveStreamProvider::canChangeStatus() const
 void QnLiveStreamProvider::setFps(float f)
 {
     {
-        SCOPED_MUTEX_LOCK( mtx, &m_livemutex);
+        QnMutexLocker mtx( &m_livemutex );
 
         if (std::abs(m_newLiveParams.fps - f) < 0.1)
             return; // same fps?
@@ -233,7 +233,7 @@ float QnLiveStreamProvider::getDefaultFps() const
 
 bool QnLiveStreamProvider::isMaxFps() const
 {
-    SCOPED_MUTEX_LOCK( mtx, &m_livemutex);
+    QnMutexLocker mtx( &m_livemutex );
     return m_newLiveParams.fps >= m_cameraRes->getMaxFps()-0.1;
 }
 
@@ -389,7 +389,7 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 
 void QnLiveStreamProvider::startIfNotRunning()
 {
-    SCOPED_MUTEX_LOCK( mtx, &m_mutex);
+    QnMutexLocker mtx( &m_mutex );
     if (!isRunning())    
     {
         m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
@@ -432,13 +432,13 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     }
 
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
-    SCOPED_MUTEX_LOCK( mtx, &m_livemutex);
+    QnMutexLocker mtx( &m_livemutex );
     updateSoftwareMotion();
 }
 
 void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_motionRoleMtx);
+    QnMutexLocker lock( &m_motionRoleMtx );
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
 }
 

@@ -344,12 +344,12 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
         int indexRecords = qMax((m_detailedIndexFile.size() - MOTION_INDEX_HEADER_SIZE) / MOTION_INDEX_RECORD_SIZE, 0ll);
         int dataRecords  = m_detailedMotionFile.size() / MOTION_DATA_RECORD_SIZE;
         if (indexRecords > dataRecords) {
-            SCOPED_MUTEX_LOCK( lock, &m_fileAccessMutex);
+            QnMutexLocker lock( &m_fileAccessMutex );
             if (!m_detailedIndexFile.resize(dataRecords*MOTION_INDEX_RECORD_SIZE + MOTION_INDEX_HEADER_SIZE))
                 return false;
         }
         else if ((indexRecords < dataRecords)) {
-            SCOPED_MUTEX_LOCK( lock, &m_fileAccessMutex);
+            QnMutexLocker lock( &m_fileAccessMutex );
             if (!m_detailedMotionFile.resize(indexRecords*MOTION_DATA_RECORD_SIZE))
                 return false;
         }

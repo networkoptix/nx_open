@@ -146,7 +146,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
         qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();
         m_dataQueue.clear();
-        SCOPED_MUTEX_LOCK( lock, &m_queueSizeMutex);
+        QnMutexLocker lock( &m_queueSizeMutex );
         m_queuedSize = 0;
         return;
     }
@@ -154,7 +154,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     
     const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(nonConstData.get());
     if (media) {
-        SCOPED_MUTEX_LOCK( lock, &m_queueSizeMutex);
+        QnMutexLocker lock( &m_queueSizeMutex );
         m_queuedSize += media->dataSize();
     }
     QnStreamRecorder::putData(nonConstData);
@@ -169,7 +169,7 @@ bool QnServerStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 
 QnScheduleTask QnServerStreamRecorder::currentScheduleTask() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_scheduleMutex);
+    QnMutexLocker lock( &m_scheduleMutex );
     return m_currentScheduleTask;
 }
 
@@ -417,7 +417,7 @@ bool QnServerStreamRecorder::isPanicMode() const
 
 void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_scheduleMutex);
+    QnMutexLocker lock( &m_scheduleMutex );
 
     if (isPanicMode())
     {
@@ -478,7 +478,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         return true; // skip data
 
     {
-        SCOPED_MUTEX_LOCK( lock, &m_queueSizeMutex);
+        QnMutexLocker lock( &m_queueSizeMutex );
         m_queuedSize -= media->dataSize();
     }
 
@@ -490,7 +490,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 
 void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_scheduleMutex);
+    QnMutexLocker lock( &m_scheduleMutex );
     m_schedule = cameraRes->getScheduleTasks();
     Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "DialStreaming helper must be defined!");
     m_lastSchedulePeriod.clear();
@@ -545,7 +545,7 @@ void QnServerStreamRecorder::endOfRun()
         DeviceFileCatalog::rebuildResume(this);
     }
 
-    SCOPED_MUTEX_LOCK( lock, &m_queueSizeMutex);
+    QnMutexLocker lock( &m_queueSizeMutex );
     m_dataQueue.clear();
     m_queuedSize = 0;
 }

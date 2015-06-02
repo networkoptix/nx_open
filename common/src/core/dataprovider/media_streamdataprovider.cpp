@@ -36,7 +36,7 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
-    SCOPED_MUTEX_LOCK( mtx, &m_mutex);
+    QnMutexLocker mtx( &m_mutex );
 
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
@@ -48,13 +48,13 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 
 bool QnAbstractMediaStreamDataProvider::needKeyData(int channel) const
 {
-    SCOPED_MUTEX_LOCK( mtx, &m_mutex);
+    QnMutexLocker mtx( &m_mutex );
     return m_gotKeyFrame[channel]==0;
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
-    SCOPED_MUTEX_LOCK( mtx, &m_mutex);
+    QnMutexLocker mtx( &m_mutex );
 
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();

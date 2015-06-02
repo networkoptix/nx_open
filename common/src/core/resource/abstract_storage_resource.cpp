@@ -16,37 +16,37 @@ QnAbstractStorageResource::~QnAbstractStorageResource()
 
 void QnAbstractStorageResource::setSpaceLimit(qint64 value)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_spaceLimit = value;
 }
 
 qint64 QnAbstractStorageResource::getSpaceLimit() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_spaceLimit;
 }
 
 void QnAbstractStorageResource::setMaxStoreTime(int timeInSeconds)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_maxStoreTime = timeInSeconds;
 }
 
 int QnAbstractStorageResource::getMaxStoreTime() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_maxStoreTime;
 }
 
 void QnAbstractStorageResource::setUsedForWriting(bool isUsedForWriting) 
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_usedForWriting = isUsedForWriting;
 }
 
 bool QnAbstractStorageResource::isUsedForWriting() const 
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_usedForWriting;
 }
 
@@ -59,7 +59,7 @@ QString QnAbstractStorageResource::getUniqueId() const
 float QnAbstractStorageResource::bitrate() const
 {
     float rez = 0;
-    SCOPED_MUTEX_LOCK( lock, &m_bitrateMtx);
+    QnMutexLocker lock( &m_bitrateMtx );
     for(const QnAbstractMediaStreamDataProvider* provider: m_providers)
         rez += provider->getBitrateMbps();
     return rez;
@@ -67,13 +67,13 @@ float QnAbstractStorageResource::bitrate() const
 
 void QnAbstractStorageResource::addBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_bitrateMtx);
+    QnMutexLocker lock( &m_bitrateMtx );
     m_providers << provider;
 }
 
 void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_bitrateMtx);
+    QnMutexLocker lock( &m_bitrateMtx );
     m_providers.remove(provider);
 }
 #endif

@@ -113,7 +113,7 @@ void QnFileConnectionProcessor::run()
 
     if (rez == CODE_OK)
     {
-        SCOPED_MUTEX_LOCK( lock, &cacheMutex);
+        QnMutexLocker lock( &cacheMutex );
 
         CacheEntry* cachedData = cachedFiles.object(path);
         if (cachedData && cachedData->lastModified == lastModified)

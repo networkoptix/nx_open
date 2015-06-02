@@ -99,7 +99,7 @@ void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& prox
 QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
         const QString& guid, int timeout, const SocketRequest& socketRequest)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_proxyMutex);
+    QnMutexLocker lock( &m_proxyMutex );
     auto& serverPool = m_proxyPool[guid]; // get or create with new code
     if (serverPool.isEmpty())
     {
@@ -144,7 +144,7 @@ void QnUniversalTcpListener::doPeriodicTasks()
 {
     QnTcpListener::doPeriodicTasks();
 
-    SCOPED_MUTEX_LOCK( lock, &m_proxyMutex);
+    QnMutexLocker lock( &m_proxyMutex );
     for (auto& serverPool : m_proxyPool)
         while(!serverPool.isEmpty() &&
               serverPool.front().timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)

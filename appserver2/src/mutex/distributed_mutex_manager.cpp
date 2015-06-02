@@ -38,7 +38,7 @@ void QnDistributedMutexManager::setUserDataHandler(QnMutexUserDataHandler* userD
 
 QnDistributedMutex* QnDistributedMutexManager::createMutex(const QString& name)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     Q_ASSERT(!m_mutexList.value(name));
 
@@ -52,13 +52,13 @@ void QnDistributedMutexManager::releaseMutex(const QString& name)
 {
     if (!m_staticInstance)
         return; // todo: connection already closed and object deleted, but posted ~QnDistributedMutex have access to deleted object. Refactor is required
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_mutexList.remove(name);
 }
 
 void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     m_timestamp = qMax(m_timestamp, lockData.timestamp);
 
@@ -79,7 +79,7 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
 
 void QnDistributedMutexManager::at_gotLockResponse(ApiLockData lockData)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QnDistributedMutex* netMutex = m_mutexList.value(lockData.name);
     if (netMutex)
@@ -89,7 +89,7 @@ void QnDistributedMutexManager::at_gotLockResponse(ApiLockData lockData)
 /*
 void QnDistributedMutexManager::at_gotUnlockRequest(ApiLockData lockData)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QnDistributedMutexPtr netMutex = m_mutexList.value(lockData.name);
     if (netMutex)

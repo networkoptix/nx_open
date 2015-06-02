@@ -669,7 +669,7 @@ namespace ec2
     template <class T>
     void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
 
         // do not perform any logic (aka sequence update) for foreign transaction. Just proxy
         if (!transportHeader.dstPeers.isEmpty() && !transportHeader.dstPeers.contains(m_localPeer.id))
@@ -1225,7 +1225,7 @@ namespace ec2
 
     void QnTransactionMessageBus::at_peerIdDiscovered(const QUrl& url, const QnUuid& id)
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         auto itr = m_remoteUrls.find(url);
         if (itr != m_remoteUrls.end()) {
             itr.value().discoveredTimeout.restart();
@@ -1235,7 +1235,7 @@ namespace ec2
 
     void QnTransactionMessageBus::doPeriodicTasks()
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
 
         // send HTTP level keep alive (empty chunk) for server <---> server connections
         if (!m_localPeer.isClient()) 
@@ -1444,7 +1444,7 @@ namespace ec2
         if (m_restartPending)
             return false; // reject incoming connection because of media server is about to restart
 
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
 
         for( QnTransactionTransport* transport: m_connections.values() )
         {
@@ -1475,7 +1475,7 @@ namespace ec2
     void QnTransactionMessageBus::addConnectionToPeer(const QUrl& _url)
     {
         QUrl url = addCurrentPeerInfo(_url);
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (!m_remoteUrls.contains(url)) {
             m_remoteUrls.insert(url, RemoteUrlConnectInfo());
             QTimer::singleShot(0, this, SLOT(doPeriodicTasks()));
@@ -1486,7 +1486,7 @@ namespace ec2
     {
         QUrl url = addCurrentPeerInfo(_url);
 
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_remoteUrls.remove(url);
         const SocketAddress& urlStr = getUrlAddr(url);
         for(QnTransactionTransport* transport: m_connections.values())
@@ -1500,7 +1500,7 @@ namespace ec2
 
 void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     for( QnTransactionTransport* transport: m_connections )
     {
         if( transport->connectionGuid() != connectionGuid )
@@ -1544,7 +1544,7 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveServerPeers() const
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         AlivePeersMap result;
         for(AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
         {
@@ -1583,20 +1583,20 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
 
     void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (!m_alivePeers.contains(id))
             emit remotePeerUnauthorized( id );
     }
 
     void QnTransactionMessageBus::setHandler(ECConnectionNotificationManager* handler) {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         Q_ASSERT(!m_thread->isRunning());
         Q_ASSERT_X(m_handler == NULL, Q_FUNC_INFO, "Previous handler must be removed at this time");
         m_handler = handler;
     }
 
     void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* handler) {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         Q_ASSERT(!m_thread->isRunning());
         Q_ASSERT_X(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
         if( m_handler == handler )
@@ -1605,7 +1605,7 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
 
     QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         const auto itr = m_alivePeers.find(dstPeer);
         if (itr == m_alivePeers.cend())
             return QnUuid(); // route info not found

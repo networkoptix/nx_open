@@ -353,7 +353,7 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 
     quint64 killTimerID = 0;
     {
-        SCOPED_MUTEX_LOCK( lk,  &d->mutex );
+        QnMutexLocker lk( &d->mutex );
         killTimerID = d->killTimerID;
         d->killTimerID = 0;
     }
@@ -691,7 +691,7 @@ void QnProgressiveDownloadingConsumer::onTimer( const quint64& /*timerID*/ )
 {
     Q_D(QnProgressiveDownloadingConsumer);
 
-    SCOPED_MUTEX_LOCK( lk,  &d->mutex );
+    QnMutexLocker lk( &d->mutex );
     d->terminated = true;
     d->killTimerID = 0;
     pleaseStop();

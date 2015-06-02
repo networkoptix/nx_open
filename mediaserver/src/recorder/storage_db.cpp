@@ -29,7 +29,7 @@ void QnStorageDb::beforeDelete()
 
 void QnStorageDb::afterDelete()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_delMutex);
+    QnMutexLocker lock( &m_delMutex );
 
     QnDbTransactionLocker tran(getTransaction());
     for(const DeleteRecordInfo& delRecord: m_recordsToDelete) {
@@ -50,7 +50,7 @@ void QnStorageDb::afterDelete()
 
 bool QnStorageDb::deleteRecords(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, qint64 startTimeMs)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_delMutex);
+    QnMutexLocker lock( &m_delMutex );
     m_recordsToDelete << DeleteRecordInfo(cameraUniqueId, catalog, startTimeMs);
     return true;
 }
@@ -78,7 +78,7 @@ bool QnStorageDb::deleteRecordsInternal(const DeleteRecordInfo& delRecord)
 
 bool QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
 {
-    SCOPED_MUTEX_LOCK( locker, &m_syncMutex);
+    QnMutexLocker locker( &m_syncMutex );
 
     if (chunk.durationMs <= 0)
         return true;
@@ -92,7 +92,7 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatal
 
 bool QnStorageDb::flushRecords()
 {
-    SCOPED_MUTEX_LOCK( locker, &m_syncMutex);
+    QnMutexLocker locker( &m_syncMutex );
     return flushRecordsNoLock();
 }
 

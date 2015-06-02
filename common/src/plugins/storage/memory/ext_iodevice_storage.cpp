@@ -27,7 +27,7 @@ QnExtIODeviceStorageResource::~QnExtIODeviceStorageResource()
 QIODevice* QnExtIODeviceStorageResource::open( const QString& filePath, QIODevice::OpenMode openMode )
 {
     Q_UNUSED(openMode)
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     std::map<QString, QIODevice*>::iterator it = m_urlToDevice.find( filePath );
     if( it == m_urlToDevice.end() )
@@ -39,7 +39,7 @@ QIODevice* QnExtIODeviceStorageResource::open( const QString& filePath, QIODevic
 
 bool QnExtIODeviceStorageResource::removeFile( const QString& path )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_urlToDevice.erase( path );
     return true;
 }
@@ -52,13 +52,13 @@ QFileInfoList QnExtIODeviceStorageResource::getFileList( const QString& /*dirNam
 
 bool QnExtIODeviceStorageResource::isFileExists( const QString& path )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_urlToDevice.find( path ) != m_urlToDevice.end();
 }
 
 qint64 QnExtIODeviceStorageResource::getFileSize( const QString& path ) const
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     std::map<QString, QIODevice*>::const_iterator it = m_urlToDevice.find( path );
     return it != m_urlToDevice.end() ? it->second->size() : 0;
@@ -66,7 +66,7 @@ qint64 QnExtIODeviceStorageResource::getFileSize( const QString& path ) const
 
 void QnExtIODeviceStorageResource::registerResourceData( const QString& path, QIODevice* data )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     std::pair<std::map<QString, QIODevice*>::iterator, bool>
         p = m_urlToDevice.insert( std::make_pair( path, data ) );

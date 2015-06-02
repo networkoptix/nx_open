@@ -76,7 +76,7 @@ public:
     */
     bool insert( const KeyType& key, const CachedType& item, unsigned int cost = 1 ) throw()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return insertNonSafe( key, item, cost );
     }
 
@@ -88,7 +88,7 @@ public:
     */
     bool get( const KeyType& key, CachedType* const item ) throw()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         CacheItemData* itemData = m_cache.object( key );
         if( itemData )
@@ -119,7 +119,7 @@ public:
     */
     bool remove( const KeyType& key ) throw()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         if( m_usedItems.find( key ) != m_usedItems.end() )
             return false;   //item exists and is used, cannot remove it
@@ -130,7 +130,7 @@ public:
 
     unsigned int totalCost() const throw()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         return m_cache.totalCost() + m_usedItemsTotalCost;
     }
@@ -140,7 +140,7 @@ public:
     */
     bool takeForUse( const KeyType& key, CachedType* const item ) throw()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         typename std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
         if( usedItemIter != m_usedItems.end() )
@@ -193,7 +193,7 @@ public:
     */
     bool putBackUsedItem( const KeyType& key, const CachedType& /*item*/ ) throw()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         typename std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
         if( usedItemIter == m_usedItems.end() )
@@ -226,7 +226,7 @@ public:
 
     ItemProviderType* itemProvider() const
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_itemProvider;
     }
 

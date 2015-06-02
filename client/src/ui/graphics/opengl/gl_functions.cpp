@@ -41,7 +41,7 @@ public:
     }
 
     void initialize(const QGLContext *context) {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if(m_initialized)
             return;
 

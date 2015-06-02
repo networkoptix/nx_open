@@ -25,19 +25,19 @@ public:
     QnLongRunnablePoolPrivate() {}
 
     void stopAll() {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
         for(QnLongRunnable *runnable: m_created)
             runnable->pleaseStop();
         waitAllLocked();
     }
 
     void waitAll() {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
         waitAllLocked();
     }
 
     void createdNotify(QnLongRunnable *runnable) {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         assert(runnable && !m_created.contains(runnable));
 
@@ -45,7 +45,7 @@ public:
     }
 
     void startedNotify(QnLongRunnable *runnable) {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         assert(runnable && !m_running.contains(runnable));
 
@@ -53,7 +53,7 @@ public:
     }
 
     void finishedNotify(QnLongRunnable *runnable) {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         assert(runnable); //  && m_running.contains(runnable)
 
@@ -63,7 +63,7 @@ public:
     }
 
     void destroyedNotify(QnLongRunnable *runnable) {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         assert(runnable && m_created.contains(runnable));
 

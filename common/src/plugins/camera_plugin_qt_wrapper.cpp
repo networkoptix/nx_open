@@ -32,7 +32,7 @@ namespace nxcip_qt
     //!See nxcip::CameraDiscoveryManager::getVendorName
     QString CameraDiscoveryManager::getVendorName() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_intf->getVendorName( m_texBuf );
         return QString::fromUtf8( m_texBuf );
     }
@@ -202,33 +202,33 @@ namespace nxcip_qt
     //!See nxcip::BaseCameraManager::getEncoderCount
     int BaseCameraManager::getEncoderCount( int* encoderCount ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_intf->getEncoderCount( encoderCount );
     }
 
     int BaseCameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_intf->getEncoder( encoderIndex, encoderPtr );
     }
 
     int BaseCameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_intf->getCameraInfo( info );
     }
 
     //!See nxcip::BaseCameraManager::getCameraCapabilities
     int BaseCameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_intf->getCameraCapabilities( capabilitiesMask );
     }
 
     //!See nxcip::BaseCameraManager::setCredentials
     void BaseCameraManager::setCredentials( const QString& username, const QString& password )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         const QByteArray& usernameUtf8 = username.toUtf8();
         const QByteArray& passwordUtf8 = password.toUtf8();
         m_intf->setCredentials( usernameUtf8.data(), passwordUtf8.data() );
@@ -236,27 +236,27 @@ namespace nxcip_qt
 
     int BaseCameraManager::setAudioEnabled( bool audioEnabled )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_intf->setAudioEnabled( audioEnabled ? 1 : 0 );
     }
 
     //!See nxcip::BaseCameraManager::getPtzManager
     nxcip::CameraPtzManager* BaseCameraManager::getPtzManager() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_intf->getPtzManager();
     }
 
     //!See nxcip::BaseCameraManager::getCameraRelayIOManager
     nxcip::CameraRelayIOManager* BaseCameraManager::getCameraRelayIOManager() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_intf->getCameraRelayIOManager();
     }
 
     QString BaseCameraManager::getLastErrorString() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_intf->getLastErrorString( m_textBuf );
         return QString::fromUtf8( m_textBuf );
     }

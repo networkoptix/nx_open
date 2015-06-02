@@ -30,7 +30,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
     NX_LOG( lit("Received soap notification from %1").
         arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")), cl_logDEBUG1 );
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     //oasisWsnB2__Notify->
     for( size_t i = 0; i < notificationRequest->oasisWsnB2__NotificationMessage.size(); ++i )
@@ -109,7 +109,7 @@ void OnvifNotificationConsumer::registerResource(
     const QString& notificationProducerAddress,
     const QString& subscriptionReference )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     auto resWeakRef = resource.toWeakRef();
     m_notificationProducerAddressToResource[notificationProducerAddress] = resWeakRef;
     if( !subscriptionReference.isEmpty() )
@@ -119,7 +119,7 @@ void OnvifNotificationConsumer::registerResource(
 //!Cancel registration of \a resource
 void OnvifNotificationConsumer::removeResourceRegistration( const QnPlOnvifResourcePtr& resource )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     auto compareResourceFunc = [resource]( const std::pair<QString, QnPlOnvifResourcePtr>& val ){ return val.second == resource; };
 

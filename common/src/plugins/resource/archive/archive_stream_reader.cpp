@@ -107,14 +107,14 @@ void QnArchiveStreamReader::nextFrame()
         return;
     }
     emit nextFrameOccured();
-    SCOPED_MUTEX_LOCK( lock, &m_jumpMtx);
+    QnMutexLocker lock( &m_jumpMtx );
     m_singleQuantProcessed = false;
     m_singleShowWaitCond.wakeAll();
 }
 
 void QnArchiveStreamReader::needMoreData()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_jumpMtx);
+    QnMutexLocker lock( &m_jumpMtx );
     m_singleQuantProcessed = false;
     m_singleShowWaitCond.wakeAll();
 }
@@ -142,7 +142,7 @@ void QnArchiveStreamReader::resumeMedia()
         m_delegate->setSingleshotMode(false);
         m_singleShot = false;
         //resumeDataProcessors();
-        SCOPED_MUTEX_LOCK( lock, &m_jumpMtx);
+        QnMutexLocker lock( &m_jumpMtx );
         m_singleShowWaitCond.wakeAll();
     }
 }
@@ -156,7 +156,7 @@ void QnArchiveStreamReader::pauseMedia()
     if (!m_singleShot)
     {
         emit streamPaused();
-        SCOPED_MUTEX_LOCK( lock, &m_jumpMtx);
+        QnMutexLocker lock( &m_jumpMtx );
         m_singleShot = true;
         m_singleQuantProcessed = true;
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE;
@@ -173,13 +173,13 @@ bool QnArchiveStreamReader::isMediaPaused() const
 
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
 {
-    SCOPED_MUTEX_LOCK( mutex, &m_jumpMtx);
+    QnMutexLocker mutex( &m_jumpMtx );
     m_currentTime = value;
 }
 
 qint64 QnArchiveStreamReader::currentTime() const
 {
-    SCOPED_MUTEX_LOCK( mutex, &m_jumpMtx);
+    QnMutexLocker mutex( &m_jumpMtx );
     if (m_skipFramesToTime)
         return m_skipFramesToTime;
     else
@@ -282,7 +282,7 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
     qint64 rez = AV_NOPTS_VALUE;
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
-        SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+        QnMutexLocker mutex( &m_mutex );
         QnAbstractDataConsumer* dp = dynamic_cast<QnAbstractDataConsumer*>(m_dataprocessors.at(i));
         if( !dp )
             continue;
@@ -357,7 +357,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
         return m_skippedMetadata.dequeue();
 
     if (m_stopCond) {
-        SCOPED_MUTEX_LOCK( lock, &m_stopMutex);
+        QnMutexLocker lock( &m_stopMutex );
         m_delegate->close();
         while (m_stopCond && !needToStop())
             m_stopWaitCond.wait(&m_stopMutex);
@@ -369,14 +369,14 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     if (m_pausedStart)
     {
         m_pausedStart = false;
-        SCOPED_MUTEX_LOCK( mutex, &m_jumpMtx);
+        QnMutexLocker mutex( &m_jumpMtx );
         while (m_singleShot && m_singleQuantProcessed && !needToStop())
             m_singleShowWaitCond.wait(&m_jumpMtx);
     }
 
     //=================
     {
-        SCOPED_MUTEX_LOCK( mutex, &m_jumpMtx);
+        QnMutexLocker mutex( &m_jumpMtx );
         while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !needToStop())
             m_singleShowWaitCond.wait(&m_jumpMtx);
         //QnLongRunnable::pause();
@@ -823,7 +823,7 @@ begin_label:
     if (m_isStillImage)
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_StillImage;
 
-    SCOPED_MUTEX_LOCK( mutex, &m_jumpMtx);
+    QnMutexLocker mutex( &m_jumpMtx );
     if (jumpTime != DATETIME_NOW)
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
@@ -970,14 +970,14 @@ void QnArchiveStreamReader::pleaseStop()
 
 void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast)
 {
-    //SCOPED_MUTEX_LOCK( mutex, &m_jumpMtx);
+    //QnMutexLocker mutex( &m_jumpMtx );
     m_skipFramesToTime = skipFramesToTime;
     m_keepLastSkkipingFrame = keepLast;
 }
 
 bool QnArchiveStreamReader::isSkippingFrames() const
 {
-    SCOPED_MUTEX_LOCK( mutex, &m_jumpMtx);
+    QnMutexLocker mutex( &m_jumpMtx );
     return m_skipFramesToTime != 0 || m_tmpSkipFramesToTime != 0;
 }
 
@@ -1116,7 +1116,7 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
 
 void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_playbackMaskSync);
+    QnMutexLocker lock( &m_playbackMaskSync );
     m_outOfPlaybackMask = false;
     m_playbackMaskHelper.setPlaybackRange(playbackRange);
 }
@@ -1128,14 +1128,14 @@ QnTimePeriod QnArchiveStreamReader::getPlaybackRange() const
 
 void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_playbackMaskSync);
+    QnMutexLocker lock( &m_playbackMaskSync );
     m_outOfPlaybackMask = false;
     m_playbackMaskHelper.setPlaybackMask(playbackMask);
 }
 
 void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_jumpMtx);
+    QnMutexLocker lock( &m_jumpMtx );
     m_oldQuality = m_quality = quality;
     m_oldQualityFastSwitch = m_qualityFastSwitch = true;
 }
@@ -1185,7 +1185,7 @@ void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
         return;
     }
 
-    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     m_speed = value;
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
@@ -1199,7 +1199,7 @@ void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
 
 double QnArchiveStreamReader::getSpeed() const
 {
-    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     return m_speed;
 }
 
@@ -1213,7 +1213,7 @@ qint64 QnArchiveStreamReader::startTime() const
     Q_ASSERT(m_delegate);
     QnTimePeriod p;
     {
-        SCOPED_MUTEX_LOCK(lock, &m_playbackMaskSync);
+        QnMutexLocker lock( &m_playbackMaskSync );
         p = m_playbackMaskHelper.getPlaybackRange();
     }
     if (p.isEmpty())
@@ -1227,7 +1227,7 @@ qint64 QnArchiveStreamReader::endTime() const
     Q_ASSERT(m_delegate);
     QnTimePeriod p;
     {
-        SCOPED_MUTEX_LOCK(lock, &m_playbackMaskSync);
+        QnMutexLocker lock( &m_playbackMaskSync );
         p = m_playbackMaskHelper.getPlaybackRange();
     }
     if (p.isEmpty())
@@ -1262,7 +1262,7 @@ bool QnArchiveStreamReader::isPaused() const
 void QnArchiveStreamReader::pause() 
 {
     if (getResource()->hasParam(lit("groupplay"))) {
-        SCOPED_MUTEX_LOCK( lock, &m_stopMutex);
+        QnMutexLocker lock( &m_stopMutex );
         m_delegate->beforeClose();
         m_stopCond = true; // for VMAX
     }
@@ -1274,7 +1274,7 @@ void QnArchiveStreamReader::pause()
 void QnArchiveStreamReader::resume() 
 {
     if (getResource()->hasParam(lit("groupplay"))) {
-        SCOPED_MUTEX_LOCK( lock, &m_stopMutex);
+        QnMutexLocker lock( &m_stopMutex );
         m_stopCond = false; // for VMAX
         m_stopWaitCond.wakeAll();
     }

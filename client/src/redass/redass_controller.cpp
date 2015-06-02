@@ -91,7 +91,7 @@ bool QnRedAssController::isForcedHQDisplay(QnCamDisplay* display, QnArchiveStrea
 
 void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     if (m_mode != Qn::AutoResolution)
         return;
@@ -143,7 +143,7 @@ bool QnRedAssController::existstBufferingDisplay() const
 
 void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     if (m_mode != Qn::AutoResolution)
         return;
@@ -230,7 +230,7 @@ bool QnRedAssController::isFFSpeed(double speed) const
 
 void QnRedAssController::onTimer()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     if (m_mode != Qn::AutoResolution) 
     {
@@ -334,13 +334,13 @@ void QnRedAssController::optimizeItemsQualityBySize()
 
 int QnRedAssController::counsumerCount() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_redAssInfo.size();
 }
 
 void QnRedAssController::registerConsumer(QnCamDisplay* display)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QnArchiveStreamReader* reader = display->getArchiveReader();
     if (display->getArchiveReader()) 
     {
@@ -392,7 +392,7 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason, 
 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (!m_redAssInfo.contains(display))
         return;
     m_redAssInfo.remove(display);
@@ -407,7 +407,7 @@ void QnRedAssController::addHQTry()
 
 void QnRedAssController::setMode(Qn::ResolutionMode mode)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     if (m_mode == mode)
         return;

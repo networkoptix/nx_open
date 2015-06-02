@@ -88,7 +88,7 @@ namespace ec2
                 errorCode = _errorCode;
                 contentType = Qn::serializationFormatToHttpContentType(format);
 
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 finished = true;
                 m_cond.wakeAll();
             };
@@ -97,7 +97,7 @@ namespace ec2
                 inputData,
                 queryDoneHandler );
 
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             while( !finished )
                 m_cond.wait( lk.mutex() );
 

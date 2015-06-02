@@ -119,7 +119,7 @@ qint64 QnTransactionLog::getTimeStamp()
     qint64 absoluteTime = qnSyncTime->currentMSecsSinceEpoch();
     qint64 newTime = absoluteTime;
 
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     if (newTime > m_lastTimestamp)
     {
         m_baseTime = m_lastTimestamp = newTime;
@@ -276,7 +276,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     */
     m_commitData.updateHistory[hash] = UpdateHistoryData(key, tran.persistentInfo.timestamp);
 
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     m_lastTimestamp = qMax(m_lastTimestamp, tran.persistentInfo.timestamp);
     return ErrorCode::ok;
 }
@@ -415,13 +415,13 @@ void QnTransactionLog::fillPersistentInfo(QnAbstractTransaction& tran)
 
 qint64 QnTransactionLog::getTransactionLogTime() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex );
+    QnMutexLocker lock( &m_timeMutex );
     return m_lastTimestamp;
 }
 
 void QnTransactionLog::setTransactionLogTime(qint64 value)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex );
+    QnMutexLocker lock( &m_timeMutex );
     m_lastTimestamp = qMax(value, m_lastTimestamp);
 }
 

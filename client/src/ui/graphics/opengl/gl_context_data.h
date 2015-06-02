@@ -31,7 +31,7 @@ public:
     QnGlContextData(const Factory &factory = Factory()): m_factory(factory) {}
 
     QSharedPointer<T> get(const QGLContext *context) {
-        SCOPED_MUTEX_LOCK( locked, &m_mutex);
+        QnMutexLocker locked( &m_mutex );
 
         typename map_type::iterator pos = m_map.find(context);
         if(pos == m_map.end())

@@ -36,7 +36,7 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
         mediaStreamParams );
     stree::ResourceContainer rc;
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_treeMutex );
+        QnMutexLocker lk( &m_treeMutex );
         if( m_currentTree.get() )
             m_currentTree->get( inputParams, &rc );
         else
@@ -83,7 +83,7 @@ void PredefinedUsageCalculator::updateTree()
 
     std::unique_ptr<stree::AbstractNode> oldTree;
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_treeMutex );
+        QnMutexLocker lk( &m_treeMutex );
         oldTree = std::move(m_currentTree);
         m_currentTree.reset( newTree );
     }

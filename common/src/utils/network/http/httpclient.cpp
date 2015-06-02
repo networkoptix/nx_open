@@ -29,7 +29,7 @@ namespace nx_http
 
     void HttpClient::pleaseStop()
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
         m_cond.wakeAll();
     }
@@ -41,7 +41,7 @@ namespace nx_http
         if( !m_asyncHttpClient->doGet( url ) )
             return false;
 
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         while( !m_terminated && (m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived) )
             m_cond.wait( lk.mutex() );
 
@@ -58,7 +58,7 @@ namespace nx_http
         if( !m_asyncHttpClient->doPost( url, contentType, messageBody ) )
             return false;
 
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         while( m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived )
             m_cond.wait( lk.mutex() );
 
@@ -73,7 +73,7 @@ namespace nx_http
     //!
     bool HttpClient::eof() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_done && m_msgBodyBuffer.isEmpty();
     }
 
@@ -83,7 +83,7 @@ namespace nx_http
     */
     BufferType HttpClient::fetchMessageBodyBuffer()
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         while( !m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done) )
             m_cond.wait( lk.mutex() );
         nx_http::BufferType result;
@@ -138,7 +138,7 @@ namespace nx_http
 
     void HttpClient::onResponseReceived()
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         //message body buffer can be non-empty
         m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
         m_cond.wakeAll();
@@ -146,14 +146,14 @@ namespace nx_http
 
     void HttpClient::onSomeMessageBodyAvailable()
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
         m_cond.wakeAll();
     }
 
     void HttpClient::onDone()
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_done = true;
         m_cond.wakeAll();
     }

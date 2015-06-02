@@ -48,13 +48,13 @@ QString StreamingChunk::mimeType() const
 //!Returns whole chunk data
 nx::Buffer StreamingChunk::data() const
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_data;
 }
 
 bool StreamingChunk::tryRead( SequentialReadingContext* const ctx, nx::Buffer* const dataBuffer )
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( ctx->m_currentOffset >= m_data.size() ) //all data has been read
         return !m_isOpenedForModification;      //if opened, expecting more data to arrive to chunk
     dataBuffer->append( m_data.mid( ctx->m_currentOffset ) );
@@ -70,7 +70,7 @@ static QString filePathBase( lit("c:\\tmp\\chunks\\%1_%2.ts").arg(rand()) );
 //!Only one thread is allowed to modify chunk data at a time
 bool StreamingChunk::openForModification()
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_isOpenedForModification )
         return false;
     m_isOpenedForModification = true;
@@ -89,7 +89,7 @@ void StreamingChunk::appendData( const nx::Buffer& data )
     static const size_t BUF_INCREASE_STEP = 128*1024;
 
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         Q_ASSERT( m_isOpenedForModification );
         if( m_data.capacity() < m_data.size() + data.size() )
             m_data.reserve( m_data.size() + data.size() + BUF_INCREASE_STEP );
@@ -100,14 +100,14 @@ void StreamingChunk::appendData( const nx::Buffer& data )
     m_dumpFile.write( data.constData(), data.size() );
 #endif
 
-    SCOPED_MUTEX_LOCK( lk, &m_signalEmitMutex );
+    QnMutexLocker lk( &m_signalEmitMutex );
     emit newDataIsAvailable( shared_from_this(), data.size() );
 }
 
 void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
 {
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         Q_ASSERT( m_isOpenedForModification );
         m_isOpenedForModification = false;
         m_cond.wakeAll();
@@ -117,25 +117,25 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
     m_dumpFile.close();
 #endif
 
-    SCOPED_MUTEX_LOCK( lk, &m_signalEmitMutex );
+    QnMutexLocker lk( &m_signalEmitMutex );
     emit newDataIsAvailable( shared_from_this(), 0 );
 }
 
 bool StreamingChunk::isClosed() const
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return !m_isOpenedForModification;
 }
 
 size_t StreamingChunk::sizeInBytes() const
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_data.size();
 }
 
 void StreamingChunk::waitForChunkReady()
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     while( (m_data.size() == 0) || m_isOpenedForModification )
         m_cond.wait( lk.mutex() );
 }
@@ -143,7 +143,7 @@ void StreamingChunk::waitForChunkReady()
 void StreamingChunk::disconnectAndJoin( QObject* receiver )
 {
     disconnect( this, nullptr, receiver, nullptr );
-    SCOPED_MUTEX_LOCK( lk, &m_signalEmitMutex );  //waiting for signals to be emitted in other threads
+    QnMutexLocker lk( &m_signalEmitMutex );  //waiting for signals to be emitted in other threads
 }
 
 

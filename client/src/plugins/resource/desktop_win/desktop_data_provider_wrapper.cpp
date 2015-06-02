@@ -24,7 +24,7 @@ void QnDesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& data)
     if (!media)
         return;
 
-    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataReceptor* dp = m_dataprocessors.at(i);

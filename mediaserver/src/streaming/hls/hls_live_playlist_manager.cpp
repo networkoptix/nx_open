@@ -52,7 +52,7 @@ namespace nx_hls
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         m_inactivityTimer.restart();
 
@@ -87,7 +87,7 @@ namespace nx_hls
 
     void HLSLivePlaylistManager::clear()
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_totalPlaylistDuration = 0;
         if( m_blockID != -1 )
         {
@@ -101,13 +101,13 @@ namespace nx_hls
 
     size_t HLSLivePlaylistManager::inactivityPeriod() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_inactivityTimer.elapsed();
     }
 
     void HLSLivePlaylistManager::onKeyFrame( quint64 currentPacketTimestampUSec )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         if( m_currentChunk.mediaSequence > 0 )
         {

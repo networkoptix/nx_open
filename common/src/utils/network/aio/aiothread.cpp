@@ -220,7 +220,7 @@ namespace aio
             if( pollSetModificationQueue.empty() )
                 return;
 
-            SCOPED_MUTEX_LOCK( lk,  aioServiceMutex );
+            QnMutexLocker lk( aioServiceMutex );
 
             for( typename std::deque<SocketAddRemoveTask>::iterator
                 it = pollSetModificationQueue.begin();
@@ -442,7 +442,7 @@ namespace aio
                     static_cast<AIOEventHandlingDataHolder<SocketType>*>(
                         socket->impl()->eventTypeToUserData[handlerToInvokeType])->data;
 
-                SCOPED_MUTEX_LOCK( lk,  &mutex );
+                QnMutexLocker lk( &mutex );
                 ++handlingData->beingProcessed;
                 //TODO #ak possibly some atomic fence is required here
                 if( handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0 ) //socket has been removed from watch
@@ -472,7 +472,7 @@ namespace aio
 
             for( ;; )
             {
-                SCOPED_MUTEX_LOCK( lk,  &mutex );
+                QnMutexLocker lk( &mutex );
 
                 PeriodicTaskData periodicTaskData;
                 {
@@ -560,7 +560,7 @@ namespace aio
             SocketType* _socket,
             aio::EventType eventType )
         {
-            SCOPED_MUTEX_LOCK( lk,  &mutex );
+            QnMutexLocker lk( &mutex );
             addPeriodicTaskNonSafe( taskClock, handlingData, _socket, eventType );
         }
 
@@ -867,7 +867,7 @@ namespace aio
             //taking clock of the next periodic task
             qint64 nextPeriodicEventClock = 0;
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_impl->mutex );
+                QnMutexLocker lk( &m_impl->mutex );
                 nextPeriodicEventClock = m_impl->periodicTasksByClock.empty() ? 0 : m_impl->periodicTasksByClock.cbegin()->first;
             }
 

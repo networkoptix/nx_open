@@ -148,7 +148,7 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user->isAdmin())
         return;
 
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     m_admin = user;
     for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
@@ -159,7 +159,7 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
     if (!m_admin || resource != m_admin)
         return;
 
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
     m_admin.reset();
 
     for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)

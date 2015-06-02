@@ -62,7 +62,7 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> result = m_socket;
 
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = true;
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
@@ -77,7 +77,7 @@ namespace nx_http
     void AsyncHttpClient::terminate()
     {
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return;
             m_terminated = true;
@@ -193,7 +193,7 @@ namespace nx_http
 
     quint64 AsyncHttpClient::totalBytesRead() const
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_totalBytesRead;
     }
 
@@ -241,7 +241,7 @@ namespace nx_http
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
@@ -286,7 +286,7 @@ namespace nx_http
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
@@ -348,7 +348,7 @@ namespace nx_http
 
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
@@ -540,7 +540,7 @@ namespace nx_http
     {
         //stopping client, if it is running
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = true;
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
@@ -548,7 +548,7 @@ namespace nx_http
             m_socket->cancelAsyncIO();
 
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = false;
         }
 

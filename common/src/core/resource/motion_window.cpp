@@ -61,7 +61,7 @@ QnRegion& QnRegion::operator=( const QnRegion& r )
 
 QVector<QRect> QnRegion::rects() const
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return QRegion::rects();
 }
 

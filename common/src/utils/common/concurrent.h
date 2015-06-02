@@ -69,7 +69,7 @@ namespace QnConcurrent
             
             void waitForFinished()
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 while( (!m_isCancelled && (m_tasksCompleted < m_totalTasksToRun)) ||
                        (m_isCancelled && (m_startedTaskCount > 0)) )
                 {
@@ -79,49 +79,49 @@ namespace QnConcurrent
 
             void cancel()
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 m_isCancelled = true;
             }
 
             bool isCanceled() const
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 return m_isCancelled;
             }
 
             size_type progressValue() const
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 return m_tasksCompleted;
             }
 
             size_type progressMinimum() const
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 return 0;
             }
 
             size_type progressMaximum() const
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 return m_totalTasksToRun;
             }
 
             size_type resultCount() const
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 return m_tasksCompleted;
             }
 
             bool isResultReadyAt( size_type index ) const
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 return m_completionMarks[index];
             }
 
             bool incStartedTaskCountIfAllowed()
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 if( m_isCancelled )
                     return false;
                 ++m_startedTaskCount;
@@ -187,13 +187,13 @@ namespace QnConcurrent
 
             reference resultAt( size_type index )
             {
-                SCOPED_MUTEX_LOCK( lk,  &this->m_mutex );
+                QnMutexLocker lk( &this->m_mutex );
                 return m_results[index];
             }
 
             const_reference resultAt( size_type index ) const
             {
-                SCOPED_MUTEX_LOCK( lk,  &this->m_mutex );
+                QnMutexLocker lk( &this->m_mutex );
                 return m_results[index];
             }
 
@@ -212,7 +212,7 @@ namespace QnConcurrent
             template<class ResultType>
             void setResultAt( size_type index, ResultType&& result )
             {
-                SCOPED_MUTEX_LOCK( lk,  &this->m_mutex );
+                QnMutexLocker lk( &this->m_mutex );
                 m_results[index] = std::forward<ResultType>(result);
                 this->setCompletedAtNonSafe( index );
             }
@@ -247,7 +247,7 @@ namespace QnConcurrent
 
             void setResultAt( size_type index )
             {
-                SCOPED_MUTEX_LOCK( lk,  &this->m_mutex );
+                QnMutexLocker lk( &this->m_mutex );
                 this->setCompletedAtNonSafe( index );
             }
         };
@@ -268,7 +268,7 @@ namespace QnConcurrent
 
             std::pair<typename Container::iterator, int> fetchAndMoveToNextPos()
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
 
                 //TODO #ak is int appropriate here?
                 std::pair<typename Container::iterator, int> curVal( m_currentIter, (int)m_currentIndex );
@@ -282,7 +282,7 @@ namespace QnConcurrent
 
             void moveToEnd()
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 m_currentIter = m_container.end();
                 m_currentIndex = m_container.size();
             }

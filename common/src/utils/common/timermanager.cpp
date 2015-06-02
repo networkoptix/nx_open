@@ -73,7 +73,7 @@ TimerManager::~TimerManager()
 void TimerManager::stop()
 {
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_impl->mtx );
+        QnMutexLocker lk( &m_impl->mtx );
         m_impl->terminated = true;
         m_impl->cond.wakeAll();
     }
@@ -95,7 +95,7 @@ quint64 TimerManager::addTimer(
 {
     static QAtomicInt lastTaskID = 0;
 
-    SCOPED_MUTEX_LOCK( lk,  &m_impl->mtx );
+    QnMutexLocker lk( &m_impl->mtx );
 
     const qint64 taskTime = QDateTime::currentMSecsSinceEpoch() + delay;
     quint64 timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
@@ -120,14 +120,14 @@ quint64 TimerManager::addTimer(
 
 void TimerManager::deleteTimer( const quint64& timerID )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_impl->mtx );
+    QnMutexLocker lk( &m_impl->mtx );
 
     m_impl->deleteTaskNonSafe( timerID );
 }
 
 void TimerManager::joinAndDeleteTimer( const quint64& timerID )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_impl->mtx );
+    QnMutexLocker lk( &m_impl->mtx );
     //having locked \a m_impl->mtx we garantee, that execution of timer timerID will not start
 
     if( QThread::currentThread() != this )
@@ -148,7 +148,7 @@ static const unsigned int ERROR_SKIP_TIMEOUT_MS = 3000;
 
 void TimerManager::run()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_impl->mtx );
+    QnMutexLocker lk( &m_impl->mtx );
 
     NX_LOG( lit("TimerManager started"), cl_logDEBUG1 );
 

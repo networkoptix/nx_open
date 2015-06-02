@@ -52,7 +52,7 @@ public:
     {
         QObject::disconnect( static_cast<Derived*>(this), nullptr, receiver, nullptr );
         //waiting for signals to be emitted in other threads to be processed
-        SCOPED_MUTEX_LOCK( lk, &m_signalEmitMutex );
+        QnMutexLocker lk( &m_signalEmitMutex );
         while( m_ongoingCalls > 0 )
             m_cond.wait( lk.mutex() );
     }
@@ -64,13 +64,13 @@ private:
 
     void beforeDirectCall()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_signalEmitMutex );
+        QnMutexLocker lk( &m_signalEmitMutex );
         ++m_ongoingCalls;
     }
 
     void afterDirectCall()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_signalEmitMutex );
+        QnMutexLocker lk( &m_signalEmitMutex );
         --m_ongoingCalls;
         m_cond.wakeAll();
     }

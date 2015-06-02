@@ -68,7 +68,7 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_discoveryMutex);
+    QnMutexLocker lock( &m_discoveryMutex );
 
     QnResourceList extraResources;
 

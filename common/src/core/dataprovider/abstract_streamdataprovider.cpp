@@ -19,7 +19,7 @@ QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
 bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
 {
     // need to read only if all queues has more space and at least one queue is exist
-    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataReceptor* dp = m_dataprocessors.at(i);
@@ -31,14 +31,14 @@ bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
 
 int QnAbstractStreamDataProvider::processorsCount() const
 {
-    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     return m_dataprocessors.size();
 }
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataReceptor* dp)
 {
     Q_ASSERT(dp);
-    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+    QnMutexLocker mutex( &m_mutex );
 
     if (!m_dataprocessors.contains(dp))
     {
@@ -50,7 +50,7 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataReceptor* dp)
 
 bool QnAbstractStreamDataProvider::needConfigureProvider() const
 {
-    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     for (auto processor: m_dataprocessors)
     {
         if (processor->needConfigureProvider())
@@ -61,7 +61,7 @@ bool QnAbstractStreamDataProvider::needConfigureProvider() const
 
 void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataReceptor* dp)
 {
-    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     m_dataprocessors.removeOne(dp);
 }
 
@@ -70,7 +70,7 @@ void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)
     if (!data)
         return;
 
-    SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataReceptor* dp = m_dataprocessors.at(i);

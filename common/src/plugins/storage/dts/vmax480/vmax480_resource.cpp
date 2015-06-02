@@ -27,7 +27,7 @@ QnPlVmax480Resource::QnPlVmax480Resource():
 
 QnPlVmax480Resource::~QnPlVmax480Resource()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_chunkReaderMutex);
+    QnMutexLocker lock( &m_chunkReaderMutex );
     if (m_chunkReader) {
         m_chunkReaderMap.remove(getHostAddress());
         delete m_chunkReader;
@@ -63,7 +63,7 @@ void QnPlVmax480Resource::setHostAddress(const QString &ip)
     setUrl(url.toString());
 
     {
-        SCOPED_MUTEX_LOCK( lock, &m_chunkReaderMutex);
+        QnMutexLocker lock( &m_chunkReaderMutex );
         if (m_chunkReader) {
             m_chunkReaderMap.remove(oldHostAddr);
             m_chunkReaderMap.insert(getHostAddress(), m_chunkReader);
@@ -145,7 +145,7 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 
     saveParams();
 
-    SCOPED_MUTEX_LOCK( lock, &m_chunkReaderMutex);
+    QnMutexLocker lock( &m_chunkReaderMutex );
     QnVMax480ChunkReader* chunkReader = m_chunkReaderMap.value(getHostAddress());
     if (chunkReader == 0) {
         m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
@@ -159,32 +159,32 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 
 qint64 QnPlVmax480Resource::startTime() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_startTime;
 }
 
 qint64 QnPlVmax480Resource::endTime() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_endTime;
 }
 
 void QnPlVmax480Resource::setStartTime(qint64 valueUsec)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_startTime = valueUsec;
 }
 
 void QnPlVmax480Resource::setEndTime(qint64 valueUsec)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_endTime = valueUsec;
 }
 
 void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec, bool recursive)
 {
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_startTime = startTimeUsec;
         m_endTime = endTimeUsec;
     }
@@ -229,13 +229,13 @@ void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
 
 QnTimePeriodList  QnPlVmax480Resource::getChunks()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexChunks);
+    QnMutexLocker lock( &m_mutexChunks );
     return m_chunks;
 }
 
 void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexChunks);
+    QnMutexLocker lock( &m_mutexChunks );
     m_chunks = chunks;
     m_chunksReady = true;
     //m_chunksCond.wakeAll();
@@ -249,7 +249,7 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
 
     QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
     
-    SCOPED_MUTEX_LOCK( lock, &m_mutexChunks);
+    QnMutexLocker lock( &m_mutexChunks );
     //while (!m_chunksReady)
     //    m_chunksCond.wait(&m_mutexChunks);
 

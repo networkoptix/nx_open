@@ -110,7 +110,7 @@ void QnPtzControllerPool::setConstructionMode(ControllerConstructionMode mode) {
 }
 
 QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource) const {
-    SCOPED_MUTEX_LOCK( locker, &d->mutex);
+    QnMutexLocker locker( &d->mutex );
     return d->controllerByResource.value(resource);
 }
 
@@ -125,7 +125,7 @@ void QnPtzControllerPool::registerResource(const QnResourcePtr &resource) {
 void QnPtzControllerPool::unregisterResource(const QnResourcePtr &resource) {
     bool changed = false;
     {
-        SCOPED_MUTEX_LOCK( locker, &d->mutex);
+        QnMutexLocker locker( &d->mutex );
 
         changed = d->controllerByResource.remove(resource) > 0;
     }
@@ -148,7 +148,7 @@ void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource)
     QnPtzControllerPtr controller = q->createController(resource);
     QnPtzControllerPtr oldController;
     {
-        SCOPED_MUTEX_LOCK( locker, &mutex);
+        QnMutexLocker locker( &mutex );
         oldController = controllerByResource.value(resource);
     }
 

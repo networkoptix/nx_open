@@ -100,7 +100,7 @@ public:
     {
         std::unique_ptr<AbstractStreamSocket> socket;
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             socket = std::move(m_socket);
         }
         if( socket )
@@ -133,7 +133,7 @@ public:
         m_state = init;
         m_extCompletionHandler = std::forward<ResultHandler>(resultHandler);
         m_resultHandler = [this](int resultCode) {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex);
+            QnMutexLocker lk( &m_mutex );
             std::function<void(int)> extCompletionHandlerLocal = std::move( m_extCompletionHandler );
             m_socket.reset();
             lk.unlock();
@@ -233,7 +233,7 @@ private:
         soap_end(m_syncWrapper->getProxy()->soap);
 
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex);
+            QnMutexLocker lk( &m_mutex );
             if( !m_socket )
                 return;
             //sending request
@@ -263,7 +263,7 @@ private:
         m_responseBuffer.reserve( READ_BUF_SIZE );
         m_responseBuffer.resize(0);
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex);
+            QnMutexLocker lk( &m_mutex );
             if( !m_socket )
                 return;
             using namespace std::placeholders;
@@ -302,7 +302,7 @@ private:
             m_responseBuffer.reserve(m_responseBuffer.capacity() + READ_BUFFER_GROW_STEP);
 
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex);
+            QnMutexLocker lk( &m_mutex );
             if( !m_socket )
                 return;
             using namespace std::placeholders;

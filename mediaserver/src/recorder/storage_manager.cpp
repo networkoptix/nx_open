@@ -114,7 +114,7 @@ public:
         if (m_scanTasks.isEmpty())
             m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, QString(), 0.0));
 
-        SCOPED_MUTEX_LOCK( lock, &m_mutex );
+        QnMutexLocker lock( &m_mutex );
         m_scanTasks.push(std::move(scanData));
         m_waitCond.wakeAll();
     }
@@ -150,7 +150,7 @@ public:
             }
 
             {
-                SCOPED_MUTEX_LOCK( lock, &m_mutex );
+                QnMutexLocker lock( &m_mutex );
                 if (m_scanTasks.isEmpty()) {
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
                     m_waitCond.wait(&m_mutex, 100);
@@ -344,14 +344,14 @@ void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
 
 QnStorageScanData QnStorageManager::rebuildInfo() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_rebuildStateMtx );
+    QnMutexLocker lock( &m_rebuildStateMtx );
     return m_archiveRebuildInfo;
 }
 
 QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 {
     QnStorageScanData result(Qn::RebuildState_FullScan, QString(), 0.0);
-    SCOPED_MUTEX_LOCK( lock, &m_mutexRebuild );
+    QnMutexLocker lock( &m_mutexRebuild );
 
     if (!m_rebuildArchiveThread->hasFullScanTasks()) 
     {
@@ -366,7 +366,7 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 
 void QnStorageManager::cancelRebuildCatalogAsync()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexRebuild );
+    QnMutexLocker lock( &m_mutexRebuild );
     m_rebuildCancelled = true;
     m_rebuildArchiveThread->cancelFullScanTasks();
     NX_LOG("Catalog rebuild operation is canceled", cl_logINFO);
@@ -374,7 +374,7 @@ void QnStorageManager::cancelRebuildCatalogAsync()
 
 bool QnStorageManager::needToStopMediaScan() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexRebuild );
+    QnMutexLocker lock( &m_mutexRebuild );
     return m_rebuildCancelled && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan;
 }
 
@@ -382,7 +382,7 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
     bool isRebuildFinished = false;
     {
-        SCOPED_MUTEX_LOCK( lock, &m_rebuildStateMtx );
+        QnMutexLocker lock( &m_rebuildStateMtx );
         isRebuildFinished = (data.state == Qn::RebuildState_None && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
         m_archiveRebuildInfo = data;
     }
@@ -441,7 +441,7 @@ int QnStorageManager::getStorageIndex(const QnStorageResourcePtr& storage)
 // determine storage index (aka 16 bit hash)
 int QnStorageManager::detectStorageIndex(const QString& p)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    QnMutexLocker lock( &m_mutexStorages );
     QString path = toCanonicalPath(p);
 
     if (m_storageIndexes.contains(path))
@@ -538,7 +538,7 @@ static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDir
 
 QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_sdbMutex);
+    QnMutexLocker lock( &m_sdbMutex );
     QnStorageDbPtr sdb = m_chunksDB[storage->getPath()];
     if (!sdb) 
     {
@@ -568,7 +568,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     {
         int storageIndex = detectStorageIndex(storage->getPath());
-        SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+        QnMutexLocker lock( &m_mutexStorages );
         m_storagesStatisticsReady = false;
     
         NX_LOG(QString("Adding storage. Path: %1").arg(storage->getPath()), cl_logINFO);
@@ -621,7 +621,7 @@ QStringList QnStorageManager::getAllStoragePathes() const
 
 void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    QnMutexLocker lock( &m_mutexStorages );
     m_storagesStatisticsReady = false;
 
     // remove existing storage record if exists
@@ -640,7 +640,7 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
 void QnStorageManager::at_storageChanged(const QnResourcePtr &)
 {
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+        QnMutexLocker lock( &m_mutexStorages );
         m_storagesStatisticsReady = false;
     }
     updateStorageStatistics();
@@ -658,7 +658,7 @@ bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& 
 
 void QnStorageManager::removeAbsentStorages(const QnAbstractStorageResourceList &newStorages)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    QnMutexLocker lock( &m_mutexStorages );
     for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
     {
         if (!existsStorageWithID(newStorages, itr.value()->getId()))
@@ -757,7 +757,7 @@ void QnStorageManager::clearSpace()
 {
     testOfflineStorages();
     {
-        SCOPED_MUTEX_LOCK( lock, &m_sdbMutex);
+        QnMutexLocker lock( &m_sdbMutex );
         for(const QnStorageDbPtr& sdb: m_chunksDB) {
             if (sdb)
                 sdb->beforeDelete();
@@ -775,7 +775,7 @@ void QnStorageManager::clearSpace()
         clearOldestSpace(storage, false);
 
     {
-        SCOPED_MUTEX_LOCK( lock, &m_sdbMutex);
+        QnMutexLocker lock( &m_sdbMutex );
         for(const QnStorageDbPtr& sdb: m_chunksDB) {
             if (sdb)
                 sdb->afterDelete();
@@ -804,13 +804,13 @@ void QnStorageManager::clearSpace()
 
 QnStorageManager::StorageMap QnStorageManager::getAllStorages() const 
 { 
-    SCOPED_MUTEX_LOCK( lock, &m_mutexStorages); 
+    QnMutexLocker lock( &m_mutexStorages ); 
     return m_storageRoots; 
 } 
 
 QnStorageResourceList QnStorageManager::getStorages() const 
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    QnMutexLocker lock( &m_mutexStorages );
     return m_storageRoots.values().toSet().toList(); // remove storage duplicates. Duplicates are allowed in sake for v1.4 compatibility
 }
 
@@ -857,7 +857,7 @@ void QnStorageManager::clearMaxDaysData()
 
 void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexCatalog);
+    QnMutexLocker lock( &m_mutexCatalog );
 
     const FileCatalogMap &catalogMap = m_devFileCatalog[catalogIdx];
 
@@ -872,7 +872,7 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
 
 void QnStorageManager::clearUnusedMotion()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexCatalog);
+    QnMutexLocker lock( &m_mutexCatalog );
 
     UsedMonthsMap usedMonths;
 
@@ -886,7 +886,7 @@ void QnStorageManager::clearUnusedMotion()
 /*
 void QnStorageManager::clearCameraHistory()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexCatalog);
+    QnMutexLocker lock( &m_mutexCatalog );
     QMap<QString, qint64> minTimes; // min archive time by camera unique ID
     minTimeByCamera(m_devFileCatalog[QnServer::HiQualityCatalog], minTimes);
     minTimeByCamera(m_devFileCatalog[QnServer::LowQualityCatalog], minTimes);
@@ -975,7 +975,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         qint64 minTime = 0x7fffffffffffffffll;
         DeviceFileCatalogPtr catalog;
         {
-            SCOPED_MUTEX_LOCK( lock, &m_mutexCatalog);
+            QnMutexLocker lock( &m_mutexCatalog );
             findTotalMinTime(useMinArchiveDays, m_devFileCatalog[QnServer::HiQualityCatalog], minTime, catalog);
             findTotalMinTime(useMinArchiveDays, m_devFileCatalog[QnServer::LowQualityCatalog], minTime, catalog);
         }
@@ -1077,7 +1077,7 @@ void QnStorageManager::testStoragesDone()
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
 {
-    //SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    //QnMutexLocker lock( &m_mutexStorages );
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
         NX_LOG(QString("Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB").
             arg(fileStorage->getPath()).arg(fileStorage->getSpaceLimit() / 1024 / 1024).arg(fileStorage->getFreeSpace() / 1024 / 1024), cl_logINFO);
@@ -1096,7 +1096,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
 void QnStorageManager::testOfflineStorages()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    QnMutexLocker lock( &m_mutexStorages );
     if (!m_testStorageThread->isRunning())
         m_testStorageThread->start();
 }
@@ -1118,7 +1118,7 @@ void QnStorageManager::stopAsyncTasks()
 
 void QnStorageManager::updateStorageStatistics()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    QnMutexLocker lock( &m_mutexStorages );
     if (m_storagesStatisticsReady) 
         return;
 
@@ -1232,7 +1232,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqu
 
 void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexCatalog);
+    QnMutexLocker lock( &m_mutexCatalog );
     int storageIndex = getStorageIndex(storage);
     
     // add new recorded chunks to scan data
@@ -1267,7 +1267,7 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
 
 DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexCatalog);
+    QnMutexLocker lock( &m_mutexCatalog );
     FileCatalogMap& catalogMap = m_devFileCatalog[catalog];
     DeviceFileCatalogPtr fileCatalog = catalogMap[cameraUniqueId];
     if (fileCatalog == 0)
@@ -1308,7 +1308,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 
 QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutexStorages);
+    QnMutexLocker lock( &m_mutexStorages );
     for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QString root = itr.value()->getPath();
@@ -1412,7 +1412,7 @@ void QnStorageManager::backupFolderRecursive(const QString& srcDir, const QStrin
 
 void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, QnStorageResourcePtr extraAllowedStorage)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_csvMigrationMutex );
+    QnMutexLocker lock( &m_csvMigrationMutex );
 
     QString base = closeDirPath(getDataDirectory());
     QString separator = getPathSeparator(base);
@@ -1454,7 +1454,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
                 }
             }
             {
-                SCOPED_MUTEX_LOCK( lock, &m_sdbMutex );
+                QnMutexLocker lock( &m_sdbMutex );
                 for(const QnStorageDbPtr& sdb: m_chunksDB.values()) {
                     if (sdb)
                         sdb->flushRecords();
@@ -1587,7 +1587,7 @@ bool QnStorageManager::deleteBookmark(const QByteArray &cameraGuid, QnCameraBook
 
 bool QnStorageManager::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result) 
 {
-    SCOPED_MUTEX_LOCK( lock, &m_sdbMutex);
+    QnMutexLocker lock( &m_sdbMutex );
     for (const QnStorageDbPtr &sdb: m_chunksDB) {
         if (!sdb)
             continue;

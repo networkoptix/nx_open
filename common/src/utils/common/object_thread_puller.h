@@ -33,7 +33,7 @@ namespace detail {
             m_object->moveToThread(m_thread);
             emit pushed(m_object);
 
-            SCOPED_MUTEX_LOCK( locker, &d->mutex);
+            QnMutexLocker locker( &d->mutex );
             d->objects.remove(m_object);
             d->condition.wakeAll();
         }
@@ -87,7 +87,7 @@ public:
             return false;
         }
 
-        SCOPED_MUTEX_LOCK( locker, &d->mutex);
+        QnMutexLocker locker( &d->mutex );
         if(d->objects.contains(object)) {
             qnWarning("Given object is already being moved.");
             return false;
@@ -103,7 +103,7 @@ public:
     }
 
     void wait(QObject *object = NULL) {
-        SCOPED_MUTEX_LOCK( locker, &d->mutex);
+        QnMutexLocker locker( &d->mutex );
         while (true) {
             if(object == NULL && d->objects.isEmpty())
                 break;

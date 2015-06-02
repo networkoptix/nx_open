@@ -40,13 +40,13 @@ namespace ec2
         }
 
         void addToCache(const QnAbstractTransaction::PersistentInfo& key, ApiCommand::Value command, const QByteArray& data) {
-            SCOPED_MUTEX_LOCK( lock, &m_mutex);
+            QnMutexLocker lock( &m_mutex );
             m_cache.insert(CacheKey(key, command), new QByteArray(data), data.size());
         }
 
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
-            SCOPED_MUTEX_LOCK( lock, &m_mutex);
+            QnMutexLocker lock( &m_mutex );
             Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)

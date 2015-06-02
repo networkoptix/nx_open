@@ -174,7 +174,7 @@ QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId)
     m_resId(resId)
 {
     {
-        SCOPED_MUTEX_LOCK( lock, &m_camClockMutex);
+        QnMutexLocker lock( &m_camClockMutex );
 
         QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int>& val = m_camClock[resId];
         if( !val.first )
@@ -191,7 +191,7 @@ QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId)
 QnRtspTimeHelper::~QnRtspTimeHelper()
 {
     {
-        SCOPED_MUTEX_LOCK( lock, &m_camClockMutex);
+        QnMutexLocker lock( &m_camClockMutex );
 
         QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> >::iterator it = m_camClock.find( m_resId );
         if( it != m_camClock.end() )
@@ -204,7 +204,7 @@ double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 {
     double localtime = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
     
-    SCOPED_MUTEX_LOCK( lock, &m_cameraClockToLocalDiff->mutex);
+    QnMutexLocker lock( &m_cameraClockToLocalDiff->mutex );
     if (m_cameraClockToLocalDiff->timeDiff == INT_MAX)  
         m_cameraClockToLocalDiff->timeDiff = localtime - cameraTime;
     double result = cameraTime + m_cameraClockToLocalDiff->timeDiff;
@@ -233,7 +233,7 @@ double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 
 void QnRtspTimeHelper::reset()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_cameraClockToLocalDiff->mutex);
+    QnMutexLocker lock( &m_cameraClockToLocalDiff->mutex );
     
     m_cameraClockToLocalDiff->timeDiff = INT_MAX;
     m_cameraClockToLocalDiff->driftStats.clear();
@@ -735,7 +735,7 @@ RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, 
 
 bool RTPSession::stop()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_sockMutex);
+    QnMutexLocker lock( &m_sockMutex );
     m_tcpSock->close();
     return true;
 }
@@ -1146,7 +1146,7 @@ void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPo
 
 QByteArray RTPSession::getGuid()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_guidMutex);
+    QnMutexLocker lock( &m_guidMutex );
     if (m_guid.isEmpty())
         m_guid = QnUuid::createUuid().toString().toUtf8();
     return m_guid;

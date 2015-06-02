@@ -19,7 +19,7 @@ QnMotionHelper::QnMotionHelper()
 
 QnMotionHelper::~QnMotionHelper()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     for(QnMotionArchive* writer: m_writers.values())
         delete writer;
     m_writers.clear();
@@ -27,7 +27,7 @@ QnMotionHelper::~QnMotionHelper()
 
 QnMotionArchive* QnMotionHelper::getArchive(const QnResourcePtr& res, int channel)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QnNetworkResourcePtr netres = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (!netres)
         return 0;

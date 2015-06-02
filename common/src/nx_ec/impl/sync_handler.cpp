@@ -21,20 +21,20 @@ namespace ec2
 
         void SyncHandler::wait()
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             while( !m_done )
                 m_cond.wait( lk.mutex() );
         }
 
         ErrorCode SyncHandler::errorCode() const
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             return m_errorCode;
         }
 
         void SyncHandler::done( int /*reqID*/, ErrorCode _errorCode )
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_done = true;
             m_errorCode = _errorCode;
             m_cond.wakeAll();

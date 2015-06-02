@@ -47,7 +47,7 @@ bool QnHomePtzExecutorPrivate::handleTimer(int timerId) {
 
     QnPtzObject homePosition;
     {
-        SCOPED_MUTEX_LOCK( locker, &mutex);
+        QnMutexLocker locker( &mutex );
         homePosition = this->homePosition;
     }
 
@@ -99,13 +99,13 @@ bool QnHomePtzExecutor::isRunning() {
 }
 
 void QnHomePtzExecutor::setHomePosition(const QnPtzObject &homePosition) {
-    SCOPED_MUTEX_LOCK( locker, &d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     d->homePosition = homePosition;
 }
 
 QnPtzObject QnHomePtzExecutor::homePosition() const {
-    SCOPED_MUTEX_LOCK( locker, &d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     return d->homePosition;
 }

@@ -35,7 +35,7 @@ MultipleInternetTimeFetcher::~MultipleInternetTimeFetcher()
 
 void MultipleInternetTimeFetcher::pleaseStop()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_terminated = true;
     for( std::unique_ptr<TimeFetcherContext>& ctx: m_timeFetchers )
         ctx->timeFetcher->pleaseStop();
@@ -45,7 +45,7 @@ void MultipleInternetTimeFetcher::join()
 {
     std::vector<std::unique_ptr<TimeFetcherContext>> timeFetchers;
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_timeFetchers.swap( timeFetchers );
     }
     for( std::unique_ptr<TimeFetcherContext>& ctx: timeFetchers )
@@ -56,7 +56,7 @@ bool MultipleInternetTimeFetcher::getTimeAsync( std::function<void(qint64, Syste
 {
     using namespace std::placeholders;
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     assert( !m_timeFetchers.empty() );
 
@@ -88,7 +88,7 @@ bool MultipleInternetTimeFetcher::getTimeAsync( std::function<void(qint64, Syste
 
 void MultipleInternetTimeFetcher::addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     std::unique_ptr<TimeFetcherContext> ctx( new TimeFetcherContext() );
     ctx->timeFetcher = std::move( timeFetcher );
@@ -108,7 +108,7 @@ void MultipleInternetTimeFetcher::timeFetchingDone(
     if( (--m_awaitedAnswers) > 0 )
         return;
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( m_terminated )
         return;

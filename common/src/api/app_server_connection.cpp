@@ -63,7 +63,7 @@ QUrl QnAppServerConnectionFactory::url() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
 
-        SCOPED_MUTEX_LOCK( locker, &factory->m_mutex);
+        QnMutexLocker locker( &factory->m_mutex );
         return factory->m_url;
     }
 
@@ -75,7 +75,7 @@ void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
         Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        SCOPED_MUTEX_LOCK( locker, &factory->m_mutex);
+        QnMutexLocker locker( &factory->m_mutex );
         factory->m_url = url;
     }
 }

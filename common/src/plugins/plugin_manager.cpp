@@ -85,7 +85,7 @@ PluginManager* PluginManager::instance( const QString& pluginDir )
 
 void PluginManager::loadPlugins( PluginManager::PluginType pluginsToLoad )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     std::set<QString> directoriesToSearchForPlugins;
 

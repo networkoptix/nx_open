@@ -60,7 +60,7 @@ private:
     int m_relockCount;
 };
 
-#define SCOPED_MUTEX_LOCK( lockerName, mutexExpr ) \
+#define QnMutexLocker lockerName( mutexExpr ) \
     QnMutexLocker lockerName( mutexExpr, __FILE__, __LINE__ )
 
 #else   //USE_OWN_MUTEX
@@ -70,7 +70,7 @@ private:
 
 typedef QMutex QnMutex;
 typedef QMutexLocker QnMutexLocker;
-#define SCOPED_MUTEX_LOCK( lockerName, mutexExpr ) \
+#define QnMutexLocker lockerName( mutexExpr ) \
     QnMutexLocker lockerName( mutexExpr )
 
 #endif  //USE_OWN_MUTEX

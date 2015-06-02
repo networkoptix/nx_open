@@ -41,7 +41,7 @@ namespace ec2
     public:
         virtual ~ClientQueryProcessor()
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             while( !m_runningHttpRequests.empty() )
             {
                 nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
@@ -89,7 +89,7 @@ namespace ec2
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
             {
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
@@ -128,7 +128,7 @@ namespace ec2
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( !httpClient->doGet( requestUrl ) )
             {
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
@@ -143,7 +143,7 @@ namespace ec2
         {
             std::function<void()> handler;
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 auto it = m_runningHttpRequests.find( httpClient );
                 assert( it != m_runningHttpRequests.end() );
                 handler = std::move(it->second);

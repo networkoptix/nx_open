@@ -84,7 +84,7 @@ public:
         }
         if (havetowait < MAX_VALID_SLEEP_TIME) 
         {
-            SCOPED_MUTEX_LOCK( lock, &m_mutex);
+            QnMutexLocker lock( &m_mutex );
             m_waitCond.wait(&m_mutex, qMin(havetowait / 1000, maxSleepTime / 1000));
         }
         else {

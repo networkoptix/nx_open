@@ -35,7 +35,7 @@ QnResourcePool::~QnResourcePool()
     //emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     m_adminResource.clear();
     m_resources.clear();
 }
@@ -62,7 +62,7 @@ void QnResourcePool::addResource(const QnResourcePtr &resource)
 
 void QnResourcePool::addResources(const QnResourceList &resources)
 {
-    SCOPED_MUTEX_LOCK( resourcesLock, &m_resourcesMtx );
+    QnMutexLocker resourcesLock( &m_resourcesMtx );
 
     for (const QnResourcePtr &resource: resources)
     {
@@ -143,7 +143,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
 
-    SCOPED_MUTEX_LOCK( lk, &m_resourcesMtx);
+    QnMutexLocker lk( &m_resourcesMtx );
 
     for (const QnResourcePtr &resource: resources)
     {
@@ -225,12 +225,12 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
 QnResourceList QnResourcePool::getResources() const
 {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     return m_resources.values();
 }
 
 QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
 
     QHash<QnUuid, QnResourcePtr>::const_iterator resIter = m_resources.find(id);
     if( resIter != m_resources.end() )
@@ -241,7 +241,7 @@ QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
 
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
 {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         if (resource->getUrl() == url)
             return resource;
@@ -252,7 +252,7 @@ QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
 
 QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString &physicalId) const
 {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
         if (netResource != 0 && netResource->getPhysicalId() == physicalId)
@@ -264,7 +264,7 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString &p
 
 QnResourcePtr QnResourcePool::getResourceByParam(const QString &key, const QString &value) const
 {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) 
     {
         if (resource->getProperty(key) == value)
@@ -277,7 +277,7 @@ QnResourcePtr QnResourcePool::getResourceByParam(const QString &key, const QStri
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac) const
 {
     QnMacAddress macAddress(mac);
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
         if (netResource != 0 && netResource->getMAC() == macAddress)
@@ -291,7 +291,7 @@ QnVirtualCameraResourceList QnResourcePool::getAllCameras(const QnResourcePtr &m
 {
     QnUuid parentId = mServer ? mServer->getId() : QnUuid();
     QnVirtualCameraResourceList result;
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) 
     {
         if (ignoreDesktopCameras && resource->hasFlags(Qn::desktop_camera))
@@ -307,7 +307,7 @@ QnVirtualCameraResourceList QnResourcePool::getAllCameras(const QnResourcePtr &m
 
 QnMediaServerResourceList QnResourcePool::getAllServers() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_resourcesMtx); //m_resourcesMtx is recursive
+    QnMutexLocker lock( &m_resourcesMtx ); //m_resourcesMtx is recursive
     if (m_cachedServerList.isEmpty())
         m_cachedServerList = getResources<QnMediaServerResource>();
     return m_cachedServerList;
@@ -316,7 +316,7 @@ QnMediaServerResourceList QnResourcePool::getAllServers() const
 QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) const
 {
     QnResourceList result;
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) 
         if (resource->getParentId() == parentId)
             result << resource;
@@ -332,7 +332,7 @@ QnResourceList QnResourcePool::getAllResourceByTypeName(const QString &typeName)
     if (!resType)
         return result;
 
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         if (resource->getTypeId() == resType->getId())
             result << resource;
@@ -344,7 +344,7 @@ QnResourceList QnResourcePool::getAllResourceByTypeName(const QString &typeName)
 QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QString &physicalId) const
 {
     QnNetworkResourceList result;
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
         if (netResource != 0 && netResource->getPhysicalId() == physicalId)
@@ -362,7 +362,7 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QHost
 QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QString &hostAddress) const
 {
     QnNetworkResourceList result;
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
         if (netResource != 0 && netResource->getHostAddress() == hostAddress)
@@ -374,14 +374,14 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QStri
 
 QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString &uniqueID) const
 {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&uniqueID](const QnResourcePtr &resource) { return resource->getUniqueId() == uniqueID; });
     return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
 }
 
 void QnResourcePool::updateUniqId(const QnResourcePtr& res, const QString &newUniqId)
 {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     res->setUniqId(newUniqId);
 }
 
@@ -394,7 +394,7 @@ QnResourceList QnResourcePool::getResourcesWithFlag(Qn::ResourceFlag flag) const
 {
     QnResourceList result;
 
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources)
         if (resource->hasFlags(flag))
             result.append(resource);
@@ -404,7 +404,7 @@ QnResourceList QnResourcePool::getResourcesWithFlag(Qn::ResourceFlag flag) const
 
 QnResourceList QnResourcePool::getResourcesWithParentId(QnUuid id) const
 {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
 
     // TODO: #Elric cache it, but remember that id and parentId of a resource may change
     // while it's in the pool.
@@ -418,7 +418,7 @@ QnResourceList QnResourcePool::getResourcesWithParentId(QnUuid id) const
 
 QnResourceList QnResourcePool::getResourcesWithTypeId(QnUuid id) const
 {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
 
     QnResourceList result;
     for(const QnResourcePtr &resource: m_resources)
@@ -428,7 +428,7 @@ QnResourceList QnResourcePool::getResourcesWithTypeId(QnUuid id) const
 }
 
 QnUserResourcePtr QnResourcePool::getAdministrator() const {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     if (m_adminResource)
         return m_adminResource;
 
@@ -447,7 +447,7 @@ QStringList QnResourcePool::allTags() const
 {
     QStringList result;
 
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources.values())
         result << resource->getTags();
 
@@ -456,7 +456,7 @@ QStringList QnResourcePool::allTags() const
 
 void QnResourcePool::clear()
 {
-    SCOPED_MUTEX_LOCK( lk, &m_resourcesMtx );
+    QnMutexLocker lk( &m_resourcesMtx );
 
     m_resources.clear();
 }
@@ -500,7 +500,7 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
 }
 
 QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnUuid &id, bool useCompatible) const {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
 
     auto it = m_incompatibleResources.find(id);
     if (it != m_incompatibleResources.end())
@@ -513,17 +513,17 @@ QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnUuid &id, bool
 }
 
 QnResourcePtr QnResourcePool::getIncompatibleResourceByUniqueId(const QString &uid) const {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     return m_incompatibleResources.value(uid);
 }
 
 QnResourceList QnResourcePool::getAllIncompatibleResources() const {
-    SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+    QnMutexLocker locker( &m_resourcesMtx );
     return m_incompatibleResources.values();
 }
 
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QnUuid &uuid) const {
-    SCOPED_MUTEX_LOCK( lk, &m_resourcesMtx );
+    QnMutexLocker lk( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
         if (!videoWall || !videoWall->items()->hasItem(uuid))
@@ -544,7 +544,7 @@ QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QnU
 }
 
 QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const QnUuid &uuid) const {
-    SCOPED_MUTEX_LOCK( lk, &m_resourcesMtx );
+    QnMutexLocker lk( &m_resourcesMtx );
     for (const QnResourcePtr &resource: m_resources) {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
         if (!videoWall || !videoWall->matrices()->hasItem(uuid))
@@ -567,6 +567,6 @@ QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QLis
 
 void QnResourcePool::invalidateCache()
 {
-    SCOPED_MUTEX_LOCK( lk, &m_resourcesMtx );
+    QnMutexLocker lk( &m_resourcesMtx );
     m_cachedServerList.clear();
 }

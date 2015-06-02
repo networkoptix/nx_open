@@ -17,12 +17,12 @@ signals:
 
 public slots:
     void increment() {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
         m_count++;
     }
 
     void decrement() {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
         m_count--;
         if(m_count == 0)
             emit reachedZero();

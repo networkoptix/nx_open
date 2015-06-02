@@ -67,7 +67,7 @@ bool StreamingChunkTranscoderThread::startTranscoding(
     DataSourceContextPtr dataSourceCtx,
     const StreamingChunkCacheKey& transcodeParams )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     //checking transcodingID uniqueness
     pair<map<int, TranscodeContext*>::iterator, bool>
@@ -96,13 +96,13 @@ bool StreamingChunkTranscoderThread::startTranscoding(
 
 size_t StreamingChunkTranscoderThread::ongoingTranscodings() const
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_transcodeContext.size();
 }
 
 //void StreamingChunkTranscoderThread::cancel( int transcodingID )
 //{
-//    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+//    QnMutexLocker lk( &m_mutex );
 //
 //    map<int, TranscodeContext*>::iterator it = m_transcodeContext.find( transcodingID );
 //    if( it == m_transcodeContext.end() )
@@ -113,7 +113,7 @@ size_t StreamingChunkTranscoderThread::ongoingTranscodings() const
 
 void StreamingChunkTranscoderThread::pleaseStop()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     QnLongRunnable::pleaseStop();
     m_cond.wakeAll();
 }
@@ -129,7 +129,7 @@ void StreamingChunkTranscoderThread::run()
     int prevReadTranscodingID = 0;
     while( !needToStop() )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         const qint64 currentMonotonicTimestamp = m_monotonicClock.elapsed();
         //taking context with data - trying to find context different from previous one
@@ -241,7 +241,7 @@ void StreamingChunkTranscoderThread::run()
 
 void StreamingChunkTranscoderThread::onStreamDataAvailable( AbstractOnDemandDataProvider* dataSource )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     //locating transcoding context by data source
     std::map<AbstractOnDemandDataProvider*, int>::const_iterator

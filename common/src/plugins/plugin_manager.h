@@ -51,7 +51,7 @@ public:
     //!Searches for plugins of type \a T among loaded plugins
     template<class T> QList<T*> findPlugins() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         QList<T*> foundPlugins;
         for( QSharedPointer<QPluginLoader> plugin: m_qtPlugins )

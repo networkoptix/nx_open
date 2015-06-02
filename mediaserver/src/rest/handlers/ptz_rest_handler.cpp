@@ -33,7 +33,7 @@ void QnPtzRestHandler::cleanupOldSequence()
 
 bool QnPtzRestHandler::checkSequence(const QString& id, int sequence)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_sequenceMutex);
+    QnMutexLocker lock( &m_sequenceMutex );
     cleanupOldSequence();
     if (id.isEmpty() || sequence == -1)
         return true; // do not check if empty
@@ -65,7 +65,7 @@ void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function
 
 int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc function)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_asyncExecMutex);
+    QnMutexLocker lock( &m_asyncExecMutex );
 
     if (m_workers[sequence].inProgress) {
         m_workers[sequence].nextCommand = function;

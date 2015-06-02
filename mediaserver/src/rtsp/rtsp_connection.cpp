@@ -70,7 +70,7 @@ bool updatePort(AbstractDatagramSocket* &socket, int port)
 bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
-    SCOPED_MUTEX_LOCK( lock, &m_createSocketMutex);
+    QnMutexLocker lock( &m_createSocketMutex );
     mediaSocket = SocketFactory::createDatagramSocket();
     rtcpSocket = SocketFactory::createDatagramSocket();
 
@@ -899,7 +899,7 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
 void QnRtspConnectionProcessor::at_camera_resourceChanged()
 {
     Q_D(QnRtspConnectionProcessor);
-    SCOPED_MUTEX_LOCK( lock, &d->mutex);
+    QnMutexLocker lock( &d->mutex );
 
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
@@ -917,7 +917,7 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    SCOPED_MUTEX_LOCK( lock, &d->mutex);
+    QnMutexLocker lock( &d->mutex );
     if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
         m_needStop = true;
         d->socket->close();
@@ -1326,7 +1326,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
 void QnRtspConnectionProcessor::processRequest()
 {
     Q_D(QnRtspConnectionProcessor);
-    SCOPED_MUTEX_LOCK( lock, &d->mutex);
+    QnMutexLocker lock( &d->mutex );
 
     if (d->dataProcessor)
         d->dataProcessor->pauseNetwork();

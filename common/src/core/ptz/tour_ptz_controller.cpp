@@ -85,7 +85,7 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
     bool restartTour = false;
     QnPtzTour activeTour;
     {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
         QnPtzTourHash records = m_adaptor->value();
         if(records.contains(tour.id) && records.value(tour.id) == tour)
             return true; /* No need to save it. */
@@ -118,7 +118,7 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 bool QnTourPtzController::removeTour(const QString &tourId) {
     bool stopTour = false;
     {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         QnPtzTourHash records = m_adaptor->value();
         if(records.remove(tourId) == 0)
@@ -146,7 +146,7 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
 
     QnPtzTour activeTour;
     {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if(m_activeTour.id == tourId)
             return true; /* Already activated. */
 
@@ -174,6 +174,6 @@ bool QnTourPtzController::getTours(QnPtzTourList *tours) {
 void QnTourPtzController::clearActiveTour() {
     m_executor->stopTour();
 
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
     m_activeTour = QnPtzTour();
 }

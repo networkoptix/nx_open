@@ -66,14 +66,14 @@ bool QtvSound::setup()
 float QtvSound::volumeLevel() const
 {
     ALfloat volume = 0.0;
-    SCOPED_MUTEX_LOCK( lock, &m_mtx);
+    QnMutexLocker lock( &m_mtx );
     alGetSourcef(m_source, AL_GAIN, &volume);
     return volume;
 }
 
 void QtvSound::setVolumeLevel(float volumeLevel)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mtx);
+    QnMutexLocker lock( &m_mtx );
     alSourcef(m_source, AL_GAIN, volumeLevel);
 }
 
@@ -159,7 +159,7 @@ void QtvSound::clearBuffers(bool clearAll)
 
 uint QtvSound::playTimeElapsed()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mtx);
+    QnMutexLocker lock( &m_mtx );
 
     if (m_deinitialized)
         return 0;
@@ -212,7 +212,7 @@ bool QtvSound::isFormatSupported(const QnAudioFormat& format)
 
 bool QtvSound::play(const quint8* data, uint size)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mtx);
+    QnMutexLocker lock( &m_mtx );
 
     if (m_deinitialized)
     {
@@ -309,19 +309,19 @@ int QtvSound::checkOpenALErrorDebug(ALCdevice *device)
 
 void QtvSound::suspend()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mtx);
+    QnMutexLocker lock( &m_mtx );
     alSourcePause(m_source);
 }
 
 void QtvSound::resume()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mtx);
+    QnMutexLocker lock( &m_mtx );
     playImpl();
 }
 
 void QtvSound::clear()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mtx);
+    QnMutexLocker lock( &m_mtx );
     if (m_deinitialized)
         return;
     internalClear();

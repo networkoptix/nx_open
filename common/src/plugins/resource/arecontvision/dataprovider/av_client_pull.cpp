@@ -46,7 +46,7 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& 
 void QnPlAVClinetPullStreamReader::at_resourceInitDone(const QnResourcePtr &resource)
 {
     if (resource->isInitialized()) {
-        SCOPED_MUTEX_LOCK( lock, &m_needUpdateMtx);
+        QnMutexLocker lock( &m_needUpdateMtx );
         m_needUpdateParams = true;
     }
 }
@@ -55,7 +55,7 @@ void QnPlAVClinetPullStreamReader::updateCameraParams()
 {
     bool needUpdate;
     {
-        SCOPED_MUTEX_LOCK( lock, &m_needUpdateMtx);
+        QnMutexLocker lock( &m_needUpdateMtx );
         needUpdate = m_needUpdateParams;
         m_needUpdateParams = false;
     }
@@ -71,7 +71,7 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
 
 void QnPlAVClinetPullStreamReader::pleaseReopenStream()
 {
-    SCOPED_MUTEX_LOCK( mtx, &m_mutex);
+    QnMutexLocker mtx( &m_mutex );
     QnLiveStreamParams params = getLiveParams();
     QString resolution;
     if (getRole() == Qn::CR_LiveVideo)

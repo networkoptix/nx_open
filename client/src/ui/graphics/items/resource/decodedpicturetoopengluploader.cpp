@@ -203,7 +203,7 @@ public:
 
     unsigned char* filler( unsigned char value, size_t size )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_fillerMutex );
+        QnMutexLocker lk( &m_fillerMutex );
 
         Filler& filler = m_fillers[value];
         if( filler.size < size )
@@ -805,7 +805,7 @@ public:
         DecodedPictureToOpenGLUploader::UploadedPicture* const pictureBuf = m_pictureBuf.load();
 
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
 
             if( !m_pictureBuf.testAndSetOrdered( pictureBuf, NULL ) )
                 return; //m_pictureBuf has been changed (running has been cancelled?)
@@ -885,7 +885,7 @@ public:
         const QRectF displayedRect,
         quint64* const prevPicPts = NULL )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         if( !m_pictureBuf.load() )
             return false;
@@ -1315,7 +1315,7 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
 
     {
         //have to remove buffers in uploading thread, since it holds gl context current
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
         if( !m_asyncUploadUsed )
         {
@@ -1350,7 +1350,7 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
 
 void DecodedPictureToOpenGLUploader::pleaseStop()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( m_terminated )
         return;
@@ -1398,7 +1398,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     m_format = decodedPicture->format;
     UploadedPicture* emptyPictureBuf = NULL;
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( m_terminated )
         return;
@@ -1579,7 +1579,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
 
 bool DecodedPictureToOpenGLUploader::isUsingFrame( const QSharedPointer<CLVideoDecoderOutput>& image ) const
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     foreach( AVPacketUploader* uploader, m_framesWaitingUploadInGUIThread )
@@ -1594,7 +1594,7 @@ bool DecodedPictureToOpenGLUploader::isUsingFrame( const QSharedPointer<CLVideoD
 
 DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader::getUploadedPicture() const
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( m_terminated )
         return NULL;
@@ -1657,7 +1657,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
 
 quint64 DecodedPictureToOpenGLUploader::nextFrameToDisplayTimestamp() const
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( !m_picturesBeingRendered.empty() )
         return m_picturesBeingRendered.front()->pts();
@@ -1677,7 +1677,7 @@ quint64 DecodedPictureToOpenGLUploader::nextFrameToDisplayTimestamp() const
 
 void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     while( !m_terminated && (!m_framesWaitingUploadInGUIThread.empty() || !m_picturesWaitingRendering.empty() || !m_usedAsyncUploaders.empty() || !m_picturesBeingRendered.empty()) )
         m_cond.wait( lk.mutex() );
@@ -1693,7 +1693,7 @@ void DecodedPictureToOpenGLUploader::ensureQueueLessThen(int maxSize)
     if( m_hardwareDecoderUsed )
         return; //if hardware decoder is used, waiting can result in bad playback experience
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     //MUST wait till all references to frames, supplied via uploadDecodedPicture are not needed anymore
@@ -1732,7 +1732,7 @@ static DecodedPictureToOpenGLUploader::UploadedPicture* resetAggregationSurfaceR
 
 void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     while( !m_usedAsyncUploaders.empty() )
         m_cond.wait( lk.mutex() );  //TODO/IMPL cancel upload
@@ -1783,7 +1783,7 @@ void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
 
 void DecodedPictureToOpenGLUploader::waitForCurrentFrameDisplayed()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     while( !m_terminated && (!m_picturesBeingRendered.empty()) )
         m_cond.wait( lk.mutex() );
@@ -1796,7 +1796,7 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
 #endif
     picture->m_glFence.placeFence();
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     NX_LOG( lit( "Finished rendering of picture (pts %1)" ).arg(picture->pts()), cl_logDEBUG2 );
 
@@ -1855,7 +1855,7 @@ void DecodedPictureToOpenGLUploader::setNV12ToRgbShaderUsed( bool nv12SharedUsed
 
 void DecodedPictureToOpenGLUploader::pictureDataUploadSucceeded( AsyncPicDataUploader* const uploader, UploadedPicture* const picture )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_picturesWaitingRendering.push_back( picture );
 
     if( uploader )
@@ -1868,7 +1868,7 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadSucceeded( AsyncPicDataUpl
 
 void DecodedPictureToOpenGLUploader::pictureDataUploadFailed( AsyncPicDataUploader* const uploader, UploadedPicture* const picture )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     //considering picture buffer invalid
     if( picture )
     {
@@ -1888,7 +1888,7 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadFailed( AsyncPicDataUpload
 
 void DecodedPictureToOpenGLUploader::pictureDataUploadCancelled( AsyncPicDataUploader* const uploader )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( uploader )
     {
         m_usedAsyncUploaders.erase( std::find( m_usedAsyncUploaders.begin(), m_usedAsyncUploaders.end(), uploader ) );
@@ -2183,7 +2183,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     }
     else
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_uploadMutex );
+        QnMutexLocker lk( &m_uploadMutex );
 
         //software conversion data to rgb
 
@@ -2421,7 +2421,7 @@ void DecodedPictureToOpenGLUploader::ensurePBOInitialized(
 
 void DecodedPictureToOpenGLUploader::releasePictureBuffers()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     releasePictureBuffersNonSafe();
     m_cond.wakeAll();
 }

@@ -213,7 +213,7 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
 
 void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     std::deque<Chunk> filteredData;
     filteredData.swap( m_chunks );
@@ -225,7 +225,7 @@ void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>&
 
 QSet<QDate> DeviceFileCatalog::recordedMonthList()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QSet<QDate> rez;
     if (m_chunks.empty())
@@ -248,7 +248,7 @@ QSet<QDate> DeviceFileCatalog::recordedMonthList()
 
 bool DeviceFileCatalog::addChunk(const Chunk& chunk)
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if (!m_chunks.empty() && chunk.startTimeMs > m_chunks[m_chunks.size()-1].startTimeMs) {
         m_chunks.push_back(chunk);
@@ -268,7 +268,7 @@ bool DeviceFileCatalog::addChunk(const Chunk& chunk)
 
 void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     std::deque<Chunk> existChunks;
     existChunks.swap( m_chunks );
@@ -363,19 +363,19 @@ QnTimePeriod DeviceFileCatalog::timePeriodFromDir(const QnStorageResourcePtr &st
 
 void DeviceFileCatalog::rebuildPause(void* value)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_rebuildMutex);
+    QnMutexLocker lock( &m_rebuildMutex );
     m_pauseList << value;
 }
 
 void DeviceFileCatalog::rebuildResume(void* value)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_rebuildMutex);
+    QnMutexLocker lock( &m_rebuildMutex );
     m_pauseList.remove(value);
 }
 
 bool DeviceFileCatalog::needRebuildPause()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_rebuildMutex);
+    QnMutexLocker lock( &m_rebuildMutex );
     return !m_pauseList.isEmpty();
 }
 
@@ -481,7 +481,7 @@ bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, co
             qnFileDeletor->deleteFile(emptyFile.fileName);
     }
 
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     for(const Chunk& chunk: allChunks)
         m_chunks.push_back(chunk);
@@ -500,7 +500,7 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
 {
     Q_ASSERT(chunk.durationMs < 1000 * 1000);
 
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
     if( itr != m_chunks.end() )
@@ -524,7 +524,7 @@ void DeviceFileCatalog::removeRecord(int idx)
 }
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     
     ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), startTimeMs);
     if (itr > m_chunks.begin())
@@ -544,14 +544,14 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64
 
 qint64 DeviceFileCatalog::lastChunkStartTime() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].startTimeMs;
 }
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
 {
     Q_ASSERT(durationMs < 1000 * 1000);
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     //m_chunks.last().durationMs = durationMs;
     auto itr = qLowerBound(m_chunks.begin(), m_chunks.end(), m_recordingChunkTime);
     if (itr != m_chunks.end() && itr->startTimeMs == m_recordingChunkTime)
@@ -593,7 +593,7 @@ QVector<DeviceFileCatalog::Chunk> DeviceFileCatalog::deleteRecordsBefore(int idx
 
 void DeviceFileCatalog::clear()
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     while(!m_chunks.empty())
     {
         lk.unlock();
@@ -604,7 +604,7 @@ void DeviceFileCatalog::clear()
 
 void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     for (size_t i = 0; i < m_chunks.size();)
     {
@@ -625,7 +625,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 
 bool DeviceFileCatalog::isEmpty() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_chunks.empty();
 }
 
@@ -635,7 +635,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
     QString delFileName;
     Chunk deletedChunk;
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
 
         if (m_chunks.empty())
             return deletedChunk;
@@ -671,7 +671,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
     NX_LOG(msg, cl_logWARNING);
     str.flush();
 */
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     if (m_chunks.empty())
         return -1;
@@ -690,7 +690,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
 
 void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
     if (itr != m_chunks.end() && itr->startTimeMs == chunk.startTimeMs)
         chunk.durationMs = itr->durationMs;
@@ -715,7 +715,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 
 qint64 DeviceFileCatalog::minTime() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
@@ -724,7 +724,7 @@ qint64 DeviceFileCatalog::minTime() const
 
 qint64 DeviceFileCatalog::maxTime() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else if (m_chunks[m_chunks.size()-1].durationMs == -1)
@@ -735,7 +735,7 @@ qint64 DeviceFileCatalog::maxTime() const
 
 bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if (m_chunks.empty())
         return false;
@@ -750,7 +750,7 @@ bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
 
 bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (m_chunks.empty())    
         return true;
     else
@@ -759,7 +759,7 @@ bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (index >= 0 && (size_t)index < m_chunks.size() )
         return m_chunks.at(index);
     else
@@ -768,7 +768,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
 
 qint64 DeviceFileCatalog::firstTime() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
@@ -783,7 +783,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
 {
     //qDebug() << "find period from " << QDateTime::fromMSecsSinceEpoch(startTime).toString("hh:mm:ss.zzz") << "to" << QDateTime::fromMSecsSinceEpoch(endTime).toString("hh:mm:ss.zzz");
 
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QnTimePeriodList result;
     if (m_chunks.empty())
         return result;

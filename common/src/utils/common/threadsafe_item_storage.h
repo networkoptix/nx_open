@@ -44,7 +44,7 @@ public:
     }
 
     void setItems(const ItemMap &items) {
-        SCOPED_MUTEX_LOCK( locker, m_mutex);
+        QnMutexLocker locker( m_mutex );
         setItemsUnderLock(items);
     }
 
@@ -53,22 +53,22 @@ public:
     }
 
     ItemMap getItems() const { 
-        SCOPED_MUTEX_LOCK( locker, m_mutex);
+        QnMutexLocker locker( m_mutex );
         return m_itemByUuid; 
     }
 
     T getItem(const QnUuid &uuid) const {
-        SCOPED_MUTEX_LOCK( locker, m_mutex);
+        QnMutexLocker locker( m_mutex );
         return m_itemByUuid.value(uuid);
     }
 
     bool hasItem(const QnUuid &uuid) const {
-        SCOPED_MUTEX_LOCK( locker, m_mutex);
+        QnMutexLocker locker( m_mutex );
         return m_itemByUuid.contains(uuid);
     }
 
     void addItem(const T &item) {
-        SCOPED_MUTEX_LOCK( locker, m_mutex);
+        QnMutexLocker locker( m_mutex );
         addItemUnderLock(item);
     }
 
@@ -77,17 +77,17 @@ public:
     }
 
     void removeItem(const QnUuid &uuid) {
-        SCOPED_MUTEX_LOCK( locker, m_mutex);
+        QnMutexLocker locker( m_mutex );
         removeItemUnderLock(uuid);
     }
 
     void updateItem(const T &item) {
-        SCOPED_MUTEX_LOCK( locker, m_mutex);
+        QnMutexLocker locker( m_mutex );
         updateItemUnderLock(item);
     }
 
     void addOrUpdateItem(const T &item) {
-        SCOPED_MUTEX_LOCK( locker, m_mutex);
+        QnMutexLocker locker( m_mutex );
         if (m_itemByUuid.contains(item.uuid))
             updateItemUnderLock(item);
         else

@@ -65,7 +65,7 @@ QnMulticastModuleFinder::~QnMulticastModuleFinder() {
 }
 
 bool QnMulticastModuleFinder::isValid() const {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return !m_clientSockets.empty();
 }
 
@@ -78,7 +78,7 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
 }
 
 void QnMulticastModuleFinder::updateInterfaces() {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
@@ -243,7 +243,7 @@ void QnMulticastModuleFinder::run() {
         currentClock = QDateTime::currentMSecsSinceEpoch();
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
 
             for (UDPSocket *socket: m_clientSockets) {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
@@ -288,7 +288,7 @@ void QnMulticastModuleFinder::run() {
         }
     }
 
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     for (UDPSocket *socket: m_clientSockets)
         m_pollSet.remove(socket->implementationDelegate(), aio::etRead);
     if (m_serverSocket)

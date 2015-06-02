@@ -48,7 +48,7 @@ QnSemaphore::~QnSemaphore()
 void QnSemaphore::acquire(int n)
 {
     Q_ASSERT_X(n >= 0, "QnSemaphore::acquire", "parameter 'n' must be non-negative");
-    SCOPED_MUTEX_LOCK( locker, &d->mutex);
+    QnMutexLocker locker( &d->mutex );
     while (n > d->avail)
         d->cond.wait(locker.mutex());
     d->avail -= n;
@@ -67,7 +67,7 @@ void QnSemaphore::acquire(int n)
 void QnSemaphore::release(int n)
 {
     Q_ASSERT_X(n >= 0, "QnSemaphore::release", "parameter 'n' must be non-negative");
-    SCOPED_MUTEX_LOCK( locker, &d->mutex);
+    QnMutexLocker locker( &d->mutex );
     d->avail += n;
     d->cond.wakeAll();
 }
@@ -80,7 +80,7 @@ void QnSemaphore::release(int n)
 */
 int QnSemaphore::available() const
 {
-    SCOPED_MUTEX_LOCK( locker, &d->mutex);
+    QnMutexLocker locker( &d->mutex );
     return d->avail;
 }
 
@@ -98,7 +98,7 @@ int QnSemaphore::available() const
 bool QnSemaphore::tryAcquire(int n)
 {
     Q_ASSERT_X(n >= 0, "QnSemaphore::tryAcquire", "parameter 'n' must be non-negative");
-    SCOPED_MUTEX_LOCK( locker, &d->mutex);
+    QnMutexLocker locker( &d->mutex );
     if (n > d->avail)
         return false;
     d->avail -= n;
@@ -124,7 +124,7 @@ bool QnSemaphore::tryAcquire(int n)
 bool QnSemaphore::tryAcquire(int n, int timeout)
 {
     Q_ASSERT_X(n >= 0, "QnSemaphore::tryAcquire", "parameter 'n' must be non-negative");
-    SCOPED_MUTEX_LOCK( locker, &d->mutex);
+    QnMutexLocker locker( &d->mutex );
     if (timeout < 0) {
         while (n > d->avail)
             d->cond.wait(locker.mutex());

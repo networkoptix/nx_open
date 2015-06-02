@@ -42,7 +42,7 @@ void QnVideoCameraPool::initStaticInstance( QnVideoCameraPool* inst )
 QnVideoCameraPool* QnVideoCameraPool::instance()
 {
     return globalInstance;
-    //SCOPED_MUTEX_LOCK( lock, &m_staticMtx);
+    //QnMutexLocker lock( &m_staticMtx );
     //static QnVideoCameraPool inst;
     //return &inst;
 }
@@ -52,7 +52,7 @@ QnVideoCamera* QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res)
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return 0;
 
-    SCOPED_MUTEX_LOCK( lock, &m_staticMtx);
+    QnMutexLocker lock( &m_staticMtx );
     QnVideoCamera* result = 0;
     CameraMap::iterator itr = m_cameras.find(res);
     if (itr == m_cameras.end()) {
@@ -67,7 +67,7 @@ QnVideoCamera* QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res)
 
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_staticMtx);
+    QnMutexLocker lock( &m_staticMtx );
     CameraMap::iterator itr = m_cameras.find(res);
     if (itr == m_cameras.end())
         return;

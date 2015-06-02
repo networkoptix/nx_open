@@ -158,13 +158,13 @@ void FileTranscoder::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_cond.wakeAll();
 }
 
 bool FileTranscoder::startAsync()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( !openFiles() )
         return false;
@@ -189,7 +189,7 @@ bool FileTranscoder::doSyncTranscode()
     if( !startAsync() )
         return false;
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     while( m_state == sWorking )
         m_cond.wait( lk.mutex() );
 
@@ -205,7 +205,7 @@ void FileTranscoder::run()
     qint64 prevSrcPacketTimestamp = -1;
     qint64 srcUSecRead = 0;
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     while( !needToStop() )
     {
         while( m_state < sWorking && !needToStop() )

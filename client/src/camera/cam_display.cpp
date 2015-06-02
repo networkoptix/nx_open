@@ -36,7 +36,7 @@ static const int MAX_METADATA_QUEUE_SIZE = 50; // max metadata fps is 7 for curr
 
 static void updateActivity()
 {
-    SCOPED_MUTEX_LOCK( locker, activityMutex());
+    QnMutexLocker locker( activityMutex() );
 
     if (QDateTime::currentMSecsSinceEpoch() >= activityTime)
     {
@@ -190,7 +190,7 @@ void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
 {
     m_audioBufferSize = bufferSize;
     m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
-    SCOPED_MUTEX_LOCK( lock, &m_audioChangeMutex);
+    QnMutexLocker lock( &m_audioChangeMutex );
     delete m_audioDisplay;
     m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize);
 
@@ -201,7 +201,7 @@ void QnCamDisplay::pause()
     QnAbstractDataConsumer::pause();
     m_isRealTimeSource = false;
     emit liveMode(false);
-    SCOPED_MUTEX_LOCK( lock, &m_audioChangeMutex);
+    QnMutexLocker lock( &m_audioChangeMutex );
     m_audioDisplay->suspend();
 }
 
@@ -210,7 +210,7 @@ void QnCamDisplay::resume()
     m_delay.afterdelay();
     m_singleShotMode = false;
     {
-        SCOPED_MUTEX_LOCK( lock, &m_audioChangeMutex);
+        QnMutexLocker lock( &m_audioChangeMutex );
         m_audioDisplay->resume();
     }
     m_firstAfterJumpTime = AV_NOPTS_VALUE;
@@ -619,7 +619,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             
             if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore)) 
             {
-                SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+                QnMutexLocker lock( &m_timeMutex );
                 m_lastDecodedTime = vd->timestamp;
             }
 
@@ -690,7 +690,7 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     m_dataQueue.lock();
     markIgnoreBefore(m_dataQueue, time);
     m_dataQueue.unlock();
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     m_singleShotQuantProcessed = false;
     m_buffering = getBufferingMask();
     m_skippingFramesTime = time;
@@ -744,7 +744,7 @@ void QnCamDisplay::onBeforeJump(qint64 time)
         cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     */
     
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
     m_lastDecodedTime = AV_NOPTS_VALUE;
@@ -785,7 +785,7 @@ void QnCamDisplay::onJumpOccured(qint64 time)
     //if (m_extTimeSrc)
     //    m_extTimeSrc->onBufferingStarted(this, time);
 
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     m_afterJump = true;
     m_bofReceived = false;
     m_buffering = getBufferingMask();
@@ -815,7 +815,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
         m_display[i]->afterJump();
 
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     m_lastAudioPacketTime = media->timestamp;
     m_lastVideoPacketTime = media->timestamp;
     m_previousVideoTime = media->timestamp;
@@ -854,14 +854,14 @@ void QnCamDisplay::onPrevFrameOccured()
 {
     if (getDisplayedTime() != DATETIME_NOW)
         m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
-    SCOPED_MUTEX_LOCK( lock, &m_audioChangeMutex);
+    QnMutexLocker lock( &m_audioChangeMutex );
     m_audioDisplay->clearDeviceBuffer();
 }
 
 void QnCamDisplay::onNextFrameOccured()
 {
     m_singleShotQuantProcessed = false;
-    SCOPED_MUTEX_LOCK( lock, &m_audioChangeMutex);
+    QnMutexLocker lock( &m_audioChangeMutex );
     m_audioDisplay->clearDeviceBuffer();
 }
 
@@ -884,7 +884,7 @@ float QnCamDisplay::getSpeed() const
 
 void QnCamDisplay::setSpeed(float speed)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
         if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0)) {
@@ -942,7 +942,7 @@ void QnCamDisplay::processNewSpeed(float speed)
         clearVideoQueue();
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
             m_display[i]->afterJump();
-        SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+        QnMutexLocker lock( &m_timeMutex );
         m_lastDecodedTime = AV_NOPTS_VALUE;
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
             m_nextReverseTime[i] = AV_NOPTS_VALUE;
@@ -1009,7 +1009,7 @@ bool QnCamDisplay::needBuffering(qint64 vTime) const
 
 void QnCamDisplay::processSkippingFramesTime()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     if (m_skippingFramesTime != AV_NOPTS_VALUE)
     {
         for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -1119,7 +1119,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         // clear everything we can
         m_bofReceived = false;
         {
-            SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+            QnMutexLocker lock( &m_timeMutex );
             if (m_executingJump == 0) 
                 m_afterJump = false;
         }
@@ -1240,7 +1240,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         if (audioParamsChanged)
         {
             int audioPrebufferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
-            SCOPED_MUTEX_LOCK( lock, &m_audioChangeMutex);
+            QnMutexLocker lock( &m_audioChangeMutex );
             delete m_audioDisplay;
             m_audioBufferSize = expectedBufferSize;
             m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, audioPrebufferSize);
@@ -1381,7 +1381,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
                 if (!ignoreVideo) {
-                    SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
+                    QnMutexLocker lock( &m_timeMutex );
                     m_lastDecodedTime = vd->timestamp;
                 }
                 if (m_lastAudioPacketTime != m_syncAudioTime) {
@@ -1440,7 +1440,7 @@ void QnCamDisplay::playAudio(bool play)
     m_needChangePriority = true;
     m_playAudio = play;
     {
-        SCOPED_MUTEX_LOCK( lock, &m_audioChangeMutex);
+        QnMutexLocker lock( &m_audioChangeMutex );
         if (!m_playAudio)
             m_audioDisplay->clearDeviceBuffer();
         else
@@ -1460,7 +1460,7 @@ void QnCamDisplay::pauseAudio()
 {
     m_playAudio = false;
     {
-        SCOPED_MUTEX_LOCK( lock, &m_audioChangeMutex);
+        QnMutexLocker lock( &m_audioChangeMutex );
         m_audioDisplay->suspend();
     }
     if (!m_forceMtDecoding)
@@ -1800,7 +1800,7 @@ void QnCamDisplay::setOverridenAspectRatio(qreal aspectRatio) {
 
 void QnFpsStatistics::updateFpsStatistics(QnCompressedVideoDataPtr vd)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if ((vd->flags & QnAbstractMediaData::MediaFlags_BOF) || (vd->flags & QnAbstractMediaData::MediaFlags_AfterDrop)) {
         m_lastTime = AV_NOPTS_VALUE;
         return;
@@ -1821,7 +1821,7 @@ void QnFpsStatistics::updateFpsStatistics(QnCompressedVideoDataPtr vd)
 
 int QnFpsStatistics::getFps() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (m_queue.size() > 0)
         return 1000000.0 / (m_queueSum / (qreal) m_queue.size()) + 0.5;
     else

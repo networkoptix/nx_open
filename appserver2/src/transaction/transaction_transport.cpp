@@ -247,7 +247,7 @@ QnTransactionTransport::~QnTransactionTransport()
     }
 
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_state = Closed;
         m_cond.wakeAll();   //signalling waiters that connection is being closed
         //waiting for waiters to quit
@@ -264,7 +264,7 @@ QnTransactionTransport::~QnTransactionTransport()
 
 void QnTransactionTransport::addData(QByteArray&& data)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if( m_base64EncodeOutgoingTransactions )
     {
         //adding size before transaction data
@@ -310,13 +310,13 @@ void QnTransactionTransport::closeSocket()
 
 void QnTransactionTransport::setState(State state)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     setStateNoLock(state);
 }
 
 void QnTransactionTransport::processExtraData()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if( !m_extraData.isEmpty() )
     {
         processTransactionData(m_extraData);
@@ -326,7 +326,7 @@ void QnTransactionTransport::processExtraData()
 
 void QnTransactionTransport::startListening()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     startListeningNonSafe();
 }
 
@@ -347,27 +347,27 @@ void QnTransactionTransport::setStateNoLock(State state)
 
 QnTransactionTransport::State QnTransactionTransport::getState() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_state;
 }
 
 int QnTransactionTransport::setHttpChunkExtensonHandler( HttpChunkExtensonHandler eventHandler )
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex);
+    QnMutexLocker lk( &m_mutex );
     m_httpChunkExtensonHandlers.emplace( ++m_prevGivenHandlerID, std::move(eventHandler) );
     return m_prevGivenHandlerID;
 }
 
 int QnTransactionTransport::setBeforeSendingChunkHandler( BeforeSendingChunkHandler eventHandler )
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex);
+    QnMutexLocker lk( &m_mutex );
     m_beforeSendingChunkHandlers.emplace( ++m_prevGivenHandlerID, std::move(eventHandler) );
     return m_prevGivenHandlerID;
 }
 
 void QnTransactionTransport::removeEventHandler( int eventHandlerID )
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex);
+    QnMutexLocker lk( &m_mutex );
     m_httpChunkExtensonHandlers.erase( eventHandlerID );
     m_beforeSendingChunkHandlers.erase( eventHandlerID );
 }
@@ -394,7 +394,7 @@ void QnTransactionTransport::close()
  
     closeSocket();
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex);
+        QnMutexLocker lock( &m_mutex );
         assert( !m_incomingDataSocket && !m_outgoingDataSocket );
         m_readSync = false;
         m_writeSync = false;
@@ -496,7 +496,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
 
 bool QnTransactionTransport::tryAcquireConnecting(const QnUuid& remoteGuid, bool isOriginator)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_staticMutex);
+    QnMutexLocker lock( &m_staticMutex );
 
     Q_ASSERT(!remoteGuid.isNull());
 
@@ -515,7 +515,7 @@ bool QnTransactionTransport::tryAcquireConnecting(const QnUuid& remoteGuid, bool
 
 void QnTransactionTransport::connectingCanceled(const QnUuid& remoteGuid, bool isOriginator)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_staticMutex);
+    QnMutexLocker lock( &m_staticMutex );
     connectingCanceledNoLock(remoteGuid, isOriginator);
 }
 
@@ -534,7 +534,7 @@ void QnTransactionTransport::connectingCanceledNoLock(const QnUuid& remoteGuid, 
 
 bool QnTransactionTransport::tryAcquireConnected(const QnUuid& remoteGuid, bool isOriginator)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_staticMutex);
+    QnMutexLocker lock( &m_staticMutex );
     bool isExist = m_existConn.contains(remoteGuid);
     bool isTowardConnecting = isOriginator ?  m_connectingConn.value(remoteGuid).second : m_connectingConn.value(remoteGuid).first;
     bool fail = isExist || (isTowardConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
@@ -547,7 +547,7 @@ bool QnTransactionTransport::tryAcquireConnected(const QnUuid& remoteGuid, bool 
 
 void QnTransactionTransport::connectDone(const QnUuid& id)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_staticMutex);
+    QnMutexLocker lock( &m_staticMutex );
     m_existConn.remove(id);
 }
 
@@ -572,7 +572,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::onSomeBytesRead. errorCode = %1, bytesRead = %2").
         arg((int)errorCode).arg(bytesRead), cl_logDEBUG2 );
     
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     m_asyncReadScheduled = false;
     m_lastReceiveTimer.invalidate();
@@ -694,7 +694,7 @@ void QnTransactionTransport::receivedTransaction(
 
 void QnTransactionTransport::transactionProcessed()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     --m_postedTranCount;
     if( m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME )
@@ -797,7 +797,7 @@ void QnTransactionTransport::monitorConnectionForClosure(
     SystemError::ErrorCode errorCode,
     size_t bytesRead )
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     if( (errorCode != SystemError::noError && errorCode != SystemError::timedOut) ||
         (bytesRead == 0) )   //error or connection closed
@@ -851,7 +851,7 @@ void QnTransactionTransport::aggregateOutgoingTransactionsNonSafe()
 
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_lastReceiveTimer.isValid() &&  //if not valid we still have not begun receiving transactions
         (m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE);
 }
@@ -987,7 +987,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 
 void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent )
 {
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( errorCode )
     {
@@ -1257,7 +1257,7 @@ void QnTransactionTransport::processChunkExtensions( const nx_http::HttpHeaders&
 
 void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data) 
 { 
-    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     assert(m_extraData.isEmpty());
     m_extraData = data;
 }

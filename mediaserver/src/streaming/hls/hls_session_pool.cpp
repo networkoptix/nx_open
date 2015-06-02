@@ -69,13 +69,13 @@ namespace nx_hls
 
     void HLSSession::saveChunkAlias( MediaQuality streamQuality, const QString& alias, quint64 startTimestamp, quint64 duration )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_chunksByAlias[std::make_pair(streamQuality, alias)] = std::make_pair( startTimestamp, duration );
     }
 
     bool HLSSession::getChunkByAlias( MediaQuality streamQuality, const QString& alias, quint64* const startTimestamp, quint64* const duration ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         auto iter = m_chunksByAlias.find( std::make_pair(streamQuality, alias) );
         if( iter == m_chunksByAlias.end() )
             return false;
@@ -121,7 +121,7 @@ namespace nx_hls
         {
             HLSSessionContext sessionCtx;
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 if( m_sessionByID.empty() )
                     break;
                 sessionCtx = m_sessionByID.begin()->second;
@@ -138,7 +138,7 @@ namespace nx_hls
 
     bool HLSSessionPool::add( HLSSession* session, unsigned int keepAliveTimeoutMS )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( !m_sessionByID.insert( std::make_pair(session->id(), HLSSessionContext(session, keepAliveTimeoutMS)) ).second )
             return false;
         Q_ASSERT( (keepAliveTimeoutMS == 0) || (m_lockedIDs.find(session->id()) != m_lockedIDs.end()) );   //session with keep-alive timeout can only be accessed under lock
@@ -147,7 +147,7 @@ namespace nx_hls
 
     HLSSession* HLSSessionPool::find( const QString& id ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         std::map<QString, HLSSessionContext>::const_iterator it = m_sessionByID.find( id );
         if( it == m_sessionByID.end() )
             return NULL;
@@ -157,7 +157,7 @@ namespace nx_hls
 
     void HLSSessionPool::remove( const QString& id )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         removeNonSafe( id );
     }
 
@@ -175,7 +175,7 @@ namespace nx_hls
 
     void HLSSessionPool::lockSessionID( const QString& id )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         while( !m_lockedIDs.insert(id).second )
             m_cond.wait( lk.mutex() );
 
@@ -189,7 +189,7 @@ namespace nx_hls
 
     void HLSSessionPool::unlockSessionID( const QString& id )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_lockedIDs.erase( id );
 
         //creating session remove task
@@ -202,7 +202,7 @@ namespace nx_hls
 
     void HLSSessionPool::onTimer( const quint64& timerID )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         std::map<quint64, QString>::iterator timerIter = m_taskToSessionID.find( timerID );
         if( timerIter == m_taskToSessionID.end() )
             return; //it is possible just after lockSessionID call

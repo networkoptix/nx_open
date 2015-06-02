@@ -310,7 +310,7 @@ int TextToWaveServer::generateSoundAsync( const QString& text, QIODevice* const 
 
 bool TextToWaveServer::generateSoundSync( const QString& text, QIODevice* const dest )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     QSharedPointer<SynthetiseSpeechTask> task = addTaskToQueue( text, dest );
     while( !task->done )
         m_cond.wait( lk.mutex() );
@@ -333,7 +333,7 @@ void TextToWaveServer::run()
 
         const bool result = textToWavInternal( task->text, task->dest );
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             task->done = true;
             task->result = result;
             m_cond.wakeAll();

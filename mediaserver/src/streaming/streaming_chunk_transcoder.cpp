@@ -61,7 +61,7 @@ StreamingChunkTranscoder::~StreamingChunkTranscoder()
 {
     //cancelling all scheduled transcodings
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
     }
 
@@ -243,7 +243,7 @@ StreamingChunkTranscoder* StreamingChunkTranscoder::instance()
 
 void StreamingChunkTranscoder::onTimer( const quint64& timerID )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( m_terminated )
         return;
@@ -312,7 +312,7 @@ bool StreamingChunkTranscoder::scheduleTranscoding(
         this,
         delayMSec );
 
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_taskIDToTranscode[taskID] = transcodeID;
     return true;
 }

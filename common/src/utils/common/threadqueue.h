@@ -41,7 +41,7 @@ public:
 
     bool contains(const T& val) const
     { 
-        SCOPED_MUTEX_LOCK( mutex, &m_cs );
+        QnMutexLocker mutex( &m_cs );
         for (int i = 0; i < m_bufferLen; ++i) {
             if (atUnsafe(i) == val)
                 return true;
@@ -51,7 +51,7 @@ public:
 
     bool push(const T& val) 
     { 
-        SCOPED_MUTEX_LOCK( mutex, &m_cs );
+        QnMutexLocker mutex( &m_cs );
 
 
         if ((uint)m_bufferLen == m_buffer.size())
@@ -73,13 +73,13 @@ public:
 
     T front() const
     {
-        SCOPED_MUTEX_LOCK( mutex, &m_cs);
+        QnMutexLocker mutex( &m_cs );
         return m_buffer[m_headIndex];
     }
     
     const T& at(int i) const
     {
-        SCOPED_MUTEX_LOCK( mutex, &m_cs);
+        QnMutexLocker mutex( &m_cs );
         int index = m_headIndex + i;
         return m_buffer[index % m_buffer.size()];
     }
@@ -92,14 +92,14 @@ public:
 
     void setAt(const T& value, int i)
     {
-        SCOPED_MUTEX_LOCK( mutex, &m_cs);
+        QnMutexLocker mutex( &m_cs );
         int index = m_headIndex + i;
         m_buffer[index % m_buffer.size()] = value;
     }
 
     T last() const
     {
-        SCOPED_MUTEX_LOCK( mutex, &m_cs);
+        QnMutexLocker mutex( &m_cs );
         int index = m_headIndex + m_bufferLen - 1;
         return m_bufferLen > 0 ? m_buffer[index % m_buffer.size()]: T();
     }
@@ -110,7 +110,7 @@ public:
         if (!m_sem.tryAcquire(1,time)) // in case of INFINITE wait the value passed to tryAcquire will be negative ( it will wait forever )
             return false;
 
-        SCOPED_MUTEX_LOCK( mutex, &m_cs);
+        QnMutexLocker mutex( &m_cs );
 
         if (m_bufferLen > 0)
         {
@@ -128,7 +128,7 @@ public:
     void removeFirst(int count)
     {
         m_sem.tryAcquire(count);
-        SCOPED_MUTEX_LOCK( mutex, &m_cs);
+        QnMutexLocker mutex( &m_cs );
         for (int i = 0; i < count; ++i)
         {
             m_buffer[m_headIndex++] = T();
@@ -151,7 +151,7 @@ public:
     template <class ConditionFunc>
     void detachDataByCondition(const ConditionFunc& cond, const QVariant& opaque = QVariant())
     {
-        SCOPED_MUTEX_LOCK( mutex, &m_cs);
+        QnMutexLocker mutex( &m_cs );
         int index = m_headIndex;
         for (int i = 0; i < m_bufferLen; ++i)
         {
@@ -179,7 +179,7 @@ public:
 
     void clear()
     {
-        SCOPED_MUTEX_LOCK( mutex, &this->m_cs);
+        QnMutexLocker mutex( &this->m_cs );
 
         this->m_sem.tryAcquire(m_bufferLen);
         int index = m_headIndex;
@@ -196,7 +196,7 @@ private:
     // for grow only
     void reallocateBuffer(int newSize)
     {
-        SCOPED_MUTEX_LOCK( mutex, &m_cs);
+        QnMutexLocker mutex( &m_cs );
 
         int oldSize = (int) m_buffer.size();
         m_buffer.resize(newSize);

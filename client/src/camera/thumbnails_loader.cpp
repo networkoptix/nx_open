@@ -105,7 +105,7 @@ QnMediaResourcePtr QnThumbnailsLoader::resource() const {
 }
 
 void QnThumbnailsLoader::setBoundingSize(const QSize &size) {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     if(m_boundingSize == size)
         return;
@@ -116,31 +116,31 @@ void QnThumbnailsLoader::setBoundingSize(const QSize &size) {
 }
 
 QSize QnThumbnailsLoader::boundingSize() const {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_boundingSize;
 }
 
 QSize QnThumbnailsLoader::sourceSize() const {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_scaleSourceSize;
 }
 
 QSize QnThumbnailsLoader::thumbnailSize() const {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_scaleTargetSize;
 }
 
 qint64 QnThumbnailsLoader::timeStep() const {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_timeStep;
 }
 
 void QnThumbnailsLoader::setTimeStep(qint64 timeStep) {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     if(m_timeStep == timeStep)
         return;
@@ -151,36 +151,36 @@ void QnThumbnailsLoader::setTimeStep(qint64 timeStep) {
 }
 
 qint64 QnThumbnailsLoader::startTime() const {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_requestStart;
 }
 
 void QnThumbnailsLoader::setStartTime(qint64 startTime) {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     setTimePeriodLocked(startTime, qMax(startTime, m_requestEnd));
 }
 
 qint64 QnThumbnailsLoader::endTime() const {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_requestStart;
 }
 
 void QnThumbnailsLoader::setEndTime(qint64 endTime) {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     setTimePeriodLocked(qMin(m_requestStart, endTime), endTime);
 }
 
 void QnThumbnailsLoader::setTimePeriod(qint64 startTime, qint64 endTime) {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
     setTimePeriodLocked(startTime, endTime);
 }
 
 void QnThumbnailsLoader::setTimePeriod(const QnTimePeriod &timePeriod) {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     setTimePeriodLocked(timePeriod.startTimeMs, timePeriod.endTimeMs());
 }
@@ -199,20 +199,20 @@ void QnThumbnailsLoader::setTimePeriodLocked(qint64 startTime, qint64 endTime) {
 }
 
 QnTimePeriod QnThumbnailsLoader::timePeriod() const {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return QnTimePeriod(m_requestStart, m_requestEnd - m_requestStart);
 }
 
 QHash<qint64, QnThumbnail> QnThumbnailsLoader::thumbnails() const {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_thumbnailByTime;
 }
 
 void QnThumbnailsLoader::pleaseStop() {
     {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         foreach(QnAbstractArchiveDelegatePtr client, m_delegates) 
             client->beforeClose();
@@ -263,7 +263,7 @@ void QnThumbnailsLoader::invalidateThumbnailsLocked() {
 }
 
 void QnThumbnailsLoader::updateProcessing() {
-    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     updateProcessingLocked();
 }
@@ -388,7 +388,7 @@ void QnThumbnailsLoader::process() {
     QList<QnAbstractArchiveDelegatePtr> delegates;
 
     {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         if(m_processingStack.isEmpty())
             return;
@@ -491,7 +491,7 @@ void QnThumbnailsLoader::process() {
                 }
 
                 {
-                    SCOPED_MUTEX_LOCK( locker, &m_mutex);
+                    QnMutexLocker locker( &m_mutex );
                     if(m_generation != generation) {
                         invalidated = true;
                         break;
@@ -535,7 +535,7 @@ void QnThumbnailsLoader::process() {
 
 void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
     {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         if(thumbnail.generation() != m_generation)
             return; /* Already outdated. */
@@ -594,7 +594,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
 QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize, qint64 timeStep, int generation) {
     QSize scaleTargetSize;
     {
-        SCOPED_MUTEX_LOCK( locker, &m_mutex);
+        QnMutexLocker locker( &m_mutex );
         ensureScaleContextLocked(outFrame.linesize[0], QSize(outFrame.width*outFrame.sample_aspect_ratio, outFrame.height), boundingSize, (PixelFormat) outFrame.format);
         scaleTargetSize = m_scaleTargetSize;
     }

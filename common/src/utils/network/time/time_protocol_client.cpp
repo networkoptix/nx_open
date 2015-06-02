@@ -48,7 +48,7 @@ void TimeProtocolClient::join()
         //so we can safely use m_tcpSock
     std::shared_ptr<AbstractStreamSocket> tcpSock;
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( !m_tcpSock )
             return;
         tcpSock = m_tcpSock;
@@ -64,7 +64,7 @@ bool TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::E
         arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
 
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_tcpSock.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
         if( !m_tcpSock )
             return false;
@@ -82,7 +82,7 @@ bool TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::E
     {
         m_tcpSock->terminateAsyncIO( true );
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_tcpSock.reset();
         }
         handlerFunc( timestamp, error );

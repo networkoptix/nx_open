@@ -24,7 +24,7 @@ CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
 
 CameraDiagnostics::Result CLServerPushStreamReader::diagnoseMediaStreamConnection()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_openStreamMutex );
+    QnMutexLocker lk( &m_openStreamMutex );
 
     const int openStreamCounter = m_openStreamCounter;
     while( openStreamCounter == m_openStreamCounter

@@ -72,13 +72,13 @@ namespace ec2
 
     void Ec2DirectConnectionFactory::pleaseStop()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
     }
 
     void Ec2DirectConnectionFactory::join()
     {
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         while( m_runningRequests > 0 )
         {
             lk.unlock();
@@ -320,7 +320,7 @@ namespace ec2
         connectionInfo.ecUrl = url;
         ec2::ErrorCode connectionInitializationResult = ec2::ErrorCode::ok;
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
                 if( !m_directConnection->initialized() )
@@ -340,7 +340,7 @@ namespace ec2
 
         ////TODO: #ak return existing connection, if one
         //{
-        //    SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        //    QnMutexLocker lk( &m_mutex );
         //    auto it = m_urlToConnection.find( addr );
         //    if( it != m_urlToConnection.end() )
         //        AbstractECConnectionPtr connection = it->second.second;
@@ -351,7 +351,7 @@ namespace ec2
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
         loginInfo.clientInfo = clientInfo;
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return INVALID_REQ_ID;
             ++m_runningRequests;
@@ -430,7 +430,7 @@ namespace ec2
                 break;
         }
 
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         --m_runningRequests;
     }
 
@@ -489,7 +489,7 @@ namespace ec2
             errorCode,
             connection);
 
-        SCOPED_MUTEX_LOCK( lk, &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         --m_runningRequests;
     }
 
@@ -503,7 +503,7 @@ namespace ec2
         if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
         {
             handler->done( reqID, errorCode, connectionInfo );
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             --m_runningRequests;
             return;
         }
@@ -580,7 +580,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         {
-            SCOPED_MUTEX_LOCK( lk, &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return INVALID_REQ_ID;
             ++m_runningRequests;

@@ -62,7 +62,7 @@ public:
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources() const {
-        SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx);
+        QnMutexLocker locker( &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
         for (const QnResourcePtr &resource : m_resources)
             if(QnSharedResourcePointer<Resource> derived = resource.template dynamicCast<Resource>())
@@ -72,7 +72,7 @@ public:
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources(const QVector<QnUuid>& idList) const {
-        SCOPED_MUTEX_LOCK( locker, &m_resourcesMtx );
+        QnMutexLocker locker( &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
         for (const auto& id: idList) {
             const auto itr = m_resources.find(id);

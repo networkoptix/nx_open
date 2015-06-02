@@ -57,7 +57,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
 
 QnMediaServerResource::~QnMediaServerResource()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     m_runningIfRequests.clear();
 }
 
@@ -69,14 +69,14 @@ void QnMediaServerResource::at_propertyChanged(const QnResourcePtr & /*res*/, co
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     if (m_firstCamera.isNull() && resource.dynamicCast<QnSecurityCamResource>() &&  resource->getParentId() == getId())
         m_firstCamera = resource;
 }
 
 void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     if (m_firstCamera && resource->getId() == m_firstCamera->getId())
         m_firstCamera.clear();
 }
@@ -96,7 +96,7 @@ QString QnMediaServerResource::getName() const
 {
     if (getServerFlags() & Qn::SF_Edge)
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex );
+        QnMutexLocker lock( &m_mutex );
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
@@ -139,20 +139,20 @@ void QnMediaServerResource::setApiUrl(const QString &apiUrl)
 
 QString QnMediaServerResource::getApiUrl() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return m_apiUrl;
 }
 
 void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     m_netAddrList = netAddrList;
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QHostAddress> QnMediaServerResource::getNetAddrList() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return m_netAddrList;
 }
 
@@ -195,7 +195,7 @@ quint16 QnMediaServerResource::getPort() const {
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
 
     /* We want the video server connection to be deleted in its associated thread, 
      * no matter where the reference count reached zero. Hence the custom deleter. */
@@ -335,7 +335,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
 
 QnSoftwareVersion QnMediaServerResource::getVersion() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
 
     return m_version;
 }
@@ -372,7 +372,7 @@ bool QnMediaServerResource::isRedundancy() const
 void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 {
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex );
+        QnMutexLocker lock( &m_mutex );
         if (m_version == version)
             return;
         m_version = version;
@@ -381,26 +381,26 @@ void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 }
 
 QnSystemInformation QnMediaServerResource::getSystemInfo() const {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
 
     return m_systemInfo;
 }
 
 void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo) {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
 
     m_systemInfo = systemInfo;
 }
 
 QString QnMediaServerResource::getSystemName() const {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
 
     return m_systemName;
 }
 
 void QnMediaServerResource::setSystemName(const QString &systemName) {
     {
-        SCOPED_MUTEX_LOCK( lock, &m_mutex );
+        QnMutexLocker lock( &m_mutex );
 
         if (m_systemName == systemName)
             return;
@@ -419,7 +419,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
     
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
 
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
@@ -464,7 +464,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
     if (getStatus() != newStatus) 
     {
         {
-            SCOPED_MUTEX_LOCK( lock, &m_mutex );
+            QnMutexLocker lock( &m_mutex );
             m_statusTimer.restart();
         }
 
@@ -483,7 +483,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
 
 qint64 QnMediaServerResource::currentStatusTime() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     return m_statusTimer.elapsed();
 }
 

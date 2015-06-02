@@ -49,7 +49,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
     bool h264;
 
     {
-            SCOPED_MUTEX_LOCK( mutex, &m_mutex);
+            QnMutexLocker mutex( &m_mutex );
 
             h264 = isH264();
 

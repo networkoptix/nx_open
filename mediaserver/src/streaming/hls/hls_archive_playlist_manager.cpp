@@ -82,7 +82,7 @@ namespace nx_hls
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         const_cast<ArchivePlaylistManager*>(this)->generateChunksIfNeeded();
 

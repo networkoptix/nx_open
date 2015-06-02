@@ -87,7 +87,7 @@ namespace ec2
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
-            SCOPED_MUTEX_LOCK( lock, &m_mutex);
+            QnMutexLocker lock( &m_mutex );
             if (m_connections.isEmpty())
                 return;
             QnTransactionTransportHeader ttHeader(connectedServerPeers() << m_localPeer.id, dstPeers);

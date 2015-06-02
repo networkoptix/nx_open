@@ -10,7 +10,7 @@ QnColdStoreConnection::QnColdStoreConnection(const QString& addr):
     m_opened(false),
     m_mutex(QnMutex::Recursive)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QByteArray ipba = addr.toLatin1();
     char* ip = ipba.data();
@@ -24,7 +24,7 @@ QnColdStoreConnection::QnColdStoreConnection(const QString& addr):
 
 QnColdStoreConnection::~QnColdStoreConnection()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     close();
 
@@ -35,7 +35,7 @@ QnColdStoreConnection::~QnColdStoreConnection()
 
 bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag, int channel)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     if (!m_isConnected)
         return false;
@@ -110,13 +110,13 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
 
 qint64 QnColdStoreConnection::size() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_openedStreamSize;
 }
 
 void QnColdStoreConnection::close()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (!m_isConnected || !m_opened)
         return;
 
@@ -134,7 +134,7 @@ void QnColdStoreConnection::close()
 
 bool QnColdStoreConnection::seek(qint64 pos)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (!m_isConnected || !m_opened)
         return false;
 
@@ -170,7 +170,7 @@ bool QnColdStoreConnection::seek(qint64 pos)
 
 bool QnColdStoreConnection::write(const char* data, int len)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (!m_isConnected || !m_opened)
         return false;
 
@@ -203,7 +203,7 @@ bool QnColdStoreConnection::write(const char* data, int len)
 
 int QnColdStoreConnection::read(char *data, int len)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (!m_isConnected || !m_opened)
         return -1;
 
@@ -236,7 +236,7 @@ int QnColdStoreConnection::read(char *data, int len)
 
 qint64 QnColdStoreConnection::oldestFileTime(const QString& fn)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_lastUsed.restart();
 
     QByteArray baFn = fn.toLatin1();
@@ -276,19 +276,19 @@ qint64 QnColdStoreConnection::oldestFileTime(const QString& fn)
 
 int QnColdStoreConnection::age() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_lastUsed.elapsed()/1000;
 }
 
 QString QnColdStoreConnection::getFilename() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_filename;
 }
 
 qint64 QnColdStoreConnection::pos() const
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_pos;
 }
 
@@ -319,7 +319,7 @@ m_mutex(QnMutex::Recursive)
 
 QnColdStoreConnectionPool::~QnColdStoreConnectionPool()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     qDeleteAll(m_pool);
     m_pool.clear();
@@ -327,7 +327,7 @@ QnColdStoreConnectionPool::~QnColdStoreConnectionPool()
 
 int QnColdStoreConnectionPool::read(const QString& csFn,   char* data, quint64 shift, int len)
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     checkIfSomeConnectionsNeedToBeClosed();
 
@@ -375,7 +375,7 @@ int QnColdStoreConnectionPool::read(const QString& csFn,   char* data, quint64 s
 
 void QnColdStoreConnectionPool::checkIfSomeConnectionsNeedToBeClosed()
 {
-    SCOPED_MUTEX_LOCK( lock, &m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QHash<QString, QnColdStoreConnection*>::iterator it = m_pool.begin();
     while (it != m_pool.end()) 

@@ -39,7 +39,7 @@ QnAbstractPictureDataRef::PicStorageType VideoDecoderSwitcher::targetMemoryType(
 //!Implementation of QnAbstractVideoDecoder::decode
 bool VideoDecoderSwitcher::decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     bool res = false;
     for( int i = 0; i < 2; ++i )
@@ -132,7 +132,7 @@ unsigned int VideoDecoderSwitcher::getDecoderCaps() const
 
 void VideoDecoderSwitcher::setSpeed( float newValue )
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( m_decoder.get() )
         m_decoder->setSpeed( newValue );
@@ -162,7 +162,7 @@ void VideoDecoderSwitcher::setHWDecoder( QnAbstractVideoDecoder* hwDecoder )
 //!Switches to ffmpeg decoder, destroys hardware decoder object
 void VideoDecoderSwitcher::switchToSoftwareDecoding()
 {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_switchToSWDecoding = true;
 }
 

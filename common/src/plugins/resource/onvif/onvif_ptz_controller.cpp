@@ -453,7 +453,7 @@ QString QnOnvifPtzController::presetName(const QString &presetId) {
 }
 
 bool QnOnvifPtzController::removePreset(const QString &presetId) {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
@@ -475,7 +475,7 @@ bool QnOnvifPtzController::removePreset(const QString &presetId) {
 }
 
 bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets) {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if (!readBuiltinPresets())
         return false;
@@ -485,7 +485,7 @@ bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets) {
 }
 
 bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
@@ -524,7 +524,7 @@ bool QnOnvifPtzController::updatePreset(const QnPtzPreset &preset) {
 }
 
 bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset) {
-    SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if (!readBuiltinPresets())
         return false;

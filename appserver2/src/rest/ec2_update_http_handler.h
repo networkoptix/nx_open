@@ -119,14 +119,14 @@ namespace ec2
             auto queryDoneHandler = [&errorCode, &finished, this]( ErrorCode _errorCode )
             {
                 errorCode = _errorCode;
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 finished = true;
                 m_cond.wakeAll();
             };
             m_connection->queryProcessor()->processUpdateAsync( tran, queryDoneHandler );
 
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 while( !finished )
                     m_cond.wait( lk.mutex() );
             }

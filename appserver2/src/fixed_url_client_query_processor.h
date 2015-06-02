@@ -35,7 +35,7 @@ namespace ec2
         {
             QUrl ecUrl;
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 ecUrl = m_ecURL;
             }
             m_clientProcessor->processUpdateAsync( ecUrl, tran, handler );
@@ -46,7 +46,7 @@ namespace ec2
         {
             QUrl ecUrl;
             {
-                SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 ecUrl = m_ecURL;
             }
             m_clientProcessor->processQueryAsync<InputData, OutputData, HandlerType>( ecUrl, cmdCode, input, handler );
@@ -54,19 +54,19 @@ namespace ec2
 
         QUrl getUrl() const
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             return m_ecURL;
         }
 
         QString userName() const
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             return m_ecURL.userName();
         }
 
         void setPassword( const QString& password )
         {
-            SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_ecURL.setPassword( password );
         }
 

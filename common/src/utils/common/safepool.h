@@ -119,7 +119,7 @@ public:
     */
     const_iterator lock( const KeyType& key ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         typename InternalContainerType::const_iterator it = m_dataDict.end();
         typename SyncCtxDict::iterator syncCtxIter = m_syncCtxDict.end();
@@ -147,7 +147,7 @@ public:
     */
     iterator lock( const KeyType& key )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         typename InternalContainerType::iterator it = m_dataDict.end();
         typename SyncCtxDict::iterator syncCtxIter = m_syncCtxDict.end();
@@ -174,7 +174,7 @@ public:
     */
     bool tryLock( const KeyType& key, const_iterator* const lockedIter ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         typename InternalContainerType::const_iterator it = m_dataDict.find( key );
         if( it == m_dataDict.end() )
@@ -195,7 +195,7 @@ public:
 
     void unlock( const const_iterator& it ) const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         typename SyncCtxDict::iterator syncCtxIter = m_syncCtxDict.find( it->first );
         Q_ASSERT( syncCtxIter != m_syncCtxDict.end() );
@@ -211,7 +211,7 @@ public:
     */
     std::pair<iterator, bool> insert( const value_type& val )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         const typename std::pair<typename InternalContainerType::iterator, bool>& p = m_dataDict.insert( val );
         if( !p.second )
@@ -227,7 +227,7 @@ public:
     */
     std::pair<iterator, bool> insertAndLock( const value_type& val )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         const typename std::pair<typename InternalContainerType::iterator, bool>& p = m_dataDict.insert( val );
         if( !p.second )
@@ -243,7 +243,7 @@ public:
     */
     void eraseAndUnlock( const iterator& it )
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         m_syncCtxDict.erase( it->first );
         m_dataDict.erase( it.m_iter );
@@ -252,43 +252,43 @@ public:
 
     size_type size() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_dataDict.size();
     }
 
     bool empty() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_dataDict.empty();
     }
 
     const_iterator begin() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return const_iterator( m_dataDict.begin() );
     }
 
     iterator begin()
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return iterator( m_dataDict.begin() );
     }
 
     const_iterator end() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return const_iterator( m_dataDict.end() );
     }
 
     iterator end()
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return iterator( m_dataDict.end() );
     }
 
     void clear()
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_dataDict.clear();
         m_syncCtxDict.clear();
         m_cond.wakeAll();
@@ -300,7 +300,7 @@ public:
     */
     std::vector<KeyType> keys() const
     {
-        SCOPED_MUTEX_LOCK( lk,  &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         std::vector<KeyType> keysVector;
         for( typename InternalContainerType::const_iterator
