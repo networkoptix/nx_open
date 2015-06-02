@@ -61,11 +61,21 @@ namespace ec2
         std::vector<ApiResourceParamData> addParams;
         ApiStorageDataList storages;
 
+        ApiMediaServerDataEx( ApiMediaServerData&& mediaServerData )
+        :   
+            ApiMediaServerData( std::move( mediaServerData ) ),
+            status( Qn::Offline )
+        {
+        }
+
         template<class ApiMediaServerDataRefType>
         ApiMediaServerDataEx( ApiMediaServerDataRefType&& mediaServerData )
         :
             ApiMediaServerData( std::forward<ApiMediaServerDataRefType>(mediaServerData) ),
-            status(Qn::Offline)
+            ApiMediaServerUserAttributesData( std::forward<ApiMediaServerDataRefType>( mediaServerData ) ),
+            status( mediaServerData.status ),
+            addParams( std::forward<ApiMediaServerDataRefType>(mediaServerData).addParams ),
+            storages( std::forward<ApiMediaServerDataRefType>(mediaServerData).storages )
         {
         }
     };

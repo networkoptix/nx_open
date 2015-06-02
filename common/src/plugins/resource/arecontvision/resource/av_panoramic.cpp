@@ -8,6 +8,7 @@
 
 #include "av_resource.h"
 #include "av_panoramic.h"
+#include "core/resource_management/resource_properties.h"
 
 #define MAX_RESPONSE_LEN (4*1024)
 
@@ -111,7 +112,7 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 
     setParamPhysical(QLatin1String("cnannelenable"), 15); // to enable all channels
 
-    updateFlipState();
+    getVideoLayout(0);
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -175,12 +176,15 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout(
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     Q_UNUSED(dataProvider)
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_layoutMutex);
 
-    const QnConstResourceVideoLayoutPtr layout = QnArecontPanoramicResource::getDefaultVideoLayout();
+    QnConstResourceVideoLayoutPtr layout = QnArecontPanoramicResource::getDefaultVideoLayout();
     const QnCustomResourceVideoLayout* customLayout = dynamic_cast<const QnCustomResourceVideoLayout*>(layout.data());
-    const_cast<QnArecontPanoramicResource*>(this)->updateFlipState();
-    if (m_isRotated && customLayout)
+    if (!customLayout)
+        return layout;
+    auto nonConstThis = const_cast<QnArecontPanoramicResource*>(this);
+    nonConstThis->updateFlipState();
+    if (m_isRotated)
     {
         if (!m_rotatedLayout) {
             m_rotatedLayout.reset( new QnCustomResourceVideoLayout(customLayout->size()) );
@@ -188,7 +192,14 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const Q
             std::reverse(channels.begin(), channels.end());
             m_rotatedLayout->setChannels(channels);
         }
-        return m_rotatedLayout;
+        layout = m_rotatedLayout;
+    }
+
+    QString oldVideoLayout = propertyDictionary->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
+    QString newVideoLayout = layout->toString();
+    if (newVideoLayout != oldVideoLayout) {
+        propertyDictionary->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+        propertyDictionary->saveParams(getId());
     }
 
     return layout;
