@@ -1213,7 +1213,7 @@ qint64 QnArchiveStreamReader::startTime() const
     Q_ASSERT(m_delegate);
     QnTimePeriod p;
     {
-        QMutexLocker lock(&m_playbackMaskSync);
+        SCOPED_MUTEX_LOCK(lock, &m_playbackMaskSync);
         p = m_playbackMaskHelper.getPlaybackRange();
     }
     if (p.isEmpty())
@@ -1227,7 +1227,7 @@ qint64 QnArchiveStreamReader::endTime() const
     Q_ASSERT(m_delegate);
     QnTimePeriod p;
     {
-        QMutexLocker lock(&m_playbackMaskSync);
+        SCOPED_MUTEX_LOCK(lock, &m_playbackMaskSync);
         p = m_playbackMaskHelper.getPlaybackRange();
     }
     if (p.isEmpty())

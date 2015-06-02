@@ -95,7 +95,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
     QnUuid id = server->getId();
 
     {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK(lock, &m_mutex);
         if (m_serverUuidByFakeUuid.contains(id))
             return;
     }
@@ -104,7 +104,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
     if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem()) {
         removeResource(getFakeId(id));
     } else if (status == Qn::Offline) {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK(lock, &m_mutex);
         QnModuleInformationWithAddresses moduleInformation = m_moduleInformationById.value(id);
         lock.unlock();
         if (!moduleInformation.id.isNull())
@@ -115,11 +115,11 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
 void QnIncompatibleServerWatcher::at_moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive) {
     if (!isAlive) {
         removeResource(getFakeId(moduleInformation.id));
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK(lock, &m_mutex);
         m_moduleInformationById.remove(moduleInformation.id);
         return;
     } else {
-        QMutexLocker lock(&m_mutex);
+        SCOPED_MUTEX_LOCK(lock, &m_mutex);
         m_moduleInformationById.insert(moduleInformation.id, moduleInformation);
         lock.unlock();
         addResource(moduleInformation);

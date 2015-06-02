@@ -1426,7 +1426,7 @@ void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* han
 
 QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer) const
 {
-    QMutexLocker lock(&m_mutex);
+    SCOPED_MUTEX_LOCK(lock, &m_mutex);
     const auto itr = m_alivePeers.find(dstPeer);
     if (itr == m_alivePeers.cend())
         return QnUuid(); // route info not found

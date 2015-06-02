@@ -328,13 +328,13 @@ void QnRtspClientArchiveDelegate::close()
 
 void QnRtspClientArchiveDelegate::lockTime(qint64 value)
 {
-    QMutexLocker lock(&m_timeMutex);
+    SCOPED_MUTEX_LOCK(lock, &m_timeMutex);
     m_lockedTime = value;
 }
 
 void QnRtspClientArchiveDelegate::unlockTime()
 {
-    QMutexLocker lock(&m_timeMutex);
+    SCOPED_MUTEX_LOCK(lock, &m_timeMutex);
     m_lockedTime = AV_NOPTS_VALUE;
 }
 
