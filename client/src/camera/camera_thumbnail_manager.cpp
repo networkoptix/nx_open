@@ -92,7 +92,7 @@ int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &reso
     if (!networkResource)
         return 0;
 
-    QnMediaServerResourcePtr serverResource = qnResPool->getResourceById(resource->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr serverResource = qnResPool->getResourceById<QnMediaServerResource>(resource->getParentId());
     if (!serverResource)
         return 0;
 

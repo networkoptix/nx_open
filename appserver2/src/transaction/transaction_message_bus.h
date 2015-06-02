@@ -67,6 +67,8 @@ namespace ec2
             const QnUuid& connectionGuid,
             const nx_http::Request& request,
             const QByteArray& requestMsgBody );
+        //!Blocks till connection \a connectionGuid is ready to accept new transactions
+        void waitForNewTransactionsReady( const QnUuid& connectionGuid );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -88,7 +90,7 @@ namespace ec2
             QMutexLocker lock(&m_mutex);
             if (m_connections.isEmpty())
                 return;
-            QnTransactionTransportHeader ttHeader(connectedServerPeers(tran.command) << m_localPeer.id, dstPeers);
+            QnTransactionTransportHeader ttHeader(connectedServerPeers() << m_localPeer.id, dstPeers);
             ttHeader.fillSequence();
             sendTransactionInternal(tran, ttHeader);
         }
@@ -226,7 +228,7 @@ namespace ec2
         */
         bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader);
 
-        QnPeerSet connectedServerPeers(ApiCommand::Value command) const;
+        QnPeerSet connectedServerPeers() const;
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 

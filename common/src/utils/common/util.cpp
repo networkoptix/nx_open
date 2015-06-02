@@ -5,6 +5,10 @@
 #   include <sys/time.h>
 #endif
 
+#ifdef Q_OS_WIN32
+#   include <mmsystem.h>
+#endif
+
 #include <QtCore/QDateTime>
 #include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>
@@ -380,4 +384,21 @@ QByteArray dateTimeToHTTPFormat(const QDateTime& value)
 
 
     //return QString(lit("%1 GMT")).arg(QLocale::c().toString(value.toUTC(), lit("ddd, dd MMM yyyy HH:mm:ss")));
+}
+
+qint64 parseDateTime(const QString& dateTime) {
+    if (dateTime.toLower().trimmed() == QLatin1String("now"))
+    {
+        return DATETIME_NOW;
+    }
+    else if( dateTime.contains(L'T') || (dateTime.contains(L'-') && !dateTime.startsWith(L'-')) )
+    {
+        QStringList dateTimeParts = dateTime.split(L'.');
+        QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);
+        if (dateTimeParts.size() > 1)
+            tmpDateTime = tmpDateTime.addMSecs(dateTimeParts[1].toInt()/1000);
+        return tmpDateTime.toMSecsSinceEpoch() * 1000;
+    }
+    else
+        return dateTime.toLongLong();
 }

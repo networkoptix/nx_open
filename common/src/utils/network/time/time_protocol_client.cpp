@@ -111,7 +111,7 @@ namespace
     qint64 rfc868TimestampToTimeToUTCMillis( const QByteArray& timeStr )
     {
         quint32 utcTimeSeconds = 0;
-        if( timeStr.size() < sizeof(utcTimeSeconds) )
+        if( (size_t)timeStr.size() < sizeof(utcTimeSeconds) )
             return -1;
         memcpy( &utcTimeSeconds, timeStr.constData(), sizeof(utcTimeSeconds) );
         utcTimeSeconds = ntohl( utcTimeSeconds );

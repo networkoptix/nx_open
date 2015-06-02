@@ -10,16 +10,16 @@
 
 #include <client/client_globals.h>
 
+#include <utils/common/singleton.h>
+
 class QnCamDisplay;
 class QnArchiveStreamReader;
 
-class QnRedAssController: public QThread
+class QnRedAssController: public QThread, public Singleton<QnRedAssController>
 {
     Q_OBJECT
 public:
     QnRedAssController();
-
-    static QnRedAssController* instance();
 
     void registerConsumer(QnCamDisplay* display);
     void unregisterConsumer(QnCamDisplay* display);

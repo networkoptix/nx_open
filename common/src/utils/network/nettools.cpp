@@ -129,7 +129,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
-                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), iface));
+                    result.append(QnInterfaceAndAddr(iface.name(), address.ip(), address.netmask(), iface));
                     break;
                 }
             }
@@ -728,3 +728,12 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
     return 0;
 }
 #endif
+
+QString getMacFromPrimaryIF()
+{
+    char  mac[MAC_ADDR_LEN];
+    char* host = 0;
+    if (getMacFromPrimaryIF(mac, &host) != 0)
+        return QString();
+    return QString::fromLatin1(mac);
+}

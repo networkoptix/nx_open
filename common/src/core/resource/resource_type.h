@@ -65,6 +65,8 @@ class QN_EXPORT QnResourceTypePool
 public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
 
+    static const QString desktopCameraTypeName;
+
     static QnResourceTypePool *instance();
 
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;

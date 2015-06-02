@@ -779,7 +779,7 @@ void DeviceFileCatalog::close()
 {
 }
 
-QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)
+QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, int limit)
 {
     //qDebug() << "find period from " << QDateTime::fromMSecsSinceEpoch(startTime).toString("hh:mm:ss.zzz") << "to" << QDateTime::fromMSecsSinceEpoch(endTime).toString("hh:mm:ss.zzz");
 
@@ -807,12 +807,21 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
     for (size_t i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
     {
         QnTimePeriod& last = result.last();
-        
-        if (qAbs(last.startTimeMs + last.durationMs - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
+        qint64 lastEndTime = last.startTimeMs + last.durationMs;
+        if (lastEndTime > m_chunks[i].startTimeMs) {
+            // overlapped periods
+            if (m_chunks[i].durationMs == -1)
+                last.durationMs = -1;
+            else
+                last.durationMs = qMax(last.durationMs, m_chunks[i].endTimeMs() - last.startTimeMs);
+        }
+        else if (qAbs(lastEndTime - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
             last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
         else {
             if (last.durationMs < detailLevel && result.size() > 1)
                 result.pop_back();
+            if (result.size() >= limit)
+                break;
             result.push_back(QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs));
         }
     }

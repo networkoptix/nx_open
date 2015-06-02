@@ -76,7 +76,8 @@ void QnTransactionTcpProcessor::run()
     ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
 
-    if( d->request.requestLine.method == nx_http::Method::POST )
+    if( d->request.requestLine.method == nx_http::Method::POST ||
+        d->request.requestLine.method == nx_http::Method::PUT )
     {
         auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == d->request.headers.end() )

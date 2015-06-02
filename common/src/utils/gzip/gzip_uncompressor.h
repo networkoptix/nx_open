@@ -18,14 +18,14 @@
 //!Deflates gzip-compressed stream. Suitable for decoding gzip http content encoding
 class GZipUncompressor
 :
-    public AbstractByteStreamConverter
+    public AbstractByteStreamFilter
 {
 public:
     GZipUncompressor( const std::shared_ptr<AbstractByteStreamFilter>& nextFilter = std::shared_ptr<AbstractByteStreamFilter>() );
     virtual ~GZipUncompressor();
 
     //!Implementation of \a AbstractByteStreamFilter::processData
-    virtual void processData( const QnByteArrayConstRef& data ) override;
+    virtual bool processData( const QnByteArrayConstRef& data ) override;
     //!Implementation of \a AbstractByteStreamFilter::flush
     virtual size_t flush() override;
 

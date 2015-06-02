@@ -42,7 +42,7 @@ qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaResourcePtr &resourc
     if(QnAviResourcePtr fileResource = resource.dynamicCast<QnAviResource>()) {
         qint64 result = fileResource->timeZoneOffset();
         return result == Qn::InvalidUtcOffset ? defaultValue : result;
-    } else if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(resource->toResource()->getParentId()).dynamicCast<QnMediaServerResource>()) {
+    } else if(QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(resource->toResource()->getParentId())) {
         return utcOffset(server, defaultValue);
     } else {
         return defaultValue;

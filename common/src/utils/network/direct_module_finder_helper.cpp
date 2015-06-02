@@ -45,6 +45,7 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnDirectModuleFinderHelper::at_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnDirectModuleFinderHelper::at_resourceRemoved);
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnDirectModuleFinderHelper::at_resourceChanged);
+    connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnDirectModuleFinderHelper::at_resourceStatusChanged);
     connect(moduleFinder->multicastModuleFinder(), &QnMulticastModuleFinder::responseReceived, this, &QnDirectModuleFinderHelper::at_responseReceived);
 
     QTimer *timer = new QTimer(this);
@@ -137,6 +138,20 @@ void QnDirectModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resourc
 void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &resource) {
     at_resourceRemoved(resource);
     at_resourceAdded(resource);
+}
+
+void QnDirectModuleFinderHelper::at_resourceStatusChanged(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    if (server->getStatus() == Qn::Online) {
+        QnUuid id = server->getId();
+
+        QnUrlSet urlsToCheck = m_serverUrlsById.value(id) + m_additionalServerUrlsById.value(id) - m_ignoredServerUrlsById.value(id);
+        for (const QUrl &url: urlsToCheck)
+            m_moduleFinder->directModuleFinder()->checkUrl(url);
+    }
 }
 
 void QnDirectModuleFinderHelper::at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address) {

@@ -28,7 +28,7 @@ namespace CameraDiagnostics
         if( !camera )
             return;
 
-        QnMediaServerResourcePtr serverResource = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr serverResource = camera->getParentServer();
         if( !serverResource )
             return;
         m_serverConnection = serverResource->apiConnection();

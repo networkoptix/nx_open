@@ -48,6 +48,7 @@
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">系统优化设置</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允许系统优化摄像机配置(不推荐)</String>     
+    <String Id="AppServerDlg_StatisticsReportAllowed"                Overridable="yes">Send usage and crash statistics to software developers</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${display.product.name}</String>
@@ -125,7 +126,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">当 ${display.product.name} 安装成后自动运行.</String>    
-    <String Id="Product_ArchMismatch"                               Overridable="yes">这个包是专为32位操作系统.安装程序将无法继续.</String>	
+    <String Id="Product_ArchMismatch"                               Overridable="yes">这个包是专为32位操作系统.安装程序将无法继续.</String> 
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">请选择您所需要安装的组件！</String>    

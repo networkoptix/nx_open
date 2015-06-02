@@ -8,7 +8,7 @@
 struct QnStorageScanData
 {
     QnStorageScanData(): state(Qn::RebuildState_Unknown), progress(0.0) {}
-    QnStorageScanData(Qn::RebuildState state, const QString& path, int progress): state(state), path(path), progress(progress) {}
+    QnStorageScanData(Qn::RebuildState state, const QString& path, qreal progress): state(state), path(path), progress(progress) {}
 
     Qn::RebuildState state;
     QString path;

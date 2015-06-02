@@ -72,7 +72,7 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
     return result;
 }
 
-CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraControlRequired)
+CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
     m_gotSDP =  false;
@@ -165,19 +165,13 @@ void PlDroidStreamReader::closeStream()
     m_tcpSock->close();
 }
 
+void PlDroidStreamReader::pleaseReopenStream()
+{
+}
+
 bool PlDroidStreamReader::isStreamOpened() const
 {
     return m_tcpSock->isConnected() && m_videoIoDevice != 0;
-}
-
-void PlDroidStreamReader::updateStreamParamsBasedOnQuality()
-{
-
-}
-
-void PlDroidStreamReader::updateStreamParamsBasedOnFps()
-{
-
 }
 
 void PlDroidStreamReader::setSDPInfo(QByteArray sdpInfo)

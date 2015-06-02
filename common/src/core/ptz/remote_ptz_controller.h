@@ -62,7 +62,7 @@ private:
         QVariant value;
     };
 
-    QnNetworkResourcePtr m_resource;
+    QnNetworkResourcePtr m_resource; //TODO: #GDM check if it is a camera
     QnUuid m_sequenceId;
     QAtomicInt m_sequenceNumber;
 

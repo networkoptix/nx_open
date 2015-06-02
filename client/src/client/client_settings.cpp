@@ -263,6 +263,10 @@ bool QnClientSettings::isWritable() const {
     return m_settings->isWritable();
 }
 
+QSettings* QnClientSettings::rawSettings() {
+    return m_settings;
+}
+
 void QnClientSettings::loadFromWebsite() {
     QNetworkAccessManager *accessManager = new QNetworkAccessManager(this);
     connect(accessManager, &QNetworkAccessManager::finished, this, [accessManager, this](QNetworkReply *reply) {

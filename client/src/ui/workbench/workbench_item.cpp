@@ -23,7 +23,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid,
     if(resourceUid.isEmpty())
         return;
 
-    QnResourcePtr resource = qnResPool->getResourceByUniqId(resourceUid);
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId(resourceUid);
     if(!resource)
         return;
 
@@ -65,7 +65,7 @@ QnWorkbenchItem::~QnWorkbenchItem() {
 }
 
 QnLayoutItemData QnWorkbenchItem::data() const {
-    QnResourcePtr resource = qnResPool->getResourceByUniqId(m_resourceUid);
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId(m_resourceUid);
 
     QnLayoutItemData data;
 
@@ -89,7 +89,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
         qnWarning("Updating item '%1' from data with different uuid (%2 != %3).", resourceUid(), data.uuid.toString(), uuid().toString());
 
 #ifdef _DEBUG
-    QnResourcePtr resource = qnResPool->getResourceByUniqId(resourceUid());
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId(resourceUid());
     QnUuid localId = resource ? resource->getId() : QnUuid();
     if(data.resource.id != localId && data.resource.path != m_resourceUid)
         qnWarning("Updating item '%1' from a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
@@ -116,7 +116,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
         qnWarning("Submitting item '%1' to a data with different uuid (%2 != %3).", resourceUid(), data.uuid, uuid());
 
 #ifdef _DEBUG
-    QnUuid localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
+    QnUuid localId = qnResPool->getResourceByUniqueId(resourceUid())->getId();
     if(data.resource.id != localId && data.resource.path != m_resourceUid)
         qnWarning("Submitting item '%1' to a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
 #endif

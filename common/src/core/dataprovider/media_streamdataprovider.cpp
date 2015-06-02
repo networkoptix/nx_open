@@ -7,6 +7,7 @@
 #include "core/datapacket/video_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
+#include "utils/common/log.h"
 #include "../resource/camera_resource.h"
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
@@ -150,11 +151,11 @@ const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel
     return &m_stat[channel];
 }
 
-float QnAbstractMediaStreamDataProvider::getBitrate() const
+float QnAbstractMediaStreamDataProvider::getBitrateMbps() const
 {
     float rez = 0;
     for (int i = 0; i < m_numberOfchannels; ++i)
-        rez += m_stat[i].getBitrate();
+        rez += m_stat[i].getBitrateMbps();
     return rez;
 }
 
@@ -170,14 +171,18 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
     {
         // correct packets timestamp if we have got several packets very fast
 
-        if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart)) {
+        if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart))
+        {
             resetTimeCheck();
         }
-        else if ((quint64)m_lastMediaTime[media->channelNumber] != AV_NOPTS_VALUE) {
+        else if ((quint64)m_lastMediaTime[media->channelNumber] != AV_NOPTS_VALUE)
+        {
             qint64 timeDiff = media->timestamp - m_lastMediaTime[media->channelNumber];
             // if timeDiff < -N it may be time correction or dayling time change
             if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION)
             {
+                NX_LOG(QLatin1String("Timestamp correction"), cl_logWARNING);
+
                 media->timestamp = m_lastMediaTime[media->channelNumber] + MIN_FRAME_DURATION;
             }
         }

@@ -100,12 +100,6 @@ void QnDigitalWatchdogResource::enableOnvifSecondStream()
     // camera rebooting ....
 }
 
-int QnDigitalWatchdogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
-{
-    int realBitrate = QnPlOnvifResource::suggestBitrateKbps(q, resolution, fps);
-    return realBitrate * (30.0 / (qreal)fps);
-}
-
 QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal() 
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));

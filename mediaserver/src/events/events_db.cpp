@@ -570,7 +570,7 @@ void QnEventsDB::getAndSerializeActions(
         if (eventType == QnBusiness::CameraMotionEvent) 
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
-            QnNetworkResourcePtr camRes = qnResPool->getResourceById(eventResId).dynamicCast<QnNetworkResource>();
+            QnNetworkResourcePtr camRes = qnResPool->getResourceById<QnNetworkResource>(eventResId);
             if (camRes) {
                 if (qnStorageMan->isArchiveTimeExists(camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
                     flags |= QnBusinessActionData::MotionExists;

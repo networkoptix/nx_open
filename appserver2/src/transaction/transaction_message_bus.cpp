@@ -180,6 +180,8 @@ namespace ec2
 
         case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
+    case ApiCommand::saveClientInfo:        return handleTransactionParams<ApiClientInfoData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+
         case ApiCommand::lockRequest:
         case ApiCommand::lockResponse:
         case ApiCommand::unlockRequest:         return handleTransactionParams<ApiLockData>             (serializedTransaction, serializationSupport, transaction, function, fastFunction); 
@@ -409,7 +411,7 @@ namespace ec2
                 tran.params = aliveData;
                 tran.params.isAlive = true;
                 Q_ASSERT(!aliveData.peer.instanceId.isNull());
-                ttHeader.processedPeers = connectedServerPeers(tran.command) << m_localPeer.id;
+            ttHeader.processedPeers = connectedServerPeers() << m_localPeer.id;
                 ttHeader.fillSequence();
                 sendTransactionInternal(tran, ttHeader); // resend broadcast alive info for that peer
                 return false; // ignore peer offline transaction
@@ -819,7 +821,7 @@ namespace ec2
         }
 
         // do not put clients peers to processed list in case if client just reconnected to other server and previous server hasn't got update yet.
-        QnPeerSet processedPeers = transportHeader.processedPeers + connectedServerPeers(tran.command);
+    QnPeerSet processedPeers = transportHeader.processedPeers + connectedServerPeers();
         processedPeers << m_localPeer.id;
         QnTransactionTransportHeader newHeader(transportHeader);
         newHeader.processedPeers = processedPeers;
@@ -1400,8 +1402,8 @@ namespace ec2
     void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
         const QSharedPointer<AbstractStreamSocket>& socket,
-        const ApiPeerData &remotePeer,
-        qint64 remoteSystemIdentityTime,
+    const ApiPeerData &/*remotePeer*/,
+    qint64 /*remoteSystemIdentityTime*/,
         const nx_http::Request& request,
         const QByteArray& requestBuf )
     {
@@ -1496,6 +1498,19 @@ namespace ec2
         }
     }
 
+void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
+{
+    QMutexLocker lock(&m_mutex);
+    for( QnTransactionTransport* transport: m_connections )
+    {
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+        return;
+    }
+}
+
     void QnTransactionMessageBus::dropConnections()
     {
         QMutexLocker lock(&m_mutex);
@@ -1514,13 +1529,13 @@ namespace ec2
         return m_alivePeers;
     }
 
-    QnPeerSet QnTransactionMessageBus::connectedServerPeers(ApiCommand::Value command) const
+QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
     {
         QnPeerSet result;
         for(QnConnectionMap::const_iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
         {
             QnTransactionTransport* transport = *itr;
-            if (!transport->remotePeer().isClient() && transport->isReadyToSend(command))
+        if (!transport->remotePeer().isClient() && transport->getState() == QnTransactionTransport::ReadyForStreaming)
                 result << transport->remotePeer().id;
         }
 

@@ -347,6 +347,7 @@ void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timest
     for (QnWorkbenchItem *item: wlayout->items())
         item->setData(Qn::ItemSliderWindowRole, qVariantFromValue(period));
 
+    m_context->navigator()->timeSlider()->setRange(period.startTimeMs, qnSyncTime->currentMSecsSinceEpoch());
     m_context->navigator()->timeSlider()->setWindow(period.startTimeMs, period.endTimeMs(), false);
 }
 
@@ -463,8 +464,7 @@ bool AxHDWitness::doInitialize()
     
     ffmpegInit();
       
-    m_moduleFinder.reset(new QnModuleFinder(true));
-    m_moduleFinder->setCompatibilityMode(qnRuntime->isDevMode());
+    m_moduleFinder.reset(new QnModuleFinder(true, qnRuntime->isDevMode()));
     m_moduleFinder->start();
 
     m_router.reset(new QnRouter(m_moduleFinder.data()));
