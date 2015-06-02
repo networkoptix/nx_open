@@ -87,24 +87,15 @@ Page {
 
     }
 
-    ActionButton {
-        id: playbackControl
-        iconName: "av/pause"
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: (video.height + timeline.y) / 2 - height / 2
-        width: Units.dp(56)
-        height: Units.dp(56)
-    }
-
-    // timeline dummy
-    Rectangle {
+    QnTimeline {
         id: timeline
 
         anchors.bottom: parent.bottom
         width: parent.width
         height: Units.dp(92)
 
-        color: theme.accentColor
+        textColor: "white"
+        chunkColor: "#589900"
     }
 
     Label {

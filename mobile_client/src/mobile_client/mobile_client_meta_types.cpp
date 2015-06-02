@@ -5,6 +5,7 @@
 #include "context/connection_manager.h"
 #include "context/context_settings.h"
 #include "ui/color_theme.h"
+#include "ui/timeline/timeline.h"
 #include "models/camera_list_model.h"
 #include "models/server_list_model.h"
 #include "models/login_sessions_model.h"
@@ -31,4 +32,5 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnLoginSessionsModel>("com.networkoptix.qml", 1, 0, "QnLoginSessionsModel");
     qmlRegisterType<QnMediaResourceHelper>("com.networkoptix.qml", 1, 0, "QnMediaResourceHelper");
     qmlRegisterType<QnContextSettings>("com.networkoptix.qml", 1, 0, "QnContextSettings");
+    qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
 }

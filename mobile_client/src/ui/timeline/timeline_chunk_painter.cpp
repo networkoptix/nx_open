@@ -65,6 +65,8 @@ void QnTimelineChunkPainter::stop() {
 }
 
 qreal QnTimelineChunkPainter::xFromValue(qint64 value) {
+    if (m_windowStart == m_windowEnd)
+        return 0;
     return m_rect.x() + m_rect.width() * (value - m_windowStart) / (m_windowEnd - m_windowStart);
 }
 

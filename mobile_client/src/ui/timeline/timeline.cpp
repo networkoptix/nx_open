@@ -49,7 +49,6 @@ public:
 
     QColor tickColor;
     QColor textColor;
-    QColor cursorColor;
     QColor chunkColor;
 
     qint64 startTime;
@@ -87,11 +86,12 @@ public:
     QElapsedTimer animationTimer;
     qint64 prevAnimationMs;
 
+    QStringList suffixList;
+
     QnTimelinePrivate(QnTimeline *parent):
         parent(parent),
         tickColor("#727272"),
         textColor("#727272"),
-        cursorColor("#727272"),
         chunkColor("#2196F3"),
         textLevel(1.0),
         targetTextLevel(1.0),
@@ -216,6 +216,10 @@ public:
         return time + timeZoneShift;
     }
 
+    void updateTextHelper() {
+        textHelper.reset(new QnTimelineTextHelper(QFont(), textColor, suffixList));
+    }
+
     bool animateProperties(qint64 dt);
     void zoomWindow(qreal factor, int x);
 };
@@ -233,12 +237,10 @@ QnTimeline::QnTimeline(QQuickItem *parent) :
                                      << tr("Jul") << tr("Aug") << tr("Sep")
                                      << tr("Oct") << tr("Nov") << tr("Dec");
 
-    QStringList suffixList;
-    suffixList << lit("ms") << lit("s") << lit("m") << lit("h") << lit(":00");
+    d->suffixList << lit("ms") << lit("s") << lit("m") << lit("h") << lit(":00");
     for (const QString &month : QnTimelineZoomLevel::monthsNames)
-        suffixList.append(month);
-
-    d->textHelper.reset(new QnTimelineTextHelper(QFont(), d->textColor, suffixList));
+        d->suffixList.append(month);
+    d->updateTextHelper();
 }
 
 QnTimeline::~QnTimeline() {
@@ -420,6 +422,31 @@ QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeD
         update();
 
     return node;
+}
+
+QColor QnTimeline::textColor() const {
+    return d->textColor;
+}
+
+void QnTimeline::setTextColor(const QColor &color) {
+    if (d->textColor == color)
+        return;
+
+    d->textColor = color;
+    d->updateTextHelper();
+    update();
+}
+
+QColor QnTimeline::chunkColor() const {
+    return d->chunkColor;
+}
+
+void QnTimeline::setChunkColor(const QColor &color) {
+    if (d->chunkColor == color)
+        return;
+
+    d->chunkColor = color;
+    update();
 }
 
 QSGGeometryNode *QnTimeline::updateTicksNode(QSGGeometryNode *ticksNode) {
@@ -712,8 +739,7 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
                 continue;
             }
 
-//            if(!pos[i]->isInfinite())
-            if(!pos[i]->durationMs == -1)
+            if(!pos[i]->isInfinite())
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 

@@ -15,11 +15,20 @@ class QnTimeline : public QQuickItem {
     Q_PROPERTY(QDateTime windowEndDate READ windowEndDate WRITE setWindowEndDate NOTIFY windowEndDateChanged)
     Q_PROPERTY(QDateTime positionDate READ positionDate WRITE setPositionDate NOTIFY positionDateChanged)
 
+    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
+    Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
+
 public:
     QnTimeline(QQuickItem *parent = 0);
     ~QnTimeline();
 
     virtual QSGNode *updatePaintNode(QSGNode *node, UpdatePaintNodeData *updatePaintNodeData) override;
+
+    QColor textColor() const;
+    void setTextColor(const QColor &color);
+
+    QColor chunkColor() const;
+    void setChunkColor(const QColor &color);
 
     qint64 windowStart() const;
     void setWindowStart(qint64 windowStart);
@@ -64,6 +73,9 @@ signals:
     void windowEndDateChanged();
     void positionChanged();
     void positionDateChanged();
+
+    void textColorChanged();
+    void chunkColorChanged();
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
