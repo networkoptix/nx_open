@@ -26,6 +26,7 @@ namespace cdb_api
             const nx_http::Request& request ) override;
 
     protected:
+        //!Implement request-specific logic in this function
         virtual void processRequest(
             const AuthorizationInfo& authzInfo,
             const stree::AbstractResourceReader& inputParams ) = 0;

@@ -19,6 +19,7 @@
 #include <utils/network/http/server/http_message_dispatcher.h>
 #include <utils/network/http/server/server_managers.h>
 
+#include "access_control/authentication_manager.h"
 #include "http_handlers/add_account_handler.h"
 
 #include "version.h"
@@ -42,7 +43,6 @@ int CloudDBProcess::executeApplication()
 {
     static const QLatin1String DEFAULT_LOG_LEVEL( "ERROR" );
     static const QLatin1String DEFAULT_HTTP_ADDRESS_TO_LISTEN( ":3346" );
-
 
     //reading settings
 #ifdef _WIN32
@@ -81,24 +81,19 @@ int CloudDBProcess::executeApplication()
         return 1;
     }
 
-    //TODO #ak make message dispatcher not global static and pass them to corresponding server explicitly
+    nx_http::ServerManagers httpServerManagers;
 
     nx_http::MessageDispatcher httpMessageDispatcher;
-    nx_http::ServerManagers httpServerManagers;
     httpServerManagers.setDispatcher( &httpMessageDispatcher );
-    //httpServerManagers.setAuthenticator( &httpMessageDispatcher );
+
+    AuthenticationManager authenticationManager;
+    httpServerManagers.setAuthenticationManager( &authenticationManager );
 
     //TODO #ak registering HTTP handlers
     cdb_api::AddAccountHttpHandler addAccountHandler;
-    //httpMessageDispatcher.registerRequestProcessor(
-    //    cdb_api::AddAccountHttpHandler::HANDLER_PATH,
-    //    [&addAccountHandler](
-    //        const nx_http::HttpServerConnection& connection,
-    //        nx_http::Message&& message) -> bool
-    //    {
-    //        return addAccountHandler.processRequest( connection, std::move(message) );
-    //    }
-    //);
+    httpMessageDispatcher.registerRequestProcessor(
+        cdb_api::AddAccountHttpHandler::HANDLER_PATH,
+        &addAccountHandler );
 
     using namespace std::placeholders;
 

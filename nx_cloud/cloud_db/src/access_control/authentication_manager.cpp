@@ -7,6 +7,15 @@
 
 
 bool AuthenticationManager::authenticate(
+    const nx_http::HttpServerConnection& connection,
+    const nx_http::Request& request,
+    nx_http::header::WWWAuthenticate* const wwwAuthenticate )
+{
+    //TODO
+    return false;
+}
+
+bool AuthenticationManager::authenticate(
     const stree::AbstractResourceReader& inputParams,
     std::function<void(AuthenticationInfo)> completionHandler ) const
 {

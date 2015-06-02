@@ -18,11 +18,9 @@ namespace cdb_api
         const nx_http::Request& /*request*/ )
     {
         //TODO #ak performing authorization and invoking specific handler
+        AuthorizationInfo authzInfo;
+        stree::ResourceContainer res;
 
-        requestDone(
-            nx_http::StatusCode::ok,
-            std::make_unique<nx_http::BufferSource>(
-                "text/html",
-                "<html><h1>Hello from base cloud_db handler</h1></html>\n" ) );
+        processRequest( authzInfo, res );
     }
 }
