@@ -10,17 +10,23 @@
 
 #include <QString>
 
-#include <utils/network/http/server/http_server_connection.h>
+#include <utils/network/http/server/abstract_http_request_handler.h>
 
 #include "db/registered_systems_data_manager.h"
 
 
 class RegisterSystemHttpHandler
+:
+    public nx_http::AbstractHttpRequestHandler
 {
 public:
     static const QString HANDLER_PATH;
 
-    bool processRequest( HttpServerConnection* connection, nx_http::Message&& message );
+protected:
+    //!Implementation of \a RegisterSystemHttpHandler::AbstractHttpRequestHandler
+    virtual void processRequest(
+        const nx_http::HttpServerConnection& connection,
+        const nx_http::Request& request ) override;
 };
 
 #endif  //NX_REGISTER_HTTP_HANDLER_H

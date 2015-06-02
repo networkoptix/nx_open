@@ -17,6 +17,7 @@
 #include <utils/common/systemerror.h>
 #include <utils/network/aio/aioservice.h>
 #include <utils/network/http/server/http_message_dispatcher.h>
+#include <utils/network/http/server/server_managers.h>
 
 #include "stun/custom_stun.h"
 #include "http/register_http_handler.h"
@@ -113,18 +114,19 @@ int MediatorProcess::executeApplication()
     //TODO opening database
     nx_hpm::RegisteredDomainsDataManager registeredDomainsDataManager;
 
-    //HTTP handlers
-    RegisterSystemHttpHandler registerHttpHandler;
-
-    //TODO #ak make mesasge dispatcher not global static and pass them to corresponding server explicitly
+    nx_http::ServerManagers httpServerManagers;
 
     nx_http::MessageDispatcher httpMessageDispatcher;
+    httpServerManagers.setDispatcher( &httpMessageDispatcher );
+
+    //TODO #ak authentication
+    //AuthenticationManager authenticationManager;
+    //httpServerManagers.setAuthenticationManager( &authenticationManager );
+
+    RegisterSystemHttpHandler registerHttpHandler;
     httpMessageDispatcher.registerRequestProcessor(
         RegisterSystemHttpHandler::HANDLER_PATH,
-        [&registerHttpHandler](HttpServerConnection* connection, nx_http::Message&& message) -> bool {
-            return registerHttpHandler.processRequest( connection, std::move(message) );
-        }
-    );
+        &registerHttpHandler );
 
     using namespace std::placeholders;
 
