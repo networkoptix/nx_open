@@ -3,7 +3,7 @@
 #include "core/resource/user_resource.h"
 #include "proxy_sender_connection_processor.h"
 #include "network/universal_request_processor_p.h"
-#include "network\authenticate_helper.h"
+#include "network/authenticate_helper.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
 #include "utils/common/log.h"
