@@ -16,15 +16,17 @@ typedef QList<quint32> CLIPList;
 
 struct QnInterfaceAndAddr
 {
-    QnInterfaceAndAddr(QString name_, QHostAddress address_, const QNetworkInterface& _netIf)
+    QnInterfaceAndAddr(QString name_, QHostAddress address_, QHostAddress netMask_, const QNetworkInterface& _netIf)
         : name(name_),
           address(address_),
+          netMask(netMask_),
           netIf(_netIf)
     {
     }
 
     QString name;
     QHostAddress address;
+    QHostAddress netMask;
     QNetworkInterface netIf;
 };
 

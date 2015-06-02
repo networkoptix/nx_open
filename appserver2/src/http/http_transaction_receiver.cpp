@@ -34,12 +34,12 @@ namespace ec2
     }
 
     int QnRestTransactionReceiver::executePost(
-        const QString& path,
+        const QString& /*path*/,
         const QnRequestParamList& /*params*/,
         const QByteArray& body,
-        const QByteArray& srcBodyContentType,
-        QByteArray& resultBody,
-        QByteArray& contentType,
+        const QByteArray& /*srcBodyContentType*/,
+        QByteArray& /*resultBody*/,
+        QByteArray& /*contentType*/,
         const QnRestConnectionProcessor* connection )
     {
         auto connectionGuidIter = connection->request().headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
@@ -100,7 +100,8 @@ namespace ec2
 
         if( !d->socket->setRecvTimeout(
                 QnTransactionTransport::TCP_KEEPALIVE_TIMEOUT *
-                QnTransactionTransport::KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE ) )
+                QnTransactionTransport::KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE ) ||
+            !d->socket->setNoDelay(true) )
         {
             const int osErrorCode = SystemError::getLastOSErrorCode();
             NX_LOG( lit("Failed to set timeout for HTTP connection from %1. %2").
@@ -120,7 +121,8 @@ namespace ec2
             if( !readSingleRequest() )
                 return;
             
-            if( d->request.requestLine.method != nx_http::Method::POST )
+            if( d->request.requestLine.method != nx_http::Method::POST &&
+                d->request.requestLine.method != nx_http::Method::PUT )
             {
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
                 return;

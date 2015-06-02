@@ -86,6 +86,8 @@ class QnAuthHelper: public QObject
     Q_OBJECT
 
 public:
+    static const QString REALM;
+
     QnAuthHelper();
     virtual ~QnAuthHelper();
 
