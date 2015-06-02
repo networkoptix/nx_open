@@ -24,8 +24,8 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnResourceVideoLayoutPtr getVideoLayout();
-    virtual QnResourceAudioLayoutPtr getAudioLayout();
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout();
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout();
     virtual bool isRealTimeSource() const;
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);
     virtual void setSingleshotMode(bool value);

@@ -15,6 +15,10 @@
 namespace {
     const int chunkSize = 1024 * 1024;
     const int chunkTimeout = 5 * 60 * 1000;
+    /* When a server receives the last chunk it extracts the uploaded zip file.
+       This process can take long time on slow devices like ISD.
+       So we have to specify a longer timeout for the last chunk. */
+    const int lastChunkTimeout = 20 * 60 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
@@ -36,7 +40,6 @@ QnUpdateUploader::QnUpdateUploader(QObject *parent) :
     m_chunkSize(chunkSize),
     m_chunkTimer(new QTimer(this))
 {
-    m_chunkTimer->setInterval(chunkTimeout);
     m_chunkTimer->setSingleShot(true);
     connect(m_chunkTimer, &QTimer::timeout, this, &QnUpdateUploader::at_chunkTimer_timeout);
 }
@@ -95,7 +98,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
         if (!server)
             return false;
 
-        if (server->hasProperty(lit("guid"))) {
+        if (QnMediaServerResource::isFakeServer(server)) {
             m_restPeers.insert(peerId);
             m_restTargets.append(server);
         } else {
@@ -135,7 +138,7 @@ void QnUpdateUploader::sendNextChunk() {
         NX_LOG(lit("Update: QnUpdateUploader: Send chunk transaction [%1, %2, %3, %4].")
                .arg(m_updateId).arg(offset).arg(data.size()).arg(getPeersString(m_pendingPeers)), cl_logDEBUG2);
         connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, data, offset, m_pendingPeers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-        m_chunkTimer->start();
+        m_chunkTimer->start(data.isEmpty() ? lastChunkTimeout : chunkTimeout);
     }
 
     for (const QnMediaServerResourcePtr &server: m_restTargets) {

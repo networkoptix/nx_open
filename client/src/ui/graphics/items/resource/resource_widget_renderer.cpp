@@ -6,7 +6,7 @@
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
-#include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include "decodedpicturetoopengluploader.h"
 #include "decodedpicturetoopengluploadercontextpool.h"
@@ -66,7 +66,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         if (m_channelRenderers[i].uploader == 0) {
             RenderingTools renderingTools;
             renderingTools.uploader = new DecodedPictureToOpenGLUploader( m_glContext );
-            renderingTools.uploader->setForceSoftYUV( qnSettings->isSoftwareYuv() );
+            renderingTools.uploader->setForceSoftYUV( qnRuntime->isSoftwareYuv() );
             renderingTools.renderer = new QnGLRenderer( m_glContext, *renderingTools.uploader );
             renderingTools.renderer->setScreenshotInterface(m_screenshotInterface);
             renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());

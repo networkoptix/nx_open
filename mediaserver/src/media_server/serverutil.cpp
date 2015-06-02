@@ -87,7 +87,7 @@ bool changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLo
         return true;
 
     qnCommon->setLocalSystemName(systemName);
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
         return false;

@@ -61,7 +61,7 @@ public:
     void setQuality(MediaQuality quality);
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
-    QByteArray getRangeStr(QnArchiveStreamReader* archiveDP);
+    QByteArray getRangeStr();
     int getMetadataChannelNum() const;
     int getAVTcpChannel(int trackNum) const;
     //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
@@ -105,7 +105,7 @@ private:
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
-
+    QSharedPointer<QnArchiveStreamReader> getArchiveDP();
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

@@ -26,7 +26,7 @@ namespace {
     static const int defaultMaxFps = 15;
     static const int defaultReservedSecondStreamFps = 2;
     static const Qn::StreamFpsSharingMethod defaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
-    static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
+    //static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
 
     static const int defaultSecondStreamFpsLow = 2;
     static const int defaultSecondStreamFpsMedium = 7;
@@ -43,9 +43,9 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_advancedWorking(false),
     m_manuallyAdded(false),
 	m_cachedLicenseType(Qn::LC_Count),
-    m_cachedHasDualStreaming2(
-        [this]()->bool{ return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse; },
-        &m_mutex ),
+    //m_cachedHasDualStreaming2( // UNDO c29dd798445d
+    //    [this]()->bool{ return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse; },
+    //    &m_mutex ),
     m_cachedSupportedMotionType(
         std::bind( &QnSecurityCamResource::calculateSupportedMotionType, this ),
         &m_mutex ),
@@ -69,7 +69,11 @@ QnSecurityCamResource::QnSecurityCamResource():
         Qt::DirectConnection);
     connect(
         this, &QnResource::resourceChanged,
-        this, &QnSecurityCamResource::atResourceChanged,
+        this, &QnSecurityCamResource::resetCachedValues,
+        Qt::DirectConnection);
+    connect(
+        this, &QnResource::propertyChanged,
+        this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
     connect(
         this, &QnSecurityCamResource::motionRegionChanged,
@@ -108,6 +112,11 @@ void QnSecurityCamResource::setCameraName( const QString& newCameraName )
     }
     QnResource::setName( newCameraName );
 }
+
+QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
+    return getParentResource().dynamicCast<QnMediaServerResource>();
+}
+
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
@@ -277,7 +286,8 @@ QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const {
 }
 
 bool QnSecurityCamResource::hasDualStreaming2() const {
-    return m_cachedHasDualStreaming2.get();
+    //return m_cachedHasDualStreaming2.get(); // UNDO c29dd798445d
+    return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse;
 }
 
 bool QnSecurityCamResource::hasDualStreaming() const {
@@ -295,8 +305,7 @@ bool QnSecurityCamResource::isAnalog() const {
 }
 
 bool QnSecurityCamResource::isAnalogEncoder() const {
-    const QnSecurityCamResourcePtr ptr = toSharedPointer(const_cast<QnSecurityCamResource*> (this));
-    QnResourceData resourceData = qnCommon->dataPool()->data(ptr);
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     return resourceData.value<bool>(lit("analogEncoder"));
 }
 
@@ -851,11 +860,18 @@ Qn::MotionTypes QnSecurityCamResource::calculateSupportedMotionType() const {
     return result;
 }
 
-void QnSecurityCamResource::atResourceChanged()
+void QnSecurityCamResource::resetCachedValues()
 {
     //resetting cached values
-    m_cachedHasDualStreaming2.update();
-    m_cachedSupportedMotionType.update();
-    m_cachedCameraCapabilities.update();
-    m_cachedIsDtsBased.update();
+    //m_cachedHasDualStreaming2.reset(); // UNDO c29dd798445d
+    m_cachedSupportedMotionType.reset();
+    m_cachedCameraCapabilities.reset();
+    m_cachedIsDtsBased.reset();
+    m_motionType.reset();
+}
+
+bool QnSecurityCamResource::isBitratePerGOP() const
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    return resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP) || getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0;
 }

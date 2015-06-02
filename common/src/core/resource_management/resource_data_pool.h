@@ -23,7 +23,7 @@ public:
      * \param camera                    resource to get data for.
      * \returns                         Resource data for the given camera.
      */
-    QnResourceData data(const QnSecurityCamResourcePtr &camera) const;
+    QnResourceData data(const QnConstSecurityCamResourcePtr &camera) const;
     
     bool load(const QString &fileName);
 

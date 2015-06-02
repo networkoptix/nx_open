@@ -107,7 +107,6 @@ namespace QJson {
         QJson::serialize(&ctx, value, target);
     }
 
-
     /**
      * Deserializes the given intermediate representation of a JSON object.
      * Note that <tt>std::enable_if</tt> is used to prevent implicit conversions

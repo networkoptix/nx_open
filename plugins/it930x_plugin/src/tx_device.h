@@ -1,10 +1,21 @@
 #ifndef RETURN_CHANNEL_DEVICE_INFO_H
 #define RETURN_CHANNEL_DEVICE_INFO_H
 
-#include <memory>
+#include <string>
+#include <vector>
+#include <map>
+#include <mutex>
+#include <atomic>
 
-#include "ret_chan/ret_chan_cmd_host.h"
+#include "ret_chan/ret_chan.h"
 #include "rc_command.h"
+#include "timer.h"
+#include "object_counter.h"
+
+namespace nxcip
+{
+    struct LiveStreamConfig;
+}
 
 namespace ite
 {
@@ -23,39 +34,30 @@ namespace ite
         RCERR_OTHER
     } RCError;
 
-    struct TxManufactureInfo
+    ///
+    struct SendSequence
     {
-        std::string companyName;
-        std::string modelName;
-        std::string firmwareVersion;
-        std::string serialNumber;
-        std::string hardwareId;
-    };
+        std::mutex mutex;
+        uint16_t txID;
+        uint16_t rcSeq;
+        uint8_t tsSeq;
+        bool tsMode;
 
-    struct TxVideoEncConfig
-    {
-        uint16_t width;
-        uint16_t height;
-        uint16_t bitrateLimit;
-        uint8_t  frameRateLimit;
-        uint8_t  quality;
-
-        TxVideoEncConfig()
-        :   width(0),
-            height(0),
-            bitrateLimit(0),
-            frameRateLimit(0),
-            quality(0)
+        SendSequence(uint16_t tx)
+        :   txID(tx),
+            rcSeq(0),
+            tsSeq(0),
+            tsMode(false)
         {}
     };
 
     ///
-    class TxDevice
+    struct TxChannels
     {
-    public:
-        static const unsigned SLEEP_TIME_MS = 200;
-        static const unsigned SEND_WAIT_TIME_MS = 1000;
-        static const unsigned CHANNELS_NUM = 16;
+        enum
+        {
+            CHANNELS_NUM = 16
+        };
 
         typedef enum
         {
@@ -78,7 +80,7 @@ namespace ite
             FREQ_CH15 = 473000
         } Frequency;
 
-        static Frequency chanFrequency(unsigned channel)
+        static Frequency freq4chan(unsigned channel)
         {
             switch (channel)
             {
@@ -104,7 +106,7 @@ namespace ite
             return FREQ_X;
         }
 
-        static unsigned freqChannel(unsigned freq)
+        static unsigned chan4freq(unsigned freq)
         {
             switch (freq)
             {
@@ -129,210 +131,122 @@ namespace ite
             }
             return 0xffff;
         }
+    };
 
+    ///
+    class TxDevice : public TxRC, public TxChannels
+    {
+    public:
         TxDevice(unsigned short txID, unsigned freq);
-        ~TxDevice();
 
-        RCHostInfo * rcHost() { return &info_; }
+        SendSequence& sendSequence() { return m_sequence; }
+        uint16_t txID() const { return m_sequence.txID; }
 
-        bool setChannel(unsigned channel);
+        unsigned frequency() const { return transmissionParameter.frequency; }
+        void setFrequency(unsigned freq) { transmissionParameter.frequency = freq; }
 
-        void resetCmd() { cmd_.clear(); }
-
-        unsigned short sequenceRecv() const { return info_.device.RCCmd_sequence_recv; }
-        void setSequenceRecv(unsigned short value) { info_.device.RCCmd_sequence_recv = value; }
-
-        unsigned short txID() const { return info_.device.clientTxDeviceID; }
-        //unsigned short rxID() const { return info_.device.hostRxDeviceID; }
-        unsigned frequency() const { return info_.transmissionParameter.frequency; }
-        void setFrequency(unsigned freq) { info_.transmissionParameter.frequency = freq; }
-
-        void setWaiting(bool wr, unsigned short cmd = 0)
+        void open()
         {
-            waitingResponse_ = wr;
-            if (wr)
-                waitingCmd_ = cmd;
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            resetWanted();
+            m_responses.clear();
+            m_ready.store(false);
         }
 
-        unsigned short waitingCmd() const { return waitingCmd_; }
-        bool isWaiting() const { return waitingResponse_; }
-        bool wait(int iWaitTime = SEND_WAIT_TIME_MS);
-
-        RebuiltCmd& cmd() { return cmd_; }
-        RCError parseCommand();
-
-        bool isActive() const { return isActive_; }
-        void setActive(bool a = true) { isActive_ = a; }
-
-        void print() const;
-
-        //
-#if 0
-        //void getTxDeviceAddressID()               { sendCmd(CMD_GetTxDeviceAddressIDInput); }
-        void getTransmissionParameterCapabilities() { sendCmd(CMD_GetTransmissionParameterCapabilitiesInput); }
-        void getTransmissionParameters()            { sendCmd(CMD_GetTransmissionParametersInput); }
-        void getHwRegisterValues()                  { sendCmd(CMD_GetHwRegisterValuesInput); }
-        void getAdvanceOptions()                    { sendCmd(CMD_GetAdvanceOptionsInput); }
-        void getTPSInformation()                    { sendCmd(CMD_GetTPSInformationInput); }
-        void getSiPsiTable()                        { sendCmd(CMD_GetSiPsiTableInput); }
-        void getNitLocation()                       { sendCmd(CMD_GetNitLocationInput); }
-        void getSdtService()                        { sendCmd(CMD_GetSdtServiceInput); }
-        void getEITInformation()                    { sendCmd(CMD_GetEITInformationInput); }
-
-        //void setTxDeviceAddressID()               { sendCmd(CMD_SetTxDeviceAddressIDInput); }
-        void setCalibrationTable()                  { sendCmd(CMD_SetCalibrationTableInput); }
-        void setTransmissionParameters()            { sendCmd(CMD_SetTransmissionParametersInput); }
-        void setHwRegisterValues()                  { sendCmd(CMD_SetHwRegisterValuesInput); }
-        void setAdvaneOptions()                     { sendCmd(CMD_SetAdvaneOptionsInput); }
-        void setTPSInformation()                    { sendCmd(CMD_SetTPSInformationInput); }
-        void setSiPsiTable()                        { sendCmd(CMD_SetSiPsiTableInput); }
-        void setNitLocation()                       { sendCmd(CMD_SetNitLocationInput); }
-        void setSdtService()                        { sendCmd(CMD_SetSdtServiceInput); }
-        void setEITInformation()                    { sendCmd(CMD_SetEITInformationInput); }
-
-        //
-
-        void getCapabilities()                      { sendCmd(CMD_GetCapabilitiesInput); }
-        void getDeviceInformation()                 { sendCmd(CMD_GetDeviceInformationInput); }
-        void getHostname()                          { sendCmd(CMD_GetHostnameInput); }
-        void getSystemDateAndTime()                 { sendCmd(CMD_GetSystemDateAndTimeInput); }
-        void getSystemLog()                         { sendCmd(CMD_GetSystemLogInput); }
-        void getOSDInformation()                    { sendCmd(CMD_GetOSDInformationInput); }
-
-        void setSystemFactoryDefault()              { sendCmd(CMD_SetSystemFactoryDefaultInput); }
-        void setHostname()                          { sendCmd(CMD_SetHostnameInput); }
-        void setSystemDateAndTime()                 { sendCmd(CMD_SetSystemDateAndTimeInput); }
-        void setOSDInformation()                    { sendCmd(CMD_SetOSDInformationInput); }
-
-        void systemReboot()                         { sendCmd(CMD_SystemRebootInput); }
-        //void upgradeSystemFirmware()              { sendCmd(CMD_UpgradeSystemFirmwareInput); }
-
-        //
-
-        void getDigitalInputs()                     { sendCmd(CMD_GetDigitalInputsInput); }
-        void getRelayOutputs()                      { sendCmd(CMD_GetRelayOutputsInput); }
-
-        void setRelayOutputState()                  { sendCmd(CMD_SetRelayOutputStateInput); }
-        void setRelayOutputSettings()               { sendCmd(CMD_SetRelayOutputSettingsInput); }
-
-        //
-
-        void getImagingSettings()                   { sendCmd(CMD_GetImagingSettingsInput); }
-        void imgGetStatus()                         { sendCmd(CMD_IMG_GetStatusInput); }
-        void imgGetOptions()                        { sendCmd(CMD_IMG_GetOptionsInput); }
-        void getUserDefinedSettings()               { sendCmd(CMD_GetUserDefinedSettingsInput); }
-        void setImagingSettings()                   { sendCmd(CMD_SetImagingSettingsInput); }
-        void imgMove()                              { sendCmd(CMD_IMG_MoveInput); }
-        void imgStop()                              { sendCmd(CMD_IMG_StopInput); }
-        void setUserDefinedSettings()               { sendCmd(CMD_SetUserDefinedSettingsInput); }
-
-        //
-
-        void getProfiles()                          { sendCmd(CMD_GetProfilesInput); }
-        void getVideoSources()                      { sendCmd(CMD_GetVideoSourcesInput); }
-        void getVideoSourceConfigurations()         { sendCmd(CMD_GetVideoSourceConfigurationsInput); }
-        void getNumberOfVideoEncoderInstances()     { sendCmd(CMD_GetGuaranteedNumberOfVideoEncoderInstancesInput); }
-        void getVideoEncoderConfigurations()        { sendCmd(CMD_GetVideoEncoderConfigurationsInput); }
-        void getAudioSources()                      { sendCmd(CMD_GetAudioSourcesInput); }
-        void getAudioSourceConfigurations()         { sendCmd(CMD_GetAudioSourceConfigurationsInput); }
-        void getAudioEncoderConfigurations()        { sendCmd(CMD_GetAudioEncoderConfigurationsInput); }
-        void getVideoSourceConfigurationOptions()   { sendCmd(CMD_GetVideoSourceConfigurationOptionsInput); }
-        void getVideoEncoderConfigurationOptions()  { sendCmd(CMD_GetVideoEncoderConfigurationOptionsInput); }
-        void getAudioSourceConfigurationOptions()   { sendCmd(CMD_GetAudioSourceConfigurationOptionsInput); }
-        void getAudioEncoderConfigurationOptions()  { sendCmd(CMD_GetAudioEncoderConfigurationOptionsInput); }
-        void getVideoOSDConfiguration()             { sendCmd(CMD_GetVideoOSDConfigurationInput); }
-        void getVideoPrivateArea()                  { sendCmd(CMD_GetVideoPrivateAreaInput); }
-
-        void setSynchronizationPoint()              { sendCmd(CMD_SetSynchronizationPointInput); }
-        void setVideoSourceConfiguration()          { sendCmd(CMD_SetVideoSourceConfigurationInput); }
-        void setVideoEncoderConfiguration()         { sendCmd(CMD_SetVideoEncoderConfigurationInput); }
-        void setAudioSourceConfiguration()          { sendCmd(CMD_SetAudioSourceConfigurationInput); }
-        void setAudioEncoderConfiguration()         { sendCmd(CMD_SetAudioEncoderConfigurationInput); }
-        void setVideoOSDConfiguration()             { sendCmd(CMD_SetVideoOSDConfigurationInput); }
-        void setVideoPrivateArea()                  { sendCmd(CMD_SetVideoPrivateAreaInput); }
-        void setVideoSourceControl()                { sendCmd(CMD_SetVideoSourceControlInput); }
-
-        //
-
-        void getConfigurations()                    { sendCmd(CMD_GetConfigurationsInput); }
-        void ptzGetStatus()                         { sendCmd(CMD_PTZ_GetStatusInput); }
-        void getPresets()                           { sendCmd(CMD_GetPresetsInput); }
-        void gotoPreset()                           { sendCmd(CMD_GotoPresetInput); }
-        void removePreset()                         { sendCmd(CMD_RemovePresetInput); }
-        void setPreset()                            { sendCmd(CMD_SetPresetInput); }
-        void absoluteMove()                         { sendCmd(CMD_AbsoluteMoveInput); }
-        void relativeMove()                         { sendCmd(CMD_RelativeMoveInput); }
-        void continuousMove()                       { sendCmd(CMD_ContinuousMoveInput); }
-        void setHomePosition()                      { sendCmd(CMD_SetHomePositionInput); }
-        void gotoHomePosition()                     { sendCmd(CMD_GotoHomePositionInput); }
-        void ptzStop()                              { sendCmd(CMD_PTZ_StopInput); }
-
-        //
-
-        void getSupportedRules()                    { sendCmd(CMD_GetSupportedRulesInput); }
-        void getRules()                             { sendCmd(CMD_GetRulesInput); }
-        void createRule()                           { sendCmd(CMD_CreateRuleInput); }
-        void modifyRule()                           { sendCmd(CMD_ModifyRuleInput); }
-        void deleteRule()                           { sendCmd(CMD_DeleteRuleInput); }
-#endif
-
-        // info
-
-        TxManufactureInfo txDeviceInfo() const
+        void close()
         {
-            TxManufactureInfo mInfo;
-            mInfo.companyName = rcStr2str(info_.manufactureInfo.manufactureName);
-            mInfo.modelName = rcStr2str(info_.manufactureInfo.modelName);
-            mInfo.firmwareVersion = rcStr2str(info_.manufactureInfo.firmwareVersion);
-            mInfo.serialNumber = rcStr2str(info_.manufactureInfo.serialNumber);
-            mInfo.hardwareId = rcStr2str(info_.manufactureInfo.hardwareId);
-            return mInfo;
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            resetWanted();
+            m_ready.store(false);
         }
 
-        // encoder
+        bool ready() const { return m_ready; }
+        void setReady() { m_ready.store(true); }
 
-        uint8_t encodersCount() const { return info_.videoEncConfig.configListSize; }
+        //
 
-        TxVideoEncConfig txVideoEncConfig(uint8_t encoderNo)
+        uint8_t encodersCount() const { return videoEncConfig.configListSize; }
+        bool videoSourceCfg(unsigned stream, int& width, int& height, float& fps);
+        bool videoEncoderCfg(unsigned encNo, nxcip::LiveStreamConfig& config);
+
+        //
+
+        uint16_t cmd2update();
+        bool setWanted(uint16_t cmd);
+        uint16_t wantedCmd() { return m_wantedCmd; }
+
+        bool responseCode(uint16_t cmd, uint8_t& outCode);
+        void clearResponse(uint16_t cmd);
+        unsigned responsesCount() const;
+
+        void parse(RcPacket& pkt);              // recv: DevReader -> Demux -> (some thread) -> RcPacket -> RcCommand -> TxDevice
+        RcCommand * mkRcCmd(uint16_t command);  // send: RxDevice -> TxDevice -> RcCommand -> RxDevice -> It930x
+        RcCommand * mkSetChannel(unsigned channel);
+        RcCommand * mkSetEncoderParams(unsigned streamNo, unsigned fps, unsigned bitrateKbps);
+        RcCommand * mkSetOSD(unsigned osdNo = 0);
+
+        // -- RC
+        static uint8_t checksum(const uint8_t * buffer, unsigned length) { return RcPacket::checksum(buffer, length); }
+        uint8_t * rc_getBuffer(unsigned size);
+        unsigned rc_command(Byte * buffer, unsigned bufferSize);
+        Security& rc_security();
+        bool rc_checkSecurity(Security& s);
+        // --
+
+        static std::string rcStr2str(const RCString& s)
         {
-            if (encoderNo >= encodersCount())
-                return TxVideoEncConfig();
-
-            TxVideoEncConfig conf;
-            conf.width = info_.videoEncConfig.configList[encoderNo].width;
-            conf.height = info_.videoEncConfig.configList[encoderNo].height;
-            conf.bitrateLimit = info_.videoEncConfig.configList[encoderNo].bitrateLimit;
-            conf.frameRateLimit = info_.videoEncConfig.configList[encoderNo].frameRateLimit;
-            conf.quality = info_.videoEncConfig.configList[encoderNo].quality;
-            return conf;
+            return std::string((const char *)s.data(), s.length());
         }
 
-        //bool setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf);
+        static void str2rcStr(const std::string& str, RCString& rcStr)
+        {
+            rcStr.set((const unsigned char *)str.c_str(), str.size());
+        }
 
     private:
-        RCHostInfo info_;
-        RebuiltCmd cmd_;
-        unsigned short waitingCmd_;
-        bool waitingResponse_;
-        bool isActive_;
-#if 0
-        void sendCmd(unsigned short command)
-        {
-            setWaiting(true, input2output(command));
+        mutable std::mutex m_mutex;
+        mutable std::atomic_bool m_ready;
+        std::atomic_ushort m_wantedCmd;
+        SendSequence m_sequence;
+        RcCommand m_cmdRecv;
+        RcCommand m_cmdSend;
+        Security m_recvSecurity;
+        std::map<uint16_t, uint8_t> m_responses; // {cmdID, RetCode}
+        Timer m_timer;
 
-            info_.cmdSendConfig.bIsCmdBroadcast = False;
-            unsigned error = Cmd_Send(&info_, command);
-            if (error)
-                throw "Can't send cmd";
-        }
-#endif
-        static std::string rcStr2str(const RCString& s) { return std::string((const char *)s.stringData, s.stringLength); }
+        void resetWanted(uint16_t cmd = 0, uint8_t code = 0);
+
+        bool hasResponses(const uint16_t * cmdInputIDs, unsigned size) const;
+        bool hasResponse(uint16_t cmdInputID) const { return hasResponses(&cmdInputID, 1); }
+        bool supported(uint16_t cmdInputID) const;
+
+        bool prepareTransmissionParams();
+        bool prepareVideoEncoderParams(unsigned streamNo);
+        bool prepareDateTime();
+        bool prepareOSD(unsigned videoSource = 0);
 
         TxDevice(const TxDevice& );
         TxDevice& operator = (const TxDevice& );
     };
 
-    typedef std::shared_ptr<TxDevice> TxDevicePtr;
+    ///
+    struct TxManufactureInfo
+    {
+        TxManufactureInfo(TxRC& tx)
+        :   m_tx(tx)
+        {}
+
+        std::string companyName() { return TxDevice::rcStr2str(m_tx.manufactureInfo.manufactureName); }
+        std::string modelName() { return TxDevice::rcStr2str(m_tx.manufactureInfo.modelName); }
+        std::string firmwareVersion() { return TxDevice::rcStr2str(m_tx.manufactureInfo.firmwareVersion); }
+        std::string serialNumber() { return TxDevice::rcStr2str(m_tx.manufactureInfo.serialNumber); }
+        std::string hardwareId() { return TxDevice::rcStr2str(m_tx.manufactureInfo.hardwareId); }
+
+    private:
+        const TxRC& m_tx;
+    };
 }
 
 #endif

@@ -9,7 +9,7 @@
 
 QnBusinessEventParameters::QnBusinessEventParameters():
     eventType(QnBusiness::UndefinedEvent),
-    eventTimestamp(0),
+    eventTimestampUsec(0),
     reasonCode(QnBusiness::NoReason)
 {}
 

@@ -10,10 +10,12 @@
 
 #include "stardot_resource.h"
 
+#if 0
 static const char STARDOT_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int STARDOT_SEI_PRODUCT_INFO = 0x0a00;
 static const int STARDOT_SEI_TIMESTAMP = 0x0a01;
 static const int STARDOT_SEI_TRIGGER_DATA = 0x0a03;
+#endif
 static const QByteArray STARDOT_MOTION_UUID = QByteArray::fromHex("bed9b7e0f06032a1bb7e7d4c6d82d249");
 
 
@@ -29,17 +31,17 @@ QnStardotStreamReader::~QnStardotStreamReader()
     stop();
 }
 
-CameraDiagnostics::Result QnStardotStreamReader::openStream()
+CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     // configure stream params
 
     // get URL
 
-    if (isCameraControlRequired())
+    if (isCameraControlRequired)
     {
         QString request(lit("admin.cgi?image&h264_bitrate=%2&h264_framerate=%3"));
-        int bitrate = m_stardotRes->suggestBitrateKbps(getQuality(), m_stardotRes->getResolution(), getFps());
-        request = request.arg(bitrate).arg(getFps());
+        int bitrate = m_stardotRes->suggestBitrateKbps(params.quality, m_stardotRes->getResolution(), params.fps);
+        request = request.arg(bitrate).arg(params.fps);
 
         CLHttpStatus status;
         m_stardotRes->makeStardotRequest(request, status);
@@ -88,11 +90,8 @@ void QnStardotStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnStardotStreamReader::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData())
         return getMetaData();
@@ -110,18 +109,6 @@ QnAbstractMediaDataPtr QnStardotStreamReader::getNextData()
     }
 
     return rez;
-}
-
-void QnStardotStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnStardotStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 QnConstResourceAudioLayoutPtr QnStardotStreamReader::getDPAudioLayout() const

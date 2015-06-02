@@ -80,17 +80,15 @@ bool QnFile::open(const QIODevice::OpenMode& mode, unsigned int systemDependentF
     if (handle == -1)
         m_impl = 0;
     else
-        m_impl = (void*) handle;
+        m_impl = reinterpret_cast<void*>(handle);
 
     return m_impl != 0;
 }
 
 void QnFile::close()
 {
-    if( ::close( (long)m_impl ) == 0 )
-	{
-        m_impl = 0;
-	}
+    ::close( (long)m_impl );
+    m_impl = 0;
 }
 
 qint64 QnFile::read( char* buffer, qint64 count )

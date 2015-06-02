@@ -82,7 +82,6 @@ public:
                 afterdelay();
             return havetowait;
         }
-        //NX_LOG("sleep time=", havetowait/1000000.0, cl_logALWAYS);
         if (havetowait < MAX_VALID_SLEEP_TIME) 
         {
             SCOPED_MUTEX_LOCK( lock, &m_mutex);

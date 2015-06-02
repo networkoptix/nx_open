@@ -50,6 +50,8 @@ QnDistributedMutex* QnDistributedMutexManager::createMutex(const QString& name)
 
 void QnDistributedMutexManager::releaseMutex(const QString& name)
 {
+    if (!m_staticInstance)
+        return; // todo: connection already closed and object deleted, but posted ~QnDistributedMutex have access to deleted object. Refactor is required
     SCOPED_MUTEX_LOCK( lock, &m_mutex);
     m_mutexList.remove(name);
 }

@@ -10,9 +10,11 @@ struct QnAppInfo {
     static QString applicationVersion();
     static QString applicationRevision();
     static QString applicationPlatform();
+
     static QString applicationArch();
     static QString applicationPlatformModification();
     static QString applicationCompiler();
+
     static QString engineVersion();
     static QString ffmpegVersion();
     static QString sigarVersion();
@@ -24,6 +26,8 @@ struct QnAppInfo {
     static QString productNameShort();
     static QString productNameLong();
     static QString customizationName();
+    
+    static QString defaultLanguage();
     
     static QString clientExecutableName();
     static QString applauncherExecutableName();
@@ -44,6 +48,26 @@ struct QnAppInfo {
     static bool    freeLicenseIsTrial();
 
     static QString iosPlayButtonTint();
+
+    // helpers:
+
+    inline
+    static QString applicationFullVersion()
+    {
+        return QString(QLatin1String("%1-%2%3"))
+                .arg(applicationVersion())
+                .arg(applicationRevision())
+                .arg(QLatin1String(beta() ? "-beta" : ""));
+    }
+
+    inline
+    static QString applicationSystemInfo()
+    {
+        return QString(QLatin1String("%1-%2-%3"))
+                .arg(applicationPlatform())
+                .arg(applicationArch())
+                .arg(applicationPlatformModification());
+    }
 };
 
 #endif // QN_APPINFO_H

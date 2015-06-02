@@ -2,13 +2,14 @@
 #define __UNIVERSAL_REQUEST_PROCESSOR_P_H__
 
 #include "utils/network/tcp_connection_priv.h"
+#include "universal_tcp_listener.h"
 
 class QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
     QnTCPConnectionProcessor* processor;
     QnMutex mutex;
-    QnTcpListener* owner;
+    QnUniversalTcpListener* owner;
     bool needAuth;
 
     QnUniversalRequestProcessorPrivate()

@@ -11,21 +11,15 @@
 namespace ite
 {
     //!
-    class VideoPacket : public nxcip::VideoDataPacket
+    class VideoPacket : public nxcip::MediaDataPacket, public ObjectCounter<VideoPacket>
     {
         DEF_REF_COUNTER
 
     public:
-        VideoPacket()
-        :   m_refManager( this ),
-            m_data( nullptr ),
-            m_size( 0 )
-        {}
-
-        VideoPacket(const uint8_t* data, unsigned size);
+        VideoPacket(const uint8_t * data, unsigned size, uint64_t ts);
         virtual ~VideoPacket();
 
-        // nxpl::MediaDataPacket
+        // nxpl::VideoDataPacket
 
         virtual nxcip::UsecUTCTimestamp timestamp() const override;
         virtual nxcip::DataPacketType type() const override;
@@ -35,28 +29,14 @@ namespace ite
         virtual nxcip::CompressionType codecType() const override;
         virtual unsigned int flags() const override;
         virtual unsigned int cSeq() const override;
-        virtual nxcip::Picture* getMotionData() const override;
+        //virtual nxcip::Picture* getMotionData() const override;
 
         //
 
-        void setTime(uint64_t ts) { m_time = ts; }
-        void setKeyFlag() { m_flags |= MediaDataPacket::fKeyPacket; }
-        void setLowQualityFlag() { m_flags |= MediaDataPacket::fLowQuality; }
-
-        bool isKey() const { return m_flags & MediaDataPacket::fKeyPacket; }
-
-        void swap(VideoPacket& vp)
-        {
-            using std::swap;
-
-            m_data.swap(vp.m_data);
-            swap(m_size, vp.m_size);
-            swap(m_time, vp.m_time);
-            swap(m_flags, vp.m_flags);
-        }
+        void setFlag(MediaDataPacket::Flags f) { m_flags |= f; }
 
     private:
-        std::shared_ptr<uint8_t> m_data;
+        void * m_data;
         size_t m_size;
         nxcip::UsecUTCTimestamp m_time;
         unsigned m_flags;

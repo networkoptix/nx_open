@@ -408,15 +408,6 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
         m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
 
-    //detecting and saving selected resolutions
-    /*
-    CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_resolutions[PRIMARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
-    if( !m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty() )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_resolutions[SECONDARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
-    saveMediaStreamInfoIfNeeded( mediaStreams );
-    */
-
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes

@@ -174,7 +174,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
 
 QnCamDisplay::~QnCamDisplay()
 {
-    qnRedAssController->unregisterConsumer(this);
+    if (qnRedAssController)
+        qnRedAssController->unregisterConsumer(this);
 
     Q_ASSERT(!isRunning());
     stop();
@@ -315,7 +316,8 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
             if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2) 
             {
                 QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
-                qnRedAssController->onSlowStream(reader);
+                if (qnRedAssController)
+                    qnRedAssController->onSlowStream(reader);
             }
         }
     }
@@ -342,14 +344,16 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCount = qMax(0, m_delayedFrameCount);
             m_delayedFrameCount++;
             if (m_delayedFrameCount > 10 && m_archiveReader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
-                qnRedAssController->onSlowStream(m_archiveReader);
+                if (qnRedAssController)
+                    qnRedAssController->onSlowStream(m_archiveReader);
         }
         else if (realSleepTime >= 0)
         {
             m_delayedFrameCount = qMin(0, m_delayedFrameCount);
             m_delayedFrameCount--;
             if (m_delayedFrameCount < -10 && m_dataQueue.size() >= m_dataQueue.size()*0.75)
-                qnRedAssController->streamBackToNormal(m_archiveReader);
+                if (qnRedAssController)
+                    qnRedAssController->streamBackToNormal(m_archiveReader);
         }
     }
 }
@@ -434,7 +438,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (!m_forceMtDecoding)
     {
-        bool canSwitchToMT = isFullScreen() || qnRedAssController->counsumerCount() == 1;
+        bool canSwitchToMT = isFullScreen() || (qnRedAssController && qnRedAssController->counsumerCount() == 1);
         bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
         if (canSwitchToMT && shouldSwitchToMT) {
             if (!m_useMTRealTimeDecode) {
@@ -936,6 +940,8 @@ void QnCamDisplay::processNewSpeed(float speed)
     {
         //m_dataQueue.clear();
         clearVideoQueue();
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
+            m_display[i]->afterJump();
         SCOPED_MUTEX_LOCK( lock, &m_timeMutex);
         m_lastDecodedTime = AV_NOPTS_VALUE;
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
@@ -1619,13 +1625,17 @@ qint64 QnCamDisplay::getDisplayedMax() const
 
 qint64 QnCamDisplay::getDisplayedMin() const
 {
-    qint64 rez = m_display[0]->getTimestampOfNextFrameToRender();
-    for (int i = 1; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+    qint64 rez = AV_NOPTS_VALUE;
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
     {
         qint64 val = m_display[i]->getTimestampOfNextFrameToRender();
-        if ((quint64)val != AV_NOPTS_VALUE) {
+        if ((quint64)val == AV_NOPTS_VALUE)
+            continue;
+
+        if ((quint64)rez == AV_NOPTS_VALUE)
+            rez = val;
+        else
             rez = qMin(rez, val);
-        }
     }
     return rez;
 }
@@ -1654,25 +1664,20 @@ qint64 QnCamDisplay::getMinReverseTime() const
 qint64 QnCamDisplay::getNextTime() const
 {
     if( m_display[0] && m_display[0]->isTimeBlocked() )
-    {
         return m_display[0]->getTimestampOfNextFrameToRender();
-    }
+    
+    qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
+
+    if (!m_display[0])
+        return rez;
+
+    qint64 lastTime = m_display[0]->getTimestampOfNextFrameToRender();
+
+    if ((quint64)rez != AV_NOPTS_VALUE)
+        return m_speed < 0 ? qMin(rez, lastTime) : qMax(rez, lastTime);
     else
-    {
-        qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
-        qint64 lastTime = m_display[0]->getTimestampOfNextFrameToRender();
+        return lastTime;
 
-        if ((quint64)rez != AV_NOPTS_VALUE)
-            return m_speed < 0 ? qMin(rez, lastTime) : qMax(rez, lastTime);
-        else
-            return lastTime;
-
-        /*
-        return m_display[0] == NULL || (quint64)rez != AV_NOPTS_VALUE
-            ? rez
-            : m_display[0]->getTimestampOfNextFrameToRender();
-        */
-    }
 }
 
 qint64 QnCamDisplay::getDisplayedTime() const

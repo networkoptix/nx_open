@@ -132,7 +132,7 @@ void MultipleInternetTimeFetcher::timeFetchingDone(
 
         //analyzing fetched time and calculating mean value
         if( (minUtcTimeMillis != std::numeric_limits<qint64>::max()) &&
-            (abs(ctx->utcMillis - minUtcTimeMillis) > m_maxDeviationMillis) )
+            (std::abs(ctx->utcMillis - minUtcTimeMillis) > m_maxDeviationMillis) )
         {
             //failure
             auto handlerFunc = std::move( m_handlerFunc );

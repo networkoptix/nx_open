@@ -37,7 +37,7 @@ QnAbstractPictureDataRef::PicStorageType VideoDecoderSwitcher::targetMemoryType(
 }
 
 //!Implementation of QnAbstractVideoDecoder::decode
-bool VideoDecoderSwitcher::decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
+bool VideoDecoderSwitcher::decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     SCOPED_MUTEX_LOCK( lk,  &m_mutex );
 
@@ -114,7 +114,7 @@ const AVFrame* VideoDecoderSwitcher::lastFrame() const
 }
 
 //!Implementation of QnAbstractVideoDecoder::resetDecoder
-void VideoDecoderSwitcher::resetDecoder( QnConstCompressedVideoDataPtr data )
+void VideoDecoderSwitcher::resetDecoder( const QnConstCompressedVideoDataPtr& data )
 {
     return m_decoder->resetDecoder( data );
 }

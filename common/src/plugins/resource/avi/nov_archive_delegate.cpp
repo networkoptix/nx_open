@@ -26,7 +26,7 @@ bool QnNovArchiveDelegate::open(const QnResourcePtr &resource)
 qint64 QnNovArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
     m_skipFramesBeforeTime = AV_NOPTS_VALUE;
-    if (!m_chunks.isEmpty())  {
+    if (!m_chunks.empty())  {
         qint64 oldTime = time;
         time = m_chunks.roundTimeToPeriodUSec(time, true);
         if (time != oldTime)

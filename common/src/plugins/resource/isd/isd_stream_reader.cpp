@@ -27,11 +27,11 @@ QnISDStreamReader::~QnISDStreamReader()
     stop();
 }
 
-static const int BYTES_PER_KB = 1024;
+//static const int BYTES_PER_KB = 1024;
 
 #define USE_VBR
 
-CameraDiagnostics::Result QnISDStreamReader::openStream()
+CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -44,7 +44,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
     int port = QUrl(res->getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
     CLSimpleHTTPClient http (res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
 
-    if (isCameraControlRequired())
+    if (isCameraControlRequired)
     {
         QByteArray request;
         QString result;
@@ -79,9 +79,9 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         }
         else
         {
-            const float fps = getFps();
+            const float fps = params.fps;
             const QSize resolution = res->getPrimaryResolution();
-            const int desiredBitrateKbps = res->suggestBitrateKbps(getQuality(), resolution, fps);
+            const int desiredBitrateKbps = res->suggestBitrateKbps(params.quality, resolution, fps);
             t << "VideoInput.1.h264.1.Resolution=" << resolution.width() << "x" << resolution.height() << "\r\n";
             t << "VideoInput.1.h264.1.FrameRate=" << fps << "\r\n";
 #ifndef USE_VBR
@@ -180,11 +180,8 @@ void QnISDStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData())
         return getMetaData();
@@ -213,18 +210,6 @@ QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
     }
 
     return rez;
-}
-
-void QnISDStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnISDStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 QnConstResourceAudioLayoutPtr QnISDStreamReader::getDPAudioLayout() const

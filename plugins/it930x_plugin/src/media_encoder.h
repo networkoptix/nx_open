@@ -11,10 +11,8 @@
 
 namespace ite
 {
-    /*!
-        \note Delegates reference counting to \a AxisCameraManager instance
-    */
-    class MediaEncoder : public nxcip::CameraMediaEncoder2
+    ///
+    class MediaEncoder : public nxcip::CameraMediaEncoder3, public ObjectCounter<MediaEncoder>
     {
         DEF_REF_COUNTER
 
@@ -36,16 +34,14 @@ namespace ite
         virtual nxcip::StreamReader* getLiveStreamReader() override;
         virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
-        //
+        // nxcip::CameraMediaEncoder3
 
-        static void fakeFree(MediaEncoder * ) {}
-
-        nxcip::ResolutionInfo& resolution() { return m_resolution; }
+        virtual int getConfiguredLiveStreamReader(nxcip::LiveStreamConfig * , nxcip::StreamReader ** ) override;
+        virtual int getVideoFormat(nxcip::CompressionType * codec, nxcip::PixelFormat * pixelFormat) const override;
 
     private:
         CameraManager * m_cameraManager;
         int m_encoderNumber;
-        nxcip::ResolutionInfo m_resolution;
     };
 }
 

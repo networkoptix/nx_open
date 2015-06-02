@@ -39,7 +39,8 @@ namespace ec2
         //!Implementation of AbstractECConnectionFactory::testConnectionAsync
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) override;
         //!Implementation of AbstractECConnectionFactory::connectAsync
-        virtual int connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) override;
+        virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo, 
+                                  impl::ConnectHandlerPtr handler ) override;
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
         virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) override;
@@ -60,7 +61,8 @@ namespace ec2
         bool m_sslEnabled;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
-        int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );
+        int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler, 
+                                               const ApiClientInfoData& clientInfo );
         template<class Handler>
         void connectToOldEC( const QUrl& ecURL, Handler completionFunc );
             //!Called on client side after receiving connection response from remote server
@@ -99,6 +101,9 @@ namespace ec2
                 QnRestProcessorPool* const restProcessorPool,
                 ApiCommand::Value cmd,
                 HandlerType handler );
+
+        template<class Function>
+            void statisticsCall(const Function& function);
     };
 }
 

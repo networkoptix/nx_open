@@ -45,6 +45,14 @@ public:
         return defaultValue;
     }
 
+    QList<Value> allValues(const Key &key) const {
+        QList<Value> result;
+        for(const QPair<Key, Value> &pair: *this)
+            if(pair.first == key)
+                result << pair.second;
+        return result;
+    }
+
     bool contains(const Key &key) const {
         for(const QPair<Key, Value> &pair: *this)
             if(pair.first == key)

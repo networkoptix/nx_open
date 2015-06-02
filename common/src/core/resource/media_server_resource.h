@@ -36,7 +36,7 @@ public:
     virtual void setName( const QString& name ) override;
     void setServerName( const QString& name );
 
-    void setApiUrl(const QString& restUrl);
+    void setApiUrl(const QString& apiUrl);
     QString getApiUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
@@ -58,7 +58,7 @@ public:
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
-    void setPrimaryIF(const QString& primaryIF);
+    void setPrimaryAddress(const SocketAddress &primaryAddress);
 
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
@@ -91,6 +91,14 @@ public:
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
+    /** Original GUID is set for incompatible servers when their getGuid() getter returns a fake GUID.
+     * This allows us to hold temporary fake server dublicates in the resource pool.
+     */
+    QnUuid getOriginalGuid() const;
+    /** Set original GUID. No signals emmited after this method because the original GUID should not be changed after resource creation. */
+    void setOriginalGuid(const QnUuid &guid);
+    static bool isFakeServer(const QnResourcePtr &resource);
+
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
     void setStorageDataToUpdate(const QnAbstractStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);
@@ -102,10 +110,11 @@ private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
+    void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
-    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
+    void apiUrlChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);
@@ -127,6 +136,8 @@ private:
     QVector<nx_http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
+
+    QnUuid m_originalGuid;
 
     // used for client purpose only. Can be moved to separete class
     QnAbstractStorageResourceList m_storagesToUpdate;

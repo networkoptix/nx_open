@@ -4,6 +4,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QObject>
 #include <QtCore/QMap>
+#include <QtCore/QElapsedTimer>
 
 #include "core/resource/resource_fwd.h"
 #include "business/business_fwd.h"
@@ -17,6 +18,8 @@
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
+class QnDualStreamingHelper;
+
 namespace ec2 {
     class QnDistributedMutex;
 }
@@ -24,10 +27,10 @@ namespace ec2 {
 struct Recorders
 {
     Recorders(): recorderHiRes(0), recorderLowRes(0) {}
-    Recorders(QnServerStreamRecorder* _recorderHiRes, QnServerStreamRecorder* _recorderLowRes):
-    recorderHiRes(_recorderHiRes), recorderLowRes(_recorderLowRes) {}
+
     QnServerStreamRecorder* recorderHiRes;
     QnServerStreamRecorder* recorderLowRes;
+    QSharedPointer<QnDualStreamingHelper> dualStreamingHelper;
 };
 
 class QnRecordingManager: public QThread
@@ -46,7 +49,7 @@ public:
 
     void start();
     void stop();
-    bool isCameraRecoring(const QnResourcePtr& camera);
+    bool isCameraRecoring(const QnResourcePtr& camera) const;
 
     Recorders findRecorders(const QnResourcePtr& res) const;
 
@@ -62,12 +65,12 @@ private slots:
     void at_camera_initializationChanged(const QnResourcePtr &resource);
     void at_camera_resourceChanged(const QnResourcePtr &resource);
     void at_checkLicenses();
-    void at_historyMutexLocked();
-    void at_historyMutexTimeout();
+    void at_serverPropertyChanged(const QnResourcePtr &, const QString &key);
 private:
     void updateCamera(const QnSecurityCamResourcePtr& camera);
 
-    QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, QnVideoCamera* camera, QnServer::ChunksCatalog catalog);
+    QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader, 
+                                           QnServer::ChunksCatalog catalog, const QSharedPointer<QnDualStreamingHelper>& dualStreamingHelper);
     bool startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(const QnResourcePtr& res) const;
     QnVirtualCameraResourceList getLocalControlledCameras() const;
@@ -75,30 +78,16 @@ private:
     void beforeDeleteRecorder(const Recorders& recorders);
     void stopRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
-    void updateCameraHistory(const QnResourcePtr& res);
+    bool updateCameraHistory();
 
     void at_licenseMutexLocked();
     void at_licenseMutexTimeout();
 private:
-    struct LockData 
-    {
-        LockData(LockData&& other);
-        LockData();
-        LockData(ec2::QnDistributedMutex* mutex, QnVirtualCameraResourcePtr cameraResource, qint64 currentTime);
-        ~LockData();
-
-        ec2::QnDistributedMutex* mutex;
-        QnVirtualCameraResourcePtr cameraResource;
-        qint64 currentTime;
-    private:
-        LockData(const LockData& other);
-    };
-    std::map<QString, LockData> m_lockInProgress;
-
     mutable QnMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
     QTimer m_licenseTimer;
+    QElapsedTimer m_updateCameraHistoryTimer;
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;

@@ -445,7 +445,7 @@ void QnLicenseManagerWidget::at_removeButton_clicked()
         at_licenseRemoved( reqID, errorCode, license );
     };
 
-    int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->removeLicense(license, this,  removeLisencesHandler);
+    QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->removeLicense(license, this,  removeLisencesHandler);
 }
 
 void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license)
@@ -487,6 +487,9 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
             case QnLicense::InvalidBrand:
             case QnLicense::InvalidType:
                 message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
+                break;
+            case QnLicense::TooManyLicensesPerDevice:
+                message = QnLicense::errorMessage(errCode);
                 break;
             default:
                 break;

@@ -41,17 +41,6 @@ namespace ec2
         }
     };
 
-    class CommonRequestsProcessor
-    {
-    public:
-        static ErrorCode getCurrentTime( std::nullptr_t, qint64* curTime )
-        {
-            *curTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-            return ErrorCode::ok;
-        }
-    };
-
-
     class ServerQueryProcessor
     {
     public:
@@ -293,7 +282,10 @@ namespace ec2
                 if( errorCode != ErrorCode::ok )
                     return;
                 if (!dbTran->commit())
+                {
+                    errorCode = ErrorCode::dbError;
                     return;
+                }
             }
             else 
             {
@@ -330,12 +322,32 @@ namespace ec2
             errorCode = processMultiUpdateSync(
                 ApiCommand::removeResource,
                 tran.isLocal,
-                dbManager->getNestedObjects(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
+                dbManager->getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
                 transactionsToSend );
             if( errorCode != ErrorCode::ok )
                 return errorCode;
 
             return processUpdateSync( tran, transactionsToSend, 0 );
+        }
+
+        ErrorCode processUpdateSync(
+            QnTransaction<ApiResetBusinessRuleData>& tran,
+            std::list<std::function<void()>>* const transactionsToSend,
+            int /*dummy*/ = 0 )
+        {
+            ErrorCode errorCode = processMultiUpdateSync(
+                ApiCommand::removeBusinessRule,
+                tran.isLocal,
+                dbManager->getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
+                transactionsToSend );
+            if( errorCode != ErrorCode::ok )
+                return errorCode;
+
+            return processMultiUpdateSync(
+                ApiCommand::saveBusinessRule,
+                tran.isLocal,
+                tran.params.defaultRules,
+                transactionsToSend );
         }
 
         template<class QueryDataType>
@@ -371,7 +383,7 @@ namespace ec2
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
-                switch(dbManager->getObjectType(tran.params.id))
+                switch(dbManager->getObjectTypeNoLock(tran.params.id))
                 {
                 case ApiObject_Server:
                     updatedTran.command = ApiCommand::removeMediaServer;

@@ -24,6 +24,7 @@
 
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
+#include <client/client_runtime_settings.h>
 
 #include <common/common_module.h>
 
@@ -451,7 +452,7 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QLatin1String("--screen") << QString::number(screen);
     }
 
-    if (qnSettings->isDevMode())
+    if (qnRuntime->isDevMode())
         arguments << lit("--dev-mode-key=razrazraz");
 
     qDebug() << "Starting new instance with args" << arguments;
@@ -472,7 +473,8 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
 }
 
 void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
-    qnRedAssController->setMode(resolutionMode);
+    if (qnRedAssController)
+        qnRedAssController->setMode(resolutionMode);
 }
 
 QnCameraSettingsDialog *QnWorkbenchActionHandler::cameraSettingsDialog() const {
@@ -561,24 +563,20 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-    if (!user) {
-        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
-        return;
-    }
+	if (!qnRuntime->isActiveXMode()) {
+		if (!user) {
+	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+			return;
+		}
 
-    if (user->isAdmin())
-        context()->instance<QnWorkbenchUpdateWatcher>()->start();
-    else
-        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
-
-    /* Open all user's layouts. */
-    //if(qnSettings->isLayoutsOpenedOnLogin()) {
-        //QnLayoutResourceList layouts = context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>();
-        //menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
-    //}
+		if (user->isAdmin())
+	        context()->instance<QnWorkbenchUpdateWatcher>()->start();
+	    else
+			context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+	}
 
     // we should not change state when using "Open in New Window"
-    if (m_delayedDrops.isEmpty() && !qnSettings->isVideoWallMode()) {
+    if (m_delayedDrops.isEmpty() && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode()) {
         QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
         workbench()->update(state);
 
@@ -592,7 +590,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     * Otherwise the user will see uncreated layouts in layout selection menu.
     * As temporary workaround we can just remove that layouts. */
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
-    if (user) {
+    if (user && !qnRuntime->isActiveXMode()) {
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
             if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
                 resourcePool()->removeResource(layout);
@@ -627,20 +625,18 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(Qn::RadassAutoAction)->setChecked(true);
-    qnRedAssController->setMode(Qn::AutoResolution);
+    if (qnRedAssController)
+        qnRedAssController->setMode(Qn::AutoResolution);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
-    if (qnSettings->isVideoWallMode())
-        return;
-
     m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
 
     action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
 
     m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
@@ -1139,7 +1135,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
     if (!server)
         /* If target server is not provided, open the server we are currently connected to. */
-        server = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
+        server = qnCommon->currentServer();
 
     if (!server)
         return;
@@ -1204,6 +1200,10 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if(!resource)
         return;
 
+    QnResourceWidget *widget = parameters.widget();
+    if (!widget)
+        return;
+
     bool isSearchLayout = workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
     
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
@@ -1213,10 +1213,6 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         if (!isSearchLayout)
             return;
 
-        QnResourceWidget *widget = parameters.widget();
-        if (!widget)
-            return;
-        
         period = widget->item()->data(Qn::ItemSliderSelectionRole).value<QnTimePeriod>();
         if (period.isEmpty())
             return;
@@ -1225,11 +1221,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     }
 
     /* Adjust for chunks. If they are provided, they MUST intersect with period */
-    if(!periods.isEmpty()) {
+    if(!periods.empty()) {
 
         QnTimePeriodList localPeriods = periods.intersected(period);
 
-        qint64 startDelta = localPeriods.first().startTimeMs - period.startTimeMs;
+        qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
         if (startDelta > 0) { //user selected period before the first chunk
             period.startTimeMs += startDelta;
             period.durationMs -= startDelta;
@@ -1332,8 +1328,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Calculate size of the resulting matrix. */
     qreal desiredItemAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-    QnResourceWidget *widget = parameters.widget();
-    if (widget && widget->hasAspectRatio())
+    if (widget->hasAspectRatio())
         desiredItemAspectRatio = widget->visualAspectRatio();
 
     /* Calculate best size for layout cells. */
@@ -1360,8 +1355,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         QnTimePeriod localPeriod (time, step);
         QnTimePeriodList localPeriods = periods.intersected(localPeriod);
         qint64 localTime = time;
-        if (!localPeriods.isEmpty())
-            localTime = qMax(localTime, localPeriods.first().startTimeMs);
+        if (!localPeriods.empty())
+            localTime = qMax(localTime, localPeriods.begin()->startTimeMs);
 
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
@@ -1484,9 +1479,18 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
-    if(!server)
+    QnMediaServerResourceList servers;
+    for (const auto &resource: menu()->currentParameters(sender()).resources()) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (server && server->getStatus() != Qn::Incompatible)
+            servers << server;
+    }
+
+    Q_ASSERT_X(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");
+    if(servers.isEmpty())
         return;
+
+    QnMediaServerResourcePtr server = servers.first();
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
     connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->instance<QnCameraDataManager>(), &QnCameraDataManager::clearCache);
@@ -1638,7 +1642,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
     foreach (const QnResourcePtr &resource, qnResPool->getResources()) {
         if (!resource->hasFlags(checkedFlags))
             continue;
-        if (resource->getName() != newName)
+        if (resource->getName().compare(newName, Qt::CaseInsensitive) != 0)
             continue;
 
         QString title = checkedFlags == Qn::user
@@ -1749,7 +1753,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         
         if (camera && nodeType == Qn::EdgeNode) {
-            if (mServer = resource->getParentResource().dynamicCast<QnMediaServerResource>())
+            if (mServer = camera->getParentServer())
                 mServer->setName(name);
         }
 
@@ -1790,6 +1794,9 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
         if(!layoutResource)
             return false;
+
+        if (qnResPool->isAutoGeneratedLayout(layoutResource))
+            return true;
 
         return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
     };
@@ -1904,7 +1911,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     QnUserResourcePtr user(new QnUserResource());
     user->setPermissions(Qn::GlobalLiveViewerPermissions);
 
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), mainWindow()));
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
@@ -1965,7 +1972,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(!(permissions & Qn::ReadPermission))
         return;
 
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), mainWindow()));
+    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
     setHelpTopic(dialog.data(), Qn::UserSettings_Help);

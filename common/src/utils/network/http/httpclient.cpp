@@ -86,14 +86,14 @@ namespace nx_http
         SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         while( !m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done) )
             m_cond.wait( lk.mutex() );
-        nx_http::BufferType result = m_msgBodyBuffer;
-        m_msgBodyBuffer.clear();
+        nx_http::BufferType result;
+        result.swap( m_msgBodyBuffer );
         return result;
     }
 
-    void HttpClient::addRequestHeader( const StringType& key, const StringType& value )
+    void HttpClient::addAdditionalHeader( const StringType& key, const StringType& value )
     {
-        m_asyncHttpClient->addRequestHeader( key, value );
+        m_asyncHttpClient->addAdditionalHeader( key, value );
     }
 
     const QUrl& HttpClient::url() const
@@ -114,6 +114,11 @@ namespace nx_http
     void HttpClient::setTotalReconnectTries( int reconnectTries )
     {
         m_asyncHttpClient->setTotalReconnectTries( reconnectTries );
+    }
+
+    void HttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
+    {
+        m_asyncHttpClient->setMessageBodyReadTimeoutMs( messageBodyReadTimeoutMs );
     }
 
     void HttpClient::setUserAgent( const QString& userAgent )

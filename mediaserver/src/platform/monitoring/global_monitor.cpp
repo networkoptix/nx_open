@@ -153,7 +153,7 @@ qreal QnGlobalMonitor::totalCpuUsage() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevCpuUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_LOG(lit("MONITORING. Cpu usage %1%").arg(d->totalCpuUsage*100, 0, 'f', 2), cl_logALWAYS);
+        NX_LOG(lit("MONITORING. Cpu usage %1%").arg(d->totalCpuUsage*100, 0, 'f', 2), cl_logWARNING);
         d->prevCpuUsageLoggingClock = d->upTimeTimer.elapsed();
     }
 
@@ -170,7 +170,7 @@ qreal QnGlobalMonitor::totalRamUsage() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevMemUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_LOG(lit("MONITORING. Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2), cl_logALWAYS);
+        NX_LOG(lit("MONITORING. Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2), cl_logWARNING);
         d->prevMemUsageLoggingClock = d->upTimeTimer.elapsed();
     }
 
@@ -187,9 +187,9 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevHddUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_LOG(lit("MONITORING. HDD usage:"), cl_logALWAYS);
+        NX_LOG(lit("MONITORING. HDD usage:"), cl_logWARNING);
         for( const HddLoad& hddLoad : d->totalHddLoad )
-            NX_LOG(lit("    %1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2), cl_logALWAYS);
+            NX_LOG(lit("    %1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2), cl_logWARNING);
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
     }
 
@@ -206,9 +206,10 @@ QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevNetworkUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_LOG(lit("MONITORING. Network usage:"), cl_logALWAYS);
+        NX_LOG(lit("MONITORING. Network usage:"), cl_logWARNING);
         for( const NetworkLoad& networkLoad : d->totalNetworkLoad )
-            NX_LOG(lit("    %1. in %2KBps, out %3KBps").arg(networkLoad.interfaceName).arg(networkLoad.bytesPerSecIn / 1024).arg(networkLoad.bytesPerSecOut / 1024), cl_logALWAYS);
+            NX_LOG(lit("    %1. in %2KBps, out %3KBps").arg(networkLoad.interfaceName).
+                arg(networkLoad.bytesPerSecIn / 1024).arg(networkLoad.bytesPerSecOut / 1024), cl_logWARNING);
         d->prevNetworkUsageLoggingClock = d->upTimeTimer.elapsed();
     }
 

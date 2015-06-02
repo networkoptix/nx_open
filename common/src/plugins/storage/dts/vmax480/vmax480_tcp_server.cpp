@@ -401,9 +401,9 @@ VMaxStreamFetcher* QnVMax480Server::bindConnection(const QString& tcpID, QnVMax4
 }
 
 
-QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
 {
-    return new QnVMax480ConnectionProcessor(clientSocket, owner);
+    return new QnVMax480ConnectionProcessor(clientSocket, this);
 }
 
 #endif // #ifdef ENABLE_VMAX

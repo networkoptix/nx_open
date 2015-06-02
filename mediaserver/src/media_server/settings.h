@@ -44,6 +44,8 @@ namespace nx_ms_conf
     static const QLatin1String IO_BLOCK_SIZE( "ioBlockSize" );
     static const int DEFAULT_IO_BLOCK_SIZE = 4*1024*1024;
 
+    static const QLatin1String DISABLE_DIRECT_IO ("disableDirectIO");
+
     //!Size of data to keep in memory after each write
     /*!
         This required to minimize seeks on disk, since ffmpeg sometimes seeks to the left from current file position to fill in some media file structure size
@@ -56,7 +58,7 @@ namespace nx_ms_conf
     static const int DEFAULT_HLS_INACTIVITY_PERIOD = 150;
 
     static const QLatin1String RESOURCE_INIT_THREADS_COUNT( "resourceInitThreadsCount" );
-    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
+    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 32;
 
     static const QLatin1String SSL_CERTIFICATE_PATH( "sslCertificatePath" );
 

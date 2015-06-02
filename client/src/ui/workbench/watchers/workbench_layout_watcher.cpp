@@ -34,7 +34,7 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
         }
         else if (!data.resource.path.isEmpty()) {
             /* Try to find online resource by unique id. */
-            resource = qnResPool->getResourceByUniqId(data.resource.path);
+            resource = qnResPool->getResourceByUniqueId(data.resource.path);
             if(!resource) {
                 /* Try to load local resource. */
                 resource = QnResourcePtr(new QnAviResource(data.resource.path));

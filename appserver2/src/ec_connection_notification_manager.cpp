@@ -19,7 +19,6 @@
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
 
-
 namespace ec2
 {
     ECConnectionNotificationManager::ECConnectionNotificationManager(const ResourceContext& resCtx,
@@ -139,6 +138,15 @@ namespace ec2
         databaseReplaceRequired();
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiReverseConnectionData>& tran )
+    {
+        Q_ASSERT(tran.command == ApiCommand::openReverseConnection);
+        emit m_ecConnection->reverseConnectionRequested(tran.params);
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiClientInfoData> & /*tran*/ ) {}
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiClientInfoDataList> & /*tran*/ ) {}
+
     void ECConnectionNotificationManager::databaseReplaceRequired()
     {
         emit m_ecConnection->databaseDumped();
@@ -190,7 +198,7 @@ namespace ec2
         m_resourceManager->triggerNotification( tran );
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran ) {
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiServerFootageData>& tran ) {
         return m_cameraManager->triggerNotification( tran );
     }
 

@@ -16,16 +16,17 @@ extern "C"
 
 namespace ite
 {
-    static const char * VENDOR_NAME = "ITE";
+    static const char * VENDOR_NAME = "it930x";
 
     //
 
+    INIT_OBJECT_COUNTER(DiscoveryManager)
     DEFAULT_REF_COUNTER(DiscoveryManager)
 
     DiscoveryManager * DiscoveryManager::Instance;
 
     DiscoveryManager::DiscoveryManager()
-    :   m_refManager( this )
+    :   m_refManager(this)
     {
         Instance = this;
     }
@@ -107,7 +108,7 @@ namespace ite
                 auto itCam = m_cameras.find(txID);
                 if (itCam == m_cameras.end())
                 {
-                    auto sp = std::make_shared<CameraManager>(info, &m_devMapper); // create CameraManager
+                    auto sp = std::make_shared<CameraManager>(info, &m_devMapper, *it); // create CameraManager
                     m_cameras[txID] = sp;
                     cam = sp.get();
                     cam->addRef();
@@ -123,6 +124,7 @@ namespace ite
                     continue; // HACK: hide camera once
 
                 cam->updateCameraInfo(info);
+                cam->updateTx(*it);
                 ++cameraNum;
             }
         }
@@ -149,10 +151,9 @@ namespace ite
             {
                 std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-                auto sp = std::make_shared<CameraManager>(info, &m_devMapper);  // create CameraManager
+                auto sp = std::make_shared<CameraManager>(info, &m_devMapper, TxDevicePtr());  // create CameraManager
                 m_cameras[txID] = sp;
                 cam = sp.get();
-                cam->addRef();
 
                 m_devMapper.restoreCamera(info);
             }

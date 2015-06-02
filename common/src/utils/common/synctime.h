@@ -7,18 +7,17 @@
 
 #include <nx_ec/ec_api.h>
 
+#include <utils/common/singleton.h>
 
 /** 
  * Time provider that is synchronized with Server.
  */
-class QnSyncTime: public QObject {
+class QnSyncTime: public QObject, public Singleton<QnSyncTime> {
     Q_OBJECT;
 
 public:
     QnSyncTime();
     virtual ~QnSyncTime();
-
-    static QnSyncTime* instance();
 
     qint64 currentMSecsSinceEpoch();
     qint64 currentUSecsSinceEpoch();

@@ -29,8 +29,8 @@ struct HttpContentTypes
 
 static HttpContentTypes contentTypes[] =
 {
-    { "html", "text/html"},
-    { "htm",  "text/html"},
+    { "html", "text/html; charset=iso-8859-1"},
+    { "htm",  "text/html; charset=iso-8859-1"},
     { "css",  "text/css"},
     { "js",   "application/javascript"},
     { "json", "application/json"},
@@ -146,6 +146,6 @@ void QnFileConnectionProcessor::run()
         }
 #endif
     }
-    d->response.headers.insert(nx_http::HttpHeader("Last-Modified", dateTimeToHTTPFormat(lastModified).toUtf8()));
+    d->response.headers.insert(nx_http::HttpHeader("Last-Modified", dateTimeToHTTPFormat(lastModified)));
     sendResponse(rez, contentType, contentEncoding, false);
 }

@@ -119,7 +119,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 if (resource==0)
                     continue;
 
-                resource->setHostAddress(remoteEndpoint.toString());
+                resource->setHostAddress(remoteEndpoint.address.toString());
                 resource->setMAC(QnMacAddress(mac));
                 resource->setName(QLatin1String("ArecontVision_Abstract"));
 

@@ -25,6 +25,10 @@ namespace {
     const unsigned errorWaitTimeoutMs = 1000;
     const unsigned checkInterfacesTimeoutMs = 60 * 1000;
 
+    const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(lit("239.255.11.11"));
+    const quint16 defaultModuleRevealMulticastGroupPort = 5007;
+
+
 } // anonymous namespace
 
 QnMulticastModuleFinder::QnMulticastModuleFinder(
@@ -40,8 +44,8 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     m_prevPingClock(0),
     m_lastInterfacesCheckMs(0),
     m_compatibilityMode(false),
-    m_multicastGroupAddress(multicastGroupAddress),
-    m_multicastGroupPort(multicastGroupPort),
+    m_multicastGroupAddress(multicastGroupAddress.isNull() ? defaultModuleRevealMulticastGroup : multicastGroupAddress),
+    m_multicastGroupPort(multicastGroupPort == 0 ? defaultModuleRevealMulticastGroupPort : multicastGroupPort),
     m_cachedResponse(MAX_CACHE_SIZE_BYTES)
 {
     if (!clientOnly) {
@@ -197,7 +201,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return false;
     }
 
-    if (response->type != nxMediaServerId && response->type != nxECId)
+    if (response->type != QnModuleInformation::nxMediaServerId() && response->type != QnModuleInformation::nxECId())
         return true;
 
         NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Ignoring %1 (%2) with different customization %3 on local address %4").
@@ -268,7 +272,7 @@ void QnMulticastModuleFinder::run() {
             continue;
         }
 
-        currentClock = QDateTime::currentMSecsSinceEpoch();
+        //currentClock = QDateTime::currentMSecsSinceEpoch();
 
         /* some sockets changed state */
         for (auto it = m_pollSet.begin(); it != m_pollSet.end(); ++it) {

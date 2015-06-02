@@ -1,7 +1,7 @@
 #ifndef __BACK_PROXY_CONNECTION_PROCESSOR_H__
 #define __BACK_PROXY_CONNECTION_PROCESSOR_H__
 
-#include "utils/network/tcp_connection_processor.h"
+#include "network/universal_request_processor.h"
 #include "proxy_connection.h"
 
 class QnProxyReceiverConnectionPrivate;
@@ -9,7 +9,8 @@ class QnProxyReceiverConnectionPrivate;
 class QnProxyReceiverConnection: public QnTCPConnectionProcessor
 {
 public:
-    QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
+                              QnUniversalTcpListener* owner);
     virtual bool isTakeSockOwnership() const override;
 protected:
     virtual void run();

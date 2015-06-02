@@ -46,6 +46,12 @@ public:
         return m_cachedVal.get();
     }
 
+    void reset()
+    {
+        QMutexLocker lk( m_mutex );
+        m_cachedVal.reset();
+    }
+
     void update()
     {
         const ValueType newVal = m_valGenerationFunc();

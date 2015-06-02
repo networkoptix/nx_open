@@ -269,7 +269,7 @@ qint64 QnColdStoreConnection::oldestFileTime(const QString& fn)
 
     qint64 resultT = QString(QLatin1String(result)).toULongLong();
 
-    delete result;
+    delete [] result;
 
     return resultT;
 }

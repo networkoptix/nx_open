@@ -49,7 +49,7 @@ static const int ERR_TIMEOUT = WSAETIMEDOUT;
 static const int ERR_WOULDBLOCK = WSAEWOULDBLOCK;
 #else
 static const int ERR_TIMEOUT = ETIMEDOUT;
-static const int ERR_WOULDBLOCK = EWOULDBLOCK;
+//static const int ERR_WOULDBLOCK = EWOULDBLOCK;
 #endif
 
 int getSystemErrCode()
@@ -460,8 +460,8 @@ bool Socket::createSocket(int type, int protocol)
 #ifndef _WIN32
 namespace
 {
-    static const size_t MILLIS_IN_SEC = 1000;
-    static const size_t NSECS_IN_MS = 1000000;
+    //static const size_t MILLIS_IN_SEC = 1000;
+    //static const size_t NSECS_IN_MS = 1000000;
 
     template<class Func>
     int doInterruptableSystemCallWithTimeout( const Func& func, unsigned int timeout )
@@ -1329,7 +1329,7 @@ bool UDPSocket::sendTo(
     unsigned int bufferLen,
     const SocketAddress& foreignEndpoint )
 {
-    setDestAddr( foreignEndpoint );  //TODO #ak optimize: pass SocketAddress to setDestAddr
+    setDestAddr( foreignEndpoint );
     return sendTo( buffer, bufferLen );
 }
 

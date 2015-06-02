@@ -4,6 +4,7 @@
 
 #include "core/datapacket/audio_data_packet.h"
 #include "audio_struct.h"
+#include "utils/media/ffmpeg_helper.h"
 
 struct AVCodecContext;
 
@@ -85,13 +86,8 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
 
 CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 {
-    if (c)
-    {
-        if (c->codec)
-            avcodec_close(c);
-        av_free(c);
-    }
-
+    QnFfmpegHelper::deleteCodecContext(c);
+    c = 0;
 }
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
@@ -114,8 +110,6 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
-        //NX_LOG("before dec",  cl_logALWAYS);
-
         if (outbuf_len + out_size > (int)result.capacity())
         {
             //Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
@@ -130,8 +124,6 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         // TODO: #vasilenko avoid using deprecated methods
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
-
-        //NX_LOG("after dec",  cl_logALWAYS);
 
         if (len < 0) 
             return false;

@@ -34,6 +34,7 @@ namespace ec2
 
             REGISTER_COMMAND(testConnection),
             REGISTER_COMMAND(connect),
+            REGISTER_COMMAND(openReverseConnection),
 
             REGISTER_COMMAND(getResourceTypes),
             REGISTER_COMMAND(setResourceStatus),
@@ -143,6 +144,12 @@ namespace ec2
 
             REGISTER_COMMAND(markLicenseOverflow),
             REGISTER_COMMAND(getSettings),
+            
+            REGISTER_COMMAND(getClientInfos),
+            REGISTER_COMMAND(saveClientInfo),
+
+            REGISTER_COMMAND(getStatisticsReport),
+            REGISTER_COMMAND(triggerStatisticsReport),
 
             REGISTER_COMMAND(getTransactionLog)
         };
@@ -181,7 +188,8 @@ namespace ec2
                     val == tranSyncDone ||
                     val == uploadUpdate ||
                     val == uploadUpdateResponce ||
-                    val == installUpdate;
+                    val == installUpdate ||
+                    val == openReverseConnection;
 
         }
 
@@ -232,7 +240,8 @@ namespace ec2
                 val == addLicenses ||
                 val == removeLicense || 
                 val == restoreDatabase ||
-                val == markLicenseOverflow;
+                val == markLicenseOverflow ||
+                val == saveClientInfo;
         }
 
     }

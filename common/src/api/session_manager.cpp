@@ -1,7 +1,5 @@
 #include "session_manager.h"
 
-#include <cassert>
-
 #include <QtCore/QMetaEnum>
 #include <QtCore/QUrl>
 #include <QtCore/QBuffer>
@@ -114,7 +112,8 @@ void QnSessionManager::at_replyReceived(QNetworkReply * reply)
 }
 
 QnSessionManager *QnSessionManager::instance() {
-    return qnCommon->sessionManager();
+    Q_ASSERT_X(qnCommon->instance<QnSessionManager>(), Q_FUNC_INFO, "Make sure session manager exists");
+    return qnCommon->instance<QnSessionManager>();
 }
 
 void QnSessionManager::start() {
@@ -144,7 +143,11 @@ QByteArray QnSessionManager::formatNetworkError(int error) {
 QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const {
     QUrl url(baseUrl);
 
-    QString path = QLatin1String("/api/") + objectName + QLatin1Char('/');
+    QString path = objectName + L'/';
+    if (!objectName.startsWith(lit("ec2/")))
+        path = lit("/api/") + path;
+    else
+        path = L'/' + path;
     url.setPath(path);
 
     QUrlQuery urlQuery(url.query());
@@ -188,7 +191,7 @@ void QnSessionManager::at_SyncRequestFinished(const QnHTTPRawResponse& response,
 {
     SCOPED_MUTEX_LOCK( lock, &m_syncReplyMutex);
     QnSessionManagerSyncReply* reply = m_syncReplyInProgress.value(handle);
-    assert(reply);
+    Q_ASSERT(reply);
     if (reply)
         reply->requestFinished(response, handle);
 }
@@ -273,7 +276,7 @@ int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &obj
 // QnSessionManager :: handlers
 // -------------------------------------------------------------------------- //
 void QnSessionManager::at_aboutToBeStarted() {
-    assert(QThread::currentThread() == this->thread());
+    Q_ASSERT(QThread::currentThread() == this->thread());
 
     SCOPED_MUTEX_LOCK( locker, &m_accessManagerMutex);
     if (m_accessManager)
@@ -289,7 +292,7 @@ void QnSessionManager::at_aboutToBeStarted() {
 }
 
 void QnSessionManager::at_aboutToBeStopped() {
-    assert(QThread::currentThread() == this->thread());
+    Q_ASSERT(QThread::currentThread() == this->thread());
 
     SCOPED_MUTEX_LOCK( locker, &m_accessManagerMutex);
     if (!m_accessManager)
@@ -336,7 +339,7 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
 void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo reqInfo, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, 
                                              const QnRequestParamList &params, const QByteArray& data) 
 {
-    assert(QThread::currentThread() == this->thread());
+    Q_ASSERT(QThread::currentThread() == this->thread());
 
     {
         SCOPED_MUTEX_LOCK( lock, &m_accessManagerMutex);
@@ -349,20 +352,13 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
 
-    //qDebug() << "api url" << request.url();
-
-    bool skipContentType = false;
     for (const QnRequestHeader& header: headers) {
-        if (header.first == QLatin1String("Content-Type"))
-            skipContentType = true;
         request.setRawHeader(header.first.toLatin1(), header.second.toUtf8());
     }
 
     QString userInfo = url.userInfo();
     if (!userInfo.isEmpty())
         request.setRawHeader("Authorization", "Basic " + userInfo.toLatin1().toBase64());
-    if (!skipContentType)
-        request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
     QNetworkReply* reply = NULL;
     switch(operation) {

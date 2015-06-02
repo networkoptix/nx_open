@@ -90,6 +90,7 @@ public:
     virtual ~QnAuthHelper();
 
     static void initStaticInstance(QnAuthHelper* instance);
+    static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter);
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side

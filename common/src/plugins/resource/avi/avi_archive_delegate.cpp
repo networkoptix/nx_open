@@ -12,7 +12,6 @@ extern "C"
 }
 
 #include <utils/media/ffmpeg_helper.h>
-#include <utils/media/nalUnits.h>
 #include <utils/common/log.h>
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
@@ -29,6 +28,7 @@ extern "C"
 
 #include <motion/light_motion_archive_connection.h>
 #include <export/sign_helper.h>
+#include "utils/media/nalUnits.h"
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {
@@ -163,7 +163,9 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
         m_contexts << QnMediaContextPtr(0);
 
     if (m_contexts[stream->index] == 0 || m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
-        m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
+    {
+	    m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
+    }
 
     return m_contexts[stream->index];
 }
@@ -361,7 +363,7 @@ const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
 }
 
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
-QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized)
         return defaultVideoLayout;
@@ -427,7 +429,7 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
     return m_videoLayout;
 }
 
-QnResourceAudioLayoutPtr QnAviArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnAviArchiveDelegate::getAudioLayout()
 {
     return m_audioLayout;
 }

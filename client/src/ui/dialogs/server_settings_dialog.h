@@ -65,6 +65,7 @@ private slots:
     void sendNextArchiveRequest();
     void at_updateRebuildInfo();
 
+    void sendStorageSpaceRequest();
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
@@ -78,6 +79,7 @@ private:
 
     QnStorageScanData m_rebuildState;
     ec2::ApiIdDataList m_storagesToRemove;
+    bool m_rebuildWasCanceled;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

@@ -189,7 +189,7 @@ QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnBus
     if (params.eventType != QnBusiness::CameraMotionEvent)
         return QByteArray();
 
-    const QnResourcePtr& cameraRes = QnResourcePool::instance()->getResourceById(params.eventResourceId);
+    const QnResourcePtr& cameraRes = qnResPool->getResourceById(params.eventResourceId);
     QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), DATETIME_NOW, dstSize);
     return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
 }

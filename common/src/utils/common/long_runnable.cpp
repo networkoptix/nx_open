@@ -8,6 +8,7 @@
 #include <utils/thread/wait_condition.h>
 
 #include <common/systemexcept_win32.h>
+#include <common/systemexcept_linux.h>
 
 #ifdef Q_OS_LINUX
 #   include <sys/types.h>
@@ -232,11 +233,19 @@ void QnLongRunnable::at_started() {
     win32_exception::installThreadSpecificUnhandledExceptionHandler();
 #endif
 
+#ifdef __linux__
+    linux_exception::installQuitThreadBacktracer();
+#endif
+
     if(m_pool)
         m_pool->startedNotify(this);
 }
 
 void QnLongRunnable::at_finished() {
+#ifdef __linux__
+    linux_exception::uninstallQuitThreadBacktracer();
+#endif
+
     if(m_pool)
         m_pool->finishedNotify(this);
 }

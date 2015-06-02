@@ -13,76 +13,26 @@
 
 #include <utils/serialization/json.h>
 #include <utils/serialization/json_functions.h>
+#include "chunks/chunks_request_helper.h"
 
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
-    qint64 startTime = -1;
-    qint64 endTime = -1;
-    qint64 detailLevel = -1;
-    QnResourceList resList;
-    QByteArray errStr;
-    QByteArray errStrPhysicalId;
-    bool urlFound = false;
-    QString physicalId;
     
-    ChunkFormat format = ChunkFormat_Unknown;
-    QString callback;
-    Qn::TimePeriodContent periodsType = Qn::TimePeriodContentCount;
-    QString filter;
-
-    for (int i = 0; i < params.size(); ++i)
-    {
-        if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
-        {
-            urlFound = true;
-            physicalId = params[i].second.trimmed();
-            QnResourcePtr res = qnResPool->getNetResourceByPhysicalId(physicalId);
-            if (res == 0)
-                errStrPhysicalId += QByteArray("Resource with physicalId '") + physicalId.toUtf8() + QByteArray("' not found. \n");
-            else 
-                resList << res;
-        }
-        else if (params[i].first == "startTime") 
-        {
-            startTime = parseDateTime(params[i].second.toUtf8());
-        }
-        else if (params[i].first == "endTime") {
-            endTime = parseDateTime(params[i].second.toUtf8());
-        }
-        else if (params[i].first == "detail")
-            detailLevel = params[i].second.toLongLong();
-        else if (params[i].first == "format") 
-        {
-            if (params[i].second == "bin")
-                format = ChunkFormat_Binary;
-            else if (params[i].second == "bii")
-                format = ChunkFormat_BinaryIntersected;
-            else if (params[i].second == "xml")
-                format = ChunkFormat_XML;
-            else if (params[i].second == "txt")
-                format = ChunkFormat_Text;
-            else
-                format = ChunkFormat_Json;
-        }
-        else if (params[i].first == "callback")
-            callback = params[i].second;
-        else if (params[i].first == "filter")
-            filter = params[i].second;
-        else if (params[i].first == "periodsType")
-            periodsType = static_cast<Qn::TimePeriodContent>(params[i].second.toInt());
-    }
-    if (!urlFound)
+    QByteArray errStr;
+    QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+    QString callback = params.value("callback");
+    
+    if (request.resList.isEmpty())
         errStr += "Parameter physicalId must be provided. \n";
-    if (startTime < 0)
+    if (request.startTimeMs < 0)
         errStr += "Parameter startTime must be provided. \n";
-    if (endTime < 0)
+    if (request.endTimeMs < 0)
         errStr += "Parameter endTime must be provided. \n";
-    if (detailLevel < 0)
+    if (request.detailLevel < 0)
         errStr += "Parameter detail must be provided. \n";
-
-    if (resList.isEmpty())
-        errStr += errStrPhysicalId;
+    if (request.format == Qn::UnsupportedFormat)
+        errStr += "Parameter format must be provided. \n";
 
     auto errLog = [&](const QString &errText) {
         result.append("<root>\n");
@@ -94,43 +44,9 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     if (!errStr.isEmpty())
         return errLog(errStr);
     
-    QnTimePeriodList periods;
-    switch (periodsType) {
-    case Qn::RecordingContent:
-        periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
-        break;
-    case Qn::MotionContent:
-        {
-            QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
-            periods = QnMotionHelper::instance()->matchImage(motionRegions, resList, startTime, endTime, detailLevel);
-        }
-        break;
-    case Qn::BookmarksContent:
-        {
-            QnCameraBookmarkTags tags;
-            if (!filter.isEmpty()) {
-                QnCameraBookmarkSearchFilter bookmarksFilter;
-                bookmarksFilter.minStartTimeMs = startTime;
-                bookmarksFilter.maxStartTimeMs = endTime;
-                bookmarksFilter.minDurationMs = detailLevel;
-                bookmarksFilter.text = filter;
-                QnCameraBookmarkList bookmarks;
-                if (qnStorageMan->getBookmarks(physicalId.toUtf8(), bookmarksFilter, bookmarks)) {
-                    for (const QnCameraBookmark &bookmark: bookmarks)
-                        periods << QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);                    
-                }
-            } else {
-            //TODO: #GDM #Bookmarks use tags to filter periods?
-                periods = qnStorageMan->getRecordedPeriods(resList.filtered<QnVirtualCameraResource>(), startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
-            }
-            break;
-        }
-    default:
-        return errLog("Invalid periodsType parameter.");
-    }
+    QnTimePeriodList periods = QnChunksRequestHelper::load(request);
 
-    
-    switch(format) 
+    switch(request.format) 
     {
         case ChunkFormat_Binary:
             result.append("BIN");

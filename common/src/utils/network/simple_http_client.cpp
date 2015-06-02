@@ -7,9 +7,10 @@
 
 #include "http/httptypes.h"
 #include "../common/util.h"
+#include "network/authenticate_helper.h"
 
 
-static const int MAX_LINE_LENGTH = 1024*16;
+//static const int MAX_LINE_LENGTH = 1024*16;
 
 using namespace std;
 
@@ -287,8 +288,13 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
     return doGET(requestStr.toUtf8(), recursive);
 }
 
-CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recursive)
+CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recursive)
 {
+    QByteArray requestStr = _requestStr;
+    if( !requestStr.startsWith('/') )
+        requestStr.insert(0, '/');
+
+
     if (!m_sock)
         return CL_TRANSPORT_ERROR;
 
@@ -309,8 +315,6 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         QByteArray request;
 
         request.append("GET ");
-        if( !requestStr.startsWith('/') )
-            request.append('/');
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
@@ -475,7 +479,7 @@ void CLSimpleHTTPClient::getAuthInfo()
     QList<QByteArray> authParams = wwwAuth.split(',');
     for (int i = 0; i < authParams.size(); ++i)
     {
-        QList<QByteArray> param = authParams[i].split('=');
+        QList<QByteArray> param = QnAuthHelper::smartSplit(authParams[i], '=');
         if (param.size() > 1) 
         {
             param[0] = param[0].trimmed();

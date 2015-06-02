@@ -41,7 +41,7 @@ QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
     return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
 }
 
-CameraDiagnostics::Result QnActiStreamReader::openStream()
+CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     // configure stream params
 
@@ -52,16 +52,16 @@ CameraDiagnostics::Result QnActiStreamReader::openStream()
     QString SET_AUDIO(QLatin1String("CHANNEL=%1&V2_AUDIO_ENABLED=%2"));
 
     m_multiCodec.setRole(m_role);
-    int fps = m_actiRes->roundFps(getFps(), m_role);
+    int fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
     QSize resolution = m_actiRes->getResolution(m_role);
     QString resolutionStr = formatResolutionStr(resolution);
-    int bitrate = m_actiRes->suggestBitrateKbps(getQuality(), resolution, fps);
+    int bitrate = m_actiRes->suggestBitrateKbps(params.quality, resolution, fps);
     bitrate = m_actiRes->roundBitrate(bitrate);
     QString bitrateStr = formatBitrateStr(bitrate);
     QString encoderStr(QLatin1String("H264"));
     QString audioStr = m_actiRes->isAudioEnabled() ? QLatin1String("1") : QLatin1String("0");
-    if (isCameraControlRequired())
+    if (isCameraControlRequired)
     {
         CLHttpStatus status;
         QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
@@ -119,11 +119,8 @@ void QnActiStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnActiStreamReader::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData())
         return getMetaData();
@@ -136,18 +133,6 @@ QnAbstractMediaDataPtr QnActiStreamReader::getNextData()
         closeStream();
 
     return rez;
-}
-
-void QnActiStreamReader::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnActiStreamReader::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 QnConstResourceAudioLayoutPtr QnActiStreamReader::getDPAudioLayout() const

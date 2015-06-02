@@ -164,8 +164,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
 {
     if (action->actionType() == QnBusiness::SendMailAction) {
         // looking for server with public IP address
-        const QnResourcePtr& mServerRes = qnResPool->getResourceById(qnCommon->moduleGUID());
-        const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(mServerRes.data());
+        const QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
             return QnMediaServerResourcePtr(); // do not proxy
         for (const QnMediaServerResourcePtr& mServer: qnResPool->getAllServers())
@@ -183,7 +182,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
-    return qnResPool->getResourceById(res->getParentId()).dynamicCast<QnMediaServerResource>();
+    return qnResPool->getResourceById<QnMediaServerResource>(res->getParentId());
 }
 
 bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)

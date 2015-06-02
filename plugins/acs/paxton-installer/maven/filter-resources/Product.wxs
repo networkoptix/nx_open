@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="${display.product.name} Paxton Plugin" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${paxtonInstaller.upgradeCode}">
+    <Package InstallerVersion="405" Compressed="yes" InstallScope="perMachine" />
+
+    <?ifdef env.CommonProgramFiles(x86) ?>
+    <?define commonProgramFiles = "c:\Program Files (x86)\Common Files\" ?>
+    <?else?>
+    <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
+    <?endif?>
+
+    <WixVariable Id="WixUILicenseRtf" Value="resources\License.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="resources\logo_493x58.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="resources\logo_493x312.bmp" />
+
+    <Icon Id="logo.ico" SourceFile="resources\logo.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="logo.ico" />
+
+    <Property Id="PAXTONINSTALLED">
+      <RegistrySearch Id="PaxtonInstalledSearch" Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\{1C927CD7-BE59-4578-B990-50826AF7A762}" Name="Installed" Type="raw" />
+    </Property>
+
+    <Condition Message="You need to have Paxton Access installed">
+      <![CDATA[ PAXTONINSTALLED <> 1 ]]>
+    </Condition>
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" Schedule="afterInstallInitialize"/>
+    <MediaTemplate EmbedCab="yes" />
+
+
+    <DirectoryRef Id="TARGETDIR">
+      <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
+    </DirectoryRef>
+
+    <Feature Id="ProductFeature" Title="ACS_Installer" Level="1">
+      <ComponentGroupRef Id="AxClient23DirComponents"/>
+      <ComponentGroupRef Id="RootComponents" />
+      <ComponentGroupRef Id="OemDriverComponents"/>
+    </Feature>
+
+    <Feature Id="VCRedistVS11" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+      <MergeRef Id="VCRedist110"/>
+    </Feature>
+
+    <UIRef Id="WixUI_Minimal" />
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="CompanyDir" Name="${company.name}">
+          <Directory Id="INSTALLDIR" Name="${display.product.name}">
+            <Directory Id="AxClientDir" Name="AxClient">
+              <Directory Id="AxClient23Dir" Name="2.3">
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+
+        <Directory Id="PaxtonDir" Name="Paxton Access">
+          <Directory Id="PaxtonAccessDir" Name="Access Control">
+            <Directory Id="DvrMiniDriversDir" Name="DvrMiniDrivers"/>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="RootComponents" Directory="PaxtonAccessDir">
+      <Component Id="InteropComponent">
+        <File Id="Interop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\Interop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="AxInteropComponent">
+        <File Id="AxInterop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\AxInterop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="NxControlComponent">
+        <File Id="NxControl.${nxec.ec2ProtoVersion}.dll" Source="..\..\..\nxcontrol\x86\bin\release\${ax.className}Control.${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
+      </Component>
+      <Component Id="NxInterfaceComponent">
+        <File Id="NxInterface.1.dll" Source="..\..\..\nxinterface\x86\bin\release\${ax.className}Interface.1.dll" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="OemDriverComponents" Directory="DvrMiniDriversDir">
+      <Component Id="OemMiniDriverComponent">
+        <File Id="${ax.className}.OemDvrMiniDriver.dll" Source="..\..\paxton\x86\bin\Release\${ax.className}.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -27,7 +27,8 @@ namespace {
 QnWorkbench::QnWorkbench(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_currentLayout(NULL)
+    m_currentLayout(NULL),
+    m_inLayoutChangeProcess(false)
 {
     for(int i = 0; i < Qn::ItemRoleCount; i++)
         m_itemByRole[i] = NULL;
@@ -161,6 +162,9 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     if(m_currentLayout == layout)
         return;
 
+    m_inLayoutChangeProcess = true;
+    emit layoutChangeProcessStarted();
+
     if(!m_layouts.contains(layout) && layout != m_dummyLayout)
         addLayout(layout);
 
@@ -195,25 +199,29 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
      * 
      * The fact that new layout is NULL means that we're in destructor, so no
      * signals should be emitted. */
-    if(m_currentLayout != NULL) {
-        emit currentLayoutChanged();
+    if(m_currentLayout == NULL)
+        return;
 
-        connect(m_currentLayout,    SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
-        connect(m_currentLayout,    SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
-        connect(m_currentLayout,    SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_layout_cellAspectRatioChanged()));
-        connect(m_currentLayout,    SIGNAL(cellSpacingChanged()),                   this, SLOT(at_layout_cellSpacingChanged()));
+    emit currentLayoutChanged();
 
-        newCellAspectRatio = m_currentLayout->cellAspectRatio();
-        newCellSpacing = m_currentLayout->cellSpacing();
+    connect(m_currentLayout,    SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+    connect(m_currentLayout,    SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
+    connect(m_currentLayout,    SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_layout_cellAspectRatioChanged()));
+    connect(m_currentLayout,    SIGNAL(cellSpacingChanged()),                   this, SLOT(at_layout_cellSpacingChanged()));
 
-        if(!qFuzzyEquals(newCellAspectRatio, oldCellAspectRatio))
-            at_layout_cellAspectRatioChanged();
+    newCellAspectRatio = m_currentLayout->cellAspectRatio();
+    newCellSpacing = m_currentLayout->cellSpacing();
 
-        if(!qFuzzyEquals(newCellSpacing, oldCellSpacing))
-            at_layout_cellSpacingChanged();
+    if(!qFuzzyEquals(newCellAspectRatio, oldCellAspectRatio))
+        at_layout_cellAspectRatioChanged();
 
-        updateActiveRoleItem();
-    }
+    if(!qFuzzyEquals(newCellSpacing, oldCellSpacing))
+        at_layout_cellSpacingChanged();
+
+    updateActiveRoleItem();
+
+    m_inLayoutChangeProcess = false;
+    emit layoutChangeProcessFinished();
 }
 
 QnWorkbenchItem *QnWorkbench::item(Qn::ItemRole role) {
@@ -273,7 +281,7 @@ void QnWorkbench::update(const QnWorkbenchState &state) {
     clear();
 
     for(int i = 0; i < state.layoutUuids.size(); i++) {
-        QnLayoutResourcePtr resource = resourcePool()->getResourceById(state.layoutUuids[i]).dynamicCast<QnLayoutResource>();
+        QnLayoutResourcePtr resource = resourcePool()->getResourceById<QnLayoutResource>(state.layoutUuids[i]);
         if(!resource)
             continue;
 
@@ -337,4 +345,6 @@ void QnWorkbench::at_layout_cellSpacingChanged() {
     emit cellSpacingChanged();
 }
 
-
+bool QnWorkbench::isInLayoutChangeProcess() const {
+    return m_inLayoutChangeProcess;
+}

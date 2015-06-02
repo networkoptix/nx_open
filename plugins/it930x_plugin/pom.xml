@@ -24,7 +24,7 @@
 		<product.title>${project.name}</product.title>	
 		<!--Global libs-->
 		<qt.libs>core</qt.libs>
-		<global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil</global.libs>
+		<global.libs>-lcommon</global.libs>
 		<!--Specific os libs used-->
         <windows.oslibs/>
 		<!--Global defines-->

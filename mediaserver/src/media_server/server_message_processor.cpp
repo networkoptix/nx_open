@@ -10,18 +10,21 @@
 #include <media_server/server_update_tool.h>
 #include <media_server/settings.h>
 #include <nx_ec/dummy_handler.h>
+#include <network/universal_tcp_listener.h>
 #include <utils/common/log.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
 #include "settings.h"
+#include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_connection_data.h"
 #include "api/app_server_connection.h"
 #include "utils/network/router.h"
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
+#include "http/custom_headers.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
@@ -33,7 +36,7 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) 
 {
     QnCommonMessageProcessor::updateResource(resource);
-    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
 
     const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
     const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
@@ -71,18 +74,30 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (isServer) 
     {
-        if (resource->getId() != ownMediaServer->getId())
-            resource->addFlags( Qn::foreigner );
-    }
+        if (resource->getId() == ownMediaServer->getId()) {
+            ec2::ApiMediaServerData ownData;
 
-    // We are always online
-    if (isServer && resource->getId() == serverGuid()) 
-    {
-        if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined) {
-            qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
-            resource->setStatus(Qn::Online);
+            ec2::ApiMediaServerData newData;
+
+            ec2::fromResourceToApi(ownMediaServer, ownData);
+            ec2::fromResourceToApi(resource.staticCast<QnMediaServerResource>(), newData);
+
+            if (ownData != newData) {
+                QnMediaServerResourcePtr savedServer;
+                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(ownMediaServer, &savedServer);
+                return;
+            }
+
+            // We are always online
+            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined) {
+                qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
+                resource->setStatus(Qn::Online);
+            }
+        } else {
+            resource->addFlags(Qn::foreigner);
         }
     }
+
     QnUuid resId = resource->getId();
     if (QnResourcePtr ownResource = qnResPool->getResourceById(resId))
         ownResource->update(resource);
@@ -112,7 +127,10 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
         this, &QnServerMessageProcessor::at_updateInstallationRequested);
 
-    connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
+    connect(connection, &ec2::AbstractECConnection::remotePeerUnauthorized,
+        this, &QnServerMessageProcessor::at_remotePeerUnauthorized);
+    connect(connection, &ec2::AbstractECConnection::reverseConnectionRequested,
+        this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
     connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
         this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) { changeSystemName(systemName, sysIdTime, tranLogTime); });
@@ -165,7 +183,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     if (addr == "localhost" || addr == "127.0.0.1")
         return true;
     if( !m_mServer )
-        m_mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        m_mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (m_mServer) 
     {
         QHostAddress hostAddr(addr);
@@ -180,7 +198,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 
 bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
 {
-    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( "x-server-guid" );
+    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
     if( xServerGuidIter != request.headers.end() )
     {
         const nx_http::BufferType& desiredServerGuid = xServerGuidIter->second;
@@ -189,13 +207,13 @@ bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
     }
 
     nx_http::BufferType desiredCameraGuid;
-    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( "x-camera-guid" );
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     if( xCameraGuidIter != request.headers.end() )
     {
         desiredCameraGuid = xCameraGuidIter->second;
     }
     else {
-        desiredCameraGuid = request.getCookieValue("x-camera-guid");
+        desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
     }
     if (!desiredCameraGuid.isEmpty()) {
         QnResourcePtr camera = qnResPool->getResourceById(desiredCameraGuid);
@@ -203,6 +221,11 @@ bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
     }
 
     return false;
+}
+
+
+void QnServerMessageProcessor::registerProxySender(QnUniversalTcpListener* tcpListener) {
+    m_universalTcpListener = tcpListener;
 }
 
 void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {
@@ -215,6 +238,16 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
     QnServerUpdateTool::instance()->installUpdate(updateId);
+}
+
+void QnServerMessageProcessor::at_reverseConnectionRequested(const ec2::ApiReverseConnectionData &data) {
+    if (m_universalTcpListener) {
+        QnRoute route = QnRouter::instance()->routeTo(data.targetServer);
+
+        // just to be sure that we have direct access to the server
+        if (route.gatewayId.isNull() && !route.addr.isNull())
+            m_universalTcpListener->addProxySenderConnections(route.addr, data.socketCount);
+    }
 }
 
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
@@ -240,8 +273,8 @@ bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)
 
 void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId) 
 {
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
-    QnStorageResourcePtr storage = qnResPool->getResourceById(resourceId).dynamicCast<QnStorageResource>();
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(resourceId);
+    QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(resourceId);
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
     bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
     if (isOwnServer) {

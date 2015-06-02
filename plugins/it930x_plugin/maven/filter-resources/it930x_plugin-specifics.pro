@@ -1,14 +1,9 @@
 TEMPLATE = lib
 
-win32 {
-  QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
-  QMAKE_LFLAGS_DEBUG += /NODEFAULTLIB:libc /NODEFAULTLIB:libcmt /NODEFAULTLIB:msvcrt /NODEFAULTLIB:libcd /NODEFAULTLIB:libcmtd
-  QMAKE_CXXFLAGS += /wd4250
-}
-
 unix
 {
-  QMAKE_CXXFLAGS += -Wno-unused-function
+  QMAKE_CXXFLAGS += -Wno-unused-function -DDTVAPI_V15
+  QMAKE_CFLAGS += -DDTVAPI_V15
 }
 
-LIBS -= -lcommon
+#LIBS -= -lcommon

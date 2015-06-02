@@ -1,9 +1,6 @@
 #include "direct_module_finder.h"
 
 #include <QtCore/QTimer>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkProxy>
 
 #include <utils/common/model_functions.h>
 #include <utils/common/log.h>
@@ -75,6 +72,11 @@ void QnDirectModuleFinder::removeUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::checkUrl(const QUrl &url) {
+    if (QThread::currentThread() != thread()) {
+        QMetaObject::invokeMethod(this, "checkUrl", Q_ARG(QUrl, url));
+        return;
+    }
+
     enqueRequest(trimmedUrl(url));
 }
 
@@ -161,7 +163,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     if (moduleInformation.id.isNull())
         return;
 
-    if (moduleInformation.type != nxMediaServerId)
+    if (moduleInformation.type != QnModuleInformation::nxMediaServerId())
         return;
 
     if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())

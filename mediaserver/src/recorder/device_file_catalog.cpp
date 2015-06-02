@@ -28,6 +28,7 @@
 #include <recording/time_period_list.h>
 
 #include <boost/array.hpp>
+#include "utils/common/concurrent.h"
 
 QnMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
@@ -106,7 +107,7 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResou
     currentParts[2] = fileDate.date().day();
     currentParts[3] = fileDate.time().hour();
 
-    bool sameDir = true;
+    //bool sameDir = true;
 
     IOCacheMap::iterator itr = m_prevPartsMap->find(chunk.storageIndex);
     if (itr == m_prevPartsMap->end()) {
@@ -124,7 +125,7 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResou
         }
         else 
         {
-            sameDir = false;
+            //sameDir = false;
             // new folder. check it
 
             for (int j = i; j < 4; ++j) {
@@ -381,6 +382,7 @@ bool DeviceFileCatalog::needRebuildPause()
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
     QDir dir(folder);
+    QList<QFileInfo> files;
     for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
         while (!qnStorageMan->needToStopMediaScan() && needRebuildPause())
@@ -397,13 +399,29 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         }
         else 
         {
+            files << fi;
+        }
+
+    }
+
+    if (files.empty())
+        return;
+
+    QThreadPool tp;
+    tp.setMaxThreadCount(4);
+    QMutex scanFilesMutex;
+    for(const auto& fi: files)
+    {
+        QnConcurrent::run( &tp, [&]() 
+        {
             QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
 
             Chunk chunk = chunkFromFile(storage, fileName);
             chunk.setFileSize(fi.size());
             if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
-                continue;
+                return;
 
+            QMutexLocker lock(&scanFilesMutex);
             if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
                 QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
                 if (itr != allChunks.begin())
@@ -423,8 +441,9 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
                 emptyFileList << EmptyFileInfo(fi.created().toMSecsSinceEpoch(), fi.absoluteFilePath());
             }
         }
-
+        );
     }
+    tp.waitForDone();
 }
 
 void DeviceFileCatalog::readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter) 
@@ -760,7 +779,7 @@ void DeviceFileCatalog::close()
 {
 }
 
-QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)
+QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel, int limit)
 {
     //qDebug() << "find period from " << QDateTime::fromMSecsSinceEpoch(startTime).toString("hh:mm:ss.zzz") << "to" << QDateTime::fromMSecsSinceEpoch(endTime).toString("hh:mm:ss.zzz");
 
@@ -783,18 +802,27 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         return result;
 
     size_t firstIndex = itr - m_chunks.begin();
-    result << QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs);
+    result.push_back(QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs));
 
     for (size_t i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
     {
         QnTimePeriod& last = result.last();
-        
-        if (qAbs(last.startTimeMs + last.durationMs - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
+        qint64 lastEndTime = last.startTimeMs + last.durationMs;
+        if (lastEndTime > m_chunks[i].startTimeMs) {
+            // overlapped periods
+            if (m_chunks[i].durationMs == -1)
+                last.durationMs = -1;
+            else
+                last.durationMs = qMax(last.durationMs, m_chunks[i].endTimeMs() - last.startTimeMs);
+        }
+        else if (qAbs(lastEndTime - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
             last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
         else {
             if (last.durationMs < detailLevel && result.size() > 1)
                 result.pop_back();
-            result << QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs);
+            if (result.size() >= limit)
+                break;
+            result.push_back(QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs));
         }
     }
     //if (!result.isEmpty())
@@ -820,7 +848,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
     if (headerLine.contains("timezone"))
         timeZoneExist = 1;
     QByteArray line;
-    bool checkDirOnly = false;
+    //bool checkDirOnly = false;
     do {
         line = file.readLine();
         QList<QByteArray> fields = line.split(';');

@@ -114,7 +114,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             processedMac << info.mac;
 
             info.uniqId = info.mac;
-            info.discoveryIp = senderEndpoint.toString();
+            info.discoveryIp = senderEndpoint.address.toString();
 
             OnvifResourceInformationFetcher onfivFetcher;
             onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result, discoveryMode());

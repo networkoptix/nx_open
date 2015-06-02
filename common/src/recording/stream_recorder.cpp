@@ -37,6 +37,7 @@ static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
 static const int STORE_QUEUE_SIZE = 50;
 
+#if 0
 static QRectF cwiseMul(const QRectF &l, const QSizeF &r) 
 {
     return QRectF(
@@ -46,6 +47,7 @@ static QRectF cwiseMul(const QRectF &l, const QSizeF &r)
         l.height() * r.height()
         );
 }
+#endif
 
 QString QnStreamRecorder::errorString(int errCode) {
     switch (errCode) {
@@ -142,12 +144,6 @@ void QnStreamRecorder::close()
             fileFinished(fileDuration, m_fileName, m_mediaProvider, QnFfmpegHelper::getFileSizeByIOContext(m_ioContext));
         }
 
-        for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
-        {
-            if (m_formatCtx->streams[i]->codec->codec)
-                avcodec_close(m_formatCtx->streams[i]->codec);
-        }
-        
         if (m_ioContext)
         {
             QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);
@@ -442,6 +438,12 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
     avPkt.data = const_cast<quint8*>((const quint8*)md->data());    //const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
     avPkt.size = static_cast<int>(md->dataSize());
     avPkt.stream_index= streamIndex;
+
+    if (avPkt.pts < avPkt.dts)
+    {
+        avPkt.pts = avPkt.dts;
+        NX_LOG(QLatin1String("Timestamp error: PTS < DTS. Fixed."), cl_logWARNING);
+    }
 
     if (av_write_frame(m_formatCtx, &avPkt) < 0) 
     {

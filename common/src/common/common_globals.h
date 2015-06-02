@@ -300,6 +300,7 @@ public:
 
         parent_change = 0x800000,       /**< Camera discovery internal purpose */
         depend_on_parent_status = 0x1000000,   /**< Resource status depend on parent resource status */
+        search_upd_only = 0x2000000,   /**< Disable to insert new resource during discovery process, allow update only */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -577,6 +578,7 @@ public:
         BnsFormat           = 2,
         CsvFormat           = 3,
         XmlFormat           = 4,
+        CompressedPeriodsFormat = 5, // used for chunks data only
 
         UnsupportedFormat   = -1
     };
@@ -584,6 +586,15 @@ public:
 
     const char* serializationFormatToHttpContentType(SerializationFormat format);
     SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
+
+    enum TTHeaderFlag
+    {
+        TT_None          = 0x0, 
+        TT_ProxyToClient = 0x1
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TTHeaderFlag)
+    Q_DECLARE_FLAGS(TTHeaderFlags, TTHeaderFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(TTHeaderFlags)
 
     enum LicenseType 
     {
@@ -646,7 +657,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
-        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState),
+        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
+        (Qn::TTHeaderFlag),
     (metatype)(lexical)
 )
 
@@ -657,6 +669,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzDataFields),
+    (metatype)(numeric)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::TTHeaderFlags),
     (metatype)(numeric)
 )
 

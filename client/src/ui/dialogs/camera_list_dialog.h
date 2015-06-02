@@ -18,10 +18,10 @@ namespace Ui {
     class CameraListDialog;
 }
 
-class QnCameraListDialog: public QnWorkbenchStateDependentButtonBoxDialog {
+class QnCameraListDialog: public QnWorkbenchStateDependentDialog<QDialog> {
     Q_OBJECT
 
-    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+    typedef QnWorkbenchStateDependentDialog<QDialog> base_type;
 
 public:
     explicit QnCameraListDialog(QWidget *parent = NULL);

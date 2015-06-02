@@ -50,7 +50,7 @@ public:
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();
-
+    void videoLayoutChanged();
 protected:
     virtual void putData(const QnAbstractDataPacketPtr& data);
     void beforeDisconnectFromResource();

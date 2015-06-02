@@ -382,7 +382,7 @@ QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value) {
 QString QnEventLogModel::textData(const Column& column,const QnBusinessActionData& action) {
     switch(column) {
     case DateTimeColumn: {
-        qint64 timestampUsec = action.getRuntimeParams().eventTimestamp;
+        qint64 timestampUsec = action.getRuntimeParams().eventTimestampUsec;
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timestampUsec/1000);
         return dt.toString(Qt::SystemLocaleShortDate);
     }

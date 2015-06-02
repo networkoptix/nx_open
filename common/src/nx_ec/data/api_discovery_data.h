@@ -5,7 +5,10 @@
 
 namespace ec2 {
 
-    struct ApiDiscoveryData : ApiIdData {
+    struct ApiDiscoveryData : ApiIdData 
+    {
+        ApiDiscoveryData(): ignore(false) {}
+
         QString url;
         bool ignore;
     };

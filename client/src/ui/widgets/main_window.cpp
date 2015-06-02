@@ -76,6 +76,7 @@
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
@@ -183,7 +184,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setWindowTitle(QString());
     setAcceptDrops(true);
 
-    if (!qnSettings->isVideoWallMode()) {
+    if (!qnRuntime->isVideoWallMode()) {
         bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
         setMinimumWidth(smallWindow ? minimalWindowWidth / 2 : minimalWindowWidth);
         setMinimumHeight(smallWindow ? minimalWindowHeight / 2 : minimalWindowHeight);
@@ -215,7 +216,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     display()->setLightMode(qnSettings->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode())
         display()->setNormalMarginFlags(0);
     else
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
@@ -224,10 +225,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         action(Qn::ToggleBackgroundAnimationAction)->setDisabled(true);
 
     m_controller.reset(new QnWorkbenchController(this));
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode())
         m_controller->setMenuEnabled(false);
     m_ui.reset(new QnWorkbenchUi(this));
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode())
         m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::HideWhenNormal );
     else
         m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
@@ -582,9 +583,9 @@ void QnMainWindow::updateDecorationsState() {
     bool uiTitleUsed = fullScreen || maximized;
 #endif
 
-    bool windowTitleUsed = !uiTitleUsed && !qnSettings->isVideoWallMode();
+    bool windowTitleUsed = !uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode();
     setTitleVisible(windowTitleUsed);
-    m_ui->setTitleUsed(uiTitleUsed && !qnSettings->isVideoWallMode());
+    m_ui->setTitleUsed(uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode());
     m_view->setLineWidth(windowTitleUsed ? 0 : 1);
 
     updateDwmState();

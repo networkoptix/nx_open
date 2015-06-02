@@ -66,16 +66,8 @@ QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
 
 QnMediaContext::~QnMediaContext()
 {
-    if (m_ctx) {
-        if (m_ctx->codec)
-            avcodec_close(m_ctx);
-        av_freep(&m_ctx->rc_override);
-        av_freep(&m_ctx->intra_matrix);
-        av_freep(&m_ctx->inter_matrix);
-        av_freep(&m_ctx->extradata);
-        av_freep(&m_ctx->rc_eq);
-        av_freep(&m_ctx);
-    }
+    QnFfmpegHelper::deleteCodecContext(m_ctx);
+    m_ctx = 0;
 }
 
 
@@ -295,8 +287,12 @@ void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIn
     int64_t* src = (int64_t*) image;
     for (int i = startIndex; i <= endIndex; ++i)
     {
-        *dst++ &= *src++;
-        *dst++ &= *src++;
+        *dst &= ~(*src);
+        ++dst;
+        ++src;
+        *dst &= ~(*src);
+        ++dst;
+        ++src;
     }
 #endif
 }

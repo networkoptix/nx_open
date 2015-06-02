@@ -34,6 +34,9 @@ public:
     bool isCameraSettingsOptimizationEnabled() const;
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
+    bool isServerAutoDiscoveryEnabled() const;
+    void setServerAutoDiscoveryEnabled(bool enabled);
+
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
 
@@ -42,9 +45,11 @@ public:
 
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
+
 signals:
     void disabledVendorsChanged();
     void cameraSettingsOptimizationChanged();
+    void serverAutoDiscoveryChanged();
     void emailSettingsChanged();
 
 private:
@@ -54,6 +59,8 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<QString> *m_serverAdaptor;
@@ -67,7 +74,6 @@ private:
     QnResourcePropertyAdaptor<int> *m_timeoutAdaptor;
     /** Flag that we are using simple smtp settings set */
     QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;   //TODO: #GDM #Common think where else we can store it
-    QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 

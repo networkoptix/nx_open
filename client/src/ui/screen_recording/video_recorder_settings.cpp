@@ -14,7 +14,9 @@
 
 #include <utils/common/warnings.h>
 
-QRegExp QnVideoRecorderSettings::m_devNumberExpr(QLatin1String(" \\([0-9]+\\)$"));
+namespace {
+    const QRegExp devNumberExpr(QLatin1String(" \\([0-9]+\\)$"));
+}
 
 QnVideoRecorderSettings::QnVideoRecorderSettings(QObject *parent) :
     QObject(parent)
@@ -81,7 +83,7 @@ QStringList QnVideoRecorderSettings::availableDeviceNames(QAudio::Mode mode)
 void QnVideoRecorderSettings::splitFullName(const QString& name, QString& shortName, int& index)
 {
     shortName = name;
-    int sameNamePos = name.lastIndexOf(m_devNumberExpr);
+    int sameNamePos = name.lastIndexOf(devNumberExpr);
     index = 1;
     if (sameNamePos > 0) {
         index = name.mid(sameNamePos+2, name.lastIndexOf(QLatin1String(")")) - sameNamePos - 2).toInt();

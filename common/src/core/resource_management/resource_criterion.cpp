@@ -7,7 +7,7 @@ namespace {
     QnResourceCriterion::Operation nextCriterionFunction(const QnResourcePtr &, const QVariant &) {
         return QnResourceCriterion::Next;
     }
-
+#if 0
     /**
      * This function is currently unused, but it may come in handy later. Don't delete. 
      */
@@ -21,7 +21,7 @@ namespace {
         pattern = QLatin1String(".*(") + pattern + QLatin1String(").*");
         return QRegExp(pattern, Qt::CaseInsensitive, QRegExp::RegExp2);
     }
-
+#endif
     static int qn_criterionListMetaTypeId = 0;
 
     void qn_initCriterionListMetaType() {

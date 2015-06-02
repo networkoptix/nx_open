@@ -100,28 +100,6 @@ void QnDigitalWatchdogResource::enableOnvifSecondStream()
     // camera rebooting ....
 }
 
-/*
-int QnDigitalWatchdogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
-{
-    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
-
-    int hiEnd = 1024*9;
-    int lowEnd = 1024*1.8;
-
-    float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
-    resolutionFactor = pow(resolutionFactor, (float)0.5);
-
-    float frameRateFactor = fps/30.0;
-    frameRateFactor = pow(frameRateFactor, (float)0.4);
-
-    int result = lowEnd + (hiEnd - lowEnd) * (q - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
-    result *= (resolutionFactor * frameRateFactor);
-
-    return qMax(1024,result);
-}
-*/
-
 QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal() 
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
@@ -143,11 +121,17 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
 }
 
 bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const {
-    QFile paramsTemplateFile(lit(":/camera_advanced_params/dw.xml"));
+    const QString paramsTemplateFileName(lit(":/camera_advanced_params/dw.xml"));
+    QFile paramsTemplateFile(paramsTemplateFileName);
 #ifdef _DEBUG
     QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
 #endif
-    return QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
+    bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
+#ifdef _DEBUG
+    if (!result)
+        qWarning() << "Error while parsing xml" << paramsTemplateFileName;
+#endif
+    return result;
 }
 
 void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params) {

@@ -21,8 +21,9 @@ QnDesktopCameraStreamReader::~QnDesktopCameraStreamReader()
     stop();
 }
 
-CameraDiagnostics::Result QnDesktopCameraStreamReader::openStream()
+CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
+    Q_UNUSED(isCameraControlRequired);
     closeStream();
 
     if (!m_socket) {
@@ -88,11 +89,8 @@ int QnDesktopCameraStreamReader::processTextResponse()
 
 QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     QnAbstractMediaDataPtr result;
 
@@ -174,11 +172,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
     return result;
 }
 
-void QnDesktopCameraStreamReader::updateStreamParamsBasedOnQuality()
-{
-}
-
-void QnDesktopCameraStreamReader::updateStreamParamsBasedOnFps()
+void QnDesktopCameraStreamReader::pleaseReopenStream()
 {
 }
 

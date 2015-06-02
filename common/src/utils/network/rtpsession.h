@@ -67,7 +67,7 @@ private:
     //double m_lastResultInSec;
     QElapsedTimer m_timer;
     qint64 m_localStartTime;
-    qint64 m_cameraTimeDrift;
+    //qint64 m_cameraTimeDrift;
     double m_rtcpReportTimeDiff;
 
     struct CamSyncInfo {
@@ -351,7 +351,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
 
-    QUrl mUrl;
+    QUrl m_url;
 
     QString m_SessionId;
     unsigned short m_ServerPort;

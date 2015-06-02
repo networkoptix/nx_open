@@ -356,12 +356,12 @@ void FrameTypeExtractor::decodeWMVSequence(const quint8* data, int size)
 }
 
 FrameTypeExtractor::FrameTypeExtractor(AVCodecContext* context): 
-    m_context(context), 
+    m_context(context),
     m_codecId(context->codec_id),
     m_vcSequence(0),
     m_dataWithNalPrefixes(false)
 {
-    if (m_context && context->extradata_size > 0)
+    if (context && context->extradata_size > 0)
     {
         quint8* data = context->extradata;
         if (m_codecId == CODEC_ID_VC1) 
@@ -382,14 +382,21 @@ FrameTypeExtractor::FrameTypeExtractor(AVCodecContext* context):
         else if (m_codecId == CODEC_ID_H264) {
             m_dataWithNalPrefixes = context->extradata[0] == 0;
         }
-
     }
+}
+
+FrameTypeExtractor::FrameTypeExtractor(CodecID codecId, bool nalPrefixes)
+:   m_context(nullptr),
+    m_codecId(codecId),
+    m_vcSequence(nullptr),
+    m_dataWithNalPrefixes(nalPrefixes)
+{
 }
 
 FrameTypeExtractor::~FrameTypeExtractor()
 {
     delete m_vcSequence;
-};
+}
 
 FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8* data, int size)
 {
@@ -697,9 +704,7 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
 
 error_label:
     qWarning() << Q_FUNC_INFO << __LINE__ << "Parse error in deserialize CodecContext";
-    if (ctx->codec)
-        avcodec_close(ctx);
-    av_free(ctx);
+    QnFfmpegHelper::deleteCodecContext(ctx);
     return 0;
 }
 
@@ -838,8 +843,7 @@ void QnFfmpegHelper::deleteCodecContext(AVCodecContext* ctx)
 {
     if (!ctx)
         return;
-    if (ctx->codec)
-        avcodec_close(ctx);
+    avcodec_close(ctx);
     av_freep(&ctx->rc_override);
     av_freep(&ctx->intra_matrix);
     av_freep(&ctx->inter_matrix);

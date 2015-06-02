@@ -182,7 +182,10 @@ void GraphicsToolTipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
 }
 
 bool GraphicsToolTipLabel::tipChanged(const QString &newText, QGraphicsItem *parent) {
-    return newText != this->text() || parent != this->item() || !qFuzzyEquals(parent->pos(), m_oldParentPos);
+    return newText != this->text() 
+        || parent != this->item() 
+        || (parent && !qFuzzyEquals(parent->pos(), m_oldParentPos))
+        ;
 }
 
 void GraphicsToolTipLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {

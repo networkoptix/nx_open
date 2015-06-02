@@ -327,6 +327,7 @@
             <modules>                       
                 <module>applauncher</module> 
                 <module>client</module>     
+                <module>clientexe</module>
             </modules>  
         </profile>         
         <profile>
@@ -340,8 +341,14 @@
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->                   
-                <module>client</module>                     
+                <module>client</module>
+                <module>axclient</module>
+                <module>clientexe</module>
                 <module>wixsetup</module>
+                <module>plugins/nxinterface</module>
+                <module>plugins/nxcontrol</module>
+                <module>plugins/acs/paxton</module>
+                <module>plugins/acs/paxton-installer</module>
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
@@ -421,9 +428,9 @@
                 <os>
                     <family>unix</family>
                     <name>linux</name>
-                </os> 
+                </os>
             </activation>
-            <properties>            
+            <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
                 <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
@@ -431,8 +438,8 @@
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
                 <module>plugins/it930x_plugin</module>
-            </modules>            
-        </profile>  
+            </modules>
+        </profile>
         <profile>
             <id>macosx</id>
             <activation>
@@ -577,7 +584,6 @@
             </properties>
             <modules>
                 <module>edge_firmware/rpi</module>
-                <module>plugins/rpi_cam</module>
             </modules>             
         </profile>
 

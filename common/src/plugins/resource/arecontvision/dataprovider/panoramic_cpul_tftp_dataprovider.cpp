@@ -375,17 +375,6 @@ bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 
 }
 
-void AVPanoramicClientPullSSTFTPStreamreader::updateStreamParamsBasedOnFps()
-{
-    QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnFps();
-}
-
-void AVPanoramicClientPullSSTFTPStreamreader::updateStreamParamsBasedOnQuality()
-{
-    QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality();
-    QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
-}
-
 void AVPanoramicClientPullSSTFTPStreamreader::beforeRun()
 {
     QnPlAVClinetPullStreamReader::beforeRun();

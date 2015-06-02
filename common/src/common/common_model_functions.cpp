@@ -15,6 +15,7 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PeerType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ServerFlags)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraStatusFlags)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, TTHeaderFlag)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTraits,
     (Qn::FourWayPtzTrait,          "FourWayPtz")
@@ -47,6 +48,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::BnsFormat,         "bns")
     (Qn::CsvFormat,         "csv")
     (Qn::XmlFormat,         "xml")
+    (Qn::CompressedPeriodsFormat, "periods")
 )
 
 

@@ -38,11 +38,8 @@ QnVMax480LiveProvider::~QnVMax480LiveProvider()
 
 QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
 {
-    if (!isStreamOpened()) {
-        openStream();
-        if (!isStreamOpened())
-            return QnAbstractMediaDataPtr(0);
-    }
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
 
     if (needMetaData())
         return getMetaData();
@@ -80,8 +77,10 @@ bool QnVMax480LiveProvider::canChangeStatus() const
 }
 
 
-CameraDiagnostics::Result QnVMax480LiveProvider::openStream()
+CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
+    Q_UNUSED(isCameraControlRequired);
+    Q_UNUSED(params)
     if (m_opened)
         return CameraDiagnostics::NoErrorResult();
 
@@ -131,18 +130,6 @@ void QnVMax480LiveProvider::afterRun()
     //msleep(300);
     CLServerPushStreamReader::afterRun();
     closeStream();
-}
-
-void QnVMax480LiveProvider::updateStreamParamsBasedOnQuality()
-{
-    if (isRunning())
-        pleaseReOpen();
-}
-
-void QnVMax480LiveProvider::updateStreamParamsBasedOnFps()
-{
-    if (isRunning())
-        pleaseReOpen();
 }
 
 int QnVMax480LiveProvider::getChannel() const

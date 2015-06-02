@@ -28,6 +28,7 @@ extern "C"
 #include "core/datapacket/media_data_packet.h"
 #include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio.h"
+#include "utils/media/ffmpeg_helper.h"
 
 // mux audio 1 and audio 2 to audio1 buffer
 // I have used intrisicts for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
@@ -870,12 +871,10 @@ void QnDesktopFileEncoder::closeStream()
     if (m_formatCtx && m_videoPacketWrited)
         av_write_trailer(m_formatCtx);
 
-    if (m_videoCodecCtx)
-        avcodec_close(m_videoCodecCtx);
+    QnFfmpegHelper::deleteCodecContext(m_videoCodecCtx);
     m_videoCodecCtx = 0;
 
-    if (m_audioCodecCtx)
-        avcodec_close(m_audioCodecCtx);
+    QnFfmpegHelper::deleteCodecContext(m_audioCodecCtx);
     m_audioCodecCtx = 0;
 
     if (m_formatCtx)

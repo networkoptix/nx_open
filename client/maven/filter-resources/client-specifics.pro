@@ -1,5 +1,4 @@
-TEMPLATE = app
-QT += xmlpatterns
+TEMPLATE = lib
 
 INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \
@@ -27,3 +26,5 @@ mac {
 unix:!mac {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }
+
+OTHER_FILES += ${root.dir}/client/src/ui/help/help_topics.i

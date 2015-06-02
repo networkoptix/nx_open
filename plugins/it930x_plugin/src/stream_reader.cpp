@@ -1,32 +1,29 @@
 #include <memory>
 
 #include "discovery_manager.h"
-#include "stream_reader.h"
+#include "camera_manager.h"
 #include "video_packet.h"
+#include "dev_reader.h"
+#include "stream_reader.h"
 
 namespace ite
 {
-#if 1
+    INIT_OBJECT_COUNTER(StreamReader)
     DEFAULT_REF_COUNTER(StreamReader)
-#else
-    unsigned int StreamReader::addRef()
-    {
-        unsigned count = m_refManager.addRef();
-        return count;
-    }
 
-    unsigned int StreamReader::releaseRef()
+    static DevReader * getDevReader(CameraManager * camera)
     {
-        unsigned count = m_refManager.releaseRef();
-        return count;
+        auto rxDevice = camera->rxDevice().lock();
+        if (rxDevice)
+            return rxDevice->reader();
+        return nullptr;
     }
-#endif
 
     StreamReader::StreamReader(CameraManager * cameraManager, int encoderNumber)
-    :
-        m_refManager( this ),
-        m_cameraManager( cameraManager ),
-        m_encoderNumber( encoderNumber )
+    :   m_refManager(this),
+        m_cameraManager(cameraManager),
+        m_encoderNumber(encoderNumber),
+        m_interrupted(false)
     {
         m_cameraManager->openStream(m_encoderNumber);
     }
@@ -53,12 +50,26 @@ namespace ite
 
     int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     {
-        nxcip::MediaDataPacket * packet = m_cameraManager->nextPacket( m_encoderNumber );
+        ContentPacketPtr pkt = nextPacket();
+        if (!pkt || pkt->empty())
+        {
+            *lpPacket = nullptr;
+            return nxcip::NX_TRY_AGAIN;
+        }
+
+#if 0
+        debug_printf("[stream] pts: %u; time: %lu; stamp: %lu\n", pkt->pts(), time(NULL), pkt->timestamp() / 1000 / 1000);
+#endif
+
+        VideoPacket * packet = new VideoPacket(pkt->data(), pkt->size(), pkt->timestamp());
         if (!packet)
         {
             *lpPacket = nullptr;
             return nxcip::NX_TRY_AGAIN;
         }
+
+        if (pkt->flags() & ContentPacket::F_StreamReset)
+            packet->setFlag(nxcip::MediaDataPacket::fStreamReset);
 
         *lpPacket = packet;
         return nxcip::NX_NO_ERROR;
@@ -66,5 +77,41 @@ namespace ite
 
     void StreamReader::interrupt()
     {
+        DevReader * devReader = getDevReader(m_cameraManager);
+        if (devReader)
+        {
+            m_interrupted = true;
+            devReader->interrupt();
+        }
+    }
+
+    //
+
+    ContentPacketPtr StreamReader::nextPacket()
+    {
+        static const unsigned TIMEOUT_MS = 10000;
+        std::chrono::milliseconds timeout(TIMEOUT_MS);
+
+        Timer timer(true);
+        while (timer.elapsedMS() < TIMEOUT_MS)
+        {
+            DevReader * devReader = getDevReader(m_cameraManager);
+            if (! devReader)
+                break;
+
+            ContentPacketPtr pkt = devReader->getPacket(RxDevice::stream2pid(m_encoderNumber), timeout);
+            if (m_interrupted)
+                break;
+
+            if (pkt)
+                return pkt;
+
+            auto rxDev = m_cameraManager->rxDevice().lock();
+            if (rxDev)
+                rxDev->processRcQueue();
+        }
+
+        m_interrupted = false;
+        return nullptr;
     }
 }

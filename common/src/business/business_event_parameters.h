@@ -13,9 +13,17 @@ struct QnBusinessEventParameters {
     QnBusinessEventParameters();
 
     QnBusiness::EventType eventType;
-    qint64 eventTimestamp;
+
+    /** When did the event occur - in usecs. */
+    qint64 eventTimestampUsec;
+
+    /** Event source - camera or server. */
     QnUuid eventResourceId;
+
     QnUuid actionResourceId;
+
+    /** Server that generated the event. */
+    QnUuid sourceServerId;
 
     QnBusiness::EventReason reasonCode;
     QString reasonParamsEncoded;
@@ -27,7 +35,7 @@ struct QnBusinessEventParameters {
     QnUuid getParamsHash() const;
 };
 
-#define QnBusinessEventParameters_Fields (eventType)(eventTimestamp)(eventResourceId)(actionResourceId)\
+#define QnBusinessEventParameters_Fields (eventType)(eventTimestampUsec)(eventResourceId)(actionResourceId)(sourceServerId)\
     (reasonCode)(reasonParamsEncoded)(source)(conflicts)(inputPortId)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq));

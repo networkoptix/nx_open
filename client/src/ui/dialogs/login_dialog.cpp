@@ -306,7 +306,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
 
             QString title;
             if (!data.systemName.isEmpty())
-                title = lit("%1 - (%2:%3)").arg(data.systemName).arg(url.host()).arg(url.port());
+                title = lit("%3 - (%1:%2)").arg(url.host()).arg(url.port()).arg(data.systemName);
             else
                 title = lit("%1:%2").arg(url.host()).arg(url.port());
             if (!isCompatible)
@@ -502,8 +502,10 @@ void QnLoginDialog::at_deleteButton_clicked() {
 void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     QSet<SocketAddress> addresses = QnModuleFinder::instance()->moduleAddresses(moduleInformation.id);
 
-    if (addresses.isEmpty())
+    if (addresses.isEmpty()) {
+        at_moduleFinder_moduleLost(moduleInformation);
         return;
+    }
 
     QnEcData data;
     data.id = moduleInformation.id;

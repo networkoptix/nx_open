@@ -87,7 +87,8 @@ void QnRestConnectionProcessor::run()
         if (d->request.requestLine.method.toUpper() == "GET") {
             rez = handler->executeGet(url.path(), params, d->responseBody, contentType, this);
         }
-        else if (d->request.requestLine.method.toUpper() == "POST") {
+        else if (d->request.requestLine.method.toUpper() == "POST" || 
+                 d->request.requestLine.method.toUpper() == "PUT") {
             rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->responseBody, contentType, this);
         }
         else {
@@ -118,4 +119,17 @@ QnUuid QnRestConnectionProcessor::authUserId() const
 {
     Q_D(const QnRestConnectionProcessor);
     return d->authUserId;
+}
+
+const nx_http::Request& QnRestConnectionProcessor::request() const
+{
+    Q_D(const QnRestConnectionProcessor);
+    return d->request;
+}
+
+nx_http::Response* QnRestConnectionProcessor::response() const
+{
+    Q_D(const QnRestConnectionProcessor);
+    //TODO #ak remove following const_cast in 2.3.1 (requires change in QnRestRequestHandler API)
+    return const_cast<nx_http::Response*>(&d->response);
 }

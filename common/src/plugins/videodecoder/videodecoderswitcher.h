@@ -37,42 +37,42 @@ public:
         const QnAbstractVideoDecoderPlugin& decoderFactory );
 
     //!Implementation of QnAbstractVideoDecoder::GetPixelFormat
-    virtual PixelFormat GetPixelFormat() const;
+    virtual PixelFormat GetPixelFormat() const override;
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
-    virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
+    virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const override;
     //!Implementation of QnAbstractVideoDecoder::decode
-    virtual bool decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
+    virtual bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) override;
     //!Implementation of QnAbstractVideoDecoder::setLightCpuMode
-    virtual void setLightCpuMode( DecodeMode val );
+    virtual void setLightCpuMode( DecodeMode val ) override;
     //!Implementation of QnAbstractVideoDecoder::setMTDecoding
-    virtual void setMTDecoding( bool value );
+    virtual void setMTDecoding( bool value ) override;
     //!Implementation of QnAbstractVideoDecoder::isMultiThreadedDecoding
-    virtual bool isMultiThreadedDecoding() const;
+    virtual bool isMultiThreadedDecoding() const override;
     //!Implementation of QnAbstractVideoDecoder::isHardwareAccelerationEnabled
-    bool isHardwareAccelerationEnabled() const;
+    bool isHardwareAccelerationEnabled() const override;
     //!Implementation of QnAbstractVideoDecoder::getWidth
-    virtual int getWidth() const;
+    virtual int getWidth() const override;
     //!Implementation of QnAbstractVideoDecoder::getHeight
-    virtual int getHeight() const;
+    virtual int getHeight() const override;
     //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
-    virtual QSize getOriginalPictureSize() const;
+    virtual QSize getOriginalPictureSize() const override;
     //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
-    virtual double getSampleAspectRatio() const;
+    virtual double getSampleAspectRatio() const override;
     //!Implementation of QnAbstractVideoDecoder::lastFrame
-    virtual const AVFrame* lastFrame() const;
+    virtual const AVFrame* lastFrame() const override;
     //!Implementation of QnAbstractVideoDecoder::resetDecoder
-    virtual void resetDecoder( QnConstCompressedVideoDataPtr data );
+    virtual void resetDecoder( const QnConstCompressedVideoDataPtr& data ) override;
     //!Implementation of QnAbstractVideoDecoder::setOutPictureSize
-    virtual void setOutPictureSize( const QSize& outSize );
+    virtual void setOutPictureSize( const QSize& outSize ) override;
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
-    virtual unsigned int getDecoderCaps() const;
+    virtual unsigned int getDecoderCaps() const override;
     //!Implementation of QnAbstractVideoDecoder::setSpeed
-    virtual void setSpeed( float newValue );
+    virtual void setSpeed( float newValue ) override;
 
     //!Implementation of AbstractDecoderEventReceiver::streamParamsChanged
     virtual DecoderBehaviour streamParamsChanged(
         QnAbstractVideoDecoder* decoder,
-        const stree::AbstractResourceReader& newStreamParams );
+        const stree::AbstractResourceReader& newStreamParams ) override;
 
     /*!
         Takes ownership of \a hwDecoder

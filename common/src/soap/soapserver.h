@@ -13,6 +13,7 @@
 #include <plugins/resource/onvif/onvif_notification_consumer.h>
 #include <utils/common/long_runnable.h>
 
+#include <utils/common/singleton.h>
 
 //!Listenes for incoming soap requests. Implemented using gsoap
 /*!
@@ -20,13 +21,14 @@
 */
 class QnSoapServer
 :
-    public QnLongRunnable
+    public QnLongRunnable,
+    public Singleton<QnSoapServer>
 {
 public:
     /*!
         \param port Port to listen on. If zero, random avalable port is chosen
     */
-    QnSoapServer( unsigned int port = 0, const char* path = "/services" );
+    QnSoapServer(unsigned int port = 0, const char* path = "/services" );
     virtual ~QnSoapServer();
 
     //!Implementation of QnSoapServer::pleaseStop
@@ -40,10 +42,6 @@ public:
     QString path() const;
     OnvifNotificationConsumer* getService();
     const OnvifNotificationConsumer* getService() const;
-
-    static void initStaticInstance( QnSoapServer* inst );
-    static QnSoapServer* instance();
-
 protected:
     virtual void run();
 

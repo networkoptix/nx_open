@@ -2,9 +2,6 @@
 #define __BUSINESS_MESSAGE_BUS_H_
 
 #include <utils/thread/mutex.h>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
 #include <QtCore/QMap>
 #include <QtCore/QUrl>
 #include <QtCore/QThread>
@@ -53,9 +50,6 @@ private slots:
     void at_DeliveryBusinessActionFinished( int handle, ec2::ErrorCode errorCode );
 
 private:
-    QNetworkAccessManager m_transport;
-    typedef QMap<QNetworkReply*, QnAbstractBusinessActionPtr> ActionMap;
-    ActionMap m_actionsInProgress;
     mutable QnMutex m_mutex;
     QMap<int, QnAbstractBusinessActionPtr> m_sendingActions;
 };

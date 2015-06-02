@@ -44,6 +44,8 @@ public:
     */
     void setCameraName( const QString& newCameraName );
 
+    QnMediaServerResourcePtr getParentServer() const;
+
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;
@@ -289,7 +291,7 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
-
+    virtual bool isBitratePerGOP() const;
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
@@ -302,7 +304,7 @@ private:
     QString m_model;
     QString m_vendor;
     mutable Qn::LicenseType m_cachedLicenseType;
-    CachedValue<bool> m_cachedHasDualStreaming2;
+    //CachedValue<bool> m_cachedHasDualStreaming2; // UNDO c29dd798445d: do not work with cam restored from db. Do not emit signal
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
@@ -311,7 +313,7 @@ private:
     Qn::MotionType calculateMotionType() const;
 
 private slots:
-    void atResourceChanged();
+    void resetCachedValues();
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

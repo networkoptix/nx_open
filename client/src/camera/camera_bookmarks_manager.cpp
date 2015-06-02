@@ -1,12 +1,11 @@
 
 #include "camera_bookmarks_manager.h"
 
-#include <core/resource/resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <camera/loaders/generic_camera_data_loader.h>
 #include <camera/data/bookmark_camera_data.h>
+#include <camera/loaders/bookmark_camera_data_loader.h>
 
 namespace
 {
@@ -38,11 +37,12 @@ public:
 private:
     /// @brief Callback for bookmarks. If data is nullptr it means error occurred
     void bookmarksDataEvent(const QnAbstractCameraDataPtr &data
+        , const QnTimePeriod &period
         , int handle);
 
 private:
     typedef std::list<BookmarkRequestHolder> RequestsContainer;
-    typedef QHash<QnResourcePtr, QnGenericCameraDataLoader *> LoadersContainer;
+    typedef QHash<QnResourcePtr, QnBookmarkCameraDataLoader *> LoadersContainer;
 
     LoadersContainer m_loaders;
     RequestsContainer m_requests;
@@ -73,33 +73,25 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
         if (it == m_loaders.end())
         {
             const QnMediaServerResourcePtr mediaServer = camera->getParentResource().dynamicCast<QnMediaServerResource>();
-            const QnNetworkResourcePtr networkResource = camera.dynamicCast<QnNetworkResource>();
-            if (QnGenericCameraDataLoader *loader = QnGenericCameraDataLoader::newInstance(
-                mediaServer, networkResource, Qn::BookmarkData, this))
-            {
+            QnBookmarkCameraDataLoader *loader = new QnBookmarkCameraDataLoader(camera, this);
+
                 connect(loader, &QnAbstractCameraDataLoader::ready, this, &Impl::bookmarksDataEvent);
                 connect(loader, &QnAbstractCameraDataLoader::failed, this
-                    , [this](int, int handle) { bookmarksDataEvent(QnAbstractCameraDataPtr(), handle); } );
+                    , [this](int, int handle) { bookmarksDataEvent(QnAbstractCameraDataPtr(), QnTimePeriod(), handle); } );
 
                 it = m_loaders.insert(camera, loader);
-            } 
-            else
-            {
-                /// If we don't hav such loader and can't create it we should mark request as failed and skip this camera
-                request.success = false;
-                continue;
-            }
+
         }
 
         enum { kMinimumResolution = 1 };    /// We should use not zero resolution to 
                                             /// prevent all cashes to be discarded when discardCachedData() called
-        QnGenericCameraDataLoader * const loader = it.value();
+        QnBookmarkCameraDataLoader * const loader = it.value();
         
         if (clearBookmarksCache)
             loader->discardCachedData(kMinimumResolution);
-
-        const int handle = loader->load(request.targetPeriod, filter.text, kMinimumResolution);
-        request.answers.insert(std::make_pair(loader, handle));
+            //TODO: #GDM #Bookmarks IMPLEMENT ME
+       // const int handle = loader->load(request.targetPeriod, filter.text, kMinimumResolution);
+      //  request.answers.insert(std::make_pair(loader, handle));
     }
 
     if (!request.answers.empty())
@@ -107,6 +99,7 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
 }
 
 void QnCameraBookmarksManager::Impl::bookmarksDataEvent(const QnAbstractCameraDataPtr &data
+    , const QnTimePeriod &period
     , int handle)
 {
     const QnAbstractCameraDataLoader * const loader = static_cast<QnAbstractCameraDataLoader *>(sender());

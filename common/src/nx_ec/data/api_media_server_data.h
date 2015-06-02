@@ -32,6 +32,8 @@ namespace ec2
     };
 #define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(not_used)(version)(systemInfo)(authKey)(systemName)
 
+    QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerData, (eq))
+
 
     struct ApiMediaServerUserAttributesData: ApiData
     {
@@ -67,7 +69,6 @@ namespace ec2
         }
     };
 #define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields_Short (status)(addParams) (storages)
-
 
 } // namespace ec2
 

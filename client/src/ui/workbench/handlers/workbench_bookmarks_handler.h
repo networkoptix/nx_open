@@ -38,7 +38,7 @@ private:
     QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const;
 
     QnCameraBookmarkTags m_tags;
-    QHash<int, QnResourcePtr> m_processingBookmarks; 
+    QHash<int, QnMediaResourcePtr> m_processingBookmarks; 
 };
 
 #endif // WORKBENCH_BOOKMARKS_HANDLER_H

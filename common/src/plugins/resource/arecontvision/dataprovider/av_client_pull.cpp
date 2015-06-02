@@ -61,7 +61,7 @@ void QnPlAVClinetPullStreamReader::updateCameraParams()
     }
 
     if (needUpdate)
-        updateStreamParamsBasedOnQuality();  // to update stream params
+        pleaseReopenStream();
 }
 
 QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
@@ -69,10 +69,10 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
     stop();
 }
 
-void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
+void QnPlAVClinetPullStreamReader::pleaseReopenStream()
 {
     SCOPED_MUTEX_LOCK( mtx, &m_mutex);
-
+    QnLiveStreamParams params = getLiveParams();
     QString resolution;
     if (getRole() == Qn::CR_LiveVideo)
         resolution = QLatin1String("full");
@@ -80,7 +80,7 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
         resolution = QLatin1String("half");
 
     QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
-    Qn::StreamQuality q = getQuality();
+    Qn::StreamQuality q = params.quality;
     switch (q)
     {
     case Qn::QualityHighest:
@@ -149,8 +149,7 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
     }
 }
 
-
-int QnPlAVClinetPullStreamReader::getBitrate() const
+int QnPlAVClinetPullStreamReader::getBitrateMbps() const
 {
     return getResource()->getProperty(lit("Bitrate")).toInt();
 }

@@ -1,7 +1,9 @@
 #include "workbench_context.h"
 
 #include <utils/common/warnings.h>
+
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <api/media_server_statistics_manager.h>
 
@@ -66,7 +68,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
 
-    instance<QnWorkbenchLicenseNotifier>(); // TODO: #Elric belongs here?
+	if (!qnRuntime->isActiveXMode())
+		instance<QnWorkbenchLicenseNotifier>(); // TODO: #Elric belongs here?
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {

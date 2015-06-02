@@ -2,67 +2,32 @@
 #define ITE_CAMERA_MANAGER_H
 
 #include <vector>
-#include <deque>
 #include <set>
+#include <map>
 #include <memory>
 #include <mutex>
-#include <thread>
-#include <atomic>
 
 #include <plugins/camera_plugin.h>
 
 #include "ref_counter.h"
 #include "rx_device.h"
+#include "tx_device.h"
+#include "timer.h"
 
 namespace ite
 {
     class MediaEncoder;
-    class VideoPacket;
-
     class DeviceMapper;
     class DevReader;
-    class DevReadThread;
-    struct LibAV;
+    class CameraManager;
 
-    typedef std::shared_ptr<VideoPacket> VideoPacketPtr;
-
-    //!
-    class VideoPacketQueue
-    {
-    public:
-        typedef std::deque<VideoPacketPtr> QueueT;
-
-        VideoPacketQueue()
-        :   m_packetsLost( 0 ),
-            m_isLowQ( false )
-        {}
-
-        void push_back(VideoPacketPtr p) { m_deque.push_back( p ); }
-        void pop_front() { m_deque.pop_front(); }
-        void incLost() { ++m_packetsLost; }
-
-        VideoPacketPtr front() { return m_deque.front(); }
-        size_t size() const { return m_deque.size(); }
-        bool empty() const { return m_deque.empty(); }
-        std::mutex& mutex() { return m_mutex; }
-
-        bool isLowQuality() const { return m_isLowQ; }
-        void setLowQuality(bool value = true) { m_isLowQ = value; }
-
-    private:
-        mutable std::mutex m_mutex;
-        QueueT m_deque;
-        unsigned m_packetsLost;
-        bool m_isLowQ;
-    };
-
-    //!
-    class CameraManager : public nxcip::BaseCameraManager3
+    ///
+    class CameraManager : public nxcip::BaseCameraManager3, public ObjectCounter<CameraManager>
     {
         DEF_REF_COUNTER
 
     public:
-        CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper);
+        CameraManager(const nxcip::CameraInfo& info, DeviceMapper * devMapper, TxDevicePtr txDev);
         virtual ~CameraManager();
 
         // nxcip::BaseCameraManager
@@ -90,22 +55,20 @@ namespace ite
         virtual int getParamValue(const char * paramName, char * valueBuf, int * valueBufSize) const override;
         virtual int setParamValue(const char * paramName, const char * value) override;
 
-
-        // for ReadThread
-
-        DevReader * devReader() { return m_rxDevice->reader(); } // TODO
-        void setThreadObj(DevReadThread * ptr) { m_threadObject = ptr; }
-
-        std::shared_ptr<VideoPacketQueue> queue(unsigned num) const;
-
         // for StreamReader
 
-        VideoPacket * nextPacket(unsigned encoderNumber);
+        std::weak_ptr<RxDevice> rxDevice() const { return m_rxDevice; }
 
         void openStream(unsigned encNo);
         void closeStream(unsigned encNo);
 
         // for DiscoveryManager
+
+        void updateTx(TxDevicePtr txDev)
+        {
+            if (! m_txDevice)
+                m_txDevice = txDev;
+        }
 
         void updateCameraInfo(const nxcip::CameraInfo& info);
         bool stopIfNeedIt();
@@ -114,89 +77,57 @@ namespace ite
 
         const char * url() const { return m_info.url; }
 
-    private:
-        mutable std::mutex m_encMutex;
-        mutable std::mutex m_reloadMutex;
-        const DeviceMapper * m_devMapper;
-        unsigned short m_txID;
-        std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
-        std::vector<std::shared_ptr<VideoPacketQueue>> m_encQueues;
-        std::set<unsigned> m_openedStreams;
-        std::atomic_bool m_waitStop;
-        time_t m_stopTime;
+        unsigned short txID() const
+        {
+            if (m_txDevice)
+                return m_txDevice->txID();
+            return 0;
+        }
 
+        //
+
+        void needUpdate(unsigned group);
+        void updateSettings();
+        void setChannel(unsigned channel) { m_newChannel = channel; }
+
+    private:
+        mutable std::mutex m_mutex;
+
+        DeviceMapper * m_devMapper;
+        TxDevicePtr m_txDevice;
         RxDevicePtr m_rxDevice;
-        std::unique_ptr<LibAV> m_libAV;
-        DevReadThread * m_threadObject;
-        std::thread m_readThread;
-        bool m_hasThread;
-        bool m_loading;
+        std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
+
+        std::set<unsigned> m_openedStreams;
+        Timer m_stopTimer;
+
+        std::map<uint8_t, bool> m_update;
+        unsigned m_newChannel;
 
         mutable const char * m_errorStr;
         nxcip::CameraInfo m_info;
 
         bool captureAnyRxDevice();
         RxDevicePtr captureFreeRxDevice();
-        void freeDevice();
+        void freeRx(bool reset = false);
 
         void initEncoders();
         void stopEncoders();
-
         void reloadMedia();
-        void tryLoad();
-
         bool stopStreams(bool force = false);
-        void stopTimer()
-        {
-            m_waitStop = false;
-            m_stopTime = 0;
-        }
-
-        std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum);
 
         typedef enum
         {
             STATE_NO_CAMERA,        // no Tx
-            STATE_NO_FREQUENCY,     // frequency not set
             STATE_NO_RECEIVER,      // no Rx for Tx
-            STATE_DEVICE_READY,     // got Rx for Tx
-            STATE_STREAM_LOADING,   // loading data streams
-            STATE_STREAM_READY,     // got data streams, no readers
-            STATE_STREAM_LOST,      //
-            STATE_STREAM_READING    // got readers
+            STATE_NOT_LOCKED,       // got Rx for Tx
+            STATE_NO_ENCODERS,      //
+            STATE_READY,            // got data streams, no readers
+            STATE_READING           // got readers
         } State;
 
         State checkState() const;
-
-        //
-
-        void getParamStr_Channel(std::string& s) const;
-        void getParamStr_Present(std::string& s) const;
-        void getParamStr_Strength(std::string& s) const;
-        void getParamStr_Quality(std::string& s) const;
-
-        void getParamStr_RxID(std::string& s) const;
-        void getParamStr_RxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().company; }
-        void getParamStr_RxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().supportHWInfo; }
-        void getParamStr_RxDriverVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().driverVersion; }
-        void getParamStr_RxAPIVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().APIVersion; }
-        void getParamStr_RxFwVer(std::string& s) const
-        {
-            if (m_rxDevice)
-            {
-                s = m_rxDevice->rxDriverInfo().fwVersionLink;
-                s += "-";
-                s += m_rxDevice->rxDriverInfo().fwVersionOFDM;
-            }
-        }
-
-        void getParamStr_TxHwID(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().hardwareId; }
-        void getParamStr_TxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().companyName; }
-        void getParamStr_TxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().modelName; }
-        void getParamStr_TxSerial(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().serialNumber; }
-        void getParamStr_TxFwVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().firmwareVersion; }
-
-        bool setParam_Channel(std::string& s);
+        State tryLoad();
     };
 }
 

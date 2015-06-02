@@ -97,7 +97,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
 
-        QnResourcePtr rpResource = qnResPool->getResourceByUniqId(newNetRes->getUniqueId());
+        QnResourcePtr rpResource = qnResPool->getResourceByUniqueId(newNetRes->getUniqueId());
         if (!rpResource) {
             ++it; // keep new resource in a list
             continue;

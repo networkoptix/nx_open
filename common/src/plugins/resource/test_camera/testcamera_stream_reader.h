@@ -8,7 +8,6 @@
 #include "testcamera_resource.h"
 #include "utils/network/socket.h"
 #include "utils/network/rtpsession.h"
-#include "utils/network/h264_rtp_parser.h"
 
 class QnTestCameraStreamReader: public CLServerPushStreamReader
 {
@@ -18,12 +17,10 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual CameraDiagnostics::Result openStream() override;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
 
-    virtual void updateStreamParamsBasedOnQuality() override;
-    virtual void updateStreamParamsBasedOnFps() override;
     int receiveData(quint8* buffer, int size);
 private:
     std::unique_ptr<AbstractStreamSocket> m_tcpSock;

@@ -5,6 +5,7 @@
 
 #include "uuid.h"
 
+#include <type_traits>
 
 QnUuid::QnUuid()
 {
@@ -78,6 +79,17 @@ QnUuid QnUuid::fromRfc4122( const QByteArray& bytes )
     return _uuid;
 }
 
+QnUuid QnUuid::fromHardwareId( const QByteArray& bytes )
+{
+    if (bytes.length() != 34)
+        return QnUuid();
+
+    QString hwid = QLatin1String(bytes);
+    return QnUuid(lit("%1-%2-%3-%4-%5")
+        .arg(hwid.mid(2, 8)).arg(hwid.mid(10, 4)).arg(hwid.mid(14, 4))
+        .arg(hwid.mid(18, 4)).arg(hwid.mid(22, 12)));
+}
+
 QnUuid QnUuid::createUuid()
 {
     QnUuid _uuid;
@@ -88,6 +100,13 @@ QnUuid QnUuid::createUuid()
 QnUuid QnUuid::fromStringSafe(const QString &uuid)
 {
     return QnUuid(QUuid(uuid));
+}
+
+QnUuid QnUuid::createUuidFromPool(const QUuid &baseId, uint offset) {
+    static_assert(sizeof(uint) <= sizeof(decltype(QUuid::data1)), "Offset type must be not greater than storage field size.");
+    QUuid result = baseId;
+    result.data1 += offset;
+    return QnUuid(result);
 }
 
 uint qHash( const QnUuid& uuid, uint seed ) throw()

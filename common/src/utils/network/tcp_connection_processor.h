@@ -15,6 +15,9 @@ class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:
+    static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
+
+
     QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket);
     virtual ~QnTCPConnectionProcessor();
 
@@ -40,7 +43,17 @@ public:
     bool sendBuffer(const QnByteArray& sendBuffer);
     bool sendBuffer(const QByteArray& sendBuffer);
 
+    /*!
+        \bug In case of interleaved requests, this method reads everything after first HTTP request as message body
+    */
     bool readRequest();
+    /*!
+        Reads single HTTP request. To be used when HTTP interleaving is required
+        \note After return of this method there is already-parsed request in d->request. 
+            No need to call QnTCPConnectionProcessor::parseRequest
+        \note \a d->clientRequest is not filled by this method!
+    */
+    bool readSingleRequest();
     virtual void parseRequest();
 
     virtual bool isTakeSockOwnership() const { return false; }
@@ -77,6 +90,8 @@ protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 
     QnTCPConnectionProcessorPrivate *d_ptr;
+
+    bool isConnectionCanBePersistent() const;
 };
 
 #endif // __TCP_CONNECTION_PROCESSOR_H__

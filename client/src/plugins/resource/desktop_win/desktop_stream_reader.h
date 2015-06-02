@@ -18,13 +18,11 @@ public:
     virtual ~QnDesktopStreamreader();
 
 protected:
-    virtual QnAbstractMediaDataPtr getNextData();
-    virtual CameraDiagnostics::Result openStream();
-    virtual void closeStream();
-    virtual bool isStreamOpened() const;
-    
-    virtual void updateStreamParamsBasedOnQuality() override {}
-    virtual void updateStreamParamsBasedOnFps() override {}
+    virtual QnAbstractMediaDataPtr getNextData() override;
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
+    virtual void closeStream() override;
+    virtual bool isStreamOpened() const override;
+    virtual void pleaseReopenStream() override {}
 
 private:
     bool init();

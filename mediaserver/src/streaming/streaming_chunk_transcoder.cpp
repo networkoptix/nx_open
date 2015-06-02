@@ -29,7 +29,7 @@ static const double MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS = 30*1000*1000;
 static const int TRANSCODE_THREAD_COUNT = 1;
 static const int USEC_IN_MSEC = 1000;
 static const int MSEC_IN_SEC = 1000;
-static const int MICROS_IN_SECOND = MSEC_IN_SEC*USEC_IN_MSEC;
+//static const int MICROS_IN_SECOND = MSEC_IN_SEC*USEC_IN_MSEC;
 
 StreamingChunkTranscoder::TranscodeContext::TranscodeContext()
 :
@@ -77,7 +77,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     StreamingChunkPtr chunk )
 {
     //searching for resource
-    QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( transcodeParams.srcResourceUniqueID() );
+    QnResourcePtr resource = qnResPool->getResourceByUniqueId( transcodeParams.srcResourceUniqueID() );
     if( !resource )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found").

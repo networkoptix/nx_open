@@ -1,31 +1,41 @@
+#include "ref_counter.h"
+#include "rx_device.h"
+
 #include "camera_manager.h"
 #include "stream_reader.h"
 #include "media_encoder.h"
 
-#include "discovery_manager.h"
+namespace
+{
+    void validate(nxcip::LiveStreamConfig& config, const nxcip::LiveStreamConfig& prev)
+    {
+        static const int MIN_BITRATE_KBPS = 200;
+
+        if (config.width <= 0 || config.height <= 0)
+        {
+            config.width = prev.width;
+            config.height = prev.height;
+        }
+
+        if (config.framerate <= 0)
+            config.framerate = prev.framerate;
+
+        if (config.bitrateKbps < 0)
+            config.bitrateKbps = prev.bitrateKbps;
+        if (config.bitrateKbps < MIN_BITRATE_KBPS)
+            config.bitrateKbps = MIN_BITRATE_KBPS;
+    }
+}
 
 namespace ite
 {
-#if 1
+    INIT_OBJECT_COUNTER(MediaEncoder)
     DEFAULT_REF_COUNTER(MediaEncoder)
-#else
-    unsigned int MediaEncoder::addRef()
-    {
-        unsigned count = m_refManager.addRef();
-        return count;
-    }
-
-    unsigned int MediaEncoder::releaseRef()
-    {
-        unsigned count = m_refManager.releaseRef();
-        return count;
-    }
-#endif
 
     MediaEncoder::MediaEncoder(CameraManager * const cameraManager, int encoderNumber)
-    :   m_refManager( this ),
-        m_cameraManager( cameraManager ),
-        m_encoderNumber( encoderNumber )
+    :   m_refManager(this),
+        m_cameraManager(cameraManager),
+        m_encoderNumber(encoderNumber)
     {
     }
 
@@ -33,8 +43,13 @@ namespace ite
     {
     }
 
-    void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
+    void * MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
     {
+        if (interfaceID == nxcip::IID_CameraMediaEncoder3)
+        {
+            addRef();
+            return static_cast<nxcip::CameraMediaEncoder3*>(this);
+        }
         if (interfaceID == nxcip::IID_CameraMediaEncoder2)
         {
             addRef();
@@ -54,53 +69,98 @@ namespace ite
         return nullptr;
     }
 
-    int MediaEncoder::getMediaUrl( char* urlBuf ) const
+    int MediaEncoder::getMediaUrl(char * ) const
     {
-        strcpy( urlBuf, m_cameraManager->url() );
-        return nxcip::NX_NO_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
-    int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const
+    int MediaEncoder::getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const
     {
-        infoList[0] = m_resolution;
+        nxcip::ResolutionInfo res;
+
+        std::shared_ptr<RxDevice> rxDev = m_cameraManager->rxDevice().lock();
+        if (rxDev)
+            rxDev->resolution(m_encoderNumber, res.resolution.width, res.resolution.height, res.maxFps);
+        else
+            RxDevice::resolutionPassive(m_encoderNumber, res.resolution.width, res.resolution.height, res.maxFps);
+
+        infoList[0] = res;
         *infoListCount = 1;
-
         return nxcip::NX_NO_ERROR;
     }
 
-    int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
+    int MediaEncoder::getMaxBitrate(int * maxBitrate) const
     {
-        *maxBitrate = 0;
+        static const unsigned MAX_BITRATE_KBPS = 12000;
+
+        *maxBitrate = MAX_BITRATE_KBPS;
         return nxcip::NX_NO_ERROR;
     }
 
-    int MediaEncoder::setResolution( const nxcip::Resolution& resolution )
+    int MediaEncoder::setResolution(const nxcip::Resolution& )
     {
-        if (resolution.height != m_resolution.resolution.height || resolution.width != m_resolution.resolution.width)
-            return nxcip::NX_UNSUPPORTED_RESOLUTION;
-        return nxcip::NX_NO_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
-    int MediaEncoder::setFps( const float& /*fps*/, float* selectedFps )
+    int MediaEncoder::setFps(const float& , float * )
     {
-        *selectedFps = m_resolution.maxFps;
-        return nxcip::NX_NO_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
-    int MediaEncoder::setBitrate( int /*bitrateKbps*/, int* /*selectedBitrateKbps*/ )
+    int MediaEncoder::setBitrate(int , int * )
     {
-        return nxcip::NX_NO_ERROR;
-    }
-
-    nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
-    {
-        StreamReader * stream = new StreamReader(m_cameraManager, m_encoderNumber);
-        //stream->addRef();
-        return stream;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
     int MediaEncoder::getAudioFormat( nxcip::AudioFormat* /*audioFormat*/ ) const
     {
-        return nxcip::NX_UNSUPPORTED_CODEC;
+        return nxcip::NX_NOT_IMPLEMENTED;
+    }
+
+    int MediaEncoder::getVideoFormat(nxcip::CompressionType * codec, nxcip::PixelFormat * pixelFormat) const
+    {
+        return nxcip::NX_NOT_IMPLEMENTED;
+    }
+
+    nxcip::StreamReader * MediaEncoder::getLiveStreamReader()
+    {
+        StreamReader * stream = new StreamReader(m_cameraManager, m_encoderNumber);
+        return stream;
+    }
+
+    int MediaEncoder::getConfiguredLiveStreamReader(nxcip::LiveStreamConfig * config, nxcip::StreamReader ** ppStream)
+    {
+        if (!config)
+            return nxcip::NX_INVALID_PARAM_VALUE;
+
+        *ppStream = nullptr;
+        RxDevicePtr rxDev = m_cameraManager->rxDevice().lock();
+        if (! rxDev)
+            return nxcip::NX_OTHER_ERROR;
+
+        // config in a first arrived stream, another is locked
+        if (! rxDev->configureTx(m_encoderNumber)) // delay inside
+            return nxcip::NX_TRY_AGAIN;
+
+        nxcip::LiveStreamConfig curConfig;
+        memset(&curConfig, 0, sizeof(nxcip::LiveStreamConfig));
+        //curConfig.codec = nxcip::CODEC_ID_H264;
+
+        if (! rxDev->getEncoderParams(m_encoderNumber, curConfig))
+            return nxcip::NX_TRY_AGAIN;
+
+        validate(*config, curConfig);
+
+        if (curConfig.framerate != config->framerate ||
+            curConfig.bitrateKbps != config->bitrateKbps)
+        {
+            if (! rxDev->setEncoderParams(m_encoderNumber, *config))
+                return nxcip::NX_INVALID_PARAM_VALUE;
+        }
+
+        *ppStream = getLiveStreamReader();
+        if (*ppStream == nullptr)
+            return nxcip::NX_OTHER_ERROR;
+        return nxcip::NX_NO_ERROR;
     }
 }

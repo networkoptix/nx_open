@@ -59,15 +59,6 @@ QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
     return 0;
 }
 
-QString QnAppServerConnectionFactory::clientGuid()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_clientGuid;
-    }
-
-    return QString();
-}
-
 QUrl QnAppServerConnectionFactory::url() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
@@ -78,14 +69,6 @@ QUrl QnAppServerConnectionFactory::url() {
 
     return QUrl();
 }
-
-void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_clientGuid = guid;
-    }
-}
-
 
 void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
     if (url.isValid())

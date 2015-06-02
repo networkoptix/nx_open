@@ -171,7 +171,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
                 streamID = m_streamParam.value("streamID").toInt();
                 //bitrate = m_streamParam.value("Bitrate").toInt();
-                bitrate = getBitrate();
+                bitrate = getBitrateMbps();
             }
             //=========
 

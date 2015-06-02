@@ -232,6 +232,7 @@ namespace nx_http
     namespace Method
     {
         extern const StringType GET;
+        extern const StringType HEAD;
         extern const StringType POST;
         extern const StringType PUT;
     }
@@ -251,6 +252,10 @@ namespace nx_http
         {
             return protocol == right.protocol
                 && version == right.version;
+        }
+        bool operator!=( const MimeProtoVersion& right ) const
+        {
+            return !(*this == right);
         }
     };
 
@@ -283,6 +288,8 @@ namespace nx_http
         void serialize( BufferType* const dstBuffer ) const;
     };
 
+    void serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer );
+
     class Request
     {
     public:
@@ -292,7 +299,11 @@ namespace nx_http
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
+        /*!
+            \note Adds \r\n headers/body separator
+        */
         void serialize( BufferType* const dstBuffer ) const;
+        BufferType serialized() const;
 
         BufferType getCookieValue(const BufferType& name) const;
     };
@@ -312,7 +323,6 @@ namespace nx_http
 
     namespace MessageType
     {
-        // TODO: #Elric #enum
         enum Value
         {
             none,
@@ -412,11 +422,15 @@ namespace nx_http
 
             Authorization();
             Authorization( const AuthScheme::Value& authSchemeVal );
+            Authorization( Authorization&& right );
             ~Authorization();
+
+            Authorization& operator=( Authorization&& right );
 
             bool parse( const BufferType& str );
             void serialize( BufferType* const dstBuffer ) const;
             StringType toString() const;
+            void clear();
 
         private:
             Authorization( const Authorization& );
@@ -581,6 +595,11 @@ namespace nx_http
         */
         int serialize( BufferType* const dstBuffer ) const;
     };
+
+    //!Returns common value for User-Agent header
+    StringType userAgentString();
+    //!Returns common value for Server header
+    StringType serverString();
 }
 
 #endif  //HTTPTYPES_H

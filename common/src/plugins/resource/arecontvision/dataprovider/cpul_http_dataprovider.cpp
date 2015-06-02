@@ -80,7 +80,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
             {
                 streamID = m_streamParam.value("streamID").toInt();
                 //bitrate = m_streamParam.get("Bitrate").value.value;
-                bitrate = getBitrate();
+                bitrate = getBitrateMbps();
             }
             //=========
 

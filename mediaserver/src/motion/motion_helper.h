@@ -32,7 +32,7 @@ public:
     static QList<QDate> recordedMonth(const QString& cameraUniqueId);
 
     QnMotionHelper();
-
+    static QString getBaseDir();
 private:
     static QString getBaseDir(const QString& cameraUniqueId);
 
@@ -46,7 +46,7 @@ private:
         qint64 msStartTime,
         qint64 msEndTime,
         int detailLevel,
-        QVector<QnTimePeriodList>* const timePeriods );
+        std::vector<QnTimePeriodList>* const timePeriods );
 
 private:
     typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;

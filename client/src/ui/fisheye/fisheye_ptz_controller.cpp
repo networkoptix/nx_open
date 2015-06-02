@@ -74,8 +74,11 @@ void QnFisheyePtzController::updateLimits() {
     qreal minY = m_mediaDewarpingParams.yCenter - radiusY;
     qreal maxY = m_mediaDewarpingParams.yCenter + radiusY;
 
+#if 0
+     // not tested yet. Also, I am not sure that it's needed for real cameras
     qreal minX = m_mediaDewarpingParams.xCenter - m_mediaDewarpingParams.radius;
     qreal maxX = m_mediaDewarpingParams.xCenter + m_mediaDewarpingParams.radius;
+#endif
 
     if(m_mediaDewarpingParams.viewMode == QnMediaDewarpingParams::Horizontal) {
         m_unlimitedPan = false;

@@ -1,18 +1,18 @@
 #ifndef ITE_STREAM_READER_H
 #define ITE_STREAM_READER_H
 
-#include <atomic>
-
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
 #include "ref_counter.h"
-#include "camera_manager.h"
 
 namespace ite
 {
+    class CameraManager;
+    class ContentPacket;
+
     //!
-    class StreamReader : public nxcip::StreamReader
+    class StreamReader : public nxcip::StreamReader, public ObjectCounter<StreamReader>
     {
         DEF_REF_COUNTER
 
@@ -28,8 +28,11 @@ namespace ite
         //
 
     private:
-        CameraManager* m_cameraManager;
+        CameraManager * m_cameraManager;
         int m_encoderNumber;
+        bool m_interrupted;
+
+        std::shared_ptr<ContentPacket> nextPacket();
     };
 }
 

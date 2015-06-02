@@ -2,11 +2,18 @@
 #define ITE_DEVICE_H
 
 #include <memory>
+#include <mutex>
 
 extern "C"
 {
-#include "DTVAPI.h"
+#if defined( DTVAPI_V14 )
+ #include "dtvapi_v14/DTVAPI.h"
+#elif defined( DTVAPI_V15 )
+ #include "dtvapi_v15/DTVAPI.h"
+#endif
 }
+
+#include "rc_command.h"
 
 namespace ite
 {
@@ -20,6 +27,35 @@ namespace ite
         char supportHWInfo[32];
     };
 
+    struct Pacidal
+    {
+        enum
+        {
+            PID_VIDEO_FHD = 0x111,
+            PID_VIDEO_HD = 0x121,
+            PID_VIDEO_SD = 0x131,
+            PID_VIDEO_CIF = 0x141
+        };
+    };
+
+    ///
+    class DtvException
+    {
+    public:
+        /// @warning static strings only
+        DtvException(const char * msg, unsigned code)
+        :   m_msg(msg),
+            m_code(code)
+        {}
+
+        const char * what() const { return m_msg; }
+        unsigned code() const { return m_code; }
+
+    private:
+        const char * m_msg;
+        unsigned m_code;
+    };
+
     /// ITE DVB-T receiver
     ///
     /// RX Setting (from driver readme):
@@ -30,9 +66,10 @@ namespace ite
     class It930x
     {
     public:
-        //static const unsigned MPEG_TS_PACKET_SIZE = 188;
-        static const unsigned DEFAULT_PACKETS_NUM = 816;
-        static const unsigned RETURN_CHANNEL_PID = 0x201;
+        enum
+        {
+            PID_RETURN_CHANNEL = 0x201
+        };
 
         typedef enum
         {
@@ -48,8 +85,9 @@ namespace ite
             It930Stream(const It930x * p)
             :   m_parent(p)
             {
-                if (DTV_StartCapture(m_parent->m_handle))
-                    throw "DTV_StartCapture";
+                unsigned ret = DTV_StartCapture(m_parent->m_handle);
+                if (ret)
+                    throw DtvException("DTV_StartCapture", ret);
             }
 
             ~It930Stream()
@@ -77,89 +115,68 @@ namespace ite
             PIDTable
         } Option;
 
-        //static unsigned bufferSize(unsigned numPackets = DEFAULT_PACKETS_NUM) { return numPackets * MPEG_TS_PACKET_SIZE; }
-
         //
 
         It930x(uint16_t rxID)
         :   m_rxID(rxID)
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             m_handle = DTV_DeviceOpen(ENDEAVOUR, rxID);
             if (m_handle < 0)
-                throw "DTV_DeviceOpen";
+                throw DtvException("DTV_DeviceOpen", rxID);
         }
 
         ~It930x()
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             m_devStream.reset();
             DTV_DeviceClose(m_handle);
         }
 
-        void enable(Option opt)
-        {
-            switch (opt)
-            {
-            case NullPacketFilter:
-                setNullPacketFilter(true);
-                break;
-
-            case PIDTable:
-                if (DTV_EnablePIDTable(m_handle))
-                    throw "DTV_EnablePIDTable";
-                break;
-            }
-        }
-
-        void disable(Option opt)
-        {
-            switch (opt)
-            {
-            case NullPacketFilter:
-                setNullPacketFilter(false);
-                break;
-
-            case PIDTable:
-                if (DTV_DisablePIDTable(m_handle))
-                    throw "DTV_DisablePIDTable";
-                break;
-            }
-        }
-
-        /// @param idx = 0..31
-        bool pidFilterAdd(uint8_t idx, short programID) { return 0 == DTV_AddPID(m_handle, idx, programID); }
-        bool pidFilterRemove(uint8_t idx, short programID) { return 0 == DTV_RemovePID(m_handle, idx, programID); }
-        bool pidFilterReset() { return 0 == DTV_ResetPIDTable(m_handle); }
-
         // both in KHz
-        void lockChannel(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
+        void lockFrequency(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
         {
-            closeStream();
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
 
-            unsigned result = DTV_AcquireChannel(m_handle, frequency, bandwidth);
-            if (result)
-                throw "DTV_AcquireChannel";
+            if (m_devStream)
+                throw DtvException("It930x.lockFrequency()", 0);
+
+            unsigned ret = DTV_AcquireChannel(m_handle, frequency, bandwidth);
+            if (ret)
+                throw DtvException("DTV_AcquireChannel", ret);
 
             Bool isLocked = False;
-            result = DTV_IsLocked(m_handle, &isLocked);
-            if (result)
-                throw "DTV_IsLocked";
+            ret = DTV_IsLocked(m_handle, &isLocked);
+            if (ret)
+                throw DtvException("DTV_IsLocked", ret);
 
-            openStream();
+            m_devStream.reset( new It930Stream(this) );
         }
 
+        void unlockFrequency()
+        {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
+            m_devStream.reset();
+        }
+#if 0
         bool isLocked() const
         {
             Bool locked = False;
             unsigned result = DTV_IsLocked(m_handle, &locked);
             return !result && (locked == True);
         }
-
+#endif
         void statistic(uint8_t& quality, uint8_t& strength, bool& presented, bool& locked) const
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             DTVStatistic statisic;
-            unsigned result = DTV_GetStatistic(m_handle, &statisic);
-            if (result)
-                throw "DTV_GetStatistic";
+            unsigned ret = DTV_GetStatistic(m_handle, &statisic);
+            if (ret)
+                throw DtvException("DTV_GetStatistic", ret);
 
             quality = statisic.signalQuality;
             strength = statisic.signalStrength;
@@ -169,12 +186,14 @@ namespace ite
 
         void info(IteDriverInfo& info)
         {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
             memset(&info, 0, sizeof(IteDriverInfo));
 
             DemodDriverInfo driverInfo;
-            int result = DTV_GetDriverInformation(m_handle, &driverInfo);
-            if (result)
-                return;
+            int ret = DTV_GetDriverInformation(m_handle, &driverInfo);
+            if (ret)
+                throw DtvException("DTV_GetDriverInformation", ret);
 
             strncpy(info.driverVersion, (const char *)driverInfo.DriverVersion, 16);
             strncpy(info.APIVersion,    (const char *)driverInfo.APIVersion, 32);
@@ -184,31 +203,53 @@ namespace ite
             strncpy(info.supportHWInfo, (const char *)driverInfo.SupportHWInfo, 32);
         }
 
+        void rxReset()
+        {
+#if 0
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
+            Byte value = 1; // some magic value from sample
+            int ret = DTV_RX_Reset(m_handle, &value);
+            if (ret)
+                throw DtvException("DTV_RX_Reset", ret);
+#endif
+        }
+
+        void sendRcPacket(const RcPacket& cmd)
+        {
+            std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
+            int ret = DTV_SendRC(m_handle, cmd.rawData(), cmd.rawSize());
+            if (ret)
+                throw DtvException("DTV_SendRC", ret);
+        }
+
         int read(uint8_t * buf, int size)
         {
+            //std::lock_guard<std::mutex> lock(m_mutex); // LOCK
+
             if (m_devStream)
                 return m_devStream->read(buf, size);
             return -1;
         }
 
         bool hasStream() const { return m_devStream.get(); }
-        void openStream() { m_devStream.reset( new It930Stream(this) ); }
-        void closeStream() { m_devStream.reset(); }
 
     private:
+        static std::mutex m_rcMutex;
         int m_handle;
         uint16_t m_rxID;
         std::unique_ptr<It930Stream> m_devStream;
 
-#if 0 // TODO: use it instead of ID from unix device name
+#if 0
         void getDeviceID() const
         {
             Word rxDeviceID = 0xFFFF;
-            unsigned result = DTV_GetDeviceID(handle_, &rxDeviceID);
-            if (result)
-                throw "DTV_GetDeviceID";
+            unsigned ret = DTV_GetDeviceID(m_handle, &rxDeviceID);
+            if (ret)
+                throw DtvException("DTV_GetDeviceID", ret);
         }
-#endif
+
         void setNullPacketFilter(bool flag)
         {
             PIDFilter pidFilter;
@@ -216,10 +257,11 @@ namespace ite
             pidFilter.newPID[0] = 0x1FFF;
             pidFilter.tableLen = (flag) ? 1 : 0;
 
-            unsigned result = DTV_NULLPacket_Pilter(m_handle, &pidFilter);
-            if (result)
-                throw "NULL Packet Filter";
+            unsigned ret = DTV_NULLPacket_Pilter(m_handle, &pidFilter);
+            if (ret)
+                throw DtvException("DTV_NULLPacket_Pilter", ret);
         }
+#endif
     };
 }
 

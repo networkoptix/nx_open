@@ -59,14 +59,8 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
     if (result!=CL_HTTP_SUCCESS)
         return result;
 
-    char c_response[200];
-    int result_size =  http.read(c_response,sizeof(c_response));
-
-    if (result_size <0)
-        return CL_TRANSPORT_ERROR;
-
-    QByteArray arr = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
-
+    QByteArray arr;
+    http.readAll(arr);
     int index = arr.indexOf('=');
     if (index==-1)
         return CL_TRANSPORT_ERROR;
@@ -298,22 +292,6 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
-    //detecting and saving selected resolutions
-    /*
-    CameraMediaStreams mediaStreams;
-    const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo(
-        PRIMARY_ENCODER_INDEX,
-        QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()),
-        streamCodec ) );
-    QString hasDualStreaming = getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME);
-    if( hasDualStreaming.toInt() > 0 )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo(
-            SECONDARY_ENCODER_INDEX,
-            QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2),
-            streamCodec ) );
-    saveMediaStreamInfoIfNeeded( mediaStreams );
-    */
     setFirmware(firmwareVersion);
     saveParams();
 
@@ -366,22 +344,15 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &id, QString &valu
     QString request = lit("get?") + id;
 
     CLHttpStatus status = connection.doGET(request);
-    if (status == CL_HTTP_AUTH_REQUIRED)
+    if (status == CL_HTTP_AUTH_REQUIRED && !getId().isNull())
         setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)
         return false;
         
 
-    char c_response[MAX_RESPONSE_LEN];
-
-    int result_size =  connection.read(c_response,sizeof(c_response));
-
-    if (result_size <0)
-        return false;
-
-    QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
-
+    QByteArray response;
+    connection.readAll(response);
     int index = response.indexOf('=');
     if (index==-1)
         return false;

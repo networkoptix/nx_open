@@ -106,13 +106,23 @@ bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
 }
 
 bool QnThirdPartyResource::setParamPhysical(const QString& id, const QString &value) {
+    return setParam( id.toUtf8().constData(), value.toUtf8().constData() );
+}
+
+bool QnThirdPartyResource::setParamsBegin() {
+    return setParam("", "{");   // TODO: describe in iface
+}
+
+bool QnThirdPartyResource::setParamsEnd() {
+    return setParam("", "}");   // TODO: describe in iface
+}
+
+bool QnThirdPartyResource::setParam(const char * id, const char * value) {
     SCOPED_MUTEX_LOCK( lk, &m_mutex );
     if( !m_cameraManager3 )
         return false;
 
-    return m_cameraManager3->setParamValue(
-        id.toUtf8().constData(),
-        value.toUtf8().constData() ) == nxcip::NX_NO_ERROR;
+    return m_cameraManager3->setParamValue( id, value ) == nxcip::NX_NO_ERROR;
 }
 
 
@@ -316,7 +326,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         nxcip::UsecUTCTimestamp periodEnd = nxcip::INVALID_TIMESTAMP_VALUE;
         timePeriods->get( &periodStart, &periodEnd );
 
-        resultTimePeriods << QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS );
+        resultTimePeriods.push_back(QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS ));
     }
     timePeriods->releaseRef();
 
@@ -549,7 +559,11 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
+#else
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("hardwaregrid"));
+#endif
     }
     else
     {
@@ -643,7 +657,14 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
             if( QnCameraAdvacedParamsXmlParser::validateXml(&dataSource)) {
                 //parsing xml to load param list and get cameraID
                 QnCameraAdvancedParams params;
-				if (QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params))
+                bool success = QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params);
+#ifdef _DEBUG
+                if (!success) {
+                    qWarning() << "Error while parsing xml for the camera" << getPhysicalId();
+                    qWarning() << paramDescXML;
+                }
+#endif
+				if (success)
                     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), params);
             }
             else {
@@ -656,8 +677,6 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         SCOPED_MUTEX_LOCK( lk, &m_mutex );
         m_selectedEncoderResolutions = std::move( selectedEncoderResolutions );
     }
-
-    //saveMediaStreamInfoIfNeeded( mediaStreams );
 
     saveParams();
 

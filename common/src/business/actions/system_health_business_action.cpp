@@ -11,7 +11,7 @@ QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::Messa
 {
     QnBusinessEventParameters runtimeParams;
     runtimeParams.eventType = QnBusiness::EventType(QnBusiness::SystemHealthEvent + message);
-    runtimeParams.eventTimestamp = qnSyncTime->currentUSecsSinceEpoch();
+    runtimeParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
     runtimeParams.eventResourceId = eventResourceId;
     setRuntimeParams(runtimeParams);
 

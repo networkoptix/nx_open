@@ -79,12 +79,12 @@ qint64 QnSyncPlayArchiveDelegate::seek (qint64 time, bool findIFrame)
     return m_ownerDelegate->seek(time, findIFrame);
 }
 
-QnResourceVideoLayoutPtr QnSyncPlayArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr QnSyncPlayArchiveDelegate::getVideoLayout()
 {
     return m_ownerDelegate->getVideoLayout();
 }
 
-QnResourceAudioLayoutPtr QnSyncPlayArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr QnSyncPlayArchiveDelegate::getAudioLayout()
 {
     return m_ownerDelegate->getAudioLayout();
 }

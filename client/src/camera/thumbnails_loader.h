@@ -39,10 +39,12 @@ public:
      *  \param mode                     Working mode. In default mode loader will adjust given time periods (add margins, etc) to show thumbnails 
      *                                  from the middle of the each given period. In strict mode thumbnail is taken from the beginning of the period.
      */
-    QnThumbnailsLoader(const QnResourcePtr &resource, Mode mode = Mode::Default);
+    QnThumbnailsLoader(const QnMediaResourcePtr &resource, Mode mode = Mode::Default);
     virtual ~QnThumbnailsLoader();
 
-    QnResourcePtr resource() const;
+    static bool supportedResource(const QnMediaResourcePtr &resource);
+
+    QnMediaResourcePtr resource() const;
 
     void setBoundingSize(const QSize &size);
     QSize boundingSize() const;
@@ -102,7 +104,7 @@ private:
     friend class QnThumbnailsLoaderHelper;
 
     mutable QnMutex m_mutex;
-    const QnResourcePtr m_resource;
+    const QnMediaResourcePtr m_resource;
     const Mode m_mode;
 
     QList<QnAbstractArchiveDelegatePtr> m_delegates;

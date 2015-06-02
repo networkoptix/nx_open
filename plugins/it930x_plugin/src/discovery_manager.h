@@ -15,7 +15,7 @@ namespace ite
     class CameraManager;
 
     //!
-    class DiscoveryManager : public nxcip::CameraDiscoveryManager
+    class DiscoveryManager : public nxcip::CameraDiscoveryManager, public ObjectCounter<DiscoveryManager>
     {
         DEF_REF_COUNTER
 
@@ -38,11 +38,6 @@ namespace ite
         virtual int fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, nxcip::CameraInfo* cameraInfo ) override;
         virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
         virtual int getReservedModelList( char** modelList, int* count ) override;
-
-        //
-
-        static nxpt::CommonRefManager * refManager() { return &(Instance->m_refManager); }
-        static DiscoveryManager * instance() { return Instance; }
 
     private:
         static DiscoveryManager * Instance;

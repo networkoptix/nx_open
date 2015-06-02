@@ -115,13 +115,13 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
 }
 
 int QnConfigureRestHandler::changePort(int port) {
-    if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT).toInt())
+    if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt())
         return ResultSkip;
 
     if (port < 0)
         return ResultFail;
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
         return ResultFail;
 

@@ -58,6 +58,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxPrimaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
+    connect(ui->checkBoxBitratePerGOP, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxSecondaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
 
@@ -91,15 +92,14 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     bool isFirstControl = true;
     
     int primaryRecorderDisabled = -1;
+    int bitratePerGopPresent = -1;
     int secondaryRecorderDisabled = -1;
     bool samePrimaryRec = true;
+    bool sameBitratePerGOP = true;
     bool sameSecRec = true;
 
     bool sameRtpTransport = true;
     QString rtpTransport;
-
-    bool sameMotionStream = true;
-    QString motionStream;
 
     int camCnt = 0;
     foreach(const QnVirtualCameraResourcePtr &camera, cameras) 
@@ -138,15 +138,16 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         else if (primaryRecorderDisabled != primaryRecDisabled)
             samePrimaryRec = false;
 
+        int bitratePerGop = camera->getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt();
+        if (bitratePerGopPresent == -1)
+            bitratePerGopPresent = bitratePerGop;
+        else if (bitratePerGopPresent != bitratePerGop)
+            sameBitratePerGOP = false;
+
         QString camRtpTransport = camera->getProperty(QnMediaResource::rtpTransportKey());
         if (camRtpTransport != rtpTransport && camCnt > 0)
             sameRtpTransport = false;
         rtpTransport = camRtpTransport;
-
-        QString camMotionStream = camera->getProperty(QnMediaResource::motionStreamKey());
-        if (camMotionStream != motionStream && camCnt > 0)
-            sameMotionStream = false;
-        motionStream = camMotionStream;
 
         camCnt++;
     }
@@ -168,6 +169,11 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         ui->checkBoxPrimaryRecorder->setChecked(primaryRecorderDisabled);
     else
         ui->checkBoxPrimaryRecorder->setCheckState(Qt::PartiallyChecked);
+
+    if (sameBitratePerGOP)
+        ui->checkBoxBitratePerGOP->setChecked(bitratePerGopPresent);
+    else
+        ui->checkBoxBitratePerGOP->setCheckState(Qt::PartiallyChecked);
 
     ui->checkBoxSecondaryRecorder->setEnabled(anyHasDualStreaming);
     if (anyHasDualStreaming) {
@@ -198,6 +204,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
             && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
+            && ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
             && ui->comboBoxTransport->currentIndex() == 0;
 
@@ -228,6 +235,8 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
 
         if (ui->checkBoxPrimaryRecorder->checkState() != Qt::PartiallyChecked)
             camera->setProperty(QnMediaResource::dontRecordPrimaryStreamKey(), ui->checkBoxPrimaryRecorder->isChecked() ? lit("1") : lit("0"));
+        if (ui->checkBoxBitratePerGOP->checkState() != Qt::PartiallyChecked)
+            camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, ui->checkBoxBitratePerGOP->isChecked() ? lit("1") : lit("0"));
         if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreaming())
             camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), ui->checkBoxSecondaryRecorder->isChecked() ? lit("1") : lit("0"));
 
@@ -259,6 +268,7 @@ void QnCameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->qualityOverrideCheckBox->setChecked(true);
     ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityMedium));
     ui->checkBoxPrimaryRecorder->setChecked(false);
+    ui->checkBoxBitratePerGOP->setChecked(false);
     ui->checkBoxSecondaryRecorder->setChecked(false);
     ui->comboBoxTransport->setCurrentIndex(0);
 }

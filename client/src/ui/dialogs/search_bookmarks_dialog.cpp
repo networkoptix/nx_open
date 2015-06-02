@@ -3,6 +3,8 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 
+#include <core/resource/camera_resource.h>
+
 #include <ui/models/search_bookmarks_model.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 
@@ -30,7 +32,7 @@ private:
     const UiImpl m_ui;
     QnSearchBookmarksModel * const m_model;
 
-    QnResourceList m_cameras;
+    QnVirtualCameraResourceList m_cameras;
 };
 
 ///
@@ -117,7 +119,7 @@ void QnSearchBookmarksDialog::Impl::chooseCamera()
 
     if (dialog.exec() == QDialog::Accepted)
     {
-        m_cameras = dialog.selectedResources();
+        m_cameras = dialog.selectedResources().filtered<QnVirtualCameraResource>();
         m_model->setCameras(m_cameras);
         m_model->applyFilter(false);
 

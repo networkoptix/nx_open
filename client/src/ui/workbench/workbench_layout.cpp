@@ -3,6 +3,7 @@
 #include <limits>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
@@ -341,7 +342,7 @@ bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem *item, const QRect &geometry
         return false;
     }
 
-    if (qnSettings->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode())
         return true;
 
     if(item->isPinned()) {

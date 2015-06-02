@@ -42,7 +42,7 @@ using namespace nx_http;
 namespace nx_hls
 {
     static const size_t READ_BUFFER_SIZE = 64*1024;
-    static const int MIN_CHUNK_COUNT_IN_PLAYLIST = 3;
+    //static const int MIN_CHUNK_COUNT_IN_PLAYLIST = 3;
     static const int CHUNK_COUNT_IN_ARCHIVE_PLAYLIST = 3;
     static const QLatin1String HLS_PREFIX( "/hls/" );
     static const quint64 MSEC_IN_SEC = 1000;
@@ -51,7 +51,7 @@ namespace nx_hls
     static const unsigned int DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * 7;
     static const int COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO = 5;
     static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
-    static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
+    //static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
 
     QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*owner*/ )
     :
@@ -223,7 +223,7 @@ namespace nx_hls
         response.headers.insert( std::make_pair(
             "Date",
             QLocale(QLocale::English).toString(QDateTime::currentDateTime(), lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1() ) );
-        response.headers.insert( std::make_pair( "Server", (qApp->applicationName() + lit(" ") + QCoreApplication::applicationVersion()).toLatin1().data()) );
+        response.headers.emplace( "Server", nx_http::serverString() );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
 
         if( request.requestLine.version == nx_http::http_1_1 )
@@ -232,7 +232,7 @@ namespace nx_hls
                 response.headers.insert( std::make_pair( 
                     "Transfer-Encoding",
                     response.headers.find("Content-Length") != response.headers.end() ? "identity" : "chunked") );
-            response.headers.insert( std::make_pair( "Connection", "close" ) ); //no persistent connections support
+            response.headers.emplace( "Connection", "close" ); //no persistent connections support
         }
 
         sendResponse( response );
@@ -266,7 +266,7 @@ namespace nx_hls
         const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
 
         //searching for requested resource
-        QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( shortFileName.toString() );
+        QnResourcePtr resource = qnResPool->getResourceByUniqueId( shortFileName.toString() );
         if( !resource )
         {
             NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Requested resource %1 not found").

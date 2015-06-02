@@ -360,15 +360,6 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
     setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0);
-
-    //detecting and saving selected resolutions
-    /*
-    CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_resolution[0], CODEC_ID_H264 ) );
-    if( !m_resolution[1].isEmpty() )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_resolution[1], CODEC_ID_H264 ) );
-    saveMediaStreamInfoIfNeeded( mediaStreams );
-    */
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();

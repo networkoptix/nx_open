@@ -225,8 +225,12 @@ namespace ec2
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,
             const TimePriorityKey& remotePeerTimePriorityKey );
-        void onBeforeSendingHttpChunk( QnTransactionTransport* transport, std::vector<nx_http::ChunkExtension>* const extensions );
-        void onRecevingHttpChunkExtensions( QnTransactionTransport* transport, const std::vector<nx_http::ChunkExtension>& extensions );
+        void onBeforeSendingTransaction(
+            QnTransactionTransport* transport,
+            nx_http::HttpHeaders* const headers );
+        void onTransactionReceived(
+            QnTransactionTransport* transport,
+            const nx_http::HttpHeaders& headers );
         void broadcastLocalSystemTime( quint64 taskID );
         void checkIfManualTimeServerSelectionIsRequired( quint64 taskID );
         //!Periodically synchronizing time with internet (if possible)

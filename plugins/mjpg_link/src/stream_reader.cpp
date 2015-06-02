@@ -96,15 +96,18 @@ unsigned int StreamReader::releaseRef()
     return m_refManager.releaseRef();
 }
 
+static const unsigned int MAX_FRAME_DURATION_MS = 5000;
+
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     bool httpClientHasBeenJustCreated = false;
-    QSharedPointer<nx_http::HttpClient> localHttpClientPtr;
+    std::shared_ptr<nx_http::HttpClient> localHttpClientPtr;
     {
         SCOPED_MUTEX_LOCK( lk,  &m_mutex );
         if( !m_httpClient )
         {
-            m_httpClient = QSharedPointer<nx_http::HttpClient>( new nx_http::HttpClient() );
+            m_httpClient = std::make_shared<nx_http::HttpClient>();
+            m_httpClient->setMessageBodyReadTimeoutMs( MAX_FRAME_DURATION_MS );
             httpClientHasBeenJustCreated = true;
         }
         localHttpClientPtr = m_httpClient;
@@ -112,7 +115,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
     if( httpClientHasBeenJustCreated )
     {
-        const int result = doRequest( localHttpClientPtr.data() );
+        const int result = doRequest( localHttpClientPtr.get() );
         if( result != nxcip::NX_NO_ERROR )
             return result;
 
@@ -141,7 +144,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             {
                 if( !waitForNextFrameTime() )
                     return nxcip::NX_INTERRUPTED;
-                const int result = doRequest( localHttpClientPtr.data() );
+                const int result = doRequest( localHttpClientPtr.get() );
                 if( result != nxcip::NX_NO_ERROR )
                     return result;
             }

@@ -1,5 +1,7 @@
 #ifdef ENABLE_DROID
 
+#include "utils/network/h264_rtp_parser.h"
+
 #include "droid_stream_reader.h"
 #include "droid_resource.h"
 
@@ -70,8 +72,9 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
     return result;
 }
 
-CameraDiagnostics::Result PlDroidStreamReader::openStream()
+CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
+    Q_UNUSED(isCameraControlRequired);
     m_gotSDP =  false;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -162,19 +165,13 @@ void PlDroidStreamReader::closeStream()
     m_tcpSock->close();
 }
 
+void PlDroidStreamReader::pleaseReopenStream()
+{
+}
+
 bool PlDroidStreamReader::isStreamOpened() const
 {
     return m_tcpSock->isConnected() && m_videoIoDevice != 0;
-}
-
-void PlDroidStreamReader::updateStreamParamsBasedOnQuality()
-{
-
-}
-
-void PlDroidStreamReader::updateStreamParamsBasedOnFps()
-{
-
 }
 
 void PlDroidStreamReader::setSDPInfo(QByteArray sdpInfo)
