@@ -1498,6 +1498,28 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
     }
 }
 
+QList<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() const {
+    QList<QnTransportConnectionInfo> connections;
+
+    auto storeTransport = [&connections](const QnTransactionTransport *transport) {
+        QnTransportConnectionInfo info;
+        info.url = transport->remoteAddr();
+        info.state = transport->getState();
+        info.incoming = transport->isIncoming();
+        info.remotePeerId = transport->remotePeer().id;
+        connections.append(info);
+    };
+
+    QMutexLocker lock(&m_mutex);
+
+    for (const QnTransactionTransport *transport: m_connections.values())
+        storeTransport(transport);
+    for (const QnTransactionTransport *transport: m_connectingConnections)
+        storeTransport(transport);
+
+    return connections;
+}
+
 void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
 {
     QMutexLocker lock(&m_mutex);

@@ -169,6 +169,8 @@ void AudioStreamReader::fillAudioFormat()
             return;
     }
 
+    m_audioFormat.sampleFmt = nxcip::AudioFormat::stS16;
+    m_audioFormat.bitsPerCodedSample = 16;
     m_audioFormat.sampleRate = m_audioInfo.sample_rate;
     m_audioFormat.bitrate = m_audioInfo.bit_rate;
 

@@ -15,6 +15,8 @@
 #include <utils/common/concurrent.h>
 #include <utils/network/simple_http_client.h>
 
+#include <rest/active_connections_rest_handler.h>
+
 #include "compatibility/old_ec_connection.h"
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
@@ -299,6 +301,8 @@ namespace ec2
                 if( !m_directConnection ) return ErrorCode::failure;
                 return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(nullptr, out);
             } );
+
+        restProcessorPool->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler());
 
         //using HTTP processor since HTTP REST does not support HTTP interleaving
         //restProcessorPool->registerHandler(
