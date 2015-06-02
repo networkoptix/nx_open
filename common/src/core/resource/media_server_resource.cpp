@@ -126,7 +126,7 @@ void QnMediaServerResource::setServerName( const QString& name )
 void QnMediaServerResource::setApiUrl(const QString &apiUrl)
 {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         if (apiUrl == m_apiUrl)
             return;
 
@@ -444,12 +444,12 @@ bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
 }
 
 QnUuid QnMediaServerResource::getOriginalGuid() const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_originalGuid;
 }
 
 void QnMediaServerResource::setOriginalGuid(const QnUuid &guid) {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_originalGuid = guid;
 }
 

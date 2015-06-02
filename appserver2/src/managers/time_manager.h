@@ -220,7 +220,7 @@ namespace ec2
                 - low DWORD - some random number
         */
         void remotePeerTimeSyncUpdate(
-            QnMutexLocker* const lock,
+            QnMutexLockerInternal* const lock,
             const QnUuid& remotePeerID,
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,

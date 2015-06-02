@@ -144,7 +144,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
     //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
     {
-        QMutexLocker lock(&m_moduleInfoMutex);
+        QnMutexLocker lock(&m_moduleInfoMutex);
         if (m_serializedModuleInfo.isEmpty())
             m_serializedModuleInfo = RevealResponse(qnCommon->moduleInformation()).serialize();
     }
@@ -159,7 +159,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
 void QnMulticastModuleFinder::at_moduleInformationChanged()
 {
-    QMutexLocker lock(&m_moduleInfoMutex);
+    QnMutexLocker lock(&m_moduleInfoMutex);
     m_serializedModuleInfo.clear(); // clear cached value
 }
 

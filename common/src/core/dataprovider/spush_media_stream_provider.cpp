@@ -69,7 +69,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     }
 
     {
-        QMutexLocker lk( &m_openStreamMutex );
+        QnMutexLocker lk( &m_openStreamMutex );
         ++m_openStreamCounter;
         m_cond.wakeAll();
     }

@@ -1251,7 +1251,7 @@ void QnArchiveStreamReader::setGroupId(const QByteArray& guid)
 bool QnArchiveStreamReader::isPaused() const
 {
     if (getResource()->hasParam(lit("groupplay"))) {
-        QMutexLocker lock(&m_stopMutex);
+        QnMutexLocker lock(&m_stopMutex);
         return m_stopCond;
     }
     else {

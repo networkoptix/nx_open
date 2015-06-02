@@ -228,7 +228,7 @@ QnTransactionTransport::~QnTransactionTransport()
 
     quint64 sendKeepAliveTaskLocal = 0;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         sendKeepAliveTaskLocal = m_sendKeepAliveTask;
         m_sendKeepAliveTask = 0;    //no new task can be added
     }
@@ -656,7 +656,7 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
 
 bool QnTransactionTransport::hasUnsendData() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return !m_dataToSend.empty();
 }
 
@@ -664,7 +664,7 @@ void QnTransactionTransport::receivedTransaction(
     const nx_http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData )
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     processChunkExtensions( headers );
 
@@ -722,7 +722,7 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     const nx_http::Request& /*request*/,
     const QByteArray& requestBuf )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     assert( m_peerRole == prAccepting );
     assert( m_connectionType != ConnectionType::bidirectional );
@@ -738,7 +738,7 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
 
 void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> invokeBeforeWait )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME )
         return;
 
@@ -757,7 +757,7 @@ void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> 
 
 void QnTransactionTransport::sendHttpKeepAlive( quint64 taskID )
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     if( m_sendKeepAliveTask != taskID )
         return; //task has been cancelled
@@ -1154,12 +1154,12 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         if( m_connectionType == ConnectionType::bidirectional )
         {
             m_outgoingDataSocket = m_incomingDataSocket;
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             startSendKeepAliveTimerNonSafe();
         }
         else
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             startSendKeepAliveTimerNonSafe();
         }
 
@@ -1381,7 +1381,7 @@ void QnTransactionTransport::startListeningNonSafe()
 
 void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClientPtr& client )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     assert( client == m_outgoingTranClient );
 

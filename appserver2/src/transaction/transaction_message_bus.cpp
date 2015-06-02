@@ -269,7 +269,7 @@ namespace ec2
         m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
         m_handler(nullptr),
         m_timer(nullptr), 
-        m_mutex(QMutex::Recursive),
+        m_mutex(QnMutex::Recursive),
         m_thread(nullptr),
         m_runtimeTransactionLog(new QnRuntimeTransactionLog()),
         m_restartPending(false)
@@ -1137,7 +1137,7 @@ namespace ec2
 
     void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         QnTransactionTransport* transport = (QnTransactionTransport*) sender();
         if (!transport)
             return;
@@ -1392,7 +1392,7 @@ namespace ec2
         connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
         connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
 
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         transport->moveToThread(thread());
         m_connectingConnections << transport;
         transport->setState(QnTransactionTransport::Connected);
@@ -1416,7 +1416,7 @@ namespace ec2
         if (m_restartPending)
             return; // reject incoming connection because of media server is about to restart
 
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         for(QnTransactionTransport* transport: m_connections.values())
         {
             if( transport->connectionGuid() == connectionGuid )
@@ -1513,7 +1513,7 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
 
     void QnTransactionMessageBus::dropConnections()
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_remoteUrls.clear();
         for(QnTransactionTransport* transport: m_connections) {
             qWarning() << "Disconnected from peer" << transport->remoteAddr();
@@ -1525,7 +1525,7 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         return m_alivePeers;
     }
 
@@ -1559,7 +1559,7 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveClientPeers() const
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         AlivePeersMap result;
         for(AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
         {

@@ -34,7 +34,7 @@ public:
 private:
     friend class ReportData;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QnConcurrent::QnFuture<bool> m_activeCollection;
     std::set<nx_http::AsyncHttpClientPtr> m_activeHttpClients;
 };

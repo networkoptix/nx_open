@@ -84,7 +84,7 @@ private:
     quint16 m_multicastGroupPort;
     QCache<QByteArray, RevealResponse> m_cachedResponse;
     QByteArray m_serializedModuleInfo;
-    mutable QMutex m_moduleInfoMutex;
+    mutable QnMutex m_moduleInfoMutex;
 };
 
 #endif // MULTICAST_MODULE_FINDER_H

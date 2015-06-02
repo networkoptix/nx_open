@@ -71,7 +71,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
 
-    QMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx(&m_livemutex);
     updateSoftwareMotion();
 
     const auto oldParams = m_newLiveParams;
@@ -343,7 +343,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 {
-    QMutexLocker lock(&m_livemutex);
+    QnMutexLocker lock(&m_livemutex);
     if (m_newLiveParams.fps == FPS_NOT_INITIALIZED)
         m_newLiveParams.fps = getDefaultFps();
     return m_newLiveParams;

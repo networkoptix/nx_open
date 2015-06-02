@@ -168,7 +168,7 @@ public:
             {
                 QMap<DeviceFileCatalogPtr, qint64> catalogToScan; // key - catalog, value - start scan time;
                 {
-                    QMutexLocker lock(&m_owner->m_mutexCatalog);
+                    QnMutexLocker lock(&m_owner->m_mutexCatalog);
                     for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::LowQualityCatalog])
                         catalogToScan.insert(catalog, catalog->lastChunkStartTime());
                     for(const DeviceFileCatalogPtr& catalog: m_owner->m_devFileCatalog[QnServer::HiQualityCatalog])
@@ -817,7 +817,7 @@ QnStorageResourceList QnStorageManager::getStorages() const
 QnStorageResourceList QnStorageManager::getStoragesInLexicalOrder() const 
 {
     // duplicate storage path's aren't used any more
-    QMutexLocker lock(&m_mutexStorages);
+    QnMutexLocker lock(&m_mutexStorages);
     QnStorageResourceList result = m_storageRoots.values();
     std::sort(result.begin(), result.end(),
               [](const QnStorageResourcePtr& storage1, const QnStorageResourcePtr& storage2)
@@ -1025,7 +1025,7 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
 {
     Q_UNUSED(newEndTimeMs)
     int storageIndex = detectStorageIndex(resource->getUrl());
-    QMutexLocker lock(&m_mutexCatalog);
+    QnMutexLocker lock(&m_mutexCatalog);
     for(const DeviceFileCatalogPtr& catalogHi: m_devFileCatalog[QnServer::HiQualityCatalog])
         catalogHi->deleteRecordsByStorage(storageIndex, newStartTimeMs);
     
@@ -1599,7 +1599,7 @@ bool QnStorageManager::getBookmarks(const QByteArray &cameraGuid, const QnCamera
 
 std::vector<QnUuid> QnStorageManager::getCamerasWithArchive() const
 {
-    QMutexLocker locker(&m_mutexCatalog);
+    QnMutexLocker locker(&m_mutexCatalog);
     std::set<QString> internalData;
     std::vector<QnUuid> result;
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::LowQualityCatalog]);

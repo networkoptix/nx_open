@@ -6,7 +6,6 @@
 #include <QByteArray>
 #include <QElapsedTimer>
 #include <QSet>
-#include <QtCore/QWaitCondition>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -14,6 +13,7 @@
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
+#include "utils/common/id.h"
 #include <utils/common/log.h>
 #include <utils/common/uuid.h>
 #include <utils/network/abstract_socket.h>
@@ -22,7 +22,8 @@
 #include "utils/network/http/httpstreamreader.h"
 #include "utils/network/http/http_message_stream_parser.h"
 #include "utils/network/http/multipart_content_parser.h"
-#include "utils/common/id.h"
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #ifdef _DEBUG
 #include <common/common_module.h>
@@ -292,7 +293,7 @@ private:
     nx_http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
     //!Number of threads waiting on \a QnTransactionTransport::waitForNewTransactionsReady
     int m_waiterCount;
-    QWaitCondition m_cond;
+    QnWaitCondition m_cond;
 
 private:
     void default_initializer();

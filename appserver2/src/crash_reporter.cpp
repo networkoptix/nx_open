@@ -28,7 +28,7 @@ CrashReporter::~CrashReporter()
     // cancel async IO
     std::set<nx_http::AsyncHttpClientPtr> httpClients;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         std::swap(httpClients, m_activeHttpClients);
     }
 }
@@ -86,7 +86,7 @@ bool CrashReporter::scanAndReport(QnUserResourcePtr admin, QSettings* settings)
 
 void CrashReporter::scanAndReportAsync(QnUserResourcePtr admin, QSettings* settings)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     // This function is not supposed to be called more then once per binary, but anyway:
     m_activeCollection.waitForFinished();
@@ -118,7 +118,7 @@ bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSetting
     httpClient->setUserPassword(Ec2StaticticsReporter::AUTH_PASSWORD);
     httpClient->setAdditionalHeaders(report->makeHttpHeaders());
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     qDebug() << "CrashReporter::send:" << filePath << "to" << serverApi;
     if (httpClient->doPost(serverApi, "application/octet-stream", content))
     {
@@ -141,7 +141,7 @@ ReportData::ReportData(const QFileInfo& crashFile, QSettings* settings,
 void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
 {
     {
-        QMutexLocker lock(&m_host.m_mutex);
+        QnMutexLocker lock(&m_host.m_mutex);
         m_host.m_activeHttpClients.erase(httpClient);
     }
 

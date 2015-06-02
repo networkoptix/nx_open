@@ -5,8 +5,7 @@
 
 #include <boost/optional.hpp>
 
-#include <QMutex>
-#include <QMutexLocker>
+#include <utils/thread/mutex.h>
 
 
 /*!
@@ -48,7 +47,7 @@ public:
 
     void reset()
     {
-        QMutexLocker lk( m_mutex );
+        QnMutexLocker lk( m_mutex );
         m_cachedVal.reset();
     }
 

@@ -120,7 +120,7 @@ QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(
 bool QnUniversalTcpListener::registerProxyReceiverConnection(
         const QString& guid, QSharedPointer<AbstractStreamSocket> socket)
 {
-    QMutexLocker lock(&m_proxyMutex);
+    QnMutexLocker lock(&m_proxyMutex);
     auto serverPool = m_proxyPool.find(guid);
     if (serverPool == m_proxyPool.end()) {
         NX_LOG(lit("QnUniversalTcpListener: proxy was not requested from %2")

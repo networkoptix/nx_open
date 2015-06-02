@@ -4,6 +4,9 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/ptz_object.h>
 #include "nx_ec/impl/ec_api_impl.h"
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
+
 
 class QnServerPtzControllerPool: public QnPtzControllerPool {
     Q_OBJECT
@@ -23,7 +26,7 @@ private slots:
     void at_controllerChanged(const QnResourcePtr &resource);
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QHash<QnResourcePtr, QnPtzObject> activeObjectByResource;
 };
 

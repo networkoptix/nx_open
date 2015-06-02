@@ -409,7 +409,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
 
     QThreadPool tp;
     tp.setMaxThreadCount(4);
-    QMutex scanFilesMutex;
+    QnMutex scanFilesMutex;
     for(const auto& fi: files)
     {
         QnConcurrent::run( &tp, [&]() 
@@ -421,7 +421,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
                 return;
 
-            QMutexLocker lock(&scanFilesMutex);
+            QnMutexLocker lock(&scanFilesMutex);
             if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
                 QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
                 if (itr != allChunks.begin())

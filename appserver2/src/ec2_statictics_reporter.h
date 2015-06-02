@@ -59,7 +59,7 @@ namespace ec2
         nx_http::AsyncHttpClientPtr m_httpClient;
         boost::optional<QDateTime> m_plannedReportTime;
 
-        QMutex m_mutex;
+        QnMutex m_mutex;
         bool m_timerDisabled;
         boost::optional<qint64> m_timerId;
     };

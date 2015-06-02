@@ -59,7 +59,33 @@ bool QnMutex::tryLock()
 //// class QnMutexLocker
 ////////////////////////////////////////////////////////////
 
-QnMutexLocker::QnMutexLocker(
+
+void saveCurrentFileLineForThread_abrakadabra(
+    const char* sourceFile,
+    int sourceLine )
+{
+    //TODO #ak saving file and line er thread
+}
+
+////////////////////////////////////////////////////////////
+//// class QnMutexLocker
+////////////////////////////////////////////////////////////
+
+QnMutexLockerInternal::QnMutexLockerInternal( QnMutex* const mtx )
+:
+    m_mtx( mtx ),
+    m_sourceFile( nullptr ),
+    m_sourceLine( 0 ),
+    m_locked( false ),
+    m_relockCount( 0 )
+{
+    //TODO #ak retrieving file/line saved by saveCurrentFileLineForThread_abrakadabra
+
+    m_mtx->lock( m_sourceFile, m_sourceLine, m_relockCount );
+    m_locked = true;
+}
+
+QnMutexLockerInternal::QnMutexLockerInternal(
     QnMutex* const mtx,
     const char* sourceFile,
     int sourceLine )
@@ -74,7 +100,7 @@ QnMutexLocker::QnMutexLocker(
     m_locked = true;
 }
 
-QnMutexLocker::~QnMutexLocker()
+QnMutexLockerInternal::~QnMutexLockerInternal()
 {
     if( m_locked )
     {
@@ -83,19 +109,19 @@ QnMutexLocker::~QnMutexLocker()
     }
 }
 
-QnMutex* QnMutexLocker::mutex()
+QnMutex* QnMutexLockerInternal::mutex()
 {
     return m_mtx;
 }
 
-void QnMutexLocker::relock()
+void QnMutexLockerInternal::relock()
 {
     Q_ASSERT( !m_locked );
     m_mtx->lock( m_sourceFile, m_sourceLine, ++m_relockCount );
     m_locked = true;
 }
 
-void QnMutexLocker::unlock()
+void QnMutexLockerInternal::unlock()
 {
     Q_ASSERT( m_locked );
     m_mtx->unlock();

@@ -260,7 +260,7 @@ void StreamingChunkTranscoderThread::onStreamDataAvailable( AbstractOnDemandData
 void StreamingChunkTranscoderThread::removeTranscodingNonSafe(
     const std::map<int, TranscodeContext*>::iterator& transcodingIter,
     bool transcodingFinishedSuccessfully,
-    QnMutexLocker* const lk )
+    QnMutexLockerInternal* const lk )
 {
     StreamingChunkPtr chunk = transcodingIter->second->chunk;
 

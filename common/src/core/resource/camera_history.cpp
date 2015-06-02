@@ -47,7 +47,7 @@ namespace {
 
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     QObject(parent),
-    m_mutex(QMutex::Recursive)
+    m_mutex(QnMutex::Recursive)
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource) {
         /* Fast check. */
@@ -112,7 +112,7 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
         return false;
 
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_runningRequests[handle] = callback;
     }
 
@@ -120,7 +120,7 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
 }
 
 void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHistoryDataList &periods, int handle) {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     QSet<QnUuid> loadedCamerasIds;
     bool success = (status == 0);
@@ -168,7 +168,7 @@ void QnCameraHistoryPool::at_cameraPrepared(int status, const ec2::ApiCameraHist
 }
 
 QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid &cameraId) const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     QnMediaServerResourceList result;
     for(auto itr = m_archivedCamerasByServer.cbegin(); itr != m_archivedCamerasByServer.cend(); ++itr) {
@@ -233,7 +233,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtu
     if (foundPeriod)
         foundPeriod->clear();
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     const auto& itr = m_historyDetail.find(camera->getId());
     if (itr == m_historyDetail.end())
         return currentServerForCamera(camera); // no history data. use current server constantly
@@ -312,7 +312,7 @@ void QnCameraHistoryPool::resetServerFootageData(const ec2::ApiServerFootageData
 
 void QnCameraHistoryPool::setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras) {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_archivedCamerasByServer.insert(serverGuid, cameras);
     }
     for (const auto &cameraId : cameras) {
