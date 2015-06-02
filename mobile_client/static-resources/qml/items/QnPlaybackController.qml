@@ -61,7 +61,7 @@ Item {
                 color: rootItem.color
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
-                anchors.leftMargin: speedMarkers.padding
+                anchors.leftMargin: speedMarkers.padding * 2
             }
 
             Text {
@@ -76,7 +76,7 @@ Item {
                 color: rootItem.color
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
-                anchors.rightMargin: speedMarkers.padding
+                anchors.rightMargin: speedMarkers.padding * 2
             }
         }
 
@@ -92,7 +92,7 @@ Item {
                 color: rootItem.color
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
-                anchors.leftMargin: speedMarkers.padding
+                anchors.leftMargin: speedMarkers.padding * 2
             }
 
             Text {
@@ -107,7 +107,7 @@ Item {
                 color: rootItem.color
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
-                anchors.rightMargin: speedMarkers.padding
+                anchors.rightMargin: speedMarkers.padding * 2
             }
         }
     }
