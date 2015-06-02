@@ -18,6 +18,8 @@ class QnTimeline : public QQuickItem {
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
 
+    Q_PROPERTY(int chunkBarHeight READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
+
 public:
     QnTimeline(QQuickItem *parent = 0);
     ~QnTimeline();
@@ -29,6 +31,9 @@ public:
 
     QColor chunkColor() const;
     void setChunkColor(const QColor &color);
+
+    int chunkBarHeight() const;
+    void setChunkBarHeight(int chunkBarHeight);
 
     qint64 windowStart() const;
     void setWindowStart(qint64 windowStart);
@@ -77,11 +82,13 @@ signals:
     void textColorChanged();
     void chunkColorChanged();
 
+    void chunkBarHeightChanged();
+
 protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
-    QSGGeometryNode *updateTicksNode(QSGGeometryNode *ticksNode);
+    QSGGeometryNode *updateTextNode(QSGGeometryNode *ticksNode);
     QSGGeometryNode *updateChunksNode(QSGGeometryNode *chunksNode);
 
 private:

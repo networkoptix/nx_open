@@ -14,8 +14,9 @@ Page {
     property alias resourceId: resourceHelper.resourceId
     property var __currentDate: new Date()
     property bool videoZoomed: false
-    property real timelineTextMargin: 48
-    property real cursorWidth: Units.dp(3)
+    property real cursorTickMargin: Units.dp(10)
+    property real timelineTextMargin: timeline.height - timeline.chunkBarHeight
+    property real cursorWidth: Units.dp(2)
 
     QnMediaResourceHelper {
         id: resourceHelper
@@ -92,27 +93,46 @@ Page {
 
         anchors.bottom: parent.bottom
         width: parent.width
-        height: Units.dp(92)
+        height: Units.dp(140)
 
         textColor: "white"
         chunkColor: "#589900"
+
+        chunkBarHeight: Units.dp(36)
     }
 
-    Label {
+    Rectangle {
+        id: timeLabelBackground
+
+        property color baseColor: colorTheme.color("nx_baseBackground")
+
+        anchors.centerIn: bigTimeLabel
+        width: bigTimeLabel.height
+        height: bigTimeLabel.width + Units.dp(64)
+
+        rotation: 90
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(timeLabelBackground.baseColor.r, timeLabelBackground.baseColor.g, timeLabelBackground.baseColor.b, 0) }
+            GradientStop { position: 0.2; color: timeLabelBackground.baseColor }
+            GradientStop { position: 0.8; color: timeLabelBackground.baseColor }
+            GradientStop { position: 1.0; color: Qt.rgba(timeLabelBackground.baseColor.r, timeLabelBackground.baseColor.g, timeLabelBackground.baseColor.b, 0) }
+        }
+    }
+
+    Text {
         id: bigTimeLabel
 
         anchors {
             horizontalCenter: parent.horizontalCenter
-            bottom: timeline.top
-            bottomMargin: -timelineTextMargin
+            verticalCenter: timeline.verticalCenter
+            verticalCenterOffset: -timeline.chunkBarHeight / 2
         }
 
-        fontInfo: {
-            "size": 56,
-            "font": "light"
-        }
+        font.pixelSize: Units.dp(48)
+        font.weight: Font.Light
 
         text: __currentDate.toTimeString()
+        color: "white"
 
         Timer {
             running: true
@@ -127,10 +147,10 @@ Page {
 
     QnPlaybackController {
         width: parent.width - height / 3
-        height: Units.dp(70)
+        height: Units.dp(80)
         anchors.bottom: timeline.top
         anchors.horizontalCenter: parent.horizontalCenter
-        tickSize: Units.dp(6)
+        tickSize: cursorTickMargin
         lineWidth: Units.dp(2)
         color: colorTheme.color("nx_baseText")
         markersBackground: Qt.darker(color, 100)
@@ -140,8 +160,8 @@ Page {
     Rectangle {
         color: "white"
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: timeline.bottom
+        anchors.bottom: parent.bottom
         width: cursorWidth
-        height: timeline.height - timelineTextMargin
+        height: timeline.chunkBarHeight + cursorTickMargin
     }
 }

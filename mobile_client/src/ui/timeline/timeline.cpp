@@ -47,9 +47,10 @@ class QnTimelinePrivate {
 public:
     QnTimeline *parent;
 
-    QColor tickColor;
     QColor textColor;
     QColor chunkColor;
+
+    int chunkBarHeight;
 
     qint64 startTime;
     qint64 endTime;
@@ -90,7 +91,6 @@ public:
 
     QnTimelinePrivate(QnTimeline *parent):
         parent(parent),
-        tickColor("#727272"),
         textColor("#727272"),
         chunkColor("#2196F3"),
         textLevel(1.0),
@@ -98,6 +98,7 @@ public:
         timeZoneShift(0)
     {
         dpMultiplier = 2;
+        chunkBarHeight = 48;
 
         const int sec = 1000;
         const int min = 60 * sec;
@@ -411,10 +412,10 @@ QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeD
     if (!node) {
         node = new QSGNode();
 
-        node->appendChildNode(updateTicksNode(nullptr));
+        node->appendChildNode(updateTextNode(nullptr));
         node->appendChildNode(updateChunksNode(nullptr));
     } else {
-        updateTicksNode(static_cast<QSGGeometryNode*>(node->childAtIndex(0)));
+        updateTextNode(static_cast<QSGGeometryNode*>(node->childAtIndex(0)));
         updateChunksNode(static_cast<QSGGeometryNode*>(node->childAtIndex(1)));
     }
 
@@ -434,6 +435,9 @@ void QnTimeline::setTextColor(const QColor &color) {
 
     d->textColor = color;
     d->updateTextHelper();
+
+    emit textColorChanged();
+
     update();
 }
 
@@ -446,22 +450,35 @@ void QnTimeline::setChunkColor(const QColor &color) {
         return;
 
     d->chunkColor = color;
+
+    emit chunkColorChanged();
+
     update();
 }
 
-QSGGeometryNode *QnTimeline::updateTicksNode(QSGGeometryNode *ticksNode) {
+int QnTimeline::chunkBarHeight() const {
+    return d->chunkBarHeight;
+}
+
+void QnTimeline::setChunkBarHeight(int chunkBarHeight) {
+    if (d->chunkBarHeight == chunkBarHeight)
+        return;
+
+    d->chunkBarHeight = chunkBarHeight;
+
+    emit chunkBarHeightChanged();
+
+    update();
+}
+
+QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
     int zoomIndex = cFloor(d->zoomLevel);
     const QnTimelineZoomLevel &zoomLevel = d->zoomLevels[zoomIndex];
-
-    int lineWidth = d->dp(1);
-    int lineHeight = d->dp(8);
-    qreal correction = lineWidth / 2.0;
 
     qint64 windowSize = windowEnd() - windowStart();
     qint64 windowStartAligned = zoomLevel.alignTick(d->adjustTime(windowStart()));
     qint64 windowEndAligned = zoomLevel.alignTick(d->adjustTime(windowEnd()));
     qint64 windowSizeAligned = windowEndAligned - windowStartAligned;
-
 
     qreal fakeWidth = width() / windowSize * windowSizeAligned;
 
@@ -470,30 +487,13 @@ QSGGeometryNode *QnTimeline::updateTicksNode(QSGGeometryNode *ticksNode) {
     tickCount = width() / xStep + extraTickCount;
     qint64 tick = windowStartAligned;
     qreal xStart = d->timeToPixelPos(tick + (windowStart() - d->adjustTime(windowStart())));
-    qreal visibilityMultipler = 1.0 - (d->zoomLevel - zoomIndex);
 
-    QSGGeometry *geometry;
-    QSGGeometryNode *textNode;
     QSGGeometry *textGeometry;
     QSGGeometryNode *lowerTextNode;
     QSGGeometry *lowerTextGeometry;
     QSGOpacityNode *lowerTextOpacityNode;
 
-    if (!ticksNode) {
-        ticksNode = new QSGGeometryNode();
-
-        geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), (tickCount + 1) * 2);
-        geometry->setDrawingMode(GL_LINES);
-        geometry->setLineWidth(lineWidth);
-
-        QSGFlatColorMaterial *material = new QSGFlatColorMaterial();
-        material->setColor(d->tickColor);
-
-        ticksNode->setGeometry(geometry);
-        ticksNode->setFlag(QSGNode::OwnsGeometry);
-        ticksNode->setMaterial(material);
-        ticksNode->setFlag(QSGNode::OwnsMaterial);
-
+    if (!textNode) {
         textNode = new QSGGeometryNode();
 
         textGeometry = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 0);
@@ -506,7 +506,6 @@ QSGGeometryNode *QnTimeline::updateTicksNode(QSGGeometryNode *ticksNode) {
         textNode->setFlag(QSGNode::OwnsGeometry);
         textNode->setMaterial(textMaterial);
         textNode->setFlag(QSGNode::OwnsMaterial);
-        ticksNode->appendChildNode(textNode);
 
         lowerTextOpacityNode = new QSGOpacityNode();
 
@@ -519,23 +518,15 @@ QSGGeometryNode *QnTimeline::updateTicksNode(QSGGeometryNode *ticksNode) {
         lowerTextNode->setFlag(QSGNode::OwnsGeometry);
         lowerTextNode->setMaterial(textMaterial);
         lowerTextOpacityNode->appendChildNode(lowerTextNode);
-        ticksNode->appendChildNode(lowerTextOpacityNode);
+        textNode->appendChildNode(lowerTextOpacityNode);
     } else {
-        geometry = ticksNode->geometry();
-        geometry->allocate((tickCount + 1) * 2);
         d->prevZoomIndex = zoomIndex;
-
-        textNode = static_cast<QSGGeometryNode*>(ticksNode->childAtIndex(0));
+        textNode = static_cast<QSGGeometryNode*>(textNode);
         textGeometry = textNode->geometry();
-        lowerTextOpacityNode = static_cast<QSGOpacityNode*>(ticksNode->childAtIndex(1));
+        lowerTextOpacityNode = static_cast<QSGOpacityNode*>(textNode->childAtIndex(0));
         lowerTextNode = static_cast<QSGGeometryNode*>(lowerTextOpacityNode->childAtIndex(0));
         lowerTextGeometry = lowerTextNode->geometry();
     }
-
-    QSGGeometry::Point2D *points = geometry->vertexDataAsPoint2D();
-    points[0].set(0, correction);
-    points[1].set(width(), correction);
-    points += 2;
 
     QVector<MarkInfo> markedTicks;
 
@@ -569,11 +560,10 @@ QSGGeometryNode *QnTimeline::updateTicksNode(QSGGeometryNode *ticksNode) {
     int textCount = 0;
     int lowerTextCount = 0;
 
-    for (int i = 1; i < geometry->vertexCount() / 2; ++i) {
+    for (int i = 0; i < tickCount; ++i) {
         int tickLevel = d->tickLevel(tick);
         int *count = textMarkLevel == tickLevel ? &lowerTextCount : &textCount;
 
-        qreal tickHeight = qFloor(lineHeight * qMin<qreal>(tickLevel - zoomIndex + visibilityMultipler, zoomLevelsVisible));
         qreal x;
         if (zoomLevel.isMonotonic())
             x = xStart + xStep * (i - 1);
@@ -592,13 +582,8 @@ QSGGeometryNode *QnTimeline::updateTicksNode(QSGGeometryNode *ticksNode) {
                 ++(*count);
         }
 
-        points[0].set(x + correction, correction);
-        points[1].set(x + correction, correction + tickHeight);
-
-        points += 2;
         tick = zoomLevel.nextTick(tick);
     }
-    ticksNode->markDirty(QSGNode::DirtyGeometry);
 
     /* update text */
     textGeometry->allocate(textCount * 6);
@@ -627,7 +612,7 @@ QSGGeometryNode *QnTimeline::updateTicksNode(QSGGeometryNode *ticksNode) {
         }
 
         qreal x = qFloor(info.x - tw / 2);
-        qreal y = qFloor(lineHeight * qMin<qreal>(d->maxSiblingLevel(info.zoomIndex) - zoomIndex + visibilityMultipler, zoomLevelsVisible)) + d->dp(4);
+        qreal y = d->dp(4);
         int shift = 0;
 
         if (isNum) {
@@ -676,7 +661,7 @@ QSGGeometryNode *QnTimeline::updateTicksNode(QSGGeometryNode *ticksNode) {
     textNode->markDirty(QSGNode::DirtyGeometry);
     lowerTextNode->markDirty(QSGNode::DirtyGeometry);
 
-    return ticksNode;
+    return textNode;
 }
 
 QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
@@ -718,14 +703,15 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     for(int i = 0; i < Qn::TimePeriodContentCount; i++)
         inside[i] = pos[i] == end[i] ? false : pos[i]->contains(value);
 
-    qreal y = height() * 2 / 3;
+    qreal y = height() - d->chunkBarHeight;
 
     QnTimelineChunkPainter chunkPainter(geometry);
     std::array<QColor, Qn::TimePeriodContentCount + 1> colors = chunkPainter.colors();
     colors[Qn::RecordingContent] = d->chunkColor;
+    colors[Qn::TimePeriodContentCount] = d->chunkColor.darker();
     chunkPainter.setColors(colors);
     chunkPainter.start(value, position(), QRectF(0, y, width(), height() - y),
-                       d->timePeriods[Qn::RecordingContent].size(),
+                       qMax(1, d->timePeriods[Qn::RecordingContent].size()),
             minimumValue, maximumValue);
 
     while (value != maximumValue) {

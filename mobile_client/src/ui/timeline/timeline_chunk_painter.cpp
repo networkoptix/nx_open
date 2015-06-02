@@ -59,6 +59,8 @@ void QnTimelineChunkPainter::paintChunk(qint64 length, Qn::TimePeriodContent con
 void QnTimelineChunkPainter::stop() {
     if (m_pendingLength > 0)
         flushChunk();
+    else if (m_index == 0)
+        addRect(m_rect, m_color[Qn::TimePeriodContentCount]);
 
     while (m_index < m_geometry->vertexCount())
         m_points[m_index++].set(0, 0, 0, 0, 0, 0);
