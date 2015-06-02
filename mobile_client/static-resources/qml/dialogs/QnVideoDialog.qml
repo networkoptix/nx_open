@@ -4,6 +4,8 @@ import QtMultimedia 5.0
 import com.networkoptix.qml 1.0
 import Material 0.1
 
+import "../items"
+
 Page {
     id: videoPlayer
 
@@ -130,6 +132,18 @@ Page {
                 __currentDate = new Date()
             }
         }
+    }
+
+    QnPlaybackController {
+        width: parent.width - height / 3
+        height: Units.dp(70)
+        anchors.bottom: timeline.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        tickSize: Units.dp(6)
+        lineWidth: Units.dp(2)
+        color: colorTheme.color("nx_baseText")
+        markersBackground: Qt.darker(color, 100)
+        highlightColor: "#2fffffff"
     }
 
     Rectangle {
