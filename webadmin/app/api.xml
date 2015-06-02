@@ -1755,7 +1755,7 @@
             <functions>
 
                 <function>
-                    <name>&lt;protocol&gt;/&lt;server guid&gt;/&lt;api request&gt;</name>
+                    <name>&lt;protocol&gt;/&lt;serverGuid&gt;/&lt;apiRequest&gt;</name>
                     <description>
                         Proxy methods allows to send any request to any server using the existing public connection. Can also be used to get video streams.
                         Example: rtsp://10.0.2.1/proxy/rtsp/{72934575-ceb7-54bb-23a0-84b81cf1d3f1}/12AB42FD5912?pos=1235631&amp;resolution=240p
