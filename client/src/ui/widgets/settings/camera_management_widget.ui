@@ -17,7 +17,7 @@
    <item>
     <widget class="QCheckBox" name="statisticsReportCheckBox">
      <property name="text">
-      <string>Allow system to send anonymous usage statistics (Recommended)</string>
+      <string>Send usage and crash statistics to software developers (Recommended)</string>
      </property>
     </widget>
    </item>

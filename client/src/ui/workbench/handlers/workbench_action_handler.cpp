@@ -2481,18 +2481,20 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (ec2::Ec2StaticticsReporter::isDefined(servers))
         return;
 
-    //TODO: #GDM #TR
     auto result = QMessageBox::information(
         mainWindow(),
         tr("Anonymous Usage Statistics"),                                   
-        tr("In order to improve our software, we periodically collect anonymous data about its work.\n"
-           "Press Yes to allow the application to send anonymous usage statistics (recommended).\n"
-           "You can change your preference at any time from the System Settings dialog, \"Send Anonymous Usage Statistics\" setting."),
-        QMessageBox::Yes | QMessageBox::No,
-        QMessageBox::Yes);
+        tr("System shares usage and crash statistics with the software development team to help us improve your user experience.\n"
+           "If you would like to disable this feature you can do so in the System Settings dialog."),
+        QMessageBox::Ok | QMessageBox::Cancel,
+        QMessageBox::Ok);
 
-    ec2::Ec2StaticticsReporter::setAllowed(servers, result == QMessageBox::Yes);
-    propertyDictionary->saveParamsAsync(idListFromResList(servers));
+    if (result == QMessageBox::Ok) {
+        ec2::Ec2StaticticsReporter::setAllowed(servers, true);
+        propertyDictionary->saveParamsAsync(idListFromResList(servers));
+    } else {
+        menu()->triggerIfPossible(Qn::SystemAdministrationAction);
+    }
 }
 
 
