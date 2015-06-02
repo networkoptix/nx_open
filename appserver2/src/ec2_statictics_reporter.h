@@ -3,14 +3,15 @@
 
 #include <QtCore/QMutex>
 
-#include "core/resource/user_resource.h"
-#include "utils/common/timermanager.h"
-#include "utils/network/http/asynchttpclient.h"
-#include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_statistics.h"
+#include <core/resource/resource_fwd.h>
+#include <utils/common/timermanager.h>
+#include <utils/network/http/asynchttpclient.h>
+#include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_statistics.h>
 
 namespace ec2
 {
+    // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2StaticticsReporter
     class Ec2StaticticsReporter
             : public QObject
     {

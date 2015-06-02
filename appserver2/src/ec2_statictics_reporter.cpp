@@ -5,6 +5,7 @@
 #include <boost/range/algorithm/count_if.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
 
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/synctime.h>
 
@@ -68,7 +69,10 @@ namespace ec2
         , m_timerId(boost::none)
     {
         Q_ASSERT(MAX_DELAY_RATIO <= 100);
-        setupTimer();
+
+        // Just in case assert did not work!
+        if (m_admin)
+            setupTimer();
     }
 
     Ec2StaticticsReporter::~Ec2StaticticsReporter()
@@ -172,7 +176,8 @@ namespace ec2
             if (user->isAdmin())
                 return user;
 
-        qFatal("Can not get user admin");
+        qFatal("Admin user does not exist");
+        NX_LOG(lit("Ec2StaticticsReporter: Admin user does not exist"), cl_logERROR); // In case qFatal didnt work!
         return QnUserResourcePtr();
     }
 

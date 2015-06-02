@@ -2,6 +2,7 @@
 
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 
 #include <common/systemexcept_linux.h>
 #include <common/systemexcept_win32.h>
@@ -39,6 +40,8 @@ CrashReporter::~CrashReporter()
 bool CrashReporter::scanAndReport(QSettings* settings)
 {
     const auto admin = qnResPool->getAdministrator();
+    if (!admin) return false;
+
     const auto msManager = QnAppServerConnectionFactory::getConnection2()->getMediaServerManager();
     if (!Ec2StaticticsReporter::isAllowed(msManager))
     {
