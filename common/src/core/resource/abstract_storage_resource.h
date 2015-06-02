@@ -22,7 +22,7 @@ public:
     qint64 getSpaceLimit() const;
 
     void setStorageType(const QString& type);
-    QString getStorageType();
+    QString getStorageType() const;
 
     void setMaxStoreTime(int timeInSeconds);
     int getMaxStoreTime() const;

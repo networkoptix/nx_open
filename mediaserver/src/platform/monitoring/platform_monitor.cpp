@@ -19,11 +19,13 @@ QList<QnPlatformMonitor::PartitionSpace> QnPlatformMonitor::totalPartitionSpaceI
     return result;
 }
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor::PartitionTypes,
-    (QnPlatformMonitor::LocalDiskPartition,    "local")
-    (QnPlatformMonitor::RamDiskPartition,      "ram")
-    (QnPlatformMonitor::OpticalDiskPartition,  "optical")
-    (QnPlatformMonitor::SwapPartition,         "swap")
-    (QnPlatformMonitor::NetworkPartition,      "network")
+#define LEXICAL_VALUES_FOR_PT                               \
+    (QnPlatformMonitor::LocalDiskPartition,    "local")     \
+    (QnPlatformMonitor::RamDiskPartition,      "ram")       \
+    (QnPlatformMonitor::OpticalDiskPartition,  "optical")   \
+    (QnPlatformMonitor::SwapPartition,         "swap")      \
+    (QnPlatformMonitor::NetworkPartition,      "network")   \
     (QnPlatformMonitor::UnknownPartition,      "unknown")
-)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor::PartitionType, LEXICAL_VALUES_FOR_PT)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor::PartitionTypes, LEXICAL_VALUES_FOR_PT)

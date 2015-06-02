@@ -31,8 +31,6 @@ namespace ec2 {
         ApiCameraDataStatistics(ApiCameraDataEx&& data);
 
 		const static std::unordered_set<QString> EXCEPT_PARAMS;
-
-        ApiResourceParamDataList addParams;
     };
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
@@ -51,9 +49,10 @@ namespace ec2 {
 		: ApiMediaServerDataEx
     {
         ApiMediaServerDataStatistics();
+        ApiMediaServerDataStatistics(ApiMediaServerDataStatistics&& data);
         ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
 
-        ApiStorageDataStatisticsList    storages;
+        ApiStorageDataStatisticsList storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
     (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)
@@ -73,9 +72,6 @@ namespace ec2 {
 	{
         ApiBusinessRuleStatistics();
         ApiBusinessRuleStatistics(ApiBusinessRuleData&& data);
-
-		// TODO: Convert enums to strings
-		// QString actionType, eventState, eventType; 
 	};
 #define ApiBusinessRuleStatistics_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState) \
 	(actionType)(actionResourceIds)(actionParams)(aggregationPeriod)(disabled)(schedule)(system)

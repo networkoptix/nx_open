@@ -32,7 +32,7 @@ void QnAbstractStorageResource::setStorageType(const QString& type)
     m_storageType = type;
 }
 
-QString QnAbstractStorageResource::getStorageType()
+QString QnAbstractStorageResource::getStorageType() const
 {
     QMutexLocker lock(&m_mutex);
     return m_storageType;

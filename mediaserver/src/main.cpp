@@ -415,8 +415,8 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
                                  [&](const QnPlatformMonitor::PartitionSpace& part)
         { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
     
-    storage->setStorageType((it != partitions.end()) ?
-        QnLexical::serialized(it->type) : lit("network"));
+    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+    storage->setStorageType(QnLexical::serialized(storageType));
 
     return storage;
 }

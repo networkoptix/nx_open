@@ -68,14 +68,13 @@ namespace ec2
         {
         }
 
-        template<class ApiMediaServerDataRefType>
-        ApiMediaServerDataEx( ApiMediaServerDataRefType&& mediaServerData )
+        ApiMediaServerDataEx( ApiMediaServerDataEx&& mediaServerData )
         :
-            ApiMediaServerData( std::forward<ApiMediaServerDataRefType>(mediaServerData) ),
-            ApiMediaServerUserAttributesData( std::forward<ApiMediaServerDataRefType>( mediaServerData ) ),
+            ApiMediaServerData( std::move( mediaServerData ) ),
+            ApiMediaServerUserAttributesData( std::move( mediaServerData ) ),
             status( mediaServerData.status ),
-            addParams( std::forward<ApiMediaServerDataRefType>(mediaServerData).addParams ),
-            storages( std::forward<ApiMediaServerDataRefType>(mediaServerData).storages )
+            addParams( std::move( mediaServerData.addParams ) ),
+            storages( std::move( mediaServerData.storages ) )
         {
         }
     };
