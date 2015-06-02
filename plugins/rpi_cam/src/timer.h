@@ -6,7 +6,7 @@
 
 namespace rpi_cam
 {
-    ///
+    /// PTS to timestamps converter
     class TimeCorrection
     {
     public:

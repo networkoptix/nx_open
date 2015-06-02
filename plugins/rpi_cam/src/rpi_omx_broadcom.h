@@ -4,6 +4,7 @@
 #include <interface/vmcs_host/vchost.h>
 #include <interface/vcos/vcos_semaphore.h>
 
+/// Broadcom specific Video Core and OpenMAX IL stuff
 namespace broadcom
 {
     typedef enum

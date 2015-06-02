@@ -14,6 +14,7 @@
 #include <IL/OMX_Video.h>
 #include <IL/OMX_Broadcom.h>
 
+/// Raspberry Pi OpenMAX IL layer
 namespace rpi_omx
 {
     typedef broadcom::ComponentType ComponentType;
@@ -29,7 +30,7 @@ namespace rpi_omx
 
     extern OMX_CALLBACKTYPE cbsEvents;
 
-    ///
+    /// Handler for OpenMAX IL errors
     class OMXExeption
     {
     public:
@@ -106,7 +107,7 @@ namespace rpi_omx
     static const VideoFromat VF_RESIZED_320x180 = { 320, 180, 30, VideoFromat::RATIO_16x9, false };
     static const VideoFromat VF_RESIZED_240x135 = { 240, 135, 30, VideoFromat::RATIO_16x9, false };
 
-    ///
+    /// OpenMAX IL parameter
     template <typename T>
     class Parameter
     {
@@ -139,7 +140,7 @@ namespace rpi_omx
         T param_;
     };
 
-    ///
+    /// OpenMAX IL CPU<->GPU buffer
     class Buffer
     {
     public:
@@ -172,7 +173,7 @@ namespace rpi_omx
         bool fillDone_;
     };
 
-    ///
+    /// Base class for OpenMAX IL components
     class Component
     {
     public:
@@ -411,7 +412,7 @@ namespace rpi_omx
 #endif
     };
 
-    /// Raspberry Pi Camera Module
+    /// OMX.broadcom.camera
     class Camera : public Component
     {
     public:
@@ -632,7 +633,7 @@ namespace rpi_omx
         bool ready_;
     };
 
-    ///
+    /// OMX.broadcom.clock
     class Clock : public Component
     {
     public:
@@ -664,7 +665,7 @@ namespace rpi_omx
         }
     };
 
-    ///
+    /// OMX.broadcom.video_encode
     class Encoder : public Component
     {
     public:
@@ -762,7 +763,7 @@ namespace rpi_omx
         Buffer bufferOut_;
     };
 
-    ///
+    /// OMX.broadcom.null_sink
     class NullSink : public Component
     {
     public:
@@ -776,7 +777,7 @@ namespace rpi_omx
         }
     };
 
-    ///
+    /// OMX.broadcom.video_splitter
     class VideoSplitter : public Component
     {
     public:
@@ -794,7 +795,7 @@ namespace rpi_omx
         }
     };
 
-    ///
+    /// OMX.broadcom.resize
     class Resizer : public Component
     {
     public:

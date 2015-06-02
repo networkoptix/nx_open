@@ -362,8 +362,10 @@ namespace nxcip
 #else
 #define PACKED __attribute__((__packed__))
 #endif
-    /// Standard-layouted memory for LiveStreamConfig hierarchy
-    /// Derived classes may have only static data members or functions.
+    //!Live stream parameters
+    /*!
+        \note Derived classes shouldn't have non-static data members
+    */
     struct PACKED LiveStreamConfig
     {
         enum LiveStreamFlags
@@ -390,7 +392,7 @@ namespace nxcip
     // {D1C7F082-B6F9-45F3-82D6-3CFE3EAE0260}
     static const nxpl::NX_GUID IID_CameraMediaEncoder3 = { { 0xd1, 0xc7, 0xf0, 0x82, 0xb6, 0xf9, 0x45, 0xf3, 0x82, 0xd6, 0x3c, 0xfe, 0x3e, 0xae, 0x2, 0x60 } };
 
-    //!Extends \a CameraMediaEncoder2 by adding configurede stream opening and
+    //!Extends \a CameraMediaEncoder2 by adding configured stream opening
     class CameraMediaEncoder3
     :
         public CameraMediaEncoder2

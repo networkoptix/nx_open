@@ -5,35 +5,35 @@
 
 #include "rpi_omx.h"
 
+/// Raspberry Pi camera unit and configuration
 namespace rpi_cam
 {
-    ///
     typedef enum
     {
-        Resolutions_default,
-        Resolutions_1280x960_640x480,
-        Resolutions_1280x960_320x240,
-        Resolutions_1920x1080_640x360,
-        Resolutions_1920x1080_480x270,
-        Resolutions_1920x1080_320x180
+        Resolutions_default,            ///< Leave unchanged
+        Resolutions_1280x960_640x480,   ///< 1280x960, 640x480, FoV
+        Resolutions_1280x960_320x240,   ///< 1280x960, 320x240, FoV
+        Resolutions_1920x1080_640x360,  ///< 1920x1080, 640x360
+        Resolutions_1920x1080_480x270,  ///< 1920x1080, 480x270
+        Resolutions_1920x1080_320x180   ///< 1920x1080, 320x180
     } ResolutionPair;
 
-    ///
     typedef enum
     {
-        Filter_None,
-        Filter_Noise,
-        Filter_Emboss,
-        Filter_Negative,
-        Filter_Sketch,
-        Filter_OilPaint,
-        Filter_Hatch,
-        Filter_Gpen,
-        Filter_Antialias,
-        Filter_DeRing,
-        Filter_Solarize
+        Filter_None,        ///< No filter
+        Filter_Noise,       ///< Remove noise
+        Filter_Emboss,      ///< Emboss
+        Filter_Negative,    ///< Negative
+        Filter_Sketch,      ///< Sketch
+        Filter_OilPaint,    ///< OilPaint
+        Filter_Hatch,       ///< Hatch
+        Filter_Gpen,        ///< Gpen
+        Filter_Antialias,   ///< Antialias
+        Filter_DeRing,      ///< DeRing
+        Filter_Solarize     ///< Solarize
     } ImageFilter;
 
+    /// Resolutions and common camera config
     struct CameraParameters
     {
         CameraParameters()
@@ -45,15 +45,15 @@ namespace rpi_cam
             brightness(50)
         {}
 
-        unsigned resolition;
-        unsigned filter;
-        int sharpness;
-        int contrast;
-        int saturation;
-        int brightness;
+        unsigned resolition;    ///< Resolutions @sa rpi_cam::ResolutionPair
+        unsigned filter;        ///< Image filter @sa rpi_cam::ImageFilter
+        int sharpness;          ///< -100..100
+        int contrast;           ///< -100..100
+        int saturation;         ///< -100..100
+        int brightness;         ///< 0..100
     };
 
-    ///
+    /// Raspberry Pi camera unit
     class RPiCamera
     {
     public:
