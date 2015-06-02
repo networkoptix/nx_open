@@ -120,7 +120,7 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
        "X-Server-Uuid: %6\r\n" \
        "\r\n"))
             .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
-            .arg(url.toString()).arg(QString::fromUtf8(digestHeader.toString()))
+            .arg(url.toString()).arg(QString::fromUtf8(digestHeader.serialized()))
             .arg(admin->getName()).arg(serverUuid.toString())
             .toUtf8();
 }

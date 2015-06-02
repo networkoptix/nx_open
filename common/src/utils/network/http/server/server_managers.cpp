@@ -10,7 +10,8 @@ namespace nx_http
 {
     ServerManagers::ServerManagers()
     :
-        m_dispatcher( nullptr )
+        m_dispatcher( nullptr ),
+        m_authenticationManager( nullptr )
     {
     }
 
@@ -22,5 +23,15 @@ namespace nx_http
     MessageDispatcher* ServerManagers::dispatcher()
     {
         return m_dispatcher;
+    }
+
+    void ServerManagers::setAuthenticationManager( AbstractAuthenticationManager* const authManager )
+    {
+        m_authenticationManager = authManager;
+    }
+
+    AbstractAuthenticationManager* ServerManagers::authenticationManager()
+    {
+        return m_authenticationManager;
     }
 }

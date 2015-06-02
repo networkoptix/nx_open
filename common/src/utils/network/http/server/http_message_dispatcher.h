@@ -6,6 +6,7 @@
 #ifndef NX_HTTP_MESSAGE_DISPATCHER_H
 #define NX_HTTP_MESSAGE_DISPATCHER_H
 
+#include "abstract_http_request_handler.h"
 #include "http_server_connection.h"
 #include "utils/network/connection_server/message_dispatcher.h"
 
@@ -18,34 +19,29 @@ namespace nx_http
             nx_http::Message&&,
             std::unique_ptr<nx_http::AbstractMsgBodySource> )
         > HttpRequestCompletionFunc;
-    typedef std::function<bool(
-            const HttpServerConnection&,
-            nx_http::Message&&,
-            HttpRequestCompletionFunc )
-        > HandleHttpRequestFunc;
 
     class MessageDispatcher
-    :
-        public
-            ::MessageDispatcher<
-                HttpServerConnection,
-                nx_http::Message,
-                typename std::map<QString, HandleHttpRequestFunc>,
-                HttpRequestCompletionFunc>
-
     {
-        typedef
-            ::MessageDispatcher<
-                HttpServerConnection,
-                nx_http::Message,
-                typename std::map<QString, HandleHttpRequestFunc>,
-                HttpRequestCompletionFunc> base_type;
     public:
         MessageDispatcher();
         virtual ~MessageDispatcher();
 
+        /*!
+            \param messageProcessor Ownership of this object is not passed
+            \note All processors MUST be registered before connection processing is started, since this class methods are not thread-safe
+            \return \a true if \a requestProcessor has been registered, \a false otherwise
+            \note Message processing function MUST be non-blocking
+        */
+        bool registerRequestProcessor(
+            const QString& path,
+            AbstractHttpRequestHandler* messageProcessor )
+        {
+            return m_processors.emplace( path, messageProcessor ).second;
+        }
+
         //!Pass message to corresponding processor
         /*!
+            \param message This object is not moved in case of failure to find processor
             \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
         */
         template<class CompletionFuncRefType>
@@ -55,12 +51,18 @@ namespace nx_http
             CompletionFuncRefType&& completionFunc )
         {
             assert( message.type == nx_http::MessageType::request );
-            return base_type::dispatchRequest(
+
+            auto it = m_processors.find( message.request->requestLine.url.path() );
+            if( it == m_processors.end() )
+                return false;
+            return it->second->processRequest(
                 conn,
-                message.request->requestLine.url.path(),
-                std::move(message),
+                std::move( message ),
                 std::forward<CompletionFuncRefType>( completionFunc ) );
         }
+
+    private:
+        std::map<QString, AbstractHttpRequestHandler*> m_processors;
     };
 }
 

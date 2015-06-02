@@ -10,6 +10,8 @@
 
 #include <utils/common/singleton.h>
 
+#include "abstract_authentication_manager.h"
+
 
 namespace nx_http
 {
@@ -23,8 +25,12 @@ namespace nx_http
         void setDispatcher( MessageDispatcher* const dispatcher );
         MessageDispatcher* dispatcher();
 
+        void setAuthenticationManager( AbstractAuthenticationManager* const authManager );
+        AbstractAuthenticationManager* authenticationManager();
+
     private:
         MessageDispatcher* m_dispatcher;
+        AbstractAuthenticationManager* m_authenticationManager;
     };
 }
 

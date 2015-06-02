@@ -45,9 +45,12 @@ namespace nx_http
         void processMessage( nx_http::Message&& request );
 
     private:
-        void requestProcessed(
+        std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
+
+        void prepareAndSendResponse(
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody );
+        void responseSent();
     };
 }
 

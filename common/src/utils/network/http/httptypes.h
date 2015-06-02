@@ -429,7 +429,7 @@ namespace nx_http
 
             bool parse( const BufferType& str );
             void serialize( BufferType* const dstBuffer ) const;
-            StringType toString() const;
+            BufferType serialized() const;
             void clear();
 
         private:
@@ -460,12 +460,15 @@ namespace nx_http
         class WWWAuthenticate
         {
         public:
+            static const StringType NAME;
+
             AuthScheme::Value authScheme;
             QMap<BufferType, BufferType> params;
 
             WWWAuthenticate();
 
             bool parse( const BufferType& str );
+            BufferType serialized() const;
         };
 
         //! identity

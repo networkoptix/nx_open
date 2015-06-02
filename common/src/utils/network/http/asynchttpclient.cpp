@@ -708,7 +708,7 @@ namespace nx_http
                 &m_request.headers,
                 nx_http::HttpHeader(
                     header::Authorization::NAME,
-                    m_currentUrlAuthorization->toString() ) );
+                    m_currentUrlAuthorization->serialized() ) );
         }
         else
         {
@@ -918,7 +918,7 @@ namespace nx_http
                 &m_request.headers,
                 nx_http::HttpHeader(
                     header::Authorization::NAME,
-                    basicAuthorization.toString() ) );
+                    basicAuthorization.serialized() ) );
             m_currentUrlAuthorization.reset( new header::Authorization( std::move(basicAuthorization) ) );
         }
         else if( wwwAuthenticateHeader.authScheme == header::AuthScheme::digest )

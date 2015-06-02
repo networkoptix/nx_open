@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include <utils/common/util.h>
+
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
 #include "server_managers.h"
@@ -28,16 +30,39 @@ namespace nx_http
 
     void HttpServerConnection::processMessage( nx_http::Message&& request )
     {
+        //TODO incoming message body
+        //    should use AbstractMsgBodySource also
+
+        //TODO #ak interleaving support
+        //    can add sequence to sendResponseFunc and use it to queue responses
+
         using namespace std::placeholders;
 
         //TODO #ak performing authentication
-        //TODO #ak interleaving support
+        //    authentication manager should be able to return some custom data
+        //    which will be forwarded to the request handler.
+        //    Should this data be template parameter?
+        header::WWWAuthenticate wwwAuthenticate;
+        if( !nx_http::ServerManagers::instance()->authenticationManager()->authenticate(
+                *this,
+                *request.request,
+                &wwwAuthenticate ) )
+        {
+            nx_http::Message response( nx_http::MessageType::response );
+            response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
+            response.response->headers.emplace(
+                header::WWWAuthenticate::NAME,
+                wwwAuthenticate.serialized() );
+            return prepareAndSendResponse( std::move( response ), nullptr );
+        }
 
         auto sendResponseFunc = [this](
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
         {
-            requestProcessed( std::move(response), std::move( responseMsgBody ) );
+            prepareAndSendResponse(
+                std::move(response),
+                std::move(responseMsgBody) );
         };
 
         MessageDispatcher* const dispatcher = nx_http::ServerManagers::instance()->dispatcher();
@@ -49,22 +74,38 @@ namespace nx_http
         {
             //creating and sending error response
             nx_http::Message response( nx_http::MessageType::response );
-            response.response->statusLine.version = request.request->requestLine.version;
-            response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
-            response.response->statusLine.reasonPhrase = nx_http::StatusCode::toString( response.response->statusLine.statusCode );
-            sendMessage(
-                std::move( response ),
-                std::bind( &HttpServerConnection::closeConnection, this ) );
+            response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
+            return prepareAndSendResponse( std::move( response ), nullptr );
         }
     }
 
-    void HttpServerConnection::requestProcessed(
-        nx_http::Message&& response,
+    void HttpServerConnection::prepareAndSendResponse(
+        nx_http::Message&& msg,
         std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
     {
+        //msg.response->statusLine.version = request.request->requestLine.version;
+        msg.response->statusLine.reasonPhrase =
+            nx_http::StatusCode::toString( msg.response->statusLine.statusCode );
+
+        //TODO #ak adding necessary headers
+        nx_http::insertOrReplaceHeader(
+            &msg.response->headers,
+            nx_http::HttpHeader( "Server", nx_http::serverString() ) );
+        nx_http::insertOrReplaceHeader(
+            &msg.response->headers,
+            nx_http::HttpHeader( "Date", dateTimeToHTTPFormat( QDateTime::currentDateTime() ) ) );
+
+        //TODO #ak connection persistency
+
+        m_currentMsgBody = std::move(responseMsgBody);
         sendMessage(
-            std::move(response),
-            std::bind( &HttpServerConnection::closeConnection, this ) );
-        //TODO #ak sending message body
+            std::move( msg ),
+            std::bind( &HttpServerConnection::responseSent, this ) );
+    }
+
+    void HttpServerConnection::responseSent()
+    {
+        //TODO #ak sending message body (m_currentMsgBody)
+        closeConnection();
     }
 }
