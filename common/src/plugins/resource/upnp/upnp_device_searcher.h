@@ -1,6 +1,7 @@
-
 #ifndef UPNP_DEVICE_SEARCHER_H
 #define UPNP_DEVICE_SEARCHER_H
+
+#include "upnp_device_description.h"
 
 #include <list>
 #include <map>
@@ -19,17 +20,6 @@
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/network/nettools.h>
 #include <utils/network/socket.h>
-
-
-//Contains some info about discovered UPnP device
-struct UpnpDeviceInfo
-{
-    QString friendlyName;
-    QString manufacturer;
-    QString modelName;
-    QString serialNumber;
-    QString presentationUrl;
-};
 
 //!Receives discovered devices info
 class UPNPSearchHandler
@@ -69,11 +59,14 @@ class UPNPDeviceSearcher
 
 public:
     static const unsigned int DEFAULT_DISCOVER_TRY_TIMEOUT_MS = 3000;
+    static const std::list<QString> DEFAULT_DEVICE_TYPES;
 
     /*!
+        \param discoverDeviceTypes Devies to discover, mediaservers by default
         \param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch
     */
-    UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
+    UPNPDeviceSearcher( const std::list<QString>& discoverDeviceTypes = DEFAULT_DEVICE_TYPES,
+                        unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
     virtual ~UPNPDeviceSearcher();
 
     //!Implementation of \a QnStoppable::pleaseStop
@@ -135,6 +128,7 @@ private:
         nx::Buffer buf;
     };
 
+    std::list<QString> m_discoverDeviceTypes;
     const unsigned int m_discoverTryTimeoutMS;
     mutable QMutex m_mutex;
     quint64 m_timerID;
@@ -175,9 +169,21 @@ private:
         \note MUST be called with \a m_mutex locked
     */
     void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
+    bool processPacket( const QHostAddress& localInterfaceAddress,
+                        const HostAddress& discoveredDevAddress,
+                        const UpnpDeviceInfo& devInfo,
+                        const QByteArray& xmlDevInfo );
 
 private slots:
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );
+};
+
+class UPNPSearchAutoHandler
+        : public UPNPSearchHandler
+{
+public:
+    UPNPSearchAutoHandler();
+    virtual ~UPNPSearchAutoHandler();
 };
 
 #endif  //UPNP_DEVICE_SEARCHER_H

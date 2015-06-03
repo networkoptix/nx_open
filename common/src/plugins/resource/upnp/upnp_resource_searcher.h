@@ -76,9 +76,6 @@ class QnUpnpResourceSearcherAsync
     public UPNPSearchHandler
 {
 public:
-    QnUpnpResourceSearcherAsync();
-    virtual ~QnUpnpResourceSearcherAsync();
-
     //!Implementation of QnAbstractNetworkResourceSearcher::findResources
     virtual QnResourceList findResources() override;
     //!Implementation of UPNPSearchHandler::processPacket
