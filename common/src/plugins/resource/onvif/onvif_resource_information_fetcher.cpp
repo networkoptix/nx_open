@@ -35,7 +35,8 @@ static const char* IGNORE_VENDORS[][2] =
     {"ISD", "*"},              // ISD
     {"spartan-6*", "*"},       // ArecontVision
     {"acti*", "*"},              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
-    {"*", "KCM*"}              // ACTi.
+    {"*", "KCM*"},              // ACTi
+    {"*", "DWCA-VF25WIR4"}      // NEW ISD cameras rebrended to DW
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
