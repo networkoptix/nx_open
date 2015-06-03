@@ -68,7 +68,7 @@ private:
 #else   //USE_OWN_MUTEX
 
 #include <QtCore/QMutex>
-#include <QtCore/QnMutexLocker>
+#include <QtCore/QMutexLocker>
 
 typedef QMutex QnMutex;
 typedef QMutexLocker QnMutexLocker;
