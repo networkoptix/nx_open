@@ -35,6 +35,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
 
     public class NetworkOptixMiniDriver : IOemDvrMiniDriver {
         private static readonly int PLAY_OFFSET_MS = 5000;
+        private static readonly int DEFAULT_NX_PORT = 7001;
         private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static IPlugin axHDWitness;
@@ -67,7 +68,8 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         }
 
         private Uri buildUrl(OemDvrConnection cnInfo) {
-            Uri url = cnInfo.HostName.StartsWith("http://") ? new Uri(cnInfo.HostName) : new Uri("http://" + cnInfo.HostName);
+            string host = cnInfo.HostName.Contains(":") ? cnInfo.HostName : String.Format("{0}:{1}", cnInfo.HostName, DEFAULT_NX_PORT);
+            Uri url = host.StartsWith("http://") ? new Uri(host) : new Uri("http://" + host);
 
             int port = (int)cnInfo.Port;
             if (port == 0)
@@ -103,6 +105,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         public OemDvrStatus GetListOfCameras(OemDvrConnection cnInfo, List<OemDvrCamera> cameras) {
             WebResponse response = null;
 
+            MessageBox.Show("MB");
             try {
                 Uri baseUrl = buildUrl(cnInfo);
 
