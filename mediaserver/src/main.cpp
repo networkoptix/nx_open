@@ -1840,6 +1840,7 @@ void QnMain::run()
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
+    selfInformation.flags = m_mediaServer->getServerFlags();
 
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);

@@ -53,6 +53,7 @@ QByteArray RevealResponse::serialize() {
     map[lit("authHash")] = authHash.toBase64();
     map[lit("protoVersion")] = protoVersion;
     map[lit("runtimeId")] = runtimeId.toString();
+    map[lit("flags")] = (int) flags;
     return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 
@@ -75,6 +76,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     authHash = QByteArray::fromBase64(map.value(lit("authHash")).toByteArray());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
+    flags = (Qn::ServerFlag) map.value(lit("flags")).toInt();
     fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();
