@@ -96,6 +96,9 @@ Page {
         width: parent.width
         height: Units.dp(140)
 
+        endDate: new Date(Date.now() + 5 * 60 * 1000)
+        startDate: new Date(Date.now() - 5 * 60 * 1000)
+
         textColor: "white"
         chunkColor: "#589900"
 

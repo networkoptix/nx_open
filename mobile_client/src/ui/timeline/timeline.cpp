@@ -27,6 +27,8 @@ namespace {
     const qreal textOpacityAnimationSpeed = 0.004;
     const qreal textMarginDp = 35;
     const qreal zoomMultiplier = 2.0;
+    const qreal liveOpacityAnimationSpeed = 0.01;
+    const qreal stripesMovingSpeed = 0.002;
 
     struct MarkInfo {
         qint64 tick;
@@ -41,6 +43,35 @@ namespace {
         return result;
     }
 
+    QImage makeStripesImage(int size, const QColor &color, const QColor &background) {
+        int stripeWidth = size / 2;
+
+        QImage image(size, size, QImage::Format_RGB888);
+        QPainter p(&image);
+        p.setRenderHint(QPainter::Antialiasing);
+
+        QPen pen;
+        pen.setWidth(0);
+        pen.setColor(Qt::transparent);
+        p.setPen(pen);
+        p.setBrush(color);
+
+        p.fillRect(image.rect(), background);
+
+        QPolygon polygon;
+        polygon.append(QPoint(-stripeWidth, size));
+        polygon.append(QPoint(-stripeWidth + size, 0));
+        polygon.append(QPoint(size, 0));
+        polygon.append(QPoint(0, size));
+
+        while (polygon[0].x() < size) {
+            p.drawPolygon(polygon);
+            polygon.translate(stripeWidth * 2, 0);
+        }
+
+        return image;
+    }
+
 } // anonymous namespace
 
 class QnTimelinePrivate {
@@ -52,13 +83,17 @@ public:
 
     int chunkBarHeight;
 
+    bool showLive;
+    QSGTexture *stripesDarkTexture;
+    QSGTexture *stripesLightTexture;
+    qreal liveOpacity;
+    qreal stripesPosition;
+
     qint64 startTime;
     qint64 endTime;
 
     qint64 windowStart;
     qint64 windowEnd;
-
-    qint64 cursorPosition;
 
     QImage textTexture;
 
@@ -93,6 +128,11 @@ public:
         parent(parent),
         textColor("#727272"),
         chunkColor("#2196F3"),
+        showLive(true),
+        stripesDarkTexture(0),
+        stripesLightTexture(0),
+        liveOpacity(0.0),
+        stripesPosition(0.0),
         textLevel(1.0),
         targetTextLevel(1.0),
         timeZoneShift(0)
@@ -136,6 +176,13 @@ public:
 
         animationTimer.start();
         prevAnimationMs = 0;
+    }
+
+    ~QnTimelinePrivate() {
+        if (stripesDarkTexture)
+            delete stripesDarkTexture;
+        if (stripesLightTexture)
+            delete stripesLightTexture;
     }
 
     int dp(qreal dpix) {
@@ -220,6 +267,8 @@ public:
     void updateTextHelper() {
         textHelper.reset(new QnTimelineTextHelper(QFont(), textColor, suffixList));
     }
+
+    void updateStripesTextures();
 
     bool animateProperties(qint64 dt);
     void zoomWindow(qreal factor, int x);
@@ -404,6 +453,9 @@ void QnTimeline::wheelEvent(QWheelEvent *event) {
 QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *updatePaintNodeData) {
     Q_UNUSED(updatePaintNodeData)
 
+    if (!d->stripesDarkTexture || !d->stripesLightTexture)
+        d->updateStripesTextures();
+
     qint64 time = d->animationTimer.elapsed();
 
     bool animated = d->animateProperties(time - d->prevAnimationMs);
@@ -453,6 +505,7 @@ void QnTimeline::setChunkColor(const QColor &color) {
 
     emit chunkColorChanged();
 
+    d->updateStripesTextures();
     update();
 }
 
@@ -468,6 +521,7 @@ void QnTimeline::setChunkBarHeight(int chunkBarHeight) {
 
     emit chunkBarHeightChanged();
 
+    d->updateStripesTextures();
     update();
 }
 
@@ -666,6 +720,10 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
 
 QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     QSGGeometry *geometry;
+    QSGGeometry *stripesGeometry;
+    QSGOpacityNode *lightStripesOpacityNode;
+    QSGGeometryNode *stripesNode;
+    QSGGeometryNode *lightStripesNode;
 
     if (!chunksNode) {
         chunksNode = new QSGGeometryNode();
@@ -678,8 +736,50 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
         QSGVertexColorMaterial *material = new QSGVertexColorMaterial();
         chunksNode->setMaterial(material);
         chunksNode->setFlag(QSGNode::OwnsMaterial);
+
+        stripesGeometry = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4);
+        stripesGeometry->setDrawingMode(GL_TRIANGLE_STRIP);
+
+        QSGTextureMaterial *stripesDarkMaterial = new QSGTextureMaterial();
+        stripesDarkMaterial->setTexture(d->stripesDarkTexture);
+        stripesDarkMaterial->setHorizontalWrapMode(QSGTexture::Repeat);
+
+        QSGTextureMaterial *stripesLightMaterial = new QSGTextureMaterial();
+        stripesLightMaterial->setTexture(d->stripesLightTexture);
+        stripesLightMaterial->setHorizontalWrapMode(QSGTexture::Repeat);
+
+        stripesNode = new QSGGeometryNode();
+        stripesNode->setGeometry(stripesGeometry);
+        stripesNode->setFlag(QSGNode::OwnsGeometry);
+        stripesNode->setMaterial(stripesDarkMaterial);
+        stripesNode->setFlag(QSGNode::OwnsMaterial);
+
+        lightStripesNode = new QSGGeometryNode();
+        lightStripesNode->setGeometry(stripesGeometry);
+        lightStripesNode->setMaterial(stripesLightMaterial);
+        lightStripesNode->setFlag(QSGNode::OwnsMaterial);
+
+        lightStripesOpacityNode = new QSGOpacityNode();
+
+        chunksNode->appendChildNode(stripesNode);
+        stripesNode->appendChildNode(lightStripesOpacityNode);
+        lightStripesOpacityNode->appendChildNode(lightStripesNode);
     } else {
         geometry = chunksNode->geometry();
+
+        stripesNode = static_cast<QSGGeometryNode*>(chunksNode->childAtIndex(0));
+        lightStripesOpacityNode = static_cast<QSGOpacityNode*>(stripesNode->childAtIndex(0));
+        lightStripesNode = static_cast<QSGGeometryNode*>(lightStripesOpacityNode->childAtIndex(0));
+        stripesGeometry = stripesNode->geometry();
+
+        QSGTextureMaterial *material = static_cast<QSGTextureMaterial*>(stripesNode->material());
+        if (material->texture() != d->stripesDarkTexture) {
+            delete material->texture();
+            material->setTexture(d->stripesDarkTexture);
+            material = static_cast<QSGTextureMaterial*>(lightStripesNode->material());
+            delete material->texture();
+            material->setTexture(d->stripesLightTexture);
+        }
     }
 
     qint64 minimumValue = this->windowStart();
@@ -760,7 +860,32 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
 
     chunksNode->markDirty(QSGNode::DirtyGeometry);
 
+    lightStripesOpacityNode->setOpacity(d->liveOpacity);
+
+    qreal liveX = qMin(width(), d->timeToPixelPos(QDateTime::currentMSecsSinceEpoch()));
+    qreal textureX = (width() - liveX) / d->chunkBarHeight;
+    QSGGeometry::TexturedPoint2D *stripesPoints = stripesGeometry->vertexDataAsTexturedPoint2D();
+    stripesPoints[0].set(liveX, y, d->stripesPosition, 0);
+    stripesPoints[1].set(width(), y, textureX + d->stripesPosition, 0.0);
+    stripesPoints[2].set(liveX, height(), d->stripesPosition, 1.0);
+    stripesPoints[3].set(width(), height(), textureX + d->stripesPosition, 1.0);
+
+    stripesNode->markDirty(QSGNode::DirtyGeometry);
+    lightStripesNode->markDirty(QSGNode::DirtyGeometry);
+
     return chunksNode;
+}
+
+void QnTimelinePrivate::updateStripesTextures() {
+    QQuickWindow *window = parent->window();
+    if (!window)
+        return;
+
+    QImage stripesDark = makeStripesImage(chunkBarHeight, chunkColor.darker(180), chunkColor.darker());
+    QImage stripesLight = makeStripesImage(chunkBarHeight, chunkColor, chunkColor.darker(105));
+
+    stripesDarkTexture = parent->window()->createTextureFromImage(stripesDark);
+    stripesLightTexture = parent->window()->createTextureFromImage(stripesLight);
 }
 
 bool QnTimelinePrivate::animateProperties(qint64 dt) {
@@ -835,6 +960,26 @@ bool QnTimelinePrivate::animateProperties(qint64 dt) {
         parent->windowStartDateChanged();
         parent->windowEndDateChanged();
         parent->positionDateChanged();
+    }
+
+    bool live = parent->position() + 1000 >= QDateTime::currentMSecsSinceEpoch();
+
+    qreal targetLiveOpacity = live ? 1.0 : 0.0;
+    if (!qFuzzyCompare(liveOpacity, targetLiveOpacity)) {
+        changed = true;
+
+        if (liveOpacity < targetLiveOpacity)
+            liveOpacity = qMin(targetLiveOpacity, liveOpacity + liveOpacityAnimationSpeed * dt);
+        else
+            liveOpacity = qMax(targetLiveOpacity, liveOpacity - liveOpacityAnimationSpeed * dt);
+    }
+
+    if (live) {
+        changed = true;
+
+        stripesPosition += dt * stripesMovingSpeed;
+        while (stripesPosition > 1.0)
+            stripesPosition -= 1.0;
     }
 
     return changed;
