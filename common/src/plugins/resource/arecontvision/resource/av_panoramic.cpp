@@ -174,7 +174,7 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout(
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     Q_UNUSED(dataProvider)
-    QMutexLocker lock(&m_layoutMutex);
+    QnMutexLocker lock(&m_layoutMutex);
 
     QnConstResourceVideoLayoutPtr layout = QnArecontPanoramicResource::getDefaultVideoLayout();
     const QnCustomResourceVideoLayout* customLayout = dynamic_cast<const QnCustomResourceVideoLayout*>(layout.data());

@@ -77,8 +77,8 @@ private:
     void createReader(QnServer::ChunksCatalog catalog);
     void stop();
 private:
-    QMutex m_readersMutex;
-    QMutex m_getReaderMutex;
+    QnMutex m_readersMutex;
+    QnMutex m_getReaderMutex;
     QnResourcePtr m_resource;
     QnLiveStreamProviderPtr m_primaryReader;
     QnLiveStreamProviderPtr m_secondaryReader;

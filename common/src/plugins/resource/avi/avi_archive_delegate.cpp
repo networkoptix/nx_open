@@ -278,7 +278,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 
 bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
 {
-    QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
+    QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
 
     m_resource = resource;
     if (m_formatContext == 0)

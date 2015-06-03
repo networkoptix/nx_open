@@ -2,7 +2,7 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/singleton.h>
 #include <utils/network/http/httptypes.h>

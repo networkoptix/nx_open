@@ -9,13 +9,13 @@ static const int DROID_TIMEOUT = 3 * 1000;
 
 static const int DROID_CONTROL_TCP_SERVER_PORT = 5690;
 
-QMutex PlDroidStreamReader::m_allReadersMutex;
+QnMutex PlDroidStreamReader::m_allReadersMutex;
 QMap<quint32, PlDroidStreamReader*> PlDroidStreamReader::m_allReaders;
 
 
 void PlDroidStreamReader::setSDPInfo(quint32 ipv4, QByteArray sdpInfo)
 {
-    QMutexLocker lock(&m_allReadersMutex);
+    QnMutexLocker lock( &m_allReadersMutex );
     PlDroidStreamReader* reader = m_allReaders.value(ipv4);
     if (reader)
         reader->setSDPInfo(sdpInfo);
@@ -59,7 +59,7 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
             continue;
         }
 
-        QMutexLocker lock(&m_controlPortSync);
+        QnMutexLocker lock( &m_controlPortSync );
         rtpBuffer.reserve(rtpBuffer.size() + MAX_RTP_PACKET_SIZE);
         int readed = m_videoIoDevice->read( (char*) rtpBuffer.data() + rtpBuffer.size(), MAX_RTP_PACKET_SIZE);
         if (readed > 0) {
@@ -116,7 +116,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
     m_h264Parser = new CLH264RtpParser();
 
     {
-        QMutexLocker lock(&m_allReadersMutex);
+        QnMutexLocker lock( &m_allReadersMutex );
         quint32 ip = resolveAddress(res->getHostAddress()).toIPv4Address();
         m_allReaders.insert(ip, this);
     }
@@ -150,7 +150,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
 void PlDroidStreamReader::closeStream()
 {
     {
-        QMutexLocker lock(&m_allReadersMutex);
+        QnMutexLocker lock( &m_allReadersMutex );
         quint32 ip = resolveAddress(m_droidRes->getHostAddress()).toIPv4Address();
         m_allReaders.remove(ip);
     }
@@ -176,7 +176,7 @@ bool PlDroidStreamReader::isStreamOpened() const
 
 void PlDroidStreamReader::setSDPInfo(QByteArray sdpInfo)
 {
-    QMutexLocker lock(&m_controlPortSync);
+    QnMutexLocker lock( &m_controlPortSync );
     m_h264Parser->setSDPInfo(sdpInfo.split('\n'));
     m_gotSDP = true;
 }

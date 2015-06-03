@@ -29,7 +29,7 @@ static const int MAX_CLIENT_BUFFER_SIZE_MS = 1000*2;
 
 QHash<QHostAddress, qint64> QnRtspDataConsumer::m_lastSwitchTime;
 QSet<QnRtspDataConsumer*> QnRtspDataConsumer::m_allConsumers;
-QMutex QnRtspDataConsumer::m_allConsumersMutex(QMutex::Recursive);
+QnMutex QnRtspDataConsumer::m_allConsumersMutex(QnMutex::Recursive);
 
 
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
@@ -66,14 +66,14 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
 
 {
     m_timer.start();
-    QMutexLocker lock(&m_allConsumersMutex);
+    QnMutexLocker lock( &m_allConsumersMutex );
     m_allConsumers << this;
 }
 
 QnRtspDataConsumer::~QnRtspDataConsumer()
 {
     {
-        QMutexLocker lock(&m_allConsumersMutex);
+        QnMutexLocker lock( &m_allConsumersMutex );
         m_allConsumers.remove(this);
     }
     stop();
@@ -96,7 +96,7 @@ void QnRtspDataConsumer::setLastSendTime(qint64 time)
 }
 void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
 { 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_waitSCeq = sceq; 
     m_lastMediaTime = m_lastSendTime = newTime;
 }
@@ -128,7 +128,7 @@ bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
 
 bool QnRtspDataConsumer::isMediaTimingsSlow() const
 {
-    QMutexLocker lock(&m_liveTimingControlMtx);
+    QnMutexLocker lock( &m_liveTimingControlMtx );
     if (m_lastLiveTime == (qint64)AV_NOPTS_VALUE)
         return false;
     Q_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
@@ -183,7 +183,7 @@ static const int MAX_DATA_QUEUE_SIZE = 120;
 
 void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    QMutexLocker lock(&m_dataQueueMtx);
+    QnMutexLocker lock( &m_dataQueueMtx );
     m_dataQueue.push(nonConstData);
 
     // quality control
@@ -260,7 +260,7 @@ void QnRtspDataConsumer::setLiveMode(bool value)
 
 void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
 {
-    QMutexLocker lock(&m_qualityChangeMutex);
+    QnMutexLocker lock( &m_qualityChangeMutex );
     m_newLiveQuality = liveQuality;
 }
 
@@ -353,7 +353,7 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
 
         sendLen = qMin(MAX_RTSP_DATA_LEN - ffHeaderSize, dataRest);
         buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
-        //QMutexLocker lock(&m_owner->getSockMutex());
+        //QnMutexLocker lock( &m_owner->getSockMutex() );
         m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         if (ffHeaderSize) 
         {
@@ -485,7 +485,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         {
-            QMutexLocker lock(&m_qualityChangeMutex);
+            QnMutexLocker lock( &m_qualityChangeMutex );
             if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
             {
                 if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
@@ -515,7 +515,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         return true; // skip data (for example audio is disabled)
     const QnRtspEncoderPtr& codecEncoder = trackInfo->encoder;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         int cseq = media->opaque;
         if (m_waitSCeq != -1) {
             if (cseq != m_waitSCeq)
@@ -545,7 +545,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (isLive && media->dataType == QnAbstractMediaData::VIDEO) 
     {
-        QMutexLocker lock(&m_liveTimingControlMtx);
+        QnMutexLocker lock( &m_liveTimingControlMtx );
         if (m_firstLiveTime == (qint64)AV_NOPTS_VALUE) {
             m_liveTimer.restart();
             m_lastLiveTime = m_firstLiveTime = media->timestamp;
@@ -625,7 +625,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
 
-    QMutexLocker lock(&m_liveTimingControlMtx);
+    QnMutexLocker lock( &m_liveTimingControlMtx );
     if (media->dataType == QnAbstractMediaData::VIDEO && m_lastLiveTime != (qint64)AV_NOPTS_VALUE)
         m_lastLiveTime = media->timestamp;
 
@@ -663,7 +663,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
 
-    QMutexLocker lock(&m_liveTimingControlMtx);
+    QnMutexLocker lock( &m_liveTimingControlMtx );
     m_firstLiveTime = AV_NOPTS_VALUE;
     m_lastLiveTime = AV_NOPTS_VALUE;
 
@@ -696,7 +696,7 @@ void QnRtspDataConsumer::setLiveMarker(int marker)
 
 void QnRtspDataConsumer::clearUnprocessedData()
 {
-    QMutexLocker lock(&m_dataQueueMtx);
+    QnMutexLocker lock( &m_dataQueueMtx );
     QnAbstractDataConsumer::clearUnprocessedData();
     m_newLiveQuality = MEDIA_Quality_None;
     m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);
@@ -716,7 +716,7 @@ void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
 {
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
-    QMutexLocker lock(&m_allConsumersMutex);
+    QnMutexLocker lock( &m_allConsumersMutex );
     m_lastSwitchTime[clientAddress] = currentTime;
     m_liveQuality = quality;
 }

@@ -2,6 +2,7 @@
 #define QNSERVERADDITIONALADDRESSESDICTIONARY_H
 
 #include <utils/common/singleton.h>
+#include <utils/thread/mutex.h>
 
 
 class QnServerAdditionalAddressesDictionary: public QObject, public Singleton<QnServerAdditionalAddressesDictionary>
@@ -21,7 +22,7 @@ private:
     };
 
     QMap<QnUuid, DiscoveryInfo> m_discoveryInfoById;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 #endif // QNSERVERADDITIONALADDRESSESDICTIONARY_H

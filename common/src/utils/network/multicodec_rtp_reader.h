@@ -113,7 +113,7 @@ private:
     Qn::ConnectionRole m_role;
 
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
-    mutable QMutex m_layoutMutex;
+    mutable QnMutex m_layoutMutex;
     QnConstResourceAudioLayoutPtr m_audioLayout;
     bool m_gotData;
     QElapsedTimer m_dataTimer;

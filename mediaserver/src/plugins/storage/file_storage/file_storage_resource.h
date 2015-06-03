@@ -53,7 +53,7 @@ private:
 
     bool isStorageDirMounted();
 private:
-    mutable QMutex m_mutexPermission;
+    mutable QnMutex m_mutexPermission;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

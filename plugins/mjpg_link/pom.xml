@@ -23,7 +23,7 @@
     <properties>
         <product.title>${project.name}</product.title>  
         <!--Global libs-->
-        <qt.libs>core</qt.libs>
+        <qt.libs>core network</qt.libs>
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib Winmm.lib common.lib -lssleay32 -llibeay32</windows.oslibs>

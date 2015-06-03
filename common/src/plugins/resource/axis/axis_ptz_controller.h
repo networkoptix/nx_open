@@ -50,7 +50,7 @@ private:
     QnLinearFunction m_35mmEquivToCameraZoom, m_cameraTo35mmEquivZoom;
     QVector3D m_maxDeviceSpeed;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QByteArray m_cookie;
 };
 

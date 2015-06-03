@@ -63,7 +63,7 @@ QnResourceList QnActiResourceSearcher::findResources(void)
 
 QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QString host = url.host();
     CasheInfo info = m_cachedXml.value(host);
@@ -85,7 +85,7 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
 
 void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QString host = reply->url().host();
     m_cachedXml[host].xml = reply->fetchMessageBodyBuffer();

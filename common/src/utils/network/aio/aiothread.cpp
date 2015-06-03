@@ -197,17 +197,17 @@ namespace aio
         //TODO #ak too many mutexes here. Refactoring required
 
         PollSetType pollSet;
-        QMutex* const aioServiceMutex;
+        QnMutex* const aioServiceMutex;
         std::deque<SocketAddRemoveTask> pollSetModificationQueue;
         unsigned int newReadMonitorTaskCount;
         unsigned int newWriteMonitorTaskCount;
-        mutable QMutex mutex;
+        mutable QnMutex mutex;
         //TODO #ak get rid of map here to avoid undesired allocations
         std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
         //TODO #ak use cyclic array here to minimize allocations
         std::deque<SocketAddRemoveTask> postedCalls;
 
-        AIOThreadImpl( QMutex* const _aioServiceMutex )
+        AIOThreadImpl( QnMutex* const _aioServiceMutex )
         :
             aioServiceMutex( _aioServiceMutex ),
             newReadMonitorTaskCount( 0 ),
@@ -220,7 +220,7 @@ namespace aio
             if( pollSetModificationQueue.empty() )
                 return;
 
-            QMutexLocker lk( aioServiceMutex );
+            QnMutexLocker lk( aioServiceMutex );
 
             for( typename std::deque<SocketAddRemoveTask>::iterator
                 it = pollSetModificationQueue.begin();
@@ -442,7 +442,7 @@ namespace aio
                     static_cast<AIOEventHandlingDataHolder<SocketType>*>(
                         socket->impl()->eventTypeToUserData[handlerToInvokeType])->data;
 
-                QMutexLocker lk( &mutex );
+                QnMutexLocker lk( &mutex );
                 ++handlingData->beingProcessed;
                 //TODO #ak possibly some atomic fence is required here
                 if( handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0 ) //socket has been removed from watch
@@ -472,7 +472,7 @@ namespace aio
 
             for( ;; )
             {
-                QMutexLocker lk( &mutex );
+                QnMutexLocker lk( &mutex );
 
                 PeriodicTaskData periodicTaskData;
                 {
@@ -560,7 +560,7 @@ namespace aio
             SocketType* _socket,
             aio::EventType eventType )
         {
-            QMutexLocker lk( &mutex );
+            QnMutexLocker lk( &mutex );
             addPeriodicTaskNonSafe( taskClock, handlingData, _socket, eventType );
         }
 
@@ -605,7 +605,7 @@ namespace aio
 
 
     template<class SocketType>
-    AIOThread<SocketType>::AIOThread( QMutex* const aioServiceMutex ) //TODO: #ak give up using single aioServiceMutex for all aio threads
+    AIOThread<SocketType>::AIOThread( QnMutex* const aioServiceMutex ) //TODO: #ak give up using single aioServiceMutex for all aio threads
     :
         m_impl( new AIOThreadImplType( aioServiceMutex ) )
     {
@@ -867,7 +867,7 @@ namespace aio
             //taking clock of the next periodic task
             qint64 nextPeriodicEventClock = 0;
             {
-                QMutexLocker lk( &m_impl->mutex );
+                QnMutexLocker lk( &m_impl->mutex );
                 nextPeriodicEventClock = m_impl->periodicTasksByClock.empty() ? 0 : m_impl->periodicTasksByClock.cbegin()->first;
             }
 

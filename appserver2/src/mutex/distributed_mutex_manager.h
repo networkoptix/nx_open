@@ -39,7 +39,7 @@ namespace ec2
         void releaseMutex(const QString& name);
     private:
         QMap<QString, QnDistributedMutex*> m_mutexList;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         qint64 m_timestamp;
         QnMutexUserDataHandler* m_userDataHandler;
     };
