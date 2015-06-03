@@ -69,7 +69,9 @@ QnAuthHelper* QnAuthHelper::m_instance;
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
 static const qint64 COOKIE_EXPERATION_PERIOD = 3600;
-static const QString REALM(lit("NetworkOptix"));
+
+// TODO: #2.4 replace with customization value
+const QString QnAuthHelper::REALM(lit("NetworkOptix"));
 
 QnAuthHelper::QnAuthHelper()
 {

@@ -68,7 +68,10 @@ StreamingChunkTranscoder::~StreamingChunkTranscoder()
     for( auto val: m_taskIDToTranscode )
         TimerManager::instance()->joinAndDeleteTimer( val.first );
 
-    std::for_each( m_transcodeThreads.begin(), m_transcodeThreads.end(), std::default_delete<StreamingChunkTranscoderThread>() );
+    std::for_each(
+        m_transcodeThreads.begin(),
+        m_transcodeThreads.end(),
+        std::default_delete<StreamingChunkTranscoderThread>() );
     m_transcodeThreads.clear();
 }
 
@@ -232,13 +235,6 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     return true;
-}
-
-Q_GLOBAL_STATIC_WITH_ARGS( StreamingChunkTranscoder, streamingChunkTranscoderInstance, (StreamingChunkTranscoder::fBeginOfRangeInclusive) );
-
-StreamingChunkTranscoder* StreamingChunkTranscoder::instance()
-{
-    return streamingChunkTranscoderInstance();
 }
 
 void StreamingChunkTranscoder::onTimer( const quint64& timerID )

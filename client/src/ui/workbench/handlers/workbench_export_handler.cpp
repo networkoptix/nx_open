@@ -150,7 +150,6 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     }
 
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
-    exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
     exportProgressDialog->show();
 
@@ -420,7 +419,6 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
     exportProgressDialog->setWindowTitle(tr("Exporting Video"));
     exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
-    exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
 
     QnMediaResourcePtr resource = widget->resource();
