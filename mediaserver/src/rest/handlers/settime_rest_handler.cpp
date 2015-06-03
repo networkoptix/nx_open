@@ -9,19 +9,22 @@
 #ifdef Q_OS_LINUX
 #include <sys/time.h>
 
-void setTimeZone(const QString& timezone)
+bool setTimeZone(const QString& timezone)
 {
-    QString tz = QString(lit(":%1")).arg(timezone);
-    setenv("TZ", tz.toLatin1().data(), 1);
-    tzset();
+    QString timezoneFile = QString(lit("/usr/share/zoneinfo/%1")).arg(timezone);
+    if (!QFile::exists(timezoneFile))
+	return false;
+    if (unlink("/etc/localtime") != 0)
+	return false;
+    return symlink(timezoneFile.toLatin1().data(), "/etc/localtime") == 0;
 }
 
-void setDateTime(const QDateTime& datetime)
+bool setDateTime(const QDateTime& datetime)
 {
     struct timeval tv;
     tv.tv_sec = datetime.toMSecsSinceEpoch() / 1000;
     tv.tv_usec = (datetime.toMSecsSinceEpoch() % 1000) * 1000;
-    settimeofday(&tv, 0);
+    return settimeofday(&tv, 0) == 0;
 }
 #endif
 
@@ -56,9 +59,20 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
     }
     
 #ifdef Q_OS_LINUX
-    if (!timezone.isEmpty())
-        setTimeZone(timezone);
-    setDateTime(dateTime);
+    if (!timezone.isEmpty()) {
+        if (!setTimeZone(timezone)) {
+    	    result.setError(QnJsonRestResult::CantProcessRequest);
+    	    result.setErrorString(lit("Invalid timezone specified"));
+    	    return CODE_OK;
+	}
+    }
+    if (!setDateTime(dateTime)) {
+        result.setError(QnJsonRestResult::CantProcessRequest);
+        result.setErrorString(lit("Can't set new datetime value"));
+        return CODE_OK;
+    }
+
+
 #endif
     return CODE_OK;
 }
