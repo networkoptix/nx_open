@@ -105,3 +105,7 @@ QImage QnTimelineTextHelper::texture() const {
 int QnTimelineTextHelper::maxCharWidth() const {
     return d->fm.size(Qt::TextSingleLine, lit("m")).width();
 }
+
+int QnTimelineTextHelper::lineHeight() const {
+    return d->lineHeight;
+}

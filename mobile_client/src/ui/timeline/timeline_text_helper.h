@@ -18,6 +18,7 @@ public:
     QSize digitSize() const;
     QImage texture() const;
     int maxCharWidth() const;
+    int lineHeight() const;
 
 private:
     QScopedPointer<QnTimelineTextHelperPrivate> d;

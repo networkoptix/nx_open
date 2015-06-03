@@ -612,7 +612,7 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
         }
 
         qreal x = qFloor(info.x - tw / 2);
-        qreal y = d->dp(4);
+        qreal y = qFloor((height() - d->chunkBarHeight - d->textHelper->lineHeight()) / 2);
         int shift = 0;
 
         if (isNum) {
