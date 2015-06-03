@@ -18,6 +18,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             public string id { get; set; }
             public string name { get; set; }
             public string model { get; set; }
+            public string url { get; set; }
         }
 
         class CurrentTime {
@@ -116,7 +117,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                     if (apiCamera.model.Contains("virtual desktop camera"))
                         continue;
 
-                    cameras.Add(new OemDvrCamera(apiCamera.id, apiCamera.name));
+                    cameras.Add(new OemDvrCamera(apiCamera.id, String.Format("{0} ({1})", apiCamera.name, apiCamera.url)));
                 }
 
                 _logger.InfoFormat("Found {0} cameras.", cameras.Count);
