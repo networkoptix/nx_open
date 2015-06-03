@@ -1,0 +1,114 @@
+#include "upnp_device_description.h"
+
+bool UpnpDeviceDescriptionHandler::startDocument()
+{
+    m_deviceInfo = UpnpDeviceInfo();
+    m_paramElement.clear();
+    m_lastService = 0;
+    return true;
+}
+
+bool UpnpDeviceDescriptionHandler::endDocument()
+{
+    return true;
+}
+
+bool UpnpDeviceDescriptionHandler::startElement(
+        const QString& /*namespaceURI*/, const QString& /*localName*/,
+        const QString& qName, const QXmlAttributes& /*atts*/ )
+{
+    if( qName == lit("device") )
+    {
+        if( m_deviceStack.empty() )
+            m_deviceStack.push_back(&m_deviceInfo);
+        else {
+            auto& devs = m_deviceStack.back()->deviceList;
+            auto& newDev = *devs.emplace(devs.end());
+            m_deviceStack.push_back(&newDev);
+        }
+    }
+    else
+    if( qName == lit("service") )
+    {
+        if (m_deviceStack.empty()) return false;
+        auto& servs = m_deviceStack.back()->serviceList;
+        auto& newServ = *servs.emplace(servs.end());
+        m_lastService = &newServ;
+    }
+    else
+        m_paramElement = qName;
+    return true;
+}
+
+bool UpnpDeviceDescriptionHandler::endElement(
+        const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName )
+{
+    if( qName == lit("device") )
+        m_deviceStack.pop_back();
+    else
+    if( qName == lit("service") )
+        m_lastService = 0;
+    else
+        m_paramElement.clear();
+    return true;
+}
+
+bool UpnpDeviceDescriptionHandler::characters( const QString& ch )
+{
+    if (m_lastService && charactersInService(ch))
+        return true;
+
+    if (!m_deviceStack.empty() && charactersInDevice(ch))
+        return true;
+
+    return true; // Something not interesting for us
+}
+
+bool UpnpDeviceDescriptionHandler::charactersInDevice( const QString& ch )
+{
+    auto& lastDev = *m_deviceStack.back();
+
+    if( m_paramElement == lit("deviceType") )
+        lastDev.deviceType = ch;
+    else
+    if( m_paramElement == lit("friendlyName") )
+        lastDev.friendlyName = ch;
+    else
+    if( m_paramElement == lit("manufacturer") )
+        lastDev.manufacturer = ch;
+    else
+    if( m_paramElement == lit("modelName") )
+        lastDev.modelName = ch;
+    else
+    if( m_paramElement == lit("serialNumber") )
+        lastDev.serialNumber = ch;
+    else
+    if( m_paramElement == lit("presentationURL") )
+        lastDev.presentationUrl = ch.endsWith( lit("/") ) ? ch.left( ch.length() - 1) : ch;
+    else
+        return false; // was not useful
+
+    return true;
+}
+
+bool UpnpDeviceDescriptionHandler::charactersInService( const QString& ch )
+{
+    if( m_paramElement == QLatin1String("serviceType") )
+        m_lastService->serviceType = ch;
+    else
+    if( m_paramElement == QLatin1String("serviceId") )
+        m_lastService->serviceId = ch;
+    else
+    if( m_paramElement == QLatin1String("controlURL") )
+        m_lastService->controlUrl = ch;
+    else
+    if( m_paramElement == QLatin1String("eventSubURL") )
+        m_lastService->eventSubUrl = ch;
+    else
+    if( m_paramElement == QLatin1String("SCPDURL") )
+        m_lastService->scpdUrl = ch;
+    else
+        return false; // was not useful
+
+    return true;
+}

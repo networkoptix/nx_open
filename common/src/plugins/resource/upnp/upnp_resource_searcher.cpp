@@ -18,7 +18,8 @@ static const int TCP_TIMEOUT = 3000;
 static const int CACHE_TIME_TIME = 1000 * 60 * 5;
 static const int GROUP_PORT = 1900;
 
-//!Partial parser for SSDP description xml (UPnP™ Device Architecture 1.1, 2.3)
+// TODO: #mu try to replace with UpnpDeviceDescriptionHandler when upnp camera is avaliable
+//!Partial parser for SSDP description xml (UPnP Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
 :
     public QXmlDefaultHandler
@@ -97,7 +98,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         UDPSocket* udpSock = new UDPSocket();
         udpSock->setReuseAddrFlag(true);
         udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
-        
+
         for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces()) {
             udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
         }
@@ -119,7 +120,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
             return 0;
         }
 
-        
+
 
         /*
         if (!sock->joinGroup(groupAddress.toString(), iface.address.toString()))
@@ -289,17 +290,6 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 ////////////////////////////////////////////////////////////
 //// class QnUpnpResourceSearcherAsync
 ////////////////////////////////////////////////////////////
-
-QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync()
-{
-    UPNPDeviceSearcher::instance()->registerHandler( this );
-}
-
-QnUpnpResourceSearcherAsync::~QnUpnpResourceSearcherAsync()
-{
-    if (UPNPDeviceSearcher::instance())
-        UPNPDeviceSearcher::instance()->cancelHandlerRegistration( this );
-}
 
 QnResourceList QnUpnpResourceSearcherAsync::findResources()
 {
