@@ -352,7 +352,7 @@ QnTransactionTransport::State QnTransactionTransport::getState() const
 }
 
 bool QnTransactionTransport::isIncoming() const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_peerRole == prAccepting;
 }
 

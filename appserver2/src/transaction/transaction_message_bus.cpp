@@ -1510,7 +1510,7 @@ QList<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() cons
         connections.append(info);
     };
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     for (const QnTransactionTransport *transport: m_connections.values())
         storeTransport(transport);
