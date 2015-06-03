@@ -41,12 +41,10 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         private static IPlugin axHDWitness;
         private static Control axHDWitnessForm;
 
-//        private static AppDomain domain;
-
         private Panel m_surface;
         private OemDvrCamera[] _cameras;
 
-        private long _tick;
+        private static long _tick;
 
         private Api.ConnectInfo getConnectInfo(Uri url, string login, string password) {
             Api.ConnectInfo connectInfo = LoadData<Api.ConnectInfo>(url.ToString() + "ec2/connect", login, password);
@@ -60,7 +58,8 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             }
 
             if (ourProtoVersion < connectInfo.nxClusterProtoVersion) {
-                MessageBox.Show("Incompatible version. Please update... blah-blah-blah", "Error", MessageBoxButtons.OK);
+                MessageBox.Show(String.Format("Incompatible version. Please install plugin of version {0}.{1}.{2} to connect to this server",
+                    serverVersion.Major, serverVersion.Minor, serverVersion.Build), "Error", MessageBoxButtons.OK);
                 return null;
             }
 
@@ -166,6 +165,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
             try {
                 _tick = dateToMsecsSinceEpoch(pbInfo.StartTimeUtc);
+
                 Uri baseUrl = buildUrl(cnInfo);
 
                 if ((pbInfo.DvrCameras == null) || (pbInfo.DvrCameras.Length <= 0)) {
@@ -270,18 +270,18 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                         }
 
                     case OemDvrPlaybackFunction.Forward: {
-                            _logger.DebugFormat("Setting speed {0}", speed);
-                            axHDWitness.setSpeed(1 + speed / 1000.0);
+                            _logger.DebugFormat("Setting speed {0}", speed / 100);
+                            axHDWitness.setSpeed(speed / 100);
                             controlOk = true;
                             break;
                         }
 
                     case OemDvrPlaybackFunction.Backward: {
-                            _logger.DebugFormat("Setting speed -{0}", speed);
-                            axHDWitness.setSpeed(-1 - speed / 1000.0);
-                            controlOk = true;
-                            break;
-                        }
+                        _logger.DebugFormat("Setting speed {0}", -speed / 100);
+                        axHDWitness.setSpeed(-speed / 100);
+                        controlOk = true;
+                        break;
+                    }
 
                     // Close down the session, such that the next actions can be closing the application or starting new session.
                     case OemDvrPlaybackFunction.Stop: {
