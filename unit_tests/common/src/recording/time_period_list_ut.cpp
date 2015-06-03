@@ -46,9 +46,9 @@ TEST( QnTimePeriodsListTest, mergeBigData )
 
     const int mergingListsCount = 10;
 
-    QVector<QnTimePeriodList> lists;
+    std::vector<QnTimePeriodList> lists;
     for (int i = 0; i < mergingListsCount; ++i)
-        lists << QnTimePeriodList();
+        lists.push_back(QnTimePeriodList());
 
     QnTimePeriodList resultPeriods;
 
@@ -186,7 +186,10 @@ TEST( QnTimePeriodsListTest, unionByCombining )
     QnTimePeriodList resultList;
     resultList << QnTimePeriod(10, 25) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
 
-    QnTimePeriodList mergedList = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << sourceList << appendingList);
+    std::vector<QnTimePeriodList> periods;
+    periods.push_back(sourceList);
+    periods.push_back(appendingList);
+    QnTimePeriodList mergedList = QnTimePeriodList::mergeTimePeriods(periods);
     ASSERT_EQ(mergedList, resultList);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
@@ -202,7 +205,10 @@ TEST( QnTimePeriodsListTest, unionByCombiningSeveral )
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(5, 30);
 
-    QnTimePeriodList resultList = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << sourceList << appendingList);
+    std::vector<QnTimePeriodList> periods;
+    periods.push_back(sourceList);
+    periods.push_back(appendingList);
+    QnTimePeriodList resultList = QnTimePeriodList::mergeTimePeriods(periods);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
 
@@ -218,7 +224,10 @@ TEST( QnTimePeriodsListTest, unionByLimits )
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(10, 5)  << QnTimePeriod(30, 5) ;
 
-    QnTimePeriodList resultList = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << sourceList << appendingList);
+    std::vector<QnTimePeriodList> periods;
+    periods.push_back(sourceList);
+    periods.push_back(appendingList);
+    QnTimePeriodList resultList = QnTimePeriodList::mergeTimePeriods(periods);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
 

@@ -169,6 +169,8 @@ public:
     void setState(State state);
     State getState() const;
 
+    bool isIncoming() const;
+
     void setRemoteIdentityTime(qint64 time);
     qint64 remoteIdentityTime() const;
 

@@ -4,31 +4,17 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/network/tcp_connection_priv.h>
-#include <utils/network/module_information.h>
-#include <utils/common/model_functions.h>
 #include <common/common_module.h>
 #include "utils/network/http/linesplitter.h"
+#include "network_address_entry.h"
 
-struct QnNetworkAddressEntry
+bool readExtraFields(QnNetworkAddressEntryList& entryList)
 {
-    QnNetworkAddressEntry(): dhcp(false) {}
-
-    QString name;
-    QString ipAddr;
-    QString netMask;
-    QString mac;
-    bool dhcp;
-}; 
-typedef QVector<QnNetworkAddressEntry> QnNetworkAddressEntryList;
-
-#define QnNetworkAddressEntry_Fields (name)(ipAddr)(netMask)(mac)(dhcp)
-QN_FUSION_DECLARE_FUNCTIONS(QnNetworkAddressEntry, (json)) 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnNetworkAddressEntry, (json), QnNetworkAddressEntry_Fields)
-
-
-bool readDHCPState(QnNetworkAddressEntryList& entryList)
-{
+#ifdef Q_OS_WIN
+    QFile netSettings(lit("c:/etc/network/interfaces"));
+#else
     QFile netSettings(lit("/etc/network/interfaces"));
+#endif
     if (!netSettings.open(QFile::ReadOnly))
     {
         qWarning() << "Can't read network settings file to determine DHCP settings";
@@ -40,14 +26,29 @@ bool readDHCPState(QnNetworkAddressEntryList& entryList)
     QnByteArrayConstRef line;
     size_t bytesRead = 0;
     size_t dataOffset = 0;
+    QByteArray lastIfName;
     while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
     {
         dataOffset += bytesRead;
-        for (auto& entry: entryList) {
-            const auto& data = line.toByteArrayWithRawData();
-            QByteArray pattern = QByteArray("iface ").append(entry.name.toLatin1());
-            if (!entry.name.isEmpty() && data.startsWith(pattern))
-                entry.dhcp = data.contains("dhcp");
+
+        QByteArray data = line.toByteArrayWithRawData().trimmed();
+        QList<QByteArray> worlds = data.split(' ');
+        if (worlds.size() < 2)
+            continue;
+
+        if (data.startsWith("iface")) {
+            lastIfName = worlds[1].trimmed();
+            for (auto& entry: entryList) {
+                if (entry.name == lastIfName)
+                    entry.dhcp = data.contains("dhcp");
+            }
+
+        }
+        else if (data.startsWith("netmask")) {
+            for (auto& entry: entryList) {
+                if (entry.name == lastIfName)
+                    entry.netMask = worlds[1].trimmed();
+            }
         }
     }
 
@@ -57,6 +58,7 @@ bool readDHCPState(QnNetworkAddressEntryList& entryList)
 int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
     Q_UNUSED(path)
+    Q_UNUSED(params)
 
     QnNetworkAddressEntryList entryList;
     for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces()) 
@@ -68,7 +70,7 @@ int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &
         entry.mac = iface.netIf.hardwareAddress().toLatin1();
         entryList.push_back(std::move(entry));
     }
-    readDHCPState(entryList);
+    readExtraFields(entryList);
 
     result.setReply(entryList);
 
