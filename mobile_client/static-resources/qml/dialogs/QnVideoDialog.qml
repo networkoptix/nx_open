@@ -12,11 +12,12 @@ Page {
     title: resourceHelper.resourceName
 
     property alias resourceId: resourceHelper.resourceId
-    property var __currentDate: new Date()
     property bool videoZoomed: false
     property real cursorTickMargin: Units.dp(10)
     property real timelineTextMargin: timeline.height - timeline.chunkBarHeight
     property real cursorWidth: Units.dp(2)
+
+    readonly property var __locale: Qt.locale()
 
     QnMediaResourceHelper {
         id: resourceHelper
@@ -106,9 +107,10 @@ Page {
 
         property color baseColor: colorTheme.color("nx_baseBackground")
 
-        anchors.centerIn: bigTimeLabel
-        width: bigTimeLabel.height
-        height: bigTimeLabel.width + Units.dp(64)
+        anchors.centerIn: timeline
+        anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
+        width: timeline.height - timeline.chunkBarHeight
+        height: timeLabel.width + Units.dp(64)
 
         rotation: 90
         gradient: Gradient {
@@ -120,29 +122,35 @@ Page {
     }
 
     Text {
-        id: bigTimeLabel
+        id: dateLabel
 
         anchors {
             horizontalCenter: parent.horizontalCenter
             verticalCenter: timeline.verticalCenter
-            verticalCenterOffset: -timeline.chunkBarHeight / 2
+            verticalCenterOffset: -timeline.chunkBarHeight / 2 - timeLabel.height / 2
+        }
+
+        font.pixelSize: Units.dp(20)
+        font.weight: Font.Light
+
+        text: timeline.positionDate.toLocaleDateString(__locale, qsTr("d MMMM yyyy"))
+        color: "white"
+    }
+
+    Text {
+        id: timeLabel
+
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            verticalCenter: timeline.verticalCenter
+            verticalCenterOffset: -timeline.chunkBarHeight / 2 + dateLabel.height / 2
         }
 
         font.pixelSize: Units.dp(48)
         font.weight: Font.Light
 
-        text: __currentDate.toTimeString()
+        text: timeline.positionDate.toTimeString()
         color: "white"
-
-        Timer {
-            running: true
-            repeat: true
-            interval: 1000
-
-            onTriggered: {
-                __currentDate = new Date()
-            }
-        }
     }
 
     QnPlaybackController {
