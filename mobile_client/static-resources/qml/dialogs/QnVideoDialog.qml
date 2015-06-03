@@ -102,6 +102,8 @@ Page {
         textColor: "white"
         chunkColor: "#589900"
 
+        stickToLive: true
+
         chunkBarHeight: Units.dp(36)
     }
 

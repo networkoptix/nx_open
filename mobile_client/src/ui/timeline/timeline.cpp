@@ -29,6 +29,7 @@ namespace {
     const qreal zoomMultiplier = 2.0;
     const qreal liveOpacityAnimationSpeed = 0.01;
     const qreal stripesMovingSpeed = 0.002;
+    const qreal windowMovingSpeed = 0.04;
 
     struct MarkInfo {
         qint64 tick;
@@ -88,6 +89,7 @@ public:
     QSGTexture *stripesLightTexture;
     qreal liveOpacity;
     qreal stripesPosition;
+    bool stickToLive;
 
     qint64 startTime;
     qint64 endTime;
@@ -133,6 +135,7 @@ public:
         stripesLightTexture(0),
         liveOpacity(0.0),
         stripesPosition(0.0),
+        stickToLive(false),
         textLevel(1.0),
         targetTextLevel(1.0),
         timeZoneShift(0)
@@ -384,6 +387,21 @@ void QnTimeline::setPositionDate(const QDateTime &dateTime) {
     setPosition(dateTime.toMSecsSinceEpoch());
 }
 
+bool QnTimeline::stickToLive() const {
+    return d->stickToLive;
+}
+
+void QnTimeline::setStickToLive(bool stickToLive) {
+    if (d->stickToLive == stickToLive)
+        return;
+
+    d->stickToLive = stickToLive;
+
+    emit stickToLiveChanged();
+
+    update();
+}
+
 void QnTimeline::zoomIn(int x) {
     d->zoomWindow(zoomMultiplier, x >= 0 ? x : width() / 2);
 }
@@ -410,6 +428,11 @@ void QnTimeline::updatePinch(int x, qreal scale) {
 }
 
 void QnTimeline::finishPinch(int x, qreal scale) {
+    if (stickToLive() && position() < QDateTime::currentMSecsSinceEpoch())
+        setStickToLive(false);
+    else if (position() > QDateTime::currentMSecsSinceEpoch())
+        setStickToLive(true);
+
     d->stickyPointKineticHelper.finish(x);
     d->zoomKineticHelper.finish(d->startZoom * scale);
     update();
@@ -427,6 +450,11 @@ void QnTimeline::updateDrag(int x) {
 }
 
 void QnTimeline::finishDrag(int x) {
+    if (stickToLive() && position() < QDateTime::currentMSecsSinceEpoch())
+        setStickToLive(false);
+    else if (position() > QDateTime::currentMSecsSinceEpoch())
+        setStickToLive(true);
+
     d->stickyPointKineticHelper.finish(x);
     update();
 }
@@ -909,8 +937,25 @@ bool QnTimelinePrivate::animateProperties(qint64 dt) {
         updateZoomLevel();
     }
 
+    qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
+
     stickyPointKineticHelper.update();
-    if (!stickyPointKineticHelper.isStopped() || windowChanged) {
+    if ((stickToLive || (showLive && parent->position() > liveTime)) && !stickyPointKineticHelper.isMeasuring()) {
+        windowChanged = true;
+
+        qint64 time = parent->position();
+
+        qint64 delta = (windowEnd - windowStart) * windowMovingSpeed;
+        if (time < liveTime)
+            time = qMin(liveTime, time + delta);
+        else
+            time = qMax(liveTime, time - delta);
+
+        delta = time - parent->position();
+
+        windowStart += delta;
+        windowEnd += delta;
+    } else if (!stickyPointKineticHelper.isStopped() || windowChanged) {
         windowChanged = true;
 
         qint64 time = pixelPosToTime(stickyPointKineticHelper.value());

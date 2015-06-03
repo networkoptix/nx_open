@@ -155,6 +155,10 @@ public:
     bool isStopped() const {
         return m_state == Stopped;
     }
+
+    bool isMeasuring() const {
+        return m_state == Measuring;
+    }
 };
 
 #endif // QNKINETICHELPER_H
