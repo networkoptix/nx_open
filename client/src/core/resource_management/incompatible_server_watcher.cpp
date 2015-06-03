@@ -83,7 +83,7 @@ void QnIncompatibleServerWatcher::stop() {
 }
 
 void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep) {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     auto it = m_moduleInformationById.find(id);
     if (it == m_moduleInformationById.end())
@@ -132,7 +132,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
 }
 
 void QnIncompatibleServerWatcher::at_moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive) {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     auto it = m_moduleInformationById.find(moduleInformation.id);
 
     if (!isAlive) {

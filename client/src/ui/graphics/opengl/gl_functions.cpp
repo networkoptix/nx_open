@@ -7,8 +7,10 @@
 #include <QtGui/QOpenGLContext>
 
 #include <utils/common/warnings.h>
+#include <utils/thread/mutex.h>
 
 #include "gl_context_data.h"
+
 
 namespace {
     bool qn_warnOnInvalidCalls = false;
@@ -97,7 +99,7 @@ public:
 		m_openGLInfo.vendor = getGLString(GL_VENDOR);
 		m_openGLInfo.renderer = getGLString(GL_RENDERER);
 		{
-			QMutexLocker lock(&m_mutex);
+			QnMutexLocker lock(&m_mutex);
 			m_openGLInfoCache = m_openGLInfo;
 		}
 		m_openGLInfoCache = m_openGLInfo;
@@ -146,7 +148,7 @@ public:
 
 	static const QnGlFunctions::OpenGLInfo openGLCachedInfo()
 	{
-		QMutexLocker lock(&m_mutex);
+		QnMutexLocker lock(&m_mutex);
 		return m_openGLInfoCache;
 	}
 
@@ -160,12 +162,12 @@ private:
     QnGlFunctions::Features m_features;
 	QnGlFunctions::OpenGLInfo m_openGLInfo;
 
-	static QMutex m_mutex;
+	static QnMutex m_mutex;
 	static QnGlFunctions::OpenGLInfo m_openGLInfoCache;
 };
 
 // static
-QMutex QnGlFunctionsPrivate::m_mutex;
+QnMutex QnGlFunctionsPrivate::m_mutex;
 QnGlFunctions::OpenGLInfo QnGlFunctionsPrivate::m_openGLInfoCache;
 
 typedef QnGlContextData<QnGlFunctionsPrivate, QnGlContextDataForwardingFactory<QnGlFunctionsPrivate> > QnGlFunctionsPrivateStorage;

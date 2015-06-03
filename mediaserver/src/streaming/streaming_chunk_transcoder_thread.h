@@ -90,7 +90,7 @@ private:
     void removeTranscodingNonSafe(
         const std::map<int, TranscodeContext*>::iterator& transcodingIter,
         bool transcodingFinishedSuccessfully,
-        QnMutexLockerInternal* const lk );
+        QnMutexLockerBase* const lk );
 };
 
 #endif  //STREAMING_CHUNK_TRANSCODER_THREAD_H

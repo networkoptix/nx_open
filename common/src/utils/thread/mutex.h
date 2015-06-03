@@ -38,24 +38,15 @@ private:
     std::unique_ptr<QnMutexImpl> m_impl;
 };
 
-void saveCurrentFileLineForThread_abrakadabra(
-    const char* sourceFile,
-    int sourceLine );
-
-//!Use this macro instead of \a QnMutexLockerInternal
-#define QnMutexLocker saveCurrentFileLineForThread_abrakadabra( __FILE__, __LINE__ ); QnMutexLockerInternal
-
 //!This class for internal usage only
-class QnMutexLockerInternal
+class QnMutexLockerBase
 {
 public:
-    //!This initializer takes file/line saved by \a saveCurrentFileLine
-    QnMutexLockerInternal( QnMutex* const mtx );
-    QnMutexLockerInternal(
+    QnMutexLockerBase(
         QnMutex* const mtx,
         const char* sourceFile,
         int sourceLine );
-    ~QnMutexLockerInternal();
+    ~QnMutexLockerBase();
 
     QnMutex* mutex();
 
@@ -70,15 +61,18 @@ private:
     int m_relockCount;
 };
 
+#define CONCATENATE_DIRECT(s1, s2) s1 ## s2
+#define CCAT(s1, s2) CONCATENATE_DIRECT(s1, s2)
+#define QnMutexLocker struct CCAT(QnMutexLocker, __LINE__) : public QnMutexLockerBase { CCAT(QnMutexLocker, __LINE__)(QnMutex* mtx) : QnMutexLockerBase( mtx, __FILE__, __LINE__) {} }
+
 #else   //USE_OWN_MUTEX
 
 #include <QtCore/QMutex>
 #include <QtCore/QnMutexLocker>
 
 typedef QMutex QnMutex;
-typedef QnMutexLocker QnMutexLocker;
-#define QnMutexLocker lockerName( mutexExpr ) \
-    QnMutexLocker lockerName( mutexExpr )
+typedef QMutexLocker QnMutexLocker;
+typedef QMutexLocker QnMutexLockerBase;
 
 #endif  //USE_OWN_MUTEX
 

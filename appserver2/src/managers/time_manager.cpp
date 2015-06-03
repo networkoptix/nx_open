@@ -521,7 +521,7 @@ namespace ec2
     }
 
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
-        QnMutexLockerInternal* const lock,
+        QnMutexLockerBase* const lock,
         const QnUuid& remotePeerID,
         qint64 localMonotonicClock,
         qint64 remotePeerSyncTime,

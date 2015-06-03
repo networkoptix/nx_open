@@ -398,8 +398,10 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
         else
             sendModuleInformation(moduleInformation, address, false);
     }
-
-    lk.unlock();
+    else
+    {
+        lk.unlock();
+    }
 
     NX_LOG(lit("QnModuleFinder: Module URL lost: %1 %2:%3")
            .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG1);

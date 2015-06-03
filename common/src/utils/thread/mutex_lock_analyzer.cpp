@@ -174,7 +174,7 @@ bool LockGraphEdgeData::connectedTo( const LockGraphEdgeData& rhs ) const
     //note: lockPositions is sorted by threadID
 
     //two edges are connected if there are elements with different thread id 
-    return !are_elements_same_in_sorted_ranges_if(
+    return !is_equal_sorted_ranges_if(
         lockPositions.cbegin(), lockPositions.cend(),
         rhs.lockPositions.cbegin(), rhs.lockPositions.cend(),
         []( const TwoMutexLockData& one, const TwoMutexLockData& two ){

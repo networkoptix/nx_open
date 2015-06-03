@@ -1,13 +1,13 @@
 #ifndef EC2_STATICTICS_REPORTER_H
 #define EC2_STATICTICS_REPORTER_H
 
-#include <QtCore/QMutex>
-
 #include "core/resource/user_resource.h"
 #include "utils/common/timermanager.h"
 #include "utils/network/http/asynchttpclient.h"
+#include <utils/thread/mutex.h>
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_statistics.h"
+
 
 namespace ec2
 {

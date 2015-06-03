@@ -1,12 +1,12 @@
 #ifndef MULTICAST_MODULE_FINDER_H
 #define MULTICAST_MODULE_FINDER_H
 
-#include <QtCore/QMutex>
 #include <QCache>
 
 #include <utils/common/long_runnable.h>
 #include <utils/network/aio/pollset.h>
 #include <utils/thread/mutex.h>
+
 #include "networkoptixmodulerevealcommon.h"
 
 

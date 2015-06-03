@@ -18,12 +18,13 @@
 #include <utils/math/digraph.h>
 
 
+//!Checks that two sorted ranges contain elements of same value using comparator \a comp. Though, different element count is allowed
 /*!
     \note Multiple same elements in either range are allowed
     \param Comp comparator used to sort ranges
 */
 template<class FirstRangeIter, class SecondRangeIter, class Comp>
-bool are_elements_same_in_sorted_ranges_if(
+bool is_equal_sorted_ranges_if(
     const FirstRangeIter& firstRangeBegin, const FirstRangeIter& firstRangeEnd,
     const SecondRangeIter& secondRangeBegin, const SecondRangeIter& secondRangeEnd,
     Comp comp )

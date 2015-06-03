@@ -4,11 +4,12 @@
 #include "ec2_statictics_reporter.h"
 
 #include <utils/common/concurrent.h>
+#include <utils/thread/mutex.h>
 
 #include <QDir>
-#include <QMutex>
 #include <QSettings>
 #include <set>
+
 
 namespace ec2 {
 
