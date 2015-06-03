@@ -105,7 +105,6 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         public OemDvrStatus GetListOfCameras(OemDvrConnection cnInfo, List<OemDvrCamera> cameras) {
             WebResponse response = null;
 
-            MessageBox.Show("MB");
             try {
                 Uri baseUrl = buildUrl(cnInfo);
 
