@@ -78,13 +78,17 @@ public:
     bool findEdge(
         const vertice_key_type& from,
         const vertice_key_type& to,
-        edge_data_type** edgeData )
+        const edge_data_type** edgeData ) const
     {
-        Vertice* vFrom = getOrAddVertice( from );
-        Vertice* vTo = getOrAddVertice( to );
+        auto vFromIter = m_keyToVertice.find( from );
+        if( vFromIter == m_keyToVertice.end() )
+            return false;
+        auto vToIter = m_keyToVertice.find( to );
+        if( vToIter == m_keyToVertice.end() )
+            return false;
 
-        auto edgeIter = vFrom->edges.find( vTo );
-        if( edgeIter == vFrom->edges.end() )
+        auto edgeIter = vFromIter->second->edges.find( vToIter->second.get() );
+        if( edgeIter == vFromIter->second->edges.end() )
             return false;
 
         *edgeData = &edgeIter->second;
@@ -175,7 +179,9 @@ private:
     const Vertice* findVertice( const vertice_key_type& vKey ) const
     {
         auto iter = m_keyToVertice.find( vKey );
-        return iter != m_keyToVertice.end() ? iter->second.get() : nullptr;
+        return iter != m_keyToVertice.end()
+            ? iter->second.get()
+            : nullptr;
     }
 
     template<class VerticeKeyRef>

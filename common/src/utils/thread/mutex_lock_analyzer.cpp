@@ -258,17 +258,21 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
         prevLock,
         mutexLockPosition );
 
-    LockGraphEdgeData* existingEdgeData = nullptr;
+    const LockGraphEdgeData* existingEdgeData = nullptr;
     if( m_lockDigraph.findEdge( prevLock.mutexPtr, mutexLockPosition.mutexPtr, &existingEdgeData ) &&
         (existingEdgeData->lockPositions.find( curMutexLockData ) != existingEdgeData->lockPositions.end()) )
     {
-        //no need to check for dead lock if graph is not modified
+        //no need to check for deadlock if graph is not modified
         return;
     }
 
     std::list<QnMutex*> existingPath;
     std::list<LockGraphEdgeData> edgesTravelled;
     //travelling edges containing any thread different from current
+    //    This is needed to avoid reporting deadlock in case of loop in the same thread.
+    //    Consider following: m1->m2, m2->m1. But both lock happen in the same thread only, 
+    //    so deadlock is possible.
+    //    NOTE: recursive locking is handled separately
     if( m_lockDigraph.findAnyPathIf(
             mutexLockPosition.mutexPtr, prevLock.mutexPtr,
             &existingPath, &edgesTravelled,
@@ -283,7 +287,8 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
             } ) )
     {
         //found path can still be not connected
-        //Example (returned edges):
+        //Example: imagine that mtx1 has been locked with mtx4 already locked
+        //found edges:
         //    - from {mtx1, line 10} to {mtx2, line 20}, thread 1
         //    - from {mtx2, line 30} to {mtx3, line 40}, thread 1
         //    - from {mtx3, line 50} to {mtx4, line 60}, thread 2
@@ -310,7 +315,6 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
             std::cerr<<deadLockMsg.toStdString()<<std::endl;
             assert( false );
         }
-        
     }
 
     //upgrading lock
