@@ -130,6 +130,13 @@ public:
         return m_value;
     }
 
+    T finalPos() const {
+        qreal dir = m_startSpeed >=0 ? -1.0 : 1.0;
+        qreal dt = -dir * m_startSpeed / m_deceleration;
+        qreal speedDelta = m_deceleration * dt;
+        return qBound<qreal>(m_minValue, m_startValue + (m_startSpeed + dir * speedDelta / 2) * dt, m_maxValue);
+    }
+
     void update() {
         if (m_state != Moving)
             return;
