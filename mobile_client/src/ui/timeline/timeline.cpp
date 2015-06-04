@@ -97,7 +97,7 @@ public:
     qint64 windowStart;
     qint64 windowEnd;
 
-    QImage textTexture;
+    QSGTexture *textTexture;
 
     qreal dpMultiplier;
 
@@ -138,6 +138,7 @@ public:
         stickToEnd(false),
         startBoundTime(-1),
         endBoundTime(-1),
+        textTexture(0),
         textLevel(1.0),
         targetTextLevel(1.0),
         timeZoneShift(0)
@@ -188,6 +189,8 @@ public:
             delete stripesDarkTexture;
         if (stripesLightTexture)
             delete stripesLightTexture;
+        if (textTexture)
+            delete textTexture;
     }
 
     int dp(qreal dpix) {
@@ -270,7 +273,12 @@ public:
     }
 
     void updateTextHelper() {
+        QQuickWindow *window = parent->window();
+        if (!window)
+            return;
+
         textHelper.reset(new QnTimelineTextHelper(QFont(), textColor, suffixList));
+        textTexture = window->createTextureFromImage(textHelper->texture());
     }
 
     void updateStripesTextures();
@@ -476,6 +484,9 @@ QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeD
     if (!d->stripesDarkTexture || !d->stripesLightTexture)
         d->updateStripesTextures();
 
+    if (!d->textTexture)
+        d->updateTextHelper();
+
     qint64 time = d->animationTimer.elapsed();
 
     d->animateProperties(time - d->prevAnimationMs);
@@ -573,7 +584,7 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
         textGeometry->setDrawingMode(GL_TRIANGLES);
 
         QSGTextureMaterial *textMaterial = new QSGTextureMaterial();
-        textMaterial->setTexture(window()->createTextureFromImage(d->textHelper->texture()));
+        textMaterial->setTexture(d->textTexture);
 
         textNode->setGeometry(textGeometry);
         textNode->setFlag(QSGNode::OwnsGeometry);
@@ -599,6 +610,12 @@ QSGGeometryNode *QnTimeline::updateTextNode(QSGGeometryNode *textNode) {
         lowerTextOpacityNode = static_cast<QSGOpacityNode*>(textNode->childAtIndex(0));
         lowerTextNode = static_cast<QSGGeometryNode*>(lowerTextOpacityNode->childAtIndex(0));
         lowerTextGeometry = lowerTextNode->geometry();
+
+        QSGTextureMaterial *textMaterial = static_cast<QSGTextureMaterial*>(textNode->material());
+        if (textMaterial->texture() != d->textTexture) {
+            delete textMaterial->texture();
+            textMaterial->setTexture(d->textTexture);
+        }
     }
 
     QVector<MarkInfo> markedTicks;
