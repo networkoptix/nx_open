@@ -15,7 +15,7 @@ void QnThreadedChunksMergeTool::run() {
     {
         bool queuedData = false;
         {
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock(&m_mutex);
             queuedData = m_queuedData;
         }
 
@@ -27,7 +27,7 @@ void QnThreadedChunksMergeTool::run() {
 }
 
 void QnThreadedChunksMergeTool::queueMerge(const std::vector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, qint64 startTimeMs, int handle) {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_periodsList = periodsList;
     m_syncedPeriods = syncedPeriods;
 
@@ -44,7 +44,7 @@ void QnThreadedChunksMergeTool::queueMerge(const std::vector<QnTimePeriodList> &
 void QnThreadedChunksMergeTool::processData() {
 
     /* Synchronization block */
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     const std::vector<QnTimePeriodList> periodsList(m_periodsList);
     const QnTimePeriodList syncedPeriods(m_syncedPeriods);
     const qint64 startTimeMs(m_startTimeMs);

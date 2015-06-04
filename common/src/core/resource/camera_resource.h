@@ -98,7 +98,7 @@ protected:
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 private:
-    QMutex m_mediaStreamsMutex;
+    QnMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
 };
 

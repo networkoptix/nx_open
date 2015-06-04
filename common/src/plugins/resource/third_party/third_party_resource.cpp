@@ -70,7 +70,7 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
 }
 
 bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( !m_cameraManager3 )
         return false;
@@ -118,7 +118,7 @@ bool QnThirdPartyResource::setParamsEnd() {
 }
 
 bool QnThirdPartyResource::setParam(const char * id, const char * value) {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( !m_cameraManager3 )
         return false;
 
@@ -385,7 +385,7 @@ void QnThirdPartyResource::inputPortStateChanged(
 
 const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( int encoderNumber ) const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_encoderData[encoderNumber].resolutionList;
 }
 
@@ -397,7 +397,7 @@ bool QnThirdPartyResource::hasDualStreaming() const
 
 nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int encoderIndex ) const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( (size_t)encoderIndex < m_selectedEncoderResolutions.size() )
         return m_selectedEncoderResolutions[encoderIndex];
     return nxcip::Resolution();
@@ -409,7 +409,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     if( !m_camManager )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         //restoring camera parameters
         if( strlen(m_camInfo.uid) == 0 )
@@ -559,7 +559,11 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
+#else
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("hardwaregrid"));
+#endif
     }
     else
     {
@@ -609,7 +613,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
 
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_encoderData = encoderDataTemp;
     }
 
@@ -670,7 +674,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
 
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_selectedEncoderResolutions = std::move( selectedEncoderResolutions );
     }
 

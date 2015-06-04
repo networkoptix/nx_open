@@ -74,7 +74,7 @@ private:
 
     struct CamSyncInfo {
         CamSyncInfo(): timeDiff(INT_MAX), driftSum(0) {}
-        QMutex mutex;
+        QnMutex mutex;
         double timeDiff;
         QnUnsafeQueue<qint64> driftStats;
         qint64 driftSum;
@@ -83,7 +83,7 @@ private:
     QSharedPointer<CamSyncInfo> m_cameraClockToLocalDiff;
     QString m_resId;
 
-    static QMutex m_camClockMutex;
+    static QnMutex m_camClockMutex;
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
 
@@ -373,7 +373,7 @@ private:
     QString m_nonce;
 
     static QByteArray m_guid; // client guid. used in proprietary extension
-    static QMutex m_guidMutex;
+    static QnMutex m_guidMutex;
 
     std::vector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
     QString m_reasonPhrase;
@@ -383,7 +383,7 @@ private:
     int m_additionalReadBufferPos;
     int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
-    mutable QMutex m_sockMutex;
+    mutable QnMutex m_sockMutex;
     QByteArray m_userAgent;
 #ifdef _DUMP_STREAM
     std::ofstream m_inStreamFile;

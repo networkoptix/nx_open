@@ -46,7 +46,7 @@ private:
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
     Page m_page;
     QnVirtualCameraResourcePtr m_camera;
-    QMutex m_cameraMutex;
+    QnMutex m_cameraMutex;
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
 };
 

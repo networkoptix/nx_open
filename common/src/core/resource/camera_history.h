@@ -4,7 +4,7 @@
 #include <set>
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -123,7 +123,7 @@ private:
 
 private:
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QMap<QnUuid, std::vector<QnUuid>> m_archivedCamerasByServer; // archived cameras by server
 
     typedef QMap<QnUuid, ec2::ApiCameraHistoryItemDataList> DetailHistoryMap;

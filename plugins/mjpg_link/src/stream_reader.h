@@ -8,9 +8,9 @@
 
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QUrl>
-#include <QtCore/QWaitCondition>
+#include <utils/thread/wait_condition.h>
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
@@ -62,15 +62,15 @@ private:
     float m_fps;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
-    QSharedPointer<nx_http::HttpClient> m_httpClient;
+    std::shared_ptr<nx_http::HttpClient> m_httpClient;
     nx_http::MultipartContentParser m_multipartContentParser;
     std::unique_ptr<ILPVideoPacket> m_videoPacket;
     StreamType m_streamType;
     qint64 m_prevFrameClock;
     qint64 m_frameDurationMSec;
     bool m_terminated;
-    QWaitCondition m_cond;
-    QMutex m_mutex;
+    QnWaitCondition m_cond;
+    QnMutex m_mutex;
     CyclicAllocator m_allocator;
  
     int doRequest( nx_http::HttpClient* const httpClient );

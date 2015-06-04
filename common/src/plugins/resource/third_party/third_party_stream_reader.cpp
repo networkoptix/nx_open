@@ -642,6 +642,8 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
     m_audioContext->ctx()->channel_layout = audioFormat.channelLayout;
     m_audioContext->ctx()->block_align = audioFormat.blockAlign;
     m_audioContext->ctx()->bits_per_coded_sample = audioFormat.bitsPerCodedSample;
+    m_audioContext->ctx()->time_base.num = 1;
+    m_audioContext->ctx()->time_base.den = audioFormat.sampleRate;
 
     m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
 }

@@ -287,8 +287,12 @@ void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIn
     int64_t* src = (int64_t*) image;
     for (int i = startIndex; i <= endIndex; ++i)
     {
-        *dst++ &= *src++;
-        *dst++ &= *src++;
+        *dst &= ~(*src);
+        ++dst;
+        ++src;
+        *dst &= ~(*src);
+        ++dst;
+        ++src;
     }
 #endif
 }

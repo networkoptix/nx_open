@@ -1196,13 +1196,13 @@ namespace nx_http
 
             //introducing loop counter to guarantee method finiteness in case of bug in code
             for( size_t curEntryEnd = nx_http::find_first_of(strValue, ","), curEntryStart = 0, i = 0;
-                curEntryStart != -1 && (i < 1000);
-                curEntryStart = (curEntryEnd == -1 ? curEntryEnd : curEntryEnd+1), curEntryEnd = nx_http::find_first_of(strValue, ",", curEntryEnd+1), ++i )
+                curEntryStart != nx_http::BufferNpos && (i < 1000);
+                curEntryStart = (curEntryEnd == nx_http::BufferNpos ? curEntryEnd : curEntryEnd+1), curEntryEnd = nx_http::find_first_of(strValue, ",", curEntryEnd+1), ++i )
             {
                 ProxyEntry entry;
 
                 //skipping spaces at the start of entry
-                while( (strValue.at(curEntryStart) == ' ') && (curEntryStart < (curEntryEnd == -1 ? strValue.size() : curEntryEnd)) )
+                while( (strValue.at(curEntryStart) == ' ') && (curEntryStart < (curEntryEnd == nx_http::BufferNpos ? strValue.size() : curEntryEnd)) )
                     ++curEntryStart;
 
                 //curEntryStart points first char after comma

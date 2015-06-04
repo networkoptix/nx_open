@@ -13,6 +13,10 @@
 #include "filters/tiled_image_filter.h"
 #include "filters/scale_image_filter.h"
 #include "filters/rotate_image_filter.h"
+#include "core/datapacket/media_data_packet.h"
+#include "core/dataprovider/abstract_streamdataprovider.h"
+#include "core/resource/camera_resource.h"
+#include "utils/serialization/json.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
@@ -112,6 +116,27 @@ QSize QnVideoTranscoder::getResolution() const
     return m_resolution;
 }
 
+QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
+{
+    QSize result;
+    if (!video->dataProvider)
+        return result;
+    QnResourcePtr res = video->dataProvider->getResource();
+    if (!res)
+        return result;
+    const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(res->getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME ).toLatin1() );
+    for(const auto& stream: supportedMediaStreams.streams) 
+    {
+        QStringList resolutionInfo = stream.resolution.split(L'x');
+        if (resolutionInfo.size() == 2) {
+            QSize newRes(resolutionInfo[0].toInt(), resolutionInfo[1].toInt());
+            if (newRes.height() > result.height())
+                result = newRes;
+        }
+    }
+    return result;
+}
+
 bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
@@ -120,13 +145,17 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     //bool lineAmountSpecified = false;
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
-        m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),8)); // round resolution height
-        m_resolution.setHeight(qMin(decoder.getContext()->height, m_resolution.height())); // strict to source frame height
+        QSize srcResolution = findSavedResolution(video);
+        if (srcResolution.isEmpty())
+            srcResolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
 
-        float ar = decoder.getContext()->width / (float) decoder.getContext()->height;
+
+        m_resolution.setHeight(qMin(srcResolution.height(), m_resolution.height())); // strict to source frame height
+        m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),8)); // round resolution height
+
+        float ar = srcResolution.width() / (float) srcResolution.height();
         m_resolution.setWidth(m_resolution.height() * ar);
         m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
-        m_resolution.setWidth(qMin(decoder.getContext()->width, m_resolution.width())); // strict to source frame width
         //lineAmountSpecified = true;
     }
     else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty()) {

@@ -35,7 +35,7 @@ public:
     void updateFpsStatistics(QnCompressedVideoDataPtr vd);
     int getFps() const;
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     qint64 m_lastTime;
     QnUnsafeQueue<qint64> m_queue;
     qint64 m_queueSum;
@@ -205,7 +205,7 @@ protected:
     bool m_ignoringVideo;
     bool m_isRealTimeSource;
     QnAudioFormat m_expectedAudioFormat;
-    QMutex m_audioChangeMutex;
+    QnMutex m_audioChangeMutex;
     bool m_videoBufferOverflow;
     bool m_singleShotMode;
     bool m_singleShotQuantProcessed;
@@ -238,7 +238,7 @@ protected:
     bool m_useMTRealTimeDecode; // multi thread decode for live temporary allowed
     bool m_forceMtDecoding; // force multi thread decode in any case
 
-    mutable QMutex m_timeMutex;
+    mutable QnMutex m_timeMutex;
     QnMediaResourcePtr m_resource;
     QTime m_afterJumpTimer;
     qint64 m_firstAfterJumpTime;

@@ -99,8 +99,8 @@ private:
     QFile m_detailedMotionFile;
     QFile m_detailedIndexFile;
     qint64 m_firstTime;
-    QMutex m_fileAccessMutex;
-    QMutex m_maskMutex;
+    QnMutex m_fileAccessMutex;
+    QnMutex m_maskMutex;
     QnMetaDataV1Ptr m_lastDetailedData;
 
     qint64 m_minMotionTime;

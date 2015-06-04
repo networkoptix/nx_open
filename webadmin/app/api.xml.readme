@@ -2,3 +2,5 @@ Warning!
 
 File api.xml must be edited in this location: /webadmin/app/api.xml
 and than copied to /mediaserver/maven/bin-resources/resources/static/api.xml
+
+No spaces are allowed in function _name_ tags.

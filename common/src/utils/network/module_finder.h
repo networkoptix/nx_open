@@ -71,7 +71,7 @@ private:
      * so no need to preserve concurrent wrighting. Mutex should only guarantee
      * correct state of m_moduleItemById for public getters.
      */
-    mutable QMutex m_itemsMutex;
+    mutable QnMutex m_itemsMutex;
 
     QElapsedTimer m_elapsedTimer;
     QTimer *m_timer;

@@ -80,6 +80,7 @@ bool QnVMax480LiveProvider::canChangeStatus() const
 CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
     Q_UNUSED(isCameraControlRequired);
+    Q_UNUSED(params)
     if (m_opened)
         return CameraDiagnostics::NoErrorResult();
 

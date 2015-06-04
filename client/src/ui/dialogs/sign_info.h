@@ -27,7 +27,7 @@ private:
     QnSignHelper m_signHelper;
     QByteArray m_sign;
     QByteArray m_signFromFrame;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QRect m_videoRect;
     double m_textureWidth;
     double m_textureHeight;

@@ -80,7 +80,7 @@ bool QnFile::open(const QIODevice::OpenMode& mode, unsigned int systemDependentF
     if (handle == -1)
         m_impl = 0;
     else
-        m_impl = (void*) handle;
+        m_impl = reinterpret_cast<void*>(handle);
 
     return m_impl != 0;
 }

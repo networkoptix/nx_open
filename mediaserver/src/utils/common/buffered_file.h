@@ -1,7 +1,7 @@
 #ifndef __BUFFERED_FILE_H__
 #define __BUFFERED_FILE_H__
 
-#include <QtCore/QWaitCondition>
+#include <utils/thread/wait_condition.h>
 #include <QtCore/QString>
 #include <QtCore/QQueue>
 #include "utils/fs/file.h"
@@ -37,8 +37,8 @@ private:
         QBufferedFile* file;
         const char* data;
         int len;
-        QMutex mutex;
-        QWaitCondition condition;
+        QnMutex mutex;
+        QnWaitCondition condition;
         qint64 result;
     };
 
@@ -47,7 +47,7 @@ private:
     typedef QPair<qint64, int> WriteTimingInfo;
     QQueue<WriteTimingInfo> m_writeTimings;
     int m_writeTime;
-    mutable QMutex m_timingsMutex;
+    mutable QnMutex m_timingsMutex;
 };
 
 class QnWriterPool
@@ -63,7 +63,7 @@ public:
     QueueFileWriter* getWriter(const QString& fileName);
     WritersMap getAllWriters();
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     WritersMap m_writers;
 };
 

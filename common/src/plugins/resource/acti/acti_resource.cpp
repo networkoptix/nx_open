@@ -41,7 +41,7 @@ QnActiResource::QnActiResource()
 
 QnActiResource::~QnActiResource()
 {
-    QMutexLocker lk( &m_dioMutex );
+    QnMutexLocker lk( &m_dioMutex );
     for( std::map<quint64, TriggerOutputTask>::iterator
         it = m_triggerOutputTasks.begin();
         it != m_triggerOutputTasks.end();
@@ -612,7 +612,7 @@ bool QnActiResource::setRelayOutputState(
     bool activate,
     unsigned int autoResetTimeoutMS )
 {
-    QMutexLocker lk( &m_dioMutex );
+    QnMutexLocker lk( &m_dioMutex );
 
     bool outputNumberOK = true;
     const int outputNumber = !ouputID.isEmpty() ? ouputID.toInt(&outputNumberOK) : 1;
@@ -630,7 +630,7 @@ void QnActiResource::onTimer( const quint64& timerID )
 {
     TriggerOutputTask triggerOutputTask;
     {
-        QMutexLocker lk( &m_dioMutex );
+        QnMutexLocker lk( &m_dioMutex );
         std::map<quint64, TriggerOutputTask>::iterator it = m_triggerOutputTasks.find( timerID );
         if( it == m_triggerOutputTasks.end() )
             return;
