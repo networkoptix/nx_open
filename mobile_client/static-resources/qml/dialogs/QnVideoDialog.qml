@@ -102,7 +102,7 @@ Page {
         textColor: "white"
         chunkColor: "#589900"
 
-        stickToLive: true
+        stickToEnd: true
 
         chunkBarHeight: Units.dp(36)
     }
@@ -140,6 +140,9 @@ Page {
 
         text: timeline.positionDate.toLocaleDateString(__locale, qsTr("d MMMM yyyy"))
         color: "white"
+
+        opacity: timeline.stickToEnd ? 0.0 : 1.0
+        Behavior on opacity { NumberAnimation { duration: 200 } }
     }
 
     Text {
@@ -148,13 +151,15 @@ Page {
         anchors {
             horizontalCenter: parent.horizontalCenter
             verticalCenter: timeline.verticalCenter
-            verticalCenterOffset: -timeline.chunkBarHeight / 2 + dateLabel.height / 2
+            verticalCenterOffset: -timeline.chunkBarHeight / 2 + (timeline.stickToEnd ? 0 : dateLabel.height / 2)
         }
+
+        Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 200 } }
 
         font.pixelSize: Units.dp(48)
         font.weight: Font.Light
 
-        text: timeline.positionDate.toTimeString()
+        text: timeline.stickToEnd ? qsTr("LIVE") : timeline.positionDate.toTimeString()
         color: "white"
     }
 

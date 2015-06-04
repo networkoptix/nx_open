@@ -89,10 +89,10 @@ public:
     QSGTexture *stripesLightTexture;
     qreal liveOpacity;
     qreal stripesPosition;
-    bool stickToLive;
+    bool stickToEnd;
 
-    qint64 startTime;
-    qint64 endTime;
+    qint64 startBoundTime;
+    qint64 endBoundTime;
 
     qint64 windowStart;
     qint64 windowEnd;
@@ -135,7 +135,9 @@ public:
         stripesLightTexture(0),
         liveOpacity(0.0),
         stripesPosition(0.0),
-        stickToLive(false),
+        stickToEnd(false),
+        startBoundTime(-1),
+        endBoundTime(-1),
         textLevel(1.0),
         targetTextLevel(1.0),
         timeZoneShift(0)
@@ -273,7 +275,7 @@ public:
 
     void updateStripesTextures();
 
-    bool animateProperties(qint64 dt);
+    void animateProperties(qint64 dt);
     void zoomWindow(qreal factor, int x);
 };
 
@@ -367,7 +369,7 @@ void QnTimeline::setWindow(qint64 windowStart, qint64 windowEnd) {
 }
 
 qint64 QnTimeline::position() const {
-    return (d->windowStart + d->windowEnd) / 2;
+    return windowStart() + (windowEnd() - windowStart()) / 2;
 }
 
 void QnTimeline::setPosition(qint64 position) {
@@ -387,17 +389,17 @@ void QnTimeline::setPositionDate(const QDateTime &dateTime) {
     setPosition(dateTime.toMSecsSinceEpoch());
 }
 
-bool QnTimeline::stickToLive() const {
-    return d->stickToLive;
+bool QnTimeline::stickToEnd() const {
+    return d->stickToEnd;
 }
 
-void QnTimeline::setStickToLive(bool stickToLive) {
-    if (d->stickToLive == stickToLive)
+void QnTimeline::setStickToEnd(bool stickToEnd) {
+    if (d->stickToEnd == stickToEnd)
         return;
 
-    d->stickToLive = stickToLive;
+    d->stickToEnd = stickToEnd;
 
-    emit stickToLiveChanged();
+    emit stickToEndChanged();
 
     update();
 }
@@ -428,13 +430,8 @@ void QnTimeline::updatePinch(int x, qreal scale) {
 }
 
 void QnTimeline::finishPinch(int x, qreal scale) {
-    if (stickToLive() && position() < QDateTime::currentMSecsSinceEpoch())
-        setStickToLive(false);
-    else if (position() > QDateTime::currentMSecsSinceEpoch())
-        setStickToLive(true);
-
-    d->stickyPointKineticHelper.finish(x);
     d->zoomKineticHelper.finish(d->startZoom * scale);
+    d->stickyPointKineticHelper.finish(x);
     update();
 }
 
@@ -450,11 +447,6 @@ void QnTimeline::updateDrag(int x) {
 }
 
 void QnTimeline::finishDrag(int x) {
-    if (stickToLive() && position() < QDateTime::currentMSecsSinceEpoch())
-        setStickToLive(false);
-    else if (position() > QDateTime::currentMSecsSinceEpoch())
-        setStickToLive(true);
-
     d->stickyPointKineticHelper.finish(x);
     update();
 }
@@ -486,7 +478,7 @@ QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeD
 
     qint64 time = d->animationTimer.elapsed();
 
-    bool animated = d->animateProperties(time - d->prevAnimationMs);
+    d->animateProperties(time - d->prevAnimationMs);
     d->prevAnimationMs = time;
 
     if (!node) {
@@ -499,8 +491,7 @@ QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeD
         updateChunksNode(static_cast<QSGGeometryNode*>(node->childAtIndex(1)));
     }
 
-    if (animated)
-        update();
+    update();
 
     return node;
 }
@@ -916,10 +907,9 @@ void QnTimelinePrivate::updateStripesTextures() {
     stripesLightTexture = parent->window()->createTextureFromImage(stripesLight);
 }
 
-bool QnTimelinePrivate::animateProperties(qint64 dt) {
-    bool changed = false;
-
+void QnTimelinePrivate::animateProperties(qint64 dt) {
     bool windowChanged = false;
+
     zoomKineticHelper.update();
     if (!zoomKineticHelper.isStopped()) {
         windowChanged = true;
@@ -939,36 +929,49 @@ bool QnTimelinePrivate::animateProperties(qint64 dt) {
 
     qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
 
+    qint64 startBound = startBoundTime == -1 ? liveTime - 1000 * 60 * 60 * 4 : startBoundTime;
+    qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
+
+    bool justStopped = stickyPointKineticHelper.isStopped();
     stickyPointKineticHelper.update();
-    if ((stickToLive || (showLive && parent->position() > liveTime)) && !stickyPointKineticHelper.isMeasuring()) {
-        windowChanged = true;
+    justStopped = !justStopped && stickyPointKineticHelper.isStopped();
 
+    if (stickyPointKineticHelper.isStopped()) {
         qint64 time = parent->position();
+        qint64 windowSize = windowEnd - windowStart;
+        qint64 delta = windowSize * windowMovingSpeed;
 
-        qint64 delta = (windowEnd - windowStart) * windowMovingSpeed;
-        if (time < liveTime)
-            time = qMin(liveTime, time + delta);
-        else
-            time = qMax(liveTime, time - delta);
+        if (justStopped)
+            parent->setStickToEnd(qMax(startBound, parent->position()) >= endBound);
+
+        if (stickToEnd && time < endBound)
+            time = qMax(endBound, qMin(time, liveTime + windowSize) - delta);
+        else if (time < startBound)
+            time = qMin(startBound, qMax(time, startBound - windowSize) + delta);
+        else if (time > endBound)
+            time = qMax(endBound, qMin(time, startBound + windowSize) - delta);
 
         delta = time - parent->position();
-
-        windowStart += delta;
-        windowEnd += delta;
-    } else if (!stickyPointKineticHelper.isStopped() || windowChanged) {
+        if (delta != 0) {
+            windowChanged = true;
+            windowStart += delta;
+            windowEnd += delta;
+        }
+    } else {
         windowChanged = true;
-
         qint64 time = pixelPosToTime(stickyPointKineticHelper.value());
         qint64 delta = stickyTime - time;
         windowStart += delta;
         windowEnd += delta;
+
+        time = parent->position();
+        if (time >= endBound && delta > 0)
+            parent->setStickToEnd(true);
+        else if (time < endBound && delta < 0)
+            parent->setStickToEnd(false);
     }
 
-    changed |= windowChanged;
-
     if (!qFuzzyCompare(zoomLevel, targetZoomLevel)) {
-        changed = true;
-
         if (targetZoomLevel > zoomLevel) {
             if (targetZoomLevel - zoomLevel > maxZoomLevelDiff)
                 zoomLevel = targetZoomLevel - maxZoomLevelDiff;
@@ -983,8 +986,6 @@ bool QnTimelinePrivate::animateProperties(qint64 dt) {
     }
 
     if (!qFuzzyCompare(textLevel, targetTextLevel)) {
-        changed = true;
-
         if (targetTextLevel > textLevel) {
             if (targetTextLevel - textLevel > maxZoomLevelDiff)
                 textLevel = targetTextLevel - maxZoomLevelDiff;
@@ -1011,8 +1012,6 @@ bool QnTimelinePrivate::animateProperties(qint64 dt) {
 
     qreal targetLiveOpacity = live ? 1.0 : 0.0;
     if (!qFuzzyCompare(liveOpacity, targetLiveOpacity)) {
-        changed = true;
-
         if (liveOpacity < targetLiveOpacity)
             liveOpacity = qMin(targetLiveOpacity, liveOpacity + liveOpacityAnimationSpeed * dt);
         else
@@ -1020,14 +1019,10 @@ bool QnTimelinePrivate::animateProperties(qint64 dt) {
     }
 
     if (live) {
-        changed = true;
-
         stripesPosition += dt * stripesMovingSpeed;
         while (stripesPosition > 1.0)
             stripesPosition -= 1.0;
     }
-
-    return changed;
 }
 
 void QnTimelinePrivate::zoomWindow(qreal factor, int x) {
