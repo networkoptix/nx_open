@@ -15,16 +15,19 @@
 
 namespace nx_cc
 {
-    //!Socket that dynamically selects stream protocol (tcp or udt) to use depending on route to requested peer
+    //!Socket that is able to use hole punching (tcp or udp) and mediator to establish connection
     /*!
+        Method to use to connect to remote peer is selected depending on route to the peer
         If connection to peer requires using udp hole punching than this socket uses UDT.
         \note Actual socket is instanciated only when address is known (\a AbstractCommunicatingSocket::connect or \a AbstractCommunicatingSocket::connectAsync)
     */
-    class HybridStreamSocket
+    class CloudStreamSocket
     :
         public AbstractStreamSocket
     {
     public:
+        //TODO #ak add all socket functions
+
         //!Implementation of AbstractStreamSocket::connect
         virtual bool connect(
             const SocketAddress& remoteAddress,
@@ -32,7 +35,9 @@ namespace nx_cc
 
     protected:
         //!Implementation of AbstractStreamSocket::connectAsyncImpl
-        virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
+        virtual bool connectAsyncImpl(
+            const SocketAddress& addr,
+            std::function<void( SystemError::ErrorCode )>&& handler ) override;
 
     private:
         std::unique_ptr<AbstractStreamSocket> m_socketDelegate;
@@ -41,7 +46,8 @@ namespace nx_cc
 
         void applyCachedAttributes();
         bool instanciateSocket( const nx_cc::DnsEntry& dnsEntry );
-        void onResolveDone( const std::vector<nx_cc::DnsEntry>& dnsEntries );
+        void onResolveDone( std::vector<nx_cc::DnsEntry> dnsEntries );
+        bool startAsyncConnect( std::vector<nx_cc::DnsEntry>&& dnsEntries );
         void cloudConnectDone( nx_cc::ErrorDescription errorCode, std::unique_ptr<AbstractStreamSocket> cloudConnection );
     };
 }

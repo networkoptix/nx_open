@@ -5,6 +5,8 @@
 
 #include "hybrid_stream_socket.h"
 
+#include <future>
+
 #include <utils/common/systemerror.h>
 
 #include "cloud_tunnel.h"
@@ -13,76 +15,87 @@
 
 namespace nx_cc
 {
-    bool HybridStreamSocket::connect(
+    bool CloudStreamSocket::connect(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis )
     {
-        //TODO #ak implement by issuing async call and waiting for completion
+        //TODO #ak use timeoutMillis
+
+        //issuing async call and waiting for completion
+        std::promise<SystemError::ErrorCode> completionPromise;
+        auto asyncRequestCompletionResult = completionPromise.get_future();
+        auto completionHandler = [&completionPromise]( SystemError::ErrorCode errorCode ) mutable {
+            completionPromise.set_value( errorCode );
+        };
+        if( !connectAsyncImpl( remoteAddress, completionHandler ) )
+            return false;
+        asyncRequestCompletionResult.wait();
+        if( asyncRequestCompletionResult.get() == SystemError::noError )
+            return true;
+        SystemError::setLastErrorCode( asyncRequestCompletionResult.get() );
         return false;
     }
 
-    bool HybridStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+    bool CloudStreamSocket::connectAsyncImpl(
+        const SocketAddress& addr,
+        std::function<void( SystemError::ErrorCode )>&& handler )
     {
+        //TODO #ak use socket write timeout
+
         using namespace std::placeholders;
         m_connectHandler = std::move(handler);
         m_remoteAddr = addr;
         std::vector<nx_cc::DnsEntry> dnsEntries;
-        if( !nx_cc::DnsTable::instance()->resolveAsync( addr.address, &dnsEntries, std::bind(&HybridStreamSocket::onResolveDone, this, _1) ) )
+        const DnsTable::ResolveResult result = DnsTable::instance()->resolveAsync(
+            addr.address,
+            &dnsEntries,
+            std::bind(&CloudStreamSocket::onResolveDone, this, _1) );
+        switch( result )
         {
-            //async resolve has been started
-            return true;
-        }
+            case DnsTable::ResolveResult::done:
+                break;  //operation completed
 
-        if( dnsEntries.empty() )
-        {
-            m_connectHandler = std::function<void( SystemError::ErrorCode )>();     //resetting handler, since it may hold some resources
-            SystemError::setLastErrorCode( SystemError::hostUnreach );
-            return false;
-        }
-        //TODO #ak should prefer regular address to a cloud one
-        const nx_cc::DnsEntry& dnsEntry = dnsEntries[0];
-        switch( dnsEntry.addressType )
-        {
-            case nx_cc::AddressType::regular:
-                //using tcp connection
-                m_socketDelegate.reset( new TCPSocket() );
-                applyCachedAttributes();
-                return m_socketDelegate->connectAsync( SocketAddress(dnsEntry.address, addr.port), std::move(m_connectHandler) );
-
-            case nx_cc::AddressType::cloud:
-            case nx_cc::AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
-            {
-                //establishing cloud connect
-                auto tunnel = CloudTunnelPool::instance()->getTunnelToHost( dnsEntry.address );
-                auto connectCompletionHandler = [this]( nx_cc::ErrorDescription errorCode, std::unique_ptr<AbstractStreamSocket> cloudConnection ) { 
-                    cloudConnectDone( errorCode, std::move(cloudConnection) );
-                };
-                if( !tunnel->connect( connectCompletionHandler ) )
-                {
-                    m_connectHandler = std::function<void( SystemError::ErrorCode )>();     //resetting handler, since it may hold some resources
-                    return false;
-                }
+            case DnsTable::ResolveResult::startedAsync:
+                //async resolve has been started
                 return true;
-            }
 
-            default:
-                assert( false );
+            case DnsTable::ResolveResult::failed:
+                //resetting handler, since it may hold some resources
+                m_connectHandler = std::function<void( SystemError::ErrorCode )>();
+                SystemError::setLastErrorCode( SystemError::hostUnreach );
                 return false;
         }
+
+        if( startAsyncConnect( std::move( dnsEntries ) ) )
+            return true;
+
+        //resetting handler, since it may hold some resources
+        m_connectHandler = std::function<void( SystemError::ErrorCode )>();
+        return false;
     }
 
-    void HybridStreamSocket::applyCachedAttributes()
+    void CloudStreamSocket::applyCachedAttributes()
     {
         //TODO #ak applying cached attributes to socket m_socketDelegate
     }
 
-    void HybridStreamSocket::onResolveDone( const std::vector<nx_cc::DnsEntry>& dnsEntries )
+    void CloudStreamSocket::onResolveDone( std::vector<nx_cc::DnsEntry> dnsEntries )
+    {
+        if( !startAsyncConnect( std::move( dnsEntries ) ) )
+        {
+            auto connectHandlerBak = std::move( m_connectHandler );
+            connectHandlerBak( SystemError::getLastOSErrorCode() );
+        }
+    }
+
+    bool CloudStreamSocket::startAsyncConnect( std::vector<nx_cc::DnsEntry>&& dnsEntries )
     {
         if( dnsEntries.empty() )
         {
-            m_connectHandler( SystemError::hostUnreach );
-            return;
+            SystemError::setLastErrorCode( SystemError::hostUnreach );
+            return false;
         }
+
         //TODO #ak should prefer regular address to a cloud one
         const nx_cc::DnsEntry& dnsEntry = dnsEntries[0];
         switch( dnsEntry.addressType )
@@ -91,41 +104,45 @@ namespace nx_cc
                 //using tcp connection
                 m_socketDelegate.reset( new TCPSocket() );
                 applyCachedAttributes();
-                if( !m_socketDelegate->connectAsync( SocketAddress(dnsEntry.address, m_remoteAddr.port), m_connectHandler ) )
-                    m_connectHandler( SystemError::getLastOSErrorCode() );
-                return;
+                return m_socketDelegate->connectAsync(
+                    SocketAddress(dnsEntry.address, m_remoteAddr.port),
+                    m_connectHandler );
 
             case nx_cc::AddressType::cloud:
             case nx_cc::AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
             {
                 //establishing cloud connect
                 auto tunnel = CloudTunnelPool::instance()->getTunnelToHost( dnsEntry.address );
-                auto connectCompletionHandler = [this]( nx_cc::ErrorDescription errorCode, std::unique_ptr<AbstractStreamSocket> cloudConnection ) { 
-                    cloudConnectDone( errorCode, std::move(cloudConnection) );
-                };
-                if( !tunnel->connect( connectCompletionHandler ) )
-                    m_connectHandler( SystemError::getLastOSErrorCode() );
-                return;
+                return tunnel->connect(
+                    [this](
+                        nx_cc::ErrorDescription errorCode,
+                        std::unique_ptr<AbstractStreamSocket> cloudConnection )
+                    {
+                        cloudConnectDone( errorCode, std::move( cloudConnection ) );
+                    } );
             }
 
             default:
                 assert( false );
-                m_connectHandler( SystemError::hostUnreach );
-                return;
+                SystemError::setLastErrorCode( SystemError::hostUnreach );
+                return false;
         }
     }
 
-    void HybridStreamSocket::cloudConnectDone( nx_cc::ErrorDescription errorCode, std::unique_ptr<AbstractStreamSocket> cloudConnection )
+    void CloudStreamSocket::cloudConnectDone(
+        nx_cc::ErrorDescription errorCode,
+        std::unique_ptr<AbstractStreamSocket> cloudConnection )
     {
         if( errorCode.resultCode == nx_cc::ResultCode::ok )
         {
-            m_socketDelegate = std::move(cloudConnection);
             assert( errorCode.sysErrorCode == SystemError::noError );
+            m_socketDelegate = std::move(cloudConnection);
+            applyCachedAttributes();
         }
         else
         {
             assert( !cloudConnection );
-            if( errorCode.sysErrorCode == SystemError::noError )
+            if( errorCode.sysErrorCode == SystemError::noError )    //e.g., cloud connect is forbidden for target host
                 errorCode.sysErrorCode = SystemError::hostUnreach;
         }
         auto userHandler = std::move(m_connectHandler);
