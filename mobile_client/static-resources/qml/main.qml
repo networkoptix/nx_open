@@ -16,6 +16,8 @@ ApplicationWindow {
     height: 800
 
     theme.accentColor: colorTheme.color("nx_base")
+    theme.backgroundColor: colorTheme.color("nx_baseBackground")
+    theme.primaryColor: colorTheme.color("nx_baseBackground")
 
     initialPage: QnLoginDialog {
 
