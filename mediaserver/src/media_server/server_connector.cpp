@@ -30,7 +30,7 @@ void QnServerConnector::at_moduleFinder_moduleAddressFound(const QnModuleInforma
     if (!moduleInformation.isCompatibleToCurrentSystem()) {
         bool used;
         {
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock( &m_mutex );
             used = m_usedAddresses.contains(address);
         }
         if (used) {
@@ -66,7 +66,7 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
     AddressInfo urlInfo;
 
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
 
         if (m_usedAddresses.contains(address)) {
             NX_LOG(lit("QnServerConnector: Address %1 is already used.").arg(address.toString()), cl_logINFO);
@@ -89,7 +89,7 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
 }
 
 void QnServerConnector::removeConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     AddressInfo urlInfo = m_usedAddresses.take(address);
     lock.unlock();
     if (urlInfo.peerId.isNull())
@@ -124,7 +124,7 @@ void QnServerConnector::stop() {
 
     QHash<SocketAddress, AddressInfo> usedUrls;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         usedUrls = m_usedAddresses;
     }
 
@@ -132,7 +132,7 @@ void QnServerConnector::stop() {
         removeConnection(m_moduleFinder->moduleInformation(it->peerId), it.key());
 
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_usedAddresses.clear();
     }
 }

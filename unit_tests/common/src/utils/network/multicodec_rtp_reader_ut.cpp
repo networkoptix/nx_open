@@ -39,7 +39,7 @@ static const QString rtspUrl( QLatin1String("rtsp://192.168.0.27:554/axis-media/
 //static const QString rtspUrl( QLatin1String("rtsp://192.168.0.27/axis-media/media.amp") );
 
 
-TEST( QnMulticodecRtpReader, streamFetchingOverRTSP )
+TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP )
 {
     QnResourcePropertyDictionary resPropertyDictionary;
     QnSyncTime syncTimeInstance;
@@ -92,7 +92,7 @@ TEST( QnMulticodecRtpReader, streamFetchingOverRTSP )
         std::endl;
 }
 
-TEST( QnMulticodecRtpReader, streamFetchingOverRTSP2 )
+TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP2 )
 {
     QAuthenticator auth;
     auth.setUser( "root" );
@@ -121,7 +121,7 @@ TEST( QnMulticodecRtpReader, streamFetchingOverRTSP2 )
 
 //#define USE_POLL
 
-TEST( QnMulticodecRtpReader, streamFetchingOverRTSP3 )
+TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
 {
     QAuthenticator auth;
     auth.setUser( "root" );
@@ -184,7 +184,7 @@ TEST( QnMulticodecRtpReader, streamFetchingOverRTSP3 )
     std::cout<<"totalBytesRead "<<totalBytesRead<<", average read size "<<(totalBytesRead/readsCount)<<" bytes"<<std::endl;
 }
 
-TEST( QnMulticodecRtpReader, streamFetchingOverHTTP )
+TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP )
 {
     nx_http::HttpClient client;
     ASSERT_TRUE( client.doGet( QUrl("http://192.168.0.1/valgrind-arm-linaro-multilib-2013.09.tar.gz") ) );
@@ -200,7 +200,7 @@ TEST( QnMulticodecRtpReader, streamFetchingOverHTTP )
     std::cout<<"totalBytesRead "<<totalBytesRead<<", average read size "<<(totalBytesRead/readsCount)<<" bytes"<<std::endl;
 }
 
-TEST( QnMulticodecRtpReader, streamFetchingOverHTTP2 )
+TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP2 )
 {
     std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
     ASSERT_TRUE( sock->connect( "192.168.0.1", 80 ) );
@@ -227,7 +227,7 @@ TEST( QnMulticodecRtpReader, streamFetchingOverHTTP2 )
 #define USE_SPLICE
 #endif
 
-TEST( QnMulticodecRtpReader, streamFetchingOverRTSP5 )
+TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
 {
     QAuthenticator auth;
     auth.setUser( "root" );
@@ -414,7 +414,7 @@ namespace
 
 static const int SESSION_COUNT = 2;
 
-TEST( QnMulticodecRtpReader, streamFetchingOverRTSP7 )
+TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP7 )
 {
     QAuthenticator auth;
     auth.setUser( "root" );
@@ -462,7 +462,7 @@ TEST( QnMulticodecRtpReader, streamFetchingOverRTSP7 )
         "average read size "<<(totalBytesRead / readsCount)<<" bytes"<<std::endl;
 }
 
-TEST( QnMulticodecRtpReader, streamFetchingOverRTSP8 )
+TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP8 )
 {
     QAuthenticator auth;
     auth.setUser( "root" );
@@ -509,7 +509,7 @@ TEST( QnMulticodecRtpReader, streamFetchingOverRTSP8 )
     std::cout<<"totalBytesRead "<<totalBytesRead<<", average read size "<<(totalBytesRead/readsCount)<<" bytes"<<std::endl;
 }
 
-TEST( QnMulticodecRtpReader, rtpParsingPerformance )
+TEST( QnMulticodecRtpReader, DISABLED_rtpParsingPerformance )
 {
     //creating necessary single-tones
     QnResourcePropertyDictionary resPropertyDictionary;

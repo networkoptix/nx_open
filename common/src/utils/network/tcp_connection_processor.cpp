@@ -146,7 +146,7 @@ bool QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock( &d->sockMutex );
     return sendData(sendBuffer.data(), sendBuffer.size());
 }
 
@@ -154,7 +154,7 @@ bool QnTCPConnectionProcessor::sendBuffer(const QByteArray& sendBuffer)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock( &d->sockMutex );
     return sendData(sendBuffer.data(), sendBuffer.size());
 }
 
@@ -238,7 +238,7 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
         arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->responseBody.size() : 0)))), cl_logDEBUG1 );
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock( &d->sockMutex );
     sendData(response.data(), response.size());
 }
 
@@ -444,7 +444,7 @@ QUrl QnTCPConnectionProcessor::getDecodedUrl() const
     return d->request.requestLine.url;
 }
 
-void QnTCPConnectionProcessor::execute(QMutex& mutex)
+void QnTCPConnectionProcessor::execute(QnMutex& mutex)
 {
     m_needStop = false;
     mutex.unlock();

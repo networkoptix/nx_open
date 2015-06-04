@@ -30,7 +30,7 @@ private:
 private:
     enum State {State_Started, State_ReadDays, State_ReadTime, State_ReadRange, State_UpdateData};
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QQueue<int> m_reqMonths;
     QnTimePeriodList m_chunks[VMAX_MAX_CH];
     QQueue<QDate> m_monthToRequest;

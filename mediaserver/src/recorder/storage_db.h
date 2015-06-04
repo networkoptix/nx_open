@@ -86,10 +86,10 @@ private:
         DeviceFileCatalog::Chunk chunk;
     };
 
-    mutable QMutex m_syncMutex;
+    mutable QnMutex m_syncMutex;
     QVector<DelayedData> m_delayedData;
     QVector<DeleteRecordInfo> m_recordsToDelete;
-    QMutex m_delMutex;
+    QnMutex m_delMutex;
     QnDbTransaction m_tran;
     bool m_needReopenDB;
 };

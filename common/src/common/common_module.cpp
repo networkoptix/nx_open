@@ -58,7 +58,7 @@ void QnCommonModule::bindModuleinformation(const QnUserResourcePtr &adminUser) {
 
 void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (m_remoteUuid == guid)
             return;
         m_remoteUuid = guid;
@@ -67,7 +67,7 @@ void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
 }
 
 QnUuid QnCommonModule::remoteGUID() const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_remoteUuid;
 }
 
@@ -79,12 +79,12 @@ QnMediaServerResourcePtr QnCommonModule::currentServer() const {
 }
 
 QnSoftwareVersion QnCommonModule::engineVersion() const {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     return m_engineVersion;
 }
 
 void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     m_engineVersion = version;
 }
 
@@ -104,7 +104,7 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInfor
 {
     bool isSystemNameChanged = false;
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk( &m_mutex );
         if (m_moduleInformation == moduleInformation)
             return;
 
@@ -118,7 +118,7 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInfor
 
 QnModuleInformation QnCommonModule::moduleInformation() const
 {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     return m_moduleInformation;
 }
 
@@ -129,7 +129,7 @@ void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QStrin
 }
 
 void QnCommonModule::updateModuleInformation() {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     QnModuleInformation moduleInformationCopy = m_moduleInformation;
     lk.unlock();
 

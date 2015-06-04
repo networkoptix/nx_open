@@ -119,14 +119,15 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
+#include <rest/handlers/iflist_rest_handler.h>
+#include <rest/handlers/ifconfig_rest_handler.h>
+#include <rest/handlers/settime_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
 #include <rest/handlers/current_user_rest_handler.h>
 #include <rest/handlers/backup_db_rest_handler.h>
 #include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
-
-#include <streaming/hls/hls_server.h>
 
 #include <rtsp/rtsp_connection.h>
 
@@ -169,6 +170,8 @@
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
 #include "streaming/hls/hls_session_pool.h"
+#include "streaming/hls/hls_server.h"
+#include "streaming/streaming_chunk_transcoder.h"
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -359,10 +362,10 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 static int lockmgr(void **mtx, enum AVLockOp op)
 {
-    QMutex** qMutex = (QMutex**) mtx;
+    QnMutex** qMutex = (QnMutex**) mtx;
     switch(op) {
         case AV_LOCK_CREATE:
-            *qMutex = new QMutex();
+            *qMutex = new QnMutex();
             return 0;
         case AV_LOCK_OBTAIN:
             (*qMutex)->lock();
@@ -620,7 +623,7 @@ void QnMain::dumpSystemUsageStats()
     qnPlatform->monitor()->totalHddLoad();
     qnPlatform->monitor()->totalNetworkLoad();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
         return;
     m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
@@ -855,7 +858,7 @@ QnMain::~QnMain()
 
 bool QnMain::isStopping() const
 {
-    QMutexLocker lock(&m_stopMutex);
+    QnMutexLocker lock( &m_stopMutex );
     return m_stopping;
 }
 
@@ -887,7 +890,7 @@ void QnMain::stopSync()
     NX_LOG( lit("Stopping server"), cl_logALWAYS );
     if (serviceMainInstance) {
         {
-            QMutexLocker lock(&m_stopMutex);
+            QnMutexLocker lock( &m_stopMutex );
             m_stopping = true;
         }
         serviceMainInstance->pleaseStop();
@@ -1337,6 +1340,9 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/iflist", new QnIfListRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler());
@@ -1662,6 +1668,8 @@ void QnMain::run()
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( restProcessorPool.get() );
 
+    std::unique_ptr<StreamingChunkTranscoder> streamingChunkTranscoder(
+        new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if( !initTcpListener() )
@@ -1679,6 +1687,7 @@ void QnMain::run()
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
+    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
@@ -1698,6 +1707,9 @@ void QnMain::run()
 #ifdef EDGE_SERVER
         serverFlags |= Qn::SF_Edge;
 #endif
+        if (QnAppInfo::armBox() == "rpi" || compatibilityMode) // check compatibilityMode here for testing purpose
+            serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
+
         if (!isLocal)
             serverFlags |= Qn::SF_RemoteEC;
         if (!m_publicAddress.isNull())
@@ -1811,8 +1823,6 @@ void QnMain::run()
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     qnResPool->addResource(m_mediaServer);
-
-    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
 
     QString moduleName = qApp->applicationName();
     if( moduleName.startsWith( qApp->organizationName() ) )
@@ -2064,7 +2074,7 @@ void QnMain::run()
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
         m_dumpSystemResourceUsageTaskID = 0;
     }
@@ -2080,6 +2090,7 @@ void QnMain::run()
     TimerManager::instance()->stop();
 
     hlsSessionPool.reset();
+    streamingChunkTranscoder.reset();
 
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );

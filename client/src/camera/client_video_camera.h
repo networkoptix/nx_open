@@ -84,7 +84,7 @@ public slots:
 
     void stopExport();
 private:
-    mutable QMutex m_exportMutex;
+    mutable QnMutex m_exportMutex;
     QnMediaResourcePtr m_resource;
     QnCamDisplay m_camdispay;
     QnAbstractMediaStreamDataProvider* m_reader;

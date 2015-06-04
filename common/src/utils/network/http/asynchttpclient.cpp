@@ -9,13 +9,15 @@
 #include <mutex>
 
 #include <QtCore/QCryptographicHash>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
+#include <http/custom_headers.h>
+#include <utils/common/log.h>
 #include <utils/common/util.h>
-#include "utils/network/socket_factory.h"
-#include "../../common/log.h"
-#include "../../common/systemerror.h"
-#include "http/custom_headers.h"
+#include <utils/network/socket_factory.h>
+#include <utils/common/systemerror.h>
+
+#include "auth_tools.h"
 #include "version.h"
 
 
@@ -60,7 +62,7 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> result = m_socket;
 
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = true;
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
@@ -75,7 +77,7 @@ namespace nx_http
     void AsyncHttpClient::terminate()
     {
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return;
             m_terminated = true;
@@ -121,6 +123,21 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
         m_request.headers.insert( make_pair("Content-Encoding", "identity") );
+        m_request.messageBody = messageBody;
+        return initiateHttpMessageDelivery( url );
+    }
+
+    bool AsyncHttpClient::doPut(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        const nx_http::StringType& messageBody )
+    {
+        resetDataBeforeNewRequest();
+        m_url = url;
+        composeRequest( nx_http::Method::PUT );
+        m_request.headers.insert( make_pair("Content-Type", contentType) );
+        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
+        //TODO #ak support chunked encoding & compression
         m_request.messageBody = messageBody;
         return initiateHttpMessageDelivery( url );
     }
@@ -176,7 +193,7 @@ namespace nx_http
 
     quint64 AsyncHttpClient::totalBytesRead() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_totalBytesRead;
     }
 
@@ -224,7 +241,7 @@ namespace nx_http
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
@@ -269,7 +286,7 @@ namespace nx_http
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
@@ -331,7 +348,7 @@ namespace nx_http
 
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         if( m_terminated )
@@ -406,7 +423,6 @@ namespace nx_http
                 const Response* response = m_httpStreamReader.message().response;
                 if( response->statusLine.statusCode == StatusCode::unauthorized )
                 {
-                    m_currentUrlAuthorization.reset();
                     if( !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
                     {
                         //trying authorization
@@ -524,7 +540,7 @@ namespace nx_http
     {
         //stopping client, if it is running
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = true;
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
@@ -532,7 +548,7 @@ namespace nx_http
             m_socket->cancelAsyncIO();
 
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = false;
         }
 
@@ -713,18 +729,18 @@ namespace nx_http
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
         if( !m_userName.isEmpty() )
-            nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()) );
-
-        //TODO #ak if that url has already been authenticated, adding same authentication info to the request
-        if( m_currentUrlAuthorization )
-        {
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
-                nx_http::HttpHeader(
-                    header::Authorization::NAME,
-                    m_currentUrlAuthorization->toString() ) );
-        }
-        else
+                HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()) );
+
+        //if that url has already been authenticated, adding same authentication info to the request
+        //first request per tcp-connection always uses authentication
+        //    This is done due to limited AuthInfoCache implementation
+        if( m_authCacheItem.url.isEmpty() ||
+            !AuthInfoCache::instance()->addAuthorizationHeader(
+                m_url,
+                &m_request,
+                &m_authCacheItem ) )
         {
             //not using Basic authentication by default, since it is not secure
             nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
@@ -753,18 +769,6 @@ namespace nx_http
         m_request.serialize( &m_requestBuffer );
         m_requestBytesSent = 0;
     }
-
-#if 0
-    bool AsyncHttpClient::sendRequest()
-    {
-        Q_ASSERT( (int)m_requestBytesSent < m_requestBuffer.size() );
-        int bytesSent = m_socket->send( m_requestBuffer.data()+m_requestBytesSent, m_requestBuffer.size()-m_requestBytesSent );
-        if( bytesSent == -1 )
-            return (SystemError::getLastOSErrorCode() == SystemError::wouldBlock) || (SystemError::getLastOSErrorCode() == SystemError::again);
-        m_requestBytesSent += bytesSent;    //TODO #ak it would be very usefull to use buffer with effective pop_front()
-        return true;
-    }
-#endif
 
     bool AsyncHttpClient::reconnectIfAppropriate()
     {
@@ -901,7 +905,16 @@ namespace nx_http
                 nx_http::HttpHeader(
                     header::Authorization::NAME,
                     basicAuthorization.toString() ) );
-            m_currentUrlAuthorization.reset( new header::Authorization( std::move(basicAuthorization) ) );
+            //TODO #ak MUST add to cache only after OK response
+            m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
+                m_url,
+                m_request.requestLine.method,
+                m_userName.toLatin1(),
+                m_userPassword.toLatin1(),
+                boost::optional<BufferType>(),
+                std::move(wwwAuthenticateHeader),
+                std::move(basicAuthorization) );
+            AuthInfoCache::instance()->cacheAuthorization( m_authCacheItem );
         }
         else if( wwwAuthenticateHeader.authScheme == header::AuthScheme::digest )
         {
@@ -972,7 +985,20 @@ namespace nx_http
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
-            m_currentUrlAuthorization.reset( new header::Authorization( std::move(digestAuthorizationHeader) ) );
+            //TODO #ak MUST add to cache only after OK response
+            m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
+                m_url,
+                m_request.requestLine.method,
+                m_userName.toLatin1(),
+                m_authType == authDigestWithPasswordHash
+                    ? boost::optional<BufferType>()
+                    : boost::optional<BufferType>(m_userPassword.toLatin1()),
+                m_authType == authDigestWithPasswordHash
+                    ? boost::optional<BufferType>(m_userPassword.toLatin1())
+                    : boost::optional<BufferType>(),
+                std::move(wwwAuthenticateHeader),
+                std::move(digestAuthorizationHeader) );
+            AuthInfoCache::instance()->cacheAuthorization( m_authCacheItem );
         }
         else
         {
@@ -1013,6 +1039,15 @@ namespace nx_http
         m_authType = value;
     }
 
+    AuthInfoCache::AuthorizationCacheItem AsyncHttpClient::authCacheItem() const
+    {
+        return m_authCacheItem;
+    }
+
+
+    /**********************************************************
+    * utils
+    ***********************************************************/
 
     bool downloadFileAsync(
         const QUrl& url,

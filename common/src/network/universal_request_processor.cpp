@@ -69,8 +69,11 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         const bool isProxy = d->owner->isProxy(d->request);
         QElapsedTimer t;
         t.restart();
-        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId) && d->socket->isConnected())
+        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId))
         {
+            if( !d->socket->isConnected() )
+                return false;   //connection has been closed
+
             if( d->request.requestLine.method == nx_http::Method::GET ||
                 d->request.requestLine.method == nx_http::Method::HEAD )
             {
@@ -177,7 +180,7 @@ bool QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
 
-    QMutexLocker lock(&d->mutex); 
+    QnMutexLocker lock( &d->mutex ); 
     if (auto handler = d->owner->findHandler(d->protocol, d->request))
         d->processor = handler(d->socket, d->owner);
     else
@@ -201,7 +204,7 @@ bool QnUniversalRequestProcessor::processRequest()
 void QnUniversalRequestProcessor::pleaseStop()
 {
     Q_D(QnUniversalRequestProcessor);
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock( &d->mutex );
     QnTCPConnectionProcessor::pleaseStop();
     if (d->processor)
         d->processor->pleaseStop();

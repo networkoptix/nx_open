@@ -14,9 +14,9 @@ Base64DecoderFilter::~Base64DecoderFilter()
 {
 }
 
-void Base64DecoderFilter::processData( const QnByteArrayConstRef& data )
+bool Base64DecoderFilter::processData( const QnByteArrayConstRef& data )
 {
-    m_nextFilter->processData( QByteArray::fromBase64( data.toByteArrayWithRawData() ) );
+    return m_nextFilter->processData( QByteArray::fromBase64( data.toByteArrayWithRawData() ) );
 }
 
 size_t Base64DecoderFilter::flush()

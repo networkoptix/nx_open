@@ -6,8 +6,6 @@
 
 #include <fstream>
 
-#include <QMutexLocker>
-
 #include <transcoding/ffmpeg_transcoder.h>
 #include <utils/common/log.h>
 
@@ -58,6 +56,8 @@ StreamingChunkTranscoderThread::StreamingChunkTranscoderThread()
 
 StreamingChunkTranscoderThread::~StreamingChunkTranscoderThread()
 {
+    stop();
+
     std::for_each( m_transcodeContext.cbegin(), m_transcodeContext.cend(),
         []( const std::pair<int, TranscodeContext*>& p ){ delete p.second; } );
     m_transcodeContext.clear();
@@ -69,7 +69,7 @@ bool StreamingChunkTranscoderThread::startTranscoding(
     DataSourceContextPtr dataSourceCtx,
     const StreamingChunkCacheKey& transcodeParams )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     //checking transcodingID uniqueness
     pair<map<int, TranscodeContext*>::iterator, bool>
@@ -98,13 +98,13 @@ bool StreamingChunkTranscoderThread::startTranscoding(
 
 size_t StreamingChunkTranscoderThread::ongoingTranscodings() const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_transcodeContext.size();
 }
 
 //void StreamingChunkTranscoderThread::cancel( int transcodingID )
 //{
-//    QMutexLocker lk( &m_mutex );
+//    QnMutexLocker lk( &m_mutex );
 //
 //    map<int, TranscodeContext*>::iterator it = m_transcodeContext.find( transcodingID );
 //    if( it == m_transcodeContext.end() )
@@ -115,7 +115,7 @@ size_t StreamingChunkTranscoderThread::ongoingTranscodings() const
 
 void StreamingChunkTranscoderThread::pleaseStop()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     QnLongRunnable::pleaseStop();
     m_cond.wakeAll();
 }
@@ -131,7 +131,7 @@ void StreamingChunkTranscoderThread::run()
     int prevReadTranscodingID = 0;
     while( !needToStop() )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         const qint64 currentMonotonicTimestamp = m_monotonicClock.elapsed();
         //taking context with data - trying to find context different from previous one
@@ -243,7 +243,7 @@ void StreamingChunkTranscoderThread::run()
 
 void StreamingChunkTranscoderThread::onStreamDataAvailable( AbstractOnDemandDataProvider* dataSource )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     //locating transcoding context by data source
     std::map<AbstractOnDemandDataProvider*, int>::const_iterator
@@ -262,7 +262,7 @@ void StreamingChunkTranscoderThread::onStreamDataAvailable( AbstractOnDemandData
 void StreamingChunkTranscoderThread::removeTranscodingNonSafe(
     const std::map<int, TranscodeContext*>::iterator& transcodingIter,
     bool transcodingFinishedSuccessfully,
-    QMutexLocker* const lk )
+    QnMutexLockerBase* const lk )
 {
     StreamingChunkPtr chunk = transcodingIter->second->chunk;
 

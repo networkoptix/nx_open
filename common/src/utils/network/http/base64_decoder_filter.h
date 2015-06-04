@@ -16,14 +16,14 @@
 */
 class Base64DecoderFilter
 :
-    public AbstractByteStreamConverter
+    public AbstractByteStreamFilter
 {
 public:
     Base64DecoderFilter();
     virtual ~Base64DecoderFilter();
 
     //!Implementation of AbstractByteStreamFilter::processData
-    virtual void processData( const QnByteArrayConstRef& data ) override;
+    virtual bool processData( const QnByteArrayConstRef& data ) override;
     //!Implementation of AbstractByteStreamFilter::flush
     virtual size_t flush() override;
 };

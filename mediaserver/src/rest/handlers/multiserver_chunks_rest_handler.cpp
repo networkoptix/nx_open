@@ -1,7 +1,6 @@
 #include "multiserver_chunks_rest_handler.h"
 
 #include <QUrlQuery>
-#include <QWaitCondition>
 
 #include "recording/time_period.h"
 #include "recording/time_period_list.h"
@@ -19,6 +18,9 @@
 #include <utils/common/model_functions.h>
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/serialization/compressed_time.h"
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
+
 
 namespace {
     static QString urlPath;
@@ -29,8 +31,8 @@ struct QnMultiserverChunksRestHandler::InternalContext
     InternalContext(const QnChunksRequestData& request): request(request), requestsInProgress(0) {}
 
     const QnChunksRequestData request;
-    QMutex mutex;
-    QWaitCondition waitCond;
+    QnMutex mutex;
+    QnWaitCondition waitCond;
     int requestsInProgress;
 };
 
@@ -49,7 +51,7 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
         if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok )
             remoteData = QnCompressedTime::deserialized(msgBody, MultiServerPeriodDataList(), &success);
         
-        QMutexLocker lock(&ctx->mutex);
+        QnMutexLocker lock(&ctx->mutex);
         if (success && !remoteData.empty())
             outputData.push_back(std::move(remoteData.front()));
         ctx->requestsInProgress--;
@@ -73,7 +75,7 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
         auth.setPassword(QString::fromUtf8(admin->getDigest()));
     }
 
-    QMutexLocker lock(&ctx->mutex);
+    QnMutexLocker lock(&ctx->mutex);
     if (nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers, auth))
         ctx->requestsInProgress++;
 }
@@ -84,14 +86,14 @@ void QnMultiserverChunksRestHandler::loadLocalData(MultiServerPeriodDataList& ou
     record.guid = qnCommon->moduleGUID();
     record.periods = QnChunksRequestHelper::load(ctx->request);
     if (!record.periods.empty()) {
-        QMutexLocker lock(&ctx->mutex);
+        QnMutexLocker lock(&ctx->mutex);
         outputData.push_back(std::move(record));
     }
 }
 
 void QnMultiserverChunksRestHandler::waitForDone(InternalContext* ctx)
 {
-    QMutexLocker lock(&ctx->mutex);
+    QnMutexLocker lock(&ctx->mutex);
     while (ctx->requestsInProgress > 0)
         ctx->waitCond.wait(&ctx->mutex);
 }

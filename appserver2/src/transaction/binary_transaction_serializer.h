@@ -23,7 +23,7 @@ namespace ec2
 
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock( &m_mutex );
             Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
@@ -56,7 +56,7 @@ namespace ec2
 
         static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
     private:
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
     };
 

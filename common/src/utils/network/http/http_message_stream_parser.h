@@ -19,20 +19,20 @@ namespace nx_http
     */
     class HttpMessageStreamParser
     :
-        public AbstractByteStreamConverter
+        public AbstractByteStreamFilter
     {
     public:
         HttpMessageStreamParser();
         virtual ~HttpMessageStreamParser();
 
         //!Implementation of AbstractByteStreamFilter::processData
-        virtual void processData( const QnByteArrayConstRef& data ) override;
+        virtual bool processData( const QnByteArrayConstRef& data ) override;
         //!Implementation of AbstractByteStreamFilter::flush
         virtual size_t flush() override;
 
         //!Returns previous http message
         /*!
-            Message is available only within \a AbstractByteStreamConverter::processData call of the next filter
+            Message is available only within \a AbstractByteStreamFilter::processData call of the next filter
         */
         nx_http::Message currentMessage() const;
 

@@ -29,7 +29,7 @@ bool QnLiveStreamParams::operator !=(const QnLiveStreamParams& rhs) { return !(*
 
 QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     QnAbstractMediaStreamDataProvider(res),
-    m_livemutex(QMutex::Recursive),
+    m_livemutex(QnMutex::Recursive),
     m_qualityUpdatedAtLeastOnce(false),
     m_framesSinceLastMetaData(0),
     m_softMotionRole(Qn::CR_Default),
@@ -71,7 +71,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
 
-    QMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx(&m_livemutex);
     updateSoftwareMotion();
 
     const auto oldParams = m_newLiveParams;
@@ -91,7 +91,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
 Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
-    QMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx( &m_livemutex );
     return m_role;
 }
 
@@ -111,7 +111,7 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
 void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
 {
     {
-        QMutexLocker mtx(&m_livemutex);
+        QnMutexLocker mtx( &m_livemutex );
         if (m_newLiveParams.secondaryQuality == quality)
             return; // same quality
         m_newLiveParams.secondaryQuality = quality;
@@ -138,7 +138,7 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
 void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
 {
     {
-        QMutexLocker mtx(&m_livemutex);
+        QnMutexLocker mtx( &m_livemutex );
         if (m_newLiveParams.quality == q && m_qualityUpdatedAtLeastOnce)
             return; // same quality
 
@@ -152,7 +152,7 @@ void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
 
 Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
-    QMutexLocker lock(&m_motionRoleMtx);
+    QnMutexLocker lock( &m_motionRoleMtx );
 
     if (m_softMotionRole == Qn::CR_Default) 
     {
@@ -200,7 +200,7 @@ bool QnLiveStreamProvider::canChangeStatus() const
 void QnLiveStreamProvider::setFps(float f)
 {
     {
-        QMutexLocker mtx(&m_livemutex);
+        QnMutexLocker mtx( &m_livemutex );
 
         if (std::abs(m_newLiveParams.fps - f) < 0.1)
             return; // same fps?
@@ -228,12 +228,12 @@ float QnLiveStreamProvider::getDefaultFps() const
 {
     Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
     float maxFps = m_cameraRes->getMaxFps();
-    return qMax(1.0, sharingMethod ==  Qn::NoFpsSharing ? maxFps : maxFps - 2);
+    return qMax(1.0, sharingMethod ==  Qn::NoFpsSharing ? maxFps : maxFps - MIN_SECOND_STREAM_FPS);
 }
 
 bool QnLiveStreamProvider::isMaxFps() const
 {
-    QMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx( &m_livemutex );
     return m_newLiveParams.fps >= m_cameraRes->getMaxFps()-0.1;
 }
 
@@ -343,7 +343,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 {
-    QMutexLocker lock(&m_livemutex);
+    QnMutexLocker lock(&m_livemutex);
     if (m_newLiveParams.fps == FPS_NOT_INITIALIZED)
         m_newLiveParams.fps = getDefaultFps();
     return m_newLiveParams;
@@ -389,7 +389,7 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 
 void QnLiveStreamProvider::startIfNotRunning()
 {
-    QMutexLocker mtx(&m_mutex);
+    QnMutexLocker mtx( &m_mutex );
     if (!isRunning())    
     {
         m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
@@ -432,13 +432,13 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     }
 
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
-    QMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx( &m_livemutex );
     updateSoftwareMotion();
 }
 
 void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
 {
-    QMutexLocker lock(&m_motionRoleMtx);
+    QnMutexLocker lock( &m_motionRoleMtx );
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
 }
 
