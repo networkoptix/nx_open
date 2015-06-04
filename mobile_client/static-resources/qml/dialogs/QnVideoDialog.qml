@@ -97,13 +97,22 @@ Page {
         height: timeline.height + playbackController.height
 
         y: parent.height - height
+        Behavior on y { NumberAnimation { duration: 200 } }
 
         MouseArea {
+            id: navigatorMouseArea
             anchors.fill: navigator
             drag.target: navigator
             drag.axis: Drag.YAxis
             drag.minimumY: videoPlayer.height - navigator.height - navigationPanel.height
             drag.maximumY: videoPlayer.height - navigator.height
+            onReleased: {
+                var mid = (drag.minimumY + drag.maximumY) / 2
+                if (navigator.y < mid)
+                    navigator.y = drag.minimumY
+                else
+                    navigator.y = drag.maximumY
+            }
         }
 
         QnTimeline {
