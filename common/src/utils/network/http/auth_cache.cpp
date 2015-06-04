@@ -46,7 +46,7 @@ namespace nx_http
                 &request->headers,
                 nx_http::HttpHeader(
                     header::Authorization::NAME,
-                    authzData.authorizationHeader->toString() ) );
+                    authzData.authorizationHeader->serialized() ) );
             return true;
         }
         else if( authzData.wwwAuthenticateHeader &&

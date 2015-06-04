@@ -15,17 +15,20 @@ AbstractDatagramSocket* SocketFactory::createDatagramSocket()
     return new UDPSocket();
 }
 
-AbstractStreamSocket* SocketFactory::createStreamSocket( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
+AbstractStreamSocket* SocketFactory::createStreamSocket(
+    bool sslRequired,
+    SocketFactory::NatTraversalType natTraversalRequired )
 {
     AbstractStreamSocket* result = nullptr;
     switch( natTraversalRequired )
     {
         case nttAuto:
         case nttEnabled:
+            //TODO #ak nat_traversal MUST be enabled explicitly by instanciating some singletone
             result = new TCPSocket(); //new HybridStreamSocket();  //that's where hole punching kicks in
             break;
         //case nttEnabled:
-        //    result = new UdtStreamSocket();   //TODO #ak does it make sense to use UdtStreamSocket only?
+        //    result = new UdtStreamSocket();   //TODO #ak does it make sense to use UdtStreamSocket only? - yes, but with different SocketFactory::NatTraversalType value
         //    break;
         case nttDisabled:
             result = new TCPSocket();
@@ -43,13 +46,16 @@ AbstractStreamSocket* SocketFactory::createStreamSocket( bool sslRequired, Socke
     return result;
 }
 
-AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
+AbstractStreamServerSocket* SocketFactory::createStreamServerSocket(
+    bool sslRequired,
+    SocketFactory::NatTraversalType natTraversalRequired )
 {
     AbstractStreamServerSocket* serverSocket = nullptr;
     switch( natTraversalRequired )
     {
         case nttAuto:
         case nttEnabled:
+            //TODO #ak cloud_acceptor
             serverSocket = new MixedTcpUdtServerSocket();
             break;
         //case nttEnabled:
