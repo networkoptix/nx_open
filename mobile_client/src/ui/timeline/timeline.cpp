@@ -975,11 +975,11 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
             parent->setStickToEnd(qMax(startBound, parent->position()) >= endBound);
 
         if (stickToEnd && time < endBound)
-            time = qMax(endBound, qMin(time, liveTime + windowSize) - delta);
+            time = qMin(endBound, qMax(time, endBound - windowSize) + delta);
         else if (time < startBound)
             time = qMin(startBound, qMax(time, startBound - windowSize) + delta);
         else if (time > endBound)
-            time = qMax(endBound, qMin(time, startBound + windowSize) - delta);
+            time = qMax(endBound, qMin(time, endBound + windowSize) - delta);
 
         delta = time - parent->position();
         if (delta != 0) {
