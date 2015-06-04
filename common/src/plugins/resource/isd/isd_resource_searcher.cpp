@@ -88,8 +88,9 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
             vendor = getValueFromString(QString::fromUtf8(line)).trimmed();
         }
     }
-
-    if (name.isEmpty() || vendor != lit("Innovative Security Designs"))
+    
+    // 'Digital Watchdog' (with space) is actually ISD cameras. Without space it's old DW cameras
+    if (name.isEmpty() || (vendor != lit("Innovative Security Designs") && vendor != lit("Digital Watchdog")))
         return QList<QnResourcePtr>();
 
 
