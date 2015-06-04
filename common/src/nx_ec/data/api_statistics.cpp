@@ -57,13 +57,6 @@ namespace ec2 {
 
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics() {}
 
-    
-    ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(ApiMediaServerDataStatistics&& data)
-        : ApiMediaServerDataEx(std::move(data))
-        , storages(std::move(data.storages))
-    {
-    }
-
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data)
         : ApiMediaServerDataEx(std::move(data))
     {

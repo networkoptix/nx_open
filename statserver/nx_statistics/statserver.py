@@ -24,7 +24,7 @@ def getAdapter():
     if hasattr(app, 'geoipDb'):
         ipResolve = GeoIp2.local(**app.geoipDb).resolve
     elif hasattr(app, 'geoipWeb'):
-        ipResolve = GeoIP2.remote(**app.geoipWeb).resolve
+        ipResolve = GeoIp2.remote(**app.geoipWeb).resolve
 
     return SqlAdapter(db, app.logger, ipResolve)
 

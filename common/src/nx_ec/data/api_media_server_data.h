@@ -77,6 +77,19 @@ namespace ec2
             storages( std::move( mediaServerData.storages ) )
         {
         }
+
+        ApiMediaServerDataEx& operator=( ApiMediaServerDataEx&& mediaServerData )
+        {
+            static_cast< ApiMediaServerData& >( *this ) =
+                    std::move( static_cast< ApiMediaServerData&& >( mediaServerData ) );
+            static_cast< ApiMediaServerUserAttributesData& >( *this ) =
+                    std::move( static_cast< ApiMediaServerUserAttributesData&& >( mediaServerData ) );
+
+            status = mediaServerData.status;
+            addParams = std::move( mediaServerData.addParams );
+            storages = std::move( mediaServerData.storages );
+            return *this;
+        }
     };
 #define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields_Short (status)(addParams) (storages)
 

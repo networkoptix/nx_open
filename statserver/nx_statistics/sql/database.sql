@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 5.5.41, for debian-linux-gnu (x86_64)
+-- MySQL dump 11.13  Distrib 5.5.41, for debian-linux-gnu (x86_64)
 --
 -- Host: 127.0.0.1    Database: nx_statistics
 -- ------------------------------------------------------
@@ -68,7 +68,10 @@ CREATE TABLE `cameras` (
   `MaxFPS` int(11) DEFAULT NULL,
   `hasDualStreaming` tinyint(1) DEFAULT NULL,
   `isAudioSupported` tinyint(1) DEFAULT NULL,
-  `overrideAr` varchar(45) DEFAULT NULL
+  `overrideAr` varchar(45) DEFAULT NULL,
+  `cameraCapabilities` int(11) DEFAULT NULL,
+  `defaultCredentials` tinyint(1) DEFAULT NULL,
+  `ptzCapabilities` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -139,7 +142,8 @@ CREATE TABLE `mediaservers` (
   `systemInfo` varchar(45) DEFAULT NULL,
   `version` varchar(45) DEFAULT NULL,
   `beta` tinyint(1) DEFAULT NULL,
-  `country` varchar(45) DEFAULT NULL
+  `country` varchar(45) DEFAULT NULL,
+  `statisticsReportAllowed` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -157,7 +161,8 @@ CREATE TABLE `storages` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `etc` text,
   `spaceLimit` bigint(20) DEFAULT NULL,
-  `usedForWriting` tinyint(1) DEFAULT NULL
+  `usedForWriting` tinyint(1) DEFAULT NULL,
+  `storageType` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
