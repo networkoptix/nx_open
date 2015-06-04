@@ -205,6 +205,7 @@ static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
+static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -1549,13 +1550,36 @@ void QnMain::run()
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
     qnCommon->setModuleGUID(serverGuid());
+
+    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
+    const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    bool isLocal = isLocalAppServer(appserverHostString);
+    int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
+#ifdef EDGE_SERVER
+    serverFlags |= Qn::SF_Edge;
+#endif
+    if (QnAppInfo::armBox() == "rpi" || compatibilityMode) // check compatibilityMode here for testing purpose
+        serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
+
+    if (!isLocal)
+        serverFlags |= Qn::SF_RemoteEC;
+    m_publicAddress = getPublicAddress();
+    if (!m_publicAddress.isNull())
+        serverFlags |= Qn::SF_HasPublicIP;
+
+
     QString systemName = settings->value(SYSTEM_NAME_KEY).toString();
 #ifdef __arm__
     if (systemName.isEmpty()) {
-        systemName = QString(lit("system_%1")).arg(getMacFromPrimaryIF());
+        systemName = QString(lit("%1system_%2")).arg(QString::fromLatin1(AUTO_GEN_SYSTEM_NAME)).arg(getMacFromPrimaryIF());
         settings->setValue(SYSTEM_NAME_KEY, systemName);
     }
 #endif
+    if (systemName.startsWith(AUTO_GEN_SYSTEM_NAME)) {
+        serverFlags |= Qn::SF_AutoSystemName;
+        systemName = systemName.mid(AUTO_GEN_SYSTEM_NAME.length());
+    }
+
     qnCommon->setLocalSystemName(systemName);
 
     qint64 systemIdentityTime = MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
@@ -1634,7 +1658,6 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
-    m_publicAddress = getPublicAddress();
     if (!m_publicAddress.isNull()) 
     {
         if (!m_ipDiscovery->publicIP().isNull()) {
@@ -1711,7 +1734,6 @@ void QnMain::run()
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
-    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
@@ -1723,21 +1745,6 @@ void QnMain::run()
             isNewServerInstance = true;
         }
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
-
-        QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
-        bool isLocal = isLocalAppServer(appserverHostString);
-
-        int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
-#ifdef EDGE_SERVER
-        serverFlags |= Qn::SF_Edge;
-#endif
-        if (QnAppInfo::armBox() == "rpi" || compatibilityMode) // check compatibilityMode here for testing purpose
-            serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
-
-        if (!isLocal)
-            serverFlags |= Qn::SF_RemoteEC;
-        if (!m_publicAddress.isNull())
-            serverFlags |= Qn::SF_HasPublicIP;
 
         server->setServerFlags((Qn::ServerFlags) serverFlags);
 
