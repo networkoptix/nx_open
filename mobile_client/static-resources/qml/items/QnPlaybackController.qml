@@ -124,6 +124,14 @@ Item {
         width: height
 
         Rectangle {
+            anchors.centerIn: circle
+            width: circle.height + 2 * tickSize
+            height: width
+            color: "#48000000"
+            radius: width / 2
+        }
+
+        Rectangle {
             id: circle
 
             antialiasing: true
