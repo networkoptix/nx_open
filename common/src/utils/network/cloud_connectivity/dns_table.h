@@ -8,6 +8,8 @@
 
 #include "../socket_common.h"
 
+#include <utils/common/singleton.h>
+
 
 //!Types used in resolving peer names
 /*!
@@ -53,8 +55,20 @@ namespace nx_cc
         
     */
     class DnsTable
+    :
+        public Singleton<DnsTable>
     {
     public:
+        enum class ResolveResult
+        {
+            //!operation completed without blocking calls
+            done,
+            //!asynchronous operation has been started. Completion hander will be invoked on result
+            startedAsync,
+            //!\todo provide reason
+            failed
+        };
+
         //!Add new peer address
         /*!
             Peer addresses are resolved from time to time in the following way:\n
@@ -79,20 +93,19 @@ namespace nx_cc
             - if \a hostName is an ipv4 address, than that address is returned
             - if \a hostName is a known peer name, registered with \a DnsTable::addPeerAddress than if some address is resolved, it is returned. 
                 Otherwise, if resolve retry timeout had passed, async resolve is started. Resolve is described in \a DnsTable::addPeerAddress
+            - if \a hostName is not ipv4 address and is unknown name, \a HostAddressResolver is used to resolve
 
             \param dnsEntries If \a hostName can be resolved immediately, it is done and result placed to \a dnsEntries. 
                 Otherwise, if completionHandler is specified, async resolve procedure is started
 
-            \return \a true if resolve is done and result placed to \a dnsEntry. \a false if async resolve procedure has been initiated
+            \return See \a DnsTable::ResolveResult
         */
-        bool resolveAsync(
+        ResolveResult resolveAsync(
             const HostAddress& hostName,
             std::vector<DnsEntry>* const dnsEntries,
             std::function<void(std::vector<DnsEntry>)> completionHandler );
         //!Calls \a DnsTable::resolveAsync and waits for completion
         std::vector<DnsEntry> resolveSync( const HostAddress& hostName );
-
-        static DnsTable* instance();
     };
 }
 
