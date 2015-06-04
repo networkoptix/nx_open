@@ -77,11 +77,18 @@ private:
     QString* m_awaitedValue;
 };
 
-bool UpnpAsyncClient::doUpnp( const QUrl& url, const Message& message, const Callback& callback )
+const QString& UpnpAsyncClient::Message::getParam( const QString& key ) const
+{
+    static const QString none;
+    const auto it = params.find( key );
+    return ( it == params.end() ) ? none : it->second;
+}
+
+bool UpnpAsyncClient::doUpnp( const QUrl& url, const Message& message,
+                              const std::function< void( const Message& )>& callback )
 {
     const auto service = toUpnpUrn( message.service, lit("service") );
     const auto action = lit( "\"%1#%2\"" ).arg( service ).arg( message.action );
-    addAdditionalHeader( "SOAPAction", action.toUtf8() );
 
     QStringList params;
     for( const auto& p : message.params )
@@ -92,16 +99,16 @@ bool UpnpAsyncClient::doUpnp( const QUrl& url, const Message& message, const Cal
 
     const auto complete = [this, callback]( const nx_http::AsyncHttpClientPtr& ptr )
     {
-        if( hasRequestSuccesed() )
+        m_httpClients.erase( ptr );
+        if( ptr->hasRequestSuccesed() )
         {
             UpnpMessageHandler xmlHandler;
             QXmlSimpleReader xmlReader;
             xmlReader.setContentHandler( &xmlHandler );
             xmlReader.setErrorHandler( &xmlHandler );
 
-            const auto msg = fetchMessageBodyBuffer();
             QXmlInputSource input;
-            input.setData( msg );
+            input.setData( ptr->fetchMessageBodyBuffer() );
             if( xmlReader.parse( &input ) )
             {
                 callback( xmlHandler.message() );
@@ -112,8 +119,55 @@ bool UpnpAsyncClient::doUpnp( const QUrl& url, const Message& message, const Cal
         callback( Message() ); // error
     };
 
-    connect( this, &nx_http::AsyncHttpClient::done,
-             this, complete, Qt::DirectConnection );
+    auto httpClient = std::make_shared< nx_http::AsyncHttpClient >();
+    httpClient->addAdditionalHeader( "SOAPAction", action.toUtf8() );
+    QObject::connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
+                      httpClient.get(), complete, Qt::DirectConnection );
 
-    return doPost( url, "text/xml", request.toUtf8() );
+    if( httpClient->doPost( url, "text/xml", request.toUtf8() ) )
+    {
+        m_httpClients.insert( std::move( httpClient ) );
+        return true;
+    }
+
+    return false;
 }
+
+static const QString WAN_IP = lit( "WANIpConnection" );
+static const QString GET_EXTERNAL_IP = lit( "GetExternalIPAddress" );
+static const QString EXTERNAL_IP = lit("NewExternalIPAddress");
+
+bool UpnpAsyncClient::externalIp( const QUrl& url,
+                                  const std::function< void( const QString& ) >& callback )
+{
+    UpnpAsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP };
+    return doUpnp(  url, request, [callback]( const Message& response ) {
+        callback( response.getParam( EXTERNAL_IP ) );
+    } );
+}
+
+/*
+bool UpnpAsyncClient::addMapping( const QUrl& url, const Mapping& mapping,
+                                  const std::function< Mapping >& callback )
+{
+    UpnpAsyncClient::Message request;
+    request.action = lit( "AddPortMapping" );
+    request.service = lit( "WANIpConnection" );
+
+    request.params[ lit( "NewExternalPort") ] = QString::number( mapping.externalPort );
+    request.params[ lit( "NewProtocol") ] = mapping.protocol;
+    request.params[ lit( "NewInternalPort") ] = QString::number( mapping.internalPort );
+    request.params[ lit( "NewInternalClient") ] = mapping.internalIp;
+    request.params[ lit( "NewEnabled") ] = QString::number( 1 );
+    request.params[ lit( "NewPortMappingDescription") ] = lit( "NX UpnpAsyncClient" );
+    request.params[ lit( "NewLeaseDuration") ] = QString::number( 0 );
+
+    return doUpnp(  url, request, [callback]( const Message& response ) {
+        if( response.action.isNull )
+        {
+            callback
+            return;
+        }
+    } );
+}
+*/
