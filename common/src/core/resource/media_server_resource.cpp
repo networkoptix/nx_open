@@ -278,6 +278,7 @@ Qn::ServerFlags QnMediaServerResource::getServerFlags() const
 void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
 {
     m_serverFlags = flags;
+    emit serverFlagsChanged(::toSharedPointer(this));
 }
 
 QnAbstractStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
@@ -427,6 +428,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.name = getName();
     moduleInformation.port = QUrl(m_apiUrl).port();
     moduleInformation.id = getId();
+    moduleInformation.flags = getServerFlags();
 
     return moduleInformation;
 }

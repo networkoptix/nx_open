@@ -120,6 +120,8 @@
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
+#include <rest/handlers/json_aggregator_rest_handler.h>
+#include <rest/handlers/ifconfig_rest_handler.h>
 #include <rest/handlers/settime_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
@@ -1357,6 +1359,8 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/iflist", new QnIfListRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/aggregator", new QnJsonAggregatorRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
@@ -1873,6 +1877,7 @@ void QnMain::run()
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
     selfInformation.runtimeId = qnCommon->runningInstanceGUID();
+    selfInformation.flags = m_mediaServer->getServerFlags();
 
     qnCommon->setModuleInformation(selfInformation);
     qnCommon->bindModuleinformation(m_mediaServer);
