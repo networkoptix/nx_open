@@ -238,11 +238,11 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
         for (auto deviceType : deviceTypes)
         {
             QByteArray data;
-            data.append(lit("M-SEARCH * HTTP/1.1\r\n"));
-            data.append(lit("Host: %1\r\n").arg(sock->getLocalAddress().toString()));
-            data.append(lit("ST:urn:schemas-upnp-org:device:%1:1\r\n").arg(deviceType));
-            data.append(lit("Man:\"ssdp:discover\"\r\n"));
-            data.append(lit("MX:3\r\n\r\n"));
+            data.append( lit("M-SEARCH * HTTP/1.1\r\n") );
+            data.append( lit("Host: %1\r\n").arg( sock->getLocalAddress().toString() ) );
+            data.append( lit("ST:%1\r\n").arg( toUpnpUrn(deviceType, lit("device")) ) );
+            data.append( lit("Man:\"ssdp:discover\"\r\n") );
+            data.append( lit("MX:3\r\n\r\n") );
             sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
         }
     }

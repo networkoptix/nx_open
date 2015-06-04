@@ -1,5 +1,24 @@
 #include "upnp_device_description.h"
 
+QString toUpnpUrn( const QString& id, const QString& suffix, int version )
+{
+    static const QString urn = lit( "urn:schemas-upnp-org:%1:%2:%3" );
+    return urn.arg( suffix ).arg( id ).arg( version );
+}
+
+QString fromUpnpUrn( const QString& urn, const QString& suffix, int version )
+{
+    const auto split = urn.split(lit(":"));
+    if( split.size() == 4
+            && split[0] == lit("urn")
+            && split[1] == lit("schemas-upnp-org")
+            && split[2] == suffix
+            && split[4] == QString::number(version) )
+        return split[3];
+
+    return QString();
+}
+
 bool UpnpDeviceDescriptionHandler::startDocument()
 {
     m_deviceInfo = UpnpDeviceInfo();
@@ -55,10 +74,10 @@ bool UpnpDeviceDescriptionHandler::endElement(
 
 bool UpnpDeviceDescriptionHandler::characters( const QString& ch )
 {
-    if (m_lastService && charactersInService(ch))
+    if ( m_lastService && charactersInService(ch) )
         return true;
 
-    if (!m_deviceStack.empty() && charactersInDevice(ch))
+    if ( !m_deviceStack.empty() && charactersInDevice(ch) )
         return true;
 
     return true; // Something not interesting for us
@@ -69,7 +88,7 @@ bool UpnpDeviceDescriptionHandler::charactersInDevice( const QString& ch )
     auto& lastDev = *m_deviceStack.back();
 
     if( m_paramElement == lit("deviceType") )
-        lastDev.deviceType = ch;
+        lastDev.deviceType = fromUpnpUrn( ch, lit("device") );
     else
     if( m_paramElement == lit("friendlyName") )
         lastDev.friendlyName = ch;
@@ -94,7 +113,7 @@ bool UpnpDeviceDescriptionHandler::charactersInDevice( const QString& ch )
 bool UpnpDeviceDescriptionHandler::charactersInService( const QString& ch )
 {
     if( m_paramElement == QLatin1String("serviceType") )
-        m_lastService->serviceType = ch;
+        m_lastService->serviceType = fromUpnpUrn( ch, lit("service") );
     else
     if( m_paramElement == QLatin1String("serviceId") )
         m_lastService->serviceId = ch;

@@ -3,6 +3,10 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
+//Helper formaters "urn:schemas-upnp-org:service:ID:VERSION"
+QString toUpnpUrn( const QString& id, const QString& suffix, int version = 1 );
+QString fromUpnpUrn( const QString& urn, const QString& suffix, int version = 1 );
+
 //!Contains some info about discovered UPnP device
 struct UpnpDeviceInfo
 {
