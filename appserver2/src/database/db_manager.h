@@ -538,6 +538,7 @@ namespace ec2
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
+        bool removeEmptyLayoutsFromTransactionLog();
         bool tuneDBAfterOpen();
         bool updateCameraHistoryGuids();
         bool migrateServerGUID(const QString& table, const QString& field);

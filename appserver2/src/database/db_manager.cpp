@@ -1105,6 +1105,31 @@ bool QnDbManager::removeServerStatusFromTransactionLog()
     return true;
 }
 
+bool QnDbManager::removeEmptyLayoutsFromTransactionLog()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT r.guid from vms_layout l JOIN vms_resource r on r.id = l.resource_ptr_id WHERE NOT EXISTS(SELECT 1 FROM vms_layoutitem li WHERE li.layout_id = l.resource_ptr_id)");
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return false;
+    }
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM transaction_log WHERE tran_guid = ?");
+    while (query.next()) {
+        QnUuid id = QnSql::deserialized_field<QnUuid>(query.value(0));
+        delQuery.bindValue(0, QnSql::serialized_field(id));
+        if (!delQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << __LINE__ << delQuery.lastError();
+            return false;
+        }
+        if (removeLayout(id) != ErrorCode::ok)
+            return false;
+    }
+
+    return true;
+}
+
 bool QnDbManager::tuneDBAfterOpen()
 {
     QSqlQuery enableWalQuery(m_sdb);
@@ -1300,6 +1325,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/36_fix_brules.sql")) {
         return fixBusinessRules();
+    }
+    else if (updateName == lit(":/updates/37_remove_empty_layouts.sql")) {
+        return removeEmptyLayoutsFromTransactionLog();
     }
 
     return true;
