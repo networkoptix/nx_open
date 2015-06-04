@@ -49,6 +49,7 @@ namespace ec2 {
 		: ApiMediaServerDataEx
     {
         ApiMediaServerDataStatistics();
+        ApiMediaServerDataStatistics(ApiMediaServerDataStatistics&& data);
         ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
 
         ApiStorageDataStatisticsList storages;
