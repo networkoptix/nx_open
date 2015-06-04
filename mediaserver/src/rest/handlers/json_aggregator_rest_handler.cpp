@@ -20,7 +20,6 @@ bool QnJsonAggregatorRestHandler::executeCommad(const QString &command, const Qn
         result.setErrorString(lit("Rest handler '%1' is not json handler. It is not supported").arg(command));
         return false;
     }
-    QByteArray msgBody;
     QnJsonRestResult subResult;
     jsonHandler->executeGet(command, params, subResult, owner);
     QVariantMap subResultWithErr;
