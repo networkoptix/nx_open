@@ -15,15 +15,14 @@ namespace rpi_cam
         m_camera(camera),
         m_encoderNumber(encoderNumber),
         m_pts(0),
-        m_interrupt(false),
-        m_firstOne(true)
+        m_interrupt(false)
     {
-        printf("[camera] StreamReader() %d\n", m_encoderNumber);
+        debug_print("StreamReader() %d\n", m_encoderNumber);
     }
 
     StreamReader::~StreamReader()
     {
-        printf("[camera] ~StreamReader() %d\n", m_encoderNumber);
+        debug_print("~StreamReader() %d\n", m_encoderNumber);
     }
 
     void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -44,27 +43,23 @@ namespace rpi_cam
 
     int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     {
-        //printf("[camera] StreamReader.getNextData() %d\n", m_encoderNumber);
+        //debug_print("StreamReader.getNextData() %d\n", m_encoderNumber);
 
         uint64_t timeStamp = 0;
         unsigned rpiFlags = 0;
 
         while (! m_interrupt)
         {
-            if (! m_camera || ! m_camera->isOK())
+            std::shared_ptr<RPiCamera> camera = m_camera.lock();
+
+            if (! camera || ! camera->isOK())
             {
-                printf("[camera] StreamReader.getNextData() %d no camera\n", m_encoderNumber);
+                debug_print("StreamReader.getNextData() %d no camera\n", m_encoderNumber);
                 return false;
             }
 
-            if (m_firstOne)
-            {
-                m_camera->fillBuffer(m_encoderNumber);
-                m_firstOne = false;
-            }
-
             m_data.clear();
-            if (m_camera->read(m_encoderNumber, m_data, timeStamp, rpiFlags))
+            if (camera->read(m_encoderNumber, m_data, timeStamp, rpiFlags))
             {
                 // only I-Frames for second stream
                 if (!m_encoderNumber || rpiFlags & RPiCamera::FLAG_SYNCFRAME)
@@ -83,7 +78,7 @@ namespace rpi_cam
 
         if (m_data.empty())
         {
-            printf("[camera] StreamReader.getNextData() %d failed. Flags: %d\n", m_encoderNumber, rpiFlags);
+            debug_print("StreamReader.getNextData() %d failed. Flags: %d\n", m_encoderNumber, rpiFlags);
 
             *lpPacket = nullptr;
             return nxcip::NX_NO_DATA;
@@ -92,7 +87,7 @@ namespace rpi_cam
         timeStamp = m_timeCorrect.fixTime(m_pts, timeStamp);
 #if 0
         if (rpiFlags & RPiCamera::FLAG_SYNCFRAME)
-            printf("[camera] StreamReader: %d timestamp %llu\n", m_encoderNumber, timeStamp);
+            debug_print("StreamReader: %d timestamp %llu\n", m_encoderNumber, timeStamp);
 #endif
 
         unsigned flags = 0;

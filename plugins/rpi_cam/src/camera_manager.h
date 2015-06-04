@@ -37,7 +37,7 @@ namespace rpi_cam
 
         //
 
-        std::shared_ptr<RPiCamera> rpiCamera() { return m_rpiCamera; }
+        std::weak_ptr<RPiCamera> rpiCamera() { return m_rpiCamera; }
         const nxcip::CameraInfo& info() const { return m_info; }
 
     private:
@@ -48,6 +48,8 @@ namespace rpi_cam
         const char * m_errorStr;
         nxcip::CameraInfo m_info;
         CameraParameters m_parameters;
+
+        void makeInfo();
     };
 }
 

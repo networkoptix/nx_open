@@ -21,7 +21,7 @@ namespace rpi_cam
     :   m_refManager(this),
         m_camera(nullptr)
     {
-        printf("[camera] DiscoveryManager()\n");
+        debug_print("DiscoveryManager()\n");
 
         RPiCamera::init();
         Instance = this;
@@ -29,7 +29,7 @@ namespace rpi_cam
 
     DiscoveryManager::~DiscoveryManager()
     {
-        printf("[camera] ~DiscoveryManager()\n");
+        debug_print("~DiscoveryManager()\n");
 
         if (m_camera)
             m_camera->releaseRef();

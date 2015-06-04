@@ -10,9 +10,13 @@ using namespace rpi_omx;
 
 namespace rpi_cam
 {
+    std::recursive_mutex RPiCamera::m_mutex;
+
+    //
+
     void RPiCamera::init()
     {
-        printf("[camera] RPiCamera::init()\n");
+        debug_print("RPiCamera::init()\n");
 
         bcm_host_init();
 
@@ -22,7 +26,7 @@ namespace rpi_cam
         }
         catch (OMXExeption& ex)
         {
-            printf("[camera] %s\n", ex.what());
+            debug_print("%s\n", ex.what());
         }
 
         rpi_omx::VcosSemaphore::common();
@@ -30,7 +34,7 @@ namespace rpi_cam
 
     void RPiCamera::deinit()
     {
-        printf("[camera] RPiCamera::deinit()\n");
+        debug_print("RPiCamera::deinit()\n");
 
         try
         {
@@ -38,74 +42,107 @@ namespace rpi_cam
         }
         catch (OMXExeption& ex)
         {
-            printf("[camera] %s\n", ex.what());
+            debug_print("%s\n", ex.what());
         }
 
         bcm_host_deinit();
     }
 
+    void RPiCamera::resetComponents()
+    {
+        m_camera.reset();
+        m_vsplitter.reset();
+        m_resizer.reset();
+        m_encoders[0].reset();
+        m_encoders[1].reset();
+
+        m_camera.reset( new rpi_omx::Camera() );
+        m_vsplitter.reset( new rpi_omx::VideoSplitter() );
+        m_resizer.reset( new rpi_omx::Resizer() );
+        m_encoders[0].reset( new rpi_omx::Encoder() );
+        m_encoders[1].reset( new rpi_omx::Encoder() );
+
+        if (! m_camera || ! m_vsplitter || ! m_resizer || ! m_encoders[0] || ! m_encoders[1])
+            throw "can't create component";
+    }
+
     void RPiCamera::configCamera(const CameraParameters& params)
     {
-        VideoFromat vf = m_vfs[0];
-        vf.framerate = m_fps;
+        m_camera->setVideoFromat(params.vfmt);
 
-        m_camera.setVideoFromat(vf);
+        m_camera->setImageDefaults();
 
-        m_camera.setImageDefaults();
-        //m_camera.setImageFilter(OMX_ALL, OMX_ImageFilterNoise);
+        m_camera->setSharpness(OMX_ALL, params.sharpness);
+        m_camera->setContrast(OMX_ALL, params.contrast);
+        m_camera->setSaturation(OMX_ALL, params.saturation);
+        m_camera->setBrightness(OMX_ALL, params.brightness);
+        m_camera->setImageFilter(OMX_ALL, (OMX_IMAGEFILTERTYPE)params.filter);
 
-        m_camera.setSharpness(OMX_ALL, params.sharpness);
-        m_camera.setContrast(OMX_ALL, params.contrast);
-        m_camera.setSaturation(OMX_ALL, params.saturation);
-        m_camera.setBrightness(OMX_ALL, params.brightness);
-        m_camera.setImageFilter(OMX_ALL, (OMX_IMAGEFILTERTYPE)params.filter);
-
-        while (!m_camera.ready())
+        for (unsigned i=0; i < 10; ++i)
         {
-            printf("[camera] waiting for Camera component\n");
-            usleep(10000);
+            if (m_camera->ready())
+                break;
+
+            debug_print("waiting for Camera component\n");
+            usleep(100000);
         }
     }
 
-    void RPiCamera::configEncoders()
+    void RPiCamera::configEncoders(const EncoderParameters& params0, const EncoderParameters& params1)
     {
         Parameter<OMX_PARAM_PORTDEFINITIONTYPE> portDef;
-        m_camera.getPortDefinition(Camera::OPORT_VIDEO, portDef);
+        m_camera->getPortDefinition(Camera::OPORT_VIDEO, portDef);
 
         // high
-        m_encoders[0].setupOutputPort(portDef, m_bitrates[0] * 1000);
-        m_encoders[0].setCodec(OMX_VIDEO_CodingAVC);
+        m_encoders[0]->setupOutputPort(portDef, params0.bitrateKbps * 1000);
+        m_encoders[0]->setCodec(OMX_VIDEO_CodingAVC);
 
         // resizer
-        m_resizer.setupOutputPort(m_vfs[1].width, m_vfs[1].height);
+        m_resizer->setupOutputPort(params1.vfmt.width, params1.vfmt.height);
 
         // low
-        portDef->format.video.nFrameWidth = m_vfs[1].width;
-        portDef->format.video.nFrameHeight = m_vfs[1].height;
+        portDef->format.video.nFrameWidth = params1.vfmt.width;
+        portDef->format.video.nFrameHeight = params1.vfmt.height;
 
-        m_encoders[1].setupOutputPort(portDef, m_bitrates[1] * 1000);
-        m_encoders[1].setCodec(OMX_VIDEO_CodingAVC);
-
-        m_encoders[1].setIFramePeriod( IFRAME_PERIOD() );
+        m_encoders[1]->setupOutputPort(portDef, params1.bitrateKbps * 1000);
+        m_encoders[1]->setCodec(OMX_VIDEO_CodingAVC);
+        m_encoders[1]->setIFramePeriod( IFRAME_PERIOD() );
     }
 
-    void RPiCamera::tunnelPorts()
+    void RPiCamera::setupTunnels()
     {
-        ERR_OMX( OMX_SetupTunnel(m_camera.component(), Camera::OPORT_VIDEO, m_vsplitter.component(), VideoSplitter::IPORT),
-            "tunnel camera.video -> splitter.input");
+        ERR_OMX( OMX_SetupTunnel(m_camera->component(), Camera::OPORT_VIDEO, m_vsplitter->component(), VideoSplitter::IPORT),
+            "setup tunnel camera.video -> splitter.input");
 
-        ERR_OMX( OMX_SetupTunnel(m_vsplitter.component(), VideoSplitter::OPORT_1, m_encoders[0].component(), Encoder::IPORT),
-            "tunnel splitter.output -> encoder.input (high)");
+        ERR_OMX( OMX_SetupTunnel(m_vsplitter->component(), VideoSplitter::OPORT_1, m_encoders[0]->component(), Encoder::IPORT),
+            "setup tunnel splitter.output -> encoder.input (high)");
 
-        ERR_OMX( OMX_SetupTunnel(m_vsplitter.component(), VideoSplitter::OPORT_2, m_resizer.component(), Resizer::IPORT),
-            "tunnel splitter.output -> resizer.input");
+        ERR_OMX( OMX_SetupTunnel(m_vsplitter->component(), VideoSplitter::OPORT_2, m_resizer->component(), Resizer::IPORT),
+            "setup tunnel splitter.output -> resizer.input");
 
-        ERR_OMX( OMX_SetupTunnel(m_resizer.component(), Resizer::OPORT, m_encoders[1].component(), Encoder::IPORT),
-            "tunnel resizer.output -> encoder.input (low)");
+        ERR_OMX( OMX_SetupTunnel(m_resizer->component(), Resizer::OPORT, m_encoders[1]->component(), Encoder::IPORT),
+            "setup tunnel resizer.output -> encoder.input (low)");
+    }
+
+    void RPiCamera::teardownTunnels()
+    {
+        ERR_OMX( OMX_SetupTunnel(m_camera->component(), Camera::OPORT_VIDEO, NULL, 0),
+            "teardown tunnel camera.video -> splitter.input");
+
+        ERR_OMX( OMX_SetupTunnel(m_vsplitter->component(), VideoSplitter::OPORT_1, NULL, 0),
+            "teardown tunnel splitter.output -> encoder.input (high)");
+
+        ERR_OMX( OMX_SetupTunnel(m_vsplitter->component(), VideoSplitter::OPORT_2, NULL, 0),
+            "teardown tunnel splitter.output -> resizer.input");
+
+        ERR_OMX( OMX_SetupTunnel(m_resizer->component(), Resizer::OPORT, NULL, 0),
+            "teardown tunnel resizer.output -> encoder.input (low)");
     }
 
     void RPiCamera::switchState(OMX_STATETYPE state)
     {
+        debug_print("RPiCamera::switchState() %d\n", state);
+
 #if 0
         if (state == OMX_StateIdle)
         {
@@ -114,163 +151,120 @@ namespace rpi_cam
         }
         m_clock.switchState(state);
 #endif
-        m_camera.switchState(state);
-        m_vsplitter.switchState(state);
-        m_resizer.switchState(state);
+        m_camera->switchState(state);
+        m_vsplitter->switchState(state);
+        m_resizer->switchState(state);
 
-        m_encoders[0].switchState(state);
-        m_encoders[1].switchState(state);
+        m_encoders[0]->switchState(state);
+        m_encoders[1]->switchState(state);
     }
 
     void RPiCamera::enablePorts()
     {
-        m_camera.enablePort(Camera::IPORT);
-        m_camera.enablePort(Camera::OPORT_VIDEO);
+        m_camera->enablePort(Camera::IPORT);
+        m_camera->enablePort(Camera::OPORT_VIDEO);
 
-        m_vsplitter.enablePort(VideoSplitter::IPORT);
-        m_vsplitter.enablePort(VideoSplitter::OPORT_1);
-        m_vsplitter.enablePort(VideoSplitter::OPORT_2);
+        m_vsplitter->enablePort(VideoSplitter::IPORT);
+        m_vsplitter->enablePort(VideoSplitter::OPORT_1);
+        m_vsplitter->enablePort(VideoSplitter::OPORT_2);
 
-        m_resizer.enablePort();
-        m_encoders[0].enablePort();
-        m_encoders[1].enablePort();
+        m_resizer->enablePort();
+        m_encoders[0]->enablePort();
+        m_encoders[1]->enablePort();
     }
 
     void RPiCamera::allocateBuffers()
     {
-        m_camera.allocBuffers();
-        m_encoders[0].allocBuffers();
-        m_encoders[1].allocBuffers();
+        m_camera->allocBuffers();
+        m_encoders[0]->allocBuffers();
+        m_encoders[1]->allocBuffers();
     }
 
     void RPiCamera::dumpPorts()
     {
-        m_camera.dumpPort(Camera::IPORT, OMX_FALSE);
-        m_camera.dumpPort(Camera::OPORT_VIDEO, OMX_FALSE);
+#if 0
+        m_camera->dumpPort(Camera::IPORT, OMX_FALSE);
+        m_camera->dumpPort(Camera::OPORT_VIDEO, OMX_FALSE);
 
-        m_vsplitter.dumpPort(VideoSplitter::IPORT, OMX_FALSE);
-        m_vsplitter.dumpPort(VideoSplitter::OPORT_1, OMX_FALSE);
-        m_vsplitter.dumpPort(VideoSplitter::OPORT_2, OMX_FALSE);
+        m_vsplitter->dumpPort(VideoSplitter::IPORT, OMX_FALSE);
+        m_vsplitter->dumpPort(VideoSplitter::OPORT_1, OMX_FALSE);
+        m_vsplitter->dumpPort(VideoSplitter::OPORT_2, OMX_FALSE);
 
-        m_resizer.dumpPort(Resizer::IPORT);
-        m_resizer.dumpPort(Resizer::OPORT);
+        m_resizer->dumpPort(Resizer::IPORT);
+        m_resizer->dumpPort(Resizer::OPORT);
 
-        m_encoders[0].dumpPort(Encoder::IPORT, OMX_FALSE);
-        m_encoders[0].dumpPort(Encoder::OPORT, OMX_FALSE);
+        m_encoders[0]->dumpPort(Encoder::IPORT, OMX_FALSE);
+        m_encoders[0]->dumpPort(Encoder::OPORT, OMX_FALSE);
 
-        m_encoders[1].dumpPort(Encoder::IPORT, OMX_FALSE);
-        m_encoders[1].dumpPort(Encoder::OPORT, OMX_FALSE);
+        m_encoders[1]->dumpPort(Encoder::IPORT, OMX_FALSE);
+        m_encoders[1]->dumpPort(Encoder::OPORT, OMX_FALSE);
+#endif
+        m_camera->dumpPort(Camera::OPORT_VIDEO, OMX_FALSE);
+        m_encoders[0]->dumpPort(Encoder::OPORT, OMX_FALSE);
+        m_encoders[1]->dumpPort(Encoder::OPORT, OMX_FALSE);
     }
 
     void RPiCamera::returnBuffers()
     {
-#if 0
-        m_encoders[0].outBuffer().flags() &= OMX_BUFFERFLAG_EOS;
-        m_encoders[1].outBuffer().flags() &= OMX_BUFFERFLAG_EOS;
-#endif
-        m_encoders[0].callFillThisBuffer();
-        m_encoders[1].callFillThisBuffer();
+        m_encoders[0]->outBuffer().flags() &= OMX_BUFFERFLAG_EOS;
+        m_encoders[1]->outBuffer().flags() &= OMX_BUFFERFLAG_EOS;
+
+        m_encoders[0]->callFillThisBuffer();
+        m_encoders[1]->callFillThisBuffer();
     }
 
     void RPiCamera::flushBuffers()
     {
-        m_camera.flushPort();
+        m_camera->flushPort(rpi_omx::Camera::OPORT_VIDEO);
 
-        m_vsplitter.flushPort();
-        m_resizer.flushPort();
+        m_vsplitter->flushPort(rpi_omx::VideoSplitter::IPORT);
+        m_vsplitter->flushPort(rpi_omx::VideoSplitter::OPORT_1);
+        m_vsplitter->flushPort(rpi_omx::VideoSplitter::OPORT_2);
 
-        m_encoders[0].flushPort();
-        m_encoders[1].flushPort();
+        m_resizer->flushPort();
+
+        m_encoders[0]->flushPort();
+        m_encoders[1]->flushPort();
     }
 
     void RPiCamera::disablePorts()
     {
-        m_camera.disablePort();
+        m_camera->disablePort(rpi_omx::Camera::OPORT_VIDEO);
 
-        m_vsplitter.disablePort();
-        m_resizer.disablePort();
+        m_vsplitter->disablePort(rpi_omx::VideoSplitter::IPORT);
+        m_vsplitter->disablePort(rpi_omx::VideoSplitter::OPORT_1);
+        m_vsplitter->disablePort(rpi_omx::VideoSplitter::OPORT_2);
 
-        m_encoders[0].disablePort();
-        m_encoders[1].disablePort();
+        m_resizer->disablePort();
+
+        m_encoders[0]->disablePort();
+        m_encoders[1]->disablePort();
     }
 
     void RPiCamera::freeBuffers()
     {
-        m_camera.freeBuffers();
+        m_camera->freeBuffers();
 
-        m_encoders[0].freeBuffers();
-        m_encoders[1].freeBuffers();
+        m_encoders[0]->freeBuffers();
+        m_encoders[1]->freeBuffers();
+
+        m_empty[1] = m_empty[0] = true;
     }
 
-    //
-
-    bool RPiCamera::config(unsigned mode, unsigned fps, unsigned bitrate0, unsigned bitrate1)
+    void RPiCamera::prepare(const CameraParameters& camParams, const EncoderParameters& encParams0, const EncoderParameters& encParams1)
     {
-        switch (mode)
-        {
-            case Resolutions_default: // do not change
-                break;
+        debug_print("RPiCamera::prepare()\n");
 
-            case Resolutions_1280x960_640x480:
-                m_vfs[0] = VF_1280x960;
-                m_vfs[1] = VF_RESIZED_640x480;
-                break;
+        std::lock_guard<std::recursive_mutex> lock(m_mutex); // LOCK
 
-            case Resolutions_1280x960_320x240:
-                m_vfs[0] = VF_1280x960;
-                m_vfs[1] = VF_RESIZED_320x240;
-                break;
+        m_isOK = false;
 
-            case Resolutions_1920x1080_640x360:
-                m_vfs[0] = VF_1920x1080;
-                m_vfs[1] = VF_RESIZED_640x360;
-                break;
-
-            case Resolutions_1920x1080_480x270:
-                m_vfs[0] = VF_1920x1080;
-                m_vfs[1] = VF_RESIZED_480x270;
-                break;
-
-            case Resolutions_1920x1080_320x180:
-                m_vfs[0] = VF_1920x1080;
-                m_vfs[1] = VF_RESIZED_320x180;
-                break;
-
-            default:
-                return false;
-        }
-
-        if (fps)
-            m_fps = fps;
-        if (! m_fps || m_fps > m_vfs[0].framerate)
-            m_fps = m_vfs[0].framerate;
-
-        if (bitrate0)
-            m_bitrates[0] = bitrate0;
-        if (bitrate1)
-            m_bitrates[1] = bitrate1;
-
-        return true;
-    }
-
-    void RPiCamera::getConfig(unsigned streamNo, unsigned& width, unsigned& height, unsigned& fps, unsigned& bitrate) const
-    {
-        if (streamNo >= STREAMS_NUM())
-            return;
-
-        width = m_vfs[streamNo].width;
-        height = m_vfs[streamNo].height;
-        fps = m_fps;
-        bitrate = m_bitrates[streamNo];
-    }
-
-    bool RPiCamera::prepare(const CameraParameters& params)
-    {
         try
         {
-            configCamera(params);
-            configEncoders();
-            tunnelPorts();
+            configCamera(camParams);
+            configEncoders(encParams0, encParams1);
+
+            setupTunnels();
 
             switchState(OMX_StateIdle);
 
@@ -280,25 +274,28 @@ namespace rpi_cam
             switchState(OMX_StateExecuting);
 
             startCapture();
-#if 0
+
             dumpPorts();
-#endif
-            return true;
+            m_isOK = true;
         }
         catch (const OMXExeption& ex)
         {
-            printf("[camera] exception RPiCamera::prepare(): %s\n", ex.what());
+            debug_print("exception RPiCamera::prepare(): %s\n", ex.what());
         }
         catch (const char * msg)
         {
-            printf("[camera] exception RPiCamera::prepare(): %s\n", msg);
+            debug_print("exception RPiCamera::prepare(): %s\n", msg);
         }
-
-        return false;
     }
 
-    bool RPiCamera::release()
+    void RPiCamera::release()
     {
+        debug_print("RPiCamera::release()\n");
+
+        std::lock_guard<std::recursive_mutex> lock(m_mutex); // LOCK
+
+        m_isOK = false;
+
         try
         {
             stopCapture();
@@ -308,26 +305,21 @@ namespace rpi_cam
             disablePorts();
             freeBuffers();
 
+            teardownTunnels();
+
             switchState(OMX_StateIdle);
             switchState(OMX_StateLoaded);
-            return true;
+
+            m_camera.reset();
         }
         catch (const OMXExeption& ex)
         {
-            printf("[camera] exception RPiCamera::release(): %s\n", ex.what());
+            debug_print("exception RPiCamera::release(): %s\n", ex.what());
         }
         catch (const char * msg)
         {
-            printf("[camera] exception RPiCamera::release(): %s\n", msg);
+            debug_print("exception RPiCamera::release(): %s\n", msg);
         }
-
-        return false;
-    }
-
-    void RPiCamera::fillBuffer(unsigned streamNo)
-    {
-        if (streamNo < STREAMS_NUM())
-            m_encoders[streamNo].callFillThisBuffer();
     }
 
     bool RPiCamera::read(rpi_omx::Encoder& encoder, std::vector<uint8_t>& data, uint64_t& ts, unsigned& flags)
@@ -347,7 +339,7 @@ namespace rpi_cam
 #if 0
                     if (flags & FLAG_DATACORRUPT || flags & FLAG_EOS)
                     {
-                        printf("[camera] RPiCamera.read() stop. Flags: %d\n", flags);
+                        debug_print("RPiCamera.read() stop. Flags: %d\n", flags);
                         data.clear();
                         return false;
                     }
@@ -355,7 +347,7 @@ namespace rpi_cam
                     unsigned bufSize = encBuffer.dataSize();
                     if (bufSize)
                     {
-                        //printf("[camera] RPiCamera.read(). size: %d, flags: %d\n", bufSize, flags);
+                        //debug_print("RPiCamera.read(). size: %d, flags: %d\n", bufSize, flags);
 
                         aval = true;
                         unsigned frameSize = data.size();
@@ -382,7 +374,7 @@ namespace rpi_cam
                     if (flags & FLAG_CODECCONFIG)
                         continue; // merge SPS/PPS data with next frame
 
-                    //printf("[camera] RPiCamera.read() timestamp: %llu\n", ts);
+                    //debug_print("RPiCamera.read() timestamp: %llu\n", ts);
 
                     if (flags & FLAG_ENDOFFRAME)
                         return true;
@@ -394,14 +386,14 @@ namespace rpi_cam
         }
         catch (const OMXExeption& ex)
         {
-            printf("[camera] exception RPiCamera.read(): %s\n", ex.what());
+            debug_print("exception RPiCamera.read(): %s\n", ex.what());
         }
         catch (const char * msg)
         {
-            printf("[camera] exception RPiCamera.read(): %s\n", msg);
+            debug_print("exception RPiCamera.read(): %s\n", msg);
         }
 
-        //printf("[camera] RPiCamera.read() failed\n");
+        //debug_print("RPiCamera.read() failed\n");
         return false;
     }
 
@@ -429,11 +421,11 @@ namespace rpi_cam
                     size_t outWritten = fwrite(encBuffer.data(), 1, toWrite, outHigh);
                     if (outWritten != toWrite)
                     {
-                        printf("Failed to write to output file: %s\n", strerror(errno));
+                        debug_print("Failed to write to output file: %s\n", strerror(errno));
                         break;
                     }
 #endif
-                    printf("[High] buffer -> out file: %d/%d flags: %d\n",
+                    debug_print("[High] buffer -> out file: %d/%d flags: %d\n",
                            encBuffer.dataSize(), encBuffer.allocSize(), encBuffer.flags());
                 }
 
@@ -450,4 +442,98 @@ namespace rpi_cam
             fclose(outHigh);
     }
 #endif
+
+    const rpi_omx::VideoFromat * RPiCamera::getVideoFormats(unsigned& num, bool resized)
+    {
+        static const unsigned FORMATS_NUM = 4;
+        static const unsigned RESIZED_NUM = 2;
+        static VideoFromat formats[FORMATS_NUM] = { VF_1920x1080, VF_1280x960, VF_1280x720, VF_640x480 };
+        static VideoFromat resizedFormats[RESIZED_NUM] = { VF_RESIZED_320x240, VF_RESIZED_320x180 };
+
+        if (resized)
+        {
+            num = RESIZED_NUM;
+            return resizedFormats;
+        }
+
+        num = FORMATS_NUM;
+        return formats;
+    }
+
+    void RPiCamera::updateRatio(rpi_omx::VideoFromat& fmt)
+    {
+        unsigned num;
+        const VideoFromat * formats = getVideoFormats(num);
+
+        for (unsigned i = 0; i < num; ++i)
+        {
+            if (fmt.width == formats[i].width && fmt.height == formats[i].height)
+            {
+                fmt.ratio = formats[i].ratio;
+                break;
+            }
+        }
+    }
+
+    const rpi_omx::VideoFromat& RPiCamera::getResizedFormat(const rpi_omx::VideoFromat& fmt)
+    {
+        if (fmt.ratio == VideoFromat::RATIO_16x9)
+            return VF_RESIZED_320x180;
+        return VF_RESIZED_320x240;
+    }
+
+    void RPiCamera::getEncoderConfig(unsigned streamNo, unsigned& width, unsigned& height, unsigned& fps, unsigned& bitrate) const
+    {
+        std::lock_guard<std::recursive_mutex> lock(m_mutex); // LOCK
+
+        if (streamNo >= STREAMS_NUM())
+            return;
+
+        width = m_encParams[streamNo].vfmt.width;
+        height = m_encParams[streamNo].vfmt.height;
+        fps = m_encParams[streamNo].vfmt.framerate;
+        bitrate = m_encParams[streamNo].bitrateKbps;
+    }
+
+    void RPiCamera::updateEncoder(unsigned width, unsigned height, unsigned framerate, unsigned bitrateKbps)
+    {
+        std::lock_guard<std::recursive_mutex> lock(m_mutex); // LOCK
+
+        bool needUpdate = false;
+        if (m_encParams[0].vfmt.width != width)
+        {
+            m_encParams[0].vfmt.width = width;
+            needUpdate = true;
+        }
+
+        if (m_encParams[0].vfmt.height != height)
+        {
+            m_encParams[0].vfmt.height = height;
+            needUpdate = true;
+        }
+
+        if (framerate && m_encParams[0].vfmt.framerate != framerate)
+        {
+            m_encParams[0].vfmt.framerate = framerate;
+            needUpdate = true;
+        }
+
+        if (bitrateKbps && m_encParams[0].bitrateKbps != bitrateKbps)
+        {
+            m_encParams[0].bitrateKbps = bitrateKbps;
+            needUpdate = true;
+        }
+
+        if (needUpdate)
+        {
+            updateRatio(m_encParams[0].vfmt);
+            m_encParams[1].vfmt = getResizedFormat(m_encParams[0].vfmt);
+
+            m_camParams.vfmt = m_encParams[0].vfmt;
+
+            release();
+            resetComponents();
+            prepare(m_camParams, m_encParams[0], m_encParams[1]);
+        }
+    }
 }

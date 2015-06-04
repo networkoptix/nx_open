@@ -30,6 +30,8 @@ namespace
     {
         CodecID codecId = packet->compressionType;
 
+        Q_ASSERT_X( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
+
         if( !packet || codecId != CODEC_ID_H264 )
             return false;
 
@@ -38,6 +40,7 @@ namespace
 
         FrameTypeExtractor frameTypeEx(codecId);
         auto type = frameTypeEx.getFrameType( udata, packet->dataSize() );
+
         switch(type)
         {
             case FrameTypeExtractor::I_Frame:

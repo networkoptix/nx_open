@@ -9,22 +9,26 @@ namespace rpi_cam
 {
     DEFAULT_REF_COUNTER(MediaEncoder)
 
-    MediaEncoder::MediaEncoder(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber, const nxcip::ResolutionInfo& res)
+    MediaEncoder::MediaEncoder(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber)
     :   m_refManager(this),
         m_camera(camera),
-        m_encoderNumber(encoderNumber),
-        m_resolution(res)
+        m_encoderNumber(encoderNumber)
     {
-        printf("[camera] MediaEncoder() %d\n", m_encoderNumber);
+        debug_print("MediaEncoder() %d\n", m_encoderNumber);
     }
 
     MediaEncoder::~MediaEncoder()
     {
-        printf("[camera] ~MediaEncoder() %d\n", m_encoderNumber);
+        debug_print("~MediaEncoder() %d\n", m_encoderNumber);
     }
 
     void * MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
     {
+        if (interfaceID == nxcip::IID_CameraMediaEncoder3)
+        {
+            addRef();
+            return static_cast<nxcip::CameraMediaEncoder3*>(this);
+        }
         if (interfaceID == nxcip::IID_CameraMediaEncoder2)
         {
             addRef();
@@ -39,19 +43,33 @@ namespace rpi_cam
         return nullptr;
     }
 
-    int MediaEncoder::getMediaUrl(char * urlBuf) const
+    int MediaEncoder::getMediaUrl(char * ) const
     {
-        strcpy(urlBuf, RPiCamera::UID());
-        return nxcip::NX_NO_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
     int MediaEncoder::getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const
     {
-        printf("[camera] MediaEncoder::getResolution(): %dx%dx%d\n",
-               m_resolution.resolution.width, m_resolution.resolution.height, (int)m_resolution.maxFps);
+        std::shared_ptr<RPiCamera> camera = m_camera.lock();
+        if (! infoList || ! camera)
+            return nxcip::NX_OTHER_ERROR;
 
-        infoList[0] = m_resolution;
-        *infoListCount = 1;
+        unsigned num;
+        const rpi_omx::VideoFromat * formats = camera->getVideoFormats(num, (bool)m_encoderNumber);
+
+        for (unsigned i = 0; i < num; ++i)
+        {
+            infoList[i].resolution.width = formats[i].width;
+            infoList[i].resolution.height = formats[i].height;
+            infoList[i].maxFps = formats[i].framerate;
+            if (m_encoderNumber)
+                infoList[i].maxFps /= RPiCamera::IFRAME_PERIOD();
+
+            debug_print("MediaEncoder::getResolution(): %d %dx%dx%d\n",
+                   m_encoderNumber, infoList[i].resolution.width, infoList[i].resolution.height, (int)infoList[i].maxFps);
+        }
+
+        *infoListCount = num;
         return nxcip::NX_NO_ERROR;
     }
 
@@ -61,58 +79,65 @@ namespace rpi_cam
         return nxcip::NX_NO_ERROR;
     }
 
-    int MediaEncoder::setResolution(const nxcip::Resolution& res)
+    int MediaEncoder::setResolution(const nxcip::Resolution& )
     {
-        return nxcip::NX_NO_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
-    int MediaEncoder::setFps(const float& fps, float * selectedFps)
+    int MediaEncoder::setFps(const float& , float * )
     {
-#if 0
-        if (! m_camera && ! m_camera->isOK())
-            return nxcip::NX_OTHER_ERROR;
-
-        if (m_encoderNumber)
-            return nxcip::NX_NO_ERROR;
-
-        m_camera->config(0, fps);
-        *selectedFps = fps; // TODO
-#endif
-        return nxcip::NX_NO_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
-    int MediaEncoder::setBitrate(int bitrateKbps, int * outBitrateKbps)
+    int MediaEncoder::setBitrate(int , int * )
     {
-#if 0
-        if (! m_camera && ! m_camera->isOK())
-            return nxcip::NX_OTHER_ERROR;
-
-        if (m_encoderNumber)
-            m_camera->config(0, 0, 0, bitrateKbps);
-        else
-            m_camera->config(0, 0, bitrateKbps, 0);
-        *outBitrateKbps = bitrateKbps; // TODO
-#endif
-        return nxcip::NX_NO_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
-    int MediaEncoder::commit()
+    int MediaEncoder::getAudioFormat(nxcip::AudioFormat * ) const
     {
-        if (! m_camera && ! m_camera->isOK())
-            return nxcip::NX_OTHER_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
+    }
 
-        m_camera->reload();
-        return nxcip::NX_NO_ERROR;
+    int MediaEncoder::getVideoFormat(nxcip::CompressionType * , nxcip::PixelFormat * ) const
+    {
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
     nxcip::StreamReader * MediaEncoder::getLiveStreamReader()
     {
-        StreamReader * stream = new StreamReader(m_camera, m_encoderNumber);
+        std::shared_ptr<RPiCamera> camera = m_camera.lock();
+        if (! camera || ! camera->isOK())
+            return nullptr;
+
+        StreamReader * stream = new StreamReader(camera, m_encoderNumber);
         return stream;
     }
 
-    int MediaEncoder::getAudioFormat(nxcip::AudioFormat * /*audioFormat*/) const
+    int MediaEncoder::getConfiguredLiveStreamReader(nxcip::LiveStreamConfig * config, nxcip::StreamReader ** reader)
     {
-        return nxcip::NX_UNSUPPORTED_CODEC;
+        if (reader)
+        {
+            std::shared_ptr<RPiCamera> camera = m_camera.lock();
+            if (! camera || ! camera->isOK())
+                return nxcip::NX_OTHER_ERROR;
+
+            if (m_encoderNumber == 0)
+            {
+                if (config->framerate > 30.0f)
+                    config->framerate = 30.0f;
+
+                debug_print("try configure encoder: %dx%dx%d %d kbps\n",
+                       config->width, config->height, (unsigned)config->framerate, config->bitrateKbps);
+
+                camera->updateEncoder(config->width, config->height, (unsigned)config->framerate, config->bitrateKbps);
+            }
+
+            *reader = getLiveStreamReader();
+            if (*reader)
+                return nxcip::NX_NO_ERROR;
+        }
+
+        return nxcip::NX_OTHER_ERROR;
     }
 }

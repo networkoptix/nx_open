@@ -32,14 +32,13 @@ namespace rpi_cam
         //
 
     private:
-        std::shared_ptr<RPiCamera> m_camera;
+        std::weak_ptr<RPiCamera> m_camera;
         unsigned m_encoderNumber;
         std::vector<uint8_t> m_data;
         static TimeCorrection m_timeCorrect;
         uint64_t m_pts;
 
         std::atomic_bool m_interrupt;
-        bool m_firstOne;
     };
 }
 

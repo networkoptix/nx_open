@@ -14,12 +14,12 @@ namespace rpi_cam
     class RPiCamera;
 
     //!
-    class MediaEncoder : public nxcip::CameraMediaEncoder2
+    class MediaEncoder : public nxcip::CameraMediaEncoder3
     {
         DEF_REF_COUNTER
 
     public:
-        MediaEncoder(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber, const nxcip::ResolutionInfo& resolution);
+        MediaEncoder(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber);
         virtual ~MediaEncoder();
 
         // nxcip::CameraMediaEncoder
@@ -36,14 +36,15 @@ namespace rpi_cam
         virtual nxcip::StreamReader* getLiveStreamReader() override;
         virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
-        //
+        // nxcip::CameraMediaEncoder3
 
-        virtual int commit(); // override
+        virtual int getConfiguredLiveStreamReader(nxcip::LiveStreamConfig * config, nxcip::StreamReader ** reader) override;
+        virtual int getVideoFormat(nxcip::CompressionType * codec, nxcip::PixelFormat * pixelFormat) const override;
 
     private:
-        std::shared_ptr<RPiCamera> m_camera;
+        std::weak_ptr<RPiCamera> m_camera;
         unsigned m_encoderNumber;
-        nxcip::ResolutionInfo m_resolution;
+        unsigned m_bitrateKbps;
     };
 }
 

@@ -1,23 +1,16 @@
 #ifndef _RPI_CAMERA_H_
 #define _RPI_CAMERA_H_
 
-#include <vector>
+#include <memory>
+#include <mutex>
+#include <atomic>
 
 #include "rpi_omx.h"
 
 /// Raspberry Pi camera unit and configuration
 namespace rpi_cam
 {
-    typedef enum
-    {
-        Resolutions_default,            ///< Leave unchanged
-        Resolutions_1280x960_640x480,   ///< 1280x960, 640x480, FoV
-        Resolutions_1280x960_320x240,   ///< 1280x960, 320x240, FoV
-        Resolutions_1920x1080_640x360,  ///< 1920x1080, 640x360
-        Resolutions_1920x1080_480x270,  ///< 1920x1080, 480x270
-        Resolutions_1920x1080_320x180   ///< 1920x1080, 320x180
-    } ResolutionPair;
-
+    /// @sa OMX_IMAGEFILTERTYPE
     typedef enum
     {
         Filter_None,        ///< No filter
@@ -33,24 +26,31 @@ namespace rpi_cam
         Filter_Solarize     ///< Solarize
     } ImageFilter;
 
-    /// Resolutions and common camera config
+    /// Resolutions and common camera parameters
     struct CameraParameters
     {
-        CameraParameters()
-        :   resolition(Resolutions_1280x960_320x240),
-            filter(Filter_None),
+        CameraParameters(rpi_omx::VideoFromat fmt = rpi_omx::VF_1280x960, ImageFilter filt = Filter_None)
+        :   vfmt(fmt),
+            filter(filt),
             sharpness(0),
             contrast(0),
             saturation(0),
             brightness(50)
         {}
 
-        unsigned resolition;    ///< Resolutions @sa rpi_cam::ResolutionPair
-        unsigned filter;        ///< Image filter @sa rpi_cam::ImageFilter
-        int sharpness;          ///< -100..100
-        int contrast;           ///< -100..100
-        int saturation;         ///< -100..100
-        int brightness;         ///< 0..100
+        rpi_omx::VideoFromat vfmt;
+        unsigned filter;            ///< Image filter @sa rpi_cam::ImageFilter
+        int sharpness;              ///< -100..100
+        int contrast;               ///< -100..100
+        int saturation;             ///< -100..100
+        int brightness;             ///< 0..100
+    };
+
+    /// Encoder parameters
+    struct EncoderParameters
+    {
+        rpi_omx::VideoFromat vfmt;
+        unsigned bitrateKbps;
     };
 
     /// Raspberry Pi camera unit
@@ -78,15 +78,21 @@ namespace rpi_cam
         static void init();
         static void deinit();
 
-        RPiCamera(const CameraParameters& params)
-        :   m_fps(0),
-            m_isOK(false)
+        RPiCamera(const CameraParameters& camParams)
+        :   m_isOK(false)
         {
-            m_bitrates[0] = BITRATE_0();
-            m_bitrates[1] = BITRATE_1();
+            resetComponents();
 
-            config(params.resolition);
-            m_isOK = prepare(params);
+            m_empty[1] = m_empty[0] = true;
+
+            m_camParams = camParams;
+            m_encParams[0].vfmt = camParams.vfmt;
+            m_encParams[0].bitrateKbps = BITRATE_0();
+
+            m_encParams[1].vfmt = getResizedFormat(camParams.vfmt);
+            m_encParams[1].bitrateKbps = BITRATE_1();
+
+            prepare(camParams, m_encParams[0], m_encParams[1]);
         }
 
         ~RPiCamera()
@@ -96,44 +102,53 @@ namespace rpi_cam
 
         bool isOK() const { return m_isOK; }
 
-        void fillBuffer(unsigned streamNo);
-
         bool read(unsigned streamNo, std::vector<uint8_t>& data, uint64_t& timeStamp, unsigned& flags)
         {
-            if (streamNo < STREAMS_NUM())
-                return read(m_encoders[streamNo], data, timeStamp, flags);
-            return false;
+            if (streamNo >= STREAMS_NUM())
+                return false;
+
+            if (m_empty[streamNo])
+            {
+                m_encoders[streamNo]->callFillThisBuffer();
+                m_empty[streamNo] = false;
+            }
+
+            return read(*m_encoders[streamNo], data, timeStamp, flags);
         }
 
-        bool config(unsigned mode, unsigned fps = 0, unsigned bitrate0 = 0, unsigned bitrate1 = 0);
-        void getConfig(unsigned streamNo, unsigned& width, unsigned& height, unsigned& fps, unsigned& bitrate) const;
+        void updateEncoder(unsigned width, unsigned height, unsigned framerate, unsigned bitrateKbps); // configure first stream
+        void getEncoderConfig(unsigned streamNo, unsigned& width, unsigned& height, unsigned& fps, unsigned& bitrate) const;
 
-        void reload()
-        {
-            // TODO
-        }
-
-        //void test();
+        static const rpi_omx::VideoFromat * getVideoFormats(unsigned& num, bool resized = false);
 
     private:
-        rpi_omx::Camera m_camera;
-        rpi_omx::VideoSplitter m_vsplitter;
-        rpi_omx::Resizer m_resizer;
-        rpi_omx::Encoder m_encoders[2];
-        rpi_omx::VideoFromat m_vfs[2];
-        unsigned m_bitrates[2];
-        unsigned m_fps;
-        bool m_isOK;
+        static std::recursive_mutex m_mutex; // locks entire class, not just an object
+        std::unique_ptr<rpi_omx::Camera> m_camera;
+        std::unique_ptr<rpi_omx::VideoSplitter> m_vsplitter;
+        std::unique_ptr<rpi_omx::Resizer> m_resizer;
+        std::unique_ptr<rpi_omx::Encoder> m_encoders[2];
+        CameraParameters m_camParams;
+        EncoderParameters m_encParams[2];
+        bool m_empty[2];
+        std::atomic_bool m_isOK;
 
-        bool prepare(const CameraParameters& params);
-        bool release();
+        static void updateRatio(rpi_omx::VideoFromat& fmt);
+        static const rpi_omx::VideoFromat& getResizedFormat(const rpi_omx::VideoFromat& f);
+
+        //
+
+        void resetComponents();
+        void prepare(const CameraParameters& camParams, const EncoderParameters& encParams0, const EncoderParameters& encParams1);
+        void release();
 
         void switchState(OMX_STATETYPE state);
 
         void configCamera(const CameraParameters& params);
-        void configEncoders();
+        void configEncoders(const EncoderParameters& params0, const EncoderParameters& params1);
 
-        void tunnelPorts();
+        void setupTunnels();
+        void teardownTunnels();
+
         void enablePorts();
         void disablePorts();
 
@@ -142,8 +157,8 @@ namespace rpi_cam
         void flushBuffers();
         void freeBuffers();
 
-        void startCapture() { m_camera.capture(rpi_omx::Camera::OPORT_VIDEO, OMX_TRUE); }
-        void stopCapture() { m_camera.capture(rpi_omx::Camera::OPORT_VIDEO, OMX_FALSE); }
+        void startCapture() { m_camera->capture(rpi_omx::Camera::OPORT_VIDEO, OMX_TRUE); }
+        void stopCapture() { m_camera->capture(rpi_omx::Camera::OPORT_VIDEO, OMX_FALSE); }
 
         void dumpPorts();
 

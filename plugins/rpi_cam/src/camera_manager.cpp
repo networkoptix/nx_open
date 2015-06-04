@@ -22,41 +22,27 @@ namespace rpi_cam
 
     CameraManager::CameraManager()
     :   m_refManager( DiscoveryManager::refManager() ),
-        m_encoderHQ(nullptr),
-        m_encoderLQ(nullptr),
         m_errorStr(nullptr)
     {
-        printf("[camera] CameraManager()\n");
+        debug_print("CameraManager()\n");
 
         m_rpiCamera = std::make_shared<RPiCamera>(m_parameters);
         if (! m_rpiCamera->isOK())
-        {
-            printf("[camera] not OK\n");
-            return;
-        }
+            debug_print("not OK\n");
 
-        nxcip::ResolutionInfo res;
-        unsigned width;
-        unsigned height;
-        unsigned fps;
-        unsigned bitrate;
+        m_encoderHQ = std::shared_ptr<MediaEncoder>( new MediaEncoder(m_rpiCamera, 0), refDeleter );
+        m_encoderLQ = std::shared_ptr<MediaEncoder>( new MediaEncoder(m_rpiCamera, 1), refDeleter );
 
-        m_rpiCamera->getConfig(0, width, height, fps, bitrate);
-        res.resolution.width = width;
-        res.resolution.height = height;
-        res.maxFps = fps;
+        makeInfo();
+    }
 
-        m_encoderHQ = std::shared_ptr<MediaEncoder>( new MediaEncoder(m_rpiCamera, 0, res), refDeleter );
+    CameraManager::~CameraManager()
+    {
+        debug_print("~CameraManager()\n");
+    }
 
-        m_rpiCamera->getConfig(1, width, height, fps, bitrate);
-        res.resolution.width = width;
-        res.resolution.height = height;
-        res.maxFps = fps / RPiCamera::IFRAME_PERIOD();
-
-        m_encoderLQ = std::shared_ptr<MediaEncoder>( new MediaEncoder(m_rpiCamera, 1, res), refDeleter );
-
-        //
-
+    void CameraManager::makeInfo()
+    {
         static const char * str = "PiCam";
         unsigned strLen = strlen(str);
 
@@ -67,11 +53,6 @@ namespace rpi_cam
         strncpy( m_info.url, str, std::min(strLen, sizeof(nxcip::CameraInfo::url)-1) );
         strncpy( m_info.uid, id, std::min(idLen, sizeof(nxcip::CameraInfo::uid)-1) );
         strncpy( m_info.modelName, str, std::min(strLen, sizeof(nxcip::CameraInfo::modelName)-1) );
-    }
-
-    CameraManager::~CameraManager()
-    {
-        printf("[camera] ~CameraManager()\n");
     }
 
     void * CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -87,22 +68,21 @@ namespace rpi_cam
 
     int CameraManager::getEncoderCount(int * encoderCount) const
     {
+#if 0
         if (! m_rpiCamera->isOK())
         {
-            printf("[camera] getEncoderCount() FAIL\n");
+            debug_print("getEncoderCount() FAIL\n");
             *encoderCount = 0;
             return nxcip::NX_TRY_AGAIN;
         }
-
-        printf("[camera] getEncoderCount() OK\n");
+#endif
+        debug_print("getEncoderCount() OK\n");
         *encoderCount = ENCODERS_COUNT;
         return nxcip::NX_NO_ERROR;
     }
 
     int CameraManager::getEncoder(int encoderIndex, nxcip::CameraMediaEncoder ** encoderPtr)
     {
-        printf("[camera] try getEncoder()\n");
-
         if (static_cast<unsigned>(encoderIndex) >= ENCODERS_COUNT)
             return nxcip::NX_INVALID_ENCODER_NUMBER;
 
@@ -123,7 +103,7 @@ namespace rpi_cam
             *encoderPtr = m_encoderHQ.get();
         }
 
-        printf("[camera] getEncoder() OK: %d\n", encoderIndex);
+        //debug_print("getEncoder() %d - OK\n", encoderIndex);
         return nxcip::NX_NO_ERROR;
     }
 

@@ -86,8 +86,19 @@ namespace rpi_omx
             }
 
             case OMX_EventError:
-                OMXExeption::die( (OMX_ERRORTYPE) nData1, "OMX_EventError received");
+            {
+                switch (nData1)
+                {
+                    case OMX_ErrorSameState:
+                    case OMX_ErrorPortUnpopulated:
+                        debug_print("OMX_EventError: %x\n", nData1);
+                        break;
+
+                    default:
+                        OMXExeption::die( (OMX_ERRORTYPE) nData1, "OMX_EventError received");
+                }
                 break;
+            }
 
             case OMX_EventMark:
             case OMX_EventResourcesAcquired:

@@ -14,6 +14,8 @@
 #include <IL/OMX_Video.h>
 #include <IL/OMX_Broadcom.h>
 
+#define debug_print(...) fprintf(stderr, "[camera] " __VA_ARGS__)
+
 /// Raspberry Pi OpenMAX IL layer
 namespace rpi_omx
 {
@@ -51,7 +53,7 @@ namespace rpi_omx
         static void die(OMX_ERRORTYPE error, const char * str)
         {
             const char * errStr = omxErr2str(error);
-            fprintf(stderr, "OMX error: %s: 0x%08x %s\n", str, error, errStr);
+            debug_print("OMX error: %s: 0x%08x %s\n", str, error, errStr);
             exit(1);
         }
 
@@ -219,7 +221,7 @@ namespace rpi_omx
             ERR_OMX( OMX_SendCommand(component_, OMX_CommandStateSet, newState, NULL), "switch state");
 
             if (! waitValue(&eventState_, value + 1))
-                printf("%s - lost state changed event\n", name());
+                debug_print("%s - lost state changed event\n", name());
         }
 
         unsigned waitCount(OMX_U32 nPortIndex) const { return (nPortIndex == OMX_ALL) ? numPorts() : 1; }
@@ -230,7 +232,7 @@ namespace rpi_omx
             ERR_OMX( OMX_SendCommand(component_, OMX_CommandPortEnable, nPortIndex, NULL), "enable port");
 
             if (! waitValue(&eventEnabled_, value + waitCount(nPortIndex)))
-                printf("%s - port %d lost enable port event\n", name(), nPortIndex);
+                debug_print("%s - port %d lost enable port event\n", name(), nPortIndex);
         }
 
         void disablePort(OMX_U32 nPortIndex = OMX_ALL)
@@ -239,7 +241,7 @@ namespace rpi_omx
             ERR_OMX( OMX_SendCommand(component_, OMX_CommandPortDisable, nPortIndex, NULL), "disable port");
 
             if (! waitValue(&eventDisabled_, value + waitCount(nPortIndex)))
-                printf("%s - port %d lost disable port event\n", name(), nPortIndex);
+                debug_print("%s - port %d lost disable port event\n", name(), nPortIndex);
         }
 
         void flushPort(OMX_U32 nPortIndex = OMX_ALL)
@@ -248,7 +250,7 @@ namespace rpi_omx
             ERR_OMX( OMX_SendCommand(component_, OMX_CommandFlush, nPortIndex, NULL), "flush buffers");
 
             if (! waitValue(&eventFlushed_, value + waitCount(nPortIndex)))
-                printf("%s - port %d lost flush port event\n", name(), nPortIndex);
+                debug_print("%s - port %d lost flush port event\n", name(), nPortIndex);
         }
 
         void getPortDefinition(OMX_U32 nPortIndex, Parameter<OMX_PARAM_PORTDEFINITIONTYPE>& portDef)
@@ -620,6 +622,7 @@ namespace rpi_omx
         }
 
         bool ready() const { return ready_; }
+        void setReady(bool r) { ready_ = r; }
 
         void eventReady()
         {
