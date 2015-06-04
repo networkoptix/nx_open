@@ -18,6 +18,7 @@ class QnTimeline : public QQuickItem {
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
+    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
 
     Q_PROPERTY(int chunkBarHeight READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
 
@@ -29,6 +30,9 @@ public:
 
     QColor textColor() const;
     void setTextColor(const QColor &color);
+
+    QFont font() const;
+    void setFont(const QFont &font);
 
     QColor chunkColor() const;
     void setChunkColor(const QColor &color);
@@ -86,6 +90,7 @@ signals:
 
     void textColorChanged();
     void chunkColorChanged();
+    void fontChanged();
 
     void chunkBarHeightChanged();
 

@@ -99,10 +99,13 @@ Page {
         endDate: new Date(Date.now() + 5 * 60 * 1000)
         startDate: new Date(Date.now() - 5 * 60 * 1000)
 
-        textColor: "white"
+        textColor: "#484848"
         chunkColor: "#589900"
 
         stickToEnd: true
+
+        font.pixelSize: Units.dp(18)
+        font.weight: Font.Bold
 
         chunkBarHeight: Units.dp(36)
     }

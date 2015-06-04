@@ -97,7 +97,9 @@ public:
     qint64 windowStart;
     qint64 windowEnd;
 
+    QFont textFont;
     QSGTexture *textTexture;
+    QScopedPointer<QnTimelineTextHelper> textHelper;
 
     qreal dpMultiplier;
 
@@ -118,8 +120,6 @@ public:
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
     qint64 timeZoneShift;
-
-    QScopedPointer<QnTimelineTextHelper> textHelper;
 
     QElapsedTimer animationTimer;
     qint64 prevAnimationMs;
@@ -277,7 +277,7 @@ public:
         if (!window)
             return;
 
-        textHelper.reset(new QnTimelineTextHelper(QFont(), textColor, suffixList));
+        textHelper.reset(new QnTimelineTextHelper(textFont, textColor, suffixList));
         textTexture = window->createTextureFromImage(textHelper->texture());
     }
 
@@ -521,6 +521,19 @@ void QnTimeline::setTextColor(const QColor &color) {
     emit textColorChanged();
 
     update();
+}
+
+QFont QnTimeline::font() const {
+    return d->textFont;
+}
+
+void QnTimeline::setFont(const QFont &font) {
+    if (d->textFont == font)
+        return;
+
+    d->textFont = font;
+    d->updateTextHelper();
+    emit fontChanged();
 }
 
 QColor QnTimeline::chunkColor() const {
