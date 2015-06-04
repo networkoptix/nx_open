@@ -120,6 +120,7 @@
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/iflist_rest_handler.h>
+#include <rest/handlers/json_aggregator_rest_handler.h>
 #include <rest/handlers/ifconfig_rest_handler.h>
 #include <rest/handlers/settime_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
@@ -1342,6 +1343,7 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/iflist", new QnIfListRestHandler() );
+    QnRestProcessorPool::instance()->registerHandler("api/aggregator", new QnJsonAggregatorRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/ifconfig", new QnIfConfigRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
