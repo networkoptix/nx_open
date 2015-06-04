@@ -41,11 +41,15 @@ namespace Qn
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
 
+    /* Whether statistics gathering is allowed on the current server. */
+    static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
+
     // Hardware information  
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
     static const QString CPU_MODEL_NAME = lit("cpuModelName");
     static const QString PHISICAL_MEMORY = lit("phisicalMemory");
     static const QString BETA = lit("beta");
+    static const QString PUBLIC_IP = lit("publicIp");
 }
 
 #endif // QN_PARAM_H

@@ -3,6 +3,12 @@
 
 #include <api/global_settings.h>
 
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource/general_attribute_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <ec2_statictics_reporter.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
@@ -45,6 +51,8 @@ void QnCameraManagementWidget::updateFromSettings() {
 
     ui->autoSettingsCheckBox->setChecked(settings->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
+
+    ui->statisticsReportCheckBox->setChecked(ec2::Ec2StaticticsReporter::isAllowed(qnResPool->getResources<QnMediaServerResource>()));
 }
 
 void QnCameraManagementWidget::submitToSettings() {
@@ -60,6 +68,14 @@ void QnCameraManagementWidget::submitToSettings() {
 
     settings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
     ui->settingsWarningLabel->setVisible(false);
+
+    const auto servers = qnResPool->getResources<QnMediaServerResource>();
+    bool statisticsReportAllowed = ec2::Ec2StaticticsReporter::isAllowed(servers);
+    if (!ec2::Ec2StaticticsReporter::isDefined(servers)
+        || ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed) {
+        ec2::Ec2StaticticsReporter::setAllowed(servers, ui->statisticsReportCheckBox->isChecked());
+        propertyDictionary->saveParamsAsync(idListFromResList(servers));
+    }
 }
 
 bool QnCameraManagementWidget::hasChanges() const  {
@@ -75,6 +91,11 @@ bool QnCameraManagementWidget::hasChanges() const  {
 
     if (settings->isCameraSettingsOptimizationEnabled() != ui->autoSettingsCheckBox->isChecked())
         return true;
+
+    const auto servers = qnResPool->getResources<QnMediaServerResource>();
+    bool statisticsReportAllowed = ec2::Ec2StaticticsReporter::isAllowed(servers);
+    if (ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed)
+        return false;
 
     return false;
 }

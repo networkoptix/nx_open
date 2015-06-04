@@ -164,6 +164,7 @@
 #endif
 
 #include "platform/hardware_information.h"
+#include "platform/platform_abstraction.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
@@ -410,6 +411,15 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     if (resType)
         storage->setTypeId(resType->getId());
     storage->setParentId(serverGuid());
+
+    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+    const auto it = std::find_if(partitions.begin(), partitions.end(),
+                                 [&](const QnPlatformMonitor::PartitionSpace& part)
+        { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+    
+    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+    storage->setStorageType(QnLexical::serialized(storageType));
 
     return storage;
 }
@@ -1204,6 +1214,12 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
             ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
             ec2Connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }
+
+        const auto publicIp = m_publicAddress.toString();
+        if (server->getProperty(Qn::PUBLIC_IP) != publicIp) {
+            server->setProperty(Qn::PUBLIC_IP, publicIp);
+            propertyDictionary->saveParams(server->getId());
+        }
     }
 }
 
@@ -1804,6 +1820,25 @@ void QnMain::run()
         if (server->getProperty(Qn::BETA) != isBeta)
             server->setProperty(Qn::BETA, isBeta);
 
+        if (!m_publicAddress.isNull())
+        {
+            const auto publicIp = m_publicAddress.toString();
+            if (server->getProperty(Qn::PUBLIC_IP) != publicIp)
+                server->setProperty(Qn::PUBLIC_IP, publicIp);
+        }
+
+        const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
+        if (!confStats.isNull()) // if present
+        {
+            const bool normStats = confStats.toBool();
+            const bool msStats = QnLexical::deserialized(server->getProperty(Qn::STATISTICS_REPORT_ALLOWED), true);
+            if (normStats != msStats)
+                server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(normStats));
+
+            MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
+            MSSettings::roSettings()->sync();
+        }
+
         propertyDictionary->saveParams(server->getId());
 
         if (m_mediaServer.isNull())
@@ -1976,14 +2011,6 @@ void QnMain::run()
 
     typedef ec2::Ec2StaticticsReporter stats;
     bool adminParamsChanged = false;
-    if (MSSettings::roSettings()->value(stats::SR_ALLOWED, false).toBool())
-    {
-        if (adminUser->getProperty(stats::SR_ALLOWED).toInt() == 0)        // == 0 => false
-            adminUser->setProperty(stats::SR_ALLOWED, QString::number(1)); // != 0 => true
-
-        MSSettings::roSettings()->remove(stats::SR_ALLOWED);
-        adminParamsChanged = true;
-    }
 
     // TODO: fix, when VS supports init lists:
     //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
@@ -2187,7 +2214,7 @@ void QnMain::at_appStarted()
         return;
 
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
-    m_crashReporter.scanAndReportAsync(qnResPool->getAdministrator(), MSSettings::runTimeSettings());
+    m_crashReporter.scanAndReportAsync(MSSettings::runTimeSettings());
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)

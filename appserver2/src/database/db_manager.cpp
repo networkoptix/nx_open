@@ -1759,8 +1759,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_storage (space_limit, used_for_writing, resource_ptr_id) \
-        VALUES (:spaceLimit, :usedForWriting, :internalId)\
+        INSERT OR REPLACE INTO vms_storage (space_limit, used_for_writing, storage_type, resource_ptr_id) \
+        VALUES (:spaceLimit, :usedForWriting, :storageType, :internalId)\
     ");
     QnSql::bind(tran.params, &insQuery);
     insQuery.bindValue(":internalId", internalId);
@@ -1845,9 +1845,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?, ?)");
+    query.prepare("INSERT OR REPLACE INTO vms_client_infos values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     query.addBindValue(tran.params.id.toRfc4122());
 	query.addBindValue(tran.params.parentId.toRfc4122());
+    query.addBindValue(tran.params.skin);
+    query.addBindValue(tran.params.systemInfo);
     query.addBindValue(tran.params.cpuArchitecture);
     query.addBindValue(tran.params.cpuModelName);
     query.addBindValue(tran.params.phisicalMemory);
@@ -2947,7 +2949,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     queryStorage.setForwardOnly(true);
     queryStorage.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        s.space_limit as spaceLimit, s.used_for_writing as usedForWriting \
+        s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType \
         FROM vms_resource r \
         JOIN vms_storage s on s.resource_ptr_id = r.id \
         %1 \
@@ -3365,14 +3367,16 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataLi
     while (query.next()) {
         ApiClientInfoData info;
 
-		info.id = QnSql::deserialized_field<QnUuid>(query.value(0));
-		info.parentId = QnSql::deserialized_field<QnUuid>(query.value(1));
-		info.cpuArchitecture = query.value(2).toString();
-		info.cpuModelName = query.value(3).toString();
-		info.phisicalMemory = query.value(4).toLongLong();
-		info.openGLVersion = query.value(5).toString();
-		info.openGLVendor = query.value(6).toString();
-		info.openGLRenderer = query.value(7).toString();
+        info.id                 = QnSql::deserialized_field<QnUuid>(query.value(0));
+        info.parentId           = QnSql::deserialized_field<QnUuid>(query.value(1));
+        info.skin               = query.value(2).toString();
+        info.systemInfo         = query.value(3).toString();
+        info.cpuArchitecture    = query.value(4).toString();
+        info.cpuModelName       = query.value(5).toString();
+        info.phisicalMemory     = query.value(6).toLongLong();
+        info.openGLVersion      = query.value(7).toString();
+        info.openGLVendor       = query.value(8).toString();
+        info.openGLRenderer     = query.value(9).toString();
 
 		data.push_back(std::move(info));
     }

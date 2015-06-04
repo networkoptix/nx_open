@@ -23,6 +23,7 @@
 
 namespace ec2
 {
+    // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnectionFactory
     class Ec2DirectConnectionFactory
     :
         public AbstractECConnectionFactory,

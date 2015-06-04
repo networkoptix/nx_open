@@ -14,6 +14,11 @@ app.sqlConnection = dict(
     db = 'nx_statistics',
 )
 
+#app.geoipDb = dict(
+#    path = '/home/mu/Downloads/GeoLite2-Country.mmdb',
+#    service = 'country',
+#)
+
 appRun = dict(
     host = '127.0.0.1',
     port = 8002,

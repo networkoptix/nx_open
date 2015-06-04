@@ -15,6 +15,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QCheckBox" name="statisticsReportCheckBox">
+     <property name="text">
+      <string>Send usage and crash statistics to software developers (Recommended)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QCheckBox" name="autoDiscoveryCheckBox">
      <property name="text">
       <string>Enable cameras and servers auto discovery</string>
