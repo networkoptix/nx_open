@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <QtCore/QProcess>
 
 #include <QtWidgets/QApplication>
@@ -2479,6 +2481,13 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
 
     /* Check if user already made a decision. */
     if (ec2::Ec2StaticticsReporter::isDefined(servers))
+        return;
+
+    /* Suppress notification if no server has internet access. */
+    bool atLeastOneServerHasInternetAccess = boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr &server) {
+        return (server->getServerFlags() & Qn::SF_HasPublicIP);
+    });
+    if (!atLeastOneServerHasInternetAccess)
         return;
 
     auto result = QMessageBox::information(
