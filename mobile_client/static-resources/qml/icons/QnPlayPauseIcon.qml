@@ -14,12 +14,11 @@ Item {
         anchors.centerIn: parent
         width: Math.min(parent.width, parent.height) - padding * 2
         height: width
-        antialiasing: true
 
         property real animationPosition: pauseState ? 1.0 : 0.0
         Behavior on animationPosition { NumberAnimation { duration: 300; easing.type: Easing.OutQuad } }
 
-        rotation: animationPosition * 90
+        rotation: pauseState ? (animationPosition * 90) : (2.0 - animationPosition) * 90
 
         property real dist: Math.round(canvasSize.width * 0.25)
         property real tsize: canvasSize.width * Math.sqrt(3) / 2
