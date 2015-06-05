@@ -1,3 +1,5 @@
+TEMPLATE = app
+
 android-no-sdk {
     target.path = /data/user/qt
     export(target.path)
@@ -25,3 +27,4 @@ android-no-sdk {
 }
 
 export(INSTALLS)
+
