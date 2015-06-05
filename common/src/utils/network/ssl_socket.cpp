@@ -201,7 +201,7 @@ namespace {
     };
 
     static std::unique_ptr<OpenSSLGlobalLockContext> kOpenSSLGlobalLock;
-#if 0
+
     void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
         Q_UNUSED(file);
         Q_UNUSED(line);
@@ -212,7 +212,7 @@ namespace {
             kOpenSSLGlobalLock->locks.get()[type].unlock();
         }
     }
-#endif
+
     void OpenSSLInitGlobalLockInternal()
     {
         Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
