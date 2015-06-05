@@ -15,6 +15,8 @@
 #include <utils/common/concurrent.h>
 #include <utils/network/simple_http_client.h>
 
+#include <rest/active_connections_rest_handler.h>
+
 #include "compatibility/old_ec_connection.h"
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
@@ -283,6 +285,8 @@ namespace ec2
 
         registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
             std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
+
+        restProcessorPool->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler());
 
         //using HTTP processor since HTTP REST does not support HTTP interleaving
         //restProcessorPool->registerHandler(

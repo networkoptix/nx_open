@@ -126,8 +126,6 @@
 #include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 
-#include <streaming/hls/hls_server.h>
-
 #include <rtsp/rtsp_connection.h>
 
 #include <soap/soapserver.h>
@@ -165,6 +163,8 @@
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
 #include "streaming/hls/hls_session_pool.h"
+#include "streaming/hls/hls_server.h"
+#include "streaming/streaming_chunk_transcoder.h"
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -1647,6 +1647,8 @@ void QnMain::run()
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( restProcessorPool.get() );
 
+    std::unique_ptr<StreamingChunkTranscoder> streamingChunkTranscoder(
+        new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if( !initTcpListener() )
@@ -2021,6 +2023,7 @@ void QnMain::run()
     TimerManager::instance()->stop();
 
     hlsSessionPool.reset();
+    streamingChunkTranscoder.reset();
 
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );
