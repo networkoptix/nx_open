@@ -278,7 +278,7 @@ Qn::ServerFlags QnMediaServerResource::getServerFlags() const
 void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
 {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         if (flags == m_serverFlags)
             return;
         m_serverFlags = flags;

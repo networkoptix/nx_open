@@ -28,13 +28,13 @@ qint64 QnAbstractStorageResource::getSpaceLimit() const
 
 void QnAbstractStorageResource::setStorageType(const QString& type)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_storageType = type;
 }
 
 QString QnAbstractStorageResource::getStorageType() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_storageType;
 }
 
