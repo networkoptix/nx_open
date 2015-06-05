@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -19,22 +12,19 @@
     <artifactId>rtu</artifactId>
     <packaging>pom</packaging>
     <name>Remote Tune Utility</name>    
-
-    <dependencies>
-    </dependencies>			
-	
+    <dependencies/>
     <properties>
         <product.title>${rtu.name}</product.title>  
         <product.display.title>${rtu.display.name}</product.display.title>
         <!--Global libs-->      
         <qt.libs>qml quick</qt.libs>
-        <global.libs></global.libs>
+        <global.libs/>
         <!--Specific os libs used-->
-        <windows.oslibs></windows.oslibs>
-        <windows.oslibs.release></windows.oslibs.release> 
-        <windows.oslibs.debug></windows.oslibs.debug>        
-        <linux.oslibs></linux.oslibs>
-        <mac.oslibs></mac.oslibs>
+        <windows.oslibs/>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <linux.oslibs/>
+        <mac.oslibs/>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
