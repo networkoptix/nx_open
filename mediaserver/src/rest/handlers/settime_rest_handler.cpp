@@ -16,7 +16,9 @@ bool setTimeZone(const QString& timezone)
         return false;
     if (unlink("/etc/localtime") != 0)
         return false;
-    return symlink(timezoneFile.toLatin1().data(), "/etc/localtime") == 0;
+    if (symlink(timezoneFile.toLatin1().data(), "/etc/localtime") != 0)
+        return false;
+    return system(lit("echo '%1' | tee /etc/timezone").arg(timezone).toLatin1().data());
 }
 
 bool setDateTime(const QDateTime& datetime)
