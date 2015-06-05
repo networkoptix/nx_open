@@ -20,17 +20,35 @@ namespace Qn
 {
     const uint64_t unknown_size = 0xffffffffffffffff;
  
-    enum IOMode
+    /**
+    *   File IO flags.
+    */
+    namespace io
     {
-        NotOpen         = 0x0000,
-        ReadOnly        = 0x0001,
-        WriteOnly       = 0x0002,
-        ReadWrite       = ReadOnly | WriteOnly,
-        ListFileCap     = 0x0004,                   // capable of listing files
-        RemoveFileCap   = 0x0008,                   // capable of removing files
-        DBReady         = 0x0010                    // capable of DB hosting
-    };
+        enum mode_t
+        {
+            NotOpen         = 0x0000,
+            ReadOnly        = 0x0001,
+            WriteOnly       = 0x0002,
+            ReadWrite       = ReadOnly | WriteOnly,
+        };
+    }
  
+    /**
+    *   Storage capabilities flags.
+    */
+    namespace cap
+    {
+        enum cap_t
+        {
+            ListFile        = 0x0000,                   // capable of listing files
+            RemoveFile      = 0x0001,                   // capable of removing files
+            ReadFile        = 0x0002,                   // capable of reading files
+            WriteFile       = 0x0004,                   // capable of writing files
+            DBReady         = 0x0008,                   // capable of DB hosting
+        };
+    }
+
     namespace error
     {
         enum code_t
@@ -84,9 +102,9 @@ namespace Qn
         *   \return         bytes read.
         */
         virtual uint32_t STORAGE_METHOD_CALL read(
-            void*       dst,
-            uint32_t    size,
-            int*        ecode
+            void*           dst,
+            const uint32_t  size,
+            int*            ecode
         ) const = 0;
  
         /**
@@ -121,7 +139,7 @@ namespace Qn
         /**
         *   \param ecode    Pointer to error code. Pass NULL if you are not interested in error information.
         *   \return         current FileInfo* and moves iterator to the next position. Previous FileInfo* is invalidated.          
-        *   if no more files, NULL is returned.
+        *                   If no more files, NULL is returned.
         */
         virtual FileInfo* STORAGE_METHOD_CALL next(int* ecode) const = 0;
     };
@@ -129,6 +147,7 @@ namespace Qn
     // {D5DA5C59-44D5-4C14-AB17-EA7395555189}
     static const nxpl::NX_GUID IID_Storage =
     { { 0xd5, 0xda, 0x5c, 0x59, 0x44, 0xd5, 0x4c, 0x14, 0xab, 0x17, 0xea, 0x73, 0x95, 0x55, 0x51, 0x89 } };
+    
     /**
     *   Storage abstraction
     */
@@ -137,8 +156,13 @@ namespace Qn
     {
     public:
         /**
+        *   \return         is storage available at the moment (0,1).
+        */ 
+        virtual int isAvailable() const = 0;
+ 
+        /**
         *   \param url      File URL. If file doesn't exists, it is created. This should be NULL terminated utf8 encoded C string.
-        *   \param flags    IOMode flag(s)
+        *   \param flags    io flag(s)
         *   \param ecode    Pointer to error code. Pass NULL if you are not interested in error information.
         *   \return         Free space size ('unknown_size' if request can't be accomplished).
         */
@@ -161,7 +185,7 @@ namespace Qn
         virtual uint64_t STORAGE_METHOD_CALL getTotalSpace(int* ecode) const = 0;
  
         /**
-        *   \return         IOMode flag(s).
+        *   \return         cap flag(s).
         */
         virtual int STORAGE_METHOD_CALL getCapabilities() const = 0;
  
