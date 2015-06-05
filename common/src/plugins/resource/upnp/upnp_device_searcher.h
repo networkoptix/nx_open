@@ -5,6 +5,7 @@
 
 #include <list>
 #include <map>
+#include <set>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QElapsedTimer>
@@ -36,7 +37,7 @@ public:
     */
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
-        const HostAddress& discoveredDevAddress,
+        const SocketAddress& discoveredDevAddress,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) = 0;
 };
@@ -59,13 +60,13 @@ class UPNPDeviceSearcher
 
 public:
     static const unsigned int DEFAULT_DISCOVER_TRY_TIMEOUT_MS = 3000;
-    static const std::list<QString> DEFAULT_DEVICE_TYPES;
+    static const QString DEFAULT_DEVICE_TYPE;
 
     /*!
         \param discoverDeviceTypes Devies to discover, mediaservers by default
         \param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch
     */
-    UPNPDeviceSearcher( const std::list<QString>& discoverDeviceTypes = DEFAULT_DEVICE_TYPES,
+    UPNPDeviceSearcher( const QString& discoverDeviceType = DEFAULT_DEVICE_TYPE,
                         unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
     virtual ~UPNPDeviceSearcher();
 
@@ -78,6 +79,10 @@ public:
     */
     void registerHandler( UPNPSearchHandler* handler );
     void cancelHandlerRegistration( UPNPSearchHandler* handler );
+
+    // TODO: merge into registerHandler
+    void registerDeviceType( const QString& devType );
+    void cancelDeviceTypeRegistration( const QString& devType );
 
     //!Makes internal copy of discovered but not processed devices. \a processDiscoveredDevices uses this copy
     void saveDiscoveredDevicesSnapshot();
@@ -128,11 +133,11 @@ private:
         nx::Buffer buf;
     };
 
-    std::list<QString> m_discoverDeviceTypes;
+    std::set<QString> m_deviceTypes;
     const unsigned int m_discoverTryTimeoutMS;
     mutable QMutex m_mutex;
     quint64 m_timerID;
-    std::list<UPNPSearchHandler*> m_handlers;
+    std::set<UPNPSearchHandler*> m_handlers;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
     char* m_readBuf;
@@ -170,7 +175,7 @@ private:
     */
     void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
     bool processPacket( const QHostAddress& localInterfaceAddress,
-                        const HostAddress& discoveredDevAddress,
+                        const SocketAddress& discoveredDevAddress,
                         const UpnpDeviceInfo& devInfo,
                         const QByteArray& xmlDevInfo );
 
@@ -182,8 +187,11 @@ class UPNPSearchAutoHandler
         : public UPNPSearchHandler
 {
 public:
-    UPNPSearchAutoHandler();
+    UPNPSearchAutoHandler(const QString& devType = QString());
     virtual ~UPNPSearchAutoHandler();
+
+private:
+    QString m_devType;
 };
 
 #endif  //UPNP_DEVICE_SEARCHER_H

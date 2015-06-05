@@ -81,7 +81,7 @@ public:
     //!Implementation of UPNPSearchHandler::processPacket
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
-        const HostAddress& discoveredDevAddress,
+        const SocketAddress& discoveredDevAddress,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) override;
 
@@ -94,7 +94,7 @@ protected:
     */
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const HostAddress& host,
+        const SocketAddress& host,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) = 0;

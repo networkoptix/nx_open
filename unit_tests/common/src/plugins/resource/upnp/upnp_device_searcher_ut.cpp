@@ -20,7 +20,7 @@ class RS : public UPNPSearchHandler
 {
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
-        const HostAddress& discoveredDevAddress,
+        const SocketAddress& discoveredDevAddress,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) override
     {
@@ -35,7 +35,7 @@ class RS : public UPNPSearchHandler
 TEST(UPNP, DISABLED_DeviceSearcher)
 {
     TimerManager timerManager;
-    UPNPDeviceSearcher deviceSearcher(std::list<QString>(1, QLatin1String("InternetGatewayDevice")));
+    UPNPDeviceSearcher deviceSearcher(QLatin1String("InternetGatewayDevice"));
 
     RS rs;
     deviceSearcher.registerHandler(&rs);

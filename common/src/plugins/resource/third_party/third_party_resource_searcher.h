@@ -60,7 +60,7 @@ protected:
     //!Implementation of QnUpnpResourceSearcherAsync::processPacket
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const HostAddress& host,
+        const SocketAddress& host,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) override;

@@ -24,18 +24,18 @@ static const unsigned int READ_BUF_CAPACITY = 64*1024+1;    //max UDP packet siz
 
 static UPNPDeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
 
-const std::list<QString> UPNPDeviceSearcher::DEFAULT_DEVICE_TYPES(
-        1, lit("%1 Server").arg(QnAppInfo::organizationName()));
+const QString UPNPDeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
+        .arg(QnAppInfo::organizationName());
 
-UPNPDeviceSearcher::UPNPDeviceSearcher( const std::list<QString>& discoverDeviceTypes,
+UPNPDeviceSearcher::UPNPDeviceSearcher( const QString& discoverDeviceType,
                                         unsigned int discoverTryTimeoutMS )
 :
-    m_discoverDeviceTypes(discoverDeviceTypes.size() ? discoverDeviceTypes : DEFAULT_DEVICE_TYPES),
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
     m_readBuf( new char[READ_BUF_CAPACITY] ),
     m_terminated( false )
 {
+    m_deviceTypes.insert( discoverDeviceType );
     m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
     m_cacheTimer.start();
 
@@ -88,17 +88,26 @@ void UPNPDeviceSearcher::pleaseStop()
 void UPNPDeviceSearcher::registerHandler( UPNPSearchHandler* handler )
 {
     QMutexLocker lk( &m_mutex );
-    std::list<UPNPSearchHandler*>::const_iterator it = std::find( m_handlers.begin(), m_handlers.end(), handler );
-    if( it == m_handlers.end() )
-        m_handlers.push_back( handler );
+    m_handlers.insert( handler );
 }
 
 void UPNPDeviceSearcher::cancelHandlerRegistration( UPNPSearchHandler* handler )
 {
     QMutexLocker lk( &m_mutex );
-    std::list<UPNPSearchHandler*>::iterator it = std::find( m_handlers.begin(), m_handlers.end(), handler );
-    if( it != m_handlers.end() )
-        m_handlers.erase( it );
+    m_handlers.erase( handler );
+}
+
+
+void UPNPDeviceSearcher::registerDeviceType( const QString& devType )
+{
+    QMutexLocker lk( &m_mutex );
+    m_deviceTypes.insert( devType );
+}
+
+void UPNPDeviceSearcher::cancelDeviceTypeRegistration( const QString& devType )
+{
+    QMutexLocker lk( &m_mutex );
+    m_deviceTypes.erase( devType );
 }
 
 void UPNPDeviceSearcher::saveDiscoveredDevicesSnapshot()
@@ -117,9 +126,10 @@ void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToU
     {
         if( handlerToUse )
         {
+            const auto url = it->second.descriptionUrl;
             if( handlerToUse->processPacket(
                     it->second.localInterfaceAddress,
-                    it->second.deviceAddress,
+                    SocketAddress( url.host(), url.port() ),
                     it->second.devInfo,
                     it->second.xmlDevInfo ) )
             {
@@ -223,10 +233,10 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
     std::list<QString> deviceTypes;
     {
         QMutexLocker lk(&m_mutex);
-        if (m_discoverDeviceTypes.empty())
+        if (m_deviceTypes.empty())
             return;
 
-        deviceTypes.assign(m_discoverDeviceTypes.begin(), m_discoverDeviceTypes.end());
+        deviceTypes.assign(m_deviceTypes.begin(), m_deviceTypes.end());
     }
 
     for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
@@ -411,13 +421,14 @@ void UPNPDeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo 
     cacheItem.xmlDevInfo = devInfo.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
 
-    processPacket(devInfo.localInterfaceAddress, devInfo.deviceAddress,
+    const auto url = devInfo.descriptionUrl;
+    processPacket(devInfo.localInterfaceAddress, SocketAddress(url.host(), url.port()),
                   devInfo.devInfo, devInfo.xmlDevInfo);
 }
 
 
 bool UPNPDeviceSearcher::processPacket( const QHostAddress& localInterfaceAddress,
-                                        const HostAddress& discoveredDevAddress,
+                                        const SocketAddress& discoveredDevAddress,
                                         const UpnpDeviceInfo& devInfo,
                                         const QByteArray& xmlDevInfo )
 {
@@ -454,13 +465,20 @@ void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpCl
     m_httpClients.erase( httpClient );
 }
 
-UPNPSearchAutoHandler::UPNPSearchAutoHandler()
+UPNPSearchAutoHandler::UPNPSearchAutoHandler(const QString& devType)
+    : m_devType( devType )
 {
     UPNPDeviceSearcher::instance()->registerHandler( this );
+    if( !devType.isEmpty() )
+        UPNPDeviceSearcher::instance()->registerDeviceType( devType );
 }
 
 UPNPSearchAutoHandler::~UPNPSearchAutoHandler()
 {
     if( auto searcher = UPNPDeviceSearcher::instance() )
+    {
         searcher->cancelHandlerRegistration( this );
+        if( !m_devType.isEmpty() )
+            searcher->registerDeviceType( m_devType );
+    }
 }

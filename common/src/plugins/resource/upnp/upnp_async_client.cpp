@@ -14,14 +14,14 @@ static const QString SOAP_REQUEST = QLatin1String(
     "</s:Envelope>"
 );
 
+// TODO: move parsers to separate file
 class UpnpMessageHandler
-    : public QXmlDefaultHandler
+        : public QXmlDefaultHandler
 {
 public:
     virtual bool startDocument() override
     {
         m_message = UpnpAsyncClient::Message();
-        m_firstInBody = false;
         m_awaitedValue = 0;
         return true;
     }
@@ -31,25 +31,12 @@ public:
     virtual bool startElement( const QString& /*namespaceURI*/,
                                const QString& /*localName*/,
                                const QString& qName,
-                               const QXmlAttributes& attrs ) override
+                               const QXmlAttributes& /*attrs*/ ) override
     {
         if( qName == lit("xml") || qName == lit("s:Envelope") )
-            static_cast<void>(0); // TODO: check fields
-        else
-        if( qName == lit("s:Body") )
-            m_firstInBody = true;
-        else
-        {
-            if (m_firstInBody)
-            {
-                m_message.action = qName.split( lit(":") )[1];
-                m_message.service = fromUpnpUrn( attrs.value( lit("xmlns:u") ), lit("service") );
-                m_firstInBody = false;
-            }
-            else
-                m_awaitedValue = &m_message.params[qName];
-        }
+            return true; // TODO: check attrs
 
+        m_awaitedValue = &m_message.params[qName];
         return true;
     }
 
@@ -71,11 +58,73 @@ public:
 
     const UpnpAsyncClient::Message& message() const { return m_message; }
 
-private:
+protected:
     UpnpAsyncClient::Message m_message;
-    bool m_firstInBody;
     QString* m_awaitedValue;
 };
+
+class UpnpSuccessHandler
+        : public UpnpMessageHandler
+{
+    typedef UpnpMessageHandler super;
+
+public:
+    virtual bool startDocument() override
+    {
+        m_firstInBody = false;
+        return super::startDocument();
+    }
+
+    virtual bool startElement( const QString& namespaceURI,
+                               const QString& localName,
+                               const QString& qName,
+                               const QXmlAttributes& attrs ) override
+    {
+
+        if( qName == lit("s:Body") )
+        {
+            m_firstInBody = true;
+            return true;
+        }
+
+        if (m_firstInBody)
+        {
+            m_message.action = qName.split( lit(":") )[1];
+            m_message.service = fromUpnpUrn( attrs.value( lit("xmlns:u") ), lit("service") );
+
+            m_firstInBody = false;
+            return true;
+        }
+
+        return super::startElement( namespaceURI, localName, qName, attrs );
+    }
+
+private:
+    bool m_firstInBody;
+};
+
+class UpnpFailureHandler
+        : public UpnpMessageHandler
+{
+    typedef UpnpMessageHandler super;
+
+public:
+    virtual bool startElement( const QString& namespaceURI,
+                               const QString& localName,
+                               const QString& qName,
+                               const QXmlAttributes& attrs ) override
+    {
+        if( qName == lit("s:Body") || qName == lit("s:Fault") || qName == lit("s:UPnpError") )
+            return true;
+
+        return super::startElement( namespaceURI, localName, qName, attrs );
+    }
+};
+
+bool UpnpAsyncClient::Message::isOk() const
+{
+    return !action.isEmpty() && !service.isEmpty();
+}
 
 const QString& UpnpAsyncClient::Message::getParam( const QString& key ) const
 {
@@ -99,24 +148,34 @@ bool UpnpAsyncClient::doUpnp( const QUrl& url, const Message& message,
 
     const auto complete = [this, callback]( const nx_http::AsyncHttpClientPtr& ptr )
     {
-        m_httpClients.erase( ptr );
-        if( ptr->hasRequestSuccesed() )
         {
-            UpnpMessageHandler xmlHandler;
+            QMutexLocker lk(&m_mutex);
+            m_httpClients.erase( ptr );
+        }
+
+        if (auto resp = ptr->response())
+        {
+            const auto status = resp->statusLine.statusCode;
+            const bool success = (status >= 200 && status < 300);
+
+            std::unique_ptr<UpnpMessageHandler> xmlHandler;
+            if( success )   xmlHandler.reset( new UpnpSuccessHandler );
+            else            xmlHandler.reset( new UpnpFailureHandler );
+
             QXmlSimpleReader xmlReader;
-            xmlReader.setContentHandler( &xmlHandler );
-            xmlReader.setErrorHandler( &xmlHandler );
+            xmlReader.setContentHandler( xmlHandler.get() );
+            xmlReader.setErrorHandler( xmlHandler.get() );
 
             QXmlInputSource input;
             input.setData( ptr->fetchMessageBodyBuffer() );
             if( xmlReader.parse( &input ) )
             {
-                callback( xmlHandler.message() );
+                callback( xmlHandler->message() );
                 return;
             }
         }
 
-        callback( Message() ); // error
+        // TODO: retry?
     };
 
     auto httpClient = std::make_shared< nx_http::AsyncHttpClient >();
@@ -126,6 +185,7 @@ bool UpnpAsyncClient::doUpnp( const QUrl& url, const Message& message,
 
     if( httpClient->doPost( url, "text/xml", request.toUtf8() ) )
     {
+        QMutexLocker lk(&m_mutex);
         m_httpClients.insert( std::move( httpClient ) );
         return true;
     }
@@ -133,12 +193,24 @@ bool UpnpAsyncClient::doUpnp( const QUrl& url, const Message& message,
     return false;
 }
 
-static const QString WAN_IP = lit( "WANIpConnection" );
-static const QString GET_EXTERNAL_IP = lit( "GetExternalIPAddress" );
-static const QString EXTERNAL_IP = lit("NewExternalIPAddress");
+const QString UpnpAsyncClient::CLIENT_ID        = lit( "NX UpnpAsyncClient" );
+const QString UpnpAsyncClient::INTERNAL_GATEWAY = lit( "InternetGatewayDevice" );
+const QString UpnpAsyncClient::WAN_IP           = lit( "WANIpConnection" );
+
+static const QString GET_EXTERNAL_IP    = lit( "GetExternalIPAddress" );
+static const QString ADD_PORT_MAPPING   = lit( "AddPortMapping" );
+
+static const QString EXTERNAL_IP    = lit("NewExternalIPAddress");
+static const QString EXTERNAL_PORT  = lit("NewExternalPort");
+static const QString PROTOCOL       = lit("NewProtocol");
+static const QString INTERNAL_PORT  = lit("NewInternalPort");
+static const QString INTERNAL_IP    = lit("NewInternalClient");
+static const QString ENABLED        = lit("NewEnabled");
+static const QString DESCRIPTION    = lit("NewPortMappingDescription");
+static const QString DURATION       = lit("NewLeaseDuration");
 
 bool UpnpAsyncClient::externalIp( const QUrl& url,
-                                  const std::function< void( const QString& ) >& callback )
+                                  const std::function< void( const HostAddress& ) >& callback )
 {
     UpnpAsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP };
     return doUpnp(  url, request, [callback]( const Message& response ) {
@@ -146,28 +218,24 @@ bool UpnpAsyncClient::externalIp( const QUrl& url,
     } );
 }
 
-/*
-bool UpnpAsyncClient::addMapping( const QUrl& url, const Mapping& mapping,
-                                  const std::function< Mapping >& callback )
+bool UpnpAsyncClient::addMapping(
+        const QUrl& url, const HostAddress& internalIp, quint16 internalPort,
+        quint16 externalPort, const QString& protocol,
+        const std::function< void( bool ) >& callback )
 {
     UpnpAsyncClient::Message request;
-    request.action = lit( "AddPortMapping" );
-    request.service = lit( "WANIpConnection" );
+    request.action = ADD_PORT_MAPPING;
+    request.service = WAN_IP;
 
-    request.params[ lit( "NewExternalPort") ] = QString::number( mapping.externalPort );
-    request.params[ lit( "NewProtocol") ] = mapping.protocol;
-    request.params[ lit( "NewInternalPort") ] = QString::number( mapping.internalPort );
-    request.params[ lit( "NewInternalClient") ] = mapping.internalIp;
-    request.params[ lit( "NewEnabled") ] = QString::number( 1 );
-    request.params[ lit( "NewPortMappingDescription") ] = lit( "NX UpnpAsyncClient" );
-    request.params[ lit( "NewLeaseDuration") ] = QString::number( 0 );
+    request.params[ EXTERNAL_PORT ] = QString::number( externalPort );
+    request.params[ PROTOCOL ]      = protocol;
+    request.params[ INTERNAL_PORT ] = QString::number( externalPort );
+    request.params[ INTERNAL_IP ]   = internalIp.toString();
+    request.params[ ENABLED]        = QString::number( 1 );
+    request.params[ DESCRIPTION ]   = CLIENT_ID;
+    request.params[ DURATION ]      = QString::number( 0 );
 
-    return doUpnp(  url, request, [callback]( const Message& response ) {
-        if( response.action.isNull )
-        {
-            callback
-            return;
-        }
+    return doUpnp( url, request, [ callback ]( const Message& response ) { 
+        callback( response.isOk() );
     } );
 }
-*/

@@ -300,7 +300,7 @@ QnResourceList QnUpnpResourceSearcherAsync::findResources()
 
 bool QnUpnpResourceSearcherAsync::processPacket(
     const QHostAddress& localInterfaceAddress,
-    const HostAddress& discoveredDevAddress,
+    const SocketAddress& discoveredDevAddress,
     const UpnpDeviceInfo& devInfo,
     const QByteArray& xmlDevInfo )
 {
