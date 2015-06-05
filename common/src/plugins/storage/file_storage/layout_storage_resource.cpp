@@ -212,12 +212,17 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
 }
 
 QnLayoutFileStorageResource::QnLayoutFileStorageResource():
-    m_fileSync(QMutex::Recursive)
+    m_fileSync(QMutex::Recursive),
+    m_capabilities(0)
 {
     QMutexLocker lock(&m_storageSync);
     m_novFileOffset = 0;
     //m_novFileLen = 0;
     m_allStorages.insert(this);
+ 
+    m_capabilities |= cap::ListFile;
+    m_capabilities |= cap::ReadFile;
+    m_capabilities |= cap::RemoveFile;
 }
 
 QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
@@ -227,10 +232,10 @@ QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
 }
 
 
-bool QnLayoutFileStorageResource::isNeedControlFreeSpace()
-{
-    return false;
-}
+//bool QnLayoutFileStorageResource::isNeedControlFreeSpace()
+//{
+//    return false;
+//}
 
 bool QnLayoutFileStorageResource::removeFile(const QString& url)
 {
@@ -295,10 +300,15 @@ bool QnLayoutFileStorageResource::isDirExists(const QString& url)
     return d.exists(removeProtocolPrefix(url));
 }
 
-bool QnLayoutFileStorageResource::isCatalogAccessible()
+int QnLayoutFileStorageResource::getCapabilities() const
 {
-    return true;
+    return m_capabilities;
 }
+
+//bool QnLayoutFileStorageResource::isCatalogAccessible()
+//{
+//    return true;
+//}
 
 bool QnLayoutFileStorageResource::isFileExists(const QString& url)
 {
@@ -349,10 +359,10 @@ bool QnLayoutFileStorageResource::isStorageAvailable()
     return false;
 }
 
-int QnLayoutFileStorageResource::getChunkLen() const 
-{
-    return 60;
-}
+//int QnLayoutFileStorageResource::getChunkLen() const 
+//{
+//    return 60;
+//}
 
 QString QnLayoutFileStorageResource::removeProtocolPrefix(const QString& url)
 {
@@ -360,15 +370,15 @@ QString QnLayoutFileStorageResource::removeProtocolPrefix(const QString& url)
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
-QnStorageResource* QnLayoutFileStorageResource::instance()
+QnAbstractStorage* QnLayoutFileStorageResource::instance()
 {
     return new QnLayoutFileStorageResource();
 }
 
-bool QnLayoutFileStorageResource::isStorageAvailableForWriting()
-{
-    return false; // it is read only file system
-}
+//bool QnLayoutFileStorageResource::isStorageAvailableForWriting()
+//{
+//    return false; // it is read only file system
+//}
 
 bool QnLayoutFileStorageResource::readIndexHeader()
 {

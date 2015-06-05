@@ -16,6 +16,8 @@ extern "C"
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
 
+#include <core/resource/storage_plugin_factory.h>
+
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_resource.h>

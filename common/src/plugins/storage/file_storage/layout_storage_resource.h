@@ -9,7 +9,7 @@ extern "C"
 {
     #include <libavformat/avio.h>
 }
-#include "core/resource/storage_resource.h"
+#include "core/resource/abstract_storage.h"
 
 class QnLayoutFile;
 class QnTimePeriodList;
@@ -17,7 +17,9 @@ class QnTimePeriodList;
 /*
 * QnLayoutFileStorageResource uses for layout export
 */
-class QnLayoutFileStorageResource: public QnStorageResource
+class QnLayoutFileStorageResource
+    : public QnResource,
+      public QnAbstractStorage
 {
 public:
     enum StorageFlags {
@@ -28,22 +30,23 @@ public:
     QnLayoutFileStorageResource();
     virtual ~QnLayoutFileStorageResource();
 
-    static QnStorageResource* instance();
+    static QnAbstractStorage* instance();
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
-    virtual int getChunkLen() const override;
-    virtual bool isStorageAvailable() override;
-    virtual bool isStorageAvailableForWriting() override;
+    virtual int getCapabilities() const override;
+    //virtual int getChunkLen() const override;
+    virtual bool isAvailable() override;
+    //virtual bool isStorageAvailableForWriting() override;
     virtual QFileInfoList getFileList(const QString& dirName) override;
-    virtual qint64 getFileSize(const QString& url) const override;
-    virtual bool isNeedControlFreeSpace() override;
+    qint64 getFileSize(const QString& url) const override;
+    //virtual bool isNeedControlFreeSpace() override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
-    virtual bool isCatalogAccessible() override;
+    //virtual bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace() override;
     virtual void setUrl(const QString& value) override;
@@ -105,6 +108,8 @@ private:
     static QMutex m_storageSync;
     static QSet<QnLayoutFileStorageResource*> m_allStorages;
     qint64 m_novFileOffset;
+
+    int m_capabilities;
     //qint64 m_novFileLen;
 };
 

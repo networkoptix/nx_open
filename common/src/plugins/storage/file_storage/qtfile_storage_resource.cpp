@@ -18,16 +18,23 @@ QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode
     return rez;
 }
 
-
-
-QnQtFileStorageResource::QnQtFileStorageResource()
+int QnQtFileStorageResource::getCapabilities() const
 {
+    return m_capabilities;
+}
+
+QnQtFileStorageResource::QnQtFileStorageResource() 
+    : m_capabilities(0)
+{
+    m_capabilities |= cap::ListFile;
+    m_capabilities |= cap::ReadFile;
+    m_capabilities |= cap::RemoveFile;
 };
 
-bool QnQtFileStorageResource::isNeedControlFreeSpace()
-{
-    return false;
-}
+//bool QnQtFileStorageResource::isNeedControlFreeSpace()
+//{
+//    return false;
+//}
 
 bool QnQtFileStorageResource::removeFile(const QString& url)
 {
@@ -55,10 +62,10 @@ bool QnQtFileStorageResource::isDirExists(const QString& url)
     return d.exists(removeProtocolPrefix(url));
 }
 
-bool QnQtFileStorageResource::isCatalogAccessible()
-{
-    return true;
-}
+//bool QnQtFileStorageResource::isCatalogAccessible()
+//{
+//    return true;
+//}
 
 bool QnQtFileStorageResource::isFileExists(const QString& url)
 {
@@ -90,7 +97,7 @@ qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 	return 0; // not implemented
 }
 
-bool QnQtFileStorageResource::isStorageAvailable()
+bool QnQtFileStorageResource::isAvailable()
 {
     QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
@@ -111,10 +118,10 @@ bool QnQtFileStorageResource::isStorageAvailable()
     return false;
 }
 
-int QnQtFileStorageResource::getChunkLen() const 
-{
-    return 60;
-}
+//int QnQtFileStorageResource::getChunkLen() const 
+//{
+//    return 60;
+//}
 
 QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url)
 {
@@ -122,12 +129,12 @@ QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url)
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
-QnStorageResource* QnQtFileStorageResource::instance()
+QnAbstractStorage* QnQtFileStorageResource::instance()
 {
     return new QnQtFileStorageResource();
 }
 
-bool QnQtFileStorageResource::isStorageAvailableForWriting()
-{
-    return false; // it is read only file system
-}
+//bool QnQtFileStorageResource::isStorageAvailableForWriting()
+//{
+//    return false; // it is read only file system
+//}

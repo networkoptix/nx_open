@@ -1,30 +1,32 @@
-#ifndef __ABSTRACT_STORAGE_RESOURCE_H__
-#define __ABSTRACT_STORAGE_RESOURCE_H__
+#ifndef __ABSTRACT_STORAGE_H__
+#define __ABSTRACT_STORAGE_H__
 
 #include <QtCore/QSet>
 #include "resource.h"
 #include <QtCore/QFileInfoList>
 #include <QtCore/QIODevice>
-#include "abstract_storage_resource.h"
 
-class QnAbstractStorageResource
+class QnAbstractStorage
 {
 public:
-    enum IOMode
+    enum cap
     {
-        NotOpen         = 0x0000,
-        ReadOnly        = 0x0001,
-        WriteOnly       = 0x0002,
-        ReadWrite       = ReadOnly | WriteOnly,
-        ListFileCap     = 0x0004,                   // capable of listing files
-        RemoveFileCap   = 0x0008,                   // capable of removing files
-        DBReady         = 0x0010                    // capable of DB hosting
+        ListFile        = 0x0000,                   // capable of listing files
+        RemoveFile      = 0x0001,                   // capable of removing files
+        ReadFile        = 0x0002,                   // capable of reading files
+        WriteFile       = 0x0004,                   // capable of writing files
+        DBReady         = 0x0008,                   // capable of DB hosting
     };
 
 public:
     static const qint64 UnknownSize = 0x0000FFFFFFFFFFFFll; // TODO: #Elric replace with -1.
 
     virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode) = 0;
+
+    /**
+    *   \return storage capabilities ('cap' flag(s))
+    */
+    virtual int getCapabilities() const = 0;
 
     ///**
     // * TODO: #vasilenko doxydocs!
@@ -49,7 +51,7 @@ public:
     ///**
     // * \returns                         Whether the storage is physically accessible.
     // */
-    //virtual bool isStorageAvailable() = 0;
+    virtual bool isAvailable() = 0;
 
     ///**
     // * \returns                         Whether the storage is physically accessible and ready for writing
@@ -120,4 +122,4 @@ public:
     virtual qint64 getFileSize(const QString& url) const = 0;
 };
 
-#endif // __ABSTRACT_STORAGE_RESOURCE_H__
+#endif // __ABSTRACT_STORAGE_H__

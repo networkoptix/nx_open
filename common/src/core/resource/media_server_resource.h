@@ -12,7 +12,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
-#include <core/resource/abstract_storage_resource.h>
+#include <core/resource/abstract_storage.h>
 #include "utils/network/http/asynchttpclient.h"
 
 

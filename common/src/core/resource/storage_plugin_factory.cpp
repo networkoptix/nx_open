@@ -16,14 +16,14 @@ QnStoragePluginFactory *QnStoragePluginFactory::instance()
     return QnStoragePluginFactory_instance();
 }
 
-void QnStoragePluginFactory::registerStoragePlugin(const QString &protocol, const StorageResourceFactory &factory, bool isDefaultProtocol)
+void QnStoragePluginFactory::registerStoragePlugin(const QString &protocol, const StorageFactory &factory, bool isDefaultProtocol)
 {
     m_factoryByProtocol.insert(protocol, factory);
     if (isDefaultProtocol)
         m_defaultFactory = factory;
 }
 
-QnStorageResource *QnStoragePluginFactory::createStorage(const QString &url, bool useDefaultForUnknownPrefix)
+QnAbstractStorage *QnStoragePluginFactory::createStorage(const QString &url, bool useDefaultForUnknownPrefix)
 {
     int index = url.indexOf(lit("://"));
     if (index == -1) 
