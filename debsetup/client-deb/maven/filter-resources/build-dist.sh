@@ -115,5 +115,7 @@ cp -r bin/update.json $STAGETARGET
 echo "client.finalName=$FINALNAME" >> finalname-client.properties
 echo "zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip $STAGETARGET"
 cd $STAGETARGET 
+mkdir ./help
+cp ${environment.dir}/help/${release.version}/${customization}/*.* ./help
 zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*
 mv -f client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ${project.build.directory}
