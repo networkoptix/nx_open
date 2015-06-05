@@ -1,23 +1,25 @@
 #ifndef EC2_STATICTICS_REPORTER_H
 #define EC2_STATICTICS_REPORTER_H
 
-#include "core/resource/user_resource.h"
-#include "utils/common/timermanager.h"
-#include "utils/network/http/asynchttpclient.h"
+#include <core/resource/resource_fwd.h>
+#include <utils/common/timermanager.h>
+#include <utils/network/http/asynchttpclient.h>
 #include <utils/thread/mutex.h>
-#include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_statistics.h"
+#include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_statistics.h>
 
 
 namespace ec2
 {
+    // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2StaticticsReporter
     class Ec2StaticticsReporter
             : public QObject
     {
     public:
         /** Collects and reports statistics in automatic mode (by internal timer) */
         Ec2StaticticsReporter(const AbstractUserManagerPtr& userManager,
-                                const AbstractResourceManagerPtr& resourceManager);
+                              const AbstractResourceManagerPtr& resourceManager,
+                              const AbstractMediaServerManagerPtr& msManager);
         ~Ec2StaticticsReporter();
 
         /** Collects \class ApiSystemStatistics in the entire system */
@@ -27,7 +29,6 @@ namespace ec2
         ErrorCode triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData);
 
         // text strings
-        static const QString SR_ALLOWED;
         static const QString SR_LAST_TIME;
         static const QString SR_TIME_CYCLE;
         static const QString SR_SERVER_API;
@@ -39,6 +40,15 @@ namespace ec2
         static const QString AUTH_PASSWORD;
 
         // helpers
+        /** Check if user has already made a decision about this system behavior. */
+        static bool isDefined(const QnMediaServerResourceList &servers);
+        /** Check if statistics reporting is allowed in this system. */
+        static bool isAllowed(const QnMediaServerResourceList &servers);
+        /** Check if statistics reporting is allowed in this system. */
+        static bool isAllowed(const AbstractMediaServerManagerPtr& msManager);
+        /** Set allowed value for the following servers. */
+        static void setAllowed(const QnMediaServerResourceList &servers, bool value);
+
         static QnUserResourcePtr getAdmin(const AbstractUserManagerPtr& manager);
         static QnUuid getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager);
 
@@ -56,6 +66,8 @@ namespace ec2
     private:
         QnUserResourcePtr m_admin;
         QnUuid m_desktopCameraTypeId;
+        AbstractMediaServerManagerPtr m_msManager;
+
         nx_http::AsyncHttpClientPtr m_httpClient;
         boost::optional<QDateTime> m_plannedReportTime;
 

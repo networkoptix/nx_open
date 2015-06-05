@@ -21,6 +21,9 @@ public:
     void setSpaceLimit(qint64 value);
     qint64 getSpaceLimit() const;
 
+    void setStorageType(const QString& type);
+    QString getStorageType() const;
+
     void setMaxStoreTime(int timeInSeconds);
     int getMaxStoreTime() const;
 
@@ -61,6 +64,7 @@ private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds
     bool m_usedForWriting;
+    QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QnMutex m_bitrateMtx;
 };

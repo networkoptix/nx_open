@@ -103,11 +103,14 @@ bool writeNetworSettings(const QnNetworkAddressEntryList& settings)
     return true;
 }
 
-void updateSettings(QnNetworkAddressEntryList& currentSettings, const QnNetworkAddressEntryList& newSettings)
+void updateSettings(QnNetworkAddressEntryList& currentSettings, QnNetworkAddressEntryList& newSettings)
 {
+    // merge existing data
     for(auto& value :currentSettings) 
     {
-        for (const auto& newValue :newSettings) {
+        for (auto itr = newSettings.begin(); itr != newSettings.end(); ++itr)
+        {
+            const auto& newValue = *itr;
             if (newValue.name != value.name)
                 continue;
             if (!newValue.ipAddr.isNull())
@@ -117,8 +120,13 @@ void updateSettings(QnNetworkAddressEntryList& currentSettings, const QnNetworkA
             if (!newValue.gateway.isNull())
                 value.gateway = newValue.gateway;
             value.dhcp = newValue.dhcp;
+            newSettings.erase(itr);
+            break;
         }
     }
+    // add new data
+    for (const auto& newValue :newSettings)
+        currentSettings.push_back(newValue);
 }
 
 int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
@@ -161,7 +169,11 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
         result.setErrorString(lit("Can't write network settings file"));
     }
 #ifndef Q_OS_WIN
-    system("/etc/init.d/networking restart");
+    if (system("/etc/init.d/networking restart") != 0)
+        qWarning() << "Failed to restart networking service";
+    for(const auto& value: currentSettings)
+        if (system(lit("ifconfig %1 up").arg(value.name).toLatin1().data()) != 0)
+            qWarning() << "Failed to restart network interface " << value.name;
 #endif
     return CODE_OK;
 }

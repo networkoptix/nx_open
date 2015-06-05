@@ -112,6 +112,9 @@ public:
      * \returns                         Size of the file, or 0 if the file does not exist.
      */
     virtual qint64 getFileSize(const QString& url) const = 0;
+
+    static QString toNativeDirPath(const QString &dirPath);
+
 protected:
     //qint64 m_writedSpace;
 

@@ -10,14 +10,48 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Drawing;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 using NxInterface;
 
 namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
+    internal class UriHostConverter : JsonConverter {
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
+            throw new NotImplementedException();
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+            if (reader.TokenType == JsonToken.String) {
+                String value = (String)serializer.Deserialize(reader, typeof(String));
+
+                try {
+                    Uri uri = (value.StartsWith("http://") || value.StartsWith("https://")) ? new Uri(value) : new Uri("http://" + value);
+                    return uri.Host;
+                } catch (InvalidOperationException) {
+                } catch (UriFormatException) {
+                } catch (ArgumentNullException) {
+                }
+
+                return value;
+            }
+
+            return null;
+        }
+
+        public override bool CanConvert(Type objectType) {
+            return false;
+        }
+    }
+
     namespace Api {
         class Camera {
             public string id { get; set; }
             public string name { get; set; }
             public string model { get; set; }
+
+            [JsonProperty("url")]
+            [JsonConverter(typeof(UriHostConverter))]
+            public string host { get; set; }
         }
 
         class CurrentTime {
@@ -34,17 +68,16 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
 
     public class NetworkOptixMiniDriver : IOemDvrMiniDriver {
         private static readonly int PLAY_OFFSET_MS = 5000;
+        private static readonly int DEFAULT_NX_PORT = 7001;
         private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static IPlugin axHDWitness;
         private static Control axHDWitnessForm;
 
-//        private static AppDomain domain;
-
         private Panel m_surface;
         private OemDvrCamera[] _cameras;
 
-        private long _tick;
+        private static long _tick;
 
         private Api.ConnectInfo getConnectInfo(Uri url, string login, string password) {
             Api.ConnectInfo connectInfo = LoadData<Api.ConnectInfo>(url.ToString() + "ec2/connect", login, password);
@@ -58,7 +91,8 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             }
 
             if (ourProtoVersion < connectInfo.nxClusterProtoVersion) {
-                MessageBox.Show("Incompatible version. Please update... blah-blah-blah", "Error", MessageBoxButtons.OK);
+                MessageBox.Show(String.Format("Incompatible version. Please install plugin of version {0}.{1}.{2} to connect to this server",
+                    serverVersion.Major, serverVersion.Minor, serverVersion.Build), "Error", MessageBoxButtons.OK);
                 return null;
             }
 
@@ -66,7 +100,8 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         }
 
         private Uri buildUrl(OemDvrConnection cnInfo) {
-            Uri url = cnInfo.HostName.StartsWith("http://") ? new Uri(cnInfo.HostName) : new Uri("http://" + cnInfo.HostName);
+            string host = cnInfo.HostName.Contains(":") ? cnInfo.HostName : String.Format("{0}:{1}", cnInfo.HostName, DEFAULT_NX_PORT);
+            Uri url = host.StartsWith("http://") ? new Uri(host) : new Uri("http://" + host);
 
             int port = (int)cnInfo.Port;
             if (port == 0)
@@ -110,22 +145,24 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                 response = request.GetResponse();
 
                 StreamReader reader = new StreamReader(response.GetResponseStream());
-                List<Api.Camera> apiCameras = JsonConvert.DeserializeObject<List<Api.Camera>>(reader.ReadToEnd());
-
+                List<Api.Camera> apiCameras = JsonConvert.DeserializeObject<List<Api.Camera>>(reader.ReadToEnd(),
+                    new JsonSerializerSettings {
+                        Error = delegate(object sender, ErrorEventArgs args) {
+                            args.ErrorContext.Handled = true;
+                        }
+                    });
                 foreach (Api.Camera apiCamera in apiCameras) {
                     if (apiCamera.model.Contains("virtual desktop camera"))
                         continue;
 
-                    cameras.Add(new OemDvrCamera(apiCamera.id, apiCamera.name));
+                    cameras.Add(new OemDvrCamera(apiCamera.id, String.Format("{0} ({1})", apiCamera.name, apiCamera.host != null ? apiCamera.host  : "")));
                 }
 
                 _logger.InfoFormat("Found {0} cameras.", cameras.Count);
                 return OemDvrStatus.Succeeded;
-            }
-            catch (Exception excp) {
+            } catch (Exception excp) {
                 _logger.Error(excp);
-            }
-            finally {
+            } finally {
                 if (response != null)
                     response.Close();
             }
@@ -163,6 +200,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
         public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
             try {
                 _tick = dateToMsecsSinceEpoch(pbInfo.StartTimeUtc);
+
                 Uri baseUrl = buildUrl(cnInfo);
 
                 if ((pbInfo.DvrCameras == null) || (pbInfo.DvrCameras.Length <= 0)) {
@@ -177,49 +215,48 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
 
                 switch (pbInfo.PlaybackFunction) {
                     case OemDvrPlaybackFunction.Start: {
-                        Api.ConnectInfo connectInfo = getConnectInfo(baseUrl, cnInfo.UserId, cnInfo.Password);
-                        if (connectInfo == null)
-                            return OemDvrStatus.FootagePlaybackFailed;
+                            Api.ConnectInfo connectInfo = getConnectInfo(baseUrl, cnInfo.UserId, cnInfo.Password);
+                            if (connectInfo == null)
+                                return OemDvrStatus.FootagePlaybackFailed;
 
-                        Version serverVersion = new Version(connectInfo.version);
+                            Version serverVersion = new Version(connectInfo.version);
 
-                        // Calculate time offset
-                        long timeOffset = calculateTimeOffsetMs(baseUrl, cnInfo.UserId, cnInfo.Password);
+                            // Calculate time offset
+                            long timeOffset = calculateTimeOffsetMs(baseUrl, cnInfo.UserId, cnInfo.Password);
 
-                        // Add timeoffset to tick
-                        _tick += timeOffset;
+                            // Add timeoffset to tick
+                            _tick += timeOffset;
 
-                        // Last minute tricks
-                        // if time is within last 30 secs show live
-                        // if it is less than 70 secs set time to current - 70 secs
-                        long currentTime = dateToMsecsSinceEpoch(DateTime.Now);
-                        long timeDiff = currentTime - _tick;
-                        if (timeDiff < 30000)
-                            _tick = -1;
-                        else if (timeDiff < 70000)
-                            _tick = currentTime - 70000;
+                            // Last minute tricks
+                            // if time is within last 30 secs show live
+                            // if it is less than 70 secs set time to current - 70 secs
+                            long currentTime = dateToMsecsSinceEpoch(DateTime.Now);
+                            long timeDiff = currentTime - _tick;
+                            if (timeDiff < 30000)
+                                _tick = -1;
+                            else if (timeDiff < 70000)
+                                _tick = currentTime - 70000;
 
-                        String assemblyName = String.Format("{0}Control.{1}", CustomProperties.className, connectInfo.nxClusterProtoVersion);
-                        try {
-                            axHDWitness = LoadAssembly(assemblyName);
-                            axHDWitnessForm = (Control)axHDWitness;
+                            String assemblyName = String.Format("{0}Control.{1}", CustomProperties.className, connectInfo.nxClusterProtoVersion);
+                            try {
+                                axHDWitness = LoadAssembly(assemblyName);
+                                axHDWitnessForm = (Control)axHDWitness;
+                            } catch (Exception) {
+                                string message = String.Format("You need to install the package version {0}.{1}.{2} to connect to this server.",
+                                    serverVersion.Major, serverVersion.Minor, serverVersion.Build);
+                                MessageBox.Show(message, "Error", MessageBoxButtons.OK);
+                                return OemDvrStatus.FootagePlaybackFailed;
+                            }
+
+                            UriBuilder uriBuilder = new UriBuilder(baseUrl);
+                            uriBuilder.UserName = cnInfo.UserId;
+                            uriBuilder.Password = cnInfo.Password;
+                            Load(pbSurface, uriBuilder.Uri);
+
+                            _cameras = pbInfo.DvrCameras;
+                            axHDWitness.play();
+                            break;
                         }
-                        catch (Exception) {
-                            string message = String.Format("You need to install the package version {0}.{1}.{2} to connect to this server.",
-                                serverVersion.Major, serverVersion.Minor, serverVersion.Build);
-                            MessageBox.Show(message, "Error", MessageBoxButtons.OK);
-                            return OemDvrStatus.FootagePlaybackFailed;
-                        }
-                        
-                        UriBuilder uriBuilder = new UriBuilder(baseUrl);
-                        uriBuilder.UserName = cnInfo.UserId;
-                        uriBuilder.Password = cnInfo.Password;
-                        Load(pbSurface, uriBuilder.Uri);
-
-                        _cameras = pbInfo.DvrCameras;
-                        axHDWitness.play();
-                        break;
-                    }
                     case OemDvrPlaybackFunction.Forward:
                     case OemDvrPlaybackFunction.Backward:
                     case OemDvrPlaybackFunction.Pause: {
@@ -237,12 +274,10 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                 }
 
                 return OemDvrStatus.Succeeded;
-            }
-            catch (WebException e) {
+            } catch (WebException e) {
                 _logger.Error(e);
                 MessageBox.Show("Can't connect to the server. Verify server information in Camera Integration settings.");
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 MessageBox.Show("Generic error occured. Please try again later.");
                 _logger.Error(e);
             }
@@ -267,15 +302,15 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                         }
 
                     case OemDvrPlaybackFunction.Forward: {
-                            _logger.DebugFormat("Setting speed {0}", speed);
-                            axHDWitness.setSpeed(1 + speed / 1000.0);
+                            _logger.DebugFormat("Setting speed {0}", speed / 100);
+                            axHDWitness.setSpeed(speed / 100);
                             controlOk = true;
                             break;
                         }
 
                     case OemDvrPlaybackFunction.Backward: {
-                            _logger.DebugFormat("Setting speed -{0}", speed);
-                            axHDWitness.setSpeed(-1 - speed / 1000.0);
+                            _logger.DebugFormat("Setting speed {0}", -speed / 100);
+                            axHDWitness.setSpeed(-speed / 100);
                             controlOk = true;
                             break;
                         }
@@ -295,8 +330,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
                 if (controlOk) {
                     return OemDvrStatus.Succeeded;
                 }
-            }
-            catch (Exception excp) {
+            } catch (Exception excp) {
                 _logger.Error(excp);
             }
 
@@ -338,7 +372,7 @@ namespace NetworkOptix.NxWitness.OemDvrMiniDriver {
             foreach (Type item in ptrAssembly.GetTypes()) {
                 if (!item.IsClass) continue;
 
-                if (Array.Exists(item.GetInterfaces(), t => ti.IsAssignableFrom(t) )) {
+                if (Array.Exists(item.GetInterfaces(), t => ti.IsAssignableFrom(t))) {
                     return (IPlugin)Activator.CreateInstance(item);
                 }
             }

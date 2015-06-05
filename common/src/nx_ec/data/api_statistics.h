@@ -31,8 +31,6 @@ namespace ec2 {
         ApiCameraDataStatistics(ApiCameraDataEx&& data);
 
 		const static std::unordered_set<QString> EXCEPT_PARAMS;
-
-        ApiResourceParamDataList addParams;
     };
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
@@ -45,7 +43,7 @@ namespace ec2 {
         ApiStorageDataStatistics();
         ApiStorageDataStatistics(ApiStorageData&& data);
     };
-#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)
+#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)(storageType)
 
     struct ApiMediaServerDataStatistics
 		: ApiMediaServerDataEx
@@ -53,7 +51,7 @@ namespace ec2 {
         ApiMediaServerDataStatistics();
         ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
 
-        ApiStorageDataStatisticsList    storages;
+        ApiStorageDataStatisticsList storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
     (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)
@@ -63,19 +61,16 @@ namespace ec2 {
         ApiLicenseStatistics();
         ApiLicenseStatistics(const ApiLicenseData& data);
 
-        QString name, licenseType, version, brand, expiration;
+        QString name, key, licenseType, version, brand, expiration;
         qint64 cameraCount;
 	};
-#define ApiLicenseStatistics_Fields (name)(cameraCount)(licenseType)(version)(brand)(expiration)
+#define ApiLicenseStatistics_Fields (name)(key)(cameraCount)(licenseType)(version)(brand)(expiration)
 
 	struct ApiBusinessRuleStatistics
 		: ApiBusinessRuleData
 	{
         ApiBusinessRuleStatistics();
         ApiBusinessRuleStatistics(ApiBusinessRuleData&& data);
-
-		// TODO: Convert enums to strings
-		// QString actionType, eventState, eventType; 
 	};
 #define ApiBusinessRuleStatistics_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState) \
 	(actionType)(actionResourceIds)(actionParams)(aggregationPeriod)(disabled)(schedule)(system)

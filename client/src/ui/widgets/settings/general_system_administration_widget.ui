@@ -123,7 +123,7 @@
    <item>
     <widget class="QGroupBox" name="camerasGroupBox">
      <property name="title">
-      <string>Camera and Network Management</string>
+      <string>System Settings</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>

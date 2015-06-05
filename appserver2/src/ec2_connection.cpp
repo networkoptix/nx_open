@@ -33,8 +33,8 @@ namespace ec2
 
         // NODE: Ec2StaticticsReporter can only be created after connection is estabilished
         if (m_isInitialized)
-            m_staticticsReporter.reset(new
-                Ec2StaticticsReporter(getUserManager(), getResourceManager()));
+            m_staticticsReporter.reset(new Ec2StaticticsReporter(
+                getUserManager(), getResourceManager(), getMediaServerManager()));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
