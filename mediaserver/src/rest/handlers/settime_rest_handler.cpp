@@ -18,8 +18,12 @@ bool setTimeZone(const QString& timezone)
         return false;
     if (symlink(timezoneFile.toLatin1().data(), "/etc/localtime") != 0)
         return false;
-    return system(lit("echo '%1' | tee /etc/timezone").arg(timezone).toLatin1().data());
+    QFile tzFile(lit("/etc/timezone"));
+    if (!tzFile.open(QFile::WriteOnly | QFile::Truncate))
+        return false;
+    return tzFile.write(timezone.toLatin1()) != 0;
 }
+
 
 bool setDateTime(const QDateTime& datetime)
 {
