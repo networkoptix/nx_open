@@ -135,6 +135,8 @@ qint64 QnServerUpdateTool::addUpdateFileChunkSync(const QString &updateId, const
     switch (reply) {
     case UploadFinished:
         return processUpdate(updateId, m_file.data(), true);
+    case NoFreeSpace:
+        return NoFreeSpace;
     case UnknownError:
     case NoReply:
         return UnknownError;
@@ -158,6 +160,9 @@ void QnServerUpdateTool::addUpdateFileChunkAsync(const QString &updateId, const 
         }
         break;
     case NoReply:
+        return;
+    case NoFreeSpace:
+        sendReply(NoFreeSpace);
         return;
     case UnknownError:
         sendReply(ec2::AbstractUpdatesManager::UnknownError);
@@ -209,7 +214,8 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, c
     if (!data.isEmpty()) {
         if (m_file->pos() >= offset) {
             m_file->seek(offset);
-            m_file->write(data);
+            if (m_file->write(data) != data.size())
+                return NoFreeSpace;
         }
         return m_file->pos();
     }
