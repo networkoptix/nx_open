@@ -1,7 +1,7 @@
 #include "server_camera_factory.h"
 
 #include <core/resource/resource_type.h>
-#include <core/resource/abstract_storage_resource.h>
+#include <core/resource/client_storage_resource.h>
 
 #include "server_camera.h"
 
@@ -12,7 +12,7 @@ QnResourcePtr QnServerCameraFactory::createResource(const QnUuid &resourceTypeId
         return QnResourcePtr();
 
     if (resourceType->getName() == QLatin1String("Storage")) {
-        return QnResourcePtr(new QnStorageResource());
+        return QnResourcePtr(new QnClientStorageResource());
     } else {
         /* Currently we support only cameras. */
         if (!resourceType->isCamera())
