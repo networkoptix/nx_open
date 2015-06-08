@@ -206,7 +206,7 @@ private:
     {
         pathTravelled->push_back( from );
 
-        for( const std::pair<Vertice*, EdgeDataType>& edge: from->edges )
+        for( const typename std::pair<Vertice* const, EdgeDataType>& edge: from->edges )
         {
             if( !edgeSelectionPred( edge.second ) )
                 continue;
