@@ -66,9 +66,43 @@ bool QnFileStorageResource::updatePermissions() const
     return true;
 }
 
+
+bool QnFileStorageResource::checkWriteCap() const
+{
+    if( !isStorageDirMounted() )
+        return false;
+    
+    if (!updatePermissions())
+    	return false;
+    
+    if (hasFlags(Qn::deprecated))
+        return false;
+    
+    QDir dir(getPath());
+    
+    bool needRemoveDir = false;
+    if (!dir.exists())  {
+        if (!dir.mkpath(getPath()))
+            return false;
+        needRemoveDir = true;
+    }
+    
+    QFile file(closeDirPath(getPath()) + QString("tmp") + QString::number((unsigned) ((rand() << 16) + rand())));
+    bool result = file.open(QFile::WriteOnly);
+    if (result) {
+        file.close();
+        file.remove();
+    }
+    
+    if (needRemoveDir)
+        dir.remove(getPath());
+    
+    return result;
+}
+
 int QnFileStorageResource::getCapabilities() const
 {
-    return m_capabilities;
+    return m_capabilities | (checkWriteCap() ? QnAbstractStorageResource::cap::WriteFile : 0);
 }
 
 void QnFileStorageResource::setUrl(const QString& url)
@@ -83,18 +117,15 @@ QnFileStorageResource::QnFileStorageResource():
     m_durty(false),
     m_capabilities(0)
 {
-
+    m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
+    m_capabilities |= QnAbstractStorageResource::cap::ListFile;
+    m_capabilities |= QnAbstractStorageResource::cap::ReadFile;
 };
 
 QnFileStorageResource::~QnFileStorageResource()
 {
 
 }
-
-//bool QnFileStorageResource::isNeedControlFreeSpace()
-//{
-//    return true;
-//}
 
 bool QnFileStorageResource::removeFile(const QString& url)
 {
@@ -124,11 +155,6 @@ bool QnFileStorageResource::isDirExists(const QString& url)
     QDir d(url);
     return d.exists(removeProtocolPrefix(url));
 }
-
-//bool QnFileStorageResource::isCatalogAccessible()
-//{
-//    return true;
-//}
 
 bool QnFileStorageResource::isFileExists(const QString& url)
 {
@@ -197,81 +223,6 @@ bool QnFileStorageResource::isAvailable() const
 
     return false;
 }
-
-//bool QnFileStorageResource::isStorageAvailableForWriting()
-//{
-//    if( !isStorageDirMounted() )
-//        return false;
-//
-//    if (!updatePermissions())
-//		return false;
-//
-//    if (hasFlags(Qn::deprecated))
-//        return false;
-//
-//    QDir dir(getPath());
-//
-//    bool needRemoveDir = false;
-//    if (!dir.exists())
-//    {
-//        if (!dir.mkpath(getPath()))
-//            return false;
-//        needRemoveDir = true;
-//    }
-//
-//    QFile file(closeDirPath(getPath()) + QString("tmp") + QString::number((unsigned) ((rand() << 16) + rand())));
-//    bool result = file.open(QFile::WriteOnly);
-//    if (result)
-//    {
-//        file.close();
-//        file.remove();
-//    }
-//
-//    if (needRemoveDir)
-//        dir.remove(getPath());
-//
-//    return result;
-//}
-
-//bool QnFileStorageResource::isStorageAvailable()
-//{
-//    if( !isStorageDirMounted() )
-//        return false;
-//
-//    if (!updatePermissions())
-//		return false;
-//
-//    QString tmpDir = closeDirPath(getPath()) + QString("tmp") + QString::number(rand());
-//    QDir dir(tmpDir);
-//    if (dir.exists()) {
-//        dir.remove(tmpDir);
-//        return true;
-//    }
-//    else {
-//        if (dir.mkpath(tmpDir))
-//        {
-//            dir.rmdir(tmpDir);
-//            return true;
-//        }
-//        else {
-//#ifdef WIN32
-//            if (::GetLastError() == ERROR_DISK_FULL)
-//                return true;
-//#else
-//            if (errno == ENOSPC)
-//                return true;
-//#endif
-//            return false;
-//        }
-//    }
-//
-//    return false;
-//}
-
-//int QnFileStorageResource::getChunkLen() const 
-//{
-//    return 60;
-//}
 
 QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 {

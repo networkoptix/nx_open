@@ -222,7 +222,6 @@ QnLayoutFileStorageResource::QnLayoutFileStorageResource():
  
     m_capabilities |= cap::ListFile;
     m_capabilities |= cap::ReadFile;
-    m_capabilities |= cap::RemoveFile;
 }
 
 QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
@@ -230,12 +229,6 @@ QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
     QMutexLocker lock(&m_storageSync);
     m_allStorages.remove(this);
 }
-
-
-//bool QnLayoutFileStorageResource::isNeedControlFreeSpace()
-//{
-//    return false;
-//}
 
 bool QnLayoutFileStorageResource::removeFile(const QString& url)
 {
@@ -305,11 +298,6 @@ int QnLayoutFileStorageResource::getCapabilities() const
     return m_capabilities;
 }
 
-//bool QnLayoutFileStorageResource::isCatalogAccessible()
-//{
-//    return true;
-//}
-
 bool QnLayoutFileStorageResource::isFileExists(const QString& url)
 {
     return QFile::exists(removeProtocolPrefix(url));
@@ -359,11 +347,6 @@ bool QnLayoutFileStorageResource::isAvailable() const
     return false;
 }
 
-//int QnLayoutFileStorageResource::getChunkLen() const 
-//{
-//    return 60;
-//}
-
 QString QnLayoutFileStorageResource::removeProtocolPrefix(const QString& url)
 {
     int prefix = url.indexOf(QLatin1String("://"));
@@ -374,11 +357,6 @@ QnStorageResource* QnLayoutFileStorageResource::instance()
 {
     return new QnLayoutFileStorageResource();
 }
-
-//bool QnLayoutFileStorageResource::isStorageAvailableForWriting()
-//{
-//    return false; // it is read only file system
-//}
 
 bool QnLayoutFileStorageResource::readIndexHeader()
 {

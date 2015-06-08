@@ -28,13 +28,7 @@ QnQtFileStorageResource::QnQtFileStorageResource()
 {
     m_capabilities |= cap::ListFile;
     m_capabilities |= cap::ReadFile;
-    m_capabilities |= cap::RemoveFile;
 };
-
-//bool QnQtFileStorageResource::isNeedControlFreeSpace()
-//{
-//    return false;
-//}
 
 bool QnQtFileStorageResource::removeFile(const QString& url)
 {
@@ -61,11 +55,6 @@ bool QnQtFileStorageResource::isDirExists(const QString& url)
     QDir d(url);
     return d.exists(removeProtocolPrefix(url));
 }
-
-//bool QnQtFileStorageResource::isCatalogAccessible()
-//{
-//    return true;
-//}
 
 bool QnQtFileStorageResource::isFileExists(const QString& url)
 {
@@ -118,11 +107,6 @@ bool QnQtFileStorageResource::isAvailable() const
     return false;
 }
 
-//int QnQtFileStorageResource::getChunkLen() const 
-//{
-//    return 60;
-//}
-
 QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url)
 {
     int prefix = url.indexOf(QLatin1String("://"));
@@ -133,8 +117,3 @@ QnStorageResource* QnQtFileStorageResource::instance()
 {
     return new QnQtFileStorageResource();
 }
-
-//bool QnQtFileStorageResource::isStorageAvailableForWriting()
-//{
-//    return false; // it is read only file system
-//}

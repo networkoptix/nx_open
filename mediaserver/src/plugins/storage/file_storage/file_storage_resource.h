@@ -18,22 +18,15 @@ public:
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
-    //virtual int getChunkLen() const override;
-
     virtual float getAvarageWritingUsage() const override;
-
-    //virtual bool isStorageAvailable() override;
-    //virtual bool isStorageAvailableForWriting() override;
 
     virtual QFileInfoList getFileList(const QString& dirName) override;
     virtual qint64 getFileSize(const QString& url) const override;
-    //virtual bool isNeedControlFreeSpace() override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
-    //bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace() override;
 
@@ -48,6 +41,7 @@ public:
 private:
     QString removeProtocolPrefix(const QString& url);
     bool updatePermissions() const;
+    bool checkWriteCap() const;
 private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
     float m_storageBitrateCoeff;

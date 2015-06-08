@@ -961,7 +961,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     QString dir = storage->getPath();
 
-    if (!storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile)
+    if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile))
         return;
 
     qint64 freeSpace = storage->getFreeSpace();

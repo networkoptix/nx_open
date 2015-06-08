@@ -407,8 +407,8 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setParentId(serverId);
     storage->setUrl(path);
     storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
-    storage->setUsedForWriting(storage->getCapabilities() & 
-                               QnAbstractStorageResource::cap::WriteFile);
+    storage->setUsedForWriting(storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile);
+
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     Q_ASSERT(resType);
     if (resType)

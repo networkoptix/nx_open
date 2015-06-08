@@ -34,18 +34,12 @@ public:
     */
     virtual QIODevice* open( const QString& fileName, QIODevice::OpenMode openMode ) override;
 
-    //!Implementation of QnStorageResource::getChunkLen
-    //virtual int getChunkLen() const override { return 0; }
-    //!Implementation of QnStorageResource::isNeedControlFreeSpace
-    //virtual bool isNeedControlFreeSpace() override { return false; }
     //!Implementation of QnStorageResource::getFreeSpace
     virtual qint64 getFreeSpace() override { return 0; }
     //!Implementation of QnStorageResource::getTotalSpace
     virtual qint64 getTotalSpace() override { return 0; }
     //!Implementation of QnStorageResource::isStorageAvailable
     virtual bool isAvailable() const override { return true; }
-    //!Implementation of QnStorageResource::isStorageAvailableForWriting
-    //virtual bool isStorageAvailableForWriting() override { return false; }
     //!Implementation of QnStorageResource::removeFile
     virtual bool removeFile( const QString& path ) override;
     //!Implementation of QnStorageResource::removeDir
@@ -58,8 +52,6 @@ public:
     virtual bool isFileExists( const QString& path );
     //!Implementation of QnStorageResource::isDirExists
     virtual bool isDirExists( const QString& path ) override { Q_UNUSED(path) return false; }
-    //!Implementation of QnStorageResource::isCatalogAccessible
-    //virtual bool isCatalogAccessible() override { return true; }
     //!Implementation of QnStorageResource::isRealFiles
     virtual bool isRealFiles() const{ return false; }
     //!Implementation of QnStorageResource::getFileSize
