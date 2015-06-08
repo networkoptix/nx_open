@@ -22,14 +22,18 @@ public:
     };
     typedef std::function< void( const MappingInfo& ) > MappingCallback;
 
-    /*! Asks to forward the @param port to some external port */
+    /*! Asks to forward the @param port to some external port
+     *  @returns false if @param port has already been mapped */
     bool enableMapping( quint16 port, const MappingCallback& callback );
 
-    /*! Asks to stop @param port forwarding */
+    /*! Asks to cancel @param port forwarding
+     *  @returns false if @param port hasnt been mapped */
     bool disableMapping( quint16 port, bool waitForFinish = true );
 
 private:
+    class CallbackControl;
     class MappingDevice;
+
     void enableMappingOnDevice( MappingDevice& device, quint16 port );
 
     virtual bool processPacket(
@@ -39,42 +43,6 @@ private:
     bool searchForMappers( const HostAddress& localAddress,
                            const SocketAddress& devAddress,
                            const UpnpDeviceInfo& devInfo );
-
-    //! mutex protected callback
-    class CallbackControl
-    {
-    public:
-        CallbackControl( const MappingCallback& callback );
-        void call( const MappingInfo& info );
-        void clear();
-
-    private:
-        QMutex m_mutex;
-        MappingCallback m_callback;
-    };
-
-    //! single mapping device interface
-    class MappingDevice
-    {
-    public:
-        MappingDevice( UpnpAsyncClient& upnpClient,
-                       const HostAddress& internalIp,
-                       const QUrl& url);
-
-        HostAddress externalIp() const;
-        void map( quint16 port, const std::function< void( quint16 ) >& callback );
-        void unmap( quint16 port );
-
-    private:
-        UpnpAsyncClient& m_upnpClient;
-        HostAddress m_internalIp;
-        QUrl m_url;
-
-        mutable QMutex m_mutex;
-        HostAddress m_externalIp;
-        // result are waiting here while m_externalIp is not avaliable
-        std::map< quint16, std::function< void() > > m_successQueue;
-    };
 
 private:
     QMutex m_mutex;

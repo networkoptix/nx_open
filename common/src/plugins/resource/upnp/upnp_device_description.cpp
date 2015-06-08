@@ -9,7 +9,7 @@ QString toUpnpUrn( const QString& id, const QString& suffix, int version )
 QString fromUpnpUrn( const QString& urn, const QString& suffix, int version )
 {
     const auto split = urn.split(lit(":"));
-    if( split.size() == 4
+    if( split.size() == 5
             && split[0] == lit("urn")
             && split[1] == lit("schemas-upnp-org")
             && split[2] == suffix

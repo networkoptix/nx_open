@@ -1,9 +1,10 @@
 #include "upnp_port_mapper.h"
 
+#include "upnp_port_mapper_internal.h"
+
 UpnpPortMapper::UpnpPortMapper()
     : UPNPSearchAutoHandler( UpnpAsyncClient::INTERNAL_GATEWAY )
 {
-
 }
 
 bool UpnpPortMapper::enableMapping( quint16 port, const MappingCallback& callback )
@@ -21,11 +22,11 @@ bool UpnpPortMapper::enableMapping( quint16 port, const MappingCallback& callbac
 
 void UpnpPortMapper::enableMappingOnDevice( MappingDevice& device, quint16 port )
 {
-    device.map( port, [ this, &device, port ]( const quint16& mappedPort )
-    {
+    device.map( port, port, [ this, &device, port ]( const quint16& mappedPort )
+    {   
         QMutexLocker lock(&m_mutex);
         const auto it = m_mappings.find( port );
-        if (it != m_mappings.end())
+        if( it != m_mappings.end() )
         {
             const std::shared_ptr< CallbackControl > control = it->second;
             lock.unlock();
@@ -43,9 +44,10 @@ bool UpnpPortMapper::disableMapping( quint16 port, bool waitForFinish )
         if( it != m_mappings.end() )
             return false;
 
-        // TODO: add request to all devices to unmap
         std::swap( callback, it->second );
         m_mappings.erase( it );
+        for( auto& device : m_devices )
+            device.second->unmap( port );
     }
 
     if( waitForFinish )
@@ -84,7 +86,7 @@ bool UpnpPortMapper::searchForMappers( const HostAddress& localAddress,
             if( !itBool.second )
                 continue; // known device
 
-            // Ask to map all existing mappings on this device as well
+            // ask to map all existing mappings on this device as well
             for( const auto& mapping : m_mappings )
                 enableMappingOnDevice( *itBool.first->second, mapping.first );
         }
@@ -94,80 +96,4 @@ bool UpnpPortMapper::searchForMappers( const HostAddress& localAddress,
     }
 
     return atLeastOneFound;
-}
-
-UpnpPortMapper::CallbackControl::CallbackControl( const MappingCallback& callback )
-    : m_callback( callback )
-{
-}
-
-void UpnpPortMapper::CallbackControl::call( const MappingInfo& info )
-{
-    QMutexLocker lk( &m_mutex );
-    if( m_callback )
-        m_callback( info );
-}
-
-void UpnpPortMapper::CallbackControl::clear()
-{
-    QMutexLocker lk( &m_mutex );
-    m_callback = nullptr;
-}
-
-UpnpPortMapper::MappingDevice::MappingDevice( UpnpAsyncClient& upnpClient,
-                                              const HostAddress& internalIp,
-                                              const QUrl& url )
-    : m_upnpClient( upnpClient )
-    , m_internalIp( internalIp )
-    , m_url( url )
-{
-    m_upnpClient.externalIp( url, [this]( const HostAddress& newIp )
-    {
-        std::map< quint16, std::function< void() > > successQueue;
-        {
-            QMutexLocker lk( &m_mutex );
-            m_externalIp = newIp;
-            std::swap( m_successQueue, successQueue );
-        }
-
-        // notify all callbacks in queue (they were not notified bc externalIp was unknown
-        for( const auto it : successQueue )
-            it.second();
-    } );
-}
-
-HostAddress UpnpPortMapper::MappingDevice::externalIp() const
-{
-    QMutexLocker lk( &m_mutex );
-    return m_externalIp;
-}
-
-void UpnpPortMapper::MappingDevice::map( quint16 port,
-                                         const std::function< void( quint16 ) >& callback )
-{
-    m_upnpClient.addMapping( m_url, m_internalIp, port, port, lit( "TCP" ),
-                              // TODO: move protocol to paramiters
-                              [this, callback, port]( bool success )
-    {
-        if( !success )
-            return;
-
-        {
-            QMutexLocker lk( &m_mutex );
-            if( m_externalIp == HostAddress::anyHost )
-            {
-                // will be notified as soon as we know external IP
-                m_successQueue[ port ] = std::bind( callback, port );
-                return;
-            }
-        }
-
-        callback( port );
-    });
-}
-
-void UpnpPortMapper::MappingDevice::unmap( quint16 port )
-{
-    // TODO: implement
-    static_cast<void>( port );
 }

@@ -71,7 +71,6 @@ class UpnpSuccessHandler
 public:
     virtual bool startDocument() override
     {
-        m_firstInBody = false;
         return super::startDocument();
     }
 
@@ -80,19 +79,13 @@ public:
                                const QString& qName,
                                const QXmlAttributes& attrs ) override
     {
-
         if( qName == lit("s:Body") )
-        {
-            m_firstInBody = true;
             return true;
-        }
 
-        if (m_firstInBody)
+        if( qName.startsWith( lit("u:") ) )
         {
-            m_message.action = qName.split( lit(":") )[1];
-            m_message.service = fromUpnpUrn( attrs.value( lit("xmlns:u") ), lit("service") );
-
-            m_firstInBody = false;
+            m_message.action = localName;
+            m_message.service = fromUpnpUrn( namespaceURI, lit("service") );
             return true;
         }
 
@@ -114,7 +107,7 @@ public:
                                const QString& qName,
                                const QXmlAttributes& attrs ) override
     {
-        if( qName == lit("s:Body") || qName == lit("s:Fault") || qName == lit("s:UPnpError") )
+        if( qName == lit("s:Fault") || qName == lit("s:UPnpError") || qName == lit("detail") )
             return true;
 
         return super::startElement( namespaceURI, localName, qName, attrs );
@@ -199,7 +192,11 @@ const QString UpnpAsyncClient::WAN_IP           = lit( "WANIpConnection" );
 
 static const QString GET_EXTERNAL_IP    = lit( "GetExternalIPAddress" );
 static const QString ADD_PORT_MAPPING   = lit( "AddPortMapping" );
+static const QString DELETE_PORT_MAPPING   = lit( "DeletePortMapping" );
+static const QString GET_GEN_PORT_MAPPING   = lit( "GetGenericPortMappingEntry" );
+static const QString GET_SPEC_PORT_MAPPING   = lit( "GetSpecificPortMappingEntry" );
 
+static const QString MAP_INDEX      = lit("NewPortMappingIndex");
 static const QString EXTERNAL_IP    = lit("NewExternalIPAddress");
 static const QString EXTERNAL_PORT  = lit("NewExternalPort");
 static const QString PROTOCOL       = lit("NewProtocol");
@@ -229,7 +226,7 @@ bool UpnpAsyncClient::addMapping(
 
     request.params[ EXTERNAL_PORT ] = QString::number( externalPort );
     request.params[ PROTOCOL ]      = protocol;
-    request.params[ INTERNAL_PORT ] = QString::number( externalPort );
+    request.params[ INTERNAL_PORT ] = QString::number( internalPort );
     request.params[ INTERNAL_IP ]   = internalIp.toString();
     request.params[ ENABLED]        = QString::number( 1 );
     request.params[ DESCRIPTION ]   = CLIENT_ID;
@@ -237,5 +234,75 @@ bool UpnpAsyncClient::addMapping(
 
     return doUpnp( url, request, [ callback ]( const Message& response ) { 
         callback( response.isOk() );
+    } );
+}
+
+bool UpnpAsyncClient::deleteMapping(
+        const QUrl& url, quint16 externalPort, const QString& protocol,
+        const std::function< void( bool ) >& callback )
+{
+    UpnpAsyncClient::Message request;
+    request.action = DELETE_PORT_MAPPING;
+    request.service = WAN_IP;
+    request.params[ EXTERNAL_PORT ] = QString::number( externalPort );
+    request.params[ PROTOCOL ]      = protocol;
+
+    return doUpnp( url, request, [ callback ]( const Message& response ) {
+        callback( response.isOk() );
+    } );
+}
+
+bool UpnpAsyncClient::getMapping( const QUrl& url, quint32 index,
+                                  const MappingInfoCallback& callback )
+{
+    UpnpAsyncClient::Message request;
+    request.action = DELETE_PORT_MAPPING;
+    request.service = WAN_IP;
+    request.params[ MAP_INDEX ] = QString::number( index );
+
+    return doUpnp( url, request, [ callback ]( const Message& response )
+    {
+        if( response.isOk() )
+        {
+            const auto internalIp = response.getParam( INTERNAL_IP );
+            const auto internalPort = response.getParam( INTERNAL_PORT ).toUShort();
+            const auto externalPort = response.getParam( EXTERNAL_PORT ).toUShort();
+            const auto protocol = response.getParam( PROTOCOL );
+            callback( internalIp, internalPort, externalPort, protocol );
+        }
+        else
+        {
+            static const QString none;
+            callback( none, 0, 0, none );
+
+        }
+    } );
+}
+
+bool UpnpAsyncClient::getMapping(
+        const QUrl& url, quint16 externalPort, const QString& protocol,
+        const MappingInfoCallback& callback )
+{
+    UpnpAsyncClient::Message request;
+    request.action = GET_SPEC_PORT_MAPPING;
+    request.service = WAN_IP;
+    request.params[ EXTERNAL_PORT ] = QString::number( externalPort );
+    request.params[ PROTOCOL ]      = protocol;
+
+    return doUpnp( url, request,
+                   [ callback, externalPort, protocol ]( const Message& response )
+    {
+        if( response.isOk() )
+        {
+            const auto internalIp = response.getParam( INTERNAL_IP );
+            const auto internalPort = response.getParam( INTERNAL_PORT ).toUShort();
+            callback( internalIp, internalPort, externalPort, protocol );
+        }
+        else
+        {
+            static const QString none;
+            callback( none, 0, externalPort, protocol );
+
+        }
     } );
 }
