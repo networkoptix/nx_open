@@ -33,6 +33,9 @@ namespace {
     QUrl requestUrl(const QUrl &url) {
         QUrl result = trimmedUrl(url);
         result.setPath(lit("/api/moduleInformation"));
+        QUrlQuery query;
+        query.addQueryItem(lit("showAddresses"), lit("false"));
+        result.setQuery(query);
         return result;
     }
 

@@ -1,7 +1,5 @@
 #include "storage_space_rest_handler.h"
 
-#include <QtCore/QDir>
-
 #include <api/model/storage_space_reply.h>
 
 #include <core/resource/storage_resource.h>
@@ -16,17 +14,6 @@
 
 #include <utils/common/app_info.h>
 
-
-namespace {
-    QString toNativeDirPath(const QString &dirPath) {
-        QString result = QDir::toNativeSeparators(dirPath);
-        if(!result.endsWith(QDir::separator()))
-            result.append(QDir::separator());
-        return result;
-    }
-
-} // anonymous namespace
-
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
@@ -37,11 +24,11 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 
     QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo(QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition);
     for(int i = 0; i < partitions.size(); i++)
-        partitions[i].path = toNativeDirPath(partitions[i].path);
+        partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
 
     QList<QString> storagePaths;
     for(const QnStorageResourcePtr &storage: qnStorageMan->getStorages()) {
-        QString path = toNativeDirPath(storage->getPath());
+        QString path = QnStorageResource::toNativeDirPath(storage->getPath());
         
         if (storage->hasFlags(Qn::deprecated))
             continue;
@@ -57,6 +44,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         data.reservedSpace = storage->getSpaceLimit();
         data.isExternal = storage->isExternal();
         data.isUsedForWriting = storage->isUsedForWriting();
+        data.storageType = storage->getStorageType();
 
         if( data.totalSpace != -1 && data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() )
             continue;
@@ -92,6 +80,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         data.reservedSpace = defaultStorageSpaceLimit;
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.isUsedForWriting = false;
+        data.storageType = QnLexical::serialized(partition.type);
 
         if( data.totalSpace < defaultStorageSpaceLimit )
             continue;
@@ -99,7 +88,8 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.url, false));
         if (storage) {
             storage->setUrl(data.url); /* createStorage does not fill url. */
-            storage->setSpaceLimit( defaultStorageSpaceLimit );
+            storage->setSpaceLimit(defaultStorageSpaceLimit);
+            storage->setStorageType(data.storageType);
             data.isWritable = storage->isStorageAvailableForWriting();
         } else {
             data.isWritable = false;

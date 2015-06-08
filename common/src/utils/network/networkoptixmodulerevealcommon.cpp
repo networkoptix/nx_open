@@ -9,6 +9,7 @@
 #include <QtCore/QJsonDocument>
 
 #include <nx_ec/ec_proto_version.h>
+#include <utils/common/model_functions.h>
 
 namespace {
     const QByteArray revealRequestStr("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
@@ -53,7 +54,7 @@ QByteArray RevealResponse::serialize() {
     map[lit("authHash")] = authHash.toBase64();
     map[lit("protoVersion")] = protoVersion;
     map[lit("runtimeId")] = runtimeId.toString();
-    map[lit("flags")] = (int) flags;
+    map[lit("flags")] = QnLexical::serialized(flags);
     return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 
@@ -76,7 +77,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     authHash = QByteArray::fromBase64(map.value(lit("authHash")).toByteArray());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
-    flags = (Qn::ServerFlag) map.value(lit("flags")).toInt();
+    flags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);
     fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();

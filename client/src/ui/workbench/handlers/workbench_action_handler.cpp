@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <QtCore/QProcess>
 
 #include <QtWidgets/QApplication>
@@ -15,6 +17,7 @@
 #include <QtGui/QImageWriter>
 
 #include <api/network_proxy_factory.h>
+#include <ec2_statictics_reporter.h>
 
 #include <business/business_action_parameters.h>
 
@@ -294,6 +297,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
+    connect(action(Qn::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
+
     /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
@@ -2465,6 +2470,42 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
                          tr("You are running beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
 }
+
+void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
+
+    const QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+
+    /* Check if we are not connected yet. */
+    if (servers.isEmpty())
+        return;
+
+    /* Check if user already made a decision. */
+    if (ec2::Ec2StaticticsReporter::isDefined(servers))
+        return;
+
+    /* Suppress notification if no server has internet access. */
+    bool atLeastOneServerHasInternetAccess = boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr &server) {
+        return (server->getServerFlags() & Qn::SF_HasPublicIP);
+    });
+    if (!atLeastOneServerHasInternetAccess)
+        return;
+
+    auto result = QMessageBox::information(
+        mainWindow(),
+        tr("Anonymous Usage Statistics"),                                   
+        tr("System shares anonymous usage and crash statistics with the software development team to help us improve your user experience.\n"
+           "If you would like to disable this feature you can do so in the System Settings dialog."),
+        QMessageBox::Ok | QMessageBox::Cancel,
+        QMessageBox::Ok);
+
+    if (result == QMessageBox::Ok) {
+        ec2::Ec2StaticticsReporter::setAllowed(servers, true);
+        propertyDictionary->saveParamsAsync(idListFromResList(servers));
+    } else {
+        menu()->triggerIfPossible(Qn::SystemAdministrationAction);
+    }
+}
+
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());

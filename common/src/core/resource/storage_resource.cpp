@@ -2,6 +2,7 @@
 #include "utils/common/util.h"
 #include "../dataprovider/media_streamdataprovider.h"
 
+#include <QDir>
 
 // ------------------------------ QnStorageResource -------------------------------
 
@@ -27,6 +28,14 @@ void QnStorageResource::addWritedSpace(qint64 value)
     m_writedSpace += value;
 }
 */
+
+QString QnStorageResource::toNativeDirPath(const QString &dirPath)
+{
+    QString result = QDir::toNativeSeparators(dirPath);
+    if(!result.endsWith(QDir::separator()))
+        result.append(QDir::separator());
+    return result;
+}
 
 // ---------------------------- QnStoragePluginFactory ------------------------------
 

@@ -7,11 +7,14 @@
 #include <utils/common/util.h>
 #include <QTimeZone>
 
-int QnTimeRestHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnTimeRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
     QnTimeReply reply;
     reply.timeZoneOffset = currentTimeZone() * 1000ll;
-    reply.utcTime = qnSyncTime->currentMSecsSinceEpoch();
+    if (params.contains("local"))
+        reply.utcTime =  QDateTime::currentDateTime().toMSecsSinceEpoch();
+    else
+        reply.utcTime = qnSyncTime->currentMSecsSinceEpoch();
     reply.timezoneId = QDateTime::currentDateTime().timeZone().id();
 
     result.setReply(reply);

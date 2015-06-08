@@ -18,18 +18,6 @@ const static QString __CAMERA_EXCEPT_PARAMS[] = {
 // TODO: remove this hack when VISUAL STUDIO supports initializer lists
 #define INIT_LIST(array) &array[0], &array[(sizeof(array)/sizeof(array[0]))]
 
-static ec2::ApiResourceParamDataList filterAddParams(
-        ec2::ApiResourceParamDataList&& paramList,
-        const std::unordered_set<QString>& exceptSet)
-{
-    auto rm = std::remove_if(paramList.begin(), paramList.end(),
-                             [&](const ec2::ApiResourceParamData& param)
-                             { return exceptSet.count(param.name); });
-
-    paramList.erase(rm, paramList.end());
-    return std::move(paramList);
-}
-
 namespace ec2 {
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
@@ -42,7 +30,21 @@ namespace ec2 {
 
     ApiCameraDataStatistics::ApiCameraDataStatistics(ApiCameraDataEx&& data)
         : ApiCameraDataEx(std::move(data))
-        , addParams(filterAddParams(std::move(ApiCameraDataEx::addParams), EXCEPT_PARAMS)) {}
+    {
+        // find out if default password worked
+        const auto& defCred = Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME;
+        const auto it = std::find_if(addParams.begin(), addParams.end(),
+            [&defCred](const ApiResourceParamData& param) { return param.name == defCred; });
+        const bool isDefCred = (it != ApiCameraDataEx::addParams.end()) && !it->value.isEmpty();
+
+        // remove confidential information
+        auto rm = std::remove_if(addParams.begin(), addParams.end(),
+                                 [](const ec2::ApiResourceParamData& param)
+                                 { return EXCEPT_PARAMS.count(param.name); });
+        
+        addParams.erase(rm, addParams.end());
+        addParams.push_back(ApiResourceParamData(defCred, isDefCred ? lit("true") : lit("false")));
+    }
 
     const std::unordered_set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(
             INIT_LIST(__CAMERA_EXCEPT_PARAMS));
@@ -77,6 +79,7 @@ namespace ec2 {
         }
 
         name        = parsed[lit("NAME")];
+        key         = parsed[lit("SERIAL")];
 		licenseType = parsed[lit("CLASS")];
         cameraCount = parsed[lit("COUNT")].toLongLong();
         version     = parsed[lit("VERSION")];

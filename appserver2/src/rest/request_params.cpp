@@ -68,18 +68,20 @@ namespace ec2
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList& params, ApiLoginData* data)
     {
         Q_UNUSED(command);
-        if (deserialize(params, lit("info_id"), &data->clientInfo.id))
+        if (deserialize(params, lit("info_id"),                 &data->clientInfo.id))
         {
-            deserialize(params, lit("info_cpuArchitecture"), &data->clientInfo.cpuArchitecture);
-            deserialize(params, lit("info_cpuModelName"), &data->clientInfo.cpuModelName);
-            deserialize(params, lit("info_phisicalMemory"), &data->clientInfo.phisicalMemory);
-            deserialize(params, lit("info_openGLVersion"), &data->clientInfo.openGLVersion);
-            deserialize(params, lit("info_openGLVendor"), &data->clientInfo.openGLVendor);
-            deserialize(params, lit("info_openGLRenderer"), &data->clientInfo.openGLRenderer);
+            deserialize(params, lit("info_skin"),               &data->clientInfo.skin);
+            deserialize(params, lit("info_systemInfo"),         &data->clientInfo.systemInfo);
+            deserialize(params, lit("info_cpuArchitecture"),    &data->clientInfo.cpuArchitecture);
+            deserialize(params, lit("info_cpuModelName"),       &data->clientInfo.cpuModelName);
+            deserialize(params, lit("info_phisicalMemory"),     &data->clientInfo.phisicalMemory);
+            deserialize(params, lit("info_openGLVersion"),      &data->clientInfo.openGLVersion);
+            deserialize(params, lit("info_openGLVendor"),       &data->clientInfo.openGLVendor);
+            deserialize(params, lit("info_openGLRenderer"),     &data->clientInfo.openGLRenderer);
         }
 
         return 
-            deserialize(params, lit("login"), &data->login) &&
+            deserialize(params, lit("login"),  &data->login) &&
             deserialize(params, lit("digest"), &data->passwordHash);
     }
 
@@ -90,6 +92,8 @@ namespace ec2
         if( data.clientInfo.id != QnUuid())
         {
             serialize( data.clientInfo.id,              lit("info_id"),              query );
+            serialize( data.clientInfo.skin,            lit("info_skin"),            query );
+            serialize( data.clientInfo.systemInfo,      lit("info_systemInfo"),      query );
             serialize( data.clientInfo.cpuArchitecture, lit("info_cpuArchitecture"), query );
             serialize( data.clientInfo.cpuModelName,    lit("info_cpuModelName"),    query );
             serialize( data.clientInfo.phisicalMemory,  lit("info_phisicalMemory"),  query );

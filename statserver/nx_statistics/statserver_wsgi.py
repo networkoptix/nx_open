@@ -9,7 +9,10 @@ import sys
 import json
 import MySQLdb
 
+config = sys.argv[1]
+for option, value in json.load(open(config)).items():
+    setattr(app, option, value)
+
 app.sqlConnector = MySQLdb
-app.sqlConnection = json.load(open(sys.argv[1]))
 app.logger.addHandler(logHandler)
 

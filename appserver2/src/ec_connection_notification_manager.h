@@ -27,6 +27,7 @@ namespace ec2
     class QnMiscNotificationManager;
     class QnDiscoveryNotificationManager;
 
+    // TODO: #2.4 remove EC prefix to avoid ec2::ECConnectionNotificationManager
     //!Stands for emitting API notifications
     class ECConnectionNotificationManager
     {
