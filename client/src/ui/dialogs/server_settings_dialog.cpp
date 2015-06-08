@@ -356,10 +356,10 @@ void QnServerSettingsDialog::updateFromResources()
 void QnServerSettingsDialog::submitToResources() 
 {
     if(m_hasStorageChanges) {
-        QnAbstractStorageResourceList newStorages;
+        QnStorageResourceList newStorages;
         foreach(const QnStorageSpaceData &item, tableItems()) 
         {
-            QnAbstractStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
+            QnStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
             if (storage) {
                 if (item.isUsedForWriting != storage->isUsedForWriting()) {
                     storage->setUsedForWriting(item.isUsedForWriting);
@@ -368,7 +368,7 @@ void QnServerSettingsDialog::submitToResources()
             }
             else {
                 // create or remove new storage
-                QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
+                QnStorageResourcePtr storage(new QnStorageResource());
                 if (!item.storageId.isNull())
                     storage->setId(item.storageId);
                 QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));

@@ -1379,9 +1379,11 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
-        ensureRaisedConeItem(widget);
         QRectF targetGeometry = widget->calculateGeometry(enclosingGeometry, rotation);
-        raisedConeItem(widget)->setOriginGeometry(rotated(targetGeometry, rotation));
+        if (!qnRuntime->isActiveXMode()) {
+            ensureRaisedConeItem(widget);
+            raisedConeItem(widget)->setOriginGeometry(rotated(targetGeometry, rotation));
+        }
         QRectF raisedGeometry = this->raisedGeometry(targetGeometry, rotation);
         qreal scale = scaleFactor(targetGeometry.size(), raisedGeometry.size(), Qt::KeepAspectRatio);
         enclosingGeometry = scaled(enclosingGeometry, scale, enclosingGeometry.center());

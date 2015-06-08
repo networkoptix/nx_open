@@ -1560,7 +1560,7 @@ void QnMain::run()
 #ifdef EDGE_SERVER
     serverFlags |= Qn::SF_Edge;
 #endif
-    if (QnAppInfo::armBox() == "rpi" || compatibilityMode) // check compatibilityMode here for testing purpose
+    if (QnAppInfo::armBox() == "bpi" || compatibilityMode) // check compatibilityMode here for testing purpose
         serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
 
     if (!isLocal)

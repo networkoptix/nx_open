@@ -12,7 +12,7 @@ QnResourcePtr QnServerCameraFactory::createResource(const QnUuid &resourceTypeId
         return QnResourcePtr();
 
     if (resourceType->getName() == QLatin1String("Storage")) {
-        return QnResourcePtr(new QnAbstractStorageResource());
+        return QnResourcePtr(new QnStorageResource());
     } else {
         /* Currently we support only cameras. */
         if (!resourceType->isCamera())
