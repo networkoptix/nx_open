@@ -4,11 +4,14 @@
 #include "upnp_device_searcher.h"
 #include "upnp_async_client.h"
 
+#include <QWaitCondition>
+
 class UpnpPortMapper
         : UPNPSearchAutoHandler
 {
 public:
-    UpnpPortMapper();
+    UpnpPortMapper( const QString& device = UpnpAsyncClient::INTERNAL_GATEWAY );
+    ~UpnpPortMapper();
 
     struct MappingInfo
     {
@@ -30,7 +33,7 @@ public:
      *  @returns false if @param port hasnt been mapped */
     bool disableMapping( quint16 port, bool waitForFinish = true );
 
-private:
+protected: // for testing only
     class CallbackControl;
     class MappingDevice;
 
@@ -44,9 +47,11 @@ private:
                            const SocketAddress& devAddress,
                            const UpnpDeviceInfo& devInfo );
 
-private:
+protected: // for testing only
     QMutex m_mutex;
-    UpnpAsyncClient m_upnpClient;
+    std::unique_ptr<UpnpAsyncClient> m_upnpClient;
+    size_t m_asyncInProgress;
+    QWaitCondition m_asyncCondition;
 
     std::map< quint16, std::shared_ptr< CallbackControl > > m_mappings;
     std::map< QString, std::unique_ptr< MappingDevice > > m_devices;

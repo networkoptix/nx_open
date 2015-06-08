@@ -1,5 +1,6 @@
-#include "common/common_globals.h"
-#include "plugins/resource/upnp/upnp_async_client.h"
+#include <plugins/resource/upnp/upnp_async_client.h>
+
+#include <common/common_globals.h>
 
 #include <gtest.h>
 #include <future>

@@ -9,6 +9,8 @@
 class UpnpAsyncClient
 {   
 public:
+    ~UpnpAsyncClient() {}
+
     //! Simple SOAP call
     struct Message
     {
@@ -35,6 +37,7 @@ public:
     static const QString INTERNAL_GATEWAY;
 
     //! Finds out external IP address
+    virtual
     bool externalIp( const QUrl& url,
                      const std::function< void( const HostAddress& ) >& callback );
 
@@ -42,17 +45,19 @@ public:
     static const QString WAN_IP;
 
     //! Maps @param externalPort to @param internalPort on @param internalIp
+    virtual
     bool addMapping( const QUrl& url, const HostAddress& internalIp,
                      quint16 internalPort, quint16 externalPort, const QString& protocol,
                      const std::function< void( bool ) >& callback );
 
     //! Removes mapping of @param externalPort
+    virtual
     bool deleteMapping( const QUrl& url, quint16 externalPort, const QString& protocol,
                         const std::function< void( bool ) >& callback );
 
     typedef std::function< void(
-                const HostAddress& /*internalIp*/,
-                quint16 /*internalPort*/, quint16 /*externalPort*/, const QString& /*protocol*/
+                const HostAddress& /*internalIp*/, quint16 /*internalPort*/,
+                quint16 /*externalPort*/, const QString& /*protocol*/
             )> MappingInfoCallback;
 
     //! Provides mapping info by @param index

@@ -2,14 +2,24 @@
 
 #include "upnp_port_mapper_internal.h"
 
-UpnpPortMapper::UpnpPortMapper()
-    : UPNPSearchAutoHandler( UpnpAsyncClient::INTERNAL_GATEWAY )
+UpnpPortMapper::UpnpPortMapper( const QString& device )
+    : UPNPSearchAutoHandler( device )
+    , m_upnpClient( new UpnpAsyncClient() )
+    , m_asyncInProgress( 0 )
 {
+}
+
+
+UpnpPortMapper::~UpnpPortMapper()
+{
+    QMutexLocker lock( &m_mutex );
+    while( m_asyncInProgress )
+        m_asyncCondition.wait( &m_mutex );
 }
 
 bool UpnpPortMapper::enableMapping( quint16 port, const MappingCallback& callback )
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock( &m_mutex );
     if( !m_mappings.emplace( port, std::make_shared< CallbackControl >( callback ) ).second )
         return false; // port already mapped
 
@@ -22,9 +32,10 @@ bool UpnpPortMapper::enableMapping( quint16 port, const MappingCallback& callbac
 
 void UpnpPortMapper::enableMappingOnDevice( MappingDevice& device, quint16 port )
 {
+    ++m_asyncInProgress;
     device.map( port, port, [ this, &device, port ]( const quint16& mappedPort )
     {   
-        QMutexLocker lock(&m_mutex);
+        QMutexLocker lock( &m_mutex );
         const auto it = m_mappings.find( port );
         if( it != m_mappings.end() )
         {
@@ -32,6 +43,9 @@ void UpnpPortMapper::enableMappingOnDevice( MappingDevice& device, quint16 port 
             lock.unlock();
             control->call( MappingInfo( port, mappedPort, device.externalIp() ) );
         }
+
+        if( --m_asyncInProgress == 0)
+            m_asyncCondition.wakeOne();
     } );
 }
 
@@ -39,15 +53,23 @@ bool UpnpPortMapper::disableMapping( quint16 port, bool waitForFinish )
 {
     std::shared_ptr< CallbackControl > callback;
     {
-        QMutexLocker lock(&m_mutex);
+        QMutexLocker lock( &m_mutex );
         const auto it = m_mappings.find( port );
-        if( it != m_mappings.end() )
+        if( it == m_mappings.end() )
             return false;
 
         std::swap( callback, it->second );
         m_mappings.erase( it );
         for( auto& device : m_devices )
-            device.second->unmap( port );
+        {
+            ++m_asyncInProgress;
+            device.second->unmap( port, [ this ]()
+            {
+                QMutexLocker lock( &m_mutex );
+                if( --m_asyncInProgress == 0)
+                    m_asyncCondition.wakeOne();
+            } );
+        }
     }
 
     if( waitForFinish )
@@ -78,8 +100,8 @@ bool UpnpPortMapper::searchForMappers( const HostAddress& localAddress,
             QUrl url( devAddress.toString() );
             url.setPath( service.controlUrl );
 
-            std::unique_ptr< MappingDevice > device( new MappingDevice(
-                m_upnpClient, localAddress, url ) );
+            std::unique_ptr< MappingDevice > device(
+                new MappingDevice( m_upnpClient.get(), localAddress, url ) );
 
             QMutexLocker lk( &m_mutex );
             const auto itBool = m_devices.emplace( devInfo.serialNumber, std::move( device ) );

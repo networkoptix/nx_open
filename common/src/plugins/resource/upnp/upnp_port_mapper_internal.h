@@ -20,7 +20,7 @@ private:
 class UpnpPortMapper::MappingDevice
 {
 public:
-    MappingDevice( UpnpAsyncClient& upnpClient,
+    MappingDevice( UpnpAsyncClient* upnpClient,
                    const HostAddress& internalIp,
                    const QUrl& url);
 
@@ -29,12 +29,12 @@ public:
     void map( quint16 port, quint16 desiredPort,
               const std::function< void( quint16 ) >& callback );
 
-    void unmap( quint16 port );
+    void unmap( quint16 port, const std::function< void() >& callback );
 
 private:
-    UpnpAsyncClient& m_upnpClient;
-    HostAddress m_internalIp;
-    QUrl m_url;
+    UpnpAsyncClient* const m_upnpClient;
+    const HostAddress m_internalIp;
+    const QUrl m_url;
 
     mutable QMutex m_mutex;
     HostAddress m_externalIp;

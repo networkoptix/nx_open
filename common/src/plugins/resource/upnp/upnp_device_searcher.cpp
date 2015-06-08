@@ -468,9 +468,11 @@ void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpCl
 UPNPSearchAutoHandler::UPNPSearchAutoHandler(const QString& devType)
     : m_devType( devType )
 {
-    UPNPDeviceSearcher::instance()->registerHandler( this );
     if( !devType.isEmpty() )
+    {
+        UPNPDeviceSearcher::instance()->registerHandler( this );
         UPNPDeviceSearcher::instance()->registerDeviceType( devType );
+    }
 }
 
 UPNPSearchAutoHandler::~UPNPSearchAutoHandler()

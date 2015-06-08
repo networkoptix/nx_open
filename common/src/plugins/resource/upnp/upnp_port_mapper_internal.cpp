@@ -21,14 +21,14 @@ void UpnpPortMapper::CallbackControl::clear()
     m_callback = nullptr;
 }
 
-UpnpPortMapper::MappingDevice::MappingDevice( UpnpAsyncClient& upnpClient,
+UpnpPortMapper::MappingDevice::MappingDevice( UpnpAsyncClient* upnpClient,
                                               const HostAddress& internalIp,
                                               const QUrl& url )
     : m_upnpClient( upnpClient )
     , m_internalIp( internalIp )
     , m_url( url )
 {
-    m_upnpClient.externalIp( url, [this]( const HostAddress& newIp )
+    m_upnpClient->externalIp( url, [this]( const HostAddress& newIp )
     {
         std::map< quint16, std::function< void() > > successQueue;
         {
@@ -52,14 +52,15 @@ HostAddress UpnpPortMapper::MappingDevice::externalIp() const
 void UpnpPortMapper::MappingDevice::map( quint16 port, quint16 desiredPort,
                                          const std::function< void( quint16 ) >& callback )
 {
-    m_upnpClient.addMapping( m_url, m_internalIp, port, desiredPort, lit( "TCP" ),
+    // FIXME: what if addMapping returns false?
+    m_upnpClient->addMapping( m_url, m_internalIp, port, desiredPort, lit( "TCP" ),
                               // TODO: move protocol to paramiters
                               [this, callback, port, desiredPort]( bool success )
     {
         if( !success )
         {
             const auto newPort = desiredPort + qrand() % RETRY_PORT_STEP;
-            if( desiredPort - port > RETRY_PORT_STEP )
+            if( newPort - port > RETRY_PORT_MAX )
             {
                 callback( 0 ); // mapping is not possible
                 return;
@@ -67,6 +68,7 @@ void UpnpPortMapper::MappingDevice::map( quint16 port, quint16 desiredPort,
 
             // retry another port
             map( port, newPort, callback );
+            return;
         }
 
         {
@@ -83,8 +85,13 @@ void UpnpPortMapper::MappingDevice::map( quint16 port, quint16 desiredPort,
     });
 }
 
-void UpnpPortMapper::MappingDevice::unmap( quint16 port )
+void UpnpPortMapper::MappingDevice::unmap( quint16 port,
+                                           const std::function< void() >& callback )
 {
-    // TODO: implement
-    static_cast<void>( port );
+    // FIXME: what if deleteMapping returns false?
+    m_upnpClient->deleteMapping( m_url, port, lit( "TCP" ), [ callback ]( bool )
+    {
+        // FIXME: what if call was not successful, shell we retry? how many times? :)
+        callback();
+    } );
 }
