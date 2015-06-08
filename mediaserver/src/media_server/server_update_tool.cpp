@@ -18,12 +18,14 @@
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
     const QString updatesDirSuffix = lit("mediaserver/updates");
     const QString updateInfoFileName = lit("update.json");
     const QString updateLogFileName = lit("update.log");
+    const int installationDelay = 5000;
 
     QDir getUpdatesDir() {
         const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
@@ -319,6 +321,10 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     QDir::setCurrent(currentDir);
 
     return true;
+}
+
+void QnServerUpdateTool::installUpdateDelayed(const QString &updateId) {
+    executeDelayed([updateId, this]() { installUpdate(updateId); }, installationDelay);
 }
 
 void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {
