@@ -155,7 +155,6 @@ namespace ec2
         //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
 
-        void transactionProcessed(const QnAbstractTransaction &transaction);
         void remotePeerUnauthorized(const QnUuid& id);
     private:
         friend class QnTransactionTransport;
