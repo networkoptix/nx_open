@@ -21,7 +21,7 @@ QtControls.TextField
     property var initTime;
     
     height: Common.SizeManager.clickableSizes.medium;
-    width: height * 3;
+    width: height * 2;
     
     text: impl.stringFromTime(initTime);
     
@@ -46,8 +46,11 @@ QtControls.TextField
         if (!initTime && (text === impl.emptyMaskValue))
             return;
         
-        if (initTime && time && (initTime !== time))
+        if (initTime && time && (impl.stringFromTime(initTime) !== impl.stringFromTime(time)))
+        {
+            console.log("date time: " + initTime + ":" + time + ":" + (initTime === time));
             thisComponent.changed = true;
+        }
     }
     
     property QtObject impl: QtObject

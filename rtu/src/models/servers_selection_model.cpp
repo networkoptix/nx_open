@@ -18,14 +18,21 @@ namespace
         Qt::CheckState selectedState;
         rtu::ServerInfo serverInfo;
         
-        /*
-        ServerModelInfo& operator=(ServerModelInfo other)
-        {
-            std::swap(*this, other);
-            return *this;
-        }
-        */
+        ServerModelInfo();
+        explicit ServerModelInfo(Qt::CheckState initSelectedState
+            , const rtu::ServerInfo initServerInfo);
     };
+
+    ServerModelInfo::ServerModelInfo()
+        : selectedState()
+        , serverInfo()
+    {}
+
+    ServerModelInfo::ServerModelInfo(Qt::CheckState initSelectedState
+        , const rtu::ServerInfo initServerInfo)
+        : selectedState(initSelectedState)
+        , serverInfo(initServerInfo)
+    {}
     
     typedef QVector<ServerModelInfo> ServerModelInfosVector;
 
@@ -36,7 +43,26 @@ namespace
         int selectedServers;
         int loggedServers;
         ServerModelInfosVector servers;
+
+        SystemModelInfo();
+
+        explicit SystemModelInfo(const QString &initName);
     };
+
+    SystemModelInfo::SystemModelInfo()
+        : name()
+        , selectedServers(0)
+        , loggedServers(0)
+        , servers()
+    {}
+
+    SystemModelInfo::SystemModelInfo(const QString &initName)
+        : name(initName)
+        , selectedServers(0)
+        , loggedServers(0)
+        , servers()
+    {}
+
 
     typedef QVector<SystemModelInfo> SystemModelInfosVector;
     
@@ -182,6 +208,21 @@ public:
     
    
     void selectionPasswordChanged(const QString &password);
+    
+    ///
+    
+    void updateTimeDateInfo(const QUuid &id
+        , const QDateTime &dateTime
+        , const QDateTime &timestamp);
+    
+    void updateInterfacesInfo(const QUuid &id
+        , const InterfaceInfoList &interfaces);
+
+    void updateSystemNameInfo(const QUuid &id
+        , const QString &systemName);
+    
+    void updatePortInfo(const QUuid &id
+        , int port);
     
 private:
     SystemModelInfo *findItem(int rowIndex
@@ -535,10 +576,66 @@ void rtu::ServersSelectionModel::Impl::selectionPasswordChanged(const QString &p
     }
 }
 
+void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
+    , const QDateTime &dateTime
+    , const QDateTime &timestamp)
+{
+    ServerSearchInfo searchInfo;
+    if (!findServer(id, searchInfo))
+        return;
+    
+    ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
+    if (!info.hasExtraInfo())
+        info.setExtraInfo(ExtraServerInfo());
+    
+    ExtraServerInfo &extraInfo = info.writableExtraInfo();
+    extraInfo.dateTime = dateTime;
+    extraInfo.timestamp = timestamp;
+}
+
+void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
+    , const InterfaceInfoList &interfaces)
+{
+    ServerSearchInfo searchInfo;
+    if (!findServer(id, searchInfo))
+        return;
+    
+    ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
+    if (!info.hasExtraInfo())
+        info.setExtraInfo(ExtraServerInfo());
+    
+    info.writableExtraInfo().interfaces = interfaces;
+}
+
+void rtu::ServersSelectionModel::Impl::updateSystemNameInfo(const QUuid &id
+    , const QString &systemName)
+{
+    ServerSearchInfo searchInfo;
+    if (!findServer(id, searchInfo))
+        return;
+    
+    BaseServerInfo &base = 
+        searchInfo.serverInfoIterator->serverInfo.writableBaseInfo();
+    base.systemName = systemName;
+    onChangedServer(base);
+}
+
+void rtu::ServersSelectionModel::Impl::updatePortInfo(const QUuid &id
+    , int port)
+{
+    ServerSearchInfo searchInfo;
+    if (!findServer(id, searchInfo))
+        return;
+    
+    BaseServerInfo &base = 
+        searchInfo.serverInfoIterator->serverInfo.writableBaseInfo();
+    base.port = port;
+    onChangedServer(base);
+}
 
 void rtu::ServersSelectionModel::Impl::onAddedServer(const BaseServerInfo &baseInfo)
 {
-    const QString systemName = (baseInfo.flags & ServerFlag::kIsFactory 
+    const QString systemName = (baseInfo.flags & Constants::ServerFlag::kIsFactory 
         ? QString() : baseInfo.systemName);
 
     int row = 0;
@@ -548,13 +645,12 @@ void rtu::ServersSelectionModel::Impl::onAddedServer(const BaseServerInfo &baseI
     {
         std::for_each(m_systems.begin(), m_systems.end()
             , [&row](const SystemModelInfo &info){ row += kSystemItemCapacity + info.servers.size(); });
-        m_systems.push_back( { systemName, 0, 0, ServerModelInfosVector() } );
+        m_systems.push_back(SystemModelInfo(systemName));
         systemModelInfo = &m_systems.last();
         exist = false;
     }
     
-    systemModelInfo->servers.push_back(
-        ServerModelInfo({ Qt::Unchecked, ServerInfo(baseInfo)}));   
+    systemModelInfo->servers.push_back(ServerModelInfo(Qt::Unchecked, ServerInfo(baseInfo)));   
     
     const int rowStart = (exist ? row + systemModelInfo->servers.size() : row);
     const int rowFinish = (row + systemModelInfo->servers.size());
@@ -692,6 +788,31 @@ void rtu::ServersSelectionModel::setItemSelected(int rowIndex)
 void rtu::ServersSelectionModel::tryLoginWith(const QString &password)
 {
     m_impl->tryLoginWith(password);
+}
+
+void rtu::ServersSelectionModel::updateTimeDateInfo(const QUuid &id
+    , const QDateTime &dateTime
+    , const QDateTime &timestamp)
+{
+    m_impl->updateTimeDateInfo(id, dateTime, timestamp);
+}
+
+void rtu::ServersSelectionModel::updateInterfacesInfo(const QUuid &id
+    , const InterfaceInfoList &interfaces)
+{
+    m_impl->updateInterfacesInfo(id, interfaces);
+}
+
+void rtu::ServersSelectionModel::updateSystemNameInfo(const QUuid &id
+    , const QString &systemName)
+{
+    m_impl->updateSystemNameInfo(id, systemName);
+}
+
+void rtu::ServersSelectionModel::updatePortInfo(const QUuid &id
+    , int port)
+{
+    m_impl->updatePortInfo(id, port);
 }
 
 void rtu::ServersSelectionModel::selectionPasswordChanged(const QString &password)
