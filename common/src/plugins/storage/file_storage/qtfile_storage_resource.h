@@ -6,26 +6,25 @@ extern "C"
     #include <libavformat/avio.h>
 }
 
-#include "core/resource/abstract_storage.h"
+#include "core/resource/storage_resource.h"
 
 /*
 * QnQtFileStorageResource uses Qt based IO access
 */
 
 class QnQtFileStorageResource
-    : public QnResource,
-      public QnAbstractStorage
+    : public QnStorageResource
 {
 public:
     QnQtFileStorageResource();
 
-    static QnAbstractStorage* instance();
+    static QnStorageResource* instance();
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getCapabilities() const override;
     //virtual int getChunkLen() const override;
-    virtual bool isAvailable() override;
+    virtual bool isAvailable() const override;
     //virtual bool isStorageAvailableForWriting() override;
     virtual QFileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;

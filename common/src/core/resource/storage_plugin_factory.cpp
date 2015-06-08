@@ -23,7 +23,7 @@ void QnStoragePluginFactory::registerStoragePlugin(const QString &protocol, cons
         m_defaultFactory = factory;
 }
 
-QnAbstractStorage *QnStoragePluginFactory::createStorage(const QString &url, bool useDefaultForUnknownPrefix)
+QnStorageResource *QnStoragePluginFactory::createStorage(const QString &url, bool useDefaultForUnknownPrefix)
 {
     int index = url.indexOf(lit("://"));
     if (index == -1) 

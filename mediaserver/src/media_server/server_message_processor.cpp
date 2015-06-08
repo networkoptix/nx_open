@@ -42,7 +42,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
     const bool isUser = dynamic_cast<const QnUserResource*>(resource.data()) != nullptr;
     const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
-    const bool isStorage = dynamic_cast<const QnAbstractStorageResource*>(resource.data()) != nullptr;
+    const bool isStorage = dynamic_cast<const QnStorageResource*>(resource.data()) != nullptr;
     const bool isLayout = !resource.dynamicCast<QnLayoutResource>().isNull();
 
     if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage && !isLayout)
@@ -283,6 +283,6 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
         QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(mServer->getId(), Qn::Online);
     }
     else if (isOwnStorage && !storage->isExternal()) {
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(QnAbstractStorageResourceList() << storage);
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(QnStorageResourceList() << storage);
     }
 }

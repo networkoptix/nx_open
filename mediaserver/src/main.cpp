@@ -42,6 +42,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/storage_plugin_factory.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
@@ -83,8 +84,8 @@
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/test_camera/testcamera_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
-#include <plugins/storage/coldstore/coldstore_storage.h>
-#include <plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h>
+//#include <plugins/storage/coldstore/coldstore_storage.h>
+//#include <plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
@@ -394,9 +395,9 @@ void ffmpegInit()
 
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
-#ifdef ENABLE_COLDSTORE
-    QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
-#endif
+//#ifdef ENABLE_COLDSTORE
+//    QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
+//#endif
 }
 
 QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
@@ -406,7 +407,8 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setParentId(serverId);
     storage->setUrl(path);
     storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
-    storage->setUsedForWriting(storage->isStorageAvailableForWriting());
+    storage->setUsedForWriting(storage->getCapabilities() & 
+                               QnAbstractStorageResource::cap::WriteFile);
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     Q_ASSERT(resType);
     if (resType)
@@ -496,9 +498,9 @@ static QStringList listRecordFolders()
     return folderPaths;
 }
 
-QnAbstractStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
+QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
 {
-    QnAbstractStorageResourceList storages;
+    QnStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
     for(const QString& folderPath: listRecordFolders()) 
@@ -523,11 +525,11 @@ QnAbstractStorageResourceList createStorages(const QnMediaServerResourcePtr mSer
     return storages;
 }
 
-QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
+QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 {
-    QMap<QnUuid, QnAbstractStorageResourcePtr> result;
+    QMap<QnUuid, QnStorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
-    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages())
+    for(const QnStorageResourcePtr& abstractStorage: mServer->getStorages())
     {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
@@ -615,7 +617,7 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     return savedServer;
 }
 
-void QnMain::saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAbstractStorageResourceList& storages)
+void QnMain::saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages)
 {
     ec2::ErrorCode rez;
     while((rez = ec2Connection->getMediaServerManager()->saveStoragesSync(storages)) != ec2::ErrorCode::ok && !needToStop())
@@ -2040,11 +2042,11 @@ void QnMain::run()
         MSSettings::roSettings()->sync();
     }
 
-    QnAbstractStorageResourceList storages = m_mediaServer->getStorages();
-    QnAbstractStorageResourceList modifiedStorages = createStorages(m_mediaServer);
+    QnStorageResourceList storages = m_mediaServer->getStorages();
+    QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
     modifiedStorages.append(updateStorages(m_mediaServer));
     saveStorages(ec2Connection, modifiedStorages);
-    for(const QnAbstractStorageResourcePtr &storage: modifiedStorages)
+    for(const QnStorageResourcePtr &storage: modifiedStorages)
         messageProcessor->updateResource(storage);
 
     qnStorageMan->initDone();

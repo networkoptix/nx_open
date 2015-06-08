@@ -97,7 +97,7 @@ qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 	return 0; // not implemented
 }
 
-bool QnQtFileStorageResource::isAvailable()
+bool QnQtFileStorageResource::isAvailable() const
 {
     QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
@@ -129,7 +129,7 @@ QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url)
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
-QnAbstractStorage* QnQtFileStorageResource::instance()
+QnStorageResource* QnQtFileStorageResource::instance()
 {
     return new QnQtFileStorageResource();
 }

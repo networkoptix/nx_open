@@ -2,7 +2,6 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 
 QnStorageResource::QnStorageResource():
-    QnResource(),
     m_spaceLimit(0),
     m_maxStoreTime(0),
     m_usedForWriting(false)

@@ -1,12 +1,12 @@
 #ifndef __STORAGE_RESOURCE_H__
 #define __STORAGE_RESOURCE_H__
 
-#include "resource.h"
+#include "abstract_storage_resource.h"
 
 class QnAbstractMediaStreamDataProvider;
 
 class QnStorageResource 
-	: public QnResource
+	: public QnAbstractStorageResource
 {
     Q_OBJECT
 
@@ -63,7 +63,7 @@ signals:
      * @param newStartTime - new archive start time point
      * @param newEndTime - Not used now, reserved for future use
      */
-    void archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
+    void archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds
@@ -73,7 +73,7 @@ private:
     mutable QMutex m_bitrateMtx;
 };
 
-Q_DECLARE_METATYPE(QnAbstractStorageResourcePtr);
-Q_DECLARE_METATYPE(QnAbstractStorageResourceList);
+Q_DECLARE_METATYPE(QnStorageResourcePtr);
+Q_DECLARE_METATYPE(QnStorageResourceList);
 
 #endif // __ABSTRACT_STORAGE_RESOURCE_H__

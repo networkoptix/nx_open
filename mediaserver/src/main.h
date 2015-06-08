@@ -63,7 +63,7 @@ private:
     bool initTcpListener();
     QHostAddress getPublicAddress();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
-    void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAbstractStorageResourceList& storages);
+    void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
     void saveAdminPswdHash();
     bool isStopping() const;

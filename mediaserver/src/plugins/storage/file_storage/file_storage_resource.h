@@ -18,25 +18,27 @@ public:
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
-    virtual int getChunkLen() const override;
+    //virtual int getChunkLen() const override;
 
     virtual float getAvarageWritingUsage() const override;
 
-    virtual bool isStorageAvailable() override;
-    virtual bool isStorageAvailableForWriting() override;
+    //virtual bool isStorageAvailable() override;
+    //virtual bool isStorageAvailableForWriting() override;
 
     virtual QFileInfoList getFileList(const QString& dirName) override;
     virtual qint64 getFileSize(const QString& url) const override;
-    virtual bool isNeedControlFreeSpace() override;
+    //virtual bool isNeedControlFreeSpace() override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
-    bool isCatalogAccessible() override;
+    //bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace() override;
 
+    virtual int getCapabilities() const override;
+    virtual bool isAvailable() const override;
 
     void setStorageBitrateCoeff(float value);
     virtual float getStorageBitrateCoeff() const override;
@@ -51,9 +53,10 @@ private:
     float m_storageBitrateCoeff;
     mutable bool m_durty;
 
-    bool isStorageDirMounted();
+    bool isStorageDirMounted() const;
 private:
-    mutable QMutex m_mutexPermission;
+    mutable QMutex  m_mutexPermission;
+    int             m_capabilities;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

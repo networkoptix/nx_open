@@ -1,12 +1,11 @@
 #ifndef __ABSTRACT_STORAGE_H__
 #define __ABSTRACT_STORAGE_H__
 
-#include <QtCore/QSet>
 #include "resource.h"
-#include <QtCore/QFileInfoList>
-#include <QtCore/QIODevice>
+#include <QtCore/QtCore>
 
-class QnAbstractStorage
+class QnAbstractStorageResource 
+    : public QnResource 
 {
 public:
     enum cap
@@ -18,6 +17,7 @@ public:
         DBReady         = 0x0008,                   // capable of DB hosting
     };
 
+    static const int chunkLen = 60;
 public:
     static const qint64 UnknownSize = 0x0000FFFFFFFFFFFFll; // TODO: #Elric replace with -1.
 
@@ -51,7 +51,7 @@ public:
     ///**
     // * \returns                         Whether the storage is physically accessible.
     // */
-    virtual bool isAvailable() = 0;
+    virtual bool isAvailable() const = 0;
 
     ///**
     // * \returns                         Whether the storage is physically accessible and ready for writing

@@ -97,9 +97,9 @@ class QnStorageResource;
 typedef QnSharedResourcePointer<QnStorageResource> QnStorageResourcePtr;
 typedef QnSharedResourcePointerList<QnStorageResource> QnStorageResourceList;
 
-class QnAbstractStorageResource;
-typedef QnSharedResourcePointer<QnAbstractStorageResource> QnAbstractStorageResourcePtr;
-typedef QnSharedResourcePointerList<QnAbstractStorageResource> QnAbstractStorageResourceList;
+//class QnAbstractStorageResource;
+//typedef QnSharedResourcePointer<QnAbstractStorageResource> QnAbstractStorageResourcePtr;
+//typedef QnSharedResourcePointerList<QnAbstractStorageResource> QnAbstractStorageResourceList;
 
 class QnUserResource;
 typedef QnSharedResourcePointer<QnUserResource> QnUserResourcePtr;

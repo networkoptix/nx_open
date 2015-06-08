@@ -33,8 +33,8 @@ namespace ec2
             if (!resType)
                 return;
             
-            QnAbstractStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
-                QnResourceParams(tran.params.id, tran.params.url, QString())).dynamicCast<QnAbstractStorageResource>();
+            QnStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
+                QnResourceParams(tran.params.id, tran.params.url, QString())).dynamicCast<QnStorageResource>();
             fromApiToResource(tran.params, storage);
             emit storageChanged( std::move(storage) );
         }
@@ -45,8 +45,8 @@ namespace ec2
             if (!resType)
                 return;
             for(const ec2::ApiStorageData& apiStorageData: tran.params) {
-                QnAbstractStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
-                    QnResourceParams(apiStorageData.id, apiStorageData.url, QString())).dynamicCast<QnAbstractStorageResource>();
+                QnStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
+                    QnResourceParams(apiStorageData.id, apiStorageData.url, QString())).dynamicCast<QnStorageResource>();
                 fromApiToResource(apiStorageData, storage);
                 emit storageChanged( std::move(storage) );
             }
@@ -114,7 +114,7 @@ namespace ec2
         //!Implementation of QnMediaServerManager::saveUserAttributes
         virtual int saveUserAttributes( const QnMediaServerUserAttributesList& serverAttrs, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::saveStorages
-        virtual int saveStorages( const QnAbstractStorageResourceList& storages, impl::SimpleHandlerPtr handler ) override;
+        virtual int saveStorages( const QnStorageResourceList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::removeStorages
         virtual int removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::getUserAttributes
