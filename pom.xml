@@ -330,7 +330,7 @@
                 <module>applauncher</module> 
                 <module>client</module>     
                 <module>client.core</module>     
-                <module>clientexe</module>
+                <module>client.bin</module>
             </modules>  
         </profile>         
         <profile>
@@ -348,7 +348,7 @@
                 <module>client.core</module>     
                 <module>axclient</module>
                 <module>rtu</module>
-                <module>clientexe</module>
+                <module>client.bin</module>
                 <module>wixsetup</module>
                 <module>plugins/nxinterface</module>
                 <module>plugins/nxcontrol</module>
