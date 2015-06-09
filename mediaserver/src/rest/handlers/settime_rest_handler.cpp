@@ -72,6 +72,13 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
             return CODE_OK;
         }
     }
+
+    // recreate datetime because of QT fromMsec toMsec change value after time zone changing
+    if (dateTimeStr.toLongLong() > 0)
+        dateTime = QDateTime::fromMSecsSinceEpoch(dateTimeStr.toLongLong());
+    else
+        dateTime = QDateTime::fromString(dateTimeStr, QLatin1String("yyyy-MM-ddThh:mm:ss"));
+
     if (!setDateTime(dateTime)) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("Can't set new datetime value"));
