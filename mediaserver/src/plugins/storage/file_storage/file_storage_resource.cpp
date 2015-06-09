@@ -291,7 +291,7 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
     return true;
 }
 
-bool QnFileStorageResource::isStorageDirMounted()
+bool QnFileStorageResource::isStorageDirMounted() const
 {
     const QString& notResolvedStoragePath = closeDirPath(getPath());
     const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
