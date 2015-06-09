@@ -32,7 +32,7 @@ public:
      */
     QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
   
-    virtual int load(const QString &filter, const qint64 resolutionMs) override;
+    virtual int load(const QString &filter = QString(), const qint64 resolutionMs = 1) override;
 
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;
 
