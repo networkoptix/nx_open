@@ -560,7 +560,6 @@ public:
         PT_DesktopClient = 1,
         PT_VideowallClient = 2,
         PT_MobileClient = 3,
-        PT_CustomClient = 4,
 
         PT_Count
     };

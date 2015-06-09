@@ -65,7 +65,7 @@ int runApplication(QGuiApplication *application) {
     srand(time(NULL));
     qsrand(time(NULL));
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(Qn::PT_CustomClient)); // TODO: #dklychkov check connection type
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(Qn::PT_MobileClient)); // TODO: #dklychkov check connection type
     ec2::ResourceContext resourceContext(
         QnServerCameraFactory::instance(),
         qnResPool,
@@ -76,7 +76,7 @@ int runApplication(QGuiApplication *application) {
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
-    runtimeData.peer.peerType = Qn::PT_CustomClient;
+    runtimeData.peer.peerType = Qn::PT_MobileClient; // TODO: #dklychkov check connection type
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);

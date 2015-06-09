@@ -1041,11 +1041,9 @@ namespace ec2
             transport->sendTransaction(tranLayouts,         processedPeers);
             transport->sendTransaction(tranCameraHistory,   processedPeers);
             transport->setReadSync(true);
-        } else if (transport->remotePeer().peerType == Qn::PT_CustomClient) {
-            transport->setWriteSync(true);
-            sendRuntimeInfo(transport, processedPeers, QnTranState());
-            transport->setReadSync(true);
         }
+
+
 
         if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
             queueSyncRequest(transport);
