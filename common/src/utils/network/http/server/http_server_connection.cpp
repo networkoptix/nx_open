@@ -33,7 +33,7 @@ namespace nx_http
         //TODO incoming message body
         //    should use AbstractMsgBodySource also
 
-        //TODO #ak interleaving support
+        //TODO #ak pipelining support
         //    can add sequence to sendResponseFunc and use it to queue responses
 
         using namespace std::placeholders;
@@ -98,6 +98,7 @@ namespace nx_http
         //TODO #ak connection persistency
 
         m_currentMsgBody = std::move(responseMsgBody);
+        //TODO #ak check sendMessage error code
         sendMessage(
             std::move( msg ),
             std::bind( &HttpServerConnection::responseSent, this ) );
@@ -105,7 +106,58 @@ namespace nx_http
 
     void HttpServerConnection::responseSent()
     {
-        //TODO #ak sending message body (m_currentMsgBody)
-        closeConnection();
+        //TODO #ak check sendData error code
+        if( !m_currentMsgBody )
+        {
+            closeConnection();
+            return;
+        }
+
+        using namespace std::placeholders;
+        if( !m_currentMsgBody->readAsync(
+                std::bind( &HttpServerConnection::someMsgBodyRead, this, _1, _2 ) ) )
+        {
+            closeConnection();
+            return;
+        }
+    }
+
+    void HttpServerConnection::someMsgBodyRead(
+        SystemError::ErrorCode errorCode,
+        BufferType buf )
+    {
+        if( errorCode != SystemError::noError )
+        {
+            closeConnection();
+            return;
+        }
+
+        if( buf.isEmpty() )
+        {
+            //done with message body
+            closeConnection();
+            return;
+        }
+
+        //TODO #ak read and send message body async
+
+        if( !sendData(
+                std::move( buf ),
+                std::bind( &HttpServerConnection::someMessageBodySent, this ) ) )
+        {
+            closeConnection();
+            return;
+        }
+    }
+
+    void HttpServerConnection::someMessageBodySent()
+    {
+        using namespace std::placeholders;
+        if( !m_currentMsgBody->readAsync(
+            std::bind( &HttpServerConnection::someMsgBodyRead, this, _1, _2 ) ) )
+        {
+            closeConnection();
+            return;
+        }
     }
 }

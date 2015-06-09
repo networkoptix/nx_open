@@ -141,14 +141,28 @@ namespace nx_api
             Initiates asynchoronous message send
         */
         template<class Handler>
-        bool sendMessage( MessageType&& msg, Handler&& handler = std::function<void(SystemError::ErrorCode)>() )
+        bool sendMessage(
+            MessageType&& msg,
+            Handler&& handler = std::function<void(SystemError::ErrorCode)>() )
         {
-            if( m_isSendingMessage > 0 )
-                return false;   //TODO: #ak interleaving is not supported yet
+            //TODO: #ak interleaving is not supported yet
+            assert( m_isSendingMessage == 0 );
 
             m_sendCompletionHandler = std::forward<Handler>(handler);
             sendMessageInternal( std::move(msg) );
             return true;
+        }
+
+        template<class BufferType, class Handler>
+        bool sendData(
+            BufferType&& data,
+            Handler&& handler = std::function<void( SystemError::ErrorCode )>() )
+        {
+            assert( m_isSendingMessage == 0 && m_writeBuffer.isEmpty() );
+            m_sendCompletionHandler = std::forward<Handler>( handler );
+            m_writeBuffer = std::forward<BufferType>( data );
+            m_serializerState = SerializerState::done;
+            return sendBufAsync( m_writeBuffer );
         }
 
     private:

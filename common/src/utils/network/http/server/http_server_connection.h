@@ -51,6 +51,8 @@ namespace nx_http
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody );
         void responseSent();
+        void someMsgBodyRead( SystemError::ErrorCode, BufferType buf );
+        void someMessageBodySent();
     };
 }
 

@@ -5,6 +5,7 @@
 
 #include "abstract_http_request_handler.h"
 
+#include <utils/common/cpp14.h>
 #include <utils/network/http/server/http_stream_socket_server.h>
 
 
@@ -12,7 +13,7 @@ namespace nx_http
 {
     AbstractHttpRequestHandler::AbstractHttpRequestHandler()
     :
-        m_response( nx_http::MessageType::response )
+        m_prevReqSeq( 0 )
     {
     }
 
@@ -22,46 +23,85 @@ namespace nx_http
 
     bool AbstractHttpRequestHandler::processRequest(
         const nx_http::HttpServerConnection& connection,
-        nx_http::Message&& request,
+        nx_http::Message&& requestMsg,
         std::function<
             void(
                 nx_http::Message&&,
                 std::unique_ptr<nx_http::AbstractMsgBodySource> )
             > completionHandler )
     {
-        assert( request.type == nx_http::MessageType::request );
+        assert( requestMsg.type == nx_http::MessageType::request );
 
-        m_request = std::move( request );
-        m_response.response->statusLine.version = request.request->requestLine.version;
-        m_completionHandler = std::move( completionHandler );
+        //creating response here to support pipelining
+        Message responseMsg( MessageType::response );
 
-        processRequest( connection, *m_request.request );
+        responseMsg.response->statusLine.version = requestMsg.request->requestLine.version;
+
+        const auto& request = *requestMsg.request;
+        auto response = responseMsg.response;
+
+        size_t reqID = 0;
+        {
+            std::lock_guard<std::mutex> lk( m_mutex );
+            reqID = ++m_prevReqSeq;
+            m_idToReqCtx.emplace(
+                reqID,
+                RequestContext(
+                    std::move( requestMsg ),
+                    std::move( responseMsg ),
+                    std::move( completionHandler ) ) );
+        }
+
+        auto sendResponseFunc = [reqID, this](
+            nx_http::StatusCode::Value statusCode,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
+        {
+            requestDone( reqID, statusCode, std::move( dataSource ) );
+        };
+
+        processRequest(
+            connection,
+            request,
+            response,
+            std::move( sendResponseFunc ) );
         return true;
     }
 
     void AbstractHttpRequestHandler::requestDone(
+        size_t reqID,
         const nx_http::StatusCode::Value statusCode,
         std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
     {
-        m_response.response->statusLine.statusCode = statusCode;
-        m_response.response->statusLine.reasonPhrase = StatusCode::toString( statusCode );
+        Message responseMsg;
+        std::function<
+            void(
+                nx_http::Message&&,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> )
+        > completionHandler;
+
+        {
+            std::lock_guard<std::mutex> lk( m_mutex );
+            auto it = m_idToReqCtx.find( reqID );
+            assert( it != m_idToReqCtx.end() );
+            responseMsg = std::move( it->second.responseMsg );
+            completionHandler = std::move( it->second.completionHandler );
+            m_idToReqCtx.erase( it );
+        }
+
+        responseMsg.response->statusLine.statusCode = statusCode;
+        responseMsg.response->statusLine.reasonPhrase = StatusCode::toString( statusCode );
         if( dataSource )
         {
-            m_response.response->headers.emplace( "Content-Type", dataSource->mimeType() );
+            responseMsg.response->headers.emplace( "Content-Type", dataSource->mimeType() );
             const auto contentLength = dataSource->contentLength();
             if( contentLength )
-                m_response.response->headers.emplace(
+                responseMsg.response->headers.emplace(
                     "Content-Size",
                     QByteArray::number( contentLength.get() ) );
         }
 
-        m_completionHandler(
-            std::move( m_response ),
+        completionHandler(
+            std::move( responseMsg ),
             std::move( dataSource ) );
-    }
-
-    Response& AbstractHttpRequestHandler::response()
-    {
-        return *m_response.response;
     }
 }

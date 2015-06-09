@@ -27,8 +27,9 @@ namespace nx_http
 
     bool BufferSource::readAsync( std::function<void( SystemError::ErrorCode, BufferType )> completionHandler )
     {
-        completionHandler( SystemError::noError, std::move( m_msgBody ) );
+        auto outMsgBody = std::move( m_msgBody );
         m_msgBody = BufferType();   //moving to valid state
+        completionHandler( SystemError::noError, std::move( outMsgBody ) );
         return true;
     }
 }
