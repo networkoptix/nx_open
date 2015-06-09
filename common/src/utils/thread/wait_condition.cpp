@@ -34,7 +34,7 @@ bool QnWaitCondition::wait( QnMutex* mutex, unsigned long time )
     mutex->m_impl->beforeMutexUnlocked();
     const bool res = m_impl->cond.wait( &mutex->m_impl->mutex, time );
     //TODO #ak pass proper parameters to the following call
-    mutex->m_impl->afterMutexLocked( nullptr, 0, (int)(size_t)this );
+    mutex->m_impl->afterMutexLocked( nullptr, 0, static_cast<int>(quintptr(this)) );
     return res;
 }
 

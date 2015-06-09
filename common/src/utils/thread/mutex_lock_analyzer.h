@@ -141,7 +141,7 @@ public:
 
     LockGraphEdgeData();
     LockGraphEdgeData( LockGraphEdgeData&& rhs );
-    LockGraphEdgeData( const LockGraphEdgeData& rhs ) = default;
+    LockGraphEdgeData( const LockGraphEdgeData& rhs );
 
     LockGraphEdgeData& operator=( LockGraphEdgeData&& rhs );
 
