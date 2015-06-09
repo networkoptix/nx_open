@@ -56,6 +56,7 @@ void QnTransactionTcpProcessor::run()
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
     bool isMobileClient = query.hasQueryItem("isMobile");
+    bool isCustomClient = query.hasQueryItem("isCustomClient");
     QnUuid remoteGuid  = QnUuid(query.queryItemValue("guid"));
     QnUuid remoteRuntimeGuid  = QnUuid(query.queryItemValue("runtime-guid"));
     qint64 remoteSystemIdentityTime  = query.queryItemValue("system-identity-time").toLongLong();
@@ -65,6 +66,7 @@ void QnTransactionTcpProcessor::run()
     bool isVideowall = (!videowallGuid.isNull());
 
     Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient
+        : isCustomClient ? Qn::PT_CustomClient
         : isVideowall   ? Qn::PT_VideowallClient
         : isClient      ? Qn::PT_DesktopClient
         : Qn::PT_Server;
