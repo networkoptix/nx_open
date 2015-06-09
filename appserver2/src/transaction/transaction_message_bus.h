@@ -71,6 +71,7 @@ namespace ec2
             const QByteArray& requestMsgBody );
         //!Blocks till connection \a connectionGuid is ready to accept new transactions
         void waitForNewTransactionsReady( const QnUuid& connectionGuid );
+        void connectionTimedout( const QnUuid& connectionGuid );
         void dropConnections();
         
         ApiPeerData localPeer() const;

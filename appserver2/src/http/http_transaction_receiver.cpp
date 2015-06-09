@@ -118,7 +118,11 @@ namespace ec2
             }
 
             if( !readSingleRequest() )
+            {
+                if( d->prevSocketError == SystemError::timedOut && !connectionGuid.isNull() )
+                    QnTransactionMessageBus::instance()->connectionTimedout( connectionGuid );
                 return;
+            }
             
             if( d->request.requestLine.method != nx_http::Method::POST )
             {

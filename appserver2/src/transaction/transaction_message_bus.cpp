@@ -1527,6 +1527,19 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
     }
 }
 
+void QnTransactionMessageBus::connectionTimedout( const QnUuid& connectionGuid )
+{
+    QMutexLocker lock( &m_mutex );
+    for( QnTransactionTransport* transport : m_connections )
+    {
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->connectionTimedout();
+        return;
+    }
+}
+
 void QnTransactionMessageBus::dropConnections()
 {
     QMutexLocker lock(&m_mutex);

@@ -361,6 +361,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
     d->requestBody.clear();
     d->responseBody.clear();
     d->currentRequestSize = 0;
+    d->prevSocketError = SystemError::noError;
 
     if( !d->clientRequest.isEmpty() )   //TODO #ak it is more reliable to check for the first call of this method
     {
@@ -381,9 +382,9 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             const int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
             if (readed <= 0)
             {
-                const int lastOSErrorCode = SystemError::getLastOSErrorCode();
+                d->prevSocketError = SystemError::getLastOSErrorCode();
                 NX_LOG( lit("Error reading request from %1: %2").
-                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString(lastOSErrorCode)),
+                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString( d->prevSocketError )),
                     cl_logDEBUG1 );
                 return false;
             }
