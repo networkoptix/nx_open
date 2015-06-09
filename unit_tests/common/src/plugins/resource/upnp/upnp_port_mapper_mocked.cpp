@@ -21,13 +21,17 @@ bool UpnpAsyncClientMock::externalIp(
 
 bool UpnpAsyncClientMock::addMapping(
         const QUrl& /*url*/, const HostAddress& internalIp,
-        quint16 internalPort, quint16 externalPort, const QString& protocol,
+        quint16 internalPort, quint16 externalPort,
+        Protocol protocol, const QString& description,
         const std::function< void( bool ) >& callback )
 {
     if( externalPort != m_disabledPort &&
-            m_mappings.find( externalPort ) == m_mappings.end() )
+            m_mappings.find( std::make_pair( externalPort, protocol ) )
+                != m_mappings.end() )
     {
-        m_mappings[ externalPort ] = SocketAddress( internalIp, internalPort );
+        m_mappings[ std::make_pair( externalPort, protocol ) ]
+            = std::make_pair( SocketAddress( internalIp, internalPort ), description );
+
         QtConcurrent::run( [ callback ]{ callback( true ); } );
         return true;
     }
@@ -37,17 +41,64 @@ bool UpnpAsyncClientMock::addMapping(
 }
 
 bool UpnpAsyncClientMock::deleteMapping(
-        const QUrl& /*url*/, quint16 externalPort, const QString& protocol,
+        const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
         const std::function< void( bool ) >& callback )
 {
-    const bool isErased = m_mappings.erase( externalPort );
+    const bool isErased = m_mappings.erase( std::make_pair( externalPort, protocol ) );
     QtConcurrent::run( [ isErased, callback ]{ callback( isErased ); } );
+    return true;
+}
+
+bool UpnpAsyncClientMock::getMapping(
+        const QUrl& /*url*/, quint32 index,
+        const std::function< void( const MappingInfo& ) >& callback )
+{
+    if( m_mappings.size() >= index )
+    {
+        QtConcurrent::run( [ callback ]{ callback( MappingInfo() ); } );
+        return true;
+    }
+
+    const auto mapping = *std::next( m_mappings.begin(), index );
+    QtConcurrent::run( [ callback, mapping ]{
+        callback( MappingInfo(
+            mapping.second.first.address,
+            mapping.second.first.port,
+            mapping.first.first,
+            mapping.first.second,
+            mapping.second.second ) );
+    } );
+
+    return true;
+}
+
+bool UpnpAsyncClientMock::getMapping(
+        const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
+        const std::function< void( const MappingInfo& ) >& callback )
+{
+    const auto it = m_mappings.find( std::make_pair( externalPort, protocol ) );
+    if( it == m_mappings.end() )
+    {
+        QtConcurrent::run( [ callback ]{ callback( MappingInfo() ); } );
+        return true;
+    }
+
+    const auto mapping = *it;
+    QtConcurrent::run( [ callback, mapping ]{
+        callback( MappingInfo(
+            mapping.second.first.address,
+            mapping.second.first.port,
+            mapping.first.first,
+            mapping.first.second,
+            mapping.second.second ) );
+    } );
+
     return true;
 }
 
 UpnpPortMapperMocked::UpnpPortMapperMocked( const HostAddress& internalIp,
                                             const HostAddress& externalIp )
-    : UpnpPortMapper( QString() )
+    : UpnpPortMapper( lit( "UpnpPortMapperMocked" ), QString() )
 {
     m_upnpClient.reset( new UpnpAsyncClientMock( externalIp ) );
 

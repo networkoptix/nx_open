@@ -10,7 +10,7 @@ TEST(UpnpAsyncClient, DISABLED_GetIp)
 {
     UpnpAsyncClient client;
     const QUrl URL( lit("http://192.168.1.1:44264/ctl/IPConn") );
-    const QString TCP = lit( "tcp" );
+    const auto TCP = UpnpAsyncClient::Protocol::TCP;
 
     {
         std::promise< HostAddress > prom;
@@ -19,11 +19,13 @@ TEST(UpnpAsyncClient, DISABLED_GetIp)
         EXPECT_EQ( prom.get_future().get().toString().toUtf8(), QByteArray( "10.0.2.130" ) );
     }
     {
-        std::promise< SocketAddress > prom;
+        std::promise< UpnpAsyncClient::MappingInfo > prom;
         EXPECT_TRUE( client.getMapping( URL, 8877, TCP,
-                     [&]( const HostAddress& ip, quint16 port, quint16, const QString& )
-                     { prom.set_value( SocketAddress( ip, port ) ); } ) );
-        EXPECT_EQ( prom.get_future().get().toString().toUtf8(), QByteArray() ); // no such mapping
+                     [&]( const UpnpAsyncClient::MappingInfo& mapping )
+                     { prom.set_value( mapping ); } ) );
+
+        // no such mapping
+        EXPECT_FALSE( prom.get_future().get().isValid() );
     }
     {
         std::promise< bool > prom;
@@ -38,26 +40,31 @@ TEST(UpnpAsyncClient, DISABLED_Mapping)
 {
     UpnpAsyncClient client;
     const QUrl URL( lit("http://192.168.1.1:44264/ctl/IPConn") );
-    const QString TCP = lit( "tcp" );
+    const auto TCP = UpnpAsyncClient::Protocol::TCP;
     const QString IP = lit( "192.168.1.170" );
+    const QString DESC = lit( "test" );
 
     {
          std::promise< bool > prom;
-         EXPECT_TRUE( client.addMapping( URL, IP, 80, 80, TCP,
+         EXPECT_TRUE( client.addMapping( URL, IP, 80, 80, TCP, DESC,
                       [&]( bool v ) { prom.set_value( v ); } ) );
+
          EXPECT_FALSE( prom.get_future().get() ); // wrong port
     }
     {
         std::promise< bool > prom;
-        EXPECT_TRUE( client.addMapping( URL, IP, 80, 8877, TCP,
+        EXPECT_TRUE( client.addMapping( URL, IP, 80, 8877, TCP, DESC,
                      [&]( bool v ) { prom.set_value( v ); } ) );
+
         ASSERT_TRUE( prom.get_future().get() );
     }
     {
         std::promise< SocketAddress > prom;
         EXPECT_TRUE( client.getMapping( URL, 8877, TCP,
-                     [&]( const HostAddress& ip, quint16 port, quint16, const QString& )
-                     { prom.set_value( SocketAddress( ip, port ) ); } ) );
+                     [&]( const UpnpAsyncClient::MappingInfo& m )
+                     { prom.set_value( SocketAddress( m.internalIp,
+                                                      m.internalPort ) ); } ) );
+
         EXPECT_EQ( prom.get_future().get().toString().toUtf8(),
                    SocketAddress( IP, 80 ).toString().toUtf8() );
     }
@@ -65,6 +72,7 @@ TEST(UpnpAsyncClient, DISABLED_Mapping)
         std::promise< bool > prom;
         EXPECT_TRUE( client.deleteMapping( URL, 8877, TCP,
                      [&]( bool v ) { prom.set_value( v ); } ) );
+
         EXPECT_TRUE( prom.get_future().get() ); // no such mapping
     }
 }

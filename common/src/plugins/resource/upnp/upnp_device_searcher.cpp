@@ -481,6 +481,6 @@ UPNPSearchAutoHandler::~UPNPSearchAutoHandler()
     {
         searcher->cancelHandlerRegistration( this );
         if( !m_devType.isEmpty() )
-            searcher->registerDeviceType( m_devType );
+            searcher->cancelDeviceTypeRegistration( m_devType );
     }
 }

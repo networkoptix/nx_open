@@ -1,6 +1,7 @@
 #ifndef UPNP_ASYNC_CLIENT_H
 #define UPNP_ASYNC_CLIENT_H
 
+#include "utils/common/model_functions_fwd.h"
 #include "utils/network/http/asynchttpclient.h"
 
 #include <set>
@@ -9,7 +10,8 @@
 class UpnpAsyncClient
 {   
 public:
-    ~UpnpAsyncClient() {}
+    enum Protocol { TCP, UDP };
+    virtual ~UpnpAsyncClient() {}
 
     //! Simple SOAP call
     struct Message
@@ -47,31 +49,50 @@ public:
     //! Maps @param externalPort to @param internalPort on @param internalIp
     virtual
     bool addMapping( const QUrl& url, const HostAddress& internalIp,
-                     quint16 internalPort, quint16 externalPort, const QString& protocol,
+                     quint16 internalPort, quint16 externalPort,
+                     Protocol protocol, const QString& description,
                      const std::function< void( bool ) >& callback );
 
     //! Removes mapping of @param externalPort
     virtual
-    bool deleteMapping( const QUrl& url, quint16 externalPort, const QString& protocol,
+    bool deleteMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
                         const std::function< void( bool ) >& callback );
 
-    typedef std::function< void(
-                const HostAddress& /*internalIp*/, quint16 /*internalPort*/,
-                quint16 /*externalPort*/, const QString& /*protocol*/
-            )> MappingInfoCallback;
+    struct MappingInfo
+    {
+        HostAddress internalIp;
+        quint16     internalPort;
+        quint16     externalPort;
+        Protocol    protocol;
+        QString     description;
+
+        MappingInfo( const HostAddress& inIp = HostAddress(),
+                     quint16 inPort = 0, quint16 exPort = 0, Protocol prot = TCP,
+                     const QString& desc = QString() );
+        bool isValid() const;
+    };
 
     //! Provides mapping info by @param index
+    virtual
     bool getMapping( const QUrl& url, quint32 index,
-                     const MappingInfoCallback& callback );
+                     const std::function< void( const MappingInfo& ) >& callback );
 
     //! Provides mapping info by @param externalPort and @param protocol
-    bool getMapping( const QUrl& url, quint16 externalPort, const QString& protocol,
-                     const MappingInfoCallback& callback );
+    virtual
+    bool getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
+                     const std::function< void( const MappingInfo& ) >& callback );
+
+    typedef std::vector< MappingInfo > MappingList;
+
+    bool getAllMappings( const QUrl& url,
+                         const std::function< void( const MappingList& ) >& callback  );
 
 private:
     // TODO: replace with single httpClient when pipeline is supported
     QMutex m_mutex;
     std::set< nx_http::AsyncHttpClientPtr > m_httpClients;
 };
+
+QN_FUSION_DECLARE_FUNCTIONS( UpnpAsyncClient::Protocol, ( lexical ) )
 
 #endif // UPNP_ASYNC_CLIENT_H

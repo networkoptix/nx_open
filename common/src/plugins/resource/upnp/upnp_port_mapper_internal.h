@@ -7,13 +7,29 @@
 class UpnpPortMapper::CallbackControl
 {
 public:
-    CallbackControl( const MappingCallback& callback );
+    CallbackControl( const std::function< void( const MappingInfo& ) >& callback );
     void call( const MappingInfo& info );
     void clear();
+    MappingInfo state();
 
 private:
     QMutex m_mutex;
-    MappingCallback m_callback;
+    MappingInfo m_state;
+    std::function< void( const MappingInfo& ) > m_callback;
+};
+
+//! slowes down requests in case of failures
+class FailCounter
+{
+public:
+    FailCounter();
+    void success();
+    void failure();
+    bool isOk();
+
+private:
+    size_t m_failsInARow;
+    size_t m_lastFail;
 };
 
 //! single mapping device interface
@@ -22,24 +38,33 @@ class UpnpPortMapper::MappingDevice
 public:
     MappingDevice( UpnpAsyncClient* upnpClient,
                    const HostAddress& internalIp,
-                   const QUrl& url);
+                   const QUrl& url,
+                   const QString& description);
 
     HostAddress externalIp() const;
 
-    void map( quint16 port, quint16 desiredPort,
+    bool map( quint16 port, quint16 desiredPort, Protocol protocol,
               const std::function< void( quint16 ) >& callback );
 
-    void unmap( quint16 port, const std::function< void() >& callback );
+    bool unmap( quint16 port, Protocol protocol,
+                const std::function< void() >& callback );
+
+private:
+    bool mapImpl( quint16 port, quint16 desiredPort, Protocol protocol, size_t retrys,
+                  const std::function< void( quint16 ) >& callback );
 
 private:
     UpnpAsyncClient* const m_upnpClient;
     const HostAddress m_internalIp;
     const QUrl m_url;
+    const QString m_description;
 
     mutable QMutex m_mutex;
     HostAddress m_externalIp;
+    FailCounter m_faultCounter;
+
     // result are waiting here while m_externalIp is not avaliable
-    std::map< quint16, std::function< void() > > m_successQueue;
+    std::vector< std::function< void() > > m_successQueue;
 };
 
 #endif // UPNP_PORT_MAPPER_INTERNAL_H

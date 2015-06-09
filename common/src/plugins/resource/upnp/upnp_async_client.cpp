@@ -1,6 +1,8 @@
 #include "upnp_async_client.h"
 
 #include "upnp_device_description.h"
+#include "utils/common/model_functions.h"
+#include "utils/serialization/lexical_functions.h"
 
 static const QString SOAP_REQUEST = QLatin1String(
     "<?xml version=\"1.0\" ?>"
@@ -29,11 +31,11 @@ public:
     virtual bool endDocument() override { return true; }
 
     virtual bool startElement( const QString& /*namespaceURI*/,
-                               const QString& /*localName*/,
+                               const QString& localName,
                                const QString& qName,
                                const QXmlAttributes& /*attrs*/ ) override
     {
-        if( qName == lit("xml") || qName == lit("s:Envelope") )
+        if( localName == lit("xml") || localName == lit("Envelope") )
             return true; // TODO: check attrs
 
         m_awaitedValue = &m_message.params[qName];
@@ -79,7 +81,7 @@ public:
                                const QString& qName,
                                const QXmlAttributes& attrs ) override
     {
-        if( qName == lit("s:Body") )
+        if( localName == lit("Body") )
             return true;
 
         if( qName.startsWith( lit("u:") ) )
@@ -91,9 +93,6 @@ public:
 
         return super::startElement( namespaceURI, localName, qName, attrs );
     }
-
-private:
-    bool m_firstInBody;
 };
 
 class UpnpFailureHandler
@@ -107,7 +106,8 @@ public:
                                const QString& qName,
                                const QXmlAttributes& attrs ) override
     {
-        if( qName == lit("s:Fault") || qName == lit("s:UPnpError") || qName == lit("detail") )
+        if( localName == lit("Fault") || localName == lit("UPnpError") ||
+                localName == lit("detail") )
             return true;
 
         return super::startElement( namespaceURI, localName, qName, attrs );
@@ -121,9 +121,8 @@ bool UpnpAsyncClient::Message::isOk() const
 
 const QString& UpnpAsyncClient::Message::getParam( const QString& key ) const
 {
-    static const QString none;
     const auto it = params.find( key );
-    return ( it == params.end() ) ? none : it->second;
+    return ( it == params.end() ) ? QString() : it->second;
 }
 
 bool UpnpAsyncClient::doUpnp( const QUrl& url, const Message& message,
@@ -176,10 +175,11 @@ bool UpnpAsyncClient::doUpnp( const QUrl& url, const Message& message,
     QObject::connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
                       httpClient.get(), complete, Qt::DirectConnection );
 
+    QMutexLocker lk(&m_mutex);
+    m_httpClients.insert( httpClient );
     if( httpClient->doPost( url, "text/xml", request.toUtf8() ) )
     {
-        QMutexLocker lk(&m_mutex);
-        m_httpClients.insert( std::move( httpClient ) );
+        m_httpClients.erase( httpClient );
         return true;
     }
 
@@ -217,7 +217,7 @@ bool UpnpAsyncClient::externalIp( const QUrl& url,
 
 bool UpnpAsyncClient::addMapping(
         const QUrl& url, const HostAddress& internalIp, quint16 internalPort,
-        quint16 externalPort, const QString& protocol,
+        quint16 externalPort, Protocol protocol, const QString& description,
         const std::function< void( bool ) >& callback )
 {
     UpnpAsyncClient::Message request;
@@ -225,11 +225,11 @@ bool UpnpAsyncClient::addMapping(
     request.service = WAN_IP;
 
     request.params[ EXTERNAL_PORT ] = QString::number( externalPort );
-    request.params[ PROTOCOL ]      = protocol;
+    request.params[ PROTOCOL ]      = QnLexical::serialized( protocol );
     request.params[ INTERNAL_PORT ] = QString::number( internalPort );
     request.params[ INTERNAL_IP ]   = internalIp.toString();
     request.params[ ENABLED]        = QString::number( 1 );
-    request.params[ DESCRIPTION ]   = CLIENT_ID;
+    request.params[ DESCRIPTION ]   = description.isEmpty() ? CLIENT_ID : description;
     request.params[ DURATION ]      = QString::number( 0 );
 
     return doUpnp( url, request, [ callback ]( const Message& response ) { 
@@ -238,22 +238,36 @@ bool UpnpAsyncClient::addMapping(
 }
 
 bool UpnpAsyncClient::deleteMapping(
-        const QUrl& url, quint16 externalPort, const QString& protocol,
+        const QUrl& url, quint16 externalPort, Protocol protocol,
         const std::function< void( bool ) >& callback )
 {
     UpnpAsyncClient::Message request;
     request.action = DELETE_PORT_MAPPING;
     request.service = WAN_IP;
     request.params[ EXTERNAL_PORT ] = QString::number( externalPort );
-    request.params[ PROTOCOL ]      = protocol;
+    request.params[ PROTOCOL ] = QnLexical::serialized( protocol );
 
     return doUpnp( url, request, [ callback ]( const Message& response ) {
         callback( response.isOk() );
     } );
 }
 
-bool UpnpAsyncClient::getMapping( const QUrl& url, quint32 index,
-                                  const MappingInfoCallback& callback )
+UpnpAsyncClient::MappingInfo::MappingInfo(
+        const HostAddress& inIp, quint16 inPort, quint16 exPort,
+        Protocol prot, const QString& desc )
+    : internalIp( inIp ), internalPort( inPort ), externalPort( exPort )
+    , protocol( prot ), description( desc )
+{
+}
+
+bool UpnpAsyncClient::MappingInfo::isValid() const
+{
+    return !( internalIp == HostAddress() ) && internalPort && externalPort;
+}
+
+bool UpnpAsyncClient::getMapping(
+        const QUrl& url, quint32 index,
+        const std::function< void( const MappingInfo& ) >& callback )
 {
     UpnpAsyncClient::Message request;
     request.action = DELETE_PORT_MAPPING;
@@ -263,46 +277,76 @@ bool UpnpAsyncClient::getMapping( const QUrl& url, quint32 index,
     return doUpnp( url, request, [ callback ]( const Message& response )
     {
         if( response.isOk() )
-        {
-            const auto internalIp = response.getParam( INTERNAL_IP );
-            const auto internalPort = response.getParam( INTERNAL_PORT ).toUShort();
-            const auto externalPort = response.getParam( EXTERNAL_PORT ).toUShort();
-            const auto protocol = response.getParam( PROTOCOL );
-            callback( internalIp, internalPort, externalPort, protocol );
-        }
+            callback( MappingInfo(
+                response.getParam( INTERNAL_IP ),
+                response.getParam( INTERNAL_PORT ).toUShort(),
+                response.getParam( EXTERNAL_PORT ).toUShort(),
+                QnLexical::deserialized< Protocol >( response.getParam( PROTOCOL ) ),
+                response.getParam( DESCRIPTION ) ) );
         else
-        {
-            static const QString none;
-            callback( none, 0, 0, none );
-
-        }
+            callback( MappingInfo() );
     } );
 }
 
 bool UpnpAsyncClient::getMapping(
-        const QUrl& url, quint16 externalPort, const QString& protocol,
-        const MappingInfoCallback& callback )
+        const QUrl& url, quint16 externalPort, Protocol protocol,
+        const std::function< void( const MappingInfo& ) >& callback )
 {
     UpnpAsyncClient::Message request;
     request.action = GET_SPEC_PORT_MAPPING;
     request.service = WAN_IP;
     request.params[ EXTERNAL_PORT ] = QString::number( externalPort );
-    request.params[ PROTOCOL ]      = protocol;
+    request.params[ PROTOCOL ] = QnLexical::serialized( protocol );
 
     return doUpnp( url, request,
                    [ callback, externalPort, protocol ]( const Message& response )
     {
         if( response.isOk() )
-        {
-            const auto internalIp = response.getParam( INTERNAL_IP );
-            const auto internalPort = response.getParam( INTERNAL_PORT ).toUShort();
-            callback( internalIp, internalPort, externalPort, protocol );
-        }
+            callback( MappingInfo(
+                response.getParam( INTERNAL_IP ),
+                response.getParam( INTERNAL_PORT ).toUShort(),
+                externalPort, protocol,
+                response.getParam( DESCRIPTION ) ) );
         else
-        {
-            static const QString none;
-            callback( none, 0, externalPort, protocol );
-
-        }
+            callback( MappingInfo() );
     } );
 }
+
+void fetchMappingsRecursive(
+        UpnpAsyncClient* client, const QUrl& url,
+        const std::function< void( const UpnpAsyncClient::MappingList& ) >& callback,
+        const std::shared_ptr< UpnpAsyncClient::MappingList >& collected,
+        const UpnpAsyncClient::MappingInfo& newMap )
+{
+    if( !newMap.isValid() )
+    {
+        callback( std::move( *collected ) );
+        return;
+    }
+
+    collected->push_back( std::move( newMap ) );
+    if( !client->getMapping( url, 0,
+                             [ client, url, callback, collected ]
+                             ( const UpnpAsyncClient::MappingInfo& nextMap )
+        { fetchMappingsRecursive( client, url, callback, collected, nextMap ); } ) )
+    {
+        // return what we have rather then nothing
+        callback( std::move( *collected ) );
+    }
+}
+
+bool UpnpAsyncClient::getAllMappings(
+        const QUrl& url, const std::function< void( const MappingList& ) >& callback )
+{
+    std::shared_ptr< std::vector< MappingInfo > > mappings;
+    return getMapping( url, 0,
+                       [ this, url, callback, mappings ]( const MappingInfo& newMap )
+    {
+        fetchMappingsRecursive( this, url, callback, mappings, newMap );
+    } );
+}
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( UpnpAsyncClient::Protocol,
+    ( UpnpAsyncClient::TCP, "tcp" )
+    ( UpnpAsyncClient::UDP, "udp" )
+)

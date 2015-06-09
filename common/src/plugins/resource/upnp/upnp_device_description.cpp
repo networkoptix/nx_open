@@ -1,9 +1,10 @@
 #include "upnp_device_description.h"
 
+
+static const QString urnTemplate = lit( "urn:schemas-upnp-org:%1:%2:%3" );
 QString toUpnpUrn( const QString& id, const QString& suffix, int version )
 {
-    static const QString urn = lit( "urn:schemas-upnp-org:%1:%2:%3" );
-    return urn.arg( suffix ).arg( id ).arg( version );
+    return urnTemplate.arg( suffix ).arg( id ).arg( version );
 }
 
 QString fromUpnpUrn( const QString& urn, const QString& suffix, int version )
