@@ -329,6 +329,7 @@
             <modules>                       
                 <module>applauncher</module> 
                 <module>client</module>     
+                <module>client.core</module>     
                 <module>clientexe</module>
             </modules>  
         </profile>         
@@ -344,6 +345,7 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->                   
                 <module>client</module>
+                <module>client.core</module>     
                 <module>axclient</module>
                 <module>rtu</module>
                 <module>clientexe</module>
