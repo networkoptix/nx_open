@@ -486,7 +486,11 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     // Client reconnects to the server
     if( m_localPeer.isClient() ) {
         q.removeQueryItem("isClient");
-        q.addQueryItem("isClient", QString());
+        q.removeQueryItem("isMobile");
+        if (m_localPeer.isMobileClient())
+            q.addQueryItem("isMobile", QString());
+        else
+            q.addQueryItem("isClient", QString());
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
     }
@@ -625,7 +629,13 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
     switch( m_remotePeer.dataFormat )
     {
         case Qn::JsonFormat:
-            if( !QnJsonTransactionSerializer::deserializeTran(
+            if (m_localPeer.isMobileClient()) {
+                transportHeader.sender = m_remotePeer.id;
+                transportHeader.processedPeers.insert(m_localPeer.id);
+                transportHeader.processedPeers.insert(m_remotePeer.id);
+                transportHeader.dstPeers.insert(m_localPeer.id);
+                serializedTran = tranData;
+            } else if( !QnJsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.constData()),
                     tranData.size(),
                     transportHeader,

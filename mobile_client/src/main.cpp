@@ -77,6 +77,7 @@ int runApplication(QGuiApplication *application) {
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_MobileClient; // TODO: #dklychkov check connection type
+    runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
