@@ -52,6 +52,30 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>
-        <buildLib>sharedlib</buildLib>
     </properties>
+    
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>            
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>            
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>	
+    </profiles>	
 </project>
