@@ -17,7 +17,6 @@ Grid
     readonly property alias subnetMaskControl: subnetMask;
 
     property string adapterNameValue;
-    property string macAddressValue;
 
     spacing: SizeManager.spacing.small;
 
@@ -30,7 +29,7 @@ Grid
 
         height: SizeManager.clickableSizes.base;
 
-        text: (thisComponent.isSingleSelectionModel ? adapterNameValue : qsTr("Multiple interfaces"));
+        text: (thisComponent.isSingleSelectionModel ? readableName: qsTr("Multiple interfaces"));
         verticalAlignment: Text.AlignVCenter;
     }
 
@@ -40,7 +39,7 @@ Grid
 
         height: SizeManager.clickableSizes.base;
 
-        text: (thisComponent.isSingleSelectionModel ? adapterNameValue : " ");
+        text: (thisComponent.isSingleSelectionModel && (model.index === 0) ? "Mask": " ");
         verticalAlignment: Text.AlignVCenter;
     }
 

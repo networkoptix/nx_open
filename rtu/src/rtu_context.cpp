@@ -27,6 +27,8 @@ public:
     
     ///
     
+    int selectionFlags() const;
+    
     int selectedServersCount() const;
     
     int selectionPort() const;
@@ -99,6 +101,16 @@ rtu::HttpClient *rtu::RtuContext::Impl::httpClient()
     return m_httpClient;
 }
 
+int rtu::RtuContext::Impl::selectionFlags() const
+{
+    const ServerInfoList &servers = m_selectionModel->selectedServers();
+    Constants::ServerFlags result = Constants::ServerFlag::kAllFlags;
+    for (const ServerInfo * const info: servers)
+    {
+        result &= info->baseInfo().flags;
+    }
+    return static_cast<int>(result);
+}
 
 int rtu::RtuContext::Impl::selectedServersCount() const
 {
@@ -108,11 +120,13 @@ int rtu::RtuContext::Impl::selectedServersCount() const
 #include <functional>
 
 template<typename ParameterType
-    , typename GetterFunc>
+    , typename GetterFunc
+    , typename EqualsFunc>
 ParameterType getSelectionValue(const rtu::ServerInfoList &servers
     , const ParameterType &emptyValue
     , const ParameterType &differentValue
-    , const GetterFunc &getter)
+    , const GetterFunc &getter
+    , const EqualsFunc &eq)
 {
     if (servers.empty())
         return emptyValue;
@@ -120,7 +134,7 @@ ParameterType getSelectionValue(const rtu::ServerInfoList &servers
     const rtu::ServerInfo * const firstInfo = *servers.begin();
     const ParameterType &value = getter(*firstInfo);
     const auto itDifferentValue = std::find_if(servers.begin(), servers.end()
-        , [&value, &getter](const rtu::ServerInfo *info) { return (getter(*info) != value);});
+        , [&value, &getter, &eq](const rtu::ServerInfo *info) { return (!eq(getter(*info), value));});
     return (itDifferentValue == servers.end() ? value : differentValue);
 }
 
@@ -130,12 +144,49 @@ int rtu::RtuContext::Impl::selectionPort() const
     enum { kDefaultPort = 0 };
     
     return getSelectionValue<int>(selectedServers, kDefaultPort, kDefaultPort,
-        [](const ServerInfo &info) { return info.baseInfo().port; });
+        [](const ServerInfo &info) { return info.baseInfo().port; }
+        ,  std::equal_to<int>());
 }
 
 QDateTime rtu::RtuContext::Impl::selectionDateTime() const
 {
-    return QDateTime::currentDateTime();
+    const ServerInfoList &servers = m_selectionModel->selectedServers();
+    if (servers.empty())
+        return QDateTime();
+    
+    const Constants::ServerFlags flags = 
+        static_cast<Constants::ServerFlags>(selectionFlags());
+    const int selectedCount = selectedServersCount();
+
+    const ServerInfo &firstInfo = **servers.begin();
+    if (selectedCount == 1)
+    {
+        if (firstInfo.hasExtraInfo())
+            return firstInfo.extraInfo().dateTime.toLocalTime();
+    }
+    else if (!(flags & Constants::ServerFlag::kAllowChangeDateTime))
+    {
+        return QDateTime();
+    }
+
+    static const auto &eq = [](const QDateTime &first, const QDateTime &second)
+    {
+        enum { kEps = 3 * 1000};    /// 3 seconds
+        return (std::abs(first.toMSecsSinceEpoch() - second.toMSecsSinceEpoch()) < kEps);
+    };
+
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    const auto &getter = [now](const ServerInfo &info) -> QDateTime
+    {
+        if (!info.hasExtraInfo())
+            return QDateTime();
+        
+        const qint64 dateMsecs = info.extraInfo().dateTime.toMSecsSinceEpoch();
+        const qint64 timestamp = info.extraInfo().timestamp.toMSecsSinceEpoch();
+        return QDateTime::fromMSecsSinceEpoch(dateMsecs + (now - timestamp));
+    };
+
+    return getSelectionValue(servers, QDateTime(), QDateTime(), getter, eq);  
 }
 
 QString rtu::RtuContext::Impl::selectionSystemName() const
@@ -145,14 +196,18 @@ QString rtu::RtuContext::Impl::selectionSystemName() const
         return QString();
     
     const ServerInfo &info = **selectedServers.begin();
-    return (info.baseInfo().flags & ServerFlag::kIsFactory ? QString() : info.baseInfo().systemName);
+    return (info.baseInfo().flags & Constants::ServerFlag::kIsFactory ? QString() : info.baseInfo().systemName);
 }
 
 QString rtu::RtuContext::Impl::selectionPassword() const
 {
     static const QString kDifferentPasswords = tr("<Different passwords>");
     return getSelectionValue(m_selectionModel->selectedServers(), QString(), kDifferentPasswords
-        , [](const ServerInfo &info) -> QString { return info.extraInfo().password; });
+        , [](const ServerInfo &info) -> QString 
+    {
+        return (info.hasExtraInfo() ? info.extraInfo().password : QString()); 
+    }
+    ,  std::equal_to<QString>() );
 }
 
 bool rtu::RtuContext::Impl::allowEditIpAddresses() const
@@ -169,7 +224,8 @@ bool rtu::RtuContext::Impl::allowEditIpAddresses() const
     };
     
     const int ipsCount = getSelectionValue<int>(selectedServers, kEmptyIps, kDifferentIpsCount
-        , [](const ServerInfo &info) -> int { return info.extraInfo().interfaces.size(); });
+        , [](const ServerInfo &info) -> int { return info.extraInfo().interfaces.size(); }
+        , std::equal_to<int>());
     
     return (ipsCount == kSingleIp ? true : false);
 }
@@ -242,6 +298,11 @@ QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
 }
 
 
+int rtu::RtuContext::selectionFlags() const
+{
+    return m_impl->selectionFlags();
+}
+
 int rtu::RtuContext::selectedServersCount() const
 {
     return m_impl->selectedServersCount();
@@ -286,5 +347,4 @@ int rtu::RtuContext::currentPage() const
 {
     return m_impl->currentPage();
 }
-
 

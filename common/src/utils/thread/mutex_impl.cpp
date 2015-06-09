@@ -33,7 +33,7 @@ QnMutexImpl::~QnMutexImpl()
 void QnMutexImpl::afterMutexLocked(
     const char* sourceFile,
     int sourceLine,
-    int lockID )
+    size_t lockID )
 {
     threadHoldingMutex = QnLongRunnable::currentThreadSystemId();
     ++recursiveLockCount;

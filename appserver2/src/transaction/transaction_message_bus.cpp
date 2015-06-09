@@ -816,7 +816,6 @@ namespace ec2
 
         // proxy incoming transaction to other peers.
         if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
-            emit transactionProcessed(tran);
             return; // all dstPeers already processed
         }
 
@@ -847,7 +846,6 @@ namespace ec2
                 NX_LOG( QnLog::EC2_TRAN_LOG, lit("proxy transaction %1 to (%2)").arg(tran.toString()).arg(proxyListStr), cl_logDEBUG1);
             }
 
-            emit transactionProcessed(tran);
     };
 
     void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
@@ -1498,40 +1496,41 @@ namespace ec2
         }
     }
 
-QList<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() const {
-    QList<QnTransportConnectionInfo> connections;
+    QList<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() const {
+        QList<QnTransportConnectionInfo> connections;
 
-    auto storeTransport = [&connections](const QnTransactionTransport *transport) {
-        QnTransportConnectionInfo info;
-        info.url = transport->remoteAddr();
-        info.state = transport->getState();
-        info.incoming = transport->isIncoming();
-        info.remotePeerId = transport->remotePeer().id;
-        connections.append(info);
-    };
+        auto storeTransport = [&connections](const QnTransactionTransport *transport) {
+            QnTransportConnectionInfo info;
+            info.url = transport->remoteAddr();
+            info.state = transport->getState();
+            info.incoming = transport->isIncoming();
+            info.remotePeerId = transport->remotePeer().id;
+            connections.append(info);
+        };
 
-    QnMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
 
-    for (const QnTransactionTransport *transport: m_connections.values())
-        storeTransport(transport);
-    for (const QnTransactionTransport *transport: m_connectingConnections)
-        storeTransport(transport);
+        for (const QnTransactionTransport *transport: m_connections.values())
+            storeTransport(transport);
+        for (const QnTransactionTransport *transport: m_connectingConnections)
+            storeTransport(transport);
 
-    return connections;
-}
-
-void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
-{
-    QnMutexLocker lock( &m_mutex );
-    for( QnTransactionTransport* transport: m_connections )
-    {
-        if( transport->connectionGuid() != connectionGuid )
-            continue;
-        //mutex is unlocked if we go to wait
-        transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
-        return;
+        return connections;
     }
-}
+
+    void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
+    {
+        QnMutexLocker lock( &m_mutex );
+        for( QnTransactionTransport* transport: m_connections )
+        {
+            if( transport->connectionGuid() != connectionGuid )
+                continue;
+            //lock.unlock();
+            //mutex is unlocked if we go to wait
+            transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+            return;
+        }
+    }
 
     void QnTransactionMessageBus::dropConnections()
     {

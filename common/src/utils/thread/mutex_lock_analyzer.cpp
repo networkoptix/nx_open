@@ -37,7 +37,7 @@ MutexLockKey::MutexLockKey(
     const char* _sourceFile,
     int _sourceLine,
     QnMutex* _mutexPtr,
-    int _lockID,
+    size_t _lockID,
     std::uintptr_t _threadHoldingMutex )
 :
     sourceFile( _sourceFile ),
@@ -147,6 +147,12 @@ LockGraphEdgeData::LockGraphEdgeData()
 LockGraphEdgeData::LockGraphEdgeData( LockGraphEdgeData&& rhs )
 :
     lockPositions( std::move(rhs.lockPositions) )
+{
+}
+
+LockGraphEdgeData::LockGraphEdgeData( const LockGraphEdgeData& rhs )
+:
+    lockPositions( rhs.lockPositions )
 {
 }
 
