@@ -487,10 +487,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     if( m_localPeer.isClient() ) {
         q.removeQueryItem("isClient");
         q.removeQueryItem("isMobile");
-        if (m_localPeer.isMobileClient())
-            q.addQueryItem("isMobile", QString());
-        else
-            q.addQueryItem("isClient", QString());
+        q.addQueryItem("isClient", QString());
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
     }
