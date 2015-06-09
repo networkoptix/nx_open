@@ -16,6 +16,7 @@ class QnTimeline : public QQuickItem {
     Q_PROPERTY(QDateTime windowEndDate READ windowEndDate WRITE setWindowEndDate NOTIFY windowEndDateChanged)
     Q_PROPERTY(QDateTime positionDate READ positionDate WRITE setPositionDate NOTIFY positionDateChanged)
     Q_PROPERTY(bool stickToEnd READ stickToEnd WRITE setStickToEnd NOTIFY stickToEndChanged)
+    Q_PROPERTY(QDateTime startBoundDate READ startBoundDate WRITE setStartBoundDate NOTIFY startBoundDateChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
@@ -69,6 +70,12 @@ public:
     bool stickToEnd() const;
     void setStickToEnd(bool stickToEnd);
 
+    qint64 startBound() const;
+    void setStartBound(qint64 startBound);
+
+    QDateTime startBoundDate() const;
+    void setStartBoundDate(const QDateTime &startBoundDate);
+
     Q_INVOKABLE void zoomIn(int x = -1);
     Q_INVOKABLE void zoomOut(int x = -1);
 
@@ -93,6 +100,8 @@ signals:
     void positionChanged();
     void positionDateChanged();
     void stickToEndChanged();
+    void startBoundChanged();
+    void startBoundDateChanged();
 
     void textColorChanged();
     void chunkColorChanged();

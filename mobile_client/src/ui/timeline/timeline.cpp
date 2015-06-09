@@ -416,6 +416,30 @@ void QnTimeline::setStickToEnd(bool stickToEnd) {
     update();
 }
 
+void QnTimeline::setStartBound(qint64 startBound) {
+    if (d->startBoundTime == startBound)
+        return;
+
+    d->startBoundTime = startBound;
+
+    emit startBoundChanged();
+    emit startBoundDateChanged();
+
+    update();
+}
+
+QDateTime QnTimeline::startBoundDate() const {
+    return QDateTime::fromMSecsSinceEpoch(startBound(), Qt::UTC);
+}
+
+void QnTimeline::setStartBoundDate(const QDateTime &startBoundDate) {
+    setStartBound(startBoundDate.isValid() ? startBoundDate.toMSecsSinceEpoch() : -1);
+}
+
+qint64 QnTimeline::startBound() const {
+    return d->startBoundTime;
+}
+
 void QnTimeline::zoomIn(int x) {
     d->zoomWindow(zoomMultiplier, x >= 0 ? x : width() / 2);
 }

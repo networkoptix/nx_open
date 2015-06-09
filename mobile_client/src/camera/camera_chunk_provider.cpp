@@ -35,6 +35,10 @@ void QnCameraChunkProvider::setResourceId(const QString &id) {
         m_loader = nullptr;
     }
 
+    m_periodList.clear();
+    emit timePeriodsUpdated();
+    emit bottomBoundChanged();
+
     QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
     if (!camera)
         return;
@@ -43,11 +47,20 @@ void QnCameraChunkProvider::setResourceId(const QString &id) {
     connect(m_loader, &QnFlatCameraDataLoader::ready, this, [this](const QnAbstractCameraDataPtr &data) {
         m_periodList = data->dataSource();
         emit timePeriodsUpdated();
+        emit bottomBoundChanged();
     });
 
     connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, m_loader, [this](){ m_loader->discardCachedData(); } );
     connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryInvalidated, this, &QnCameraChunkProvider::update);
 
+}
+
+QDateTime QnCameraChunkProvider::bottomBound() const {
+    QnTimePeriod boundingPeriod = m_periodList.boundingPeriod();
+    if (boundingPeriod.startTimeMs > 0)
+        return QDateTime::fromMSecsSinceEpoch(boundingPeriod.startTimeMs, Qt::UTC);
+    else
+        return QDateTime();
 }
 
 void QnCameraChunkProvider::update() {

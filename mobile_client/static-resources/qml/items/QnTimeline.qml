@@ -14,6 +14,7 @@ Item {
     property alias stickToEnd: timeline.stickToEnd
     property alias font: timeline.font
     property alias chunkProvider: timeline.chunkProvider
+    property alias startBoundDate: timeline.startBoundDate
 
     function zoomIn() {
         timeline.zoomIn()

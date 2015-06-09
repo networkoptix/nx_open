@@ -150,6 +150,7 @@ Page {
             chunkBarHeight: Units.dp(36)
 
             chunkProvider: chunkProvider
+            startBoundDate: chunkProvider.bottomBound
         }
 
         Rectangle {

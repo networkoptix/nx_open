@@ -11,6 +11,7 @@ class QnFlatCameraDataLoader;
 class QnCameraChunkProvider : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QDateTime bottomBound READ bottomBound NOTIFY bottomBoundChanged)
 
 public:
     QnCameraChunkProvider(QObject *parent = 0);
@@ -20,12 +21,15 @@ public:
     QString resourceId() const;
     void setResourceId(const QString &id);
 
+    QDateTime bottomBound() const;
+
 public slots:
     void update();
 
 signals:
     void timePeriodsUpdated();
     void resourceIdChanged();
+    void bottomBoundChanged();
 
 private:
     QnFlatCameraDataLoader *m_loader;
