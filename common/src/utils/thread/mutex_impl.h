@@ -35,7 +35,7 @@ public:
     void afterMutexLocked(
         const char* sourceFile,
         int sourceLine,
-        int lockID );
+        size_t lockID );
     void beforeMutexUnlocked();
 };
 

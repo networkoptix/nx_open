@@ -95,7 +95,7 @@ public:
     QByteArray sourceFile;
     int line;
     QnMutex* mutexPtr;
-    int lockID;
+    size_t lockID;
     std::uintptr_t threadHoldingMutex;
     int lockRecursionDepth;
 
@@ -104,7 +104,7 @@ public:
         const char* sourceFile,
         int sourceLine,
         QnMutex* mutexPtr,
-        int lockID,
+        size_t lockID,
         std::uintptr_t threadHoldingMutex );
 
     bool operator<( const MutexLockKey& rhs ) const;
