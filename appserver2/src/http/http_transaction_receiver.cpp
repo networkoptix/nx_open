@@ -118,19 +118,19 @@ namespace ec2
             }
 
             if( !readSingleRequest() )
-                return;
+                break;
             
             if( d->request.requestLine.method != nx_http::Method::POST )
             {
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-                return;
+                break;
             }
 
             auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
             if( connectionGuidIter == d->request.headers.end() )
             {
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-                return;
+                break;
             }
 
             const QnUuid requestConnectionGuid( connectionGuidIter->second );
@@ -142,7 +142,7 @@ namespace ec2
             {
                 //not allowing to use TCP same connection for multiple transaction connections
                 sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
-                return;
+                break;
             }
 
             if( !QnTransactionMessageBus::instance()->gotTransactionFromRemotePeer(
@@ -153,7 +153,7 @@ namespace ec2
                 NX_LOG( lit("QnHttpTransactionReceiver. Received transaction from %1 for unknown connection %2").
                     arg(d->socket->getForeignAddress().toString()).arg(connectionGuid.toString()), cl_logWARNING );
                 sendResponse( nx_http::StatusCode::notFound, nx_http::StringType() );
-                return;
+                break;
             }
 
             //checking whether connection persistent or not...
@@ -174,7 +174,10 @@ namespace ec2
             sendResponse( nx_http::StatusCode::ok, nx_http::StringType() );
 
             if( closeConnection )
-                return;
+                break;
         }
+
+        if( !connectionGuid.isNull() )
+            QnTransactionMessageBus::instance()->connectionFailure( connectionGuid );
     }
 }
