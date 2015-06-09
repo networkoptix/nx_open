@@ -28,7 +28,7 @@ namespace
         , const int port
         , const QString &user
         , const QString &password
-        , const QString &namespaceTag)
+        , const QString &kCommand)
     {
         QUrl url;
         url.setScheme("http");
@@ -36,7 +36,7 @@ namespace
         url.setPort(port);
         url.setUserName(user);
         url.setPassword(password);
-        url.setPath(namespaceTag);
+        url.setPath(kCommand);
         return url;
     }
     
@@ -67,6 +67,13 @@ bool isErrorReply(const QJsonObject &object)
     return (object.contains(kErrorTag) ? object.value(kErrorTag).toInt() : true);
 }
 
+QString getErrorDescription(const QJsonObject &object)
+{
+    static const QString &kReasonTag = "errorString";
+    return (object.contains(kReasonTag) ? 
+        object.value(kReasonTag).toString() : QString());
+}
+
 bool parseIfListCmd(const QJsonObject &object
     , rtu::ExtraServerInfo &extraInfo)
 {
@@ -95,10 +102,13 @@ bool parseIfListCmd(const QJsonObject &object
             return false;
         }
         
-        const rtu::InterfaceInfo ifInfo = { ifObject.value(kNameTag).toString()
-            , ifObject.value(kIpAddressTag).toString(), ifObject.value(kMacAddressTag).toString()
-            , ifObject.value(kMaskTag).toString(), ifObject.value(kGateWayTag).toString()
-            , ifObject.value(kDHCPTag).toBool() ? Qt::Checked : Qt::Unchecked };
+        const rtu::InterfaceInfo &ifInfo = rtu::InterfaceInfo(
+            ifObject.value(kNameTag).toString()
+            , ifObject.value(kIpAddressTag).toString()
+            , ifObject.value(kMacAddressTag).toString()
+            , ifObject.value(kMaskTag).toString()
+            , ifObject.value(kGateWayTag).toString()
+            , ifObject.value(kDHCPTag).toBool() ? Qt::Checked : Qt::Unchecked);
         interfaces.push_back(ifInfo);
     }
     
@@ -129,8 +139,8 @@ bool parseGetTimeCmd(const QJsonObject &object
         ? QTimeZone(timeData.value(kTimeZoneIdTag).toString().toStdString().c_str())
         : QTimeZone(timeData.value(kTimeZoneOffsetTag).toInt()));
 
-    const QDateTime &utcTime = 
-        QDateTime::fromMSecsSinceEpoch(timeData.value(kUtcTimeTag).toInt());
+    const qint64 msecs = timeData.value(kUtcTimeTag).toString().toLongLong();
+    const QDateTime &utcTime = QDateTime::fromMSecsSinceEpoch(msecs);
     
     extraInfo.dateTime = (timeZone.isValid() ? utcTime.toTimeZone(timeZone) : utcTime);
     extraInfo.timestamp = QDateTime::currentDateTime();
@@ -219,17 +229,21 @@ void rtu::getServerExtraInfo(HttpClient *client
     url.setQuery(query);
 
     const QUuid &id = baseInfo.id;
-    const auto successfulCallback = 
-        [successful, failed, id, password](const QByteArray &data)
+    
+    const auto handleSuccessfullResult = 
+        [id, successful, failed, password](const QByteArray &data, const QString &cmdName)
     {
         rtu::ExtraServerInfo extraInfo;
-        const bool parsed = parseExtraInfoCommand(kGetServerExtraInfoCmd
+        const bool parsed = parseExtraInfoCommand(cmdName
             , QJsonDocument::fromJson(data.data()).object(), extraInfo);
                 
         if (parsed)
         {
             if (successful)
+            {
+                extraInfo.password = password;
                 successful(id, extraInfo);
+            }
         }
         else if (failed)
         {
@@ -237,19 +251,39 @@ void rtu::getServerExtraInfo(HttpClient *client
         }
     };
 
-    const auto failedCallback = [failed, id](const QString &) 
+    const auto successfulCallback = [handleSuccessfullResult](const QByteArray &data)
     {
-        if (failed)
-            failed(id);
+        handleSuccessfullResult(data, kGetServerExtraInfoCmd);
+    };
+
+    const auto failedCallback = 
+        [client, baseInfo, failed, password, handleSuccessfullResult](const QString &, int) 
+    {
+        const auto succesfulCallback = 
+            [handleSuccessfullResult](const QByteArray &data)
+        {
+            handleSuccessfullResult(data, kGetTimeCmdName);
+        };
+        
+        const auto failedCallback = 
+            [failed, baseInfo](const QString &, int)
+        {
+            if (failed)
+                failed(baseInfo.id);
+        };
+
+        const QUrl url = makeUrl(baseInfo.hostAddress, baseInfo.port
+            , adminUserName(), password, kGetTimeCmdName);
+        client->sendGet(url, succesfulCallback, failedCallback);
     };
     
-    client->sendGet(url, successfulCallback, failed);
+    client->sendGet(url, successfulCallback, failedCallback);
 }
 
 rtu::HttpClient::OnErrorReplyFunc makeFailedCallback(const rtu::OperationCallback &callback
     , rtu::AffectedEntities affected)
 {
-    const auto result = [callback, affected](const QString &reason)
+    const auto result = [callback, affected](const QString &reason, int)
     {
         callback(reason, affected);
     };
@@ -309,6 +343,7 @@ bool rtu::configureRequest(HttpClient *client
         callback(QString(), 0);
     };
     
+    qDebug() << url;
     client->sendGet(url, successfullCallback, makeFailedCallback(callback, affected));
     return true;
 }
@@ -359,7 +394,7 @@ bool rtu::getTimeRequest(HttpClient *client
         successfullCallback(id, serverTime, QDateTime::currentDateTimeUtc());
     };
     
-    const auto fCallback = [failedCallback, id] (const QString &) 
+    const auto fCallback = [failedCallback, id] (const QString &, int) 
     {
         if (failedCallback)
             failedCallback(id); 
@@ -369,13 +404,54 @@ bool rtu::getTimeRequest(HttpClient *client
     return true;
 }
 
-bool rtu::setTimeRequest(HttpClient *client
+void rtu::setTimeRequest(HttpClient *client
     , const ServerInfo &info
     , const QDateTime &dateTime
-    , const DateTimeCallbackType &succesfulCallback
-    , const FailedCallback &failedCallback)
+    , const DateTimeCallbackType &successfulCallback
+    , const OperationCallback &failedCallback)
 {
-    return true;
+    static const QString &kCmdName = kApiNamespaceTag + "settime";
+    static const QString &kDateTimeTag = "datetime";
+    static const QString &kTimeZoneTag = "timezone";
+    
+    if (!info.hasExtraInfo())
+        return;
+    
+    QUrl url = makeUrl(info.baseInfo().hostAddress, info.baseInfo().port
+        , adminUserName(), info.extraInfo().password, kCmdName);
+
+    QString strTime = dateTime.toUTC().toString(Qt::ISODate);
+    strTime.remove(strTime.size() - 1, 1);      /// Removes 'Z' character
+    
+    QUrlQuery query;
+    query.addQueryItem(kDateTimeTag, strTime);
+    query.addQueryItem(kTimeZoneTag, dateTime.timeZone().id());
+    url.setQuery(query);
+    
+    const QDateTime timestamp = QDateTime::currentDateTime();
+    const auto &successful = 
+        [info, dateTime, timestamp, successfulCallback, failedCallback](const QByteArray &data)
+    {
+        const QJsonObject &object = QJsonDocument::fromJson(data.data()).object();
+        if (isErrorReply(object))
+        {
+            if (failedCallback)
+                failedCallback(getErrorDescription(object), kDateTime | kTimeZone);
+        }
+        else if (successfulCallback)
+        {
+            successfulCallback(info.baseInfo().id, dateTime, timestamp);
+        }
+    };
+
+    const auto &failed = [failedCallback](const QString &errorReason, int)
+    {
+        if (failedCallback)
+            failedCallback(errorReason, kDateTime | kTimeZone);
+    };
+    
+    qDebug() << url;
+    client->sendGet(url, successful, failed);
 }
 
 QJsonObject serializeAddr(const rtu::InterfaceInfo &address
@@ -384,11 +460,12 @@ QJsonObject serializeAddr(const rtu::InterfaceInfo &address
     static const QString kIpTag = "ipAddr";
     static const QString kMaskTag = "netMask";
     static const QString kDHCPFlagTag = "dhcp";
-    static const QString kMacAddressTag = "mac";
+    static const QString kNameTag = "name";
     
     QJsonObject jsonAddr;
-    if (!address.macAddress.isEmpty())
-        jsonAddr.insert(kMacAddressTag, address.macAddress);
+    if (!address.name.isEmpty())
+        jsonAddr.insert(kNameTag, address.name);
+    
     if (!address.ip.isEmpty())
     {
         jsonAddr.insert(kIpTag, address.ip);
@@ -406,12 +483,12 @@ QJsonObject serializeAddr(const rtu::InterfaceInfo &address
     return jsonAddr;
 }
 
-bool rtu::changeIpsRequest(HttpClient *client
+void rtu::changeIpsRequest(HttpClient *client
     , const ServerInfo &info
     , const InterfaceInfoList &addresses
     , const OperationCallback &callback)
 {
-    const QString kCommandName = "changeIpAddresses";
+    const QString kCommandName = "ifconfig";
 
     QJsonArray jsonAddresses;
     AffectedEntities affected = 0;
@@ -422,20 +499,15 @@ bool rtu::changeIpsRequest(HttpClient *client
 
     QUrl url = makeUrl(info.baseInfo().hostAddress, info.baseInfo().port
         , adminUserName(), info.extraInfo().password, kApiNamespaceTag + kCommandName);
-    
     const auto &successfullCallback = [callback](const QByteArray &data) 
     {
+        qDebug() <<"***" << data;
         callback(QString(), 0);
     };
-    
-    const auto &failedCallback = [callback](int errorCode) 
-    {
-        callback(QString("No error"), 0);
-    };
 
-    qDebug() << jsonAddresses;
-    client->sendPost(url, QJsonDocument(jsonAddresses).toBinaryData(), successfullCallback
+    qDebug() << url;
+    qDebug() << QJsonDocument(jsonAddresses).toJson();
+    client->sendPost(url, QJsonDocument(jsonAddresses).toJson(), successfullCallback
         , makeFailedCallback(callback, affected));
-    return true;
 }
 

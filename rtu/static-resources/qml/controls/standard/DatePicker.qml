@@ -46,7 +46,7 @@ QtControls.TextField
         if (!initDate && (text === impl.emptyMaskValue))
             return;
         
-        if (initDate && date && (initDate !== date))
+        if (initDate && date && (impl.stringFromDate(initDate) !== impl.stringFromDate(date)))
             thisComponent.changed = true;
     }
     
@@ -56,9 +56,9 @@ QtControls.TextField
         readonly property string mask: (dateFormat.replace(new RegExp(/[a-zA-Z0-9]/g), "9") + ";-");
         readonly property string emptyMaskValue: ":";  
     
-        function stringFromDate(timeValue)
+        function stringFromDate(dateValue)
         {
-            return (timeValue ? timeValue.toLocaleDateString(Qt.locale(), dateFormat) : "");
+            return (dateValue ? dateValue.toLocaleDateString(Qt.locale(), dateFormat) : "");
         }
     }
 }

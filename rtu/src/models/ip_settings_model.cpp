@@ -17,7 +17,7 @@ namespace
         , kIpAddressRoleId
         , kSubnetMaskRoleId
         , kIsDHCP
-        , kMacAddress
+        , kReadableName
         
         , kLastCustomRoleId
     };
@@ -30,7 +30,7 @@ namespace
         result.insert(kIpAddressRoleId, "address");
         result.insert(kSubnetMaskRoleId, "subnetMask");
         result.insert(kIsDHCP, "useDHCP");
-        result.insert(kMacAddress, "macAddress");
+        result.insert(kReadableName, "readableName");
         return result;
     }();
     
@@ -65,7 +65,7 @@ namespace
     
         const Qt::CheckState useDHCP = (diffUseDHCP ? Qt::PartiallyChecked : initialUseDHCP);
         rtu::InterfaceInfoList addresses;
-        addresses.push_back({"", "", "", "", "", useDHCP});
+        addresses.push_back(rtu::InterfaceInfo(useDHCP));
         return addresses;
     }
 }
@@ -150,19 +150,15 @@ QVariant rtu::IpSettingsModel::Impl::data(const QModelIndex &index
     switch(role)
     {
     case kAdapterNameRoleId:
-    {
-        if (!m_isSingleSelection)
-            return tr("Multiple interfaces");
-        return tr("Adapter #%1").arg(QString::number(row + 1));
-    }
+        return info.name;
     case kIpAddressRoleId:
         return info.ip;
     case kSubnetMaskRoleId:
         return info.mask;
     case kIsDHCP:
         return info.useDHCP;
-    case kMacAddress:
-        return info.macAddress;
+    case kReadableName:
+        return QString("Interface #%1").arg(QString::number(row + 1));
     default:
         return QVariant();
     }

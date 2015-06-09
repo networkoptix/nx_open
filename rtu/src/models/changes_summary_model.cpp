@@ -26,13 +26,30 @@ namespace
     }();
 
 }
+
 namespace
 {
     struct ServerRequestsInfo
     {
         rtu::ServerInfo info;
-        QSharedPointer<rtu::ServerChangesModel> changesModel;
+        rtu::ServerChangesModel *changesModel;
+
+        ServerRequestsInfo();
+
+        ServerRequestsInfo(const rtu::ServerInfo &initInfo
+            , rtu::ServerChangesModel *initChangesModel);
     };
+
+    ServerRequestsInfo::ServerRequestsInfo()
+        : info()
+        , changesModel(nullptr)
+    {}
+
+    ServerRequestsInfo::ServerRequestsInfo(const rtu::ServerInfo &initInfo
+        , rtu::ServerChangesModel *initChangesModel)
+        : info(initInfo)
+        , changesModel(initChangesModel) 
+    {}
 
     typedef QVector<ServerRequestsInfo> ServersRequests;
 }
@@ -99,8 +116,7 @@ void rtu::ChangesSummaryModel::Impl::addRequestResult(const ServerInfo &info
     {
         int newIndex = rowCount();
         const ModelChangeHelper::Guard modelChangeAction = m_changeHelper->insertRowsGuard(newIndex, newIndex);
-        it = m_requests.insert(m_requests.end()
-            , {info, QSharedPointer<ServerChangesModel>(new ServerChangesModel(m_successfulChangesModel))});
+        it = m_requests.insert(m_requests.end(), ServerRequestsInfo(info, new ServerChangesModel(m_successfulChangesModel, this)));
 
         Q_UNUSED(modelChangeAction);
     }
@@ -160,6 +176,7 @@ void rtu::ChangesSummaryModel::addRequestResult(const ServerInfo &info
 
 int rtu::ChangesSummaryModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return m_impl->rowCount();
 }
 

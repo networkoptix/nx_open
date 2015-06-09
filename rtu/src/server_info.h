@@ -8,19 +8,11 @@
 #include <QMetaType>
 #include <QScopedPointer>
 
+#include <constants.h>
+
 namespace rtu
 {
 
-    enum class ServerFlag
-    {
-        kNoFlags
-        , kAllowChangeDateTime
-        , kAllowChangeInterfaceSettings
-        , kIsFactory
-    };
-    
-    Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
-    
     struct InterfaceInfo
     {
         QString name;
@@ -32,13 +24,25 @@ namespace rtu
         Qt::CheckState useDHCP;
         
         bool operator == (const InterfaceInfo &other);
+
+        InterfaceInfo();
+
+        InterfaceInfo(bool initUseDHCP);
+
+        InterfaceInfo(QString initName
+            , QString initIp
+            , QString initMacAddress
+            , QString initMask
+            , QString initGateway
+            , Qt::CheckState initUseDHCP);
+
     };
     typedef QList<InterfaceInfo> InterfaceInfoList;
     
     struct BaseServerInfo
     {
         QUuid id;
-        ServerFlags flags;
+        Constants::ServerFlags flags;
         
         QString name;
         QString systemName;
@@ -58,6 +62,13 @@ namespace rtu
         QDateTime timestamp;
         QDateTime dateTime;
         InterfaceInfoList interfaces;
+        
+        ExtraServerInfo();
+        
+        ExtraServerInfo(const QString &initPassword
+            , const QDateTime &initTimestamp
+            , const QDateTime &initDateTime
+            , const InterfaceInfoList initInterfaces);
     };
     
     class ServerInfo
@@ -71,10 +82,12 @@ namespace rtu
         
         ~ServerInfo();
         
-        ServerInfo &operator = (ServerInfo other);
+        ServerInfo &operator = (const ServerInfo &other);
         
     public:
         const BaseServerInfo &baseInfo() const;
+        
+        BaseServerInfo &writableBaseInfo();
         
         void setBaseInfo(const BaseServerInfo &baseInfo);
         
@@ -83,6 +96,8 @@ namespace rtu
         bool hasExtraInfo() const;
         
         const ExtraServerInfo &extraInfo() const;
+        
+        ExtraServerInfo &writableExtraInfo();
         
         void setExtraInfo(const ExtraServerInfo &extraInfo);
         

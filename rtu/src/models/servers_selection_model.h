@@ -29,6 +29,21 @@ namespace rtu
         void tryLoginWith(const QString &password);
 
         ///
+        
+        void updateTimeDateInfo(const QUuid &id
+            , const QDateTime &dateTime
+            , const QDateTime &timestamp);
+        
+        void updateInterfacesInfo(const QUuid &id
+            , const InterfaceInfoList &interfaces);
+
+        void updateSystemNameInfo(const QUuid &id
+            , const QString &systemName);
+        
+        void updatePortInfo(const QUuid &id
+            , int port);
+        
+        ///
 
         int selectedCount() const;
         

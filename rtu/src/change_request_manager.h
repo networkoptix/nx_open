@@ -37,14 +37,16 @@ namespace rtu
         
         void addPortChangeRequest(int port);
         
-        void addIpChangeRequest(const QString &macAdderss
+        void addIpChangeRequest(const QString &name
             , bool useDHCP                                
             , const QString &address
             , const QString &subnetMask);
         
         void addSelectionDHCPStateChange(bool useDHCP);
         
-        void addDateTimeChange(const QDateTime &dateTime);
+        void addDateTimeChange(const QDate &date
+            , const QTime &time
+            , const QByteArray &timeZoneId);
         
         void clearChanges();
 

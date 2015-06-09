@@ -20,6 +20,7 @@ namespace rtu
         Q_PROPERTY(QString selectionPassword READ selectionPassword NOTIFY selectionChagned)
         Q_PROPERTY(bool allowEditIpAddresses READ allowEditIpAddresses NOTIFY selectionChagned)
 
+        Q_PROPERTY(int selectionFlags READ selectionFlags NOTIFY selectionChagned)
         Q_PROPERTY(QDateTime selectionDateTime READ selectionDateTime NOTIFY selectionChagned)
         
         Q_PROPERTY(int currentPage READ currentPage WRITE setCurrentPage NOTIFY currentPageChanged)
@@ -53,6 +54,9 @@ namespace rtu
             , const QTime &time
             , const QByteArray &prevTimeZoneId
             , const QByteArray &newTimeZoneId);
+        
+    public:
+        int selectionFlags() const;
         
     public slots:
         int selectedServersCount() const;

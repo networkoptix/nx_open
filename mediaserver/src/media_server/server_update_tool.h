@@ -33,6 +33,7 @@ public:
     qint64 addUpdateFileChunkSync(const QString &updateId, const QByteArray &data, qint64 offset);
     void addUpdateFileChunkAsync(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
+    void installUpdateDelayed(const QString &updateId);
 
 private:
     qint64 addUpdateFileChunkInternal(const QString &updateId, const QByteArray &data, qint64 offset);
