@@ -84,8 +84,6 @@
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/test_camera/testcamera_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
-//#include <plugins/storage/coldstore/coldstore_storage.h>
-//#include <plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
@@ -395,9 +393,6 @@ void ffmpegInit()
 
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
-//#ifdef ENABLE_COLDSTORE
-//    QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
-//#endif
 }
 
 QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
