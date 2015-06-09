@@ -10,7 +10,9 @@ DEFINES += CL_FORCE_LOGO
 #				${basedir}/translations/client_ko.ts \
 #				${basedir}/translations/client_pt-BR.ts \
 
-INCLUDEPATH +=  ${root.dir}/appserver2/src/
+INCLUDEPATH += \
+    ${root.dir}/appserver2/src/ \
+    ${root.dir}/client.core/src/
 
 QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 
