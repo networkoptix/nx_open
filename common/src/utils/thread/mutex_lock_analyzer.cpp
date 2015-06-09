@@ -150,6 +150,12 @@ LockGraphEdgeData::LockGraphEdgeData( LockGraphEdgeData&& rhs )
 {
 }
 
+LockGraphEdgeData::LockGraphEdgeData( const LockGraphEdgeData& rhs )
+:
+    lockPositions( rhs.lockPositions )
+{
+}
+
 LockGraphEdgeData& LockGraphEdgeData::operator=( LockGraphEdgeData&& rhs )
 {
     lockPositions = std::move( rhs.lockPositions );
