@@ -32,6 +32,7 @@ namespace
     const QString kPortTag = "port";
     const QString kRemoteAddressesTag = "remoteAddresses";
     const QString kReplyTag = "reply";
+    const QString kFlagsTag = "flags";
       
     enum 
     {
@@ -66,6 +67,26 @@ namespace
             { info.systemName = object.value(kSystemNameTag).toString(); });
         result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
             { info.port = object.value(kPortTag).toInt(); });
+            
+            
+        result.insert(kFlagsTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+            {
+                typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
+                static const TextFlagsInfo kKnownFlags[] = 
+                {
+                    TextFlagsInfo("SF_timeCtrl", rtu::Constants::ServerFlag::kAllowChangeDateTime)
+                    , TextFlagsInfo("SF_IfListCtrl", rtu::Constants::ServerFlag::kAllowChangeInterfaceSettings)
+                    , TextFlagsInfo("SF_AutoSystemName" , rtu::Constants::ServerFlag::kIsFactory)
+                };
+                
+                info.flags = rtu::Constants::ServerFlag::kNoFlags;
+                const QString textFlags = object.value(kFlagsTag).toString();
+                for (const TextFlagsInfo &flagInfo: kKnownFlags)
+                {
+                    if (textFlags.contains(flagInfo.first));
+                        info.flags &= flagInfo.second;
+                }
+            });
         return result;
     }();
 }

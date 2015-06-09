@@ -1,6 +1,37 @@
 
 #include "server_info.h"
 
+rtu::InterfaceInfo::InterfaceInfo()
+    : name()
+    , ip()
+    , macAddress()
+    , mask()
+    , gateway()
+    , useDHCP()
+{}
+
+rtu::InterfaceInfo::InterfaceInfo(bool initUseDHCP)
+    : name()
+    , ip()
+    , macAddress()
+    , mask()
+    , gateway()
+    , useDHCP(initUseDHCP ? Qt::Checked : Qt::Unchecked)
+{}
+
+rtu::InterfaceInfo::InterfaceInfo(QString initName
+    , QString initIp
+    , QString initMacAddress
+    , QString initMask
+    , QString initGateway
+    , Qt::CheckState initUseDHCP)
+    : name(initName)
+    , ip(initIp)
+    , macAddress(initMacAddress)
+    , mask(initMask)
+    , gateway(initGateway)
+    , useDHCP(initUseDHCP)
+{}
 
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
@@ -18,6 +49,29 @@ bool rtu::operator != (const BaseServerInfo &first
 {
     return !(first == second);
 }
+
+///
+
+rtu::ExtraServerInfo::ExtraServerInfo()
+    : password()
+    , timestamp()
+    , dateTime()
+    , interfaces()
+{
+}
+
+rtu::ExtraServerInfo::ExtraServerInfo(const QString &initPassword
+    , const QDateTime &initTimestamp
+    , const QDateTime &initDateTime
+    , const InterfaceInfoList initInterfaces)
+    : password(initPassword)
+    , timestamp(initTimestamp)
+    , dateTime(initDateTime)
+    , interfaces(initInterfaces)
+{
+}
+
+///
 
 rtu::ServerInfo::ServerInfo()
     : m_base()
@@ -42,13 +96,20 @@ rtu::ServerInfo::~ServerInfo()
 {
 }
 
-rtu::ServerInfo &rtu::ServerInfo::operator = (ServerInfo other)
+rtu::ServerInfo &rtu::ServerInfo::operator = (const ServerInfo &other)
 {
-    std::swap(*this, other);
+    m_base = other.baseInfo();
+    if (other.hasExtraInfo())
+        setExtraInfo(other.extraInfo());
     return *this;
 }
 
 const rtu::BaseServerInfo &rtu::ServerInfo::baseInfo() const
+{
+    return m_base;
+}
+
+rtu::BaseServerInfo &rtu::ServerInfo::writableBaseInfo()
 {
     return m_base;
 }
@@ -64,6 +125,12 @@ bool rtu::ServerInfo::hasExtraInfo() const
 }
 
 const rtu::ExtraServerInfo &rtu::ServerInfo::extraInfo() const
+{
+    Q_ASSERT(!m_extra.isNull());
+    return *m_extra;
+}
+
+rtu::ExtraServerInfo &rtu::ServerInfo::writableExtraInfo()
 {
     Q_ASSERT(!m_extra.isNull());
     return *m_extra;

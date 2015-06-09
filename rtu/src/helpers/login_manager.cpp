@@ -9,7 +9,12 @@
 
 namespace
 {
-    QStringList g_availablePasswords({rtu::defaultAdminPassword()});
+    QStringList g_availablePasswords = []() -> QStringList
+    {
+        QStringList result;
+        result.push_back(rtu::defaultAdminPassword());
+        return result;
+    }();
 }
 
 class rtu::LoginManager::Impl : public QObject

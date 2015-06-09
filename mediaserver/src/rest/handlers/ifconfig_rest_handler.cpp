@@ -124,9 +124,11 @@ void updateSettings(QnNetworkAddressEntryList& currentSettings, QnNetworkAddress
             break;
         }
     }
+#if 0
     // add new data
     for (const auto& newValue :newSettings)
         currentSettings.push_back(newValue);
+#endif
 }
 
 int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)

@@ -29,12 +29,14 @@ public:
     
     void addPortChangeRequest(int port);
     
-    void addIpChangeRequest(const QString &macAdderss
+    void addIpChangeRequest(const QString &name
         , bool useDHCP
         , const QString &address
         , const QString &subnetMask);
     
-    void addDateTimeChange(const QDateTime &dateTime);
+    void addDateTimeChange(const QDate &date
+        , const QTime &time
+        , const QByteArray &timeZoneId);
     
     void clearChanges();
 
@@ -149,15 +151,15 @@ void rtu::ChangeRequestManager::Impl::addPortChangeRequest(int port)
     m_newPort = port;
 }
 
-void rtu::ChangeRequestManager::Impl::addIpChangeRequest(const QString &macAdderss
+void rtu::ChangeRequestManager::Impl::addIpChangeRequest(const QString &name
     , bool useDHCP
     , const QString &address
     , const QString &subnetMask)
 {
-    const InterfaceInfo newInfo = { "", address, macAdderss, subnetMask, ""
-        , (useDHCP ? Qt::Checked : Qt::Unchecked)};
+    const InterfaceInfo newInfo = InterfaceInfo(name, address, "", subnetMask, ""
+        , (useDHCP ? Qt::Checked : Qt::Unchecked));
     const auto &it = std::find_if(m_addressChanges.begin(), m_addressChanges.end()
-        , [&newInfo](const InterfaceInfo &addrInfo) { return (addrInfo.macAddress == newInfo.macAddress); });
+        , [&newInfo](const InterfaceInfo &addrInfo) { return (addrInfo.name == newInfo.name); });
     
     if (it == m_addressChanges.end())
     {
@@ -168,9 +170,11 @@ void rtu::ChangeRequestManager::Impl::addIpChangeRequest(const QString &macAdder
     *it = newInfo;
 }
 
-void rtu::ChangeRequestManager::Impl::addDateTimeChange(const QDateTime &dateTime)
+void rtu::ChangeRequestManager::Impl::addDateTimeChange(const QDate &date
+    , const QTime &time
+    , const QByteArray &timeZoneId)
 {
-    m_newDateTime = dateTime;
+    m_newDateTime = QDateTime(date, time, QTimeZone(timeZoneId));
 }
 
 void rtu::ChangeRequestManager::Impl::clearChanges()
@@ -180,6 +184,7 @@ void rtu::ChangeRequestManager::Impl::clearChanges()
     m_newPort = kInvalidPort;
     
     m_addressChanges.clear();
+    m_newDateTime = QDateTime();
     
     setAppliedChangesCount(0);
     setTotalChangesCount(0);
@@ -206,15 +211,6 @@ void rtu::ChangeRequestManager::Impl::applyChanges()
     
     HttpClient * const httpClient = m_context->httpClient();
     
-    if (systemChangesCount)
-    {
-        for(const ServerInfo *info: selectedServers)
-        {
-            rtu::configureRequest(httpClient, makeSystemOpCallback(*info)
-                , *info, m_newSystemName, m_newPassword, m_newPort);
-        }
-    }
-    
     if (!m_addressChanges.empty())
     {
         if (selectedServers.size() == 1)
@@ -233,8 +229,8 @@ void rtu::ChangeRequestManager::Impl::applyChanges()
                 InterfaceInfoList changes;
                 for(const InterfaceInfo &addInfo: info->extraInfo().interfaces)
                 {
-                    const InterfaceInfo interface = {"", addressChanges.ip
-                        , addInfo.macAddress, addressChanges.mask, "", addressChanges.useDHCP};
+                    const InterfaceInfo interface = InterfaceInfo(addInfo.name, addressChanges.ip
+                        , "", addressChanges.mask, "", addressChanges.useDHCP);
                     changes.push_back(interface);
                 }
                 
@@ -247,6 +243,17 @@ void rtu::ChangeRequestManager::Impl::applyChanges()
         {
         }
     }
+    
+    if (systemChangesCount)
+    {
+        for(const ServerInfo *info: selectedServers)
+        {
+            rtu::configureRequest(httpClient, makeSystemOpCallback(*info)
+                , *info, m_newSystemName, m_newPassword, m_newPort);
+        }
+    }
+    
+    applyDateTimeChanges(selectedServers);
 }
 
 void rtu::ChangeRequestManager::Impl::onChangesetApplied(int changesCount)
@@ -328,14 +335,14 @@ rtu::OperationCallback rtu::ChangeRequestManager::Impl::makeAddressOpCallback(co
             {
                 static const QString requestNameTemplate = tr("use dhcp (%1)");
                 addRequestResult(info, (addrInfo.useDHCP ? kYes : kNo)
-                    , requestNameTemplate.arg(addrInfo.macAddress), kDHCPUsage, affectedEntities, errorReason);
+                    , requestNameTemplate.arg(addrInfo.name), kDHCPUsage, affectedEntities, errorReason);
             }
             else
             {
                 static const QString requestNameTemplate = tr("ip / subnet mask / use dhcp (%1)");
                 static const QString valueTemplate = "%1 / %2 / %3";
                 
-                const QString valueName = requestNameTemplate.arg(addrInfo.macAddress);
+                const QString valueName = requestNameTemplate.arg(addrInfo.name);
                 const QString value = valueTemplate.arg(addrInfo.ip)
                     .arg(addrInfo.mask).arg(addrInfo.useDHCP ? kYes : kNo);
                 
@@ -381,8 +388,14 @@ rtu::OperationCallback rtu::ChangeRequestManager::Impl::makeSystemOpCallback(con
         
         addRequestResult(info, m_newPassword, kPasswordRequestDesc
             , kPassword, affectedEntities, errorReason);
+        
+        if (!m_newSystemName.isEmpty())
+            m_selectionModel->updateSystemNameInfo(info.baseInfo().id, m_newSystemName);
         addRequestResult(info, m_newSystemName, kSystemNameRequestDesc
             , kSystemName, affectedEntities, errorReason);
+
+        if (m_newPort)
+            m_selectionModel->updatePortInfo(info.baseInfo().id, m_newPort);
         addRequestResult(info, (m_newPort ? QString::number(m_newPort) : QString())
             , kPortRequestDesc, kPort, affectedEntities, errorReason);
     };
@@ -392,19 +405,42 @@ rtu::OperationCallback rtu::ChangeRequestManager::Impl::makeSystemOpCallback(con
 
 void rtu::ChangeRequestManager::Impl::applyDateTimeChanges(const rtu::ServerInfoList &servers)
 {
-    if (m_newDateTime.isNull())
+    if (m_newDateTime.isNull() || !m_newDateTime.isValid())
         return;
+    
+    const int changesCount = (servers.size() * 2); /// Date/Time + Time zone
+    setTotalChangesCount(totalChangesCount() + changesCount);
+    
+    const QDateTime applyingDateTime = m_newDateTime;
     
     HttpClient *client = m_context->httpClient();
     for (const ServerInfo *info: servers)
     {
-        const auto successfulCallback = [](const QUuid &id
-            , const QDateTime &utcTime
-            , const QDateTime &responseUtcTimeStamp)
+        static const QString &kDateTimeRequestDesc = tr("date/time");
+        static const QString &kTimeZoneRequestDesc = tr("time zone");
+        
+        const ServerInfo &serverInfoRef = *info;
+        const auto &successful = [serverInfoRef, this](
+            const QUuid &serverId, const QDateTime &serverTime, const QDateTime &timestamp)
         {
+            m_selectionModel->updateTimeDateInfo(serverId, serverTime, timestamp);
+            addRequestResult(serverInfoRef, serverTime.toString(Qt::SystemLocaleShortDate), kDateTimeRequestDesc
+                , kDateTime, kNoEntitiesAffected, QString());
+            addRequestResult(serverInfoRef, serverTime.timeZone().id()
+                , kTimeZoneRequestDesc, kTimeZone, kNoEntitiesAffected, QString());
             
+            /// todo
         };
-//        rtu::setTimeRequest(client, info, m_newDateTime, );
+        
+        const auto &failed = [serverInfoRef, this, applyingDateTime](const QString &errorReason, AffectedEntities affected)
+        {  
+            addRequestResult(serverInfoRef, applyingDateTime.toString(), kDateTimeRequestDesc
+                , kDateTime, affected, errorReason);
+            addRequestResult(serverInfoRef, applyingDateTime.timeZone().id()
+                , kTimeZoneRequestDesc, kTimeZone, affected, errorReason);
+        };
+        
+        rtu::setTimeRequest(client, *info, m_newDateTime, successful, failed);
     }
 }
 
@@ -447,12 +483,12 @@ void rtu::ChangeRequestManager::addPortChangeRequest(int port)
     m_impl->addPortChangeRequest(port);
 }
 
-void rtu::ChangeRequestManager::addIpChangeRequest(const QString &macAdderss
+void rtu::ChangeRequestManager::addIpChangeRequest(const QString &name
     , bool useDHCP
     , const QString &address
     , const QString &subnetMask)
 {
-    m_impl->addIpChangeRequest(macAdderss, useDHCP, address, subnetMask);
+    m_impl->addIpChangeRequest(name, useDHCP, address, subnetMask);
 }
 
 void rtu::ChangeRequestManager::addSelectionDHCPStateChange(bool useDHCP)
@@ -460,9 +496,11 @@ void rtu::ChangeRequestManager::addSelectionDHCPStateChange(bool useDHCP)
     m_impl->addIpChangeRequest(QString(), useDHCP, QString(), QString());
 }
 
-void rtu::ChangeRequestManager::addDateTimeChange(const QDateTime &dateTime)
+void rtu::ChangeRequestManager::addDateTimeChange(const QDate &date
+    , const QTime &time
+    , const QByteArray &timeZoneId)
 {
-    m_impl->addDateTimeChange(dateTime);
+    m_impl->addDateTimeChange(date, time, timeZoneId);
 }
 
 void rtu::ChangeRequestManager::clearChanges()

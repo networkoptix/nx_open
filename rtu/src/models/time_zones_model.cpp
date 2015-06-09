@@ -25,7 +25,7 @@ namespace
     }
     
     enum { kDifferentTimeZoneDefaultIndex = 0};
-    const QString kDiffTimeZonesTag = rtu::TimeZonesModel::tr("<Different>");
+    const QString kDiffTimeZonesTag = QT_TR_NOOP("<Different>");
     const QStringList baseTimeZonesInfo = getBaseTimeZones();
     const QStringList timeZonesInfoWithDiff = []() -> QStringList
     {

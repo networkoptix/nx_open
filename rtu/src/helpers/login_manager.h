@@ -5,8 +5,8 @@
 
 namespace rtu
 {
-    class BaseServerInfo;
-    class ExtraServerInfo;
+    struct BaseServerInfo;
+    struct ExtraServerInfo;
     
     class LoginManager : public QObject
     {

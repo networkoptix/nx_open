@@ -22,17 +22,17 @@ Column
         for (var i = 0; i !== children.length; ++i)
         {
             var item = children[i];
-            if (!item.hasOwnProperty("macAddressValue")|| !item.hasOwnProperty("isSingleSelectionModel") 
+            if (!item.hasOwnProperty("adapterNameValue")|| !item.hasOwnProperty("isSingleSelectionModel") 
                 || !item.hasOwnProperty("changed") || !item.changed)
             {
                 continue;
             }
             
             var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
-            var ipAddress = (item.ipAddressControl.changed && useDHCP ? item.ipAddressControl.text : "");
-            var subnetMask = (item.subnetMaskControl.changed && useDHCP ? item.subnetMaskControl.text : "");
+            var ipAddress = (item.ipAddressControl.changed && !useDHCP ? item.ipAddressControl.text : "");
+            var subnetMask = (item.subnetMaskControl.changed && !useDHCP ? item.subnetMaskControl.text : "");
             rtuContext.changesManager().addIpChangeRequest(
-                item.macAddressValue, useDHCP, ipAddress, subnetMask);
+                item.adapterNameValue, useDHCP, ipAddress, subnetMask);
         }
     }
     
@@ -63,7 +63,6 @@ Column
                 subnetMaskControl.initialText: (isSingleSelectionModel ? subnetMask : qsTr("Multiple interfaces"));
                 
                 adapterNameValue: adapterName;
-                macAddressValue: macAddress;
             }
         }
     }

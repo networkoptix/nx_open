@@ -16,14 +16,20 @@ bool setTimeZone(const QString& timezone)
         return false;
     if (unlink("/etc/localtime") != 0)
         return false;
-    return symlink(timezoneFile.toLatin1().data(), "/etc/localtime") == 0;
+    if (symlink(timezoneFile.toLatin1().data(), "/etc/localtime") != 0)
+        return false;
+    QFile tzFile(lit("/etc/timezone"));
+    if (!tzFile.open(QFile::WriteOnly | QFile::Truncate))
+        return false;
+    return tzFile.write(timezone.toLatin1()) != 0;
 }
 
-bool setDateTime(const QDateTime& datetime)
+
+bool setDateTime(qint64 value)
 {
     struct timeval tv;
-    tv.tv_sec = datetime.toMSecsSinceEpoch() / 1000;
-    tv.tv_usec = (datetime.toMSecsSinceEpoch() % 1000) * 1000;
+    tv.tv_sec = value / 1000;
+    tv.tv_usec = (value % 1000) * 1000;
     return settimeofday(&tv, 0) == 0;
 }
 #endif
@@ -33,14 +39,14 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
     Q_UNUSED(path)
     QString timezone = params.value("timezone");
     QString dateTimeStr = params.value("datetime");
-    QDateTime dateTime;
+    qint64 dateTime = -1;
     if (dateTimeStr.toLongLong() > 0)
-        dateTime = QDateTime::fromMSecsSinceEpoch(dateTimeStr.toLongLong());
+        dateTime = dateTimeStr.toLongLong();
     else
-        dateTime = QDateTime::fromString(dateTimeStr, QLatin1String("yyyy-MM-ddThh:mm:ss"));
-    
+        dateTime = QDateTime::fromString(dateTimeStr, QLatin1String("yyyy-MM-ddThh:mm:ss")).toMSecsSinceEpoch();
 
-    if (!dateTime.isValid()) {
+
+    if (dateTime < 1) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("Invalid datetime format specified"));
         return CODE_OK;
@@ -66,6 +72,7 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
             return CODE_OK;
         }
     }
+
     if (!setDateTime(dateTime)) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("Can't set new datetime value"));

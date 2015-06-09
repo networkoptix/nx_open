@@ -7,7 +7,7 @@
 
 namespace rtu
 {
-    class BaseServerInfo;
+    struct BaseServerInfo;
     typedef QVector<QUuid> IDsVector;
     
     class ServersFinder : public QObject

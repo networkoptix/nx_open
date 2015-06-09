@@ -4,5 +4,5 @@
     "arch" : "${arch}",
     "modification" : "${modification}",
     "client" : true,
-    "minimalVersion" : "${release.version}.0"
+    "minimalVersion" : "2.3.0.0"
 }
