@@ -11,6 +11,7 @@ class QnMediaResourceHelper : public QObject {
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(QUrl mediaUrl READ mediaUrl NOTIFY mediaUrlChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
+
 public:
     explicit QnMediaResourceHelper(QObject *parent = 0);
 
@@ -21,6 +22,9 @@ public:
 
     QString resourceName() const;
 
+    Q_INVOKABLE void setDateTime(const QDateTime &dateTime);
+    Q_INVOKABLE void setLive();
+
 signals:
     void resourceIdChanged();
     void mediaUrlChanged();
@@ -28,7 +32,7 @@ signals:
 
 private:
     QnResourcePtr m_resource;
-
+    QDateTime m_dateTime;
 };
 
 #endif // MEDIA_RESOURCE_HELPER_H

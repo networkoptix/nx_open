@@ -151,6 +151,13 @@ Page {
 
             chunkProvider: chunkProvider
             startBoundDate: chunkProvider.bottomBound
+
+            onDragFinished: {
+                if (stickToEnd)
+                    resourceHelper.setLive()
+                else
+                    resourceHelper.setDateTime(timeline.positionDate)
+            }
         }
 
         Rectangle {

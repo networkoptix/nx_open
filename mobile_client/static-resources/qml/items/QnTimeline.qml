@@ -16,6 +16,8 @@ Item {
     property alias chunkProvider: timeline.chunkProvider
     property alias startBoundDate: timeline.startBoundDate
 
+    signal dragFinished()
+
     function zoomIn() {
         timeline.zoomIn()
     }
@@ -37,7 +39,10 @@ Item {
 
         onPinchStarted: timeline.startPinch(pinch.center.x, pinch.scale)
         onPinchUpdated: timeline.updatePinch(pinch.center.x, pinch.scale)
-        onPinchFinished: timeline.finishPinch(pinch.center.x, pinch.scale)
+        onPinchFinished: {
+            timeline.finishPinch(pinch.center.x, pinch.scale)
+            root.dragFinished()
+        }
 
         MouseArea {
             property int pressX: -1
@@ -56,6 +61,7 @@ Item {
             onReleased: {
                 pressX = -1
                 timeline.finishDrag(mouse.x)
+                root.dragFinished()
             }
             onDoubleClicked: timeline.zoomIn(mouse.x)
         }

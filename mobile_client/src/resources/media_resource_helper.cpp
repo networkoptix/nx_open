@@ -53,6 +53,8 @@ QUrl QnMediaResourceHelper::mediaUrl() const {
     query.addQueryItem(lit("serverGuid"), server->getId().toString());
     query.addQueryItem(lit("cameraGuid"), camera->getId().toString());
     query.addQueryItem(lit("resolution"), lit("360p"));
+    if (m_dateTime.isValid())
+        query.addQueryItem(lit("pos"), QString::number(m_dateTime.toMSecsSinceEpoch()));
     url.setQuery(query);
 
     return QnNetworkProxyFactory::instance()->urlToResource(url, server);
@@ -63,4 +65,17 @@ QString QnMediaResourceHelper::resourceName() const {
         return QString();
 
     return m_resource->getName();
+}
+
+void QnMediaResourceHelper::setDateTime(const QDateTime &dateTime) {
+    if (m_dateTime == dateTime)
+        return;
+
+    m_dateTime = dateTime;
+
+    emit mediaUrlChanged();
+}
+
+void QnMediaResourceHelper::setLive() {
+    setDateTime(QDateTime());
 }
