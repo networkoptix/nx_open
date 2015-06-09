@@ -376,7 +376,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
 
     while (!needToStop() && d->socket->isConnected())
     {
-        if( d->interleavedMessageDataPos == d->interleavedMessageData.size() )
+        if( d->interleavedMessageDataPos == (size_t)d->interleavedMessageData.size() )
         {
             //buffer depleted, draining more data
             const int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);

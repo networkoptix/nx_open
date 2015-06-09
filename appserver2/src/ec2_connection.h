@@ -15,6 +15,7 @@
 
 namespace ec2
 {
+    // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnection
     class Ec2DirectConnection
     :
         public BaseEc2Connection<ServerQueryProcessor>

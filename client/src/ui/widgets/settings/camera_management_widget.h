@@ -9,7 +9,7 @@ namespace Ui {
     class CameraManagementWidget;
 }
 
-// TODO: #dklychkov #2.4 rename class to QnCameraAndNetworkManagementWidget
+// TODO: #dklychkov #2.4 rename class to QnSystemSettingsWidget
 class QnCameraManagementWidget: public QnAbstractPreferencesWidget {
     Q_OBJECT
 public:

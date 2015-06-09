@@ -26,6 +26,18 @@ qint64 QnAbstractStorageResource::getSpaceLimit() const
     return m_spaceLimit;
 }
 
+void QnAbstractStorageResource::setStorageType(const QString& type)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_storageType = type;
+}
+
+QString QnAbstractStorageResource::getStorageType() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_storageType;
+}
+
 void QnAbstractStorageResource::setMaxStoreTime(int timeInSeconds)
 {
     QnMutexLocker lock( &m_mutex );

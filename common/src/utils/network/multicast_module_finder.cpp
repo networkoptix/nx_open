@@ -51,7 +51,7 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     if (!clientOnly) {
         m_serverSocket = new UDPSocket();
         m_serverSocket->setReuseAddrFlag(true);
-        m_serverSocket->bind(SocketAddress(HostAddress::anyHost, multicastGroupPort));
+        m_serverSocket->bind(SocketAddress(HostAddress::anyHost, m_multicastGroupPort));
     }
     connect(qnCommon, &QnCommonModule::moduleInformationChanged, this, &QnMulticastModuleFinder::at_moduleInformationChanged, Qt::DirectConnection);
 }

@@ -34,6 +34,7 @@ namespace ec2
 {
     class ECConnectionNotificationManager;
 
+    // TODO: #2.4 remove Ec2 suffix to avoid ec2::BaseEc2Connection
     template<class QueryProcessorType>
     class BaseEc2Connection
     :

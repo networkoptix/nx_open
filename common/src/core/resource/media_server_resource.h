@@ -115,6 +115,7 @@ private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
     void apiUrlChanged(const QnResourcePtr &resource);
+    void serverFlagsChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);

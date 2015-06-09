@@ -4,8 +4,9 @@
 
 from flask import Flask, request
 from adapters import SqlAdapter
+from utils import GeoIp2
 
-import json
+import json, os
 
 app = Flask(__name__)
 
@@ -18,7 +19,14 @@ def getAdapter():
     if not hasattr(app, 'sqlConnection'):
         raise app.SqlError(0, 'Database is not configured')
     db = app.sqlConnector.connect(**app.sqlConnection)
-    return SqlAdapter(db, app.logger)
+
+    ipResolve = None
+    if hasattr(app, 'geoipDb'):
+        ipResolve = GeoIp2.local(**app.geoipDb).resolve
+    elif hasattr(app, 'geoipWeb'):
+        ipResolve = GeoIp2.remote(**app.geoipWeb).resolve
+
+    return SqlAdapter(db, app.logger, ipResolve)
 
 @app.route('/api/report', methods=['POST'])
 def report():
