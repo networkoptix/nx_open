@@ -2257,6 +2257,7 @@ void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString
                     ec2::ApiUserData userData;
                     fromResourceToApi(user, userData);
                     user->setDigest(userData.digest);
+                    user->setCryptSha512Hash(userData.cryptSha512Hash);
                 }
                 m_updateUserRequests.remove(user->getId());
             } );

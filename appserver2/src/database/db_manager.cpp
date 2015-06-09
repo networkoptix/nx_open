@@ -816,10 +816,6 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "guid", guids))
         return false;
 
-    //guids = getGuidList("SELECT resource_ptr_id, '__USER__' || username from auth_user JOIN vms_userprofile on user_id = auth_user.id WHERE auth_user.username != 'admin' order by resource_ptr_id", CM_MakeHash);
-    //if (!updateTableGuids("vms_resource", "guid", guids))
-    //    return false;
-
     guids = getGuidList("SELECT li.id, r.guid FROM vms_layoutitem_tmp li JOIN vms_resource r on r.id = li.resource_id order by li.id", CM_Binary);
     if (!updateTableGuids("vms_layoutitem", "resource_guid", guids))
         return false;
@@ -1577,21 +1573,25 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     }
 
     QSqlQuery insQuery2(m_sdb);
-    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, rights) VALUES (:internalId, :internalId, :digest, :permissions)");
+    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, crypt_sha512_hash, rights) "
+                      "VALUES (:internalId, :internalId, :digest, :cryptSha512Hash, :permissions)");
     QnSql::bind(data, &insQuery2);
     if (data.digest.isEmpty())
     {
         // keep current digest value if exists
         QSqlQuery digestQuery(m_sdb);
         digestQuery.setForwardOnly(true);
-        digestQuery.prepare("SELECT digest FROM vms_userprofile WHERE user_id = ?");
+        digestQuery.prepare("SELECT digest, crypt_sha512_hash FROM vms_userprofile WHERE user_id = ?");
         digestQuery.addBindValue(internalId);
         if (!digestQuery.exec()) {
             qWarning() << Q_FUNC_INFO << digestQuery.lastError().text();
             return ErrorCode::dbError;
         }
         if (digestQuery.next())
+        {
             insQuery2.bindValue(":digest", digestQuery.value(0).toByteArray());
+            insQuery2.bindValue(":cryptSha512Hash", digestQuery.value(1).toByteArray());
+        }
     }
     insQuery2.bindValue(":internalId", internalId);
     if (!insQuery2.exec())
@@ -3299,7 +3299,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& user
     query.setForwardOnly(true);
     query.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        u.is_superuser as isAdmin, u.email, p.digest as digest, u.password as hash, p.rights as permissions \
+        u.is_superuser as isAdmin, u.email, p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, u.password as hash, p.rights as permissions \
         FROM vms_resource r \
         JOIN auth_user u  on u.id = r.id\
         JOIN vms_userprofile p on p.user_id = u.id\

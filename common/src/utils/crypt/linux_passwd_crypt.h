@@ -9,6 +9,9 @@
 #include <QtCore/QByteArray>
 
 
+static const size_t LINUX_CRYPT_SALT_LENGTH = 8;
+
+QByteArray generateSalt( int length );
 //!Calculates sha512 hash suitable for /etc/shadow file
 QByteArray linuxCryptSha512( const QByteArray& password, const QByteArray& salt );
 

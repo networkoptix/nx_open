@@ -20,6 +20,16 @@ namespace
     const int HASH_LENGTH = 86;
 }
 
+QByteArray generateSalt( int length )
+{
+    QByteArray salt;
+    salt.resize( length );
+    for( int i = 0; i < length; ++i )
+        salt[i] = BASE64[rand() % (sizeof(BASE64)/sizeof(*BASE64))];
+
+    return salt;
+}
+
 QByteArray linuxCryptSha512( const QByteArray& password, const QByteArray& salt )
 {
     QByteArray intermediate = password + salt;
