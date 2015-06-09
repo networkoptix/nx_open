@@ -13,6 +13,7 @@ Item {
     property alias chunkBarHeight: timeline.chunkBarHeight
     property alias stickToEnd: timeline.stickToEnd
     property alias font: timeline.font
+    property alias chunkProvider: timeline.chunkProvider
 
     function zoomIn() {
         timeline.zoomIn()

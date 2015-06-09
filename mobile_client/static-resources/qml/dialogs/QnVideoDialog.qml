@@ -12,7 +12,7 @@ Page {
 
     title: resourceHelper.resourceName
 
-    property alias resourceId: resourceHelper.resourceId
+    property string resourceId
     property bool videoZoomed: false
     property real cursorTickMargin: Units.dp(10)
     property real timelineTextMargin: timeline.height - timeline.chunkBarHeight
@@ -22,6 +22,20 @@ Page {
 
     QnMediaResourceHelper {
         id: resourceHelper
+        resourceId: videoPlayer.resourceId
+    }
+
+    QnCameraChunkProvider {
+        id: chunkProvider
+        resourceId: videoPlayer.resourceId
+    }
+
+    Timer {
+        id: chunksUpdateTimer
+        interval: 30000
+        triggeredOnStart: true
+        running: true
+        onTriggered: chunkProvider.update()
     }
 
     Flickable {
@@ -134,6 +148,8 @@ Page {
             font.weight: Font.Bold
 
             chunkBarHeight: Units.dp(36)
+
+            chunkProvider: chunkProvider
         }
 
         Rectangle {

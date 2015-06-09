@@ -12,6 +12,7 @@
 #include "resources/media_resource_helper.h"
 #include "utils/mobile_app_info.h"
 #include "mobile_client/mobile_client_settings.h"
+#include "camera/camera_chunk_provider.h"
 
 void QnMobileClientMetaTypes::initialize() {
     registerMetaTypes();
@@ -33,4 +34,5 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnMediaResourceHelper>("com.networkoptix.qml", 1, 0, "QnMediaResourceHelper");
     qmlRegisterType<QnContextSettings>("com.networkoptix.qml", 1, 0, "QnContextSettings");
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
+    qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
 }

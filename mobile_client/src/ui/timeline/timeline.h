@@ -8,6 +8,7 @@
 
 class QnTimelinePrivate;
 class QSGGeometryNode;
+class QnCameraChunkProvider;
 
 class QnTimeline : public QQuickItem {
     Q_OBJECT
@@ -21,6 +22,8 @@ class QnTimeline : public QQuickItem {
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
 
     Q_PROPERTY(int chunkBarHeight READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
+
+    Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
 
 public:
     QnTimeline(QQuickItem *parent = 0);
@@ -77,6 +80,9 @@ public:
     Q_INVOKABLE void updateDrag(int x);
     Q_INVOKABLE void finishDrag(int x);
 
+    QnCameraChunkProvider *chunkProvider() const;
+    void setChunkProvider(QnCameraChunkProvider *chunkProvider);
+
 signals:
     void zoomLevelChanged();
     void lowerTextOpacityChanged();
@@ -93,6 +99,8 @@ signals:
     void fontChanged();
 
     void chunkBarHeightChanged();
+
+    void chunkProviderChanged();
 
 protected:
     void wheelEvent(QWheelEvent *event) override;

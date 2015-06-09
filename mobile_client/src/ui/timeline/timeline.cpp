@@ -16,6 +16,7 @@
 #include "timeline_zoom_level.h"
 #include "timeline_chunk_painter.h"
 #include "kinetic_helper.h"
+#include "camera/camera_chunk_provider.h"
 
 namespace {
 
@@ -126,6 +127,8 @@ public:
 
     QStringList suffixList;
 
+    QnCameraChunkProvider *chunkProvider;
+
     QnTimelinePrivate(QnTimeline *parent):
         parent(parent),
         textColor("#727272"),
@@ -141,7 +144,8 @@ public:
         textTexture(0),
         textLevel(1.0),
         targetTextLevel(1.0),
-        timeZoneShift(0)
+        timeZoneShift(0),
+        chunkProvider(nullptr)
     {
         dpMultiplier = 2;
         chunkBarHeight = 48;
@@ -457,6 +461,29 @@ void QnTimeline::updateDrag(int x) {
 void QnTimeline::finishDrag(int x) {
     d->stickyPointKineticHelper.finish(x);
     update();
+}
+
+QnCameraChunkProvider *QnTimeline::chunkProvider() const {
+    return d->chunkProvider;
+}
+
+void QnTimeline::setChunkProvider(QnCameraChunkProvider *chunkProvider) {
+    if (d->chunkProvider == chunkProvider)
+        return;
+
+    if (d->chunkProvider)
+        disconnect(d->chunkProvider, nullptr, this, nullptr);
+
+    d->chunkProvider = chunkProvider;
+
+    if (d->chunkProvider) {
+        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated, this, [this]() {
+            d->timePeriods[Qn::RecordingContent] = d->chunkProvider->timePeriods();
+            update();
+        });
+    }
+
+    emit chunkProviderChanged();
 }
 
 void QnTimeline::wheelEvent(QWheelEvent *event) {
