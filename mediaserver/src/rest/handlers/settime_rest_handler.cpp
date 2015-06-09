@@ -25,11 +25,11 @@ bool setTimeZone(const QString& timezone)
 }
 
 
-bool setDateTime(const QDateTime& datetime)
+bool setDateTime(qint64 value)
 {
     struct timeval tv;
-    tv.tv_sec = datetime.toMSecsSinceEpoch() / 1000;
-    tv.tv_usec = (datetime.toMSecsSinceEpoch() % 1000) * 1000;
+    tv.tv_sec = value / 1000;
+    tv.tv_usec = (value % 1000) * 1000;
     return settimeofday(&tv, 0) == 0;
 }
 #endif
@@ -39,14 +39,14 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
     Q_UNUSED(path)
     QString timezone = params.value("timezone");
     QString dateTimeStr = params.value("datetime");
-    QDateTime dateTime;
+    qint64 dateTime = -1;
     if (dateTimeStr.toLongLong() > 0)
-        dateTime = QDateTime::fromMSecsSinceEpoch(dateTimeStr.toLongLong());
+        dateTime = dateTimeStr.toLongLong();
     else
-        dateTime = QDateTime::fromString(dateTimeStr, QLatin1String("yyyy-MM-ddThh:mm:ss"));
-    
+        dateTime = QDateTime::fromString(dateTimeStr, QLatin1String("yyyy-MM-ddThh:mm:ss")).toMSecsSinceEpoch();
 
-    if (!dateTime.isValid()) {
+
+    if (dateTime < 1) {
         result.setError(QnJsonRestResult::CantProcessRequest);
         result.setErrorString(lit("Invalid datetime format specified"));
         return CODE_OK;
@@ -72,12 +72,6 @@ int QnSetTimeRestHandler::executeGet(const QString &path, const QnRequestParams 
             return CODE_OK;
         }
     }
-
-    // recreate datetime because of QT fromMsec toMsec change value after time zone changing
-    if (dateTimeStr.toLongLong() > 0)
-        dateTime = QDateTime::fromMSecsSinceEpoch(dateTimeStr.toLongLong());
-    else
-        dateTime = QDateTime::fromString(dateTimeStr, QLatin1String("yyyy-MM-ddThh:mm:ss"));
 
     if (!setDateTime(dateTime)) {
         result.setError(QnJsonRestResult::CantProcessRequest);
