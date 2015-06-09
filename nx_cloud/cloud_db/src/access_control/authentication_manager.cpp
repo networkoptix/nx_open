@@ -12,7 +12,7 @@ bool AuthenticationManager::authenticate(
     nx_http::header::WWWAuthenticate* const wwwAuthenticate )
 {
     //TODO
-    return false;
+    return true;
 }
 
 bool AuthenticationManager::authenticate(

@@ -23,13 +23,21 @@ namespace cdb_api
         //!Implementation of AbstractHttpRequestHandler::processRequest
         virtual void processRequest(
             const nx_http::HttpServerConnection& connection,
-            const nx_http::Request& request ) override;
+            const nx_http::Request& request,
+            nx_http::Response* const response,
+            std::function<void(
+                const nx_http::StatusCode::Value statusCode,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override;
 
     protected:
         //!Implement request-specific logic in this function
         virtual void processRequest(
             const AuthorizationInfo& authzInfo,
-            const stree::AbstractResourceReader& inputParams ) = 0;
+            const stree::AbstractResourceReader& inputParams,
+            nx_http::Response* const response,
+            std::function<void(
+                const nx_http::StatusCode::Value statusCode,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) = 0;
     };
 }
 

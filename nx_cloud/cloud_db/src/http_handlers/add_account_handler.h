@@ -27,10 +27,18 @@ namespace cdb_api
     protected:
         virtual void processRequest(
             const AuthorizationInfo& authzInfo,
-            const stree::AbstractResourceReader& inputParams ) override;
+            const stree::AbstractResourceReader& inputParams,
+            nx_http::Response* const response,
+            std::function<void(
+                const nx_http::StatusCode::Value statusCode,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )>&& completionHandler ) override;
 
     private:
-        void addAccountDone( ResultCode resultCode );
+        void addAccountDone(
+            ResultCode resultCode,
+            std::function<void(
+                const nx_http::StatusCode::Value statusCode,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler );
     };
 }
 

@@ -12,6 +12,8 @@ void AccountManager::addAccount(
     std::function<void(ResultCode)> completionHandler )
 {
     //TODO #ak
+
+    completionHandler( ResultCode::ok );
 }
 
 void AccountManager::verifyAccountEmailAddress(

@@ -41,6 +41,7 @@ void CloudDBProcess::pleaseStop()
 
 int CloudDBProcess::executeApplication()
 {
+    //TODO #ak settings
     static const QLatin1String DEFAULT_LOG_LEVEL( "ERROR" );
     static const QLatin1String DEFAULT_HTTP_ADDRESS_TO_LISTEN( ":3346" );
 
