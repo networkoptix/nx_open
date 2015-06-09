@@ -334,6 +334,11 @@ QnTransactionTransport::State QnTransactionTransport::getState() const
     return m_state;
 }
 
+bool QnTransactionTransport::isIncoming() const {
+    QMutexLocker lock(&m_mutex);
+    return m_peerRole == prAccepting;
+}
+
 int QnTransactionTransport::setHttpChunkExtensonHandler( HttpChunkExtensonHandler eventHandler )
 {
     QMutexLocker lk(&m_mutex);

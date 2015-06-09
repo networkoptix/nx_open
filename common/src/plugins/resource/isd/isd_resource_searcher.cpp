@@ -88,8 +88,9 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
             vendor = getValueFromString(QString::fromUtf8(line)).trimmed();
         }
     }
-
-    if (name.isEmpty() || vendor != lit("Innovative Security Designs"))
+    
+    // 'Digital Watchdog' (with space) is actually ISD cameras. Without space it's old DW cameras
+    if (name.isEmpty() || (vendor != lit("Innovative Security Designs") && vendor != lit("Digital Watchdog")))
         return QList<QnResourcePtr>();
 
 
@@ -141,6 +142,13 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
     return result;
 }
 
+QString extractWord(int index, const QByteArray& rawData)
+{
+    int endIndex = index;
+    for (;endIndex < rawData.size() && rawData.at(endIndex) != ' '; ++endIndex);
+    return QString::fromLatin1(rawData.mid(index, endIndex - index));
+}
+
 QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     QnResourceList& result,
     const QByteArray& responseData,
@@ -158,10 +166,12 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
 
     if (!responseData.contains("ISD")) {
         // check for new ISD models. it has been rebrended
-        if (responseData.contains("DWcam"))
-            name = lit("DWcam");
-        else
+        int modelPos = responseData.indexOf("DWCA-");
+        if (modelPos == -1)
+            modelPos = responseData.indexOf("DWCS-");
+        if (modelPos == -1)
             return local_result; // not found
+        name = extractWord(modelPos, responseData);
     }
 
     int macpos = responseData.indexOf("macaddress=");

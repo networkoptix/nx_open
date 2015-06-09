@@ -291,6 +291,7 @@ void QnUpdateProcess::installClientUpdate() {
         || qnSettings->isClientUpdateDisabled() 
         || m_clientUpdateFile->version == qnCommon->engineVersion())
     {
+            NX_LOG(lit("Update: QnUpdateProcess: Client update skipped."), cl_logDEBUG1);
             prepareToUpload();
             return;
     }
@@ -317,13 +318,13 @@ void QnUpdateProcess::at_clientUpdateInstalled() {
         return;
 
     if (futureWatcher->result() != applauncher::api::ResultType::ok) {
-        NX_LOG(lit("Update: QnUpdateProcess: Client update failed."), cl_logDEBUG1);
+        NX_LOG(lit("Update: QnUpdateProcess: Client update failed."), cl_logERROR);
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::ClientInstallationFailed);
         return;
     }
 
-    NX_LOG(lit("Update: QnUpdateProcess: Client update installed."), cl_logDEBUG1);
+    NX_LOG(lit("Update: QnUpdateProcess: Client update installed."), cl_logINFO);
 
     prepareToUpload();
 }
