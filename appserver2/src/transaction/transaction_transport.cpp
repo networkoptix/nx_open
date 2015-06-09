@@ -109,7 +109,6 @@ void QnTransactionTransport::default_initializer()
     m_sendKeepAliveTask = 0;
     m_base64EncodeOutgoingTransactions = false;
     m_waiterCount = 0;
-    m_externalConnectionTimeoutReported = false;
 }
 
 QnTransactionTransport::QnTransactionTransport(
@@ -748,10 +747,9 @@ void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> 
     m_cond.wakeAll();    //signalling that we are not waiting anymore
 }
 
-void QnTransactionTransport::connectionTimedout()
+void QnTransactionTransport::connectionFailure()
 {
-    QMutexLocker lk( &m_mutex );
-    m_externalConnectionTimeoutReported = true;
+    setState( Error );
 }
 
 void QnTransactionTransport::sendHttpKeepAlive( quint64 taskID )
@@ -831,9 +829,7 @@ void QnTransactionTransport::monitorConnectionForClosure(
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 {
     QMutexLocker lock(&m_mutex);
-    return 
-        m_externalConnectionTimeoutReported ||
-        (m_lastReceiveTimer.isValid() &&  //if not valid we still have not begun receiving transactions
+    return (m_lastReceiveTimer.isValid() &&  //if not valid we still have not begun receiving transactions
          (m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE));
 }
 

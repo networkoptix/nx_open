@@ -1527,7 +1527,7 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
     }
 }
 
-void QnTransactionMessageBus::connectionTimedout( const QnUuid& connectionGuid )
+void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )
 {
     QMutexLocker lock( &m_mutex );
     for( QnTransactionTransport* transport : m_connections )
@@ -1535,7 +1535,7 @@ void QnTransactionMessageBus::connectionTimedout( const QnUuid& connectionGuid )
         if( transport->connectionGuid() != connectionGuid )
             continue;
         //mutex is unlocked if we go to wait
-        transport->connectionTimedout();
+        transport->connectionFailure();
         return;
     }
 }

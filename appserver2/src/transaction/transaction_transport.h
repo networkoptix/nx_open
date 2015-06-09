@@ -215,8 +215,8 @@ public:
             until \a QnTransactionTransport::waitForNewTransactionsReady has returned
     */
     void waitForNewTransactionsReady( std::function<void()> invokeBeforeWait );
-    //!Transport level logic should use this method to report passed inactivity timeout
-    void connectionTimedout();
+    //!Transport level logic should use this method to report connection problem
+    void connectionFailure();
 
     static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
@@ -294,7 +294,6 @@ private:
     //!Number of threads waiting on \a QnTransactionTransport::waitForNewTransactionsReady
     int m_waiterCount;
     QWaitCondition m_cond;
-    bool m_externalConnectionTimeoutReported;
 
 private:
     void default_initializer();
