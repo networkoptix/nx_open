@@ -8,12 +8,15 @@
 namespace nx_upnp {
 namespace test {
 
-// TODO: implement over mocked sockets
-TEST(AsyncClient, DISABLED_GetIp)
+static const QUrl URL( lit("http://192.168.1.1:57166/ctl/IPConn") );
+static const auto TCP = AsyncClient::Protocol::TCP;
+static const QString IP = lit( "192.168.1.170" );
+static const QString DESC = lit( "test" );
+
+// TODO: implement over test HTTP server
+TEST( UpnpAsyncClient, DISABLED_GetIp )
 {
     AsyncClient client;
-    const QUrl URL( lit("http://192.168.1.1:44264/ctl/IPConn") );
-    const auto TCP = AsyncClient::Protocol::TCP;
 
     {
         std::promise< HostAddress > prom;
@@ -36,16 +39,18 @@ TEST(AsyncClient, DISABLED_GetIp)
                      [&]( bool v ) { prom.set_value( v ); } ) );
         EXPECT_FALSE( prom.get_future().get() ); // no such mapping
     }
+    {
+        std::promise< AsyncClient::MappingList > prom;
+        EXPECT_TRUE( client.getAllMappings( URL,
+                     [&]( const AsyncClient::MappingList& v ) { prom.set_value( v ); } ) );
+        EXPECT_EQ( prom.get_future().get().size(), 2 ); // mappings from Skype ;)
+    }
 }
 
-// TODO: implement over mocked sockets
-TEST(AsyncClient, DISABLED_Mapping)
+// TODO: implement over test HTTP server
+TEST( UpnpAsyncClient, DISABLED_Mapping )
 {
     AsyncClient client;
-    const QUrl URL( lit("http://192.168.1.1:44264/ctl/IPConn") );
-    const auto TCP = AsyncClient::Protocol::TCP;
-    const QString IP = lit( "192.168.1.170" );
-    const QString DESC = lit( "test" );
 
     {
          std::promise< bool > prom;

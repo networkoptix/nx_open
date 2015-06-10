@@ -49,19 +49,18 @@ bool PortMapper::enableMapping(
 
     // ask to map this port on all known devices
     for( auto& device : m_devices )
-        enableMappingOnDevice( *device.second, request );
+        enableMappingOnDevice( *device.second, false, request );
 
     return true;
 }
 
 void PortMapper::enableMappingOnDevice(
-        Device& device, std::pair< quint16, Protocol > request )
+        Device& device, bool isCheck, std::pair< quint16, Protocol > request )
 {
     const auto port = request.first;
     const auto protocol = request.second;
-    const auto result = device.map( port, port, protocol,
-            [ this, &device, port, protocol ]( const quint16& mappedPort )
-    {   
+    const auto callback = [ this, &device, port, protocol ]( const quint16& mappedPort )
+    {
         QMutexLocker lock( &m_mutex );
         const auto it = m_mappings.find( std::make_pair( port, protocol ) );
         if( it != m_mappings.end() )
@@ -73,7 +72,12 @@ void PortMapper::enableMappingOnDevice(
 
         if( --m_asyncInProgress == 0)
             m_asyncCondition.wakeOne();
-    } );
+    };
+
+
+    const auto result = isCheck
+            ? device.check( port, protocol, callback )
+            : device.map( port, port, protocol, callback);
 
     if( result )
         ++m_asyncInProgress;
@@ -142,7 +146,7 @@ bool PortMapper::searchForMappers( const HostAddress& localAddress,
 
             // ask to map all existing mappings on this device as well
             for( const auto& mapping : m_mappings )
-                enableMappingOnDevice( *itBool.first->second, mapping.first );
+                enableMappingOnDevice( *itBool.first->second, false, mapping.first );
         }
 
         for( const auto& subDev : devInfo.deviceList )
@@ -157,7 +161,7 @@ void PortMapper::onTimer( const quint64& /*timerID*/ )
     QMutexLocker lock( &m_mutex );
     for( const auto& mapping : m_mappings )
         for( auto& device : m_devices )
-            enableMappingOnDevice( *device.second, mapping.first );
+            enableMappingOnDevice( *device.second, true, mapping.first );
 
     m_timerId = TimerManager::instance()->addTimer( this, CHECK_MAPPINGS_INTERVAL );
 }

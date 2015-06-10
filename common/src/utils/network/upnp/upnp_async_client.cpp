@@ -4,6 +4,11 @@
 #include "utils/common/model_functions.h"
 #include "utils/serialization/lexical_functions.h"
 
+namespace nx_upnp {
+namespace /* noname */ {
+
+static const auto MESSAGE_BODY_READ_TIMEOUT_MS = 20 * 1000; // 20 sec
+
 static const QString SOAP_REQUEST = QLatin1String(
     "<?xml version=\"1.0\" ?>"
     "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""
@@ -15,9 +20,6 @@ static const QString SOAP_REQUEST = QLatin1String(
         "</s:Body>"
     "</s:Envelope>"
 );
-
-namespace nx_upnp {
-namespace /* noname */ {
 
 // TODO: move parsers to separate file
 class UpnpMessageHandler
@@ -124,10 +126,11 @@ bool AsyncClient::Message::isOk() const
     return !action.isEmpty() && !service.isEmpty();
 }
 
+static const QString none;
 const QString& AsyncClient::Message::getParam( const QString& key ) const
 {
     const auto it = params.find( key );
-    return ( it == params.end() ) ? QString() : it->second;
+    return ( it == params.end() ) ? none : it->second;
 }
 
 bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
@@ -177,29 +180,30 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
 
     auto httpClient = std::make_shared< nx_http::AsyncHttpClient >();
     httpClient->addAdditionalHeader( "SOAPAction", action.toUtf8() );
+    httpClient->setMessageBodyReadTimeoutMs( MESSAGE_BODY_READ_TIMEOUT_MS );
     QObject::connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
                       httpClient.get(), complete, Qt::DirectConnection );
 
     QMutexLocker lk(&m_mutex);
     m_httpClients.insert( httpClient );
-    if( httpClient->doPost( url, "text/xml", request.toUtf8() ) )
+    if( !httpClient->doPost( url, "text/xml", request.toUtf8() ) )
     {
         m_httpClients.erase( httpClient );
-        return true;
+        return false;
     }
 
-    return false;
+    return true;
 }
 
 const QString AsyncClient::CLIENT_ID        = lit( "NX UpnpAsyncClient" );
 const QString AsyncClient::INTERNAL_GATEWAY = lit( "InternetGatewayDevice" );
 const QString AsyncClient::WAN_IP           = lit( "WANIpConnection" );
 
-static const QString GET_EXTERNAL_IP    = lit( "GetExternalIPAddress" );
-static const QString ADD_PORT_MAPPING   = lit( "AddPortMapping" );
-static const QString DELETE_PORT_MAPPING   = lit( "DeletePortMapping" );
+static const QString GET_EXTERNAL_IP        = lit( "GetExternalIPAddress" );
+static const QString ADD_PORT_MAPPING       = lit( "AddPortMapping" );
+static const QString DELETE_PORT_MAPPING    = lit( "DeletePortMapping" );
 static const QString GET_GEN_PORT_MAPPING   = lit( "GetGenericPortMappingEntry" );
-static const QString GET_SPEC_PORT_MAPPING   = lit( "GetSpecificPortMappingEntry" );
+static const QString GET_SPEC_PORT_MAPPING  = lit( "GetSpecificPortMappingEntry" );
 
 static const QString MAP_INDEX      = lit("NewPortMappingIndex");
 static const QString EXTERNAL_IP    = lit("NewExternalIPAddress");
@@ -215,7 +219,7 @@ bool AsyncClient::externalIp( const QUrl& url,
                                   const std::function< void( const HostAddress& ) >& callback )
 {
     AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP };
-    return doUpnp(  url, request, [callback]( const Message& response ) {
+    return doUpnp( url, request, [callback]( const Message& response ) {
         callback( response.getParam( EXTERNAL_IP ) );
     } );
 }
@@ -275,7 +279,7 @@ bool AsyncClient::getMapping(
         const std::function< void( const MappingInfo& ) >& callback )
 {
     AsyncClient::Message request;
-    request.action = DELETE_PORT_MAPPING;
+    request.action = GET_GEN_PORT_MAPPING;
     request.service = WAN_IP;
     request.params[ MAP_INDEX ] = QString::number( index );
 
@@ -330,7 +334,7 @@ void fetchMappingsRecursive(
     }
 
     collected->push_back( std::move( newMap ) );
-    if( !client->getMapping( url, 0,
+    if( !client->getMapping( url, collected->size(),
                              [ client, url, callback, collected ]
                              ( const AsyncClient::MappingInfo& nextMap )
         { fetchMappingsRecursive( client, url, callback, collected, nextMap ); } ) )
@@ -343,7 +347,7 @@ void fetchMappingsRecursive(
 bool AsyncClient::getAllMappings(
         const QUrl& url, const std::function< void( const MappingList& ) >& callback )
 {
-    std::shared_ptr< std::vector< MappingInfo > > mappings;
+    auto mappings = std::make_shared< std::vector< MappingInfo > >();
     return getMapping( url, 0,
                        [ this, url, callback, mappings ]( const MappingInfo& newMap )
     {

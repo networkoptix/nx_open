@@ -55,7 +55,7 @@ protected: // for testing only
     class Callback;
     class Device;
 
-    void enableMappingOnDevice( Device& device,
+    void enableMappingOnDevice( Device& device, bool isCheck,
                                 std::pair< quint16, Protocol > request );
 
     virtual bool processPacket(

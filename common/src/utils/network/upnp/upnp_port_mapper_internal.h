@@ -39,9 +39,9 @@ class PortMapper::Device
 {
 public:
     Device( AsyncClient* upnpClient,
-                   const HostAddress& internalIp,
-                   const QUrl& url,
-                   const QString& description);
+            const HostAddress& internalIp,
+            const QUrl& url,
+            const QString& description);
 
     HostAddress externalIp() const;
 
@@ -50,6 +50,9 @@ public:
 
     bool unmap( quint16 port, Protocol protocol,
                 const std::function< void() >& callback );
+
+    bool check( quint16 port, Protocol protocol,
+                const std::function< void( quint16 ) >& callback );
 
 private:
     bool mapImpl( quint16 port, quint16 desiredPort, Protocol protocol, size_t retrys,
@@ -67,6 +70,7 @@ private:
 
     // result are waiting here while m_externalIp is not avaliable
     std::vector< std::function< void() > > m_successQueue;
+    std::map< std::pair< quint16, Protocol >, quint16 > m_alreadyMapped;
 };
 
 } // namespace nx_upnp

@@ -65,9 +65,9 @@ bool FailCounter::isOk()
 }
 
 PortMapper::Device::Device( AsyncClient* upnpClient,
-                                              const HostAddress& internalIp,
-                                              const QUrl& url,
-                                              const QString& description )
+                           const HostAddress& internalIp,
+                           const QUrl& url,
+                           const QString& description )
     : m_upnpClient( upnpClient )
     , m_internalIp( internalIp )
     , m_url( url )
@@ -113,6 +113,8 @@ bool PortMapper::Device::map(
                 mapping.protocol == protocol )
             {
                 m_faultCounter.success();
+                m_alreadyMapped[ std::make_pair( port, protocol ) ]
+                        = mapping.externalPort;
                 lk.unlock();
 
                 // already mapped, let's use this one
@@ -136,13 +138,54 @@ bool PortMapper::Device::map(
 }
 
 bool PortMapper::Device::unmap( quint16 port, Protocol protocol,
-                                           const std::function< void() >& callback )
+                                const std::function< void() >& callback )
 {
-    return m_upnpClient->deleteMapping( m_url, port, protocol, [ callback ]( bool )
+    QMutexLocker lk( &m_mutex );
+    const auto it = m_alreadyMapped.find( std::make_pair( port, protocol ) );
+    if( it == m_alreadyMapped.end() )
+        return false;
+
+    const auto external = it->second;
+    return m_upnpClient->deleteMapping( m_url, external, protocol,
+                                        [ this, callback, port, protocol ]( bool success )
     {
         // if something goes wrong the mapping will be avaliable when
         // server starts next time
         callback();
+
+        if( success )
+        {
+            QMutexLocker lk( &m_mutex );
+            m_alreadyMapped.erase( std::make_pair( port, protocol ) );
+        }
+    } );
+}
+
+bool PortMapper::Device::check( quint16 port, Protocol protocol,
+                                const std::function< void( quint16 ) >& callback )
+{
+    QMutexLocker lk( &m_mutex );
+    const auto it = m_alreadyMapped.find( std::make_pair( port, protocol ) );
+    if( it == m_alreadyMapped.end() )
+        return false;
+
+    const auto external = it->second;
+    return m_upnpClient->getMapping(
+        m_url, external, protocol,
+        [ this, port, external, protocol, callback ]( const AsyncClient::MappingInfo& info )
+    {
+        QMutexLocker lk( &m_mutex );
+        if( info.internalPort == 0 &&
+                info.internalIp == m_internalIp )
+            return; // it's ok, dont bother
+
+        // looks like we lost this one, try to restore
+        m_alreadyMapped.erase( std::make_pair( port, protocol ) );
+        if( !mapImpl( port, external, protocol, PORT_RETRY_COUNT, callback ) )
+        {
+            lk.unlock();
+            callback( 0 );
+        }
     } );
 }
 
@@ -150,7 +193,6 @@ bool PortMapper::Device::mapImpl(
         quint16 port, quint16 desiredPort, Protocol protocol, size_t retrys,
         const std::function< void( quint16 ) >& callback )
 {
-    QMutexLocker lk( &m_mutex );
     if( !m_faultCounter.isOk() )
         return false;
 
@@ -178,6 +220,7 @@ bool PortMapper::Device::mapImpl(
         }
 
         m_faultCounter.success();
+        m_alreadyMapped[ std::make_pair( port, protocol ) ] = desiredPort;
         if( m_externalIp == HostAddress::anyHost )
         {
             // will be notified as soon as we know external IP

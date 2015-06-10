@@ -68,23 +68,25 @@ public:
         \param discoverDeviceTypes Devies to discover, mediaservers by default
         \param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch
     */
-    DeviceSearcher( const QString& discoverDeviceType = DEFAULT_DEVICE_TYPE,
-                        unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
+    DeviceSearcher( unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
     virtual ~DeviceSearcher();
 
     //!Implementation of \a QnStoppable::pleaseStop
     virtual void pleaseStop() override;
 
     /*!
-        If \a handler is already added, nothing is done
+        If \a handler is already added for \a deviceType, nothing is done
         \note Handlers are iterated in order they were registered
+        \note if \a deviceType is empty, all devices will be reported
     */
-    void registerHandler( SearchHandler* handler );
-    void cancelHandlerRegistration( SearchHandler* handler );
+    void registerHandler( SearchHandler* handler, const QString& deviceType = QString() );
 
-    // TODO: merge into registerHandler
-    void registerDeviceType( const QString& devType );
-    void cancelDeviceTypeRegistration( const QString& devType );
+    /*!
+     *  If \a handler is not added for \a deviceType, nothing is done
+     *  \note if \a deviceType is empty, handler will be unregistred for ALL device types
+     *        even if they were registred by separate calls with certain types
+     */
+    void unregisterHandler( SearchHandler* handler, const QString& deviceType = QString() );
 
     //!Makes internal copy of discovered but not processed devices. \a processDiscoveredDevices uses this copy
     void saveDiscoveredDevicesSnapshot();
@@ -135,11 +137,10 @@ private:
         nx::Buffer buf;
     };
 
-    std::set<QString> m_deviceTypes;
     const unsigned int m_discoverTryTimeoutMS;
     mutable QMutex m_mutex;
     quint64 m_timerID;
-    std::set<SearchHandler*> m_handlers;
+    std::map< QString, std::map< SearchHandler*, uint > > m_handlers;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
     char* m_readBuf;
@@ -189,11 +190,8 @@ class SearchAutoHandler
         : public SearchHandler
 {
 public:
-    SearchAutoHandler(const QString& devType = QString());
+    SearchAutoHandler( const QString& devType = QString() );
     virtual ~SearchAutoHandler();
-
-private:
-    QString m_devType;
 };
 
 } // namespace nx_upnp

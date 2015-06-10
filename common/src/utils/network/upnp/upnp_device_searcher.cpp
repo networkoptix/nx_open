@@ -12,6 +12,8 @@
 
 #include <utils/common/app_info.h>
 
+#include <QDateTime>
+
 using namespace std;
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
@@ -28,15 +30,13 @@ static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
 const QString DeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
         .arg(QnAppInfo::organizationName());
 
-DeviceSearcher::DeviceSearcher( const QString& discoverDeviceType,
-                                        unsigned int discoverTryTimeoutMS )
+DeviceSearcher::DeviceSearcher( unsigned int discoverTryTimeoutMS )
 :
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
     m_readBuf( new char[READ_BUF_CAPACITY] ),
     m_terminated( false )
 {
-    m_deviceTypes.insert( discoverDeviceType );
     m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
     m_cacheTimer.start();
 
@@ -86,29 +86,52 @@ void DeviceSearcher::pleaseStop()
     m_httpClients.clear();
 }
 
-void DeviceSearcher::registerHandler( SearchHandler* handler )
+void DeviceSearcher::registerHandler( SearchHandler* handler, const QString& deviceType )
 {
     QMutexLocker lk( &m_mutex );
-    m_handlers.insert( handler );
+
+    // check if handler is registred without deviceType
+    const auto& allDev = m_handlers[ QString() ];
+    if( allDev.find( handler ) != allDev.end() )
+        return;
+
+    // try to register for specified deviceType
+    const auto now = QDateTime::currentDateTimeUtc().toTime_t();
+    const auto itBool = m_handlers[ deviceType ].insert( std::make_pair( handler, now ) );
+    if( !itBool.second )
+        return;
+
+    // if deviceType was not wspecified, delete all previous registrations with deviceType
+    if( deviceType.isEmpty() )
+        for( auto& specDev : m_handlers )
+            if( !specDev.first.isEmpty() )
+                specDev.second.erase( handler );
 }
 
-void DeviceSearcher::cancelHandlerRegistration( SearchHandler* handler )
+void DeviceSearcher::unregisterHandler( SearchHandler* handler, const QString& deviceType )
 {
     QMutexLocker lk( &m_mutex );
-    m_handlers.erase( handler );
-}
 
+    // try to unregister for specified deviceType
+    auto it = m_handlers.find( deviceType );
+    if( it != m_handlers.end() )
+        if( it->second.erase( handler ) )
+        {
+            // remove deviceType from discovery, if no more subscribers left
+            if( !it->second.size() && !deviceType.isEmpty() )
+                m_handlers.erase( it );
+            return;
+        }
 
-void DeviceSearcher::registerDeviceType( const QString& devType )
-{
-    QMutexLocker lk( &m_mutex );
-    m_deviceTypes.insert( devType );
-}
-
-void DeviceSearcher::cancelDeviceTypeRegistration( const QString& devType )
-{
-    QMutexLocker lk( &m_mutex );
-    m_deviceTypes.erase( devType );
+    // remove all registrations if deviceType is not specified
+    if( deviceType.isEmpty() )
+        for( auto specDev = m_handlers.begin(); specDev != m_handlers.end(); )
+            if( !specDev->first.isEmpty() &&
+                    specDev->second.erase( handler ) &&
+                    !specDev->second.size() )
+                m_handlers.erase( specDev++ ); // remove deviceType from discovery
+            else                               // if no more subscribers left
+                ++specDev;
 }
 
 void DeviceSearcher::saveDiscoveredDevicesSnapshot()
@@ -231,23 +254,18 @@ void DeviceSearcher::onSomeBytesRead(
 
 void DeviceSearcher::dispatchDiscoverPackets()
 {
-    std::list<QString> deviceTypes;
-    {
-        QMutexLocker lk(&m_mutex);
-        if (m_deviceTypes.empty())
-            return;
-
-        deviceTypes.assign(m_deviceTypes.begin(), m_deviceTypes.end());
-    }
-
     for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
         const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);
         if( !sock )
             continue;
 
-        for (auto deviceType : deviceTypes)
+        for( const auto& handler : m_handlers )
         {
+            // undefined device type will trigger default discovery
+            const auto& deviceType = !handler.first.isEmpty() ?
+                        handler.first : DEFAULT_DEVICE_TYPE;
+
             QByteArray data;
             data.append( lit("M-SEARCH * HTTP/1.1\r\n") );
             data.append( lit("Host: %1\r\n").arg( sock->getLocalAddress().toString() ) );
@@ -433,9 +451,16 @@ bool DeviceSearcher::processPacket( const QHostAddress& localInterfaceAddress,
                                         const DeviceInfo& devInfo,
                                         const QByteArray& xmlDevInfo )
 {
+    std::map< uint, SearchHandler* > sortedHandlers;
+    for( const auto handler : m_handlers[ QString() ] )
+        sortedHandlers[ handler.second ] = handler.first;
+
+    for( const auto handler : m_handlers[ devInfo.deviceType ] )
+        sortedHandlers[ handler.second ] = handler.first;
+
     bool precessed = true;
-    for( const auto& handler : m_handlers )
-        precessed &= handler->processPacket(
+    for( const auto& handler : sortedHandlers )
+        precessed &= handler.second->processPacket(
             localInterfaceAddress, discoveredDevAddress, devInfo, xmlDevInfo );
     return precessed;
 }
@@ -467,23 +492,14 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient
 }
 
 SearchAutoHandler::SearchAutoHandler(const QString& devType)
-    : m_devType( devType )
 {
-    if( !devType.isEmpty() )
-    {
-        DeviceSearcher::instance()->registerHandler( this );
-        DeviceSearcher::instance()->registerDeviceType( devType );
-    }
+    DeviceSearcher::instance()->registerHandler( this, devType );
 }
 
 SearchAutoHandler::~SearchAutoHandler()
 {
     if( auto searcher = DeviceSearcher::instance() )
-    {
-        searcher->cancelHandlerRegistration( this );
-        if( !m_devType.isEmpty() )
-            searcher->cancelDeviceTypeRegistration( m_devType );
-    }
+        searcher->unregisterHandler( this );
 }
 
 } // namespace nx_upnp

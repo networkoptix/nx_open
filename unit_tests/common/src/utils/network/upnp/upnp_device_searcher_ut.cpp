@@ -17,8 +17,15 @@ TEST(Upnp, Urn)
     EXPECT_NE( id, fromUpnpUrn( urn, lit("yyy") ) );
 }
 
-class RS : public SearchHandler
+class TestSearchHandler
+        : public SearchAutoHandler
 {
+public:
+    TestSearchHandler()
+        : SearchAutoHandler( QLatin1String( "InternetGatewayDevice" ) )
+    {
+    }
+
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
         const SocketAddress& discoveredDevAddress,
@@ -34,14 +41,12 @@ class RS : public SearchHandler
 };
 
 // TODO: implement over mocked sockets
-TEST(Upnp, DISABLED_DeviceSearcher)
+TEST( UpnpDeviceSearcher, DISABLED_General )
 {
     TimerManager timerManager;
-    DeviceSearcher deviceSearcher(QLatin1String("InternetGatewayDevice"));
-
-    RS rs;
-    deviceSearcher.registerHandler(&rs);
-    QThread::sleep(5);
+    DeviceSearcher deviceSearcher;
+    TestSearchHandler testSearcher;
+    QThread::sleep( 5 );
 }
 
 } // namespace test

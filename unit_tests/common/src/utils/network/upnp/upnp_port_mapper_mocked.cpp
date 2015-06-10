@@ -28,19 +28,20 @@ bool UpnpAsyncClientMock::addMapping(
         Protocol protocol, const QString& description,
         const std::function< void( bool ) >& callback )
 {
-    if( externalPort != m_disabledPort &&
+    if( externalPort == m_disabledPort ||
             m_mappings.find( std::make_pair( externalPort, protocol ) )
                 != m_mappings.end() )
     {
-        m_mappings[ std::make_pair( externalPort, protocol ) ]
-            = std::make_pair( SocketAddress( internalIp, internalPort ), description );
-
-        QtConcurrent::run( [ callback ]{ callback( true ); } );
+        QtConcurrent::run( [ callback ]{ callback( false ); } );
         return true;
     }
 
-    QtConcurrent::run( [ callback ]{ callback( false ); } );
+    m_mappings[ std::make_pair( externalPort, protocol ) ]
+        = std::make_pair( SocketAddress( internalIp, internalPort ), description );
+
+    QtConcurrent::run( [ callback ]{ callback( true ); } );
     return true;
+
 }
 
 bool UpnpAsyncClientMock::deleteMapping(
@@ -56,14 +57,15 @@ bool UpnpAsyncClientMock::getMapping(
         const QUrl& /*url*/, quint32 index,
         const std::function< void( const MappingInfo& ) >& callback )
 {
-    if( m_mappings.size() >= index )
+    if( m_mappings.size() <= index )
     {
         QtConcurrent::run( [ callback ]{ callback( MappingInfo() ); } );
         return true;
     }
 
     const auto mapping = *std::next( m_mappings.begin(), index );
-    QtConcurrent::run( [ callback, mapping ]{
+    QtConcurrent::run( [ callback, mapping ]
+    {
         callback( MappingInfo(
             mapping.second.first.address,
             mapping.second.first.port,
@@ -87,7 +89,8 @@ bool UpnpAsyncClientMock::getMapping(
     }
 
     const auto mapping = *it;
-    QtConcurrent::run( [ callback, mapping ]{
+    QtConcurrent::run( [ callback, mapping ]
+    {
         callback( MappingInfo(
             mapping.second.first.address,
             mapping.second.first.port,
