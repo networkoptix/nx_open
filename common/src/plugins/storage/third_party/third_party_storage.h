@@ -5,7 +5,7 @@
 #include "plugins/plugin_api.h"
  
 #if defined(STORAGE_EXPORTS)
-    #include "storage_library.h"
+    #include "third_party_storage_library.h"
 #else
 	#define STORAGE_API
 #endif
