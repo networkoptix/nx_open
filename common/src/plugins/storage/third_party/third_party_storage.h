@@ -290,6 +290,6 @@ namespace Qn
 }
  
 typedef Qn::StorageFactory* (*create_qn_storage_factory_function)();
-typedef const char* (*qn_storage_error_message)(int);
+typedef const char* (*qn_storage_error_message_function)(int);
 
 #endif // __THIRD_PARTY_STORAGE_H__
