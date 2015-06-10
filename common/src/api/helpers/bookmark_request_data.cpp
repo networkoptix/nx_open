@@ -1,13 +1,12 @@
 #include "bookmark_request_data.h"
 
-
 #include <common/common_globals.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-
-#include <utils/serialization/lexical.h>
+#include <utils/common/model_functions.h>
+//#include <utils/serialization/lexical.h>
 #include <utils/common/util.h>
 
 
@@ -25,12 +24,10 @@ namespace {
 }
 
 QnBookmarkRequestData::QnBookmarkRequestData():
-    strategy(Qn::EarliestFirst), 
-    format(Qn::JsonFormat),
-    startTimeMs(0), 
-    endTimeMs(DATETIME_NOW), 
-    isLocal(false), 
-    limit(std::numeric_limits<int>().max())
+      filter()
+    , format(Qn::JsonFormat)
+    , cameras()
+    , isLocal(false)
 {
 
 }
@@ -39,21 +36,21 @@ QnBookmarkRequestData QnBookmarkRequestData::fromParams(const QnRequestParamList
     QnBookmarkRequestData request;
 
     if (params.contains(startTimeKey))
-        request.startTimeMs = parseDateTime(params.value(startTimeKey));
+        request.filter.startTimeMs = parseDateTime(params.value(startTimeKey));
 
     if (params.contains(endTimeKey))
-        request.endTimeMs = parseDateTime(params.value(endTimeKey));
+        request.filter.endTimeMs = parseDateTime(params.value(endTimeKey));
 
     //if (params.contains(strategyKey())) {
-        QnLexical::deserialize(params.value(strategyKey), &request.strategy);
+        QnLexical::deserialize(params.value(strategyKey), &request.filter.strategy);
         //request.strategy = QnLexical::deserialized(params.value(periodsTypeKey), Qn::EarliestFirst);
             //static_cast<Qn::BookmarkSearchStrategy>(.toInt());
     //}
 
     if (params.contains(limitKey))
-        request.limit = qMax(0LL, params.value(limitKey).toLongLong());
+        request.filter.limit = qMax(0LL, params.value(limitKey).toLongLong());
 
-    request.filter = params.value(filterKey);
+    request.filter.text = params.value(filterKey);
     request.isLocal = params.contains(localKey);
     QnLexical::deserialize(params.value(formatKey), &request.format);
 
@@ -76,17 +73,17 @@ QnBookmarkRequestData QnBookmarkRequestData::fromParams(const QnRequestParamList
 QnRequestParamList QnBookmarkRequestData::toParams() const {
     QnRequestParamList result;
 
-    result.insert(startTimeKey,     QString::number(startTimeMs));
-    result.insert(endTimeKey,       QString::number(endTimeMs));
-    result.insert(filterKey,        filter);
-    result.insert(limitKey,         QString::number(limit));
+    result.insert(startTimeKey,     QnLexical::serialized(filter.startTimeMs));
+    result.insert(endTimeKey,       QnLexical::serialized(filter.endTimeMs));
+    result.insert(filterKey,        QnLexical::serialized(filter.text));
+    result.insert(limitKey,         QnLexical::serialized(filter.limit));
+    result.insert(strategyKey,      QnLexical::serialized(filter.strategy));
     if (isLocal)
-        result.insert(localKey, QString());
+        result.insert(localKey,     QString());
     result.insert(formatKey,        QnLexical::serialized(format));
-    result.insert(strategyKey,      QnLexical::serialized(strategy));
 
     for (const auto &camera: cameras)
-        result.insert(physicalIdKey, camera->getPhysicalId());
+        result.insert(physicalIdKey,QnLexical::serialized(camera->getPhysicalId()));
 
     return result;
 }
@@ -100,6 +97,6 @@ QUrlQuery QnBookmarkRequestData::toUrlQuery() const {
 
 bool QnBookmarkRequestData::isValid() const {
     return !cameras.isEmpty() 
-        && endTimeMs > startTimeMs 
+        && filter.endTimeMs > filter.startTimeMs 
         && format != Qn::UnsupportedFormat;
 }

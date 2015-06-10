@@ -23,9 +23,9 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
             QnCameraBookmarkTags tags;
             if (!request.filter.isEmpty()) {
                 QnCameraBookmarkSearchFilter bookmarksFilter;
-                bookmarksFilter.minStartTimeMs = request.startTimeMs;
-                bookmarksFilter.maxStartTimeMs = request.endTimeMs;
-                bookmarksFilter.minDurationMs = request.detailLevel;
+                bookmarksFilter.startTimeMs = request.startTimeMs;
+                bookmarksFilter.endTimeMs = request.endTimeMs;
+                //bookmarksFilter.minDurationMs = request.detailLevel;
                 bookmarksFilter.text = request.filter;
                 QnCameraBookmarkList bookmarks;
                 

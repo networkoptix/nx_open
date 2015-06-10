@@ -369,12 +369,13 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
 
     if (!cameraUniqueId.isEmpty())
         addFilter("book.unique_id = :cameraUniqueId");
-    if (filter.minStartTimeMs > 0)
+    if (filter.startTimeMs > 0)
         addFilter("startTimeMs >= :minStartTimeMs");
-    if (filter.maxStartTimeMs < INT64_MAX)
+    if (filter.endTimeMs < INT64_MAX)
         addFilter("startTimeMs <= :maxStartTimeMs");
-    if (filter.minDurationMs > 0)
-        addFilter("durationMs >= :minDurationMs");
+//     if (filter.minDurationMs > 0)
+//         addFilter("durationMs >= :minDurationMs");
+    //TODO: #GDM #Bookmarks add strategy filter
     if (!filter.text.isEmpty()) {
         addFilter("book.rowid in (SELECT docid FROM fts_bookmarks WHERE fts_bookmarks MATCH :text)");
         bindings.append(":text");   //minor hack to workaround closing bracket
@@ -405,9 +406,9 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
     };
 
     checkedBind(":cameraUniqueId", cameraUniqueId);
-    checkedBind(":minStartTimeMs", filter.minStartTimeMs);
-    checkedBind(":maxStartTimeMs", filter.maxStartTimeMs);
-    checkedBind(":minDurationMs", filter.minDurationMs);
+    checkedBind(":minStartTimeMs", filter.startTimeMs);
+    checkedBind(":maxStartTimeMs", filter.endTimeMs);
+    //checkedBind(":minDurationMs", filter.minDurationMs);
     checkedBind(":text", filter.text);
 
     if (!query.exec()) {

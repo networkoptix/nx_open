@@ -2,6 +2,7 @@
 
 #include <QUrlQuery>
 
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 
@@ -14,13 +15,8 @@ struct QnBookmarkRequestData
     QUrlQuery toUrlQuery() const;
     bool isValid() const;
 
-    Qn::BookmarkSearchStrategy strategy;
+    QnCameraBookmarkSearchFilter filter;
     Qn::SerializationFormat format;
-
     QnVirtualCameraResourceList cameras;
-    qint64 startTimeMs;
-    qint64 endTimeMs;
-    QString filter;
     bool isLocal;   
-    int limit;
 };

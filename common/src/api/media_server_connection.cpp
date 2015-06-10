@@ -86,7 +86,6 @@ namespace {
         (BookmarkAddObject,        "cameraBookmarks/add")
         (BookmarkUpdateObject,     "cameraBookmarks/update")
         (BookmarkDeleteObject,     "cameraBookmarks/delete")
-        (BookmarksGetObject,       "cameraBookmarks/get")
         (InstallUpdateObject,      "installUpdate")
         (Restart,                  "restart")
         (ConfigureObject,          "configure")
@@ -240,9 +239,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case BookmarkUpdateObject: 
     case BookmarkDeleteObject:
         processJsonReply<QnCameraBookmark>(this, response, handle);
-        break;
-    case BookmarksGetObject:
-        processJsonReply<QnCameraBookmarkList>(this, response, handle);
         break;
     case InstallUpdateObject:
         processJsonReply<QnUploadUpdateReply>(this, response, handle);
@@ -755,20 +751,6 @@ int QnMediaServerConnection::deleteBookmarkAsync(const QnVirtualCameraResourcePt
     params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
 
     return sendAsyncPostRequest(BookmarkDeleteObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
-}
-
-int QnMediaServerConnection::getBookmarksAsync(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot) {
-    QnRequestHeaderList headers;
-    //headers << QnRequestParam("content-type",   "application/json");
-
-    QnRequestParamList params;
-    params << QnRequestParam("id",               QnLexical::serialized(camera->getPhysicalId()));
-    params << QnRequestParam("minStartTimeMs",   QnLexical::serialized(filter.minStartTimeMs));
-    params << QnRequestParam("maxStartTimeMs",   QnLexical::serialized(filter.maxStartTimeMs));
-    params << QnRequestParam("minDurationMs",    QnLexical::serialized(filter.minDurationMs));
-    params << QnRequestParam("text",             QnLexical::serialized(filter.text));
-    
-    return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
 int QnMediaServerConnection::installUpdate(const QString &updateId, QObject *target, const char *slot) {

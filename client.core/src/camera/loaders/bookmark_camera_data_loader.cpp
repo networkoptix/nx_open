@@ -97,11 +97,11 @@ void QnBookmarksLoader::sendRequest(const QnTimePeriod &period) {
 
     QnBookmarkRequestData requestData;
     requestData.cameras << m_camera;
-    requestData.startTimeMs = period.startTimeMs;
-    requestData.endTimeMs = period.isInfinite()
+    requestData.filter.startTimeMs = period.startTimeMs;
+    requestData.filter.endTimeMs = period.isInfinite()
         ? DATETIME_NOW
         : period.endTimeMs();
-    requestData.strategy = Qn::LongestFirst;
+    requestData.filter.strategy = Qn::LongestFirst;
     requestData.format = Qn::JsonFormat;
 
     //TODO: #GDM #Bookmarks #IMPLEMENT ME

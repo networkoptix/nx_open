@@ -61,22 +61,22 @@ struct QnCameraBookmark {
  *                                                  with length exceeding fixed minimal, with name and/or tags containing fixed string.
  */
 struct QnCameraBookmarkSearchFilter {
-    //TODO: #GDM #Bookmarks change minStartTimeMs to maxEndTimeMs to load bookmarks that end in the current window.
     /** Minimum start time for the bookmark. */
-    qint64 minStartTimeMs;
+    qint64 startTimeMs;
 
-    /** Maximum start time for the bookmark. */
-    qint64 maxStartTimeMs;
-
-    /** Minimum bookmark duration. */
-    qint64 minDurationMs;
+    /** Maximum end time for the bookmark. */
+    qint64 endTimeMs;
 
     /** Text-search filter string. */
     QString text;
 
+    int limit;
+
+    Qn::BookmarkSearchStrategy strategy;
+
     QnCameraBookmarkSearchFilter();
 };
-#define QnCameraBookmarkSearchFilter_Fields (minStartTimeMs)(maxStartTimeMs)(minDurationMs)(text)
+#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
 

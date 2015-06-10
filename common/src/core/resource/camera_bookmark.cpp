@@ -31,9 +31,10 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
 }
 
 QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter():
-    minStartTimeMs(0),
-    maxStartTimeMs(INT64_MAX),
-    minDurationMs(0)
+    startTimeMs(0),
+    endTimeMs(std::numeric_limits<qint64>().max()),
+    limit(std::numeric_limits<int>().max()),
+    strategy(Qn::EarliestFirst)
 {}
 
 

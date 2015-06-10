@@ -7,7 +7,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
-class QnResourceWidget;
 class QnCachingCameraDataLoader;
 
 class QnCameraDataManager : public QObject
