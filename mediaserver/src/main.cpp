@@ -1224,6 +1224,19 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
     }
 }
 
+void QnMain::at_adminUserChanged( const QnResourcePtr& resource )
+{
+    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+    if( !user )
+        return;
+
+    if( !user->isAdmin() )
+        return;
+
+    //TODO changing password hash in /etc/shadow file
+    //user->getCryptSha512Hash();
+}
+
 void QnMain::at_localInterfacesChanged()
 {
     if (isStopping())
@@ -1490,6 +1503,10 @@ void QnMain::run()
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     std::unique_ptr<QnResourcePool> resourcePool( new QnResourcePool() );
 
+    connect(
+        resourcePool.get(), &QnResourcePool::resourceChanged,
+        this, &QnMain::at_adminUserChanged );
+    
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());

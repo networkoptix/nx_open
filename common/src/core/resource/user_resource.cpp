@@ -182,6 +182,11 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
             modifiedFields << "digestChanged";
         }
 
+        if (m_cryptSha512Hash != localOther->m_cryptSha512Hash ) {
+            m_cryptSha512Hash = localOther->m_cryptSha512Hash;
+            modifiedFields << "cryptSha512HashChanged";
+        }
+
         if (m_permissions != localOther->m_permissions) {
             m_permissions = localOther->m_permissions;
             modifiedFields << "permissionsChanged";
