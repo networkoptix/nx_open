@@ -39,7 +39,7 @@ public:
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, 
                             QByteArray& resultContentType, const QnRestConnectionProcessor*) = 0;
 
-    
+    virtual void afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) {}
     friend class QnRestProcessorPool;
 
 protected:

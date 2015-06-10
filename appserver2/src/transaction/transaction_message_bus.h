@@ -71,6 +71,7 @@ namespace ec2
             const QByteArray& requestMsgBody );
         //!Blocks till connection \a connectionGuid is ready to accept new transactions
         void waitForNewTransactionsReady( const QnUuid& connectionGuid );
+        void connectionFailure( const QnUuid& connectionGuid );
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -155,7 +156,6 @@ namespace ec2
         //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
 
-        void transactionProcessed(const QnAbstractTransaction &transaction);
         void remotePeerUnauthorized(const QnUuid& id);
     private:
         friend class QnTransactionTransport;

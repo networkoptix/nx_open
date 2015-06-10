@@ -816,7 +816,6 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
 
     // proxy incoming transaction to other peers.
     if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
-        emit transactionProcessed(tran);
         return; // all dstPeers already processed
     }
 
@@ -847,7 +846,6 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("proxy transaction %1 to (%2)").arg(tran.toString()).arg(proxyListStr), cl_logDEBUG1);
         }
 
-    emit transactionProcessed(tran);
 };
 
 void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
@@ -1529,6 +1527,19 @@ void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connect
             continue;
         //mutex is unlocked if we go to wait
         transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+        return;
+    }
+}
+
+void QnTransactionMessageBus::connectionFailure( const QnUuid& connectionGuid )
+{
+    QMutexLocker lock( &m_mutex );
+    for( QnTransactionTransport* transport : m_connections )
+    {
+        if( transport->connectionGuid() != connectionGuid )
+            continue;
+        //mutex is unlocked if we go to wait
+        transport->connectionFailure();
         return;
     }
 }

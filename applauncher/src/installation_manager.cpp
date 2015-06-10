@@ -288,25 +288,35 @@ QString InstallationManager::installationDirForVersion(const QnSoftwareVersion &
 
 bool InstallationManager::installZip(const QnSoftwareVersion &version, const QString &fileName)
 {
+    NX_LOG(lit("InstallationManager: Installing update %1 from %2").arg(version.toString()).arg(fileName), cl_logDEBUG1);
+
     QnClientInstallationPtr installation = installationForVersion(version, true);
-    if (installation && installation->verify())
+    if (installation && installation->verify()) {
+        NX_LOG(lit("InstallationManager: Version %1 is already installed").arg(version.toString()), cl_logINFO);
         return true;
+    }
 
     QDir targetDir = QDir(installationDirForVersion(version));
 
     if (targetDir.exists())
         targetDir.removeRecursively();
 
-    if (!QDir().mkdir(targetDir.absolutePath()))
+    if (!QDir().mkdir(targetDir.absolutePath())) {
+        NX_LOG(lit("InstallationManager: Cannot create directory %1").arg(targetDir.absolutePath()), cl_logERROR);
         return false;
+    }
 
     QnZipExtractor extractor(fileName, targetDir);
-    if (extractor.extractZip() != QnZipExtractor::Ok)
+    int errorCode = extractor.extractZip();
+    if (errorCode != QnZipExtractor::Ok) {
+        NX_LOG(lit("InstallationManager: Cannot extract zip %1 to %2, errorCode = %3").arg(fileName).arg(targetDir.absolutePath()).arg(errorCode), cl_logERROR);
         return false;
+    }
 
     installation = QnClientInstallation::installationForPath(targetDir.absolutePath());
     if (installation.isNull() || !installation->exists()) {
         targetDir.removeRecursively();
+        NX_LOG(lit("InstallationManager: Update package %1 (%2) is invalid").arg(version.toString()).arg(fileName), cl_logERROR);
         return false;
     }
 
@@ -315,6 +325,7 @@ bool InstallationManager::installZip(const QnSoftwareVersion &version, const QSt
 
     if (!installation->createInstallationDat()) {
         targetDir.removeRecursively();
+        NX_LOG(lit("InstallationManager: Cannot create verification file for %1.").arg(version.toString()).arg(fileName), cl_logERROR);
         return false;
     }
 
@@ -323,6 +334,8 @@ bool InstallationManager::installZip(const QnSoftwareVersion &version, const QSt
     lk.unlock();
 
     createGhosts();
+
+    NX_LOG(lit("InstallationManager: Version %1 has been installed successfully to %2").arg(version.toString()).arg(targetDir.absolutePath()), cl_logINFO);
 
     return true;
 }

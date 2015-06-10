@@ -9,12 +9,6 @@
 
 namespace
 {
-    struct ReplyData
-    {
-        rtu::HttpClient::OnSuccesfullReplyFunc successfullCallbac;
-        rtu::HttpClient::OnErrorReplyFunc errorCallback;
-    };
-    
     QNetworkRequest preparePostJsonReqiestRequest(const QUrl &url)
     {
         QNetworkRequest result(url);
@@ -43,7 +37,8 @@ private:
     void onReply(QNetworkReply *reply);
     
 private:
-    typedef QMap<QNetworkReply *, ReplyData> RepliesMap;
+    typedef QPair<OnSuccesfullReplyFunc, OnErrorReplyFunc> CallbacksPair;
+    typedef QMap<QNetworkReply *, CallbacksPair> RepliesMap;
     
     QNetworkAccessManager * const m_manager;
     RepliesMap m_replies;
@@ -65,7 +60,8 @@ void rtu::HttpClient::Impl::sendGet(const QUrl &url
     , const OnSuccesfullReplyFunc &successfullCallback
     , const OnErrorReplyFunc &errorCallback)
 {
-    m_replies.insert(m_manager->get(QNetworkRequest(url)), { successfullCallback, errorCallback });
+    m_replies.insert(m_manager->get(QNetworkRequest(url))
+        , CallbacksPair(successfullCallback, errorCallback));
 }
 
 void rtu::HttpClient::Impl::sendPost(const QUrl &url
@@ -74,7 +70,7 @@ void rtu::HttpClient::Impl::sendPost(const QUrl &url
     , const OnErrorReplyFunc &errorCallback)
 {
     m_replies.insert(m_manager->post(preparePostJsonReqiestRequest(url), data)
-        , { successfullCallback, errorCallback });
+        , CallbacksPair(successfullCallback, errorCallback));
 }
 
 void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
@@ -91,16 +87,22 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
         , kHttpSuccessCodeLast = 299
     };
     
+    const int errorCode = reply->error();
     const int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if ((httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast))
+    if ((errorCode != QNetworkReply::NoError)
+        || (httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast))
     { 
-        if (it->errorCallback)
-            it->errorCallback(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString());
+        const OnErrorReplyFunc &errorCallback = it->second;
+        if (errorCallback)
+        {
+            const QString &errorReason = reply->attribute(
+                QNetworkRequest::HttpReasonPhraseAttribute).toString();
+            errorCallback(errorReason, httpCode);
+        }
     }
-    else
+    else if (const OnSuccesfullReplyFunc &successCallback = it->first)
     {
-        if (it->successfullCallbac)
-            it->successfullCallbac(reply->readAll());
+        successCallback(reply->readAll());
     }
     m_replies.erase(it);
 }

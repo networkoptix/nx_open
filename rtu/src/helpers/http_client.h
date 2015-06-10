@@ -14,7 +14,8 @@ namespace rtu
     {
     public:
         typedef std::function<void (const QByteArray &data)> OnSuccesfullReplyFunc;
-        typedef std::function<void (const QString &errorReason)> OnErrorReplyFunc;
+        typedef std::function<void (const QString &errorReason
+            , int errorCode)> OnErrorReplyFunc;
         
         HttpClient(QObject *parent);
         
