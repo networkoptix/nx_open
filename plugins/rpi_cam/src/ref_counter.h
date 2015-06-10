@@ -3,7 +3,7 @@
 
 #include <plugins/plugin_tools.h>
 
-namespace nxpl
+namespace rpi_cam
 {
     inline bool operator == ( const nxpl::NX_GUID& id1, const nxpl::NX_GUID& id2 )
     {
@@ -14,18 +14,29 @@ namespace nxpl
         }
         return true;
     }
-}
 
-#define DEF_REF_COUNTER \
-    public: \
-        virtual unsigned int addRef() override; \
-        virtual unsigned int releaseRef() override; \
-        virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override; \
-    private: \
+    template <typename T>
+    class DefaultRefCounter : public T
+    {
+    public:
+        virtual unsigned int addRef() override;
+        virtual unsigned int releaseRef() override;
+
+    protected:
         nxpt::CommonRefManager m_refManager;
 
-#define DEFAULT_REF_COUNTER(ClassName) \
-    unsigned int ClassName::addRef() { return m_refManager.addRef(); } \
-    unsigned int ClassName::releaseRef() { return m_refManager.releaseRef(); }
+        DefaultRefCounter()
+        :   m_refManager(this)
+        {}
+
+        DefaultRefCounter(nxpt::CommonRefManager * refManager)
+        :   m_refManager(refManager)
+        {}
+    };
+
+    #define DEFAULT_REF_COUNTER(T) \
+        template <> unsigned int DefaultRefCounter<T>::addRef() { return m_refManager.addRef(); } \
+        template <> unsigned int DefaultRefCounter<T>::releaseRef() { return m_refManager.releaseRef(); }
+}
 
 #endif //DEFAULT_REF_COUNTER_H

@@ -13,15 +13,14 @@ extern "C"
 
 namespace rpi_cam
 {
-    DEFAULT_REF_COUNTER(DiscoveryManager)
+    DEFAULT_REF_COUNTER(nxcip::CameraDiscoveryManager)
 
     DiscoveryManager * DiscoveryManager::Instance;
 
     DiscoveryManager::DiscoveryManager()
-    :   m_refManager(this),
-        m_camera(nullptr)
+    :   m_camera(nullptr)
     {
-        debug_print("DiscoveryManager()\n");
+        debug_print("%s\n", __FUNCTION__);
 
         RPiCamera::init();
         Instance = this;
@@ -29,7 +28,7 @@ namespace rpi_cam
 
     DiscoveryManager::~DiscoveryManager()
     {
-        debug_print("~DiscoveryManager()\n");
+        debug_print("%s\n", __FUNCTION__);
 
         if (m_camera)
             m_camera->releaseRef();
@@ -62,7 +61,6 @@ namespace rpi_cam
 
     int DiscoveryManager::findCameras(nxcip::CameraInfo * cameras, const char * /*localInterfaceIPAddr*/)
     {
-        if (! m_camera)
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
@@ -92,12 +90,12 @@ namespace rpi_cam
         int /*mdnsResponsePacketSize*/,
         nxcip::CameraInfo* /*cameraInfo*/ )
     {
-        return nxcip::NX_NO_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
     int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )
     {
-        return nxcip::NX_NO_ERROR;
+        return nxcip::NX_NOT_IMPLEMENTED;
     }
 
     nxcip::BaseCameraManager* DiscoveryManager::createCameraManager(const nxcip::CameraInfo& )

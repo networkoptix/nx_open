@@ -11,19 +11,20 @@
 namespace rpi_cam
 {
     //!
-    class VideoPacket : public nxcip::VideoDataPacket
+    class VideoPacket : public DefaultRefCounter<nxcip::VideoDataPacket>
     {
-        DEF_REF_COUNTER
-
     public:
         VideoPacket()
-        :   m_refManager( this ),
-            m_data( nullptr ),
+        :   m_data( nullptr ),
             m_size( 0 )
         {}
 
         VideoPacket(const uint8_t * data, size_t size, uint64_t ts, unsigned flags);
         virtual ~VideoPacket();
+
+        // nxpl::PluginInterface
+
+        virtual void * queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxpl::MediaDataPacket
 

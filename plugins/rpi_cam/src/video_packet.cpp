@@ -16,16 +16,13 @@ namespace
 
 namespace rpi_cam
 {
-    DEFAULT_REF_COUNTER(VideoPacket)
+    DEFAULT_REF_COUNTER(nxcip::VideoDataPacket)
 
     VideoPacket::VideoPacket(const uint8_t * data, size_t size, uint64_t ts, unsigned flags)
-    :   m_refManager(this),
-        m_size(0),
+    :   m_size(0),
         m_time(ts),
         m_flags(flags)
     {
-        //printf("[camera] VideoPacket()\n");
-
         if (data)
         {
             m_data = std::shared_ptr<uint8_t>(
@@ -38,11 +35,9 @@ namespace rpi_cam
 
     VideoPacket::~VideoPacket()
     {
-        //printf("[camera] ~VideoPacket()\n");
     }
 
-    // TODO
-    void* VideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
+    void * VideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         if (interfaceID == nxcip::IID_VideoDataPacket)
         {

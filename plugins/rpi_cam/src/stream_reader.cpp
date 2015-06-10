@@ -6,23 +6,22 @@
 
 namespace rpi_cam
 {
-    DEFAULT_REF_COUNTER(StreamReader)
+    DEFAULT_REF_COUNTER(nxcip::StreamReader)
 
     TimeCorrection StreamReader::m_timeCorrect;
 
     StreamReader::StreamReader(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber)
-    :   m_refManager(this),
-        m_camera(camera),
+    :   m_camera(camera),
         m_encoderNumber(encoderNumber),
         m_pts(0),
         m_interrupt(false)
     {
-        debug_print("StreamReader() %d\n", m_encoderNumber);
+        debug_print("%s %d\n", __FUNCTION__, m_encoderNumber);
     }
 
     StreamReader::~StreamReader()
     {
-        debug_print("~StreamReader() %d\n", m_encoderNumber);
+        debug_print("%s %d\n", __FUNCTION__, m_encoderNumber);
     }
 
     void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -55,7 +54,7 @@ namespace rpi_cam
             if (! camera || ! camera->isOK())
             {
                 debug_print("StreamReader.getNextData() %d no camera\n", m_encoderNumber);
-                return false;
+                return nxcip::NX_OTHER_ERROR;
             }
 
             m_data.clear();
@@ -85,7 +84,8 @@ namespace rpi_cam
         }
 
         timeStamp = m_timeCorrect.fixTime(m_pts, timeStamp);
-#if 0
+
+#if 0   // debug: check timestamp correction
         if (rpiFlags & RPiCamera::FLAG_SYNCFRAME)
             debug_print("StreamReader: %d timestamp %llu\n", m_encoderNumber, timeStamp);
 #endif

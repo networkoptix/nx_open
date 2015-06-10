@@ -14,13 +14,15 @@ namespace rpi_cam
     class RPiCamera;
 
     //!
-    class MediaEncoder : public nxcip::CameraMediaEncoder3
+    class MediaEncoder : public DefaultRefCounter<nxcip::CameraMediaEncoder3>
     {
-        DEF_REF_COUNTER
-
     public:
         MediaEncoder(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber);
         virtual ~MediaEncoder();
+
+        // nxpl::PluginInterface
+
+        virtual void * queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxcip::CameraMediaEncoder
 

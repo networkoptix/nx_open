@@ -16,13 +16,15 @@ namespace rpi_cam
     class RPiCamera;
 
     //!
-    class StreamReader : public nxcip::StreamReader
+    class StreamReader : public DefaultRefCounter<nxcip::StreamReader>
     {
-        DEF_REF_COUNTER
-
     public:
         StreamReader(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber);
         virtual ~StreamReader();
+
+        // nxpl::PluginInterface
+
+        virtual void * queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxcip::StreamReader
 

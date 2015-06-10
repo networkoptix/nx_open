@@ -6,7 +6,6 @@
 #include <plugins/camera_plugin.h>
 
 #include "ref_counter.h"
-#include "rpi_camera.h"
 
 namespace rpi_cam
 {
@@ -14,13 +13,15 @@ namespace rpi_cam
     class RPiCamera;
 
     //!
-    class CameraManager : public nxcip::BaseCameraManager
+    class CameraManager : public DefaultRefCounter<nxcip::BaseCameraManager>
     {
-        DEF_REF_COUNTER
-
     public:
         CameraManager();
         virtual ~CameraManager();
+
+        // nxpl::PluginInterface
+
+        virtual void * queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxcip::BaseCameraManager
 
@@ -35,17 +36,11 @@ namespace rpi_cam
         virtual nxcip::CameraRelayIOManager* getCameraRelayIOManager() const override;
         virtual void getLastErrorString( char* errorString ) const override;
 
-        //
-
-        std::weak_ptr<RPiCamera> rpiCamera() { return m_rpiCamera; }
-        const nxcip::CameraInfo& info() const { return m_info; }
-
     private:
         std::shared_ptr<RPiCamera> m_rpiCamera;
         std::shared_ptr<MediaEncoder> m_encoderHQ;
         std::shared_ptr<MediaEncoder> m_encoderLQ;
 
-        const char * m_errorStr;
         nxcip::CameraInfo m_info;
         CameraParameters m_parameters;
 

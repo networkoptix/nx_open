@@ -7,19 +7,18 @@
 
 namespace rpi_cam
 {
-    DEFAULT_REF_COUNTER(MediaEncoder)
+    DEFAULT_REF_COUNTER(nxcip::CameraMediaEncoder3)
 
     MediaEncoder::MediaEncoder(std::shared_ptr<RPiCamera> camera, unsigned encoderNumber)
-    :   m_refManager(this),
-        m_camera(camera),
+    :   m_camera(camera),
         m_encoderNumber(encoderNumber)
     {
-        debug_print("MediaEncoder() %d\n", m_encoderNumber);
+        debug_print("%s %d\n", __FUNCTION__, m_encoderNumber);
     }
 
     MediaEncoder::~MediaEncoder()
     {
-        debug_print("~MediaEncoder() %d\n", m_encoderNumber);
+        debug_print("%s %d\n", __FUNCTION__, m_encoderNumber);
     }
 
     void * MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
@@ -106,9 +105,13 @@ namespace rpi_cam
 
     nxcip::StreamReader * MediaEncoder::getLiveStreamReader()
     {
+        debug_print("%s %d\n", __FUNCTION__, m_encoderNumber);
+
         std::shared_ptr<RPiCamera> camera = m_camera.lock();
-        if (! camera || ! camera->isOK())
+        if (! camera)
             return nullptr;
+
+        camera->update();
 
         StreamReader * stream = new StreamReader(camera, m_encoderNumber);
         return stream;
@@ -116,23 +119,16 @@ namespace rpi_cam
 
     int MediaEncoder::getConfiguredLiveStreamReader(nxcip::LiveStreamConfig * config, nxcip::StreamReader ** reader)
     {
+        debug_print("%s %d\n", __FUNCTION__, m_encoderNumber);
+
+        std::shared_ptr<RPiCamera> camera = m_camera.lock();
+        if (! camera)
+            return nxcip::NX_OTHER_ERROR;
+
+        camera->configEncoder(m_encoderNumber, config->width, config->height, (unsigned)config->framerate, config->bitrateKbps);
+
         if (reader)
         {
-            std::shared_ptr<RPiCamera> camera = m_camera.lock();
-            if (! camera || ! camera->isOK())
-                return nxcip::NX_OTHER_ERROR;
-
-            if (m_encoderNumber == 0)
-            {
-                if (config->framerate > 30.0f)
-                    config->framerate = 30.0f;
-
-                debug_print("try configure encoder: %dx%dx%d %d kbps\n",
-                       config->width, config->height, (unsigned)config->framerate, config->bitrateKbps);
-
-                camera->updateEncoder(config->width, config->height, (unsigned)config->framerate, config->bitrateKbps);
-            }
-
             *reader = getLiveStreamReader();
             if (*reader)
                 return nxcip::NX_NO_ERROR;

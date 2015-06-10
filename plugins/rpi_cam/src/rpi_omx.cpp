@@ -2,6 +2,9 @@
 
 namespace rpi_omx
 {
+    std::atomic<uint32_t> OMXExeption::lastError_;
+    std::atomic<uint32_t> OMXExeption::eventError_;
+
     static OMX_ERRORTYPE callback_EventHandler(
         OMX_HANDLETYPE hComponent,
         OMX_PTR pAppData,
@@ -89,14 +92,13 @@ namespace rpi_omx
             {
                 switch (nData1)
                 {
-                    case OMX_ErrorSameState:
-                    case OMX_ErrorPortUnpopulated:
-                        debug_print("OMX_EventError: %x\n", nData1);
-                        break;
-
-                    default:
-                        OMXExeption::die( (OMX_ERRORTYPE) nData1, "OMX_EventError received");
+                case OMX_ErrorPortUnpopulated:
+                    // not an error
+                    break;
                 }
+
+                debug_print("OMX_EventError: 0x%x\n", nData1);
+                OMXExeption::setEventError(nData1);
                 break;
             }
 
@@ -115,10 +117,11 @@ namespace rpi_omx
         return OMX_ErrorNone;
     }
 
-    static OMX_ERRORTYPE callback_FillBufferDone(OMX_HANDLETYPE /*hComponent*/, OMX_PTR pAppData, OMX_BUFFERHEADERTYPE * pBuffer)
+    static OMX_ERRORTYPE callback_FillBufferDone(OMX_HANDLETYPE /*hComponent*/, OMX_PTR pAppData, OMX_BUFFERHEADERTYPE * /*pBuffer*/)
     {
         Component * component = static_cast<Component *>(pAppData);
 
+        // Only Encoders use CPU<->GPU Buffer. Others are tunneled => no events for them here.
         if (component->type() == Encoder::cType)
         {
             Encoder * encoder = static_cast<Encoder *>(pAppData);
@@ -126,27 +129,5 @@ namespace rpi_omx
         }
 
         return OMX_ErrorNone;
-    }
-
-    //
-
-    const char * OMXExeption::omxErr2str(OMX_ERRORTYPE error)
-    {
-        switch (error)
-        {
-            case OMX_ErrorNone:                     return "OMX_ErrorNone";
-            case OMX_ErrorBadParameter:             return "OMX_ErrorBadParameter";
-            case OMX_ErrorIncorrectStateOperation:  return "OMX_ErrorIncorrectStateOperation";
-            case OMX_ErrorIncorrectStateTransition: return "OMX_ErrorIncorrectStateTransition";
-            case OMX_ErrorInsufficientResources:    return "OMX_ErrorInsufficientResources";
-            case OMX_ErrorBadPortIndex:             return "OMX_ErrorBadPortIndex";
-            case OMX_ErrorHardware:                 return "OMX_ErrorHardware";
-            // ...
-
-            default:
-                break;
-        }
-
-        return "";
     }
 }

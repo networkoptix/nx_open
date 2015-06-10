@@ -12,13 +12,15 @@ namespace rpi_cam
     class CameraManager;
 
     //!
-    class DiscoveryManager : public nxcip::CameraDiscoveryManager
+    class DiscoveryManager : public DefaultRefCounter<nxcip::CameraDiscoveryManager>
     {
-        DEF_REF_COUNTER
-
     public:
         DiscoveryManager();
         virtual ~DiscoveryManager();
+
+        // nxpl::PluginInterface
+
+        virtual void * queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxcip::CameraDiscoveryManager
 

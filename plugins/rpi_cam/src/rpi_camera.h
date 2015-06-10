@@ -3,9 +3,10 @@
 
 #include <memory>
 #include <mutex>
-#include <atomic>
 
+#include "rw_lock.h"
 #include "rpi_omx.h"
+
 
 /// Raspberry Pi camera unit and configuration
 namespace rpi_cam
@@ -57,6 +58,8 @@ namespace rpi_cam
     class RPiCamera
     {
     public:
+        typedef rw_lock::OneWriterManyReaders RWLock;
+
         enum
         {
             FLAG_EOS = OMX_BUFFERFLAG_EOS,
@@ -71,55 +74,22 @@ namespace rpi_cam
         static constexpr unsigned STREAMS_NUM() { return 2; }
         static constexpr unsigned BITRATE_0() { return 6000; }
         static constexpr unsigned BITRATE_1() { return 500; }
-        static constexpr unsigned IFRAME_PERIOD() { return 6; }
+        static constexpr unsigned IFRAME_PERIOD() { return 5; }
 
         static constexpr const char * UID() { return "Raspberry Pi Camera 0"; }
 
         static void init();
         static void deinit();
-
-        RPiCamera(const CameraParameters& camParams)
-        :   m_isOK(false)
-        {
-            resetComponents();
-
-            m_empty[1] = m_empty[0] = true;
-
-            m_camParams = camParams;
-            m_encParams[0].vfmt = camParams.vfmt;
-            m_encParams[0].bitrateKbps = BITRATE_0();
-
-            m_encParams[1].vfmt = getResizedFormat(camParams.vfmt);
-            m_encParams[1].bitrateKbps = BITRATE_1();
-
-            prepare(camParams, m_encParams[0], m_encParams[1]);
-        }
-
-        ~RPiCamera()
-        {
-            release();
-        }
-
-        bool isOK() const { return m_isOK; }
-
-        bool read(unsigned streamNo, std::vector<uint8_t>& data, uint64_t& timeStamp, unsigned& flags)
-        {
-            if (streamNo >= STREAMS_NUM())
-                return false;
-
-            if (m_empty[streamNo])
-            {
-                m_encoders[streamNo]->callFillThisBuffer();
-                m_empty[streamNo] = false;
-            }
-
-            return read(*m_encoders[streamNo], data, timeStamp, flags);
-        }
-
-        void updateEncoder(unsigned width, unsigned height, unsigned framerate, unsigned bitrateKbps); // configure first stream
-        void getEncoderConfig(unsigned streamNo, unsigned& width, unsigned& height, unsigned& fps, unsigned& bitrate) const;
-
         static const rpi_omx::VideoFromat * getVideoFormats(unsigned& num, bool resized = false);
+
+        RPiCamera(const CameraParameters& camParams);
+        ~RPiCamera();
+
+        bool isOK() const;
+        bool read(unsigned streamNo, std::vector<uint8_t>& data, uint64_t& timeStamp, unsigned& flags);
+        void getEncoderConfig(unsigned streamNo, unsigned& width, unsigned& height, unsigned& fps, unsigned& bitrateKbps) const;
+        void configEncoder(unsigned streamNo, unsigned width, unsigned height, unsigned framerate, unsigned bitrateKbps);
+        void update(); // update if need it
 
     private:
         static std::recursive_mutex m_mutex; // locks entire class, not just an object
@@ -129,17 +99,17 @@ namespace rpi_cam
         std::unique_ptr<rpi_omx::Encoder> m_encoders[2];
         CameraParameters m_camParams;
         EncoderParameters m_encParams[2];
-        bool m_empty[2];
-        std::atomic_bool m_isOK;
+        RWLock m_rw;
+        bool m_needUpdate;
 
         static void updateRatio(rpi_omx::VideoFromat& fmt);
         static const rpi_omx::VideoFromat& getResizedFormat(const rpi_omx::VideoFromat& f);
 
         //
 
-        void resetComponents();
         void prepare(const CameraParameters& camParams, const EncoderParameters& encParams0, const EncoderParameters& encParams1);
         void release();
+        void resetErrors();
 
         void switchState(OMX_STATETYPE state);
 
@@ -161,8 +131,6 @@ namespace rpi_cam
         void stopCapture() { m_camera->capture(rpi_omx::Camera::OPORT_VIDEO, OMX_FALSE); }
 
         void dumpPorts();
-
-        bool read(rpi_omx::Encoder& encoder, std::vector<uint8_t>& data, uint64_t& timeStamp, unsigned& flags);
     };
 }
 

@@ -1,6 +1,8 @@
 #include <string>
 #include <cstdlib>
 
+#include "rpi_camera.h"
+
 #include "discovery_manager.h"
 #include "media_encoder.h"
 #include "camera_manager.h"
@@ -18,27 +20,26 @@ namespace rpi_cam
 {
     static unsigned ENCODERS_COUNT = 2;
 
-    DEFAULT_REF_COUNTER(CameraManager)
+    DEFAULT_REF_COUNTER(nxcip::BaseCameraManager)
 
     CameraManager::CameraManager()
-    :   m_refManager( DiscoveryManager::refManager() ),
-        m_errorStr(nullptr)
+    :   DefaultRefCounter( DiscoveryManager::refManager() )
     {
-        debug_print("CameraManager()\n");
+        debug_print("%s\n", __FUNCTION__);
 
         m_rpiCamera = std::make_shared<RPiCamera>(m_parameters);
-        if (! m_rpiCamera->isOK())
-            debug_print("not OK\n");
-
-        m_encoderHQ = std::shared_ptr<MediaEncoder>( new MediaEncoder(m_rpiCamera, 0), refDeleter );
-        m_encoderLQ = std::shared_ptr<MediaEncoder>( new MediaEncoder(m_rpiCamera, 1), refDeleter );
+        if (m_rpiCamera)
+        {
+            m_encoderHQ = std::shared_ptr<MediaEncoder>( new MediaEncoder(m_rpiCamera, 0), refDeleter );
+            m_encoderLQ = std::shared_ptr<MediaEncoder>( new MediaEncoder(m_rpiCamera, 1), refDeleter );
+        }
 
         makeInfo();
     }
 
     CameraManager::~CameraManager()
     {
-        debug_print("~CameraManager()\n");
+        debug_print("%s\n", __FUNCTION__);
     }
 
     void CameraManager::makeInfo()
@@ -68,21 +69,15 @@ namespace rpi_cam
 
     int CameraManager::getEncoderCount(int * encoderCount) const
     {
-#if 0
-        if (! m_rpiCamera->isOK())
-        {
-            debug_print("getEncoderCount() FAIL\n");
-            *encoderCount = 0;
-            return nxcip::NX_TRY_AGAIN;
-        }
-#endif
-        debug_print("getEncoderCount() OK\n");
+        debug_print("%s\n", __FUNCTION__);
         *encoderCount = ENCODERS_COUNT;
         return nxcip::NX_NO_ERROR;
     }
 
     int CameraManager::getEncoder(int encoderIndex, nxcip::CameraMediaEncoder ** encoderPtr)
     {
+        //debug_print("%s\n", __FUNCTION__);
+
         if (static_cast<unsigned>(encoderIndex) >= ENCODERS_COUNT)
             return nxcip::NX_INVALID_ENCODER_NUMBER;
 
@@ -103,7 +98,7 @@ namespace rpi_cam
             *encoderPtr = m_encoderHQ.get();
         }
 
-        //debug_print("getEncoder() %d - OK\n", encoderIndex);
+        //debug_print("%s %d - OK\n", __FUNCTION__, encoderIndex);
         return nxcip::NX_NO_ERROR;
     }
 
@@ -145,11 +140,13 @@ namespace rpi_cam
 
     void CameraManager::getLastErrorString(char * errorString) const
     {
+        using namespace rpi_omx;
+
         if (errorString)
         {
-            errorString[0] = '\0';
-            if (m_errorStr)
-                strncpy( errorString, m_errorStr, nxcip::MAX_TEXT_LEN );
+            const char * str = err2str((OMX_ERRORTYPE)OMXExeption::lastError());
+            if (str)
+                strncpy( errorString, str, nxcip::MAX_TEXT_LEN );
         }
     }
 }
