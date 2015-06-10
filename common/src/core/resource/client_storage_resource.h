@@ -33,7 +33,6 @@ public:
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace() override;
-    virtual void setUrl(const QString& value) override;
 };
 
 typedef QSharedPointer<QnClientStorageResource> QnClientStorageResourcePtr;

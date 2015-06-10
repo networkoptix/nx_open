@@ -1,7 +1,7 @@
 #include <cassert>
 #include "client_storage_resource.h"
 
-QIODevice* QnClientStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
+QIODevice* QnClientStorageResource::open(const QString&, QIODevice::OpenMode)
 {
     assert(false);
     return NULL;
@@ -19,43 +19,43 @@ bool QnClientStorageResource::isAvailable() const
     return 0;
 }
 
-QFileInfoList QnClientStorageResource::getFileList(const QString& dirName)
+QFileInfoList QnClientStorageResource::getFileList(const QString&)
 {
     assert(false);
     return QFileInfoList();
 }
 
-qint64 QnClientStorageResource::getFileSize(const QString& url) const
+qint64 QnClientStorageResource::getFileSize(const QString&) const
 {
     assert(false);
     return 0;
 }
 
-bool QnClientStorageResource::removeFile(const QString& url)
+bool QnClientStorageResource::removeFile(const QString&)
 {
     assert(false);
     return false;
 }
 
-bool QnClientStorageResource::removeDir(const QString& url)
+bool QnClientStorageResource::removeDir(const QString&)
 {
     assert(false);
     return false;
 }
 
-bool QnClientStorageResource::renameFile(const QString& oldName, const QString& newName)
+bool QnClientStorageResource::renameFile(const QString&, const QString&)
 {
     assert(false);
     return false;
 }
 
-bool QnClientStorageResource::isFileExists(const QString& url)
+bool QnClientStorageResource::isFileExists(const QString&)
 {
     assert(false);
     return false;
 }
 
-bool QnClientStorageResource::isDirExists(const QString& url)
+bool QnClientStorageResource::isDirExists(const QString&)
 {
     assert(false);
     return false;
@@ -71,9 +71,4 @@ qint64 QnClientStorageResource::getTotalSpace()
 {
     assert(false);
     return 0;
-}
-
-void QnClientStorageResource::setUrl(const QString& value)
-{
-    assert(false);
 }
