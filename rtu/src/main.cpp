@@ -4,8 +4,8 @@
 #include <QtQml>
 #include <models/ip_settings_model.h>
 #include <models/servers_selection_model.h>
-#include <constants.h>
-#include <rtu_context.h>
+#include <base/constants.h>
+#include <base/rtu_context.h>
 
 void registerTypes()
 {
@@ -19,7 +19,9 @@ void registerTypes()
     };
     
     const char kServerFlagsQmlTypeName[] = "Constants";
-    qmlRegisterType<rtu::Constants>(kRtuDomainName, 1, 0, kServerFlagsQmlTypeName);
+
+    qmlRegisterUncreatableType<rtu::Constants>(kRtuDomainName
+        , kMajorVersion, kMinorVersion, kServerFlagsQmlTypeName, kServerFlagsQmlTypeName);
     
 /*
     const char kIpSettingsModelTypeName[] = "IpSettingsModel";
@@ -39,9 +41,10 @@ void registerTypes()
     
 }
 
+#include <helpers/time_helper.h>
+
 int main(int argc, char *argv[])
 {
-            
     QGuiApplication app(argc, argv);
 
     rtu::RtuContext rtuContext(&app);
@@ -51,7 +54,7 @@ int main(int argc, char *argv[])
     registerTypes();
 
     engine.rootContext()->setContextProperty("rtuContext", &rtuContext);
-    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/src/qml/main.qml")));
 
     return app.exec();
 }

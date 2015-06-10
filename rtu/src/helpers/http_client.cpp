@@ -87,8 +87,10 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
         , kHttpSuccessCodeLast = 299
     };
     
+    const int errorCode = reply->error();
     const int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if ((httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast))
+    if ((errorCode != QNetworkReply::NoError)
+        || (httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast))
     { 
         const OnErrorReplyFunc &errorCallback = it->second;
         if (errorCallback)

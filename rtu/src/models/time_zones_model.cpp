@@ -1,10 +1,10 @@
 
 #include "time_zones_model.h"
 
+#include <QDebug>
 #include <QTimeZone>
 
-#include <server_info.h>
-#include <QDebug>
+#include <base/server_info.h>
 
 namespace
 {
@@ -40,10 +40,10 @@ namespace
         if (servers.empty())
             return kDiffTimeZonesTag;
         
-        const QString timeZone = (**servers.begin()).extraInfo().dateTime.timeZone().id();
+        const QString timeZone = (**servers.begin()).extraInfo().timeZone.id();
         for (rtu::ServerInfo *info: servers)
         {
-            if (timeZone != info->extraInfo().dateTime.timeZone().id())
+            if (timeZone != info->extraInfo().timeZone.id())
                 return kDiffTimeZonesTag;
         }
         return timeZone;
@@ -63,6 +63,8 @@ public:
     
     int initIndex() const;
     
+    int currentTimeZoneIndex() const;
+
 private:
     rtu::TimeZonesModel * const m_owner;
     QString m_initSelectionTimeZone;
@@ -99,12 +101,21 @@ int rtu::TimeZonesModel::Impl::onCurrentIndexChanged(int index)
     enum { kInvalidIndex = -1 };
     m_initIndex = kInvalidIndex;
     emit m_owner->initIndexChanged();
+    emit m_owner->currentTimeZoneIndexChanged();
     return index - 1;
 }
 
 int rtu::TimeZonesModel::Impl::initIndex() const
 {
     return m_initIndex;
+}
+
+int rtu::TimeZonesModel::Impl::currentTimeZoneIndex() const
+{
+    QStringList zones = m_owner->stringList();
+    const QString currentTimeZoneId =  QDateTime::currentDateTime().timeZone().id();
+    const int result = zones.indexOf(currentTimeZoneId);
+    return result;
 }
 
 ///
@@ -124,6 +135,11 @@ rtu::TimeZonesModel::~TimeZonesModel()
 int rtu::TimeZonesModel::initIndex() const
 {
     return m_impl->initIndex();
+}
+
+int rtu::TimeZonesModel::currentTimeZoneIndex()
+{
+    return m_impl->currentTimeZoneIndex();
 }
 
 int rtu::TimeZonesModel::onCurrentIndexChanged(int index)
