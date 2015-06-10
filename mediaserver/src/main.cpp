@@ -140,6 +140,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/common/system_information.h>
+#include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
@@ -1233,8 +1234,16 @@ void QnMain::at_adminUserChanged( const QnResourcePtr& resource )
     if( !user->isAdmin() )
         return;
 
-    //TODO changing password hash in /etc/shadow file
-    //user->getCryptSha512Hash();
+#ifdef __linux__
+    if( QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1" )
+    {
+        //changing root password in system
+        if( !setRootPasswordDigest( "root", user->getCryptSha512Hash() ) )
+        {
+            qWarning()<<"Failed to set root password on current system";
+        }
+    }
+#endif
 }
 
 void QnMain::at_localInterfacesChanged()

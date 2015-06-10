@@ -5,6 +5,11 @@
 
 #include "linux_passwd_crypt.h"
 
+#ifdef __linux__
+#include <unistd.h>
+#include <sys/types.h>
+#endif
+
 #include <QCryptographicHash>
 
 
@@ -118,4 +123,63 @@ QByteArray linuxCryptSha512( const QByteArray& password, const QByteArray& salt 
     }
 
     return "$6$" + salt + "$" + hash;
+}
+
+bool setRootPasswordDigest( const QByteArray& userName, const QByteArray& digest )
+{
+    if( userName.isEmpty() )
+        return false;
+
+#ifdef __linux__
+    if( geteuid() != 0 )
+        return false;   //we are not root
+
+    QFile shadowFile( lit("/etc/shadow") );
+    if( !shadowFile.open( QIODevice::ReadOnly ) )
+        return false;
+
+    QByteArray shadowFileContents = shadowFile.readAll();
+    shadowFile.close();
+
+    int userPos = 0;
+    for( ;; )
+    {
+        userPos = shadowFileContents.indexOf( userName+":", userPos );
+        if( userPos == -1 )
+            return false; //user not found
+
+        //checking that we have found complete word
+        if( userPos != 0 && (isalnum(shadowFileContents[userPos-1]) || shadowFileContents[userPos - 1] == '_') )
+        {
+            //searching futher
+            ++userPos;
+            continue;
+        }
+
+        break;  //found user record
+    }
+
+    const int passwordHashStartPos = userPos + userName.size() + 1;
+
+    //searching password hash end
+    const int passwordHashEndPos = shadowFileContents.indexOf( ':', passwordHashStartPos );
+    if( passwordHashEndPos == -1 )
+        return false;   //bad file format
+
+    //replacing password
+    shadowFileContents.replace(
+        passwordHashStartPos,
+        passwordHashEndPos-passwordHashStartPos,
+        digest );
+
+    //saving modified file
+
+    if( !shadowFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+        return false;
+
+    return shadowFile.write( shadowFileContents ) == shadowFileContents.size();
+#else
+    assert( false );
+    return false;
+#endif
 }
