@@ -131,6 +131,43 @@ void updateSettings(QnNetworkAddressEntryList& currentSettings, QnNetworkAddress
 #endif
 }
 
+
+bool isValidIP(const QString& ipAddr)
+{
+    return !QHostAddress(ipAddr).isNull();
+}
+
+bool isValidMask(const QString& ipAddr)
+{
+    if (!isValidIP(ipAddr))
+        return false;
+    quint32 value = QHostAddress(ipAddr).toIPv4Address();
+    value = ~value;
+    return (value & (value+1)) == 0;
+}
+
+bool checkData(const QnNetworkAddressEntryList& newSettings, QString* errString)
+{
+    for (const auto& value: newSettings) 
+    {
+        if (!value.ipAddr.isNull() && !isValidIP(value.ipAddr)) {
+            *errString = lit("Invalid IP address for interface '%1'").arg(value.name);
+            return false;
+        }
+        
+        if (!value.netMask.isNull() && !isValidMask(value.netMask)) {
+            *errString = lit("Invalid network mask for interface '%1'").arg(value.name);
+            return false;
+        }
+
+        if (!value.gateway.isNull() && !isValidIP(value.gateway)) {
+            *errString = lit("Invalid gateway for interface '%1'").arg(value.name);
+            return false;
+        }
+    }
+    return true;
+}
+
 int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
@@ -162,6 +199,13 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
     {
         result.setError(QnJsonRestResult::InvalidParameter);
         result.setErrorString(lit("Invalid message body format"));
+        return CODE_OK;
+    }
+    
+    QString errString;
+    if (!checkData(newSettings, &errString)) {
+        result.setError(QnJsonRestResult::InvalidParameter);
+        result.setErrorString(errString);
         return CODE_OK;
     }
 
