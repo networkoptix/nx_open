@@ -21,6 +21,8 @@ public:
 
     QnBookmarksLoader *loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists = true);
 
+    QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera) const;
+
     void clearCache();
 private:
     /// @brief Callback for bookmarks. If data is nullptr it means error occurred

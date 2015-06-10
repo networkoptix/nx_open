@@ -33,9 +33,11 @@ extern "C"
 
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
+#include <camera/loaders/bookmark_camera_data_loader.h>
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
+#include <camera/camera_bookmarks_manager.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -113,6 +115,12 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
     m_cameraDataManager = context()->instance<QnCameraDataManager>();
     connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this, &QnWorkbenchNavigator::updateLoaderPeriods);
+
+    auto bookmarksManager = context()->instance<QnCameraBookmarksManager>();
+    connect(bookmarksManager, &QnCameraBookmarksManager::bookmarksChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
+        updateLoaderBookmarks(camera);
+    });
+
   //  connect(m_cameraDataManager, &QnCameraDataManager::bookmarksChanged, this, &QnWorkbenchNavigator::updateLoaderBookmarks);
 
     //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
@@ -1515,12 +1523,12 @@ void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr &resourc
         updateSyncedPeriods(type, startTimeMs);
 }
 
-void QnWorkbenchNavigator::updateLoaderBookmarks(const QnMediaResourcePtr &resource) {
+void QnWorkbenchNavigator::updateLoaderBookmarks(const QnVirtualCameraResourcePtr &resource) {
     if(!m_timeSlider || !m_currentMediaWidget || m_currentMediaWidget->resource() != resource)
         return;
 
-//     QnCameraBookmarkList bookmarks = m_cameraDataManager->bookmarks(resource);
-//     m_timeSlider->setBookmarks(bookmarks);
+    QnCameraBookmarkList bookmarks = context()->instance<QnCameraBookmarksManager>()->bookmarks(resource);
+    m_timeSlider->setBookmarks(bookmarks);
 }
 
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {

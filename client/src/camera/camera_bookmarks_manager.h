@@ -26,6 +26,8 @@ public:
 
     QnBookmarksLoader *loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists = true);
 
+    QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera) const;
+
     void clearCache();
 protected:
     Q_DECLARE_PRIVATE(QnCameraBookmarksManager);

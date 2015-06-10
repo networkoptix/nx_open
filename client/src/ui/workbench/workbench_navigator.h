@@ -190,7 +190,7 @@ protected slots:
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
     void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
-    void updateLoaderBookmarks(const QnMediaResourcePtr &resource);
+    void updateLoaderBookmarks(const QnVirtualCameraResourcePtr &resource);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();

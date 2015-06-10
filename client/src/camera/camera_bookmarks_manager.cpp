@@ -35,3 +35,8 @@ void QnCameraBookmarksManager::clearCache() {
     Q_D(QnCameraBookmarksManager);
     d->clearCache();
 }
+
+QnCameraBookmarkList QnCameraBookmarksManager::bookmarks(const QnVirtualCameraResourcePtr &camera) const {
+    const Q_D(QnCameraBookmarksManager);
+    return d->bookmarks(camera);
+}

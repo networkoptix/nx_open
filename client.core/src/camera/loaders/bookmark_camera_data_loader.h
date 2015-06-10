@@ -32,6 +32,8 @@ public:
     
     void load(const QnTimePeriod &period);
 
+    QnCameraBookmarkList bookmarks() const;
+
     void discardCachedData();
 
 signals:

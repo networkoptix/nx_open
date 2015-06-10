@@ -79,6 +79,10 @@ void QnBookmarksLoader::load(const QnTimePeriod &period) {
     return m_loading.handle;*/
 }
 
+QnCameraBookmarkList QnBookmarksLoader::bookmarks() const {
+    return m_loadedData;
+}
+
 void QnBookmarksLoader::discardCachedData() {
 #ifdef QN_BOOKMARK_CAMERA_DATA_LOADER_DEBUG
     qDebug() << "QnBookmarksLoader::" << "discarding cached data";

@@ -132,6 +132,15 @@ QnBookmarksLoader * QnCameraBookmarksManagerPrivate::loader(const QnVirtualCamer
     return loader;
 }
 
+QnCameraBookmarkList QnCameraBookmarksManagerPrivate::bookmarks(const QnVirtualCameraResourcePtr &camera) const {
+    LoadersContainer::const_iterator pos = m_loaderByResource.find(camera);
+    if(pos == m_loaderByResource.cend())
+        return QnCameraBookmarkList();
+
+    auto loader = *pos;
+    return loader->bookmarks();
+}
+
 void QnCameraBookmarksManagerPrivate::clearCache() {
     for (QnBookmarksLoader* loader: m_loaderByResource)
         if (loader)
