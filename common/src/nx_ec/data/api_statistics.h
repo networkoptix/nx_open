@@ -1,6 +1,8 @@
 #ifndef API_STATISTICS_H
 #define API_STATISTICS_H
 
+#include <set>
+
 #include "api_globals.h"
 #include "api_resource_data.h"
 #include "api_media_server_data.h"
@@ -9,7 +11,6 @@
 #include "api_license_data.h"
 #include "api_business_rule_data.h"
 
-#include <unordered_set>
 
 namespace std
 {
@@ -30,7 +31,7 @@ namespace ec2 {
         ApiCameraDataStatistics();
         ApiCameraDataStatistics(ApiCameraDataEx&& data);
 
-		const static std::unordered_set<QString> EXCEPT_PARAMS;
+		const static std::set<QString> EXCEPT_PARAMS;
     };
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \

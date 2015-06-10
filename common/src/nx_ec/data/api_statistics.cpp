@@ -4,7 +4,6 @@
 
 #include <utils/serialization/lexical.h>
 
-#include <unordered_map>
 
 const static QString __CAMERA_EXCEPT_PARAMS[] = {
 	Qn::CAMERA_CREDENTIALS_PARAM_NAME,
@@ -46,7 +45,7 @@ namespace ec2 {
         addParams.push_back(ApiResourceParamData(defCred, isDefCred ? lit("true") : lit("false")));
     }
 
-    const std::unordered_set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(
+    const std::set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(
             INIT_LIST(__CAMERA_EXCEPT_PARAMS));
 
     ApiStorageDataStatistics::ApiStorageDataStatistics() {}
