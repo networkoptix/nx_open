@@ -1,8 +1,11 @@
 #include "common/common_globals.h"
-#include "plugins/resource/upnp/upnp_device_searcher.h"
+#include "utils/network/upnp/upnp_device_searcher.h"
 
 #include <gtest.h>
 #include <iostream>
+
+namespace nx_upnp {
+namespace test {
 
 TEST(Upnp, Urn)
 {
@@ -14,12 +17,12 @@ TEST(Upnp, Urn)
     EXPECT_NE( id, fromUpnpUrn( urn, lit("yyy") ) );
 }
 
-class RS : public UPNPSearchHandler
+class RS : public SearchHandler
 {
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
         const SocketAddress& discoveredDevAddress,
-        const UpnpDeviceInfo& devInfo,
+        const DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) override
     {
         std::cout << localInterfaceAddress.toString().toStdString()
@@ -34,9 +37,12 @@ class RS : public UPNPSearchHandler
 TEST(Upnp, DISABLED_DeviceSearcher)
 {
     TimerManager timerManager;
-    UPNPDeviceSearcher deviceSearcher(QLatin1String("InternetGatewayDevice"));
+    DeviceSearcher deviceSearcher(QLatin1String("InternetGatewayDevice"));
 
     RS rs;
     deviceSearcher.registerHandler(&rs);
     QThread::sleep(5);
 }
+
+} // namespace test
+} // namespace nx_upnp

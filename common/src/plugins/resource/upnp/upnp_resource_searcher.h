@@ -8,18 +8,9 @@
 #include "utils/network/nettools.h"
 #include "utils/network/socket.h"
 
-#include "upnp_device_searcher.h"
+#include "utils/network/upnp/upnp_device_searcher.h"
 
-
-//struct UpnpDeviceInfo
-//{
-//    QString friendlyName;
-//    QString manufacturer;
-//    QString modelName;
-//    QString serialNumber;
-//    QString presentationUrl;
-//};
-
+// TODO: Remove and and use nx_upnp::DeviceSearcher instead!
 class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
 public:
@@ -40,7 +31,7 @@ protected:
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
         const HostAddress& host,
-        const UpnpDeviceInfo& devInfo,
+        const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         const QAuthenticator &auth,
         QnResourceList& result) = 0;
@@ -73,7 +64,7 @@ private:
 class QnUpnpResourceSearcherAsync
 :
     virtual public QnAbstractNetworkResourceSearcher,
-    public UPNPSearchHandler
+    public nx_upnp::SearchHandler
 {
 public:
     //!Implementation of QnAbstractNetworkResourceSearcher::findResources
@@ -82,7 +73,7 @@ public:
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
         const SocketAddress& discoveredDevAddress,
-        const UpnpDeviceInfo& devInfo,
+        const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) override;
 
 protected:
@@ -95,7 +86,7 @@ protected:
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
         const SocketAddress& host,
-        const UpnpDeviceInfo& devInfo,
+        const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) = 0;
 

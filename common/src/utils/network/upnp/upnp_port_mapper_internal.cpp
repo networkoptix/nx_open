@@ -12,13 +12,15 @@ static const quint16 PORT_SAFE_RANGE_BEGIN = 4096; // begining of range to peak 
 static const quint16 PORT_SAFE_RANGE_END = 49151;
 static const quint16 PORT_RETRY_COUNT = 5; // maximal number of ports to try open
 
-UpnpPortMapper::CallbackControl::CallbackControl(
+namespace nx_upnp {
+
+PortMapper::Callback::Callback(
         const std::function< void( const MappingInfo& ) >& callback )
     : m_callback( callback )
 {
 }
 
-void UpnpPortMapper::CallbackControl::call( const MappingInfo& info )
+void PortMapper::Callback::call( const MappingInfo& info )
 {
     QMutexLocker lk( &m_mutex );
     if( !m_callback || (
@@ -30,7 +32,7 @@ void UpnpPortMapper::CallbackControl::call( const MappingInfo& info )
     m_callback( info );
 }
 
-void UpnpPortMapper::CallbackControl::clear()
+void PortMapper::Callback::clear()
 {
     QMutexLocker lk( &m_mutex );
     m_callback = nullptr;
@@ -62,7 +64,7 @@ bool FailCounter::isOk()
     return QDateTime::currentDateTime().toTime_t() > breakTime;
 }
 
-UpnpPortMapper::MappingDevice::MappingDevice( UpnpAsyncClient* upnpClient,
+PortMapper::Device::Device( AsyncClient* upnpClient,
                                               const HostAddress& internalIp,
                                               const QUrl& url,
                                               const QString& description )
@@ -86,13 +88,13 @@ UpnpPortMapper::MappingDevice::MappingDevice( UpnpAsyncClient* upnpClient,
     } );
 }
 
-HostAddress UpnpPortMapper::MappingDevice::externalIp() const
+HostAddress PortMapper::Device::externalIp() const
 {
     QMutexLocker lk( &m_mutex );
     return m_externalIp;
 }
 
-bool UpnpPortMapper::MappingDevice::map(
+bool PortMapper::Device::map(
         quint16 port, quint16 desiredPort, Protocol protocol,
         const std::function< void( quint16 ) >& callback )
 {
@@ -102,7 +104,7 @@ bool UpnpPortMapper::MappingDevice::map(
 
     const bool result = m_upnpClient->getAllMappings( m_url,
         [ this, port, desiredPort, protocol, callback ]
-            ( const UpnpAsyncClient::MappingList& list )
+            ( const AsyncClient::MappingList& list )
     {
         QMutexLocker lk( &m_mutex );
         for( const auto mapping : list )
@@ -133,7 +135,7 @@ bool UpnpPortMapper::MappingDevice::map(
     return result;
 }
 
-bool UpnpPortMapper::MappingDevice::unmap( quint16 port, Protocol protocol,
+bool PortMapper::Device::unmap( quint16 port, Protocol protocol,
                                            const std::function< void() >& callback )
 {
     return m_upnpClient->deleteMapping( m_url, port, protocol, [ callback ]( bool )
@@ -144,7 +146,7 @@ bool UpnpPortMapper::MappingDevice::unmap( quint16 port, Protocol protocol,
     } );
 }
 
-bool UpnpPortMapper::MappingDevice::mapImpl(
+bool PortMapper::Device::mapImpl(
         quint16 port, quint16 desiredPort, Protocol protocol, size_t retrys,
         const std::function< void( quint16 ) >& callback )
 {
@@ -193,3 +195,5 @@ bool UpnpPortMapper::MappingDevice::mapImpl(
 
     return result;
 }
+
+} // namespace nx_upnp

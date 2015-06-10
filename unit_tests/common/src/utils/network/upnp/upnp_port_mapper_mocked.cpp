@@ -1,9 +1,12 @@
 #include "upnp_port_mapper_mocked.h"
 
 #include <common/common_globals.h>
-#include <plugins/resource/upnp/upnp_port_mapper_internal.h>
+#include <utils/network/upnp/upnp_port_mapper_internal.h>
 
 #include <QtConcurrent>
+
+namespace nx_upnp {
+namespace test {
 
 UpnpAsyncClientMock::UpnpAsyncClientMock( const HostAddress& externalIp )
     : m_externalIp( externalIp )
@@ -98,15 +101,15 @@ bool UpnpAsyncClientMock::getMapping(
 
 UpnpPortMapperMocked::UpnpPortMapperMocked( const HostAddress& internalIp,
                                             const HostAddress& externalIp )
-    : UpnpPortMapper( lit( "UpnpPortMapperMocked" ), QString() )
+    : PortMapper( lit( "UpnpPortMapperMocked" ), QString() )
 {
     m_upnpClient.reset( new UpnpAsyncClientMock( externalIp ) );
 
-    UpnpDeviceInfo::Service service;
-    service.serviceType = UpnpAsyncClient::WAN_IP;
+    DeviceInfo::Service service;
+    service.serviceType = AsyncClient::WAN_IP;
     service.controlUrl = lit( "/someUrl" );
 
-    UpnpDeviceInfo devInfo;
+    DeviceInfo devInfo;
     devInfo.serialNumber = lit( "XXX" );
     devInfo.serviceList.push_back( service );
 
@@ -117,3 +120,6 @@ UpnpAsyncClientMock& UpnpPortMapperMocked::clientMock()
 {
     return *static_cast< UpnpAsyncClientMock* >( m_upnpClient.get() );
 }
+
+} // namespace test
+} // namespace nx_upnp

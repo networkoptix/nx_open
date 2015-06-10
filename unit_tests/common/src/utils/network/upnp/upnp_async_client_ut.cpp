@@ -1,16 +1,19 @@
-#include <plugins/resource/upnp/upnp_async_client.h>
+#include <utils/network/upnp/upnp_async_client.h>
 
 #include <common/common_globals.h>
 
 #include <gtest.h>
 #include <future>
 
+namespace nx_upnp {
+namespace test {
+
 // TODO: implement over mocked sockets
-TEST(UpnpAsyncClient, DISABLED_GetIp)
+TEST(AsyncClient, DISABLED_GetIp)
 {
-    UpnpAsyncClient client;
+    AsyncClient client;
     const QUrl URL( lit("http://192.168.1.1:44264/ctl/IPConn") );
-    const auto TCP = UpnpAsyncClient::Protocol::TCP;
+    const auto TCP = AsyncClient::Protocol::TCP;
 
     {
         std::promise< HostAddress > prom;
@@ -19,9 +22,9 @@ TEST(UpnpAsyncClient, DISABLED_GetIp)
         EXPECT_EQ( prom.get_future().get().toString().toUtf8(), QByteArray( "10.0.2.130" ) );
     }
     {
-        std::promise< UpnpAsyncClient::MappingInfo > prom;
+        std::promise< AsyncClient::MappingInfo > prom;
         EXPECT_TRUE( client.getMapping( URL, 8877, TCP,
-                     [&]( const UpnpAsyncClient::MappingInfo& mapping )
+                     [&]( const AsyncClient::MappingInfo& mapping )
                      { prom.set_value( mapping ); } ) );
 
         // no such mapping
@@ -36,11 +39,11 @@ TEST(UpnpAsyncClient, DISABLED_GetIp)
 }
 
 // TODO: implement over mocked sockets
-TEST(UpnpAsyncClient, DISABLED_Mapping)
+TEST(AsyncClient, DISABLED_Mapping)
 {
-    UpnpAsyncClient client;
+    AsyncClient client;
     const QUrl URL( lit("http://192.168.1.1:44264/ctl/IPConn") );
-    const auto TCP = UpnpAsyncClient::Protocol::TCP;
+    const auto TCP = AsyncClient::Protocol::TCP;
     const QString IP = lit( "192.168.1.170" );
     const QString DESC = lit( "test" );
 
@@ -61,7 +64,7 @@ TEST(UpnpAsyncClient, DISABLED_Mapping)
     {
         std::promise< SocketAddress > prom;
         EXPECT_TRUE( client.getMapping( URL, 8877, TCP,
-                     [&]( const UpnpAsyncClient::MappingInfo& m )
+                     [&]( const AsyncClient::MappingInfo& m )
                      { prom.set_value( SocketAddress( m.internalIp,
                                                       m.internalPort ) ); } ) );
 
@@ -76,3 +79,6 @@ TEST(UpnpAsyncClient, DISABLED_Mapping)
         EXPECT_TRUE( prom.get_future().get() ); // no such mapping
     }
 }
+
+} // namespace test
+} // namespace nx_upnp

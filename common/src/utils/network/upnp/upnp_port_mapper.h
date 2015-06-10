@@ -8,16 +8,18 @@
 
 #include <QWaitCondition>
 
-class UpnpPortMapper
-        : UPNPSearchAutoHandler
+namespace nx_upnp {
+
+class PortMapper
+        : SearchAutoHandler
         , TimerEventHandler
 {
 public:
-    UpnpPortMapper( const QString& description = QnAppInfo::organizationName(),
-                    const QString& device = UpnpAsyncClient::INTERNAL_GATEWAY );
-    ~UpnpPortMapper();
+    PortMapper( const QString& description = QnAppInfo::organizationName(),
+                    const QString& device = AsyncClient::INTERNAL_GATEWAY );
+    ~PortMapper();
 
-    typedef UpnpAsyncClient::Protocol Protocol;
+    typedef AsyncClient::Protocol Protocol;
 
     struct MappingInfo
     {
@@ -50,33 +52,35 @@ public:
     bool disableMapping( quint16 port, Protocol protocol, bool waitForFinish = true );
 
 protected: // for testing only
-    class CallbackControl;
-    class MappingDevice;
+    class Callback;
+    class Device;
 
-    void enableMappingOnDevice( MappingDevice& device,
+    void enableMappingOnDevice( Device& device,
                                 std::pair< quint16, Protocol > request );
 
     virtual bool processPacket(
         const QHostAddress& localAddress, const SocketAddress& devAddress,
-        const UpnpDeviceInfo& devInfo, const QByteArray& xmlDevInfo ) override;
+        const DeviceInfo& devInfo, const QByteArray& xmlDevInfo ) override;
 
     bool searchForMappers( const HostAddress& localAddress,
                            const SocketAddress& devAddress,
-                           const UpnpDeviceInfo& devInfo );
+                           const DeviceInfo& devInfo );
 
     virtual void onTimer( const quint64& timerID ) override;
 
 protected: // for testing only
     QMutex m_mutex;
-    std::unique_ptr<UpnpAsyncClient> m_upnpClient;
+    std::unique_ptr<AsyncClient> m_upnpClient;
     size_t m_asyncInProgress;
     QWaitCondition m_asyncCondition;
     quint64 m_timerId;
     const QString m_description;
 
-    std::map< std::pair< quint16, Protocol >, std::shared_ptr< CallbackControl > > m_mappings;
-    std::map< QString, std::unique_ptr< MappingDevice > > m_devices;
+    std::map< std::pair< quint16, Protocol >, std::shared_ptr< Callback > > m_mappings;
+    std::map< QString, std::unique_ptr< Device > > m_devices;
     // TODO: replace unique_ptr with try_emplace when avaliable
 };
+
+} // namespace nx_upnp
 
 #endif // UPNP_PORT_MAPPER_H

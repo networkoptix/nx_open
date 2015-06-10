@@ -1,7 +1,9 @@
 #include "upnp_device_description.h"
 
-
 static const QString urnTemplate = lit( "urn:schemas-upnp-org:%1:%2:%3" );
+
+namespace nx_upnp {
+
 QString toUpnpUrn( const QString& id, const QString& suffix, int version )
 {
     return urnTemplate.arg( suffix ).arg( id ).arg( version );
@@ -20,20 +22,20 @@ QString fromUpnpUrn( const QString& urn, const QString& suffix, int version )
     return QString();
 }
 
-bool UpnpDeviceDescriptionHandler::startDocument()
+bool DeviceDescriptionHandler::startDocument()
 {
-    m_deviceInfo = UpnpDeviceInfo();
+    m_deviceInfo = DeviceInfo();
     m_paramElement.clear();
     m_lastService = 0;
     return true;
 }
 
-bool UpnpDeviceDescriptionHandler::endDocument()
+bool DeviceDescriptionHandler::endDocument()
 {
     return true;
 }
 
-bool UpnpDeviceDescriptionHandler::startElement(
+bool DeviceDescriptionHandler::startElement(
         const QString& /*namespaceURI*/, const QString& /*localName*/,
         const QString& qName, const QXmlAttributes& /*atts*/ )
 {
@@ -60,7 +62,7 @@ bool UpnpDeviceDescriptionHandler::startElement(
     return true;
 }
 
-bool UpnpDeviceDescriptionHandler::endElement(
+bool DeviceDescriptionHandler::endElement(
         const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName )
 {
     if( qName == lit("device") )
@@ -73,7 +75,7 @@ bool UpnpDeviceDescriptionHandler::endElement(
     return true;
 }
 
-bool UpnpDeviceDescriptionHandler::characters( const QString& ch )
+bool DeviceDescriptionHandler::characters( const QString& ch )
 {
     if ( m_lastService && charactersInService(ch) )
         return true;
@@ -84,7 +86,7 @@ bool UpnpDeviceDescriptionHandler::characters( const QString& ch )
     return true; // Something not interesting for us
 }
 
-bool UpnpDeviceDescriptionHandler::charactersInDevice( const QString& ch )
+bool DeviceDescriptionHandler::charactersInDevice( const QString& ch )
 {
     auto& lastDev = *m_deviceStack.back();
 
@@ -111,7 +113,7 @@ bool UpnpDeviceDescriptionHandler::charactersInDevice( const QString& ch )
     return true;
 }
 
-bool UpnpDeviceDescriptionHandler::charactersInService( const QString& ch )
+bool DeviceDescriptionHandler::charactersInService( const QString& ch )
 {
     if( m_paramElement == QLatin1String("serviceType") )
         m_lastService->serviceType = fromUpnpUrn( ch, lit("service") );
@@ -132,3 +134,5 @@ bool UpnpDeviceDescriptionHandler::charactersInService( const QString& ch )
 
     return true;
 }
+
+} // namespace nx_upnp

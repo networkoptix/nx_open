@@ -3,11 +3,13 @@
 
 #include "upnp_port_mapper.h"
 
+namespace nx_upnp {
+
 //! mutex protected callback
-class UpnpPortMapper::CallbackControl
+class PortMapper::Callback
 {
 public:
-    CallbackControl( const std::function< void( const MappingInfo& ) >& callback );
+    Callback( const std::function< void( const MappingInfo& ) >& callback );
     void call( const MappingInfo& info );
     void clear();
     MappingInfo state();
@@ -33,10 +35,10 @@ private:
 };
 
 //! single mapping device interface
-class UpnpPortMapper::MappingDevice
+class PortMapper::Device
 {
 public:
-    MappingDevice( UpnpAsyncClient* upnpClient,
+    Device( AsyncClient* upnpClient,
                    const HostAddress& internalIp,
                    const QUrl& url,
                    const QString& description);
@@ -54,7 +56,7 @@ private:
                   const std::function< void( quint16 ) >& callback );
 
 private:
-    UpnpAsyncClient* const m_upnpClient;
+    AsyncClient* const m_upnpClient;
     const HostAddress m_internalIp;
     const QUrl m_url;
     const QString m_description;
@@ -66,5 +68,7 @@ private:
     // result are waiting here while m_externalIp is not avaliable
     std::vector< std::function< void() > > m_successQueue;
 };
+
+} // namespace nx_upnp
 
 #endif // UPNP_PORT_MAPPER_INTERNAL_H

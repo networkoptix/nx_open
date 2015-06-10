@@ -1,4 +1,3 @@
-
 #include "upnp_device_searcher.h"
 
 #include <algorithm>
@@ -22,12 +21,14 @@ static const int XML_DESCRIPTION_LIVE_TIME_MS = 5*60*1000;
 static const int PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS = 24*60*60*1000;
 static const unsigned int READ_BUF_CAPACITY = 64*1024+1;    //max UDP packet size
 
-static UPNPDeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
+namespace nx_upnp {
 
-const QString UPNPDeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
+static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
+
+const QString DeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
         .arg(QnAppInfo::organizationName());
 
-UPNPDeviceSearcher::UPNPDeviceSearcher( const QString& discoverDeviceType,
+DeviceSearcher::DeviceSearcher( const QString& discoverDeviceType,
                                         unsigned int discoverTryTimeoutMS )
 :
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
@@ -43,7 +44,7 @@ UPNPDeviceSearcher::UPNPDeviceSearcher( const QString& discoverDeviceType,
     UPNPDeviceSearcherInstance = this;
 }
 
-UPNPDeviceSearcher::~UPNPDeviceSearcher()
+DeviceSearcher::~DeviceSearcher()
 {
     pleaseStop();
 
@@ -53,7 +54,7 @@ UPNPDeviceSearcher::~UPNPDeviceSearcher()
     UPNPDeviceSearcherInstance = nullptr;
 }
 
-void UPNPDeviceSearcher::pleaseStop()
+void DeviceSearcher::pleaseStop()
 {
     //stopping dispatching discover packets
     {
@@ -85,39 +86,39 @@ void UPNPDeviceSearcher::pleaseStop()
     m_httpClients.clear();
 }
 
-void UPNPDeviceSearcher::registerHandler( UPNPSearchHandler* handler )
+void DeviceSearcher::registerHandler( SearchHandler* handler )
 {
     QMutexLocker lk( &m_mutex );
     m_handlers.insert( handler );
 }
 
-void UPNPDeviceSearcher::cancelHandlerRegistration( UPNPSearchHandler* handler )
+void DeviceSearcher::cancelHandlerRegistration( SearchHandler* handler )
 {
     QMutexLocker lk( &m_mutex );
     m_handlers.erase( handler );
 }
 
 
-void UPNPDeviceSearcher::registerDeviceType( const QString& devType )
+void DeviceSearcher::registerDeviceType( const QString& devType )
 {
     QMutexLocker lk( &m_mutex );
     m_deviceTypes.insert( devType );
 }
 
-void UPNPDeviceSearcher::cancelDeviceTypeRegistration( const QString& devType )
+void DeviceSearcher::cancelDeviceTypeRegistration( const QString& devType )
 {
     QMutexLocker lk( &m_mutex );
     m_deviceTypes.erase( devType );
 }
 
-void UPNPDeviceSearcher::saveDiscoveredDevicesSnapshot()
+void DeviceSearcher::saveDiscoveredDevicesSnapshot()
 {
     QMutexLocker lk( &m_mutex );
     m_discoveredDevicesToProcess.swap( m_discoveredDevices );
     m_discoveredDevices.clear();
 }
 
-void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToUse )
+void DeviceSearcher::processDiscoveredDevices( SearchHandler* handlerToUse )
 {
     for( std::map<HostAddress, DiscoveredDeviceInfo>::iterator
         it = m_discoveredDevicesToProcess.begin();
@@ -147,12 +148,12 @@ void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToU
     }
 }
 
-UPNPDeviceSearcher* UPNPDeviceSearcher::instance()
+DeviceSearcher* DeviceSearcher::instance()
 {
     return UPNPDeviceSearcherInstance;
 }
 
-void UPNPDeviceSearcher::onTimer( const quint64& /*timerID*/ )
+void DeviceSearcher::onTimer( const quint64& /*timerID*/ )
 {
     //sending discover packet(s)
     dispatchDiscoverPackets();
@@ -163,7 +164,7 @@ void UPNPDeviceSearcher::onTimer( const quint64& /*timerID*/ )
         m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
 }
 
-void UPNPDeviceSearcher::onSomeBytesRead(
+void DeviceSearcher::onSomeBytesRead(
     AbstractCommunicatingSocket* sock,
     SystemError::ErrorCode errorCode,
     nx::Buffer* readBuffer,
@@ -192,12 +193,12 @@ void UPNPDeviceSearcher::onSomeBytesRead(
         return;
     }
 
-    auto SCOPED_GUARD_FUNC = [this, readBuffer, sock]( UPNPDeviceSearcher* ){
+    auto SCOPED_GUARD_FUNC = [this, readBuffer, sock]( DeviceSearcher* ){
         readBuffer->resize( 0 );
         using namespace std::placeholders;
-        sock->readSomeAsync( readBuffer, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock, _1, readBuffer, _2 ) );
+        sock->readSomeAsync( readBuffer, std::bind( &DeviceSearcher::onSomeBytesRead, this, sock, _1, readBuffer, _2 ) );
     };
-    std::unique_ptr<UPNPDeviceSearcher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+    std::unique_ptr<DeviceSearcher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
     HostAddress remoteHost;
     nx_http::Request foundDeviceReply;
@@ -228,7 +229,7 @@ void UPNPDeviceSearcher::onSomeBytesRead(
     startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
 }
 
-void UPNPDeviceSearcher::dispatchDiscoverPackets()
+void DeviceSearcher::dispatchDiscoverPackets()
 {
     std::list<QString> deviceTypes;
     {
@@ -258,7 +259,7 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
     }
 }
 
-std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
+std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
 {
     const QString& localAddress = iface.address.toString();
 
@@ -282,7 +283,7 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !sock->readSomeAsync( &p.first->second.buf, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock.get(), _1, &p.first->second.buf, _2 ) ) )
+        !sock->readSomeAsync( &p.first->second.buf, std::bind( &DeviceSearcher::onSomeBytesRead, this, sock.get(), _1, &p.first->second.buf, _2 ) ) )
     {
         QMutexLocker lk( &m_mutex );
         m_socketList.erase( p.first );
@@ -292,7 +293,7 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
     return sock;
 }
 
-void UPNPDeviceSearcher::startFetchDeviceXml(
+void DeviceSearcher::startFetchDeviceXml(
     const QByteArray& uuidStr,
     const QUrl& descriptionUrl,
     const HostAddress& remoteHost )
@@ -335,13 +336,13 @@ void UPNPDeviceSearcher::startFetchDeviceXml(
 
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
-        this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone,
+        this, &DeviceSearcher::onDeviceDescriptionXmlRequestDone,
         Qt::DirectConnection );
     if( !httpClient->doGet( descriptionUrl ) )
     {
         QObject::disconnect(
             httpClient.get(), &nx_http::AsyncHttpClient::done,
-            this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone );
+            this, &DeviceSearcher::onDeviceDescriptionXmlRequestDone );
 
         QMutexLocker lk( &m_mutex );
         httpClient->terminate();
@@ -350,12 +351,12 @@ void UPNPDeviceSearcher::startFetchDeviceXml(
     }
 }
 
-void UPNPDeviceSearcher::processDeviceXml(
+void DeviceSearcher::processDeviceXml(
     const DiscoveredDeviceInfo& devInfo,
     const QByteArray& foundDeviceDescription )
 {
     //parsing description xml
-    UpnpDeviceDescriptionHandler xmlHandler;
+    DeviceDescriptionHandler xmlHandler;
     QXmlSimpleReader xmlReader;
     xmlReader.setContentHandler( &xmlHandler );
     xmlReader.setErrorHandler( &xmlHandler );
@@ -374,7 +375,7 @@ void UPNPDeviceSearcher::processDeviceXml(
     updateItemInCache( devInfoFull );
 }
 
-QHostAddress UPNPDeviceSearcher::findBestIface( const HostAddress& host )
+QHostAddress DeviceSearcher::findBestIface( const HostAddress& host )
 {
     QHostAddress oldAddress;
     for(const QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
@@ -386,7 +387,7 @@ QHostAddress UPNPDeviceSearcher::findBestIface( const HostAddress& host )
     return oldAddress;
 }
 
-int UPNPDeviceSearcher::cacheTimeout()
+int DeviceSearcher::cacheTimeout()
 {
     int xmlDescriptionLiveTimeout = XML_DESCRIPTION_LIVE_TIME_MS;
     QSet<QString> disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
@@ -398,7 +399,7 @@ int UPNPDeviceSearcher::cacheTimeout()
     return xmlDescriptionLiveTimeout;
 }
 
-const UPNPDeviceSearcher::UPNPDescriptionCacheItem* UPNPDeviceSearcher::findDevDescriptionInCache( const QByteArray& uuid )
+const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescriptionInCache( const QByteArray& uuid )
 {
     std::map<QByteArray, UPNPDescriptionCacheItem>::iterator it = m_upnpDescCache.find( uuid );
     if( it == m_upnpDescCache.end() )
@@ -414,7 +415,7 @@ const UPNPDeviceSearcher::UPNPDescriptionCacheItem* UPNPDeviceSearcher::findDevD
     return &it->second;
 }
 
-void UPNPDeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo )
+void DeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo )
 {
     UPNPDescriptionCacheItem& cacheItem = m_upnpDescCache[devInfo.uuid];
     cacheItem.devInfo = devInfo.devInfo;
@@ -427,9 +428,9 @@ void UPNPDeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo 
 }
 
 
-bool UPNPDeviceSearcher::processPacket( const QHostAddress& localInterfaceAddress,
+bool DeviceSearcher::processPacket( const QHostAddress& localInterfaceAddress,
                                         const SocketAddress& discoveredDevAddress,
-                                        const UpnpDeviceInfo& devInfo,
+                                        const DeviceInfo& devInfo,
                                         const QByteArray& xmlDevInfo )
 {
     bool precessed = true;
@@ -439,7 +440,7 @@ bool UPNPDeviceSearcher::processPacket( const QHostAddress& localInterfaceAddres
     return precessed;
 }
 
-void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient )
+void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient )
 {
     DiscoveredDeviceInfo* ctx = NULL;
     {
@@ -465,22 +466,24 @@ void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpCl
     m_httpClients.erase( httpClient );
 }
 
-UPNPSearchAutoHandler::UPNPSearchAutoHandler(const QString& devType)
+SearchAutoHandler::SearchAutoHandler(const QString& devType)
     : m_devType( devType )
 {
     if( !devType.isEmpty() )
     {
-        UPNPDeviceSearcher::instance()->registerHandler( this );
-        UPNPDeviceSearcher::instance()->registerDeviceType( devType );
+        DeviceSearcher::instance()->registerHandler( this );
+        DeviceSearcher::instance()->registerDeviceType( devType );
     }
 }
 
-UPNPSearchAutoHandler::~UPNPSearchAutoHandler()
+SearchAutoHandler::~SearchAutoHandler()
 {
-    if( auto searcher = UPNPDeviceSearcher::instance() )
+    if( auto searcher = DeviceSearcher::instance() )
     {
         searcher->cancelHandlerRegistration( this );
         if( !m_devType.isEmpty() )
             searcher->cancelDeviceTypeRegistration( m_devType );
     }
 }
+
+} // namespace nx_upnp

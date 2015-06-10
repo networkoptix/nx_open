@@ -22,11 +22,13 @@
 #include <utils/network/nettools.h>
 #include <utils/network/socket.h>
 
+namespace nx_upnp {
+
 //!Receives discovered devices info
-class UPNPSearchHandler
+class SearchHandler
 {
 public:
-    virtual ~UPNPSearchHandler() {}
+    virtual ~SearchHandler() {}
 
     /*!
         \param localInterfaceAddress Local interface address, device has been discovered on
@@ -38,7 +40,7 @@ public:
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
         const SocketAddress& discoveredDevAddress,
-        const UpnpDeviceInfo& devInfo,
+        const DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) = 0;
 };
 
@@ -50,7 +52,7 @@ public:
     \note Class methods are thread-safe with the only exception: \a saveDiscoveredDevicesSnapshot() and \a processDiscoveredDevices() calls MUST be serialized by calling entity
     \note this class is single-tone
 */
-class UPNPDeviceSearcher
+class DeviceSearcher
 :
     public QObject,
     public TimerEventHandler,
@@ -66,9 +68,9 @@ public:
         \param discoverDeviceTypes Devies to discover, mediaservers by default
         \param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch
     */
-    UPNPDeviceSearcher( const QString& discoverDeviceType = DEFAULT_DEVICE_TYPE,
+    DeviceSearcher( const QString& discoverDeviceType = DEFAULT_DEVICE_TYPE,
                         unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
-    virtual ~UPNPDeviceSearcher();
+    virtual ~DeviceSearcher();
 
     //!Implementation of \a QnStoppable::pleaseStop
     virtual void pleaseStop() override;
@@ -77,8 +79,8 @@ public:
         If \a handler is already added, nothing is done
         \note Handlers are iterated in order they were registered
     */
-    void registerHandler( UPNPSearchHandler* handler );
-    void cancelHandlerRegistration( UPNPSearchHandler* handler );
+    void registerHandler( SearchHandler* handler );
+    void cancelHandlerRegistration( SearchHandler* handler );
 
     // TODO: merge into registerHandler
     void registerDeviceType( const QString& devType );
@@ -91,9 +93,9 @@ public:
         If some handlers processes packet (UPNPSearchHandler::processPacket returns true), then packet is removed and not passed to other handlers
         \param handlerToUse If NULL, all handlers are used, otherwise packets are passed to \a handlerToUse only
     */
-    void processDiscoveredDevices( UPNPSearchHandler* handlerToUse = NULL );
+    void processDiscoveredDevices( SearchHandler* handlerToUse = NULL );
 
-    static UPNPDeviceSearcher* instance();
+    static DeviceSearcher* instance();
     static int cacheTimeout();
 private:
     class DiscoveredDeviceInfo
@@ -106,7 +108,7 @@ private:
         //!Device uuid. Places as a separater member because it becomes known before \a devInfo
         QByteArray uuid;
         QUrl descriptionUrl;
-        UpnpDeviceInfo devInfo;
+        DeviceInfo devInfo;
         QByteArray xmlDevInfo;
     };
 
@@ -115,7 +117,7 @@ private:
     class UPNPDescriptionCacheItem
     {
     public:
-        UpnpDeviceInfo devInfo;
+        DeviceInfo devInfo;
         QByteArray xmlDevInfo;
         qint64 creationTimestamp;
 
@@ -137,7 +139,7 @@ private:
     const unsigned int m_discoverTryTimeoutMS;
     mutable QMutex m_mutex;
     quint64 m_timerID;
-    std::set<UPNPSearchHandler*> m_handlers;
+    std::set<SearchHandler*> m_handlers;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
     char* m_readBuf;
@@ -176,22 +178,24 @@ private:
     void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
     bool processPacket( const QHostAddress& localInterfaceAddress,
                         const SocketAddress& discoveredDevAddress,
-                        const UpnpDeviceInfo& devInfo,
+                        const DeviceInfo& devInfo,
                         const QByteArray& xmlDevInfo );
 
 private slots:
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );
 };
 
-class UPNPSearchAutoHandler
-        : public UPNPSearchHandler
+class SearchAutoHandler
+        : public SearchHandler
 {
 public:
-    UPNPSearchAutoHandler(const QString& devType = QString());
-    virtual ~UPNPSearchAutoHandler();
+    SearchAutoHandler(const QString& devType = QString());
+    virtual ~SearchAutoHandler();
 
 private:
     QString m_devType;
 };
+
+} // namespace nx_upnp
 
 #endif  //UPNP_DEVICE_SEARCHER_H

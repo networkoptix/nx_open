@@ -24,7 +24,7 @@ class UpnpDeviceDescriptionSaxHandler
 :
     public QXmlDefaultHandler
 {
-    UpnpDeviceInfo m_deviceInfo;
+    nx_upnp::DeviceInfo m_deviceInfo;
     QString m_currentElementName;
 public:
     virtual bool startDocument()
@@ -72,7 +72,7 @@ public:
     QString serialNumber() const { return m_serialNumber; }
     QString presentationUrl() const { return m_presentationUrl; }
     */
-    UpnpDeviceInfo deviceInfo() const { return m_deviceInfo; }
+    nx_upnp::DeviceInfo deviceInfo() const { return m_deviceInfo; }
 };
 
 
@@ -139,7 +139,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
 
 QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
 {
-    if (m_cacheLivetime.elapsed() > UPNPDeviceSearcher::cacheTimeout()) {
+    if (m_cacheLivetime.elapsed() > nx_upnp::DeviceSearcher::cacheTimeout()) {
         m_cacheLivetime.restart();
         m_deviceXmlCache.clear();
     }
@@ -294,14 +294,14 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 QnResourceList QnUpnpResourceSearcherAsync::findResources()
 {
     m_resList.clear();
-    UPNPDeviceSearcher::instance()->processDiscoveredDevices( this );
+    nx_upnp::DeviceSearcher::instance()->processDiscoveredDevices( this );
     return m_resList;
 }
 
 bool QnUpnpResourceSearcherAsync::processPacket(
     const QHostAddress& localInterfaceAddress,
     const SocketAddress& discoveredDevAddress,
-    const UpnpDeviceInfo& devInfo,
+    const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& xmlDevInfo )
 {
     const int resListSizeBak = m_resList.size();

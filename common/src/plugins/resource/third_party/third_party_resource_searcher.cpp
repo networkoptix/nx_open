@@ -184,7 +184,7 @@ QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
 void ThirdPartyResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
     const SocketAddress& /*host*/,
-    const UpnpDeviceInfo& /*devInfo*/,
+    const nx_upnp::DeviceInfo& /*devInfo*/,
     const QByteArray& xmlDevInfo,
     QnResourceList& result )
 {

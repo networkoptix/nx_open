@@ -3,12 +3,14 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
+namespace nx_upnp {
+
 //Helper formaters "urn:schemas-upnp-org:service:ID:VERSION"
 QString toUpnpUrn( const QString& id, const QString& suffix, int version = 1 );
 QString fromUpnpUrn( const QString& urn, const QString& suffix, int version = 1 );
 
 //!Contains some info about discovered UPnP device
-struct UpnpDeviceInfo
+struct DeviceInfo
 {
     QString deviceType;
     QString friendlyName;
@@ -26,12 +28,12 @@ struct UpnpDeviceInfo
         QString scpdUrl;
     };
 
-    std::list<UpnpDeviceInfo> deviceList;
+    std::list<DeviceInfo> deviceList;
     std::list<Service> serviceList;
 };
 
 //!Partial parser for SSDP descrition xml (UPnP Device Architecture 1.1, 2.3)
-class UpnpDeviceDescriptionHandler
+class DeviceDescriptionHandler
     : public QXmlDefaultHandler
 {
 public:
@@ -49,18 +51,20 @@ public:
 
     virtual bool characters( const QString& ch ) override;
 
-    const UpnpDeviceInfo& deviceInfo() const { return m_deviceInfo; }
+    const DeviceInfo& deviceInfo() const { return m_deviceInfo; }
 
 private:
     bool charactersInDevice( const QString& ch );
     bool charactersInService( const QString& ch );
 
 private:
-    UpnpDeviceInfo m_deviceInfo;
+    DeviceInfo m_deviceInfo;
     QString m_paramElement;
 
-    std::list<UpnpDeviceInfo*> m_deviceStack;
-    UpnpDeviceInfo::Service* m_lastService;
+    std::list<DeviceInfo*> m_deviceStack;
+    DeviceInfo::Service* m_lastService;
 };
+
+} // namespace nx_upnp
 
 #endif // UPNP_DEVICE_DESCRIPTION_H

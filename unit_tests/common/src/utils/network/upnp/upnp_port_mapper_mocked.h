@@ -1,12 +1,15 @@
 #ifndef UPNP_PORT_MAPPER_MOCKED_H
 #define UPNP_PORT_MAPPER_MOCKED_H
 
-#include <plugins/resource/upnp/upnp_async_client.h>
-#include <plugins/resource/upnp/upnp_port_mapper.h>
+#include <utils/network/upnp/upnp_async_client.h>
+#include <utils/network/upnp/upnp_port_mapper.h>
+
+namespace nx_upnp {
+namespace test {
 
 //! \class UpnpAsyncClient implementation for tests
 class UpnpAsyncClientMock
-        : public UpnpAsyncClient
+        : public AsyncClient
 {
 public:
     UpnpAsyncClientMock( const HostAddress& externalIp );
@@ -41,11 +44,14 @@ public:
 };
 
 class UpnpPortMapperMocked
-        : public UpnpPortMapper
+        : public PortMapper
 {
 public:
     UpnpPortMapperMocked( const HostAddress& internalIp, const HostAddress& externalIp );
     UpnpAsyncClientMock& clientMock();
 };
+
+} // namespace test
+} // namespace nx_upnp
 
 #endif // UPNP_PORT_MAPPER_MOCKED_H

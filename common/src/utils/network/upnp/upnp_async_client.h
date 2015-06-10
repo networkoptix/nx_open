@@ -6,12 +6,14 @@
 
 #include <set>
 
+namespace nx_upnp {
+
 //! UPnP SOAP based client
-class UpnpAsyncClient
+class AsyncClient
 {   
 public:
     enum Protocol { TCP, UDP };
-    virtual ~UpnpAsyncClient() {}
+    virtual ~AsyncClient() {}
 
     //! Simple SOAP call
     struct Message
@@ -93,6 +95,8 @@ private:
     std::set< nx_http::AsyncHttpClientPtr > m_httpClients;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS( UpnpAsyncClient::Protocol, ( lexical ) )
+QN_FUSION_DECLARE_FUNCTIONS( AsyncClient::Protocol, ( lexical ) )
+
+} // namespace nx_upnp
 
 #endif // UPNP_ASYNC_CLIENT_H
