@@ -223,6 +223,7 @@ public:
     int cameraHistory(const QnChunksRequestData &request, QObject *target, const char *slot);
 
     int recordedTimePeriods(const QnChunksRequestData &request, QObject *target, const char *slot);
+    int getBookmarksAsync(const QnBookmarkRequestData &request, QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
     virtual bool isReady() const override;

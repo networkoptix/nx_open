@@ -11,6 +11,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include <api/helpers/chunks_request_data.h>
+#include <api/helpers/bookmark_request_data.h>
 
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
@@ -95,6 +96,7 @@ namespace {
         (ModulesInformationObject, "moduleInformationAuthenticated")
         (ec2CameraHistoryObject,   "ec2/cameraHistory")
         (ec2RecordedTimePeriodsObject, "ec2/recordedTimePeriods")
+        (ec2BookmarksObject,        "ec2/bookmarks")
     );
 #if 0
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -265,6 +267,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case ec2RecordedTimePeriodsObject:
         processCompressedPeriodsReply<MultiServerPeriodDataList>(this, response, handle);
+        break;
+    case ec2BookmarksObject:
+        processFusionReply<QnCameraBookmarkList>(this, response, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -837,4 +842,8 @@ int QnMediaServerConnection::recordedTimePeriods(const QnChunksRequestData &requ
     QnChunksRequestData fixedFormatRequest(request);
     fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
     return sendAsyncGetRequest(ec2RecordedTimePeriodsObject, fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList) ,target, slot);
+}
+
+int QnMediaServerConnection::getBookmarksAsync(const QnBookmarkRequestData &request, QObject *target, const char *slot) {
+    return sendAsyncGetRequest(ec2BookmarksObject, request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
 }

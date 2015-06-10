@@ -10,12 +10,8 @@
 class QnCameraBookmarksManager : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(SearchStrategy)
 public:
-    enum SearchStrategy {
-        EarliestFirst,
-        LongestFirst
-    };
+
 
     struct FilterParameters;    /// Forward declaration of structure with filter parameters
     typedef std::function<void (bool success, const QnCameraBookmarkList &bookmarks)> BookmarksCallbackType;
@@ -38,7 +34,7 @@ struct QnCameraBookmarksManager::FilterParameters {
     QString text;
     QnTimePeriod period;
     int limit;
-    QnCameraBookmarksManager::SearchStrategy strategy;
+    Qn::BookmarkSearchStrategy strategy;
 
     FilterParameters();
 };
