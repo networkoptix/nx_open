@@ -1,22 +1,22 @@
-#ifndef _QTFILE_STORAGE_PROTOCOL_H__
-#define _QTFILE_STORAGE_PROTOCOL_H__
+#ifndef __CLIENT_STORAGE_RESOURCE_H__
+#define __CLIENT_STORAGE_RESOURCE_H__
 
-extern "C"
-{
-    #include <libavformat/avio.h>
-}
-
-#include "core/resource/storage_resource.h"
-
+#include <core/resource/storage_resource.h>
 /*
-* QnQtFileStorageResource uses Qt based IO access
+*   This class used only for manipulating storage as User Interface entity. 
+*   Never use any functions derived from QnAbstractStorageResource.
 */
-
-class QnQtFileStorageResource
+class QnClientStorageResource
     : public QnStorageResource
 {
 public:
-    QnQtFileStorageResource();
+    enum StorageFlags {
+        ReadOnly        = 0x1,
+        ContainsCameras = 0x2,
+    };
+
+    QnClientStorageResource() {}
+    virtual ~QnClientStorageResource() {}
 
     static QnStorageResource* instance();
 
@@ -33,12 +33,8 @@ public:
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace() override;
-
-protected:
-private:
-    QString removeProtocolPrefix(const QString& url);
-private:
-    int  m_capabilities; // see QnAbstractStorageResource::cap flags
 };
 
-#endif // _FILE_STORAGE_PROTOCOL_H__
+typedef QSharedPointer<QnClientStorageResource> QnClientStorageResourcePtr;
+
+#endif // __CLIENT_STORAGE_RESOURCE_H__

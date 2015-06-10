@@ -1,75 +1,125 @@
-#ifndef __ABSTRACT_STORAGE_RESOURCE_H__
-#define __ABSTRACT_STORAGE_RESOURCE_H__
+#ifndef __ABSTRACT_STORAGE_H__
+#define __ABSTRACT_STORAGE_H__
 
 #include "resource.h"
+#include <QtCore/QtCore>
 
-class QnAbstractMediaStreamDataProvider;
-
-class QnAbstractStorageResource : public QnResource
+class QnAbstractStorageResource 
+    : public QnResource 
 {
-    Q_OBJECT
-
-    Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
-    Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
-
 public:
-    QnAbstractStorageResource();
-    virtual ~QnAbstractStorageResource();
+    enum cap
+    {
+        ListFile        = 0x0000,                   // capable of listing files
+        RemoveFile      = 0x0001,                   // capable of removing files
+        ReadFile        = 0x0002,                   // capable of reading files
+        WriteFile       = 0x0004,                   // capable of writing files
+        DBReady         = 0x0008,                   // capable of DB hosting
+    };
 
-    virtual QString getUniqueId() const;
+    static const int chunkLen = 60;
+public:
+    static const qint64 UnknownSize = 0x0000FFFFFFFFFFFFll; // TODO: #Elric replace with -1.
 
-    void setSpaceLimit(qint64 value);
-    qint64 getSpaceLimit() const;
+    virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode) = 0;
 
-    void setStorageType(const QString& type);
-    QString getStorageType() const;
+    /**
+    *   \return storage capabilities ('cap' flag(s))
+    */
+    virtual int getCapabilities() const = 0;
 
-    void setMaxStoreTime(int timeInSeconds);
-    int getMaxStoreTime() const;
+    ///**
+    // * TODO: #vasilenko doxydocs!
+    // */
+    //virtual int getChunkLen() const = 0;
 
-    void setUsedForWriting(bool isUsedForWriting);
-    bool isUsedForWriting() const;
-    QString getPath() const;
-    static QString urlToPath(const QString& url);
+    ///**
+    // * \returns                         Whether the storage automatically deletes old files.
+    // */
+    //virtual bool isNeedControlFreeSpace() = 0;
 
-    static QnUuid fillID(const QnUuid& mserverId, const QString& url);
-    bool isExternal() const;
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual float bitrate() const;
-    virtual float getStorageBitrateCoeff() const { return 1.0; }
-
-    void addBitrate(QnAbstractMediaStreamDataProvider* provider);
-    void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
-#endif
-
-    /*
-     * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization
+    /**
+     * \returns                         Storage free space in bytes, or <tt>UnknownSize</tt> if this function is not supported.
      */
-    virtual void setUrl(const QString& value) override;
+    virtual qint64 getFreeSpace() = 0;
 
-    /*
-     * Returns storage usage in range [0..1]
+    /**
+     * \returns                         Storage total space in bytes, or <tt>UnknownSize</tt> if this function is not supported.
      */
-    virtual float getAvarageWritingUsage() const;
+    virtual qint64 getTotalSpace() = 0;
 
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
-signals:
-    /*
-     * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
-     * @param newStartTime - new archive start time point
-     * @param newEndTime - Not used now, reserved for future use
+    ///**
+    // * \returns                         Whether the storage is physically accessible.
+    // */
+    virtual bool isAvailable() const = 0;
+
+    ///**
+    // * \returns                         Whether the storage is physically accessible and ready for writing
+    // */
+    //virtual bool isStorageAvailableForWriting() = 0;
+
+
+    /**
+     * \param url                       Url of the file to delete.
+     * \returns                         Whether the file was successfully removed.
      */
-    void archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
-private:
-    qint64 m_spaceLimit;
-    int m_maxStoreTime; // in seconds
-    bool m_usedForWriting;
-    QString m_storageType;
-    QSet<QnAbstractMediaStreamDataProvider*> m_providers;
-    mutable QMutex m_bitrateMtx;
+    virtual bool removeFile(const QString& url) = 0;
+
+    /**
+     * \param url                       Url of the folder to remove.
+     * \returns                         Whether the folder was successfully removed.
+     */
+    virtual bool removeDir(const QString& url) = 0;
+
+    /**
+     * This function is used when server restarts. Unfinished files re-readed, writed again (under a new name), then renamed.
+     *
+     * \param oldName
+     * \param newName
+     * \returns                         Whether the file was successfully renamed.
+     */
+    virtual bool renameFile(const QString& oldName, const QString& newName) = 0;
+
+    /**
+     * \param dirName                   Url of the folder to list.
+     * \returns                         List of files in given directory, excluding subdirectories.
+     * 
+     * \note QFileInfo structure MUST contains valid fields for full file name and file size.
+     */
+    virtual QFileInfoList getFileList(const QString& dirName) = 0;
+
+    /**
+     * \param url                       Url of a file to check.
+     * \returns                         Whether a file with the given url exists.
+     */
+    virtual bool isFileExists(const QString& url) = 0;
+
+    /**
+     * \param url                       Url of a folder to check.
+     * \returns                         Whether a folder with the given name exists.
+     */
+    virtual bool isDirExists(const QString& url) = 0;
+
+    ///**
+    // * \returns                         Whether storage supports catalog functions: 
+    // *                                  <tt>isFileExists</tt>, <tt>isDirExists</tt>, <tt>getFileList</tt>. 
+    // *                                  If function returns false, server doesn't check file catalog on startup.
+    // */
+    //virtual bool isCatalogAccessible() = 0;
+
+    ///**
+    // * TODO: #vasilenko doxydocs!
+    // */
+    //virtual bool isRealFiles() const{return true;}
+
+    //qint64 getWritedSpace() const;
+    //void addWritedSpace(qint64 value);
+
+    /**
+     * \param url                       Url of the file to get size of.
+     * \returns                         Size of the file, or 0 if the file does not exist.
+     */
+    virtual qint64 getFileSize(const QString& url) const = 0;
 };
 
-Q_DECLARE_METATYPE(QnAbstractStorageResourcePtr);
-Q_DECLARE_METATYPE(QnAbstractStorageResourceList);
-
-#endif // __ABSTRACT_STORAGE_RESOURCE_H__
+#endif // __ABSTRACT_STORAGE_H__

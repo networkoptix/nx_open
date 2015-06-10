@@ -9,7 +9,10 @@
 
 
 QnExtIODeviceStorageResource::QnExtIODeviceStorageResource()
+    : m_capabilities(0)
 {
+    m_capabilities |= QnAbstractStorageResource::cap::ListFile;
+    m_capabilities |= QnAbstractStorageResource::cap::ReadFile;
 }
 
 QnExtIODeviceStorageResource::~QnExtIODeviceStorageResource()
@@ -22,6 +25,11 @@ QnExtIODeviceStorageResource::~QnExtIODeviceStorageResource()
         delete it->second;
         m_urlToDevice.erase( it++ );
     }
+}
+
+int QnExtIODeviceStorageResource::getCapabilities() const
+{
+    return m_capabilities;
 }
 
 QIODevice* QnExtIODeviceStorageResource::open( const QString& filePath, QIODevice::OpenMode openMode )

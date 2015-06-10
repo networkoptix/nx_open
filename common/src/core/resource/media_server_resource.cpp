@@ -215,12 +215,12 @@ QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourc
     return result;
 }
 
-QnAbstractStorageResourceList QnMediaServerResource::getStorages() const
+QnStorageResourceList QnMediaServerResource::getStorages() const
 {
-    return qnResPool->getResourcesByParentId(getId()).filtered<QnAbstractStorageResource>();
+    return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
 }
 
-void QnMediaServerResource::setStorageDataToUpdate(const QnAbstractStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storagesToRemove)
+void QnMediaServerResource::setStorageDataToUpdate(const QnStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storagesToRemove)
 {
     m_storagesToUpdate = storagesToUpdate;
     m_storagesToRemove = storagesToRemove;
@@ -286,13 +286,13 @@ void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
     emit serverFlagsChanged(::toSharedPointer(this));
 }
 
-QnAbstractStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
+QnStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
 {
-   for(const QnAbstractStorageResourcePtr& storage: getStorages()) {
+   for(const QnStorageResourcePtr& storage: getStorages()) {
        if (storage->getUrl() == url)
            return storage;
    }
-   return QnAbstractStorageResourcePtr();
+   return QnStorageResourcePtr();
 }
 
 void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {

@@ -575,7 +575,7 @@ static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList) {
     return addListStrings.join(QLatin1String(";"));
 }
 
-void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &dst) {
+void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
     dst.spaceLimit = src->getSpaceLimit();
@@ -583,9 +583,9 @@ void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &
     dst.storageType = src->getStorageType();
 }
 
-void fromResourceToApi(const QnAbstractStorageResourceList &src, ApiStorageDataList &dst)
+void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)
 {
-    for(const QnAbstractStorageResourcePtr& storage: src) 
+    for(const QnStorageResourcePtr& storage: src) 
     {
         ApiStorageData dstStorage;
         fromResourceToApi(storage, dstStorage);
@@ -593,7 +593,7 @@ void fromResourceToApi(const QnAbstractStorageResourceList &src, ApiStorageDataL
     }
 }
 
-void fromApiToResource(const ApiStorageData &src, QnAbstractStorageResourcePtr &dst) {
+void fromApiToResource(const ApiStorageData &src, QnStorageResourcePtr &dst) {
     fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
     dst->setSpaceLimit(src.spaceLimit);
@@ -804,8 +804,8 @@ void fromApiToResourceList(const ApiStorageDataList &src, QnResourceList &dst, c
     auto resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
     for(const ApiStorageData &srcStorage: src) 
     {
-        QnAbstractStorageResourcePtr dstStorage = ctx.resFactory->createResource(resType->getId(), 
-                                                  QnResourceParams(srcStorage.id, srcStorage.url, QString())).dynamicCast<QnAbstractStorageResource>();
+        QnStorageResourcePtr dstStorage = ctx.resFactory->createResource(resType->getId(), 
+                                                  QnResourceParams(srcStorage.id, srcStorage.url, QString())).dynamicCast<QnStorageResource>();
         fromApiToResource(srcStorage, dstStorage);
         dst.push_back(std::move(dstStorage));
     }

@@ -6,6 +6,7 @@
 
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/storage_resource.h>
+#include <core/resource/storage_plugin_factory.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -58,7 +59,9 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     else 
 #endif
     {
-        reply.storage.isWritable = storage ? storage->isStorageAvailableForWriting() : false;
+        reply.storage.isWritable = storage ? 
+                                   storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile : 
+                                   false;
         reply.storage.isUsedForWriting = exists ? storage->isUsedForWriting() : false;
     }
         

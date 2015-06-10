@@ -511,7 +511,7 @@ QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* 
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
         m_storage = qnStorageMan->getOptimalStorageRoot(provider);
         if (m_storage)
-            setTruncateInterval(m_storage->getChunkLen());
+            setTruncateInterval(QnAbstractStorageResource::chunkLen/*m_storage->getChunkLen()*/);
         return qnStorageMan->getFileName(m_startDateTime/1000, m_currentTimeZone, netResource, DeviceFileCatalog::prefixByCatalog(m_catalog), m_storage);
     }
     else {

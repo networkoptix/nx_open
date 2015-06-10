@@ -217,7 +217,7 @@ public:
             if (needToStop())
                 break;
             QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
-            Qn::ResourceStatus status = fileStorage->isStorageAvailable() ? Qn::Online : Qn::Offline;
+            Qn::ResourceStatus status = fileStorage->isAvailable() ? Qn::Online : Qn::Offline;
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
         }
@@ -578,8 +578,8 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         //    storage->addWritedSpace(oldStorage->getWritedSpace());
         storage->setStatus(Qn::Offline); // we will check status after
         m_storageRoots.insert(storageIndex, storage);
-        connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), 
-                this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
+        connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), 
+                this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
     }
     updateStorageStatistics();
 }
@@ -645,9 +645,9 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &)
     updateStorageStatistics();
 }
 
-bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const
+bool QnStorageManager::existsStorageWithID(const QnStorageResourceList& storages, const QnUuid &id) const
 {
-    for(const QnAbstractStorageResourcePtr& storage: storages)
+    for(const QnStorageResourcePtr& storage: storages)
     {
         if (storage->getId() == id)
             return true;
@@ -655,7 +655,7 @@ bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& 
     return false;
 }
 
-void QnStorageManager::removeAbsentStorages(const QnAbstractStorageResourceList &newStorages)
+void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStorages)
 {
     QMutexLocker lock(&m_mutexStorages);
     for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
@@ -961,7 +961,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     QString dir = storage->getPath();
 
-    if (!storage->isNeedControlFreeSpace())
+    if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile))
         return;
 
     qint64 freeSpace = storage->getFreeSpace();
@@ -1020,7 +1020,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     }
 }
 
-void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs)
+void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs)
 {
     Q_UNUSED(newEndTimeMs)
     int storageIndex = detectStorageIndex(resource->getUrl());

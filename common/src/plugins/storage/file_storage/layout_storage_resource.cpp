@@ -212,24 +212,22 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
 }
 
 QnLayoutFileStorageResource::QnLayoutFileStorageResource():
-    m_fileSync(QMutex::Recursive)
+    m_fileSync(QMutex::Recursive),
+    m_capabilities(0)
 {
     QMutexLocker lock(&m_storageSync);
     m_novFileOffset = 0;
     //m_novFileLen = 0;
     m_allStorages.insert(this);
+ 
+    m_capabilities |= cap::ListFile;
+    m_capabilities |= cap::ReadFile;
 }
 
 QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
 {
     QMutexLocker lock(&m_storageSync);
     m_allStorages.remove(this);
-}
-
-
-bool QnLayoutFileStorageResource::isNeedControlFreeSpace()
-{
-    return false;
 }
 
 bool QnLayoutFileStorageResource::removeFile(const QString& url)
@@ -295,9 +293,9 @@ bool QnLayoutFileStorageResource::isDirExists(const QString& url)
     return d.exists(removeProtocolPrefix(url));
 }
 
-bool QnLayoutFileStorageResource::isCatalogAccessible()
+int QnLayoutFileStorageResource::getCapabilities() const
 {
-    return true;
+    return m_capabilities;
 }
 
 bool QnLayoutFileStorageResource::isFileExists(const QString& url)
@@ -328,7 +326,7 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
     return 0; // not implemented
 }
 
-bool QnLayoutFileStorageResource::isStorageAvailable()
+bool QnLayoutFileStorageResource::isAvailable() const
 {
     QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
@@ -349,11 +347,6 @@ bool QnLayoutFileStorageResource::isStorageAvailable()
     return false;
 }
 
-int QnLayoutFileStorageResource::getChunkLen() const 
-{
-    return 60;
-}
-
 QString QnLayoutFileStorageResource::removeProtocolPrefix(const QString& url)
 {
     int prefix = url.indexOf(QLatin1String("://"));
@@ -363,11 +356,6 @@ QString QnLayoutFileStorageResource::removeProtocolPrefix(const QString& url)
 QnStorageResource* QnLayoutFileStorageResource::instance()
 {
     return new QnLayoutFileStorageResource();
-}
-
-bool QnLayoutFileStorageResource::isStorageAvailableForWriting()
-{
-    return false; // it is read only file system
 }
 
 bool QnLayoutFileStorageResource::readIndexHeader()
