@@ -5,8 +5,6 @@
 
 #include "linux_passwd_crypt.h"
 
-#include <boost/multiprecision/cpp_int.hpp>
-
 #include <QCryptographicHash>
 
 
@@ -16,7 +14,10 @@ namespace
     { 63, 62, 20, 41, 40, 61, 19, 18, 39, 60, 59, 17, 38, 37, 58, 16, 15, 36, 57, 56, 14, 35,
           34, 55, 13, 12, 33, 54, 53, 11, 32, 31, 52, 10,  9, 30, 51, 50,  8, 29, 28, 49,  7,
           6,  27, 48, 47,  5, 26, 25, 46,  4,  3, 24, 45, 44,  2, 23, 22, 43,  1,  0, 21, 42 };
+    const size_t SHUFFLE_INDEXES_SIZE = sizeof( SHUFFLE_INDEXES ) / sizeof( *SHUFFLE_INDEXES );
+
     const char BASE64[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
     const int HASH_LENGTH = 86;
 }
 
@@ -28,6 +29,31 @@ QByteArray generateSalt( int length )
         salt[i] = BASE64[rand() % (sizeof(BASE64)/sizeof(*BASE64))];
 
     return salt;
+}
+
+namespace
+{
+    const int BITS_MASK[] = { 0, 0x1, 0x3, 0x7, 0xF, 0x1F, 0x3F, 0x7F };
+
+    //!Performs inplace bitshift of array \a data
+    void shiftArrayRight( unsigned char* data, size_t dataSize, size_t bitsCount )
+    {
+        //TODO #ak moving by number of bytes and modifing bitsCount
+        assert( bitsCount < 8 );
+
+        if( bitsCount == 0 )
+            return;
+
+        int shiftedBitsBak = 0;
+        for( size_t i = 0; i < dataSize; ++i )
+        {
+            //saving most right bits
+            const int shiftedBitsNewBak = data[i] & BITS_MASK[bitsCount];
+            data[i] >>= bitsCount;
+            data[i] |= shiftedBitsBak << (8-bitsCount);
+            shiftedBitsBak = shiftedBitsNewBak;
+        }
+    }
 }
 
 QByteArray linuxCryptSha512( const QByteArray& password, const QByteArray& salt )
@@ -45,7 +71,7 @@ QByteArray linuxCryptSha512( const QByteArray& password, const QByteArray& salt 
     }
     intermediate = QCryptographicHash::hash( intermediate, QCryptographicHash::Sha512 );
 
-    unsigned char firstByte = intermediate[0];
+    const unsigned char firstByte = intermediate[0];
 
     QByteArray p_bytes;
     for( int i = 0; i < password.size(); ++i )
@@ -75,19 +101,20 @@ QByteArray linuxCryptSha512( const QByteArray& password, const QByteArray& salt 
         intermediate = QCryptographicHash::hash( result, QCryptographicHash::Sha512 );
     }
 
-    boost::multiprecision::int512_t rearrangedInt( 0 );
-    for( size_t i = 0; i < sizeof( SHUFFLE_INDEXES ) / sizeof( *SHUFFLE_INDEXES ); ++i )
-    {
-        rearrangedInt <<= 8;
-        rearrangedInt |= (unsigned char)(intermediate[SHUFFLE_INDEXES[i]]);
-    }
+    QByteArray rearranged;
+    rearranged.resize( intermediate.size() );
+    for( int i = 0; i < (int)SHUFFLE_INDEXES_SIZE; ++i )
+        rearranged[i] = intermediate[SHUFFLE_INDEXES[i]];
 
     QByteArray hash;
     hash.reserve( HASH_LENGTH );
     for( int j = 0; j < HASH_LENGTH; ++j )
     {
-        hash += BASE64[(rearrangedInt & 0x3f).convert_to<int>()];
-        rearrangedInt >>= 6;    //div by 64
+        hash += BASE64[rearranged[rearranged.size() - 1] & BITS_MASK[6]];
+        shiftArrayRight(
+            reinterpret_cast<unsigned char*>(rearranged.data()),
+            rearranged.size(),
+            6 );
     }
 
     return "$6$" + salt + "$" + hash;
