@@ -24,7 +24,7 @@ namespace {
     const int minOverlapDuration = 120*1000;
 }
 
-QnFlatCameraDataLoader::QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
+QnFlatCameraDataLoader::QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::TimePeriodContent dataType, QObject *parent):
     QnAbstractCameraDataLoader(camera, dataType, parent)
 {
     if(!camera)
@@ -79,8 +79,6 @@ void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
 }
 
 int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
-    Q_ASSERT_X(m_dataType != Qn::BookmarkData, Q_FUNC_INFO, "this loader should NOT be used to load bookmarks");
-
     auto server = qnCommon->currentServer();
     if (!server)
         return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
@@ -94,7 +92,7 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
     requestData.startTimeMs = startTimeMs;
     requestData.endTimeMs = DATETIME_NOW,   /* Always load data to the end. */ 
     requestData.filter = m_filter;
-    requestData.periodsType = dataTypeToPeriod(m_dataType);
+    requestData.periodsType = m_dataType;
 
     return connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int)));
 }

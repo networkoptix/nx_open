@@ -4,7 +4,7 @@
 
 #include <recording/time_period.h>
 
-QnAbstractCameraDataLoader::QnAbstractCameraDataLoader(const QnResourcePtr &resource, const Qn::CameraDataType dataType, QObject *parent): 
+QnAbstractCameraDataLoader::QnAbstractCameraDataLoader(const QnResourcePtr &resource, const Qn::TimePeriodContent dataType, QObject *parent): 
     QObject(parent),
     m_resource(resource),
     m_dataType(dataType)

@@ -186,8 +186,8 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
 
-    if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
-        loader->addBookmark(bookmark);
+//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
+//         loader->addBookmark(bookmark);
 }
 
 
@@ -200,8 +200,8 @@ void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraB
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
 
-    if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
-        loader->updateBookmark(bookmark);
+//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
+//         loader->updateBookmark(bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraBookmark &bookmark, int handle) {
@@ -209,7 +209,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraB
     if (status != 0 || !camera)
         return;
 
-    if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
-        loader->removeBookmark(bookmark);
+//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
+//         loader->removeBookmark(bookmark);
 }
 

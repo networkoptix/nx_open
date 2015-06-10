@@ -87,6 +87,7 @@ private:
     QnCameraBookmarksManager * const m_bookmarksManager;
 
     QnCameraBookmarkList m_bookmarks;
+    QnVirtualCameraResourceList m_cameras;
     QnCameraBookmarksManager::FilterParameters m_filter;
     UniqIdToStringMap m_camerasNames;
 
@@ -123,8 +124,8 @@ void QnSearchBookmarksModel::Impl::setDates(const QDate &start
 {
     static const QTime kStartOfTheDayTime = QTime(0, 0, 0, 0);
     static const QTime kEndOfTheDayTime = QTime(23, 59, 59, 999);
-    m_filter.startTime = QDateTime(start, kStartOfTheDayTime).toMSecsSinceEpoch();
-    m_filter.finishTime = QDateTime(finish, kEndOfTheDayTime).toMSecsSinceEpoch();
+    m_filter.period.startTimeMs = QDateTime(start, kStartOfTheDayTime).toMSecsSinceEpoch();
+    m_filter.period.durationMs = QDateTime(finish, kEndOfTheDayTime).toMSecsSinceEpoch() - m_filter.period.startTimeMs;
 }
 
 void QnSearchBookmarksModel::Impl::setFilterText(const QString &text)
@@ -134,16 +135,16 @@ void QnSearchBookmarksModel::Impl::setFilterText(const QString &text)
 
 void QnSearchBookmarksModel::Impl::setCameras(const QnVirtualCameraResourceList &cameras)
 {
-    m_filter.cameras = cameras;
+    m_cameras = cameras;
 }
 
 void QnSearchBookmarksModel::Impl::applyFilter(bool clearBookmarksCache)
 {
     QnCameraBookmarksManager::FilterParameters filter = m_filter;
-    if (filter.cameras.empty())
-        filter.cameras = qnResPool->getAllCameras(QnResourcePtr(), true);
+    if (m_cameras.empty())
+        m_cameras = qnResPool->getAllCameras(QnResourcePtr(), true);
 
-    m_bookmarksManager->getBookmarksAsync(filter, clearBookmarksCache
+    m_bookmarksManager->getBookmarksAsync(m_cameras, filter, 1
         , [this](bool success, const QnCameraBookmarkList &bookmarks)
     {
         m_beginResetModel();

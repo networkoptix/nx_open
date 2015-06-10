@@ -19,12 +19,9 @@ public:
    
     QnCachingCameraDataLoader *loader(const QnMediaResourcePtr &resource, bool createIfNotExists = true);
 
-    QnCameraBookmarkList bookmarks(const QnMediaResourcePtr &resource) const;
-
     void clearCache();
 signals:
     void periodsChanged(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
-    void bookmarksChanged(const QnMediaResourcePtr &resource);
 private:
     mutable QHash<QnMediaResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
 };

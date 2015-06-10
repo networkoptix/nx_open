@@ -113,7 +113,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
     m_cameraDataManager = context()->instance<QnCameraDataManager>();
     connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this, &QnWorkbenchNavigator::updateLoaderPeriods);
-    connect(m_cameraDataManager, &QnCameraDataManager::bookmarksChanged, this, &QnWorkbenchNavigator::updateLoaderBookmarks);
+  //  connect(m_cameraDataManager, &QnCameraDataManager::bookmarksChanged, this, &QnWorkbenchNavigator::updateLoaderBookmarks);
 
     //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.
@@ -358,8 +358,8 @@ void QnWorkbenchNavigator::initialize() {
     {
         if (!m_currentMediaWidget)
             return;
-        if(QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
-            loader->setBookmarksTextFilter(text); //TODO: #GDM #Bookmarks synced widgets? clear previous?
+//         if(QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
+//             loader->setBookmarksTextFilter(text); //TODO: #GDM #Bookmarks synced widgets? clear previous?
     });
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
@@ -1088,23 +1088,8 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
         loader->load();
 
         //loader->setBoundingPeriod(boundingPeriod);
-        for (int i = 0; i < Qn::CameraDataTypeCount; ++i) {
-            Qn::CameraDataType dataType = static_cast<Qn::CameraDataType>(i);
-            switch (dataType) {
-            case Qn::RecordedTimePeriod:
-            case Qn::MotionTimePeriod:
          //       loader->setTargetPeriod(calendarPeriod, dataType);
-            case Qn::BookmarkTimePeriod:
-         //       loader->setTargetPeriod(calendarPeriod, dataType);
-                break;
-            case Qn::BookmarkData:
          //       loader->setTargetPeriod(timeSliderPeriod, dataType);
-                break;
-            default:
-                break;
-            }
-        }
-
     }
 }
 
@@ -1132,8 +1117,8 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
 
 void QnWorkbenchNavigator::updateCurrentBookmarks() {
     QnCameraBookmarkList bookmarks;
-    if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
-        bookmarks = loader->bookmarks();
+//     if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
+//         bookmarks = loader->bookmarks();
     if (m_timeSlider)
         m_timeSlider->setBookmarks(bookmarks);
 }
@@ -1439,7 +1424,7 @@ void QnWorkbenchNavigator::at_timeSlider_bookmarksUnderCursorUpdated(const QPoin
     {
         if (QnCachingCameraDataLoader * const loader = loaderByWidget(m_currentMediaWidget))
         {
-            bookmarks = loader->allBookmarksByTime(position);
+/*            bookmarks = loader->allBookmarksByTime(position);*/
         }
     }
 
@@ -1470,8 +1455,8 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
     if (m_currentWidget && m_timeSlider->timePeriods(CurrentLine, Qn::BookmarksContent).containTime(position)) {
         QnCameraBookmark bookmark;
-        if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
-            bookmark = loader->bookmarkByTime(position);
+//         if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
+//             bookmark = loader->bookmarkByTime(position);
         if (!bookmark.isNull())
             parameters.setArgument(Qn::CameraBookmarkRole, bookmark);
     }
@@ -1534,8 +1519,8 @@ void QnWorkbenchNavigator::updateLoaderBookmarks(const QnMediaResourcePtr &resou
     if(!m_timeSlider || !m_currentMediaWidget || m_currentMediaWidget->resource() != resource)
         return;
 
-    QnCameraBookmarkList bookmarks = m_cameraDataManager->bookmarks(resource);
-    m_timeSlider->setBookmarks(bookmarks);
+//     QnCameraBookmarkList bookmarks = m_cameraDataManager->bookmarks(resource);
+//     m_timeSlider->setBookmarks(bookmarks);
 }
 
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {

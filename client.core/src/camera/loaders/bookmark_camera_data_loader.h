@@ -19,7 +19,7 @@
  * Uses flat structure. Data is loaded with the most detailed level.
  * Source data period is solid, no spaces are allowed.
  */
-class QnBookmarkCameraDataLoader: public QnAbstractCameraDataLoader
+class QnBookmarkCameraDataLoader: public QObject
 {
     Q_OBJECT
 public:
@@ -32,12 +32,27 @@ public:
      */
     QnBookmarkCameraDataLoader(const QnVirtualCameraResourcePtr &camera, QObject *parent = NULL);
     
-    virtual int load(const QString &filter, const qint64 resolutionMs) override;
+    virtual int load(const QString &filter, const qint64 resolutionMs);
 
-    virtual void discardCachedData(const qint64 resolutionMs = 0) override;
+    virtual void discardCachedData(const qint64 resolutionMs = 0);
 
-private slots:
-    void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
+signals:
+    /**
+     * This signal is emitted whenever motion periods were successfully loaded.
+     *
+     * \param data                      Full data loaded.
+     * \param updatedPeriod             Source time period for the updated piece of data.
+     * \param handle                    Request handle.
+     */
+    void ready(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle);
+
+    /**
+     * This signal is emitted whenever the reader was unable to load motion periods.
+     * 
+     * \param status                    Error code.
+     * \param handle                    Request handle.
+     */
+    void failed(int status, int handle);
 
 private:
     int sendRequest(qint64 startTimeMs);
@@ -59,6 +74,8 @@ private:
 
         void clear();
     };
+
+    const QnVirtualCameraResourcePtr m_camera;
 
     QString m_filter;
     

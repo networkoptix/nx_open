@@ -29,7 +29,7 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
             StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
@@ -359,15 +359,6 @@ public:
         TimePeriodContentCount
     };
 
-    enum CameraDataType {
-        RecordedTimePeriod,
-        MotionTimePeriod,
-        BookmarkTimePeriod, /// Used for retreiving general time periods of bookmarks
-        BookmarkData,       /// Used for retreiving bookmarks data
-
-        CameraDataTypeCount
-    };
-
     enum SystemComponent {
         ServerComponent,
         ClientComponent,
@@ -652,7 +643,7 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #endif
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType), 
+    (Qn::TimePeriodContent)(Qn::Corner), 
     (metatype)
 )
 

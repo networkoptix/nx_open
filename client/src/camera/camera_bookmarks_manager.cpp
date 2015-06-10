@@ -21,6 +21,8 @@ namespace
         AnswersContainer answers;
         bool success;
     };
+
+    const static int defaultSearchLimit = 100;
 }
 
 class QnCameraBookmarksManager::Impl : public QObject
@@ -30,9 +32,7 @@ public:
 
     virtual ~Impl();
 
-    void getBookmarksAsync(const FilterParameters &filter
-        , const BookmarksCallbackType &callback
-        , bool clearBookmarksCache);
+    void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const FilterParameters &filter, int limit, BookmarksCallbackType callback);
 
 private:
     /// @brief Callback for bookmarks. If data is nullptr it means error occurred
@@ -59,15 +59,19 @@ QnCameraBookmarksManager::Impl::~Impl()
 {
 }
 
-void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &filter
-    , const BookmarksCallbackType &callback
-    , bool clearBookmarksCache)
+void QnCameraBookmarksManager::Impl::getBookmarksAsync(const QnVirtualCameraResourceList &cameras
+                                                       , const FilterParameters &filter
+                                                       , int limit
+                                                       , BookmarksCallbackType callback)
 {
-    BookmarkRequestHolder request = { QnTimePeriod(filter.startTime, filter.finishTime - filter.startTime)
+
+
+
+    BookmarkRequestHolder request = { filter.period
         , callback, QnCameraBookmarkList(), AnswersContainer(), true };
 
     /// Make Load request for any camera
-    for(const auto &camera: filter.cameras)
+    for(const auto &camera: cameras)
     {
         LoadersContainer::iterator it = m_loaders.find(camera);
         if (it == m_loaders.end())
@@ -75,8 +79,8 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
             const QnMediaServerResourcePtr mediaServer = camera->getParentResource().dynamicCast<QnMediaServerResource>();
             QnBookmarkCameraDataLoader *loader = new QnBookmarkCameraDataLoader(camera, this);
 
-                connect(loader, &QnAbstractCameraDataLoader::ready, this, &Impl::bookmarksDataEvent);
-                connect(loader, &QnAbstractCameraDataLoader::failed, this
+                connect(loader, &QnBookmarkCameraDataLoader::ready, this, &Impl::bookmarksDataEvent);
+                connect(loader, &QnBookmarkCameraDataLoader::failed, this
                     , [this](int, int handle) { bookmarksDataEvent(QnAbstractCameraDataPtr(), QnTimePeriod(), handle); } );
 
                 it = m_loaders.insert(camera, loader);
@@ -87,8 +91,8 @@ void QnCameraBookmarksManager::Impl::getBookmarksAsync(const FilterParameters &f
                                             /// prevent all cashes to be discarded when discardCachedData() called
         QnBookmarkCameraDataLoader * const loader = it.value();
         
-        if (clearBookmarksCache)
-            loader->discardCachedData(kMinimumResolution);
+//         if (clearBookmarksCache)
+//             loader->discardCachedData(kMinimumResolution);
             //TODO: #GDM #Bookmarks IMPLEMENT ME
        // const int handle = loader->load(request.targetPeriod, filter.text, kMinimumResolution);
       //  request.answers.insert(std::make_pair(loader, handle));
@@ -159,9 +163,18 @@ QnCameraBookmarksManager::~QnCameraBookmarksManager()
 {
 }
 
-void QnCameraBookmarksManager::getBookmarksAsync(const FilterParameters &filter
-    , bool clearBookmarksCache
-    , const BookmarksCallbackType &callback)
+void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceList &cameras
+                                                 , const FilterParameters &filter
+                                                 , int limit
+                                                 , BookmarksCallbackType callback)
 {
-    m_impl->getBookmarksAsync(filter, callback, clearBookmarksCache);
+    m_impl->getBookmarksAsync(cameras, filter, limit, callback);
+}
+
+QnCameraBookmarksManager::FilterParameters::FilterParameters():
+    period(0, QnTimePeriod::infiniteDuration()),
+    limit(defaultSearchLimit),
+    strategy(QnCameraBookmarksManager::EarliestFirst)
+{
+
 }

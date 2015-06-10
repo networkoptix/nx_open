@@ -22,17 +22,38 @@ namespace {
 
     /** Minimum time (in milliseconds) for overlapping time periods requests.  */
     const int minOverlapDuration = 120*1000;
+
+    qint64 bookmarkResolution(qint64 periodDuration) {
+        const int maxPeriodsPerTimeline = 1024; // magic const, thus visible periods can be edited through right-click
+        qint64 maxPeriodLength = periodDuration / maxPeriodsPerTimeline;
+
+        static const std::vector<qint64> steps = [maxPeriodLength](){ 
+            std::vector<qint64> result;
+            for (int i = 0; i < 40; ++i)
+                result.push_back(1ll << i);
+
+            result.push_back(maxPeriodLength);  /// To avoid end() result from lower_bound
+            return result; 
+        }();
+
+        auto step = std::lower_bound(steps.cbegin(), steps.cend(), maxPeriodLength);
+        return *step;
+
+    }
 }
 
 QnBookmarkCameraDataLoader::QnBookmarkCameraDataLoader(const QnVirtualCameraResourcePtr &camera, QObject *parent):
-    QnAbstractCameraDataLoader(camera, Qn::BookmarkData, parent)
+    QObject(parent),
+    m_camera(camera)
 {
-    if(!camera)
-        qnNullWarning(camera);
+    Q_ASSERT_X(m_camera, Q_FUNC_INFO, "Camera must exist here");
 }
 
 
 int QnBookmarkCameraDataLoader::load(const QString &filter, const qint64 resolutionMs) {
+    if (!m_camera)
+        return -1;
+
     Q_UNUSED(resolutionMs);
 
     if (filter != m_filter)
@@ -80,8 +101,6 @@ void QnBookmarkCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
 }
 
 int QnBookmarkCameraDataLoader::sendRequest(qint64 startTimeMs) {
-    Q_ASSERT_X(m_dataType == Qn::BookmarkData, Q_FUNC_INFO, "this loader must be used to load bookmarks only");
-
     auto server = qnCommon->currentServer();
     if (!server)
         return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
@@ -91,25 +110,14 @@ int QnBookmarkCameraDataLoader::sendRequest(qint64 startTimeMs) {
         return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
 
     QnChunksRequestData requestData;
-    requestData.resList << m_resource.dynamicCast<QnVirtualCameraResource>();
+    requestData.resList << m_camera;
     requestData.startTimeMs = startTimeMs;
     requestData.endTimeMs = DATETIME_NOW,   /* Always load data to the end. */ 
     requestData.filter = m_filter;
-    requestData.periodsType = dataTypeToPeriod(m_dataType);
+    //requestData.periodsType = ;
 
-    //TODO: #GDM #IMPLEMENT ME
+    //TODO: #GDM #Bookmarks #IMPLEMENT ME
     return connection->recordedTimePeriods(requestData, this, SLOT(at_timePeriodsReceived(int, const MultiServerPeriodDataList &, int)));
-}
-
-void QnBookmarkCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle) {
-
-    std::vector<QnTimePeriodList> rawPeriods;
-
-    for(auto period: timePeriods)
-        rawPeriods.push_back(period.periods);
-    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(QnTimePeriodList::mergeTimePeriods(rawPeriods)));
-
-    handleDataLoaded(status, data, requestHandle);
 }
 
 void QnBookmarkCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle) {

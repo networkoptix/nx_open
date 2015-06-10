@@ -30,7 +30,7 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent = NULL);
+    QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::TimePeriodContent dataType, QObject *parent = NULL);
   
     virtual int load(const QString &filter = QString(), const qint64 resolutionMs = 1) override;
 
