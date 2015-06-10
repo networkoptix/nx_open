@@ -164,6 +164,10 @@ bool checkData(const QnNetworkAddressEntryList& newSettings, QString* errString)
             *errString = lit("Invalid gateway for interface '%1'").arg(value.name);
             return false;
         }
+        if ((value.ipAddr.isEmpty() || value.netMask.isEmpty()) && !value.dhcp) {
+            *errString = lit("IP address or network mask for interface '%1' is empty.").arg(value.name);
+            return false;
+        }
     }
     return true;
 }
