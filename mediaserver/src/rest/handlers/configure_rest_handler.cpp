@@ -14,6 +14,8 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/module_finder.h"
 #include "api/model/configure_reply.h"
+#include "utils/crypt/linux_passwd_crypt.h"
+
 
 void changePort(quint16 port);
 
@@ -39,6 +41,12 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     qint64 sysIdTime = params.value(lit("sysIdTime")).toLongLong();
     qint64 tranLogTime = params.value(lit("tranLogTime")).toLongLong();
     int port = params.value(lit("port")).toInt();
+
+    if( cryptSha512Hash.isEmpty() && !password.isEmpty() )
+    {
+        //genereating cryptSha512Hash
+        cryptSha512Hash = linuxCryptSha512( password.toUtf8(), generateSalt( LINUX_CRYPT_SALT_LENGTH ) );
+    }
 
     /* set system name */
     int changeSystemNameResult = changeSystemName(systemName, sysIdTime, wholeSystem, tranLogTime);
