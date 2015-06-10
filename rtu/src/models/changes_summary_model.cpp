@@ -1,7 +1,7 @@
 
 #include "changes_summary_model.h"
 
-#include <server_info.h>
+#include <base/server_info.h>
 #include <models/server_changes_model.h>
 #include <helpers/model_change_helper.h>
 

@@ -3,18 +3,13 @@
 
 #include <QStringList>
 
-#include <server_info.h>
-#include <requests/requests.h>
+#include <base/server_info.h>
+#include <base/requests.h>
 #include <helpers/http_client.h>
 
 namespace
 {
-    QStringList g_availablePasswords = []() -> QStringList
-    {
-        QStringList result;
-        result.push_back(rtu::defaultAdminPassword());
-        return result;
-    }();
+    QStringList g_availablePasswords = rtu::defaultAdminPasswords();
 }
 
 class rtu::LoginManager::Impl : public QObject

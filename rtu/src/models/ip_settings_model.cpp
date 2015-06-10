@@ -3,8 +3,8 @@
 
 #include <functional>
 
-#include <server_info.h>
-#include <models/types.h>
+#include <base/types.h>
+#include <base/server_info.h>
 #include <models/servers_selection_model.h>
 
 namespace

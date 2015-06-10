@@ -4,8 +4,8 @@
 #include <QtQml>
 #include <QAbstractListModel>
 
-#include <server_info.h>
-#include <models/types.h>
+#include <base/types.h>
+#include <base/server_info.h>
 
 namespace rtu
 {
@@ -24,36 +24,45 @@ namespace rtu
         
         void setItemSelected(int rowIndex);
 
-        void selectionPasswordChanged(const QString &password);
+//        void selectionPasswordChanged(const QString &password);
         
         void tryLoginWith(const QString &password);
 
-        ///
-        
-        void updateTimeDateInfo(const QUuid &id
-            , const QDateTime &dateTime
-            , const QDateTime &timestamp);
-        
-        void updateInterfacesInfo(const QUuid &id
-            , const InterfaceInfoList &interfaces);
-
-        void updateSystemNameInfo(const QUuid &id
-            , const QString &systemName);
-        
-        void updatePortInfo(const QUuid &id
-            , int port);
-        
         ///
 
         int selectedCount() const;
         
         ServerInfoList selectedServers();
-        
+
+        ///
+
+        void addServer(const BaseServerInfo &baseInfo);
+
+        void changeServer(const BaseServerInfo &baseInfo);
+
+        void removeServers(const IDsVector &removed);
+
+        void updateTimeDateInfo(const QUuid &id
+            , const QDateTime &utcDateTime
+            , const QTimeZone &timeZone
+            , const QDateTime &timestamp);
+
+        void updateInterfacesInfo(const QUuid &id
+            , const InterfaceInfoList &interfaces);
+
+        void updateSystemNameInfo(const QUuid &id
+            , const QString &systemName);
+
+        void updatePortInfo(const QUuid &id
+            , int port);
+
+        void updatePasswordInfo(const QUuid &id
+            , const QString &password);
+
     signals:
         void selectionChanged();
         
-        void serverInfoChanged(ServerInfo *info);
-        
+        void serverLogged(const ServerInfo &info);
     private:
         int rowCount(const QModelIndex &parent = QModelIndex()) const;
         
