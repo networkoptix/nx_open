@@ -71,7 +71,9 @@ QJsonValue extractReplyBody(const QJsonObject &object)
 bool isErrorReply(const QJsonObject &object)
 {
     static const QString &kErrorTag = "error";
-    return (object.contains(kErrorTag) ? object.value(kErrorTag).toInt() : true);
+    const int code = (!object.contains(kErrorTag) ? 0
+        : object.value(kErrorTag).toString().toInt());
+    return code;
 }
 
 QString getErrorDescription(const QJsonObject &object)
@@ -289,6 +291,7 @@ void rtu::getServerExtraInfo(HttpClient *client
     };
     
     qDebug() << url;
+    qDebug() << password;
     client->sendGet(url, successfulCallback, failedCallback);
 }
 
@@ -351,10 +354,9 @@ bool rtu::configureRequest(HttpClient *client
     
     const auto successfullCallback = [callback](const QByteArray &data)
     {
-        qDebug() << data;
         callback(QString(), 0);
     };
-    
+
     qDebug() << url;
     client->sendGet(url, successfullCallback, makeFailedCallback(callback, affected));
     return true;
@@ -458,6 +460,7 @@ void rtu::setTimeRequest(HttpClient *client
             failedCallback(errorReason, kDateTime | kTimeZone);
     };
     
+    qDebug() << "*********** settime \n" << url;
     client->sendGet(url, successful, failed);
 }
 
@@ -474,7 +477,6 @@ void rtu::interfacesListRequest(HttpClient *client
     const auto &successfullCallback =
         [id, successful, failed](const QByteArray &data)
     {
-        qDebug() << data;
         const QJsonObject &object = QJsonDocument::fromJson(data.data()).object();
 
         rtu::ExtraServerInfo extraInfo;
@@ -546,8 +548,16 @@ void rtu::changeIpsRequest(HttpClient *client
         , adminUserName(), info.extraInfo().password, kApiNamespaceTag + kCommandName);
     const auto &successfullCallback = [callback](const QByteArray &data) 
     {
-        qDebug() <<"***" << data;
-        callback(QString(), 0);
+        qDebug() << "++++ \n" << data;
+        const QJsonObject &object = QJsonDocument::fromJson(data.data()).object();
+        if (isErrorReply(object))
+        {
+            callback(getErrorDescription(object), kAllAddressFlags);
+        }
+        else
+        {
+            callback(QString(), kNoEntitiesAffected);
+        }
     };
 
     qDebug() << "----" << url;

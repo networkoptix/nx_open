@@ -26,9 +26,12 @@ namespace rtu
         , kPort             = 0x1
         , kPassword         = 0x2
         , kSystemName       = 0x4
+
         , kIpAddress        = 0x8
         , kSubnetMask       = 0x10
         , kDHCPUsage        = 0x20
+        , kAllAddressFlags = kIpAddress | kSubnetMask | kDHCPUsage
+
         , kDateTime         = 0x40
         , kTimeZone         = 0x80
         , kAllFlags         = 0xFF

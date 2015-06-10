@@ -56,9 +56,10 @@ Window
         Pages.ServerSelectionPage
         {
             id: serversSelectionListView;
-            askForSelectionChanges: (loader.item && loader.item.hasOwnProperty("parametersChanged") 
+            askForSelectionChanges: (loader.item && loader.item.hasOwnProperty("parametersChanged")
                 ? loader.item.parametersChanged : false);
             
+
             enabled: (rtuContext.currentPage === NxRtu.Constants.SettingsPage);
             opacity: enabled ? 1 : 0.5;
         }

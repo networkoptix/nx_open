@@ -629,18 +629,13 @@ void rtu::ServersSelectionModel::Impl::updatePasswordInfo(const QUuid &id
     if (!findServer(id, searchInfo))
         return;
 
-    for (ServerModelInfo &serverInfo: searchInfo.systemInfoIterator->servers)
-    {
+    ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
+    if (!info.hasExtraInfo())
+        info.setExtraInfo(ExtraServerInfo());
 
-        ServerInfo &info = serverInfo.serverInfo;
-        if (!info.hasExtraInfo())
-            info.setExtraInfo(ExtraServerInfo());
-
-        info.writableExtraInfo().password = password;
-    }
-
-    m_changeHelper->dataChanged(searchInfo.systemRowIndex
-        , searchInfo.systemRowIndex + searchInfo.systemInfoIterator->servers.size());
+    info.writableExtraInfo().password = password;
+    m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
+    m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
 }
 
 void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info
