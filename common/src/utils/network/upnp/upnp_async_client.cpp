@@ -134,7 +134,7 @@ const QString& AsyncClient::Message::getParam( const QString& key ) const
 }
 
 bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
-                              const std::function< void( const Message& )>& callback )
+                          const std::function< void( const Message& )>& callback )
 {
     const auto service = toUpnpUrn( message.service, lit("service") );
     const auto action = lit( "\"%1#%2\"" ).arg( service ).arg( message.action );
@@ -197,7 +197,7 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
 
 const QString AsyncClient::CLIENT_ID        = lit( "NX UpnpAsyncClient" );
 const QString AsyncClient::INTERNAL_GATEWAY = lit( "InternetGatewayDevice" );
-const QString AsyncClient::WAN_IP           = lit( "WANIpConnection" );
+const QString AsyncClient::WAN_IP           = lit( "WANIPConnection" );
 
 static const QString GET_EXTERNAL_IP        = lit( "GetExternalIPAddress" );
 static const QString ADD_PORT_MAPPING       = lit( "AddPortMapping" );
@@ -216,7 +216,7 @@ static const QString DESCRIPTION    = lit("NewPortMappingDescription");
 static const QString DURATION       = lit("NewLeaseDuration");
 
 bool AsyncClient::externalIp( const QUrl& url,
-                                  const std::function< void( const HostAddress& ) >& callback )
+                              const std::function< void( const HostAddress& ) >& callback )
 {
     AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP };
     return doUpnp( url, request, [callback]( const Message& response ) {

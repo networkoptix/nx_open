@@ -15,10 +15,12 @@ class PortMapper
         , TimerEventHandler
 {
 public:
-    PortMapper( const QString& description = QnAppInfo::organizationName(),
-                    const QString& device = AsyncClient::INTERNAL_GATEWAY );
+    PortMapper( quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL,
+                const QString& description = QnAppInfo::organizationName(),
+                const QString& device = AsyncClient::INTERNAL_GATEWAY );
     ~PortMapper();
 
+    static const quint64 DEFAULT_CHECK_MAPPINGS_INTERVAL;
     typedef AsyncClient::Protocol Protocol;
 
     struct MappingInfo
@@ -75,6 +77,7 @@ protected: // for testing only
     QWaitCondition m_asyncCondition;
     quint64 m_timerId;
     const QString m_description;
+    const quint64 m_checkMappingsInterval;
 
     std::map< std::pair< quint16, Protocol >, std::shared_ptr< Callback > > m_mappings;
     std::map< QString, std::unique_ptr< Device > > m_devices;

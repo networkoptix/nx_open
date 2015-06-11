@@ -407,14 +407,14 @@ QHostAddress DeviceSearcher::findBestIface( const HostAddress& host )
 
 int DeviceSearcher::cacheTimeout()
 {
-    int xmlDescriptionLiveTimeout = XML_DESCRIPTION_LIVE_TIME_MS;
-    QSet<QString> disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
-    if( disabledVendorsForAutoSearch.size() == 1 &&
-        disabledVendorsForAutoSearch.contains(lit("all=partial")) )
+    if( auto settings = QnGlobalSettings::instance() )
     {
-        xmlDescriptionLiveTimeout = PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS;
+        const auto disabledVendors = settings->disabledVendorsSet();
+        if( disabledVendors.size() == 1 && disabledVendors.contains( lit("all=partial") ) )
+            return PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS;
     }
-    return xmlDescriptionLiveTimeout;
+
+    return XML_DESCRIPTION_LIVE_TIME_MS;
 }
 
 const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescriptionInCache( const QByteArray& uuid )

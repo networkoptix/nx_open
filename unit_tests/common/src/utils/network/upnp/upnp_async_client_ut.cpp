@@ -17,7 +17,6 @@ static const QString DESC = lit( "test" );
 TEST( UpnpAsyncClient, DISABLED_GetIp )
 {
     AsyncClient client;
-
     {
         std::promise< HostAddress > prom;
         EXPECT_TRUE( client.externalIp( URL,
@@ -51,7 +50,6 @@ TEST( UpnpAsyncClient, DISABLED_GetIp )
 TEST( UpnpAsyncClient, DISABLED_Mapping )
 {
     AsyncClient client;
-
     {
          std::promise< bool > prom;
          EXPECT_TRUE( client.addMapping( URL, IP, 80, 80, TCP, DESC,

@@ -8,13 +8,13 @@
 namespace nx_upnp {
 namespace test {
 
-UpnpAsyncClientMock::UpnpAsyncClientMock( const HostAddress& externalIp )
+AsyncClientMock::AsyncClientMock( const HostAddress& externalIp )
     : m_externalIp( externalIp )
     , m_disabledPort( 80 )
 {
 }
 
-bool UpnpAsyncClientMock::externalIp(
+bool AsyncClientMock::externalIp(
         const QUrl& /*url*/,
         const std::function< void( const HostAddress& ) >& callback )
 {
@@ -22,12 +22,13 @@ bool UpnpAsyncClientMock::externalIp(
     return true;
 }
 
-bool UpnpAsyncClientMock::addMapping(
+bool AsyncClientMock::addMapping(
         const QUrl& /*url*/, const HostAddress& internalIp,
         quint16 internalPort, quint16 externalPort,
         Protocol protocol, const QString& description,
         const std::function< void( bool ) >& callback )
 {
+    QMutexLocker lock( &m_mutex );
     if( externalPort == m_disabledPort ||
             m_mappings.find( std::make_pair( externalPort, protocol ) )
                 != m_mappings.end() )
@@ -44,19 +45,21 @@ bool UpnpAsyncClientMock::addMapping(
 
 }
 
-bool UpnpAsyncClientMock::deleteMapping(
+bool AsyncClientMock::deleteMapping(
         const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
         const std::function< void( bool ) >& callback )
 {
+    QMutexLocker lock( &m_mutex );
     const bool isErased = m_mappings.erase( std::make_pair( externalPort, protocol ) );
     QtConcurrent::run( [ isErased, callback ]{ callback( isErased ); } );
     return true;
 }
 
-bool UpnpAsyncClientMock::getMapping(
+bool AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint32 index,
         const std::function< void( const MappingInfo& ) >& callback )
 {
+    QMutexLocker lock( &m_mutex );
     if( m_mappings.size() <= index )
     {
         QtConcurrent::run( [ callback ]{ callback( MappingInfo() ); } );
@@ -77,10 +80,11 @@ bool UpnpAsyncClientMock::getMapping(
     return true;
 }
 
-bool UpnpAsyncClientMock::getMapping(
+bool AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
         const std::function< void( const MappingInfo& ) >& callback )
 {
+    QMutexLocker lock( &m_mutex );
     const auto it = m_mappings.find( std::make_pair( externalPort, protocol ) );
     if( it == m_mappings.end() )
     {
@@ -102,11 +106,37 @@ bool UpnpAsyncClientMock::getMapping(
     return true;
 }
 
-UpnpPortMapperMocked::UpnpPortMapperMocked( const HostAddress& internalIp,
-                                            const HostAddress& externalIp )
-    : PortMapper( lit( "UpnpPortMapperMocked" ), QString() )
+AsyncClientMock::Mappings AsyncClientMock::mappings() const
 {
-    m_upnpClient.reset( new UpnpAsyncClientMock( externalIp ) );
+    QMutexLocker lock( &m_mutex );
+    return m_mappings;
+}
+
+size_t AsyncClientMock::mappingsCount() const
+{
+    QMutexLocker lock( &m_mutex );
+    return m_mappings.size();
+}
+
+bool AsyncClientMock::mkMapping( const Mappings::value_type& value )
+{
+    QMutexLocker lock( &m_mutex );
+    return m_mappings.insert( value ).second;
+}
+
+
+bool AsyncClientMock::rmMapping( quint16 port, Protocol protocol )
+{
+    QMutexLocker lock( &m_mutex );
+    return m_mappings.erase( std::make_pair( port, protocol ) );
+}
+
+PortMapperMocked::PortMapperMocked( const HostAddress& internalIp,
+                                    const HostAddress& externalIp,
+                                    quint64 checkMappingsInterval )
+    : PortMapper( checkMappingsInterval, lit( "UpnpPortMapperMocked" ), QString() )
+{
+    m_upnpClient.reset( new AsyncClientMock( externalIp ) );
 
     DeviceInfo::Service service;
     service.serviceType = AsyncClient::WAN_IP;
@@ -119,9 +149,9 @@ UpnpPortMapperMocked::UpnpPortMapperMocked( const HostAddress& internalIp,
     searchForMappers( internalIp, SocketAddress(), devInfo );
 }
 
-UpnpAsyncClientMock& UpnpPortMapperMocked::clientMock()
+AsyncClientMock& PortMapperMocked::clientMock()
 {
-    return *static_cast< UpnpAsyncClientMock* >( m_upnpClient.get() );
+    return *static_cast< AsyncClientMock* >( m_upnpClient.get() );
 }
 
 } // namespace test

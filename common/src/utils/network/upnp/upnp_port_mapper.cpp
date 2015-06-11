@@ -2,17 +2,17 @@
 
 #include "upnp_port_mapper_internal.h"
 
-static const quint64 CHECK_MAPPINGS_INTERVAL = 1 * 60; // a minute
-
 namespace nx_upnp {
 
-PortMapper::PortMapper( const QString& description, const QString& device )
+PortMapper::PortMapper( quint64 checkMappingsInterval,
+                        const QString& description, const QString& device )
     : SearchAutoHandler( device )
     , m_upnpClient( new AsyncClient() )
     , m_asyncInProgress( 0 )
     , m_description( description )
+    , m_checkMappingsInterval( checkMappingsInterval )
 {
-    m_timerId = TimerManager::instance()->addTimer( this, CHECK_MAPPINGS_INTERVAL );
+    m_timerId = TimerManager::instance()->addTimer( this, m_checkMappingsInterval );
 }
 
 PortMapper::~PortMapper()
@@ -21,6 +21,7 @@ PortMapper::~PortMapper()
     {
         QMutexLocker lock( &m_mutex );
         timerId = m_timerId;
+        m_timerId = 0;
     }
 
     TimerManager::instance()->joinAndDeleteTimer( timerId );
@@ -29,6 +30,8 @@ PortMapper::~PortMapper()
     while( m_asyncInProgress )
         m_asyncCondition.wait( &m_mutex );
 }
+
+const quint64 PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL = 10 * 60 * 1000; // 10 min
 
 PortMapper::MappingInfo::MappingInfo( quint16 inPort, quint16 exPort,
                                           const HostAddress& exIp, Protocol prot )
@@ -73,7 +76,6 @@ void PortMapper::enableMappingOnDevice(
         if( --m_asyncInProgress == 0)
             m_asyncCondition.wakeOne();
     };
-
 
     const auto result = isCheck
             ? device.check( port, protocol, callback )
@@ -133,7 +135,9 @@ bool PortMapper::searchForMappers( const HostAddress& localAddress,
             continue; // uninteresting
 
         {
-            QUrl url( devAddress.toString() );
+            QUrl url;
+            url.setHost( devAddress.address.toString() );
+            url.setPort( devAddress.port );
             url.setPath( service.controlUrl );
 
             std::unique_ptr< Device > device(
@@ -148,10 +152,10 @@ bool PortMapper::searchForMappers( const HostAddress& localAddress,
             for( const auto& mapping : m_mappings )
                 enableMappingOnDevice( *itBool.first->second, false, mapping.first );
         }
-
-        for( const auto& subDev : devInfo.deviceList )
-            atLeastOneFound |= searchForMappers( localAddress, devAddress, subDev );
     }
+
+    for( const auto& subDev : devInfo.deviceList )
+        atLeastOneFound |= searchForMappers( localAddress, devAddress, subDev );
 
     return atLeastOneFound;
 }
@@ -163,7 +167,8 @@ void PortMapper::onTimer( const quint64& /*timerID*/ )
         for( auto& device : m_devices )
             enableMappingOnDevice( *device.second, true, mapping.first );
 
-    m_timerId = TimerManager::instance()->addTimer( this, CHECK_MAPPINGS_INTERVAL );
+    if( m_timerId )
+        m_timerId = TimerManager::instance()->addTimer( this, m_checkMappingsInterval );
 }
 
 } // namespace nx_upnp

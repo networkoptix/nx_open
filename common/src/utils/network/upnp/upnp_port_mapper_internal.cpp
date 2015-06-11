@@ -149,15 +149,15 @@ bool PortMapper::Device::unmap( quint16 port, Protocol protocol,
     return m_upnpClient->deleteMapping( m_url, external, protocol,
                                         [ this, callback, port, protocol ]( bool success )
     {
-        // if something goes wrong the mapping will be avaliable when
-        // server starts next time
-        callback();
-
         if( success )
         {
             QMutexLocker lk( &m_mutex );
             m_alreadyMapped.erase( std::make_pair( port, protocol ) );
         }
+
+        // if something goes wrong the mapping will be avaliable when
+        // server starts next time
+        callback();
     } );
 }
 
@@ -175,9 +175,13 @@ bool PortMapper::Device::check( quint16 port, Protocol protocol,
         [ this, port, external, protocol, callback ]( const AsyncClient::MappingInfo& info )
     {
         QMutexLocker lk( &m_mutex );
-        if( info.internalPort == 0 &&
-                info.internalIp == m_internalIp )
-            return; // it's ok, dont bother
+        if( info.internalPort == port &&
+            info.internalIp == m_internalIp )
+        {
+            lk.unlock();
+            callback( info.externalPort );
+            return;
+        }
 
         // looks like we lost this one, try to restore
         m_alreadyMapped.erase( std::make_pair( port, protocol ) );
@@ -220,15 +224,23 @@ bool PortMapper::Device::mapImpl(
         }
 
         m_faultCounter.success();
-        m_alreadyMapped[ std::make_pair( port, protocol ) ] = desiredPort;
         if( m_externalIp == HostAddress::anyHost )
         {
             // will be notified as soon as we know external IP
-            m_successQueue[ port ] = std::bind( callback, desiredPort );
+            m_successQueue[ port ] = [ this, port, protocol, desiredPort, callback ]()
+            {
+                {
+                    QMutexLocker lk( &m_mutex );
+                    m_alreadyMapped[ std::make_pair( port, protocol ) ] = desiredPort;
+                }
+                callback( desiredPort );
+            };
             return;
         }
 
+        m_alreadyMapped[ std::make_pair( port, protocol ) ] = desiredPort;
         lk.unlock();
+
         callback( desiredPort );
     } );
 

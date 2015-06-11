@@ -8,11 +8,11 @@ namespace nx_upnp {
 namespace test {
 
 //! \class UpnpAsyncClient implementation for tests
-class UpnpAsyncClientMock
+class AsyncClientMock
         : public AsyncClient
 {
 public:
-    UpnpAsyncClientMock( const HostAddress& externalIp );
+    AsyncClientMock( const HostAddress& externalIp );
 
     virtual
     bool externalIp( const QUrl& url,
@@ -36,19 +36,31 @@ public:
     bool getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
                      const std::function< void( const MappingInfo& ) >& callback );
 
-// public for tests:
+    typedef std::map<
+            std::pair< quint16 /*port*/, Protocol /*protocol*/ >,
+            std::pair< SocketAddress /*external*/, QString /*description*/ >
+        > Mappings;
+
+    Mappings mappings() const;
+    size_t mappingsCount() const;
+    bool mkMapping( const Mappings::value_type& value );
+    bool rmMapping( quint16 port, Protocol protocol );
+
+private:
     const HostAddress m_externalIp;
     const quint16 m_disabledPort;
-    std::map< std::pair< quint16 /*port*/, Protocol /*protocol*/ >,
-              std::pair< SocketAddress /*external*/, QString /*description*/ > > m_mappings;
+
+    mutable QMutex m_mutex;
+    Mappings m_mappings;
 };
 
-class UpnpPortMapperMocked
+class PortMapperMocked
         : public PortMapper
 {
 public:
-    UpnpPortMapperMocked( const HostAddress& internalIp, const HostAddress& externalIp );
-    UpnpAsyncClientMock& clientMock();
+    PortMapperMocked( const HostAddress& internalIp, const HostAddress& externalIp,
+                      quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL );
+    AsyncClientMock& clientMock();
 };
 
 } // namespace test
