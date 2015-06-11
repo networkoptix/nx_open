@@ -78,12 +78,6 @@ namespace broadcom
         VCOS_STATUS_T wait() { return vcos_semaphore_wait(&sem_); }
         VCOS_STATUS_T post() { return vcos_semaphore_post(&sem_); }
 
-        static VcosSemaphore * common()
-        {
-            static VcosSemaphore sem("common semaphore");
-            return &sem;
-        }
-
     private:
         VCOS_SEMAPHORE_T sem_;
     };

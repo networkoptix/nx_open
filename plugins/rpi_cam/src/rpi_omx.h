@@ -156,17 +156,8 @@ namespace rpi_omx
             fillDone_(false)
         {}
 
-        bool filled() const
-        {
-            return fillDone_;
-        }
-
-        void setFilled(bool val = true)
-        {
-            Lock lock(VcosSemaphore::common()); // LOCK
-
-            fillDone_ = val;
-        }
+        bool filled() const { return fillDone_; }
+        void setFilled(bool val = true) { fillDone_ = val; }
 
         OMX_BUFFERHEADERTYPE ** pHeader() { return &ppBuffer_; }
         OMX_BUFFERHEADERTYPE * header() { return ppBuffer_; }
@@ -228,7 +219,7 @@ namespace rpi_omx
             unsigned value = eventState_ + 1;
             ERR_OMX( OMX_SendCommand(component_, OMX_CommandStateSet, newState, NULL), "switch state");
 
-            if (! waitValue(&eventState_, value))
+            if (! waitValue(eventState_, value))
                 debug_print("%s - lost state changed event\n", name());
 
             if (state() != newState)
@@ -242,7 +233,7 @@ namespace rpi_omx
             unsigned value = eventEnabled_ + count2wait(nPortIndex);
             ERR_OMX( OMX_SendCommand(component_, OMX_CommandPortEnable, nPortIndex, NULL), "enable port");
 
-            if (! waitValue(&eventEnabled_, value))
+            if (! waitValue(eventEnabled_, value))
                 debug_print("%s - port %d lost enable port event\n", name(), nPortIndex);
         }
 
@@ -251,7 +242,7 @@ namespace rpi_omx
             unsigned value = eventDisabled_ + count2wait(nPortIndex);
             ERR_OMX( OMX_SendCommand(component_, OMX_CommandPortDisable, nPortIndex, NULL), "disable port");
 
-            if (! waitValue(&eventDisabled_, value))
+            if (! waitValue(eventDisabled_, value))
                 debug_print("%s - port %d lost disable port event\n", name(), nPortIndex);
         }
 
@@ -260,7 +251,7 @@ namespace rpi_omx
             unsigned value = eventFlushed_ + count2wait(nPortIndex);
             ERR_OMX( OMX_SendCommand(component_, OMX_CommandFlush, nPortIndex, NULL), "flush buffers");
 
-            if (! waitValue(&eventFlushed_, value))
+            if (! waitValue(eventFlushed_, value))
                 debug_print("%s - port %d lost flush port event\n", name(), nPortIndex);
         }
 
@@ -294,10 +285,10 @@ namespace rpi_omx
             ERR_OMX( OMX_FillThisBuffer(component_, buffer.header()), "OMX_FillThisBuffer");
         }
 
+        // from callbacks
+
         void eventCmdComplete(OMX_U32 cmd, OMX_U32 /*nPortIndex*/)
         {
-            Lock lock(VcosSemaphore::common());  // LOCK
-
             switch (cmd)
             {
                 case OMX_CommandStateSet:
@@ -324,26 +315,23 @@ namespace rpi_omx
 
         void eventPortSettingsChanged(OMX_U32 /*nPortIndex*/)
         {
-#if 0
-            Lock lock(VcosSemaphore::common());  // LOCK
-
-            ++changedPorts_[n2idx(nPortIndex)];
-#endif
         }
+
+        //VcosSemaphore * semaphore() { return &sem_; }
 
     protected:
         OMX_HANDLETYPE component_;
         ComponentType type_;
+        //VcosSemaphore sem_; // commented: synced by atomics
 
         Component(ComponentType type, OMX_PTR pAppData, OMX_CALLBACKTYPE * callbacks)
         :   type_(type),
+            //sem_("rpi_cam:event"),
             eventState_(0),
             eventFlushed_(0),
             eventDisabled_(0),
             eventEnabled_(0)
         {
-            //changedPorts_.resize(numPorts());
-
             OMX_STRING xName = const_cast<OMX_STRING>(name());
             ERR_OMX( OMX_GetHandle(&component_, xName, pAppData, callbacks), "OMX_GetHandle");
 
@@ -368,20 +356,19 @@ namespace rpi_omx
         unsigned idx2n(unsigned idx) const { return type_ + idx; }
 
     private:
-        unsigned eventState_;
-        unsigned eventFlushed_;
-        unsigned eventDisabled_;
-        unsigned eventEnabled_;
-        //std::vector<unsigned> changedPorts_;
+        std::atomic<uint32_t> eventState_;
+        std::atomic<uint32_t> eventFlushed_;
+        std::atomic<uint32_t> eventDisabled_;
+        std::atomic<uint32_t> eventEnabled_;
 
-        bool waitValue(unsigned * pValue, unsigned wantedValue)
+        bool waitValue(std::atomic<uint32_t>& value, unsigned wantedValue)
         {
             static const unsigned WAIT_CHANGES_US = 10000;
             static const unsigned MAX_WAIT_COUNT = 200;
 
             for (unsigned i = 0; i < MAX_WAIT_COUNT; ++i)
             {
-                if (*pValue == wantedValue)
+                if (value >= wantedValue)
                     return true;
 
                 usleep(WAIT_CHANGES_US);
@@ -599,8 +586,6 @@ namespace rpi_omx
 
         void eventReady()
         {
-            Lock lock(VcosSemaphore::common()); // LOCK
-
             ready_ = true;
         }
 

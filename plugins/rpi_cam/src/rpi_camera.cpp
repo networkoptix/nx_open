@@ -27,8 +27,6 @@ namespace rpi_cam
         {
             debug_print("OMXExeption: %s %s\n", __FUNCTION__, ex.what());
         }
-
-        rpi_omx::VcosSemaphore::common();
     }
 
     void RPiCamera::deinit()
@@ -90,6 +88,21 @@ namespace rpi_cam
     {
         OMXExeption::setLastError();
         OMXExeption::setEventError();
+    }
+
+    void RPiCamera::startCapture()
+    {
+        m_camera->capture(rpi_omx::Camera::OPORT_VIDEO, OMX_TRUE);
+    }
+
+    void RPiCamera::stopCapture()
+    {
+        m_camera->capture(rpi_omx::Camera::OPORT_VIDEO, OMX_FALSE);
+
+#if 1   // It's not clear how to detect the moment when it's stopped capturing.
+        static const unsigned TIME_TO_RELAX_US = 1000 * 1000;
+        usleep(TIME_TO_RELAX_US);
+#endif
     }
 
     void RPiCamera::prepare(const CameraParameters& camParams, const EncoderParameters& encParams0, const EncoderParameters& encParams1)
@@ -470,10 +483,11 @@ namespace rpi_cam
 #endif
     }
 
+    // In fact I'm not sure if we realy need this step.
     void RPiCamera::returnBuffers()
     {
-        m_encoders[0]->outBuffer().flags() &= OMX_BUFFERFLAG_EOS;
-        m_encoders[1]->outBuffer().flags() &= OMX_BUFFERFLAG_EOS;
+        m_encoders[0]->outBuffer().flags() |= OMX_BUFFERFLAG_EOS;
+        m_encoders[1]->outBuffer().flags() |= OMX_BUFFERFLAG_EOS;
 
         m_encoders[0]->callFillThisBuffer();
         m_encoders[1]->callFillThisBuffer();

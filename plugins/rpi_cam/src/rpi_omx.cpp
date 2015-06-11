@@ -43,6 +43,9 @@ namespace rpi_omx
 
         printEvent(component->name(), hComponent, eEvent, nData1, nData2);
 
+        // commented: synced by atomic variables
+        //Lock lock(component->semaphore());  // LOCK
+
         switch (eEvent)
         {
             case OMX_EventCmdComplete:
@@ -90,15 +93,19 @@ namespace rpi_omx
 
             case OMX_EventError:
             {
+                debug_print("OMX_EventError: 0x%x 0x%x\n", nData1, nData2);
+
                 switch (nData1)
                 {
                 case OMX_ErrorPortUnpopulated:
                     // not an error
                     break;
+
+                default:
+                    OMXExeption::setEventError(nData1);
+                    break;
                 }
 
-                debug_print("OMX_EventError: 0x%x\n", nData1);
-                OMXExeption::setEventError(nData1);
                 break;
             }
 
@@ -120,6 +127,9 @@ namespace rpi_omx
     static OMX_ERRORTYPE callback_FillBufferDone(OMX_HANDLETYPE /*hComponent*/, OMX_PTR pAppData, OMX_BUFFERHEADERTYPE * /*pBuffer*/)
     {
         Component * component = static_cast<Component *>(pAppData);
+
+        // commented: synced by atomic variables
+        //Lock lock(component->semaphore());  // LOCK
 
         // Only Encoders use CPU<->GPU Buffer. Others are tunneled => no events for them here.
         if (component->type() == Encoder::cType)

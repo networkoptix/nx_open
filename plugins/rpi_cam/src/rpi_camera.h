@@ -127,8 +127,8 @@ namespace rpi_cam
         void flushBuffers();
         void freeBuffers();
 
-        void startCapture() { m_camera->capture(rpi_omx::Camera::OPORT_VIDEO, OMX_TRUE); }
-        void stopCapture() { m_camera->capture(rpi_omx::Camera::OPORT_VIDEO, OMX_FALSE); }
+        void startCapture();
+        void stopCapture();
 
         void dumpPorts();
     };
