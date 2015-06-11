@@ -146,7 +146,7 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
     const auto request = SOAP_REQUEST.arg( message.action ).arg( service )
                                      .arg( params.join( lit("") ) );
 
-    const auto complete = [this, callback]( const nx_http::AsyncHttpClientPtr& ptr )
+    auto complete = [ this, callback ]( const nx_http::AsyncHttpClientPtr& ptr )
     {
         {
             QMutexLocker lk(&m_mutex);
@@ -178,7 +178,7 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
         callback( Message() );
     };
 
-    auto httpClient = std::make_shared< nx_http::AsyncHttpClient >();
+    const auto httpClient = std::make_shared< nx_http::AsyncHttpClient >();
     httpClient->addAdditionalHeader( "SOAPAction", action.toUtf8() );
     httpClient->setMessageBodyReadTimeoutMs( MESSAGE_BODY_READ_TIMEOUT_MS );
     QObject::connect( httpClient.get(), &nx_http::AsyncHttpClient::done,

@@ -63,7 +63,7 @@ void PortMapper::enableMappingOnDevice(
 {
     const auto port = request.first;
     const auto protocol = request.second;
-    const auto callback = [ this, &device, port, protocol ]( const quint16& mappedPort )
+    auto callback = [ this, &device, port, protocol ]( const quint16& mappedPort )
     {
         QMutexLocker lock( &m_mutex );
         const auto it = m_mappings.find( std::make_pair( port, protocol ) );

@@ -82,7 +82,7 @@ PortMapper::Device::Device( AsyncClient* upnpClient,
         }
 
         // notify all callbacks in queue (they were not notified bc externalIp was unknown
-        for( const auto callback : successQueue )
+        for( const auto& callback : successQueue )
             callback();
     } );
 }
