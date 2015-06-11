@@ -48,7 +48,7 @@ signals:
 
 private:
     void sendRequest(const QnTimePeriod &period);
-    void handleDataLoaded(int status, const QnCameraBookmarkList &data, int requestHandle);
+    Q_SLOT void handleDataLoaded(int status, const QnCameraBookmarkList &data, int requestHandle);
 private:
 
     const QnVirtualCameraResourcePtr m_camera;

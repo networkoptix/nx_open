@@ -218,10 +218,10 @@ private:
     bool isBookmarksLoadingAvailable() const;
 
     /** Update bookmarks on the timeline. */
-    void updateTimelineBookmarks(const QnVirtualCameraResourcePtr &resource);
+    void updateTimelineBookmarks();
 
     /** Queue bookmarks loading for the currently selected camera. */
-    void updateBookmarks();
+    void loadBookmarks();
     
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
