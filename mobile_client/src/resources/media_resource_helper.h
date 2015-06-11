@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_resource.h>
 
 class QnMediaResourceHelper : public QObject {
     Q_OBJECT
@@ -11,8 +12,19 @@ class QnMediaResourceHelper : public QObject {
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(QUrl mediaUrl READ mediaUrl NOTIFY mediaUrlChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
+    Q_PROPERTY(QStringList resolutions READ resolutions NOTIFY resolutionsChanged)
+    Q_PROPERTY(QString resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
+    Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
+
+    Q_ENUMS(Protocol)
 
 public:
+    enum Protocol {
+        Http,
+        Rtsp,
+        UnknownProtocol
+    };
+
     explicit QnMediaResourceHelper(QObject *parent = 0);
 
     QString resourceId() const;
@@ -25,14 +37,34 @@ public:
     Q_INVOKABLE void setDateTime(const QDateTime &dateTime);
     Q_INVOKABLE void setLive();
 
+    QStringList resolutions() const;
+    QString resolution() const;
+    void setResolution(const QString &resolution);
+
+    QSize screenSize() const;
+    void setScreenSize(const QSize &size);
+
+    QString optimalResolution() const;
+
 signals:
     void resourceIdChanged();
     void mediaUrlChanged();
     void resourceNameChanged();
+    void resolutionsChanged();
+    void resolutionChanged();
+    void screenSizeChanged();
+
+private:
+    void at_resourcePropertyChanged(const QnResourcePtr &resource, const QString &key);
 
 private:
     QnResourcePtr m_resource;
     QDateTime m_dateTime;
+    Protocol m_protocol;
+    CameraMediaStreams m_supportedStreams;
+    QString m_resolution;
+    QSize m_screenSize;
+    qreal m_aspectRatio;
 };
 
 #endif // MEDIA_RESOURCE_HELPER_H

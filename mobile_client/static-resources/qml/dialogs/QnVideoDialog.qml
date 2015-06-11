@@ -23,6 +23,8 @@ Page {
     QnMediaResourceHelper {
         id: resourceHelper
         resourceId: videoPlayer.resourceId
+        onMediaUrlChanged: console.log(mediaUrl)
+        screenSize: Qt.size(videoPlayer.width, videoPlayer.height)
     }
 
     QnCameraChunkProvider {
