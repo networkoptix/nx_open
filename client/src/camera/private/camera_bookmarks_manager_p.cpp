@@ -27,6 +27,7 @@ QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
 
 void QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraResourceList &cameras
                                                         , const QnCameraBookmarkSearchFilter &filter
+                                                        , const QUuid &requestId
                                                         , BookmarksCallbackType callback)
 {
 

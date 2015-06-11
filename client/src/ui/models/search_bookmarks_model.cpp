@@ -93,6 +93,7 @@ private:
 
     int m_sortingColumn;
     Qt::SortOrder m_sortingOrder;
+    QUuid m_searchRequestId;
 };
 
 ///
@@ -112,6 +113,7 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
 
     , m_sortingColumn(kInvalidSortingColumn)
     , m_sortingOrder(Qt::AscendingOrder)
+    , m_searchRequestId(QUuid::createUuid())
 {
 }
 
@@ -143,7 +145,7 @@ void QnSearchBookmarksModel::Impl::applyFilter(bool clearBookmarksCache)
     if (m_cameras.empty())
         m_cameras = qnResPool->getAllCameras(QnResourcePtr(), true);
 
-    m_bookmarksManager->getBookmarksAsync(m_cameras, m_filter
+    m_bookmarksManager->getBookmarksAsync(m_cameras, m_filter, m_searchRequestId
         , [this](bool success, const QnCameraBookmarkList &bookmarks)
     {
         m_beginResetModel();

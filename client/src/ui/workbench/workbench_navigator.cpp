@@ -118,10 +118,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
     auto bookmarksManager = context()->instance<QnCameraBookmarksManager>();
     connect(bookmarksManager, &QnCameraBookmarksManager::bookmarksChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
-        updateLoaderBookmarks(camera);
+        updateTimelineBookmarks(camera);
     });
-
-  //  connect(m_cameraDataManager, &QnCameraDataManager::bookmarksChanged, this, &QnWorkbenchNavigator::updateLoaderBookmarks);
 
     //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.
@@ -319,7 +317,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(rangeChanged(qint64, qint64)),               this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
-    connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateTargetPeriod()));
+    connect(m_timeSlider,                       &QnTimeSlider::windowChanged,                       this,   &QnWorkbenchNavigator::updateBookmarks);
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateCalendarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(selectionReleased()),                        this,   SLOT(at_timeSlider_selectionReleased()));
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
@@ -340,7 +338,6 @@ void QnWorkbenchNavigator::initialize() {
     m_timeScrollBar->installEventFilter(this);
 
     connect(m_calendar,                         SIGNAL(dateClicked(const QDate &)),                 this,   SLOT(at_calendar_dateClicked(const QDate &)));
-    connect(m_calendar,                         SIGNAL(currentPageChanged(int,int)),                this,   SLOT(updateTargetPeriod()));
 
     connect(m_dayTimeWidget,                    SIGNAL(timeClicked(const QTime &)),                 this,   SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
 
@@ -900,7 +897,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     updateLocalOffset();
     updateCurrentPeriods();
-    updateCurrentBookmarks();
+    if (m_currentWidget)
+        updateTimelineBookmarks(m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>());
     updateLiveSupported();
     updateLive();
     updatePlayingSupported();
@@ -1052,7 +1050,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
     if(!m_currentWidgetLoaded && ((quint64)startTimeUSec != AV_NOPTS_VALUE && (quint64)endTimeUSec != AV_NOPTS_VALUE)) {
         m_currentWidgetLoaded = true;
-        updateTargetPeriod();
+        updateBookmarks();
 
         if(m_sliderDataInvalid) {
             updateSliderFromItemData(m_currentMediaWidget, !m_sliderWindowInvalid);
@@ -1063,42 +1061,16 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     }
 }
 
-void QnWorkbenchNavigator::updateTargetPeriod() {
-    if (!m_currentWidgetLoaded || !m_timeSlider) 
-        return;
-
-    /* Do not update periods if lines are hidden. */
-    if (!(m_currentWidgetFlags & WidgetSupportsPeriods))
+void QnWorkbenchNavigator::updateBookmarks() {
+    if (!isBookmarksLoadingAvailable())
         return;
 
     /* Update target time period for time period loaders. */
     QnTimePeriod timeSliderPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
-    QnTimePeriod boundingPeriod(0, m_timeSlider->maximum());
-    //TODO: #Elric Invalid boundingPeriod near daylight time
-    boundingPeriod = boundingPeriod.intersected(QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()));
 
-    /* Some time periods should also be displayed on the calendar so we are loading them for the whole month. */
-    QnTimePeriod calendarPeriod(timeSliderPeriod);
-    if (m_calendar) {
-        QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);
-        QnTimePeriod monthPeriod(QDateTime(date).toMSecsSinceEpoch(), QDateTime(date.addMonths(1)).toMSecsSinceEpoch() - QDateTime(date).toMSecsSinceEpoch());
-        calendarPeriod.addPeriod(boundingPeriod.intersected(monthPeriod));
-    }
-
-    QSet<QnMediaResourceWidget*> widgets = m_syncedWidgets;
-    if (m_currentMediaWidget)
-        widgets.insert(m_currentMediaWidget);
-
-    foreach(QnMediaResourceWidget *widget, widgets) {
-        QnCachingCameraDataLoader *loader = loaderByWidget(widget);
-        if (!loader)
-            continue;
-        loader->load();
-
-        //loader->setBoundingPeriod(boundingPeriod);
-         //       loader->setTargetPeriod(calendarPeriod, dataType);
-         //       loader->setTargetPeriod(timeSliderPeriod, dataType);
-    }
+    /* m_currentWidget and its resource are checked inside the isBookmarksLoadingAvailable() method. */
+    auto loader = context()->instance<QnCameraBookmarksManager>()->loader(m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>());
+    loader->load(timeSliderPeriod);
 }
 
 void QnWorkbenchNavigator::updateCurrentPeriods() {
@@ -1121,14 +1093,6 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
         m_calendar->setCurrentTimePeriods(type, periods);
     if(m_dayTimeWidget)
         m_dayTimeWidget->setPrimaryTimePeriods(type, periods);
-}
-
-void QnWorkbenchNavigator::updateCurrentBookmarks() {
-    QnCameraBookmarkList bookmarks;
-//     if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
-//         bookmarks = loader->bookmarks();
-    if (m_timeSlider)
-        m_timeSlider->setBookmarks(bookmarks);
 }
 
 void QnWorkbenchNavigator::resetSyncedPeriods() {
@@ -1523,14 +1487,6 @@ void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr &resourc
         updateSyncedPeriods(type, startTimeMs);
 }
 
-void QnWorkbenchNavigator::updateLoaderBookmarks(const QnVirtualCameraResourcePtr &resource) {
-    if(!m_timeSlider || !m_currentMediaWidget || m_currentMediaWidget->resource() != resource)
-        return;
-
-    QnCameraBookmarkList bookmarks = context()->instance<QnCameraBookmarksManager>()->bookmarks(resource);
-    m_timeSlider->setBookmarks(bookmarks);
-}
-
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
     if(!m_currentWidget)
         return;
@@ -1841,4 +1797,35 @@ void QnWorkbenchNavigator::updateHistoryForCamera(const QnVirtualCameraResourceP
         if (!success)
             m_updateHistoryQueue.insert(camera);
     });
+}
+
+void QnWorkbenchNavigator::updateTimelineBookmarks(const QnVirtualCameraResourcePtr &resource) {
+    if (!isBookmarksLoadingAvailable())
+        return;
+
+    if(m_currentMediaWidget->resource() != resource)
+        return;
+
+    QnCameraBookmarkList bookmarks = context()->instance<QnCameraBookmarksManager>()->bookmarks(resource);
+    m_timeSlider->setBookmarks(bookmarks);
+}
+
+bool QnWorkbenchNavigator::isBookmarksLoadingAvailable() const {
+    if (   !m_currentWidget 
+        || !m_currentMediaWidget 
+        || !m_currentWidgetLoaded 
+        || !m_timeSlider
+        ) 
+        return false;
+
+    /* Bookmarks are loaded for live cameras only. */
+    QnVirtualCameraResourcePtr camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return false;
+
+    /* Do not update periods if lines are hidden. */
+    if (!(m_currentWidgetFlags & WidgetSupportsPeriods))
+        return false;
+
+    return true;
 }

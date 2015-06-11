@@ -20,10 +20,11 @@ QnCameraBookmarksManager::~QnCameraBookmarksManager()
 
 void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceList &cameras
                                                  , const QnCameraBookmarkSearchFilter &filter
+                                                 , const QUuid &requestId
                                                  , BookmarksCallbackType callback)
 {
     Q_D(QnCameraBookmarksManager);
-    d->getBookmarksAsync(cameras, filter, callback);
+    d->getBookmarksAsync(cameras, filter, requestId, callback);
 }
 
 QnBookmarksLoader * QnCameraBookmarksManager::loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists /*= true*/) {

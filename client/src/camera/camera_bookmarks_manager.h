@@ -22,7 +22,9 @@ public:
     /// @brief Asynchronously gathers bookmarks using specified filter
     /// @param filter Filter parameters
     /// @param callback Callback for receiving bookmarks data
-    void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
+    void getBookmarksAsync(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, const QUuid &requestId, BookmarksCallbackType callback);
+
+
 
     QnBookmarksLoader *loader(const QnVirtualCameraResourcePtr &camera, bool createIfNotExists = true);
 

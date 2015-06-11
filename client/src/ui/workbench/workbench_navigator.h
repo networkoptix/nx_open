@@ -157,8 +157,6 @@ protected slots:
     void updateSyncedPeriods(qint64 startTimeMs = 0);
     void updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, qint64 startTimeMs = 0);
 
-    void updateCurrentBookmarks();
-    void updateTargetPeriod();
     void updateLines();
     void updateCalendar();
 
@@ -189,8 +187,7 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
-    void updateLoaderBookmarks(const QnVirtualCameraResourcePtr &resource);
+    void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);   
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
@@ -215,6 +212,17 @@ private:
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
     void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
 
+    /* Bookmarks methods section */
+
+    /** Check if bookmarks can be loaded for the current widget. */
+    bool isBookmarksLoadingAvailable() const;
+
+    /** Update bookmarks on the timeline. */
+    void updateTimelineBookmarks(const QnVirtualCameraResourcePtr &resource);
+
+    /** Queue bookmarks loading for the currently selected camera. */
+    void updateBookmarks();
+    
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
