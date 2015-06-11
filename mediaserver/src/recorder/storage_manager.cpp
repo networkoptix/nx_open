@@ -276,7 +276,7 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         newChunks.push_back(itr.value());
 
     for(const DeviceFileCatalog::EmptyFileInfo& emptyFile: emptyFileList)
-        qnFileDeletor->deleteFile(emptyFile.fileName);
+        storage->removeFile(emptyFile.fileName);
 
     // add to DB
     QnStorageDbPtr sdb = getSDB(storage);
