@@ -12,6 +12,7 @@ Item {
     property color highlightColor: "#60000000"
     property real tickSize: 10
     property real lineWidth: 2
+    property bool speedEnabled: true
     readonly property alias dragging: rootItem.__dragging
 
     readonly property int __minSpeed: -16
@@ -169,7 +170,7 @@ Item {
             anchors.fill: parent
             onClicked: rootItem.paused = !rootItem.paused
 
-            drag.target: grip
+            drag.target: speedEnabled ? grip : undefined
             drag.axis: Drag.XAxis
             drag.minimumX: 0
             drag.maximumX: rootItem.width - grip.width

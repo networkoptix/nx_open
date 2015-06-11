@@ -40,70 +40,18 @@ Page {
         onTriggered: chunkProvider.update()
     }
 
-    Flickable {
-        id: flickable
+
+    Video {
+        id: video
+
+        property int videoWidth: metaData.resolution ? metaData.resolution.width : 0
+        property int videoHeight: metaData.resolution ? metaData.resolution.height : 0
 
         width: parent.width
-        height: timeline.y + timelineTextMargin
+        height: parent.height
 
-        contentWidth: width
-        contentHeight: height
-
-        PinchArea {
-            width: Math.max(flickable.contentWidth, flickable.width)
-            height: Math.max(flickable.contentHeight, flickable.height)
-
-            property real initialWidth
-            property real initialHeight
-            property real maxScale
-
-            onPinchStarted: {
-                initialWidth = flickable.contentWidth
-                initialHeight = flickable.contentHeight
-                maxScale = video.videoWidth / initialWidth
-            }
-
-            onPinchUpdated: {
-                var scale = Math.min(maxScale, pinch.scale)
-                flickable.contentX += pinch.previousCenter.x - pinch.center.x
-                flickable.contentY += pinch.previousCenter.y - pinch.center.y
-                flickable.resizeContent(initialWidth * scale, initialHeight * scale, pinch.center)
-            }
-
-            onPinchFinished: {
-                flickable.returnToBounds()
-            }
-
-            Video {
-                id: video
-
-                property int videoWidth: metaData.resolution ? metaData.resolution.width : 0
-                property int videoHeight: metaData.resolution ? metaData.resolution.height : 0
-
-                anchors.top: parent.top
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                width: flickable.contentWidth
-                height: flickable.contentHeight
-
-                source: resourceHelper.mediaUrl
-                autoPlay: true
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onWheel: {
-                    var scale = wheel.angleDelta.y / 100
-                    if (scale < 0)
-                        scale = 1.0 / -scale
-
-                    scale = Math.max(Math.min(scale, video.videoWidth / flickable.contentWidth), flickable.width / flickable.contentWidth)
-                    flickable.resizeContent(flickable.contentWidth * scale, flickable.contentHeight * scale, Qt.point(wheel.x, wheel.y))
-                    flickable.returnToBounds()
-                }
-            }
-        }
-
+        source: resourceHelper.mediaUrl
+        autoPlay: true
     }
 
     Item {
@@ -286,6 +234,7 @@ Page {
             color: colorTheme.color("nx_baseText")
             markersBackground: Qt.darker(color, 100)
             highlightColor: "#2fffffff"
+            speedEnabled: false
         }
 
         Rectangle {
