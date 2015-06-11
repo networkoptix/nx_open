@@ -17,7 +17,7 @@ QString QnCameraBookmark::tagsAsString() const {
     return tags.join(kDelimiter);
 }
 
-//TODO: #GDM #Bookmarks #High count strategy
+//TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
 QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const MultiServerCameraBookmarkList &source, int limit, Qn::BookmarkSearchStrategy strategy) {
     Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit must be correct");
     if (limit <= 0)
