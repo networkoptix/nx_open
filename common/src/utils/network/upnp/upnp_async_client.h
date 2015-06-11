@@ -32,7 +32,7 @@ public:
 
     //! Creates request by @param message and calls @fn doPost
     bool doUpnp( const QUrl& url, const Message& message,
-                 const std::function< void( const Message& ) >& callback );
+                 std::function< void( const Message& ) > callback );
 
     //! ID string of this client
     static const QString CLIENT_ID;
@@ -43,7 +43,7 @@ public:
     //! Finds out external IP address
     virtual
     bool externalIp( const QUrl& url,
-                     const std::function< void( const HostAddress& ) >& callback );
+                     std::function< void( const HostAddress& ) > callback );
 
     //! UPnP Service for @fn externalIp, @fn addMapping
     static const QString WAN_IP;
@@ -53,12 +53,12 @@ public:
     bool addMapping( const QUrl& url, const HostAddress& internalIp,
                      quint16 internalPort, quint16 externalPort,
                      Protocol protocol, const QString& description,
-                     const std::function< void( bool ) >& callback );
+                     std::function< void( bool ) > callback );
 
     //! Removes mapping of @param externalPort
     virtual
     bool deleteMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
-                        const std::function< void( bool ) >& callback );
+                        std::function< void( bool ) > callback );
 
     struct MappingInfo
     {
@@ -77,17 +77,17 @@ public:
     //! Provides mapping info by @param index
     virtual
     bool getMapping( const QUrl& url, quint32 index,
-                     const std::function< void( const MappingInfo& ) >& callback );
+                     std::function< void( const MappingInfo& ) > callback );
 
     //! Provides mapping info by @param externalPort and @param protocol
     virtual
     bool getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
-                     const std::function< void( const MappingInfo& ) >& callback );
+                     const std::function< void( const MappingInfo& ) > callback );
 
     typedef std::vector< MappingInfo > MappingList;
 
     bool getAllMappings( const QUrl& url,
-                         const std::function< void( const MappingList& ) >& callback  );
+                         std::function< void( const MappingList& ) > callback  );
 
 private:
     // TODO: replace with single httpClient when pipeline is supported

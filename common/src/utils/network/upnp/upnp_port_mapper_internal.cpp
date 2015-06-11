@@ -14,9 +14,8 @@ static const quint16 PORT_RETRY_COUNT = 5; // maximal number of ports to try ope
 
 namespace nx_upnp {
 
-PortMapper::Callback::Callback(
-        const std::function< void( const MappingInfo& ) >& callback )
-    : m_callback( callback )
+PortMapper::Callback::Callback( std::function< void( const MappingInfo& ) > callback )
+    : m_callback( std::move( callback ) )
 {
 }
 
@@ -96,7 +95,7 @@ HostAddress PortMapper::Device::externalIp() const
 
 bool PortMapper::Device::map(
         quint16 port, quint16 desiredPort, Protocol protocol,
-        const std::function< void( quint16 ) >& callback )
+        std::function< void( quint16 ) > callback )
 {
     QMutexLocker lk( &m_mutex );
     if( !m_faultCounter.isOk() )
@@ -138,7 +137,7 @@ bool PortMapper::Device::map(
 }
 
 bool PortMapper::Device::unmap( quint16 port, Protocol protocol,
-                                const std::function< void() >& callback )
+                                std::function< void() > callback )
 {
     QMutexLocker lk( &m_mutex );
     const auto it = m_alreadyMapped.find( std::make_pair( port, protocol ) );
@@ -162,7 +161,7 @@ bool PortMapper::Device::unmap( quint16 port, Protocol protocol,
 }
 
 bool PortMapper::Device::check( quint16 port, Protocol protocol,
-                                const std::function< void( quint16 ) >& callback )
+                                std::function< void( quint16 ) > callback )
 {
     QMutexLocker lk( &m_mutex );
     const auto it = m_alreadyMapped.find( std::make_pair( port, protocol ) );
@@ -195,7 +194,7 @@ bool PortMapper::Device::check( quint16 port, Protocol protocol,
 
 bool PortMapper::Device::mapImpl(
         quint16 port, quint16 desiredPort, Protocol protocol, size_t retrys,
-        const std::function< void( quint16 ) >& callback )
+        std::function< void( quint16 ) > callback )
 {
     if( !m_faultCounter.isOk() )
         return false;

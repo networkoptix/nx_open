@@ -16,7 +16,7 @@ AsyncClientMock::AsyncClientMock( const HostAddress& externalIp )
 
 bool AsyncClientMock::externalIp(
         const QUrl& /*url*/,
-        const std::function< void( const HostAddress& ) >& callback )
+        std::function< void( const HostAddress& ) > callback )
 {
     QtConcurrent::run( [ this, callback ]{ callback( m_externalIp ); } );
     return true;
@@ -26,7 +26,7 @@ bool AsyncClientMock::addMapping(
         const QUrl& /*url*/, const HostAddress& internalIp,
         quint16 internalPort, quint16 externalPort,
         Protocol protocol, const QString& description,
-        const std::function< void( bool ) >& callback )
+        std::function< void( bool ) > callback )
 {
     QMutexLocker lock( &m_mutex );
     if( externalPort == m_disabledPort ||
@@ -47,7 +47,7 @@ bool AsyncClientMock::addMapping(
 
 bool AsyncClientMock::deleteMapping(
         const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
-        const std::function< void( bool ) >& callback )
+        std::function< void( bool ) > callback )
 {
     QMutexLocker lock( &m_mutex );
     const bool isErased = m_mappings.erase( std::make_pair( externalPort, protocol ) );
@@ -57,7 +57,7 @@ bool AsyncClientMock::deleteMapping(
 
 bool AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint32 index,
-        const std::function< void( const MappingInfo& ) >& callback )
+        std::function< void( const MappingInfo& ) > callback )
 {
     QMutexLocker lock( &m_mutex );
     if( m_mappings.size() <= index )
@@ -82,7 +82,7 @@ bool AsyncClientMock::getMapping(
 
 bool AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
-        const std::function< void( const MappingInfo& ) >& callback )
+        std::function< void( const MappingInfo& ) > callback )
 {
     QMutexLocker lock( &m_mutex );
     const auto it = m_mappings.find( std::make_pair( externalPort, protocol ) );

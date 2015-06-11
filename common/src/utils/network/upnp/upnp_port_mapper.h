@@ -43,7 +43,7 @@ public:
      *         remapped or mapping is not valid any more)
      */
     bool enableMapping( quint16 port, Protocol protocol,
-                        const std::function< void( const MappingInfo& ) >& callback );
+                        std::function< void( const MappingInfo& ) > callback );
 
     /*!
      * Asks to cancel @param port forwarding

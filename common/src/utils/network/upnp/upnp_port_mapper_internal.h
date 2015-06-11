@@ -9,7 +9,7 @@ namespace nx_upnp {
 class PortMapper::Callback
 {
 public:
-    Callback( const std::function< void( const MappingInfo& ) >& callback );
+    Callback( std::function< void( const MappingInfo& ) > callback );
     void call( const MappingInfo& info );
     void clear();
     MappingInfo state();
@@ -46,17 +46,17 @@ public:
     HostAddress externalIp() const;
 
     bool map( quint16 port, quint16 desiredPort, Protocol protocol,
-              const std::function< void( quint16 ) >& callback );
+              std::function< void( quint16 ) > callback );
 
     bool unmap( quint16 port, Protocol protocol,
-                const std::function< void() >& callback );
+                std::function< void() > callback );
 
     bool check( quint16 port, Protocol protocol,
-                const std::function< void( quint16 ) >& callback );
+                std::function< void( quint16 ) > callback );
 
 private:
     bool mapImpl( quint16 port, quint16 desiredPort, Protocol protocol, size_t retrys,
-                  const std::function< void( quint16 ) >& callback );
+                  std::function< void( quint16 ) > callback );
 
 private:
     AsyncClient* const m_upnpClient;

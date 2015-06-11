@@ -34,7 +34,7 @@ PortMapper::~PortMapper()
 const quint64 PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL = 10 * 60 * 1000; // 10 min
 
 PortMapper::MappingInfo::MappingInfo( quint16 inPort, quint16 exPort,
-                                          const HostAddress& exIp, Protocol prot )
+                                      const HostAddress& exIp, Protocol prot )
     : internalPort( inPort ), externalPort( exPort )
     , externalIp( exIp ), protocol( prot )
 {
@@ -42,12 +42,13 @@ PortMapper::MappingInfo::MappingInfo( quint16 inPort, quint16 exPort,
 
 bool PortMapper::enableMapping(
         quint16 port, Protocol protocol,
-        const std::function< void( const MappingInfo& ) >& callback )
+        std::function< void( const MappingInfo& ) > callback )
 {
     const auto request = std::make_pair( port, protocol );
 
     QMutexLocker lock( &m_mutex );
-    if( !m_mappings.emplace( request, std::make_shared< Callback >( callback ) ).second )
+    if( !m_mappings.emplace( request, std::make_shared< Callback >(
+                                 std::move( callback ) ) ).second )
         return false; // port already mapped
 
     // ask to map this port on all known devices
@@ -78,8 +79,8 @@ void PortMapper::enableMappingOnDevice(
     };
 
     const auto result = isCheck
-            ? device.check( port, protocol, callback )
-            : device.map( port, port, protocol, callback);
+            ? device.check( port, protocol, std::move( callback ) )
+            : device.map( port, port, protocol, std::move( callback ) );
 
     if( result )
         ++m_asyncInProgress;

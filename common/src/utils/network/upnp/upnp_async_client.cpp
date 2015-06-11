@@ -134,7 +134,7 @@ const QString& AsyncClient::Message::getParam( const QString& key ) const
 }
 
 bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
-                          const std::function< void( const Message& )>& callback )
+                          std::function< void( const Message& )> callback )
 {
     const auto service = toUpnpUrn( message.service, lit("service") );
     const auto action = lit( "\"%1#%2\"" ).arg( service ).arg( message.action );
@@ -175,14 +175,14 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
             }
         }
 
-        // TODO: retry?
+        callback( Message() );
     };
 
     auto httpClient = std::make_shared< nx_http::AsyncHttpClient >();
     httpClient->addAdditionalHeader( "SOAPAction", action.toUtf8() );
     httpClient->setMessageBodyReadTimeoutMs( MESSAGE_BODY_READ_TIMEOUT_MS );
     QObject::connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
-                      httpClient.get(), complete, Qt::DirectConnection );
+                      httpClient.get(), std::move( complete ), Qt::DirectConnection );
 
     QMutexLocker lk(&m_mutex);
     m_httpClients.insert( httpClient );
@@ -216,7 +216,7 @@ static const QString DESCRIPTION    = lit("NewPortMappingDescription");
 static const QString DURATION       = lit("NewLeaseDuration");
 
 bool AsyncClient::externalIp( const QUrl& url,
-                              const std::function< void( const HostAddress& ) >& callback )
+                              std::function< void( const HostAddress& ) > callback )
 {
     AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP };
     return doUpnp( url, request, [callback]( const Message& response ) {
@@ -227,7 +227,7 @@ bool AsyncClient::externalIp( const QUrl& url,
 bool AsyncClient::addMapping(
         const QUrl& url, const HostAddress& internalIp, quint16 internalPort,
         quint16 externalPort, Protocol protocol, const QString& description,
-        const std::function< void( bool ) >& callback )
+        std::function< void( bool ) > callback )
 {
     AsyncClient::Message request;
     request.action = ADD_PORT_MAPPING;
@@ -248,7 +248,7 @@ bool AsyncClient::addMapping(
 
 bool AsyncClient::deleteMapping(
         const QUrl& url, quint16 externalPort, Protocol protocol,
-        const std::function< void( bool ) >& callback )
+        std::function< void( bool ) > callback )
 {
     AsyncClient::Message request;
     request.action = DELETE_PORT_MAPPING;
@@ -276,7 +276,7 @@ bool AsyncClient::MappingInfo::isValid() const
 
 bool AsyncClient::getMapping(
         const QUrl& url, quint32 index,
-        const std::function< void( const MappingInfo& ) >& callback )
+        std::function< void( const MappingInfo& ) > callback )
 {
     AsyncClient::Message request;
     request.action = GET_GEN_PORT_MAPPING;
@@ -299,7 +299,7 @@ bool AsyncClient::getMapping(
 
 bool AsyncClient::getMapping(
         const QUrl& url, quint16 externalPort, Protocol protocol,
-        const std::function< void( const MappingInfo& ) >& callback )
+        std::function< void( const MappingInfo& ) > callback )
 {
     AsyncClient::Message request;
     request.action = GET_SPEC_PORT_MAPPING;
@@ -324,7 +324,7 @@ bool AsyncClient::getMapping(
 void fetchMappingsRecursive(
         AsyncClient* client, const QUrl& url,
         const std::function< void( const AsyncClient::MappingList& ) >& callback,
-        const std::shared_ptr< AsyncClient::MappingList >& collected,
+        std::shared_ptr< AsyncClient::MappingList > collected,
         const AsyncClient::MappingInfo& newMap )
 {
     if( !newMap.isValid() )
@@ -345,7 +345,7 @@ void fetchMappingsRecursive(
 }
 
 bool AsyncClient::getAllMappings(
-        const QUrl& url, const std::function< void( const MappingList& ) >& callback )
+        const QUrl& url, std::function< void( const MappingList& ) > callback )
 {
     auto mappings = std::make_shared< std::vector< MappingInfo > >();
     return getMapping( url, 0,
