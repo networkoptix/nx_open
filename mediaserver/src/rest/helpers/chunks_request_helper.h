@@ -1,7 +1,8 @@
 #pragma once
 
 #include <recording/time_period_list.h>
-#include <api/helpers/chunks_request_data.h>
+
+struct QnChunksRequestData;
 
 class QnChunksRequestHelper
 {

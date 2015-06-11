@@ -1,12 +1,15 @@
-#include "multiserver_chunks_rest_handler.h"
+#include "multiserver_bookmarks_rest_handler.h"
 
 #include <QUrlQuery>
 
 #include "recording/time_period.h"
 #include "recording/time_period_list.h"
 
-#include <api/helpers/chunks_request_data.h>
-#include <rest/helpers/chunks_request_helper.h>
+#include <api/helpers/bookmark_request_data.h>
+
+#include <core/resource/camera_bookmark.h>
+
+#include <rest/helpers/bookmarks_request_helper.h>
 
 #include "common/common_module.h"
 
@@ -19,7 +22,6 @@
 #include "utils/network/router.h"
 #include <utils/common/model_functions.h>
 #include "utils/network/http/asynchttpclient.h"
-#include "utils/serialization/compressed_time.h"
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
 
@@ -28,30 +30,30 @@ namespace {
     static QString urlPath;
 }
 
-struct QnMultiserverChunksRestHandler::InternalContext
+struct QnMultiserverBookmarksRestHandler::InternalContext
 {
-    InternalContext(const QnChunksRequestData& request): request(request), requestsInProgress(0) {}
+    InternalContext(const QnBookmarkRequestData& request): request(request), requestsInProgress(0) {}
 
-    const QnChunksRequestData request;
+    const QnBookmarkRequestData request;
     QnMutex mutex;
     QnWaitCondition waitCond;
     int requestsInProgress;
 };
 
-QnMultiserverChunksRestHandler::QnMultiserverChunksRestHandler(const QString& path): QnFusionRestHandler()
+QnMultiserverBookmarksRestHandler::QnMultiserverBookmarksRestHandler(const QString& path): QnFusionRestHandler()
 {
     urlPath = path;
 }
 
-void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataList& outputData, const QnMediaServerResourcePtr &server, InternalContext* ctx)
+void QnMultiserverBookmarksRestHandler::loadRemoteDataAsync(MultiServerCameraBookmarkList& outputData, const QnMediaServerResourcePtr &server, InternalContext* ctx)
 {
 
     auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
     {
-        MultiServerPeriodDataList remoteData;
+        MultiServerCameraBookmarkList remoteData;
         bool success = false;
         if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok )
-            remoteData = QnCompressedTime::deserialized(msgBody, MultiServerPeriodDataList(), &success);
+            remoteData = QJson::deserialized(msgBody, MultiServerCameraBookmarkList(), &success);
         
         QnMutexLocker lock(&ctx->mutex);
         if (success && !remoteData.empty())
@@ -63,8 +65,7 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
     QUrl apiUrl(server->getApiUrl());
     apiUrl.setPath(L'/' + urlPath + L'/');
 
-    QnChunksRequestData modifiedRequest = ctx->request;
-    modifiedRequest.format = Qn::CompressedPeriodsFormat;
+    QnBookmarkRequestData modifiedRequest = ctx->request;
     modifiedRequest.isLocal = true;
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
@@ -82,28 +83,26 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
         ctx->requestsInProgress++;
 }
 
-void QnMultiserverChunksRestHandler::loadLocalData(MultiServerPeriodDataList& outputData, InternalContext* ctx)
+void QnMultiserverBookmarksRestHandler::loadLocalData(MultiServerCameraBookmarkList& outputData, InternalContext* ctx)
 {
-    MultiServerPeriodData record;
-    record.guid = qnCommon->moduleGUID();
-    record.periods = QnChunksRequestHelper::load(ctx->request);
-    if (!record.periods.empty()) {
+    auto bookmarks = QnBookmarksRequestHelper::load(ctx->request);
+    if (!bookmarks.empty()) {
         QnMutexLocker lock(&ctx->mutex);
-        outputData.push_back(std::move(record));
+        outputData.push_back(std::move(bookmarks));
     }
 }
 
-void QnMultiserverChunksRestHandler::waitForDone(InternalContext* ctx)
+void QnMultiserverBookmarksRestHandler::waitForDone(InternalContext* ctx)
 {
     QnMutexLocker lock(&ctx->mutex);
     while (ctx->requestsInProgress > 0)
         ctx->waitCond.wait(&ctx->mutex);
 }
 
-MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnChunksRequestData& request)
+QnCameraBookmarkList QnMultiserverBookmarksRestHandler::loadDataSync(const QnBookmarkRequestData& request)
 {
     InternalContext ctx(request);
-    MultiServerPeriodDataList outputData;
+    MultiServerCameraBookmarkList outputData;
     if (request.isLocal)
     {
         loadLocalData(outputData, &ctx);
@@ -111,7 +110,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnC
     else 
     {
         QSet<QnMediaServerResourcePtr> servers;
-        for (const auto& camera: ctx.request.resList)
+        for (const auto& camera: ctx.request.cameras)
             servers += qnCameraHistoryPool->getCameraFootageData(camera).toSet();
 
         for (const auto& server: servers) 
@@ -123,27 +122,21 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnC
         }
         waitForDone(&ctx);
     }
-    return outputData;
+    //TODO: #GDM #Bookmarks #High merge bookmark lists
+    return outputData.empty()
+        ? QnCameraBookmarkList()
+        : outputData.front();
 }
 
-int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnMultiserverBookmarksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path);
 
-    QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+    QnBookmarkRequestData request = QnBookmarkRequestData::fromParams(params);
     if (!request.isValid())
         return nx_http::StatusCode::badRequest;
-    MultiServerPeriodDataList outputData = loadDataSync(request);
-
-    if (request.format == Qn::CompressedPeriodsFormat)
-    {
-        bool signedSerialization = request.periodsType == Qn::BookmarksContent;
-        result = QnCompressedTime::serialized(outputData, signedSerialization);
-        contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
-    }
-    else {
-        QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);
-    }
-
+    QnCameraBookmarkList outputData = loadDataSync(request);
+    //TODO: #GDM #Bookmarks serialization
+    //QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);
     return nx_http::StatusCode::ok;
 }

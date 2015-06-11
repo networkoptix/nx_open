@@ -9,6 +9,7 @@
 
 struct QnCameraBookmark;
 typedef QList<QnCameraBookmark> QnCameraBookmarkList;
+typedef std::vector<QnCameraBookmarkList> MultiServerCameraBookmarkList;
 
 struct QnCameraBookmarkSearchFilter;
 

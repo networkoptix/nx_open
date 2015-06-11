@@ -1,4 +1,7 @@
 #include "chunks_request_helper.h"
+
+#include <api/helpers/chunks_request_data.h>
+
 #include "recorder/storage_manager.h"
 #include "core/resource/camera_bookmark.h"
 #include <core/resource/camera_resource.h>

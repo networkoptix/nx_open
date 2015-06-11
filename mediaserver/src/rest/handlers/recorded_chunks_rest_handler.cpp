@@ -1,19 +1,22 @@
 #include "recorded_chunks_rest_handler.h"
 
+#include <api/helpers/chunks_request_data.h>
+
 #include "recorder/storage_manager.h"
-#include "utils/network/tcp_connection_priv.h"
 
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 
-#include "utils/common/util.h"
-#include <utils/fs/file.h>
 #include "motion/motion_helper.h"
 
+#include <rest/helpers/chunks_request_helper.h>
+
+#include "utils/common/util.h"
+#include <utils/fs/file.h>
+#include "utils/network/tcp_connection_priv.h"
 #include <utils/serialization/json.h>
 #include <utils/serialization/json_functions.h>
-#include "chunks/chunks_request_helper.h"
 
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
