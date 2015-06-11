@@ -117,6 +117,16 @@ namespace Qn
         *   \return         available (read) size of device
         */
         virtual uint32_t STORAGE_METHOD_CALL size(int* ecode) const = 0;
+
+        /**
+        *   \param pos      seek position
+        *   \param ecode    Pointer to error code. Pass NULL if you are not interested in error information.
+        *   \return         success (0,1)
+        */
+        virtual int STORAGE_METHOD_CALL seek(
+            uint64_t    pos, 
+            int*        ecode
+        ) = 0;
     };
  
     struct FileInfo
@@ -158,7 +168,7 @@ namespace Qn
         /**
         *   \return         is storage available at the moment (0,1).
         */ 
-        virtual int isAvailable() const = 0;
+        virtual int STORAGE_METHOD_CALL isAvailable() const = 0;
  
         /**
         *   \param url      File URL. If file doesn't exists, it is created. This should be NULL terminated utf8 encoded C string.
