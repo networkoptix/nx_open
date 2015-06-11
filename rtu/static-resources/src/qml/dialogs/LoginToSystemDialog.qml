@@ -20,6 +20,15 @@ Window
     width: spacer.width + Common.SizeManager.spacing.base;
     height: spacer.height + Common.SizeManager.spacing.base
     
+    onVisibleChanged:
+    {
+        if (visible)
+        {
+            password.text = "";
+            showPasswordCheckbox.checked = false;
+        }
+    }
+
     Base.Column
     {
         id: spacer;
@@ -44,11 +53,20 @@ Window
                 
                 width: height * 4;
                 focus: true;
+
+                echoMode: (showPasswordCheckbox.checked ? TextInput.Normal : TextInput.Password);
+                onEditingFinished:
+                {
+                    okClicked();
+                    thisComponent.close();
+                }
             }
         }
         
         Base.CheckBox
         {
+            id: showPasswordCheckbox;
+
             anchors.right: parent.right;
             
             text: qsTr("Show password");
@@ -63,7 +81,9 @@ Window
             
             Base.Button
             {
+                id: okButton;
                 text: qsTr("Ok");
+
                 width: height * 2.5;
                 
                 onClicked:

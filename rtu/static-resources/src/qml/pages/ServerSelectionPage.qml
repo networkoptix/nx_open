@@ -6,6 +6,7 @@ import "../controls/rtu" as Rtu;
 
 Rtu.ServerSelectionListView
 {
+    askForSelectionChanges: true;
 }
 
 

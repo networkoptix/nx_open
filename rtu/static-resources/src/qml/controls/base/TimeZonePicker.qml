@@ -40,7 +40,11 @@ ComboBox
         }
 
         if (changesHandler && (currentIndex !== initIndex))
+        {
             thisComponent.changed = true;
+            console.log("changed: " + currentIndex + ":" + initIndex)
+        }
+        console.log(currentIndex + ":" + initIndex)
 
         if (!changed)
             return;

@@ -6,7 +6,7 @@ import "../controls/base" as Base;
 
 Item
 {
-    property bool parametersChanged: false;
+    property bool parametersChanged: systemAndPasswordSettings.changed || ipPortSettings.changed || dateTimeSettings.changed;
     property var selectedServersModel;
 
     anchors.fill: parent;

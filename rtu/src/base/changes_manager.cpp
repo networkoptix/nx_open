@@ -632,9 +632,9 @@ rtu::OperationCallback rtu::ChangesManager::Impl::makeSystemOpCallback(const Ser
         if (!m_newSystemName.isEmpty())
         {
             m_selectionModel->updateSystemNameInfo(info.baseInfo().id, m_newSystemName);
-            addRequestResult(info, m_newSystemName, kSystemNameRequestDesc
-                , kSystemName, affectedEntities, errorReason);
         }
+        addRequestResult(info, m_newSystemName, kSystemNameRequestDesc
+            , kSystemName, affectedEntities, errorReason);
 
         if (!m_newPassword.isEmpty() && !(affectedEntities & kPassword))
         {
@@ -643,20 +643,19 @@ rtu::OperationCallback rtu::ChangesManager::Impl::makeSystemOpCallback(const Ser
             newInfo.writableExtraInfo().password = m_newPassword;
 
             m_selectionModel->updatePasswordInfo(info.baseInfo().id, m_newPassword);
-            addRequestResult(info, m_newPassword, kPasswordRequestDesc
-                , kPassword, affectedEntities, errorReason);
         }
+        addRequestResult(info, m_newPassword, kPasswordRequestDesc
+            , kPassword, affectedEntities, errorReason);
 
-        
-
-        if (m_newPort)
+        if (m_newPort && !(affectedEntities & kPort))
         {
             newInfo.writableBaseInfo().port = m_newPort;
 
             m_selectionModel->updatePortInfo(info.baseInfo().id, m_newPort);
-            addRequestResult(info, (m_newPort ? QString::number(m_newPort) : QString())
-                , kPortRequestDesc, kPort, affectedEntities, errorReason);
         }
+
+        addRequestResult(info, (m_newPort ? QString::number(m_newPort) : QString())
+            , kPortRequestDesc, kPort, affectedEntities, errorReason);
 
         applyIpChange(newInfo, selectedCount);
     };

@@ -17,7 +17,8 @@ namespace
         QStringList result;
         for(const auto &zoneIanaId: timeZones)
         {
-            if (!zoneIanaId.contains(utcIanaTemplate))
+            if (!zoneIanaId.contains(utcIanaTemplate)
+                || (zoneIanaId.size() == utcIanaTemplate.size()))
                 result.push_back(zoneIanaId);
         };
     

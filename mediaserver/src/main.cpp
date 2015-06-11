@@ -2234,12 +2234,6 @@ void QnMain::run()
     m_mediaServer.clear();
 }
 
-void QnMain::changePort(quint16 port) {
-    m_universalTcpListener->updatePort(port);
-    QString address = QUrl(m_mediaServer->getApiUrl()).host();
-    setServerNameAndUrls(m_mediaServer, address, port);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(m_mediaServer, this, &QnMain::at_serverSaved);
-}
 
 void QnMain::at_appStarted()
 {
@@ -2447,11 +2441,15 @@ void restartServer(int restartTimeout)
     }
 }
 
-void changePort(quint16 port)
+/*
+bool changePort(quint16 port)
 {
     if (serviceMainInstance)
-        serviceMainInstance->changePort(port);
+        return serviceMainInstance->changePort(port);
+    else
+        return false;
 }
+*/
 
 static void printVersion();
 
