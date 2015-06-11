@@ -8,7 +8,7 @@
 #include <utils/common/model_functions_fwd.h>
 
 struct QnCameraBookmark;
-typedef QList<QnCameraBookmark> QnCameraBookmarkList;
+typedef QVector<QnCameraBookmark> QnCameraBookmarkList;
 typedef std::vector<QnCameraBookmarkList> MultiServerCameraBookmarkList;
 
 struct QnCameraBookmarkSearchFilter;

@@ -4,6 +4,9 @@
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QStringList>
+
+#include <common/common_globals.h>
+
 #include <utils/common/uuid.h>
 
 #include "camera_bookmark_fwd.h"
@@ -48,11 +51,9 @@ struct QnCameraBookmark {
         durationMs(0)
     {}
 
-    QString tagsAsString() const
-    {
-        static const QString kDelimiter = lit(" ");
-        return tags.join(kDelimiter);
-    }
+    QString tagsAsString() const;
+
+    static QnCameraBookmarkList mergeCameraBookmarks(const MultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)
 

@@ -12,6 +12,113 @@ bool QnCameraBookmark::isNull() const {
     return guid.isNull();
 }
 
+QString QnCameraBookmark::tagsAsString() const {
+    static const QString kDelimiter = lit(" ");
+    return tags.join(kDelimiter);
+}
+
+//TODO: #GDM #Bookmarks #High count strategy
+QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const MultiServerCameraBookmarkList &source, int limit, Qn::BookmarkSearchStrategy strategy) {
+    Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit must be correct");
+    if (limit <= 0)
+        return QnCameraBookmarkList();
+
+    MultiServerCameraBookmarkList nonEmptyLists;
+    for (const auto &list: source)
+        if (!list.isEmpty())
+            nonEmptyLists.push_back(list);
+
+    if (nonEmptyLists.empty())
+        return QnCameraBookmarkList();
+
+    if(nonEmptyLists.size() == 1) {
+        QnCameraBookmarkList result = nonEmptyLists.front();
+        if (result.size() > limit)
+            result.resize(limit);
+        return result;
+    }
+
+    std::vector< QnCameraBookmarkList::const_iterator > minIndices(nonEmptyLists.size());
+    for (int i = 0; i < nonEmptyLists.size(); ++i)
+        minIndices[i] = nonEmptyLists[i].cbegin();
+
+    QnCameraBookmarkList result;
+
+    int maxSize = 0;
+    for (const auto &list: nonEmptyLists)
+        maxSize += list.size();
+    result.reserve(std::max(maxSize, limit));
+
+    int minIndex = 0;
+    while (minIndex != -1) {
+        qint64 minStartTime = 0x7fffffffffffffffll;
+        minIndex = -1;
+        int i = 0;
+        for (const QnCameraBookmarkList &periodsList: nonEmptyLists) {
+            const auto startIdx = minIndices[i];
+
+            if (startIdx != periodsList.cend()) {
+                const QnCameraBookmark &startPeriod = *startIdx;
+                if (startPeriod.startTimeMs < minStartTime) {
+                    minIndex = i;
+                    minStartTime = startPeriod.startTimeMs;
+                }
+            }
+            ++i;
+        }
+
+        if (minIndex >= 0) {
+            auto &startIdx = minIndices[minIndex];
+            const QnCameraBookmark &startPeriod = *startIdx;
+
+            // add chunk to merged data
+            if (result.empty()) {
+                if (result.size() >= limit && strategy == Qn::EarliestFirst)
+                    return result;
+                result.push_back(startPeriod);
+            } else {
+                QnCameraBookmark &last = result.last();
+                Q_ASSERT_X(last.startTimeMs <= startPeriod.startTimeMs, Q_FUNC_INFO, "Algorithm semantics failure, order failed");
+                if (result.size() >= limit && strategy == Qn::EarliestFirst)
+                    return result;
+                result.push_back(startPeriod);
+            } 
+            startIdx++;
+        }
+    }
+
+    if (strategy == Qn::EarliestFirst || result.size() <= limit)
+        return result;
+
+    int offset = result.size() - limit;
+    Q_ASSERT_X(offset > 0, Q_FUNC_INFO, "Make sure algorithm is correct");
+
+    switch (strategy) {
+    case Qn::LatestFirst: 
+        {
+            auto insertIter = result.begin();
+            auto sourceIter = result.cbegin() + offset;
+            while (sourceIter != result.end()) {
+                *insertIter = *sourceIter;
+                ++insertIter;
+                ++sourceIter;
+            }
+            result.resize(limit);
+            break;
+        }
+    case Qn::LongestFirst: 
+        {
+            std::partial_sort(result.begin(), result.begin() + offset, result.end(), [](const QnCameraBookmark &l, const QnCameraBookmark &r) {return l.durationMs > r.durationMs; });
+            result.resize(limit);
+            std::sort(result.begin(), result.end());
+            break;
+        }
+    default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+    }
+    return result;
+}
+
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other) {
     if (first.startTimeMs == other.startTimeMs)
         return first.guid.toRfc4122() < other.guid.toRfc4122();

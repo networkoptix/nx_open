@@ -1,27 +1,20 @@
 #include "multiserver_bookmarks_rest_handler.h"
 
-#include <QUrlQuery>
-
-#include "recording/time_period.h"
-#include "recording/time_period_list.h"
-
 #include <api/helpers/bookmark_request_data.h>
-
+ 
 #include <core/resource/camera_bookmark.h>
-
+ 
 #include <rest/helpers/bookmarks_request_helper.h>
-
+ 
 #include "common/common_module.h"
-
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/camera_history.h"
-#include "core/resource/media_server_resource.h"
+ 
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
 #include "utils/network/router.h"
-#include <utils/common/model_functions.h>
-#include "utils/network/http/asynchttpclient.h"
+// #include <utils/common/model_functions.h>
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
 
@@ -122,10 +115,7 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandler::loadDataSync(const QnBoo
         }
         waitForDone(&ctx);
     }
-    //TODO: #GDM #Bookmarks #High merge bookmark lists
-    return outputData.empty()
-        ? QnCameraBookmarkList()
-        : outputData.front();
+    return QnCameraBookmark::mergeCameraBookmarks(outputData, request.filter.limit, request.filter.strategy);
 }
 
 int QnMultiserverBookmarksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)

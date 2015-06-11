@@ -4,11 +4,6 @@
 #include "recorder/storage_manager.h"
 #include "core/resource/camera_bookmark.h"
 #include <core/resource/camera_resource.h>
-#include <core/resource/camera_bookmark.h>
-#include "motion/motion_helper.h"
-#include <utils/serialization/json.h>
-#include <utils/serialization/json_functions.h>
-#include "core/resource_management/resource_pool.h"
 
 QnCameraBookmarkList QnBookmarksRequestHelper::load(const QnBookmarkRequestData& request)
 {
@@ -20,9 +15,5 @@ QnCameraBookmarkList QnBookmarksRequestHelper::load(const QnBookmarkRequestData&
         multiBookmarks.push_back(std::move(bookmarks));
     }
     
-    //TODO: #GDM #Bookmarks muticameras request, merge,  limit
-
-    return multiBookmarks.empty()
-        ? QnCameraBookmarkList()
-        : multiBookmarks.front();
+    return QnCameraBookmark::mergeCameraBookmarks(multiBookmarks, request.filter.limit, request.filter.strategy);
 }

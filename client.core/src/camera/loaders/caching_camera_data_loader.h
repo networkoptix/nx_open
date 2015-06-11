@@ -6,7 +6,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 
-#include <camera/data/bookmark_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
 #include <camera/loaders/camera_data_loader_fwd.h>
 

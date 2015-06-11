@@ -2,7 +2,6 @@
 
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
-#include <camera/data/bookmark_camera_data.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
