@@ -12,6 +12,7 @@ public:
     virtual ~QnStoragePluginFactory();
     static QnStoragePluginFactory *instance();
 
+    bool existsFactoryForProtocol(const QString &protocol);
     void registerStoragePlugin(const QString &protocol, const StorageFactory &factory, bool isDefaultProtocol = false);
     QnStorageResource *createStorage(const QString &url, bool useDefaultForUnknownPrefix = true);
 

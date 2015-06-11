@@ -3,6 +3,8 @@
 #include <QtSql>
 
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/storage_plugin_factory.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <utils/serialization/sql.h>
 #include "utils/common/log.h"
@@ -240,10 +242,21 @@ bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServe
 
 void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix, QnServer::ChunksCatalog catalog, QVector<DeviceFileCatalogPtr>& result)
 {
+    if (!QnStoragePluginFactory::instance()->existsFactoryForProtocol("file"))
+    {
+        QnStoragePluginFactory::instance()->registerStoragePlugin(
+            "file", 
+            QnFileStorageResource::instance, 
+            true
+        );
+    }
+
+    QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("db"));
 
     QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
-    QDir dir(root);
-    for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name))
+    QFileInfoList files = storage->getFileList(root);
+
+    for (const QFileInfo& fi: files)
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId)) {

@@ -394,11 +394,15 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff)
 {
-    QDir dir(closeDirPath(storage->getPath()) + DeviceFileCatalog::prefixByCatalog(catalog));
     ArchiveScanPosition scanPos;
     scanPos.load(); // load from persistent storage
 
-    QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+    QFileInfoList list = 
+        storage->getFileList(
+            closeDirPath(
+                storage->getPath()) + DeviceFileCatalog::prefixByCatalog(catalog)
+            );
+
     for(const QFileInfo& fi: list)
     {
         if (m_rebuildCancelled)

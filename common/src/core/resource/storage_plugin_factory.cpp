@@ -18,9 +18,16 @@ QnStoragePluginFactory *QnStoragePluginFactory::instance()
 
 void QnStoragePluginFactory::registerStoragePlugin(const QString &protocol, const StorageFactory &factory, bool isDefaultProtocol)
 {
+    QMutexLocker lock(&m_mutex);
     m_factoryByProtocol.insert(protocol, factory);
     if (isDefaultProtocol)
         m_defaultFactory = factory;
+}
+
+bool QnStoragePluginFactory::existsFactoryForProtocol(const QString &protocol)
+{
+    QMutexLocker lock(&m_mutex);
+    return m_factoryByProtocol.find(protocol) == m_factoryByProtocol.end() ? false : true;
 }
 
 QnStorageResource *QnStoragePluginFactory::createStorage(const QString &url, bool useDefaultForUnknownPrefix)
