@@ -593,7 +593,23 @@ void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
     if (!info.hasExtraInfo())
         info.setExtraInfo(ExtraServerInfo());
     
-    info.writableExtraInfo().interfaces = interfaces;
+    ExtraServerInfo &extra = info.writableExtraInfo();
+    for (const InterfaceInfo &itf: interfaces)
+    {
+        InterfaceInfoList &oldItf = extra.interfaces;
+        const auto &it = std::find_if(oldItf.begin(), oldItf.end()
+            , [itf](const InterfaceInfo &param)
+        {
+            return (param.name == itf.name);
+        });
+        
+        if (it == oldItf.end())
+        {
+            oldItf.push_back(itf);
+            continue;
+        }    
+        *it = itf;
+    }
 }
 
 void rtu::ServersSelectionModel::Impl::updateSystemNameInfo(const QUuid &id
@@ -633,9 +649,20 @@ void rtu::ServersSelectionModel::Impl::updatePasswordInfo(const QUuid &id
     if (!info.hasExtraInfo())
         info.setExtraInfo(ExtraServerInfo());
 
+    const QString oldPassword = info.extraInfo().password;
     info.writableExtraInfo().password = password;
-    m_changeHelper->dataChanged(searchInfo.systemRowIndex, searchInfo.systemRowIndex);
-    m_changeHelper->dataChanged(searchInfo.serverRowIndex, searchInfo.serverRowIndex);
+    
+    for (ServerModelInfo &otherInfo: searchInfo.systemInfoIterator->servers)
+    {
+        if ((info.baseInfo().systemName == otherInfo.serverInfo.baseInfo().systemName)
+            && (oldPassword == info.extraInfo().password))
+        {
+            otherInfo.serverInfo.writableExtraInfo().password = oldPassword;
+        }
+    }
+        
+    m_changeHelper->dataChanged(searchInfo.systemRowIndex
+        , searchInfo.systemRowIndex + searchInfo.systemInfoIterator->servers.size());
 }
 
 void rtu::ServersSelectionModel::Impl::addServer(const ServerInfo &info

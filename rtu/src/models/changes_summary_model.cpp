@@ -70,11 +70,12 @@ public:
         , const QString &errorReason);
     
 public:
+    int changesCount() const;
+    
     int rowCount() const;
 
     QVariant data(const QModelIndex &index
         , int role) const;
-    
     
 private:
     const bool m_successfulChangesModel;
@@ -82,6 +83,7 @@ private:
     rtu::ModelChangeHelper * const m_changeHelper;
     
     ServersRequests m_requests;
+    int m_changesCount;
 };
 
 rtu::ChangesSummaryModel::Impl::Impl(bool successfulChangesModel
@@ -93,8 +95,8 @@ rtu::ChangesSummaryModel::Impl::Impl(bool successfulChangesModel
     , m_changeHelper(changeHelper)
     
     , m_requests()
-{
-    
+    , m_changesCount(0)
+{   
 }
 
 rtu::ChangesSummaryModel::Impl::~Impl() 
@@ -122,6 +124,14 @@ void rtu::ChangesSummaryModel::Impl::addRequestResult(const ServerInfo &info
     }
     
     it->changesModel->addRequestResult(request, value, errorReason);
+    
+    ++m_changesCount;
+    emit m_owner->changesCount();
+}
+
+int rtu::ChangesSummaryModel::Impl::changesCount() const
+{
+    return m_changesCount;
 }
 
 int rtu::ChangesSummaryModel::Impl::rowCount() const
@@ -172,6 +182,11 @@ void rtu::ChangesSummaryModel::addRequestResult(const ServerInfo &info
     , const QString &errorReason)
 {
     m_impl->addRequestResult(info, request, value, errorReason);
+}
+
+int rtu::ChangesSummaryModel::changesCount() const
+{
+    return m_impl->changesCount();
 }
 
 int rtu::ChangesSummaryModel::rowCount(const QModelIndex &parent) const

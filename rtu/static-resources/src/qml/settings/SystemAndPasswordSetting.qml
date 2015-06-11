@@ -24,9 +24,9 @@ Expandable.MaskedSettingsPanel
                 onApplyButtonPressed:
                 {
                     if (systemName.changed)
-                        rtuContext.changesManager().addSystemChangeRequest(systemName.text);
+                        rtuContext.changesManager().addSystemChange(systemName.text);
                     if (password.changed)
-                        rtuContext.changesManager().addPasswordChangeRequest(password.text);
+                        rtuContext.changesManager().addPasswordChange(password.text);
                 }
             }
 

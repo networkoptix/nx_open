@@ -109,8 +109,8 @@ namespace
 
         const QStringList &keys = jsonObject.keys();
         
-        //if (!jsonObject.value("systemName").toString().contains("rtu_"))
-        //    return false;
+        if (!jsonObject.value("systemName").toString().contains("rtu_"))
+            return false;
         
         for (const auto &key: keys)
         {

@@ -13,22 +13,22 @@ namespace rtu
     class HttpClient : public QObject
     {
     public:
-        typedef std::function<void (const QByteArray &data)> OnSuccesfullReplyFunc;
+        typedef std::function<void (const QByteArray &data)> ReplyCallback;
         typedef std::function<void (const QString &errorReason
-            , int errorCode)> OnErrorReplyFunc;
+            , int errorCode)> ErrorCallback;
         
         HttpClient(QObject *parent);
         
         virtual ~HttpClient();
         
         void sendGet(const QUrl &url
-            , const OnSuccesfullReplyFunc &sucessfullCallback = OnSuccesfullReplyFunc()
-            , const OnErrorReplyFunc &errorCallback = OnErrorReplyFunc());
+            , const ReplyCallback &sucessfullCallback = ReplyCallback()
+            , const ErrorCallback &errorCallback = ErrorCallback());
         
         void sendPost(const QUrl &url
             , const QByteArray &data
-            , const OnSuccesfullReplyFunc &successfullCallback
-            , const OnErrorReplyFunc &errorCallback = OnErrorReplyFunc());
+            , const ReplyCallback &successfullCallback
+            , const ErrorCallback &errorCallback = ErrorCallback());
         
     private:
         class Impl;

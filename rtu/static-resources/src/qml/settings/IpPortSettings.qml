@@ -62,7 +62,7 @@ Expandable.MaskedSettingsPanel
                 onApplyButtonPressed:
                 {
                     if (portNumber.changed)
-                        rtuContext.changesManager().addPortChangeRequest(Number(portNumber.text));
+                        rtuContext.changesManager().addPortChange(Number(portNumber.text));
                     
                     ipList.applyButtonPressed();       
                 }

@@ -29,7 +29,7 @@ Base.Column
             var useDHCP = (item.useDHCPControl.checkedState !== Qt.Unchecked ? true : false);
             var ipAddress = (item.ipAddressControl.changed || !useDHCP ? item.ipAddressControl.text : "");
             var subnetMask = (item.subnetMaskControl.changed || !useDHCP ? item.subnetMaskControl.text : "");
-            rtuContext.changesManager().addIpChangeRequest(
+            rtuContext.changesManager().addIpChange(
                 item.adapterNameValue, useDHCP, ipAddress, subnetMask);
         }
     }

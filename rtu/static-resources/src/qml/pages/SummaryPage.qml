@@ -34,15 +34,14 @@ Item
             
             Rtu.ChangesSummary
             {
-                changesCount: rtuContext.changesManager().totalChangesCount
-                    - rtuContext.changesManager().errorsCount;
+                changesCount: model.changesCount;
                 captionTemplate: qsTr("%1 changes successfully applied");
                 model: rtuContext.changesManager().successfulResultsModel();
             }
             
             Rtu.ChangesSummary
             {
-                changesCount: rtuContext.changesManager().errorsCount;
+                changesCount: model.changesCount;
                 captionTemplate: qsTr("%1 errors");
                 model: rtuContext.changesManager().failedResultsModel();
             }
