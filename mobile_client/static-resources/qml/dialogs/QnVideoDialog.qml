@@ -40,18 +40,39 @@ Page {
         onTriggered: chunkProvider.update()
     }
 
-
     Video {
         id: video
 
         property int videoWidth: metaData.resolution ? metaData.resolution.width : 0
         property int videoHeight: metaData.resolution ? metaData.resolution.height : 0
+        property date startPosition: new Date()
+        property date positionDate: new Date()
+        property int __prevPosition: 0
 
         width: parent.width
         height: parent.height
 
         source: resourceHelper.mediaUrl
-        autoPlay: true
+        autoPlay: !playbackController.paused
+
+        onPlaybackStateChanged: {
+            if (playbackState == MediaPlayer.PlayingState) {
+                startPosition = timeline.positionDate
+                positionDate = timeline.positionDate
+            }
+        }
+
+        onPositionChanged: {
+            var diff = position - __prevPosition
+            __prevPosition = position
+            positionDate = new Date(startPosition.getTime() + diff)
+        }
+    }
+
+    Timer {
+        interval: 5000
+        running: !timeline.stickToEnd && (video.playbackState === MediaPlayer.PlayingState)
+        onTriggered: timeline.positionDate = video.positionDate
     }
 
     Item {
@@ -102,11 +123,19 @@ Page {
             chunkProvider: chunkProvider
             startBoundDate: chunkProvider.bottomBound
 
-            onDragFinished: {
+            autoPlay: !stickToEnd && video.playbackState == MediaPlayer.PlayingState
+
+            onMoveFinished: {
+                if (!stickToEnd) {
+                    var startDate = chunkProvider.closestChunkStartDate(positionDate, true)
+                    if (positionDate < startDate)
+                        positionDate = startDate
+                }
+
                 if (stickToEnd)
                     resourceHelper.setLive()
                 else
-                    resourceHelper.setDateTime(timeline.positionDate)
+                    resourceHelper.setDateTime(positionDate)
             }
         }
 
@@ -235,6 +264,13 @@ Page {
             markersBackground: Qt.darker(color, 100)
             highlightColor: "#2fffffff"
             speedEnabled: false
+
+            onPausedChanged: {
+                if (paused)
+                    video.pause()
+                else
+                    video.play()
+            }
         }
 
         Rectangle {

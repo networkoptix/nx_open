@@ -15,8 +15,10 @@ Item {
     property alias font: timeline.font
     property alias chunkProvider: timeline.chunkProvider
     property alias startBoundDate: timeline.startBoundDate
+    property alias autoPlay: timeline.autoPlay
 
     signal dragFinished()
+    signal moveFinished()
 
     function zoomIn() {
         timeline.zoomIn()
@@ -29,6 +31,8 @@ Item {
     QnTimelineView {
         id: timeline
         anchors.fill: parent
+
+        onMoveFinished: root.moveFinished()
     }
 
     PinchArea {

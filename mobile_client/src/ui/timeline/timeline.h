@@ -17,6 +17,7 @@ class QnTimeline : public QQuickItem {
     Q_PROPERTY(QDateTime positionDate READ positionDate WRITE setPositionDate NOTIFY positionDateChanged)
     Q_PROPERTY(bool stickToEnd READ stickToEnd WRITE setStickToEnd NOTIFY stickToEndChanged)
     Q_PROPERTY(QDateTime startBoundDate READ startBoundDate WRITE setStartBoundDate NOTIFY startBoundDateChanged)
+    Q_PROPERTY(bool autoPlay READ autoPlay WRITE setAutoPlay NOTIFY autoPlayChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
@@ -76,6 +77,9 @@ public:
     QDateTime startBoundDate() const;
     void setStartBoundDate(const QDateTime &startBoundDate);
 
+    bool autoPlay() const;
+    void setAutoPlay(bool autoPlay);
+
     Q_INVOKABLE void zoomIn(int x = -1);
     Q_INVOKABLE void zoomOut(int x = -1);
 
@@ -102,6 +106,7 @@ signals:
     void stickToEndChanged();
     void startBoundChanged();
     void startBoundDateChanged();
+    void autoPlayChanged();
 
     void textColorChanged();
     void chunkColorChanged();
@@ -110,6 +115,8 @@ signals:
     void chunkBarHeightChanged();
 
     void chunkProviderChanged();
+
+    void moveFinished();
 
 protected:
     void wheelEvent(QWheelEvent *event) override;

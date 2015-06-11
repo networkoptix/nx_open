@@ -10,6 +10,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/camera_resource.h"
+#include "core/resource/camera_history.h"
 #include "common/common_module.h"
 #include "utils/common/model_functions.h"
 
@@ -87,7 +88,8 @@ QUrl QnMediaResourceHelper::mediaUrl() const {
     if (!camera)
         return QUrl();
 
-    QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    QnTimePeriod period;
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, m_dateTime.toMSecsSinceEpoch(), &period);
     if (!server)
         return QUrl();
 
