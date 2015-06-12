@@ -4,6 +4,8 @@
 #include <map>
 
 #include <QtCore/QMap>
+#include <QElapsedTimer>
+#include <QCache>
 
 #include <core/resource/resource_fwd.h>
 
@@ -148,6 +150,9 @@ private:
 
     QMap<qint64, qint64> m_cookieNonceCache;
     mutable QMutex m_cookieNonceCacheMutex;
+
+    QCache<QByteArray, QElapsedTimer> m_digestNonceCache;
+    mutable QMutex m_nonceMtx;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()
