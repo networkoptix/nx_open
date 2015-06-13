@@ -111,6 +111,10 @@ namespace
         
         if (!jsonObject.value("systemName").toString().contains("rtu_"))
             return false;
+//        if (!jsonObject.value("systemName").toString().contains("rtu_roma"))
+//            return false;
+        if (jsonObject.value("name").toString() == "win7")
+            return false;
         
         for (const auto &key: keys)
         {

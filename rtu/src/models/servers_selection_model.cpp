@@ -234,6 +234,7 @@ public:
         , const QDateTime &timestamp);
     
     void updateInterfacesInfo(const QUuid &id
+        , const QString &host
         , const InterfaceInfoList &interfaces);
 
     void updateSystemNameInfo(const QUuid &id
@@ -539,29 +540,6 @@ void rtu::ServersSelectionModel::Impl::tryLoginWith(const QString &password)
         }
     }
 }
-/*
-void rtu::ServersSelectionModel::Impl::selectionPasswordChanged(const QString &password)
-{
-    for (SystemModelInfo &system: m_systems)
-    {
-        if (system.selectedServers)
-        {
-            for (ServerModelInfo &info: system.servers)
-            {
-                if (info.selectedState == Qt::Unchecked)
-                    continue;
-
-                if (info.serverInfo.hasExtraInfo())
-                {
-                    info.serverInfo.resetExtraInfo();
-                    --system.loggedServers;
-                }
-                m_loginManager->loginToServer(info.serverInfo.baseInfo(), password);
-            }
-        }
-    }
-}
-*/
 
 void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
     , const QDateTime &utcDateTime
@@ -583,6 +561,7 @@ void rtu::ServersSelectionModel::Impl::updateTimeDateInfo(const QUuid &id
 }
 
 void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
+    , const QString &host
     , const InterfaceInfoList &interfaces)
 {
     ItemSearchInfo searchInfo;
@@ -590,6 +569,7 @@ void rtu::ServersSelectionModel::Impl::updateInterfacesInfo(const QUuid &id
         return;
     
     ServerInfo &info = searchInfo.serverInfoIterator->serverInfo;
+    info.writableBaseInfo().hostAddress = host;
     if (!info.hasExtraInfo())
         info.setExtraInfo(ExtraServerInfo());
     
@@ -622,6 +602,7 @@ void rtu::ServersSelectionModel::Impl::updateSystemNameInfo(const QUuid &id
     BaseServerInfo base =
         searchInfo.serverInfoIterator->serverInfo.baseInfo();
     base.systemName = systemName;
+    base.flags &= ~Constants::IsFactoryFlag;
     changeServer(base);
 }
 
@@ -857,9 +838,10 @@ void rtu::ServersSelectionModel::updateTimeDateInfo(const QUuid &id
 }
 
 void rtu::ServersSelectionModel::updateInterfacesInfo(const QUuid &id
+    , const QString &host                                                      
     , const InterfaceInfoList &interfaces)
 {
-    m_impl->updateInterfacesInfo(id, interfaces);
+    m_impl->updateInterfacesInfo(id, host, interfaces);
 }
 
 void rtu::ServersSelectionModel::updateSystemNameInfo(const QUuid &id

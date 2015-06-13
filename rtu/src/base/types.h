@@ -18,6 +18,6 @@ namespace rtu
 
     ///
 
-    typedef QScopedPointer<QString> StringPointer;
-    typedef QScopedPointer<int> IntPointer;
+    typedef QSharedPointer<QString> StringPointer;
+    typedef QSharedPointer<int> IntPointer;
 }

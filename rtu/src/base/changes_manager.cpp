@@ -14,6 +14,8 @@
 #include <models/changes_summary_model.h>
 #include <models/servers_selection_model.h>
 
+#include <QThread>
+
 namespace
 {
     struct DateTime
@@ -69,7 +71,7 @@ namespace
 
 namespace
 {
-    const bool kNonBlockingRequest = true;
+    const bool kNonBlockingRequest = false;
     const bool kBlockingRequest = true;
 }
 
@@ -223,9 +225,10 @@ void rtu::ChangesManager::Impl::addIpChange(const QString &name
     , const QString &address
     , const QString &mask)
 {
-    getChangeset().itfUpdateInfo.push_back(ItfUpdateInfo(name, useDHCP
-        , StringPointer(new QString(address))
-        , StringPointer(new QString(mask))));
+    getChangeset().itfUpdateInfo.push_back(
+        ItfUpdateInfo(name, useDHCP
+        , address.isEmpty() ? StringPointer(nullptr) : StringPointer(new QString(address))
+        , mask.isEmpty() ? StringPointer(nullptr) : StringPointer(new QString(mask)) ));
 }
 
 void rtu::ChangesManager::Impl::turnOnDHCP()
@@ -315,7 +318,7 @@ rtu::InterfaceInfoList::const_iterator changeAppliedPos(const rtu::InterfaceInfo
         return it;
 
     const rtu::InterfaceInfo &info = *it;
-    const bool applied = ((change.useDHCP == info.useDHCP)
+    const bool applied = ((change.useDHCP == (info.useDHCP == Qt::Checked))
         && (!change.ip || (*change.ip == info.ip))
         && (!change.mask || (*change.mask == info.mask)));
     
@@ -333,9 +336,12 @@ bool changesApplied(const rtu::InterfaceInfoList &itf
     return true;
 }
 
-void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &info)
+void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &baseInfo)
 {
-    const auto &it = m_itfChanges.find(info.id);
+//    if (baseInfo.systemName.contains("rtu_nx123")
+//        qDebug() << baseInfo.hostAddress << ":" << baseInfo.port;
+    
+    const auto &it = m_itfChanges.find(baseInfo.id);
     if (it == m_itfChanges.end())
         return;
     
@@ -348,8 +354,9 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &info
     if ((current - request.timestamp) < kRequestsMinOffset)
         return;
     
+    qDebug() << baseInfo.name << ":" << baseInfo.hostAddress << ":" << baseInfo.port;
     const auto processCallback =
-         [this](bool successful, const QUuid &id, const ExtraServerInfo &extraInfo)
+         [this, baseInfo](bool successful, const QUuid &id, const ExtraServerInfo &extraInfo)
     {
         const auto &it = m_itfChanges.find(id);
         if (it == m_itfChanges.end())
@@ -361,8 +368,8 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &info
         
         const bool totalApplied = changesApplied(extraInfo.interfaces, request.itfUpdateInfo);
         
-        enum { kMaxTriesCount = 10 };
-        if ((successful && !totalApplied) || (++request.tries < kMaxTriesCount))
+        enum { kMaxTriesCount = 20 };
+        if (!(successful && totalApplied) && (++request.tries < kMaxTriesCount))
             return;
 
         InterfaceInfoList newInterfaces;
@@ -399,12 +406,14 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &info
             if (applied)
                 newInterfaces.push_back(*it);
         }
+        if (successful && totalApplied)
+        {
+            request.info->writableBaseInfo().hostAddress = baseInfo.hostAddress;
+            m_model->updateInterfacesInfo(info.baseInfo().id
+                , baseInfo.hostAddress, newInterfaces);
+        }
         
-        m_model->updateInterfacesInfo(info.baseInfo().id, newInterfaces);
         m_itfChanges.erase(it);
-        
-        qDebug() << "Discovered";
-        
         onChangeApplied();
     };
     
@@ -420,7 +429,7 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &info
     };
     
     request.inProgress = true;
-    interfacesListRequest(m_client, info
+    interfacesListRequest(m_client, baseInfo
         , request.info->extraInfo().password, successful, failed);
 }
 
@@ -482,8 +491,6 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
                 static const QString kDateTimeDescription = "date / time";
                 static const QString kTimeZoneDescription = "time zone";
                 
-                qDebug() << "time change callback";
-                
                 const QString &value= convertUtcToTimeZone(change.utcDateTime, change.timeZone).toString();
                 const bool dateTimeOk = addSummaryItem(*info, kDateTimeDescription
                     , value, errorReason, kDateTimeAffected, affected);
@@ -504,7 +511,6 @@ void rtu::ChangesManager::Impl::addDateTimeChangeRequests()
                 onChangeApplied();
             };
 
-            qDebug() << "Send time change request";
             sendSetTimeRequest(m_client, *info, change.utcDateTime, change.timeZone, callback);
         };
 
@@ -527,7 +533,6 @@ void rtu::ChangesManager::Impl::addSystemNameChangeRequests()
             {
                 static const QString &kSystemNameDescription = "system name";
 
-                qDebug() << "system name callback";
                 if(addSummaryItem(*info, kSystemNameDescription, systemName
                     , errorReason, kSystemNameAffected, affected))
                 {
@@ -537,7 +542,6 @@ void rtu::ChangesManager::Impl::addSystemNameChangeRequests()
                 onChangeApplied();
             };
 
-            qDebug() << "System name send";
             sendSetSystemNameRequest(m_client, *info, systemName, callback);
         };
 
@@ -560,17 +564,16 @@ void rtu::ChangesManager::Impl::addPortChangeRequests()
             {
                 static const QString kPortDescription = "port";
                 
-                qDebug() << "add port callback";
                 
                 if (addSummaryItem(*info, kPortDescription, QString::number(port)
                     , errorReason, kPortAffected, affected))
                 {
                     m_model->updatePortInfo(info->baseInfo().id, port);
+                    info->writableBaseInfo().port = port;
                 }
                 onChangeApplied();
             };
 
-            qDebug() << "add port send";
             sendSetPortRequest(m_client, *info, port, callback);
         };
 
@@ -593,7 +596,7 @@ void rtu::ChangesManager::Impl::addIpChangeRequests()
             sendChangeItfRequest(m_client, *info, changes, OperationCallback());
         };
         
-        m_requests.push_back(RequestData(kNonBlockingRequest, request));
+        m_requests.push_back(RequestData(kBlockingRequest, request));
     };
 
     enum { kSingleSelection = 1 };
@@ -633,16 +636,11 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
             {
                 static const QString kPasswordDescription = "password";
 
-                qDebug() << "Password final callback " << password;
                 if (addSummaryItem(*info, kPasswordDescription, password
                     , errorReason, kPasswordAffected, affected))
                 {
                     info->writableExtraInfo().password = password;
                     m_model->updatePasswordInfo(info->baseInfo().id, password);
-                }
-                else
-                {
-                    qDebug() << "************ " << errorReason << affected;
                 }
                 
                 onChangeApplied();
@@ -651,7 +649,6 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
             const auto &callback = 
                 [this, info, password, finalCallback](const QString &errorReason, AffectedEntities affected)
             {
-                qDebug() << "Password intermediate callback";
                 if (errorReason.isEmpty())
                 {
                     finalCallback(errorReason, affected);
@@ -662,7 +659,6 @@ void rtu::ChangesManager::Impl::addPasswordChangeRequests()
                 }
             };
 
-            qDebug() << "Send Password";
             sendSetPasswordRequest(m_client, *info, password, false, callback );
         };
 
@@ -677,8 +673,10 @@ bool rtu::ChangesManager::Impl::addSummaryItem(const rtu::ServerInfo &info
     , AffectedEntities checkFlags
     , AffectedEntities affected)
 {
-    qDebug() << "***" << description << " : " << value << " : " << error << " : " << checkFlags 
-        << affected;
+    static const Qt::HANDLE h = QThread::currentThreadId();
+    if (h != QThread::currentThreadId())
+        qDebug() << "***************************************************";
+                    
     const bool successResult = error.isEmpty() && !(affected & checkFlags);
     ChangesSummaryModel * const model = (successResult ?
         m_succesfulChangesModel : m_failedChangesModel);

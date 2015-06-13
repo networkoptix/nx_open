@@ -36,9 +36,8 @@ rtu::InterfaceInfo::InterfaceInfo(QString initName
 bool rtu::operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
-    /// Do not compare hostAddress - it could be changed and it is Ok
-    return ((first.flags == second.flags)
-        && (first.id == second.id)
+    /// Do not compare hostAddress and flags - it is Ok
+    return ((first.id == second.id)
         && (first.name == second.name)
         && (first.port == second.port)
         && (first.systemName == second.systemName));

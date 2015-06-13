@@ -114,6 +114,7 @@ Item
                 text: "Cancel";
 
                 enabled: applyButton.enabled;
+                onClicked: rtuContext.selectionChanged();
             }
         }
 

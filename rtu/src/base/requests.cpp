@@ -34,8 +34,6 @@ namespace
         , const QString &command)
 
     {
-        qDebug() << "---- " << command << ":" << password;
-        
         QUrl url;
         url.setScheme("http");
         url.setHost(host);
@@ -89,7 +87,6 @@ namespace
             const QJsonObject &object = doc.object();
             if (isErrorReply(object))
             {
-                qDebug() << data;
                 callback(getErrorDescription(object), affected);
             }
             else
@@ -106,7 +103,9 @@ namespace
     {
         const auto result = [callback, affected](const QString &reason, int)
         {
-            qDebug() << "\t\t\t" << reason;
+            if (!callback)
+                return;
+            
             callback(reason, affected);
         };
         
@@ -321,7 +320,6 @@ void rtu::getServerExtraInfo(HttpClient *client
     const auto failedCallback = 
         [client, baseInfo, failed, password, handleSuccessfullResult](const QString &r, int)
     {
-        qDebug() << r;
         const auto succesfulCallback = 
             [handleSuccessfullResult](const QByteArray &data)
         {
@@ -340,8 +338,6 @@ void rtu::getServerExtraInfo(HttpClient *client
         client->sendGet(url, succesfulCallback, failedCallback);
     };
     
-    qDebug() << url;
-    qDebug() << password;
     client->sendGet(url, successfulCallback, failedCallback);
 }
 
@@ -418,6 +414,12 @@ bool rtu::sendSetTimeRequest(HttpClient *client
     url.setQuery(query);
     
     const AffectedEntities affected = (kDateTimeAffected | kTimeZoneAffected);
+    
+    
+    qDebug() << "____";
+    qDebug() << url;
+    qDebug() << info.extraInfo().password;
+    
     client->sendGet(url, makeReplyCallback(callback, affected)
         , makeErrorCallback(callback, affected));
     return true;
@@ -443,7 +445,11 @@ bool rtu::sendSetSystemNameRequest(HttpClient *client
     QUrl url = makeUrl(info, kConfigureCommand);
     url.setQuery(query);
 
-    qDebug() << "___" << url << " : " << info.extraInfo().password;
+    
+    qDebug() << "____";
+    qDebug() << url;
+    qDebug() << info.extraInfo().password;
+    
     client->sendGet(url, makeReplyCallback(callback, kSystemNameAffected)
         , makeErrorCallback(callback, kSystemNameAffected));
     return true;
@@ -469,8 +475,14 @@ bool rtu::sendSetPasswordRequest(HttpClient *client
     QUrl url = makeUrl(info.baseInfo().hostAddress, info.baseInfo().port, authPass, kConfigureCommand);
     url.setQuery(query);
 
+    
+    qDebug() << "____";
+    qDebug() << url;
+    qDebug() << authPass;
+    
     client->sendGet(url, makeReplyCallback(callback, kPasswordAffected)
         , makeErrorCallback(callback, kPasswordAffected));
+    
     return true;    
 }
 
@@ -494,6 +506,11 @@ bool rtu::sendSetPortRequest(HttpClient *client
 
     client->sendGet(url, makeReplyCallback(callback, kPortAffected)
         , makeErrorCallback(callback, kPortAffected));
+    
+    qDebug() << "____";
+    qDebug() << url;
+    qDebug() << info.extraInfo().password;
+    
     return true;
 }
 
@@ -531,7 +548,6 @@ void rtu::interfacesListRequest(HttpClient *client
             failed(id);
     };
 
-    qDebug() << "++++++ QUrl: " << url;
     client->sendGet(url, successfullCallback, failedCallback);
 }
 
@@ -590,13 +606,13 @@ void rtu::sendChangeItfRequest(HttpClient *client
         jsonInfoChange.insert(kDHCPFlagTag, change.useDHCP);
         affected |= rtu::kDHCPUsageAffected;
         
-        if (!change.ip && !change.ip->isEmpty())
+        if (change.ip && !change.ip->isEmpty())
         {
             jsonInfoChange.insert(kIpTag, *change.ip);
             affected |= rtu::kIpAddressAffected;
         }
         
-        if (!change.mask && !change.mask->isEmpty())
+        if (change.mask && !change.mask->isEmpty())
         {
             jsonInfoChange.insert(kMaskTag, *change.mask);
             affected |= rtu::kMaskAffected;
@@ -606,6 +622,12 @@ void rtu::sendChangeItfRequest(HttpClient *client
     }
 
     QUrl url = makeUrl(info, kIfConfigCommand);
+   
+    qDebug() << "____";
+    qDebug() << url;
+    qDebug() << info.extraInfo().password;
+    qDebug() << QJsonDocument(jsonInfoChanges).toJson();
+   
     client->sendPost(url, QJsonDocument(jsonInfoChanges).toJson()
         , makeReplyCallback(callback, affected)
         , makeErrorCallback(callback, affected));

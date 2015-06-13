@@ -89,14 +89,17 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
     
     const int errorCode = reply->error();
     const int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if ((errorCode != QNetworkReply::NoError)
-        || (httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast))
+    const bool isRequestError = (errorCode != QNetworkReply::NoError);
+    const bool isHttpError = ((httpCode < kHttpSuccessCodeFirst) || (httpCode > kHttpSuccessCodeLast));
+    if (isRequestError || isHttpError)
     { 
         const ErrorCallback &errorCallback = it->second;
         if (errorCallback)
         {
-            const QString &errorReason = reply->attribute(
+            const QString httpError = reply->attribute(
                 QNetworkRequest::HttpReasonPhraseAttribute).toString();
+            const QString &errorReason = (!httpError.isEmpty()? httpError 
+                : QString("Netowrk error #%1").arg(errorCode));
             errorCallback(errorReason, httpCode);
         }
     }
