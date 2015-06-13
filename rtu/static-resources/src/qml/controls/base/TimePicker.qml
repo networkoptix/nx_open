@@ -13,6 +13,7 @@ QtControls.TextField
         text = impl.stringFromTime(newTime);
     }
 
+    property bool showNow: false;
     property bool changed: false;    
     property var changesHandler;
     
@@ -27,10 +28,12 @@ QtControls.TextField
     text: impl.stringFromTime(initTime);
     inputMask: impl.mask;
 
-    onEnabledChanged:
+    enabled: !showNow;
+    
+    onShowNowChanged:
     {
-        inputMask = (enabled ? impl.mask : "");
-        text = (enabled ? impl.stringFromTime(time) : qsTr("<now>"));
+        inputMask = (showNow ? impl.mask : "");
+        text = (showNow ? impl.stringFromTime(time) : qsTr("<now>"));
     }
 
     font.pointSize: Common.SizeManager.fontSizes.medium;
@@ -39,7 +42,6 @@ QtControls.TextField
     {
         renderType: Text.NativeRendering;
     }
-
     
     onChangedChanged: 
     {

@@ -81,7 +81,7 @@ namespace
                 for (const TextFlagsInfo &flagInfo: kKnownFlags)
                 {
                     if (textFlags.contains(flagInfo.first))
-                        info.flags &= flagInfo.second;
+                        info.flags |= flagInfo.second;
                 }
             });
         return result;
@@ -108,14 +108,14 @@ namespace
             return false;
 
         const QStringList &keys = jsonObject.keys();
-        
+        /*
         if (!jsonObject.value("systemName").toString().contains("rtu_"))
             return false;
 //        if (!jsonObject.value("systemName").toString().contains("rtu_roma"))
 //            return false;
         if (jsonObject.value("name").toString() == "win7")
             return false;
-        
+        */
         for (const auto &key: keys)
         {
             const auto itHandler = parser.find(key);

@@ -66,7 +66,7 @@ GenericSettingsPanel
 
                     spacing: Common.SizeManager.spacing.small;
 
-                    Button
+                    Base.Button
                     {
                         id: editAllButton;
 
@@ -74,18 +74,6 @@ GenericSettingsPanel
                         width: height * 3;
                         text: qsTr("Edit all");
 
-                        style: ButtonStyle
-                        {
-                            label: Text
-                            {
-                                renderType: Text.NativeRendering;
-                                verticalAlignment: Text.AlignVCenter;
-                                horizontalAlignment: Text.AlignHCenter;
-                                font.pointSize: Common.SizeManager.fontSizes.medium;
-                                text: control.text;
-                            }
-                        }
-                
                         onClicked: { thisComponent.warned = true; }
 
                     }

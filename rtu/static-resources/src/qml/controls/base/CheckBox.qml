@@ -14,6 +14,7 @@ CheckBox
     property int initialCheckedState: Qt.Checked;
     property int fontSize: Common.SizeManager.fontSizes.medium;
 
+    opacity: enabled ? 1.0 : 0.5;
     checkedState: initialCheckedState;
 
     style: CheckBoxStyle

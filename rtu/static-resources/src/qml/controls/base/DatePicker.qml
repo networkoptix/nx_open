@@ -13,6 +13,7 @@ QtControls.TextField
         text = impl.stringFromDate(newTime);
     }
 
+    property bool showNow: false;
     property bool changed: false;    
     property var changesHandler;
     
@@ -21,14 +22,18 @@ QtControls.TextField
     
     height: Common.SizeManager.clickableSizes.medium;
     width: height * 3;
+    
     opacity: enabled ? 1.0 : 0.5;
 
-    text: (enabled ? impl.stringFromDate(initDate) : "<now>");
+    text: impl.stringFromDate(initDate);
+    inputMask: impl.mask;
+    
+    enabled: !showNow;
 
-    onEnabledChanged:
+    onShowNowChanged:
     {
-        inputMask = (enabled ? impl.mask : "");
-        text = (enabled ? impl.stringFromDate(date) : qsTr("<now>"));
+        inputMask = (showNow ? impl.mask : "");
+        text = (showNow ? impl.stringFromDate(date) : qsTr("<now>"));
     }
 
     font.pointSize: Common.SizeManager.fontSizes.medium;
@@ -38,7 +43,6 @@ QtControls.TextField
         renderType: Text.NativeRendering;
     }
 
-    inputMask: impl.mask;
     
     onChangedChanged: 
     {

@@ -338,9 +338,6 @@ bool changesApplied(const rtu::InterfaceInfoList &itf
 
 void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &baseInfo)
 {
-//    if (baseInfo.systemName.contains("rtu_nx123")
-//        qDebug() << baseInfo.hostAddress << ":" << baseInfo.port;
-    
     const auto &it = m_itfChanges.find(baseInfo.id);
     if (it == m_itfChanges.end())
         return;
@@ -354,7 +351,6 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
     if ((current - request.timestamp) < kRequestsMinOffset)
         return;
     
-    qDebug() << baseInfo.name << ":" << baseInfo.hostAddress << ":" << baseInfo.port;
     const auto processCallback =
          [this, baseInfo](bool successful, const QUuid &id, const ExtraServerInfo &extraInfo)
     {
@@ -423,13 +419,14 @@ void rtu::ChangesManager::Impl::serverDiscovered(const rtu::BaseServerInfo &base
         processCallback(true, id, extraInfo);
     };
 
-    const auto &failed = [processCallback](const QUuid &id)
+    const auto &failed = 
+        [processCallback, baseInfo](const QString &, int)
     {
-        processCallback(false, id, ExtraServerInfo());
+        processCallback(false, baseInfo.id, ExtraServerInfo());
     };
     
     request.inProgress = true;
-    interfacesListRequest(m_client, baseInfo
+    sendIfListRequest(m_client, baseInfo
         , request.info->extraInfo().password, successful, failed);
 }
 

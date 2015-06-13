@@ -10,9 +10,12 @@ QtControls.Button
     id: thisComponent;
 
     implicitHeight: Common.SizeManager.clickableSizes.medium;
+    opacity: (enabled ? 1.0 : 0.5);
    
     property int fontSize: Common.SizeManager.fontSizes.medium;
 
+    activeFocusOnPress: true;
+    
     style: ButtonStyle
     {
         label: Base.Text

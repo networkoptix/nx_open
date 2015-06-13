@@ -22,23 +22,6 @@ void registerTypes()
 
     qmlRegisterUncreatableType<rtu::Constants>(kRtuDomainName
         , kMajorVersion, kMinorVersion, kServerFlagsQmlTypeName, kServerFlagsQmlTypeName);
-    
-/*
-    const char kIpSettingsModelTypeName[] = "IpSettingsModel";
-    qmlRegisterType<rtu::IpSettingsModel>(kRtuDomainName, 1, 0, kIpSettingsModelTypeName);
-    */
-    /*
-    const char kServersSelectionListModelTypeName[] = "ServersSelectionListModel";
-    qmlRegisterType<rtu::ServersSelectionModel>(kRtuDomainName, rtu::ServersSelectionModel::kVersionMajor
-        , rtu::ServersSelectionModel::kVersionMinor, kServersSelectionListModelTypeName);
-    */
-    /*
-    const char kRtuContextTypeName[] = "ServersSelectionListModel";
-    qmlRegisterType<rtu::ServersSelectionModel>(kRtuDomainName, rtu::ServersSelectionModel::kVersionMajor
-        , rtu::ServersSelectionModel::kVersionMinor, kServersSelectionListModelTypeName);
-        */
-    
-    
 }
 
 #include <helpers/time_helper.h>

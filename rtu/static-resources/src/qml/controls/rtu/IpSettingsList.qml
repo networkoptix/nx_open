@@ -49,7 +49,6 @@ Base.Column
         anchors
         {
             left: parent.left;            
-            leftMargin: Common.SizeManager.spacing.base;
         }
 
         Repeater
@@ -86,5 +85,6 @@ Base.Column
         
         visible: !repeater.model.isSingleSelection;
     }
+    onWidthChanged: console.log("**width: " + width);
 }
 

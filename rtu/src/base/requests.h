@@ -19,8 +19,6 @@ namespace rtu
     const QString &adminUserName();
     const QStringList &defaultAdminPasswords();
     
-    typedef std::function<void (const QUuid &serverId)> FailedCallback;
-    
     enum AffectedEntity
     {
         kNoEntitiesAffected = 0x0
@@ -41,6 +39,30 @@ namespace rtu
     
     Q_DECLARE_FLAGS(AffectedEntities, AffectedEntity)
     Q_DECLARE_OPERATORS_FOR_FLAGS(AffectedEntities)
+
+    ///
+
+    struct ItfUpdateInfo
+    {
+        QString name;
+
+        bool useDHCP;
+        StringPointer ip;
+        StringPointer mask;
+
+        ItfUpdateInfo();
+
+        ItfUpdateInfo(const ItfUpdateInfo &other);
+        
+        ItfUpdateInfo(const QString &initName
+            , bool initUseDHCP
+            , const StringPointer &initIp = StringPointer()
+            , const StringPointer &initMask = StringPointer());
+        
+        ItfUpdateInfo &operator =(const ItfUpdateInfo &other);
+    };
+
+    typedef QVector<ItfUpdateInfo> ItfUpdateInfoContainer;
     
     typedef std::function<void (const QString &errorReason
         , AffectedEntities affectedEntities)> OperationCallback; 
@@ -55,22 +77,17 @@ namespace rtu
     typedef std::function<void (const QUuid &id
         , const rtu::ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
     
-    void getServerExtraInfo(HttpClient *client
+    bool getServerExtraInfo(HttpClient *client
         , const BaseServerInfo &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
-        , const FailedCallback &failed);
-    
-    bool getTimeRequest(HttpClient *client
-        , const ServerInfo &info
-        , const DateTimeCallbackType &successfullCallback
-        , const FailedCallback &failedCallback);
-    
-    void interfacesListRequest(HttpClient *client
+        , const OperationCallback &failed);
+
+    bool sendIfListRequest(HttpClient *client
         , const BaseServerInfo &info
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
-        , const FailedCallback &failed);
+        , const OperationCallback &failed);
 
     ///
 
@@ -97,31 +114,6 @@ namespace rtu
         , const ServerInfo &info
         , int port
         , const OperationCallback &callback);
-
-    
-    ///
-
-    struct ItfUpdateInfo
-    {
-        QString name;
-
-        bool useDHCP;
-        StringPointer ip;
-        StringPointer mask;
-
-        ItfUpdateInfo();
-
-        ItfUpdateInfo(const ItfUpdateInfo &other);
-        
-        ItfUpdateInfo(const QString &initName
-            , bool initUseDHCP
-            , const StringPointer &initIp = StringPointer()
-            , const StringPointer &initMask = StringPointer());
-        
-        ItfUpdateInfo &operator =(const ItfUpdateInfo &other);
-    };
-
-    typedef QVector<ItfUpdateInfo> ItfUpdateInfoContainer;
 
     void sendChangeItfRequest(HttpClient *client
         , const ServerInfo &infos

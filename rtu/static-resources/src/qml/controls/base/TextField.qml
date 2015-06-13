@@ -8,7 +8,7 @@ TextField
 {
     id: thisComponent;
 
-    property bool changed: false;
+    property bool changed: (text !== initialText);
     
     property string initialText: "";
     property var changesHandler;
@@ -19,9 +19,22 @@ TextField
     text: initialText;
     font.pointSize: Common.SizeManager.fontSizes.medium;
     
+    Binding
+    {
+        target: thisComponent;
+        property: "text";
+        value: initialText;
+    }
+   
     style: TextFieldStyle
     {
         renderType: Text.NativeRendering;
+    }
+
+    onActiveFocusChanged: 
+    {
+        if (activeFocus)
+            selectAll();
     }
 
     onTextChanged: 
@@ -29,7 +42,6 @@ TextField
         if (changesHandler && (text !== initialText))
         {
             thisComponent.changesHandler.changed = true;
-            thisComponent.changed = true;
         }
     }
     

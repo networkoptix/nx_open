@@ -50,7 +50,7 @@ Grid
         height: 1;
     }
 
-    Base.TextField
+    Base.IpControl
     {
         id: ipControl
 
@@ -60,7 +60,7 @@ Grid
         opacity: ( enabled ? 1 : 0.5 );
     }
 
-    Base.TextField
+    Base.IpControl
     {
         id: subnetMask;
 

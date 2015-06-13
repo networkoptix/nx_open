@@ -55,7 +55,6 @@ Item
             {
                 id: systemAndPasswordSettings;
             }
-
 /*
             UpdatesSettings
             {
@@ -98,7 +97,6 @@ Item
                 text: "Apply changes";
 
                 enabled: systemAndPasswordSettings.changed || ipPortSettings.changed || dateTimeSettings.changed;
-                opacity: (enabled ? 1.0 : 0.5);
                 onClicked:
                 {
                     ipPortSettings.applyButtonPressed();

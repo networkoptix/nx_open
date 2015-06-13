@@ -65,7 +65,6 @@ Item
         onClicked:
         {
             rtuContext.currentPage = 0;
-            rtuContext.changesManager().clearChanges();
         }
     }
 }
