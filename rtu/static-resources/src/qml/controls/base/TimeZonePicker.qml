@@ -32,7 +32,7 @@ ComboBox
             lastSelectedIndex = currentIndex;
         }
 
-        if (!changed)
+        if ((currentIndex === initIndex) )
             return;
         
         var newTimeZone = textAt(currentIndex);
@@ -47,4 +47,5 @@ ComboBox
         lastSelectedIndex = currentIndex;
     }
     
+    onTimeZoneChanged: console.log(from + ":" + to);
 }
